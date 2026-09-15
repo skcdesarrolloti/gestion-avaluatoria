@@ -1,4 +1,9 @@
 Options -Indexes
+# Override the project-root deny only for the public web directory.
+Require all granted
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
 DirectoryIndex index.php
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f

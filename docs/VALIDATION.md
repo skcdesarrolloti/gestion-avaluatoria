@@ -40,3 +40,16 @@ en la aplicación distribuida. La limpieza local automática fue bloqueada por p
 El login compartido está implementado y probado contra el contrato de columnas de
 SuCasa, pero la conexión real, permisos del hosting y una cuenta real deben verificarse
 después de configurar `.env`. La base no incluye los módulos de negocio completos.
+
+## Corrección de acceso 403 en hosting
+
+Se reprodujo en Apache local el 403 de `/public/login` antes del cambio. La regla
+`Require all granted` en `public/.htaccess` permite el directorio web y conserva el
+bloqueo del directorio raíz. También se deniegan los archivos ocultos dentro de public.
+
+Después del cambio: login y assets devuelven 200 tanto bajo `/public/` como con raíz
+web directamente en public; `.env`, `.git/config`, `app/`, `storage/` y el `.htaccess`
+público siguen devolviendo 403. Se verificaron enlaces, formulario y cookie con prefijo
+`/public`. Pasaron nuevamente las pruebas PHP, JS, compilación y control de tamaño.
+La corrección requiere actualizar el despliegue del hosting y configurar APP_BASE_PATH
+según [HOSTING.md](HOSTING.md); no se modificó el servidor remoto desde esta sesión.

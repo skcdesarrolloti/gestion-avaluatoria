@@ -65,6 +65,7 @@ tests/               Pruebas aisladas
 
 ## Publicar y actualizar
 
+- Si aparece **403 Forbidden** al entrar a `/public/`, consultar [acceso en hosting](docs/HOSTING.md).
 - Configura el document root del dominio en `gestion-avaluatoria/public`.
   No publiques el directorio raíz ni sirvas `.env` como archivo.
 - En Apache permite `.htaccess` y `mod_rewrite`; el `.htaccess` raíz deniega acceso
