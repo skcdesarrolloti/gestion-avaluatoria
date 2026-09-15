@@ -19,33 +19,27 @@ Algunos despliegues Git limpian la carpeta y eliminan archivos no versionados. S
 borra `.env`, crea un archivo persistente llamado `.gestion-avaluatoria.env` en la
 carpeta padre del proyecto y coloca allí las mismas variables. El bootstrap lo lee
 después de `.env`, queda fuera del repositorio y no se elimina al actualizar el checkout.
-Si también se borran los PDFs importados de normas, define `NTS_STORAGE_DIR` en una
-carpeta privada persistente fuera del checkout y vuelve a importarlos desde la pantalla
-de Normas Técnicas Sectoriales o con `php bin/console.php standards:import`.
+Los PDFs importados se guardan dentro de `storage/`. Si se borran al desplegar, revisa
+que el proceso de actualización no limpie archivos privados existentes de esa carpeta
+y vuelve a importarlos desde la pantalla de Normas Técnicas Sectoriales o con
+`php bin/console.php standards:import`.
 La pantalla de Normas Técnicas muestra un diagnóstico con la ruta real, escritura,
-archivos físicos y registros marcados en base sin archivo. Si aparece "Storage interno",
-el hosting puede borrar los PDFs al actualizar el repositorio.
+archivos físicos y registros marcados en base sin archivo. El modo normal esperado es
+`storage/ del proyecto`.
 
-Ejemplo de ruta persistente:
+Rutas internas esperadas:
 
 ```dotenv
-NTS_STORAGE_DIR=/home/usuario/gestion-avaluatoria-storage/normas-tecnicas-sectoriales
+NTS_STORAGE_DIR=storage/normas-tecnicas-sectoriales
+LEGAL_STORAGE_DIR=storage/marco-juridico-nacional
 ```
 
 Si se cargan las 22 normas en un solo intento, revisar `upload_max_filesize`,
 `post_max_size` y `max_file_uploads`; algunos hostings aceptan solo 20 archivos por
 petición o no permiten PDFs grandes sin subir el límite.
-Para la biblioteca jurídica nacional aplica el mismo patrón con otra carpeta privada:
-
-```dotenv
-LEGAL_STORAGE_DIR=/home/usuario/gestion-avaluatoria-storage/marco-juridico-nacional
-```
-
-Si `LEGAL_STORAGE_DIR` queda vacío, la app usa `storage/marco-juridico-nacional/` y
-puede crear esa carpeta automáticamente cuando PHP tenga permisos de escritura. Esa
-carpeta base queda anclada en Git con `.gitkeep`, pero los PDFs se ignoran y algunos
-despliegues limpios pueden borrar archivos privados no versionados. Por eso, para
-producción, usar `LEGAL_STORAGE_DIR` fuera del checkout sigue siendo la opción segura.
+Si esas variables quedan vacías, la app usa las mismas rutas internas por defecto y
+puede crear las carpetas automáticamente cuando PHP tenga permisos de escritura. Las
+carpetas base quedan ancladas en Git con `.gitkeep`, pero los PDFs se ignoran.
 
 La pantalla del Marco Jurídico acepta varios PDFs o un `.zip` con PDFs. El ZIP ayuda
 a evitar seleccionar documentos uno por uno, pero sigue limitado por `post_max_size`.

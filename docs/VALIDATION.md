@@ -69,5 +69,5 @@ Verificación local ejecutada el 15 de septiembre de 2026:
 - `npm run check:size`: CSS + JS 27,1 KB gzip.
 
 `php tests/database.php` no se ejecutó en esta pasada porque `GA_TEST_PORT` no estaba
-definido. En producción falta confirmar `LEGAL_STORAGE_DIR` y `NTS_STORAGE_DIR` en
-carpetas persistentes fuera del checkout del despliegue.
+definido. En producción falta confirmar escritura en `storage/normas-tecnicas-sectoriales`
+y `storage/marco-juridico-nacional`.

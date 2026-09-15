@@ -95,6 +95,5 @@ estructura oficial de inscripción.
 El menú jurídico nacional queda listo para sembrar leyes, decretos, resoluciones,
 actos y artículos aplicables por categoría. El menú de Normas Internacionales de
 Valuación registra la estructura IVS por familia y su relación con categorías RAA.
-Los PDFs fuente del marco jurídico se importan desde la pantalla del módulo y deben
-usar `LEGAL_STORAGE_DIR` en producción para sobrevivir a despliegues que limpien
-archivos no versionados.
+Los PDFs fuente del marco jurídico se importan desde la pantalla del módulo y se guardan
+en `storage/marco-juridico-nacional/`; Git conserva la carpeta base pero ignora los PDFs.

@@ -63,15 +63,16 @@ Los PDFs se copian a `storage/normas-tecnicas-sectoriales/`, carpeta excluida de
 También se puede definir `NTS_SOURCE_DIR` y ejecutar `php bin/console.php standards:import`.
 En producción autenticada, la pantalla de Normas Técnicas Sectoriales permite seleccionar
 varios PDFs a la vez e importarlos por nombre contra el catálogo existente.
-Si el despliegue del hosting limpia `storage/`, configura `NTS_STORAGE_DIR` apuntando
-a una carpeta privada persistente fuera del checkout y vuelve a importar los PDFs.
+La ruta predeterminada es `storage/normas-tecnicas-sectoriales/`. También se puede
+definir `NTS_STORAGE_DIR=storage/normas-tecnicas-sectoriales` explícitamente.
 La misma pantalla muestra un diagnóstico de guardado: ruta real, permiso de escritura,
 archivos físicos encontrados, registros marcados en BD sin archivo y límites PHP
 (`upload_max_filesize`, `post_max_size`, `max_file_uploads`). Si `max_file_uploads`
 es menor que el total, importa los PDFs por lotes o aumenta ese límite en el hosting.
-El Marco Jurídico Nacional usa el mismo criterio para documentos fuente: configura
-`LEGAL_STORAGE_DIR` antes de cargar bibliotecas grandes y luego sube PDFs o un ZIP
-con PDFs desde su pantalla. Cada archivo queda como documento fuente preliminar por categoría; los
+El Marco Jurídico Nacional usa el mismo criterio para documentos fuente:
+`storage/marco-juridico-nacional/` es la ruta predeterminada y se puede fijar con
+`LEGAL_STORAGE_DIR=storage/marco-juridico-nacional`. Luego sube PDFs o un ZIP desde su
+pantalla. Cada archivo queda como documento fuente preliminar por categoría; los
 artículos o fragmentos aplicables se incorporan después.
 
 ```text
@@ -107,9 +108,9 @@ tests/               Pruebas aisladas
   secretos de desarrollo y bases temporales. Configura `.env` en el servidor.
   Si el despliegue Git borra `.env`, crea `.gestion-avaluatoria.env` en la carpeta
   padre del proyecto; la app lo lee después de `.env` y no se versiona.
-- Si el despliegue Git borra archivos privados de `storage/`, define `NTS_STORAGE_DIR`
-  en una carpeta persistente no pública, por ejemplo una carpeta hermana del proyecto.
-  Para el Marco Jurídico Nacional define también `LEGAL_STORAGE_DIR` fuera del checkout.
+- Las carpetas privadas de PDFs quedan dentro de `storage/` y Git solo conserva su
+  `.gitkeep`: no versiona los PDFs. No uses un despliegue que elimine archivos
+  privados existentes dentro de `storage/`.
 - Ejecuta `php bin/console.php migrate` durante el despliegue; con `AUTO_MIGRATE=true`
   el primer acceso autenticado también aplica pendientes. Migraciones costosas deben
   ejecutarse antes de abrir tráfico. La base inicial no borra tablas ni datos.

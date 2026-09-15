@@ -73,7 +73,7 @@ $maxFiles = max(0, (int) ($limits['max_file_uploads'] ?? 0));
                 </span>
             </div>
             <dl class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-                <div><dt class="text-xs font-semibold uppercase text-slate-500">Modo</dt><dd><?= $storageReport['configured'] ? 'NTS_STORAGE_DIR' : 'Storage interno' ?></dd></div>
+                <div><dt class="text-xs font-semibold uppercase text-slate-500">Modo</dt><dd><?= $storageReport['configured'] ? 'NTS_STORAGE_DIR' : 'storage/ del proyecto' ?></dd></div>
                 <div><dt class="text-xs font-semibold uppercase text-slate-500">Archivos físicos</dt><dd><?= e($storageReport['present']) ?> / <?= e($storageReport['total']) ?></dd></div>
                 <div><dt class="text-xs font-semibold uppercase text-slate-500">BD sin archivo</dt><dd><?= e($storageReport['marked_missing']) ?></dd></div>
                 <div><dt class="text-xs font-semibold uppercase text-slate-500">Límite por lote</dt><dd><?= e($maxFiles ?: ($limits['max_file_uploads'] ?? '')) ?> archivo(s)</dd></div>
@@ -84,7 +84,7 @@ $maxFiles = max(0, (int) ($limits['max_file_uploads'] ?? 0));
                 max_execution_time <?= e($limits['max_execution_time'] ?? '') ?>s.
             </p>
             <?php if (!$storageReport['configured']): ?>
-                <p class="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">Estás usando storage interno del proyecto. En Hostinger configura NTS_STORAGE_DIR en una carpeta privada persistente fuera del checkout para que el despliegue no borre los PDFs.</p>
+                <p class="mt-3 rounded-lg bg-blue-50 p-3 text-sm text-blue-800">Usando la ruta interna storage/normas-tecnicas-sectoriales. La app crea la carpeta si PHP tiene permisos y Git conserva la carpeta base sin versionar los PDFs.</p>
             <?php endif; ?>
             <?php if ($maxFiles > 0 && $maxFiles < (int) $storageReport['total']): ?>
                 <p class="mt-3 rounded-lg bg-amber-50 p-3 text-sm text-amber-800">El hosting acepta <?= e($maxFiles) ?> archivos por carga y el catálogo tiene <?= e($storageReport['total']) ?>. Importa en varios lotes o aumenta max_file_uploads.</p>
