@@ -11,6 +11,13 @@ function url(string $route = ''): string
     return App\Core\Http::basePath() . '/' . ltrim($route, '/');
 }
 
+function asset_url(string $path): string
+{
+    $file = BASE_PATH . '/public/' . ltrim($path, '/');
+    $version = is_file($file) ? '?v=' . filemtime($file) : '';
+    return url($path) . $version;
+}
+
 function view(string $template, array $data = []): void
 {
     extract($data, EXTR_SKIP);

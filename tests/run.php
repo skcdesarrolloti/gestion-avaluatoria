@@ -42,6 +42,7 @@ try {
     $_SERVER['SCRIPT_NAME'] = '/public/index.php';
     putenv('APP_BASE_PATH');
     expect(Http::basePath() === '/public' && url('assets/app.css') === '/public/assets/app.css', 'base path public detectado');
+    expect(str_starts_with(asset_url('assets/app.css'), '/public/assets/app.css?v='), 'assets versionados por archivo');
     putenv('APP_BASE_PATH=/avaluatoria');
     expect(Http::basePath() === '/avaluatoria', 'base path configurado prevalece');
     putenv('APP_BASE_PATH');

@@ -41,21 +41,21 @@ $stats = $stats ?? ['total' => 0, 'categories' => 0];
             <h2 class="text-xl font-semibold text-slate-950"><?= e($typologies[0]['category_name'] ?? 'Tipologías') ?></h2>
             <span class="text-sm text-slate-500"><?= count($typologies) ?> registro(s)</span>
         </div>
-        <div class="mt-4 grid gap-4 lg:grid-cols-2">
+        <div class="mt-4 grid min-w-0 gap-4 lg:grid-cols-2">
             <?php foreach ($typologies as $typology): ?>
                 <?php
                 $term = mb_strtolower(implode(' ', [$typology['denomination'], $typology['description'],
                     $typology['specifications'], $typology['category_name'], $typology['useful_life'], $typology['unit']]));
                 $imageUrl = url('assets/tipologias-igac/images/' . rawurlencode((string) $typology['image_filename']));
                 ?>
-                <article class="grid max-w-full gap-4 overflow-hidden rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[minmax(140px,180px)_minmax(0,1fr)]"
+                <article class="grid min-w-0 max-w-full gap-4 overflow-hidden rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[minmax(140px,180px)_minmax(0,1fr)]"
                     x-show='query === "" || <?= e(json_encode($term, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>.includes(query.toLowerCase())'>
-                    <a class="block self-start overflow-hidden rounded-md border border-slate-200 bg-slate-100" href="<?= e($imageUrl) ?>" target="_blank" rel="noopener" data-no-fetch>
-                        <img class="aspect-[4/3] w-full object-cover" src="<?= e($imageUrl) ?>" alt="<?= e($typology['denomination']) ?>" loading="lazy">
+                    <a class="block aspect-[4/3] w-full self-start overflow-hidden rounded-md border border-slate-200 bg-white" href="<?= e($imageUrl) ?>" target="_blank" rel="noopener" data-no-fetch>
+                        <img class="h-full w-full object-contain" src="<?= e($imageUrl) ?>" alt="<?= e($typology['denomination']) ?>" loading="lazy">
                     </a>
                     <div class="min-w-0">
-                        <div class="flex flex-wrap items-start justify-between gap-2">
-                            <h3 class="text-anywhere max-w-full text-base font-semibold text-slate-950"><?= e($typology['denomination']) ?></h3>
+                        <div class="flex min-w-0 flex-wrap items-start justify-between gap-2">
+                            <h3 class="text-anywhere min-w-0 flex-1 text-base font-semibold text-slate-950"><?= e($typology['denomination']) ?></h3>
                             <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600"><?= e($typology['category_name']) ?></span>
                         </div>
                         <p class="text-anywhere mt-3 text-sm leading-6 text-slate-600"><?= e($typology['description']) ?></p>

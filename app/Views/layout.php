@@ -5,8 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="csrf-token" content="<?= e($_SESSION['csrf'] ?? '') ?>">
     <title><?= e($title ?? 'Gestión avaluatoria') ?> · SuCasa</title>
-    <link rel="stylesheet" href="<?= e(url('assets/app.css')) ?>">
-    <script type="module" src="<?= e(url('assets/app.js')) ?>"></script>
+    <link rel="stylesheet" href="<?= e(asset_url('assets/app.css')) ?>">
+    <script type="module" src="<?= e(asset_url('assets/app.js')) ?>"></script>
 </head>
 <?php
 $logged = isset($_SESSION['user']);
