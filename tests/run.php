@@ -8,6 +8,7 @@ use App\Core\Http;
 use App\Services\AppraisalValidator;
 use App\Services\AuthDiagnostics;
 use App\Services\AuthService;
+use App\Services\LegalDocumentFileImportService;
 use App\Services\LegalDocumentImportService;
 use App\Services\RateLimiter;
 use App\Models\FuncionarioRepository;
@@ -115,22 +116,23 @@ try {
     putenv('LEGAL_STORAGE_DIR=' . $legalDir);
     $tmpLegalPdf = tempnam(sys_get_temp_dir(), 'ga_legal_pdf_');
     file_put_contents($tmpLegalPdf, "%PDF-1.4\n%legal\n");
-    $legalImport = (new LegalDocumentImportService($legal))->importUploaded([
-        'name' => ['Ley 1673 de 2013.pdf'],
-        'tmp_name' => [$tmpLegalPdf],
-        'error' => [UPLOAD_ERR_OK],
-    ], 'A', 'vigente');
+    $legalImport = (new LegalDocumentImportService($legal))->importUploaded(['name' => ['Ley 1673 de 2013.pdf'],
+        'tmp_name' => [$tmpLegalPdf], 'error' => [UPLOAD_ERR_OK]], 'A', 'vigente');
     expect(count($legalImport['copied']) === 1, 'importacion PDF juridico');
     $tmpB1Pdf = tempnam(sys_get_temp_dir(), 'ga_b1_pdf_');
     file_put_contents($tmpB1Pdf, "%PDF-1.4\n%b1\n");
-    (new LegalDocumentImportService($legal))->importUploaded([
-        'name' => ['Ley 388 de 1997.pdf'],
-        'tmp_name' => [$tmpB1Pdf],
-        'error' => [UPLOAD_ERR_OK],
-    ], '1', 'vigente');
+    (new LegalDocumentImportService($legal))->importUploaded(['name' => ['Ley 388 de 1997.pdf'],
+        'tmp_name' => [$tmpB1Pdf], 'error' => [UPLOAD_ERR_OK]], '1', 'vigente');
     $urbanDocument = $legal->find('b1-01-ley-388-1997');
     expect($urbanDocument['has_file'] && $urbanDocument['source_filename'] === 'Ley 388 de 1997.pdf',
         'importacion juridica enlaza PDF con documento B1');
+    $tmpCardPdf = tempnam(sys_get_temp_dir(), 'ga_b1_card_pdf_');
+    file_put_contents($tmpCardPdf, "%PDF-1.4\n%b1-card\n");
+    (new LegalDocumentFileImportService($legal))->importFor(['name' => ['archivo consultado.pdf'],
+        'tmp_name' => [$tmpCardPdf], 'error' => [UPLOAD_ERR_OK]], $legal->find('b1-02-decreto-1170-2015-capitulo-3'));
+    $cardDocument = $legal->find('b1-02-decreto-1170-2015-capitulo-3');
+    expect($cardDocument['has_file'] && $cardDocument['source_filename'] === 'archivo consultado.pdf',
+        'importacion juridica por tarjeta no depende del nombre');
     if (class_exists(ZipArchive::class)) {
         $zipPath = tempnam(sys_get_temp_dir(), 'ga_legal_zip_');
         $zip = new ZipArchive();

@@ -20,44 +20,16 @@ $maxFiles = max(0, (int) ($limits['max_file_uploads'] ?? 0));
         </label>
     </div>
     <section class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <div class="grid gap-5 lg:grid-cols-[1fr_380px]">
-            <div>
-                <h2 class="text-lg font-semibold text-slate-950">Repositorio jurídico</h2>
-                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Cada ley o decreto se registra como documento fuente, pero por categoría solo se cargan artículos o fragmentos relevantes con su nota de aplicación.</p>
-                <div class="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
-                    <span class="rounded-full bg-slate-100 px-3 py-1 text-slate-600"><?= e($legalStats['total']) ?> documento(s)</span>
-                    <span class="rounded-full bg-indigo-50 px-3 py-1 text-indigo-700"><?= e($legalStats['articles']) ?> artículo(s)</span>
-                    <span class="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700"><?= e($legalStats['vigente']) ?> vigente(s)</span>
-                    <span class="rounded-full bg-amber-50 px-3 py-1 text-amber-700"><?= e($legalStats['derogada']) ?> derogada(s)</span>
-                    <span class="rounded-full bg-blue-50 px-3 py-1 text-blue-700"><?= e($legalStats['historica']) ?> histórica(s)</span>
-                </div>
+        <div>
+            <h2 class="text-lg font-semibold text-slate-950">Repositorio jurídico</h2>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Cada ley o decreto se registra como documento fuente. El PDF se carga desde su propia tarjeta para conservar la relación exacta con la categoría y el código.</p>
+            <div class="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
+                <span class="rounded-full bg-slate-100 px-3 py-1 text-slate-600"><?= e($legalStats['total']) ?> documento(s)</span>
+                <span class="rounded-full bg-indigo-50 px-3 py-1 text-indigo-700"><?= e($legalStats['articles']) ?> artículo(s)</span>
+                <span class="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700"><?= e($legalStats['vigente']) ?> vigente(s)</span>
+                <span class="rounded-full bg-amber-50 px-3 py-1 text-amber-700"><?= e($legalStats['derogada']) ?> derogada(s)</span>
+                <span class="rounded-full bg-blue-50 px-3 py-1 text-blue-700"><?= e($legalStats['historica']) ?> histórica(s)</span>
             </div>
-            <form class="grid gap-3" method="post" action="<?= e(url('marco-juridico-valuatorio/importar')) ?>" enctype="multipart/form-data" x-data="{ busy: false }" @submit="busy = true">
-                <?= csrf_field() ?>
-                <label class="block text-sm font-medium text-slate-700">
-                    Categoría jurídica
-                    <select class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-3" name="categoria" required>
-                        <?php foreach ($categories as $category): ?>
-                            <option value="<?= e($category['code']) ?>" <?= $category['code'] === $activeCategoryCode ? 'selected' : '' ?>><?= e($category['code'] . ' · ' . $category['name']) ?></option>
-                        <?php endforeach; ?>
-                    </select>
-                </label>
-                <label class="block text-sm font-medium text-slate-700">
-                    Estado
-                    <select class="mt-2 w-full rounded-lg border border-slate-300 bg-white px-3 py-3" name="estado" required>
-                        <option value="vigente">Vigente</option>
-                        <option value="derogada">Derogada</option>
-                        <option value="historica">Histórica</option>
-                    </select>
-                </label>
-                <label class="block text-sm font-medium text-slate-700">
-                    PDFs jurídicos o ZIP
-                    <input class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700"
-                        type="file" name="legal_files[]" accept="application/pdf,.pdf,application/zip,.zip" multiple required>
-                    <span class="mt-1 block text-xs text-slate-500">Puedes subir varios PDFs o un ZIP con PDFs; los artículos relevantes se clasifican después.</span>
-                </label>
-                <button class="btn-primary" type="submit" :disabled="busy" x-text="busy ? 'Importando…' : 'Importar documentos'">Importar documentos</button>
-            </form>
         </div>
         <?php if (!empty($importNotice)): ?>
             <?php $ok = (bool) ($importNotice['ok'] ?? false); ?>
@@ -148,6 +120,20 @@ $maxFiles = max(0, (int) ($limits['max_file_uploads'] ?? 0));
                                     <a class="btn-secondary" target="_blank" rel="noopener" href="<?= e(url('marco-juridico-valuatorio/' . $document['slug'] . '/archivo')) ?>">Abrir PDF</a>
                                 <?php endif; ?>
                             </div>
+                            <form class="mt-4 grid gap-2 border-t border-slate-100 pt-4" method="post"
+                                action="<?= e(url('marco-juridico-valuatorio/' . $document['slug'] . '/importar')) ?>"
+                                enctype="multipart/form-data" x-data="{ busy: false }" @submit="busy = true">
+                                <?= csrf_field() ?>
+                                <label class="block text-xs font-semibold uppercase text-slate-500">
+                                    PDF de <?= e($document['document_code']) ?>
+                                    <input class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700"
+                                        type="file" name="legal_file[]" accept="application/pdf,.pdf" required>
+                                </label>
+                                <button class="btn-primary w-full" type="submit" :disabled="busy"
+                                    x-text="busy ? 'Importando…' : '<?= $document['has_file'] ? 'Reemplazar PDF' : 'Importar PDF' ?>'">
+                                    <?= $document['has_file'] ? 'Reemplazar PDF' : 'Importar PDF' ?>
+                                </button>
+                            </form>
                         </article>
                     <?php endforeach; ?>
                 </div>

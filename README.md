@@ -71,8 +71,8 @@ archivos físicos encontrados, registros marcados en BD sin archivo y límites P
 es menor que el total, importa los PDFs por lotes o aumenta ese límite en el hosting.
 El Marco Jurídico Nacional usa el mismo criterio para documentos fuente:
 `storage/marco-juridico-nacional/` es la ruta predeterminada y se puede fijar con
-`LEGAL_STORAGE_DIR=storage/marco-juridico-nacional`. Luego sube PDFs o un ZIP desde su
-pantalla. Cada archivo queda como documento fuente preliminar por categoría; los
+`LEGAL_STORAGE_DIR=storage/marco-juridico-nacional`. Cada PDF se sube desde la tarjeta
+del documento jurídico correspondiente para evitar duplicados por nombre; los
 artículos o fragmentos aplicables se incorporan después.
 
 ```text

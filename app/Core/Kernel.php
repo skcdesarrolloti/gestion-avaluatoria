@@ -44,7 +44,8 @@ final class Kernel
                 continue;
             }
             if ($method === 'POST') {
-                if ($action === 'import' && in_array($controller, ['standards', 'legal'], true)
+                if (in_array($action, ['import', 'importFile'], true)
+                    && in_array($controller, ['standards', 'legal'], true)
                     && $this->uploadLikelyExceededPostLimit()) {
                     $flash = $controller === 'legal' ? 'legal_import' : 'standards_import';
                     $route = $controller === 'legal' ? 'marco-juridico-valuatorio' : 'normas-tecnicas-sectoriales';

@@ -5,6 +5,7 @@ use App\Core\Http;
 use App\Core\HttpException;
 use App\Core\Session;
 use App\Models\LegalDocumentRepository;
+use App\Services\LegalDocumentFileImportService;
 use App\Services\LegalDocumentImportService;
 
 final class LegalFrameworkController
@@ -40,6 +41,19 @@ final class LegalFrameworkController
         }
         Session::flash('legal_import', json_encode($result, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
         Http::redirect('marco-juridico-valuatorio' . ($category ? '?categoria=' . rawurlencode($category) : ''));
+    }
+
+    public function importFile(string $slug): void
+    {
+        $document = $this->documents->find($slug);
+        try {
+            $result = (new LegalDocumentFileImportService($this->documents))
+                ->importFor($_FILES['legal_file'] ?? [], $document);
+        } catch (\Throwable $error) {
+            $result = ['ok' => false, 'message' => $error->getMessage()];
+        }
+        Session::flash('legal_import', json_encode($result, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
+        Http::redirect('marco-juridico-valuatorio?categoria=' . rawurlencode((string) $document['category_code']));
     }
 
     public function file(string $slug): void
