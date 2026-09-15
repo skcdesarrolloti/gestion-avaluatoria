@@ -42,11 +42,15 @@ No debes crear tablas ni pegar sentencias SQL. El programa hace esa parte.
 | --- | --- |
 | `schema_migrations` | Versión, checksum y fecha de cada migración aplicada |
 | `appraisals` | Ficha borrador, propietario, título, tipo, dirección, municipio, observaciones, versión y fechas |
+| `valuation_standard_categories` | Grupos A, B y categorías valuatorias 1 a 13 |
+| `valuation_standards` | Catálogo de normas técnicas y metadatos del PDF privado |
 
 `owner_id` guarda `_ID` del funcionario. No hay FK entre servidores/bases ni copia de
 contraseñas. `id` es aleatorio (32 caracteres hexadecimales), pero siempre se comprueba
 propiedad. Fechas en UTC; presentación en America/Bogota. Índice por propietario y fecha.
 Las tablas de cálculos, documentos y flujos se agregarán según la implementación del jefe.
+Los PDFs de normas no se guardan en Git; se importan a `storage/` con
+`php bin/console.php standards:import <carpeta>`.
 
 ## 4. Nueva tabla o columna
 

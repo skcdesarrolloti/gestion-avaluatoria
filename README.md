@@ -9,6 +9,7 @@ completos de InversKC. El proyecto original permanece intacto.
 - Login con funcionarios de SuCasa, sesiones, CSRF y límite de intentos.
 - Mis fichas, creación de borradores y formulario inicial con guardado en BD.
 - Autoguardado, validación, propiedad por usuario y conflictos entre pestañas.
+- Biblioteca inicial de Normas Técnicas Sectoriales, categorizada por A, B y 1 a 13.
 - Instalador y migraciones automáticas de tablas y columnas.
 - Assets locales compilados y estructura pequeña, sin dependencias PHP externas.
 
@@ -47,6 +48,15 @@ npm run check:size
 
 En PowerShell usa `npm.cmd` si la política local bloquea `npm.ps1`.
 Composer es opcional para este esqueleto; el autoload mínimo ya está en `bootstrap.php`.
+
+Para importar los PDFs privados de normas técnicas después de migrar la base:
+
+```powershell
+php bin/console.php standards:import "C:\Users\skcge\OneDrive\Escritorio\Nueva Ley Valuatoria\Normas Sectoriales"
+```
+
+Los PDFs se copian a `storage/normas-tecnicas-sectoriales/`, carpeta excluida de Git.
+También se puede definir `NTS_SOURCE_DIR` y ejecutar `php bin/console.php standards:import`.
 
 ```text
 app/Controllers/     Coordinación de solicitudes

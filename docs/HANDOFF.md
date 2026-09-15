@@ -6,6 +6,7 @@ Proyecto: `C:\Workspace\desarrollo-skc\gestion-avaluatoria`.
 Origen de consulta: `C:\Workspace\desarrollo-skc\inverskc`.
 La base nueva no necesita cargar ningún archivo del proyecto original.
 Contiene acceso y un ciclo real de crear, editar, autoguardar y recuperar fichas privadas.
+Incluye biblioteca inicial de Normas Técnicas Sectoriales con categorías A, B y 1 a 13.
 Solo implementa datos iniciales, no fórmulas, aprobación ni generación de informes.
 
 ## Referencias encontradas en InversKC
@@ -71,3 +72,15 @@ para elegir una base a borrar: no borra bases ni tablas y rechaza fixtures exist
 
 Repetir revisión visual en navegador cuando cambien vistas. No declarar validado el
 login real hasta tener conexión a funcionarios y una cuenta de prueba autorizada.
+
+## Normas Técnicas Sectoriales
+
+La migración `202609150003_create_valuation_standards.php` crea el catálogo y siembra
+las 22 normas entregadas. Los archivos PDF se copian al almacenamiento privado con:
+
+```powershell
+php bin/console.php standards:import "C:\Users\skcge\OneDrive\Escritorio\Nueva Ley Valuatoria\Normas Sectoriales"
+```
+
+Las categorías sin normas asignadas quedan visibles como pendientes para conservar la
+estructura oficial de inscripción.

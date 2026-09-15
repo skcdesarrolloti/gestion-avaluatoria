@@ -3,9 +3,11 @@ declare(strict_types=1);
 namespace App\Core;
 use App\Controllers\AppraisalController;
 use App\Controllers\AuthController;
+use App\Controllers\StandardController;
 use App\Database\Migrator;
 use App\Models\AppraisalRepository;
 use App\Models\FuncionarioRepository;
+use App\Models\ValuationStandardRepository;
 use App\Services\AuthService;
 
 final class Kernel
@@ -67,8 +69,11 @@ final class Kernel
                     (new Migrator($db, BASE_PATH . '/database/migrations'))->run();
                 }
             }
-            $instance = $controller === 'auth' ? new AuthController($auth)
-                : new AppraisalController(new AppraisalRepository($db), $user);
+            $instance = match ($controller) {
+                'auth' => new AuthController($auth),
+                'standards' => new StandardController(new ValuationStandardRepository($db)),
+                default => new AppraisalController(new AppraisalRepository($db), $user),
+            };
             $instance->$action(...array_slice($matches, 1));
             return;
         }

@@ -17,8 +17,12 @@
                 <span>Gestión avaluatoria<span class="block text-xs font-normal tracking-wide text-slate-500">SuCasa Inmobiliaria</span></span>
             </a>
             <?php if (isset($_SESSION['user'])): ?>
-                <div class="flex items-center gap-4 text-sm">
-                    <span class="max-w-48 break-words"><?= e($_SESSION['user']['name']) ?></span>
+                <div class="flex flex-wrap items-center gap-3 text-sm">
+                    <nav class="flex flex-wrap items-center gap-2" aria-label="Principal">
+                        <a class="rounded-lg px-3 py-2 font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-950" href="<?= e(url()) ?>">Avalúos</a>
+                        <a class="rounded-lg px-3 py-2 font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-950" href="<?= e(url('normas-tecnicas-sectoriales')) ?>">Normas Técnicas Sectoriales</a>
+                    </nav>
+                    <span class="max-w-48 break-words text-slate-500"><?= e($_SESSION['user']['name']) ?></span>
                     <form method="post" action="<?= e(url('logout')) ?>">
                         <?= csrf_field() ?><button class="btn-secondary" type="submit">Salir</button>
                     </form>

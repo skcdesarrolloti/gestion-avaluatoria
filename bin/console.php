@@ -3,11 +3,12 @@ declare(strict_types=1);
 require dirname(__DIR__) . '/bootstrap.php';
 use App\Core\Database;
 use App\Database\Migrator;
+use App\Models\ValuationStandardRepository;
 
 try {
     $command = $argv[1] ?? 'help';
-    if (!in_array($command, ['install', 'migrate', 'auth:check'], true)) {
-        echo "Comandos:\n  install [--create-database]\n  migrate\n  auth:check\n";
+    if (!in_array($command, ['install', 'migrate', 'auth:check', 'standards:import'], true)) {
+        echo "Comandos:\n  install [--create-database]\n  migrate\n  auth:check\n  standards:import <carpeta>\n";
         exit($command === 'help' ? 0 : 1);
     }
     Database::assertSeparate();
@@ -25,6 +26,21 @@ try {
         echo "Base propia preparada.\n";
     }
     $applied = (new Migrator(Database::connection(), BASE_PATH . '/database/migrations'))->run();
+    if ($command === 'standards:import') {
+        $source = $argv[2] ?? getenv('NTS_SOURCE_DIR') ?: '';
+        if ($source === '') {
+            throw new RuntimeException('Indica la carpeta de origen de las normas.');
+        }
+        $result = (new ValuationStandardRepository(Database::connection()))->importFrom($source);
+        echo $applied ? implode("\n", $applied) . "\n" : "Base al dia; no hay migraciones pendientes.\n";
+        echo 'PDF copiados: ' . count($result['copied']) . "\n";
+        echo 'PDF sin cambios: ' . count($result['skipped']) . "\n";
+        echo 'PDF faltantes: ' . count($result['missing']) . "\n";
+        foreach ($result['missing'] as $missing) {
+            echo "  - $missing\n";
+        }
+        exit($result['missing'] ? 1 : 0);
+    }
     echo $applied ? implode("\n", $applied) . "\n" : "Base al dia; no hay migraciones pendientes.\n";
 } catch (Throwable $error) {
     // PDO errors may contain connection/user details: don't expose credentials on CLI either.

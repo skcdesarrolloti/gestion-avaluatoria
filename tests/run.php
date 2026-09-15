@@ -7,6 +7,7 @@ use App\Services\AppraisalValidator;
 use App\Services\AuthService;
 use App\Services\RateLimiter;
 use App\Models\FuncionarioRepository;
+use App\Models\ValuationStandardRepository;
 
 // All fixtures are in memory; never connect to the configured production database.
 foreach (['AUTH_TABLE' => 'wp_jet_cct_funcionarios', 'AUTH_USER_COLUMN' => 'user_others_apss',
@@ -29,6 +30,22 @@ try {
     expect(true, 'CSRF valido');
     $db = new PDO('sqlite::memory:', null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
     fixture($db);
+    $db->exec("CREATE TABLE valuation_standard_categories (
+        code TEXT PRIMARY KEY, name TEXT, group_type TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE valuation_standards (
+        slug TEXT PRIMARY KEY, category_code TEXT, standard_code TEXT, title TEXT, kind TEXT, sector_code TEXT,
+        source_filename TEXT, storage_filename TEXT, summary TEXT, file_size_bytes INTEGER,
+        imported_at TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("INSERT INTO valuation_standard_categories VALUES
+        ('A', 'Normas Técnicas Generales', 'general', 0, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
+    $db->exec("INSERT INTO valuation_standards VALUES
+        ('nts-s04-codigo-conducta', 'A', 'NTS S04', 'Código de conducta', 'NTS', 'S04',
+        '01 NTS S04 Codigo conducta.pdf', 'unit-test-norma-inexistente.pdf', '', NULL, NULL, 1,
+        '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
+    $standards = (new ValuationStandardRepository($db))->categoriesWithStandards();
+    expect($standards[0]['code'] === 'A', 'categoria general disponible');
+    expect($standards[0]['standards'][0]['standard_code'] === 'NTS S04', 'norma tecnica agrupada');
+    expect($standards[0]['standards'][0]['has_file'] === false, 'PDF privado no se presume importado');
     $auth = new AuthService(new FuncionarioRepository($db));
     expect(!$auth->attempt('ga_test', 'incorrecta'), 'contraseña incorrecta rechazada');
     expect(!$auth->attempt('inactive', 'Only-test-2026!'), 'funcionario inactivo rechazado');
