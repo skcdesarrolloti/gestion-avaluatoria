@@ -50,15 +50,18 @@ $stats = $stats ?? ['total' => 0, 'vigente' => 0, 'historica' => 0];
             </div>
             <div class="mt-4 grid gap-3 md:grid-cols-2">
                 <?php foreach ($group['standards'] as $standard): ?>
-                    <?php $term = mb_strtolower(implode(' ', [$standard['standard_code'], $standard['title'], $standard['applicable_categories'], $standard['summary']])); ?>
+                    <?php $term = mb_strtolower(implode(' ', [$standard['standard_code'], $standard['title'], $standard['applicable_categories'], $standard['summary'], $standard['source_reference']])); ?>
                     <article class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
                         x-show='query === "" || <?= e(json_encode($term, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>.includes(query.toLowerCase())'>
                         <div class="flex items-start justify-between gap-3">
-                            <div><p class="text-sm font-semibold text-teal-800"><?= e($standard['standard_code']) ?></p>
-                                <h3 class="mt-1 font-semibold text-slate-950"><?= e($standard['title']) ?></h3></div>
+                            <div><p class="text-anywhere text-sm font-semibold text-teal-800"><?= e($standard['standard_code']) ?></p>
+                                <h3 class="text-anywhere mt-1 font-semibold text-slate-950"><?= e($standard['title']) ?></h3></div>
                             <span class="shrink-0 rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-700"><?= e($standard['status']) ?></span>
                         </div>
                         <p class="mt-3 text-sm text-slate-500"><?= e($standard['summary']) ?></p>
+                        <?php if ($standard['source_reference'] !== ''): ?>
+                            <p class="text-anywhere mt-3 text-xs text-slate-500"><?= e($standard['source_reference']) ?></p>
+                        <?php endif; ?>
                         <p class="mt-4 text-xs font-medium text-slate-600">Categorías RAA: <?= e($standard['applicable_categories']) ?></p>
                     </article>
                 <?php endforeach; ?>

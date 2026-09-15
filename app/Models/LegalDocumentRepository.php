@@ -93,6 +93,15 @@ final class LegalDocumentRepository
         return (string) ($query->fetchColumn() ?: 'A');
     }
 
+    public function catalogCandidates(string $category): array
+    {
+        $query = $this->db->prepare("SELECT slug, category_code, document_code, title,
+            document_type, source_filename, storage_filename
+            FROM valuation_legal_documents WHERE category_code = ? ORDER BY sort_order ASC");
+        $query->execute([$category]);
+        return $query->fetchAll();
+    }
+
     public function saveImportedDocument(array $meta, string $status, int $bytes): void
     {
         $now = gmdate('Y-m-d H:i:s');
@@ -105,6 +114,7 @@ final class LegalDocumentRepository
                 storage_filename, file_size_bytes, imported_at, sort_order, created_at, updated_at)
                 VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(slug) DO UPDATE SET status = excluded.status,
+                source_filename = excluded.source_filename, storage_filename = excluded.storage_filename,
                 file_size_bytes = excluded.file_size_bytes, imported_at = excluded.imported_at,
                 updated_at = excluded.updated_at";
             $this->db->prepare($sql)->execute([...array_slice($values, 0, 9), $now, ...array_slice($values, 9)]);

@@ -133,12 +133,15 @@ $maxFiles = max(0, (int) ($limits['max_file_uploads'] ?? 0));
                             x-show='query === "" || <?= e(json_encode($term, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>.includes(query.toLowerCase())'>
                             <div class="flex items-start justify-between gap-3">
                                 <div>
-                                    <p class="text-sm font-semibold text-teal-800"><?= e($document['document_code']) ?></p>
-                                    <h3 class="mt-1 font-semibold text-slate-950"><?= e($document['title']) ?></h3>
+                                    <p class="text-anywhere text-sm font-semibold text-teal-800"><?= e($document['document_code']) ?></p>
+                                    <h3 class="text-anywhere mt-1 font-semibold text-slate-950"><?= e($document['title']) ?></h3>
                                 </div>
                                 <span class="shrink-0 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600"><?= e($document['document_type']) ?></span>
                             </div>
-                            <p class="mt-3 text-sm text-slate-500"><?= e($document['source_filename'] ?: $document['source_reference']) ?></p>
+                            <?php if ($document['summary'] !== ''): ?>
+                                <p class="mt-3 text-sm leading-6 text-slate-600"><?= e($document['summary']) ?></p>
+                            <?php endif; ?>
+                            <p class="text-anywhere mt-3 text-sm text-slate-500"><?= e($document['source_filename'] ?: $document['source_reference']) ?></p>
                             <div class="mt-4 flex flex-wrap items-center justify-between gap-3">
                                 <span class="text-xs font-medium <?= $document['has_file'] ? 'text-emerald-700' : 'text-amber-700' ?>"><?= $document['has_file'] ? 'PDF disponible' : 'Pendiente de archivo' ?></span>
                                 <?php if ($document['has_file']): ?>
@@ -157,8 +160,8 @@ $maxFiles = max(0, (int) ($limits['max_file_uploads'] ?? 0));
                         <article class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
                             x-show='query === "" || <?= e(json_encode($term, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>.includes(query.toLowerCase())'>
                             <div class="flex items-start justify-between gap-3">
-                                <div><p class="text-sm font-semibold text-teal-800"><?= e($article['document_code']) ?> · <?= e($article['article_label']) ?></p>
-                                    <h3 class="mt-1 font-semibold text-slate-950"><?= e($article['title'] ?: $article['document_title']) ?></h3></div>
+                                <div><p class="text-anywhere text-sm font-semibold text-teal-800"><?= e($article['document_code']) ?> · <?= e($article['article_label']) ?></p>
+                                    <h3 class="text-anywhere mt-1 font-semibold text-slate-950"><?= e($article['title'] ?: $article['document_title']) ?></h3></div>
                                 <span class="shrink-0 rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600"><?= e($article['document_type']) ?></span>
                             </div>
                             <p class="mt-3 text-sm leading-6 text-slate-600"><?= e($article['excerpt']) ?></p>

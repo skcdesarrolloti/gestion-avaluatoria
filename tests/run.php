@@ -3,6 +3,7 @@ declare(strict_types=1);
 require dirname(__DIR__) . '/bootstrap.php';
 require __DIR__ . '/support.php';
 use App\Core\Session;
+use App\Database\Schema;
 use App\Core\Http;
 use App\Services\AppraisalValidator;
 use App\Services\AuthDiagnostics;
@@ -98,6 +99,8 @@ try {
         ('ivs-400-real-property', '400', 'IVS 400', 'Real Property Interests', '1,2',
         'Derechos sobre inmuebles.', '2025-01-31', 'vigente', 'IVSC', 1,
         '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
+    $seedB1 = require dirname(__DIR__) . '/database/migrations/202609150007_seed_b1_urban_legal_bibliography.php';
+    $seedB1(new Schema($db));
     $standards = (new ValuationStandardRepository($db))->categoriesWithStandards();
     expect($standards[0]['code'] === 'A', 'categoria general disponible');
     expect($standards[0]['standards'][0]['standard_code'] === 'NTS S04', 'norma tecnica agrupada');
@@ -106,6 +109,7 @@ try {
     $legalCategories = $legal->categoriesWithDocuments();
     expect($legalCategories[0]['name'] === 'Marco jurídico general', 'categoria juridica general disponible');
     expect(count($legalCategories[1]['articles']) === 1, 'marco juridico guarda articulos pertinentes por categoria');
+    expect($legalCategories[1]['documents'][0]['document_code'] === 'B1-01', 'bibliografia B1 de urbanos sembrada');
     expect($legal->stats($legalCategories)['articles'] === 1, 'marco juridico cuenta articulos sin ley completa');
     $legalDir = sys_get_temp_dir() . '/ga_legal_' . bin2hex(random_bytes(4));
     putenv('LEGAL_STORAGE_DIR=' . $legalDir);
@@ -117,6 +121,16 @@ try {
         'error' => [UPLOAD_ERR_OK],
     ], 'A', 'vigente');
     expect(count($legalImport['copied']) === 1, 'importacion PDF juridico');
+    $tmpB1Pdf = tempnam(sys_get_temp_dir(), 'ga_b1_pdf_');
+    file_put_contents($tmpB1Pdf, "%PDF-1.4\n%b1\n");
+    (new LegalDocumentImportService($legal))->importUploaded([
+        'name' => ['Ley 388 de 1997.pdf'],
+        'tmp_name' => [$tmpB1Pdf],
+        'error' => [UPLOAD_ERR_OK],
+    ], '1', 'vigente');
+    $urbanDocument = $legal->find('b1-01-ley-388-1997');
+    expect($urbanDocument['has_file'] && $urbanDocument['source_filename'] === 'Ley 388 de 1997.pdf',
+        'importacion juridica enlaza PDF con documento B1');
     if (class_exists(ZipArchive::class)) {
         $zipPath = tempnam(sys_get_temp_dir(), 'ga_legal_zip_');
         $zip = new ZipArchive();
@@ -137,8 +151,10 @@ try {
     expect($storedLegal['has_file'] === true && $storedLegal['document_type'] === 'Ley', 'documento juridico queda consultable');
     unlink(LegalDocumentRepository::storagePath($storedLegal['storage_filename']));
     expect($legal->storageReport()['marked_missing'] === 1, 'diagnostico juridico detecta PDF faltante');
-    foreach ($legal->categoriesWithDocuments()[0]['documents'] as $document) {
-        if ($document['has_file']) unlink(LegalDocumentRepository::storagePath($document['storage_filename']));
+    foreach ($legal->categoriesWithDocuments() as $category) {
+        foreach ($category['documents'] as $document) {
+            if ($document['has_file']) unlink(LegalDocumentRepository::storagePath($document['storage_filename']));
+        }
     }
     rmdir($legalDir);
     putenv('LEGAL_STORAGE_DIR');

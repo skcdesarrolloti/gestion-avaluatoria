@@ -111,6 +111,14 @@ final class LegalDocumentImportService
 
     private function documentMeta(string $name, string $category): array
     {
+        $catalog = $this->catalogMatch($name, $category);
+        if ($catalog !== null) {
+            $filename = (string) ($catalog['storage_filename'] ?: $catalog['slug'] . '.pdf');
+            return ['slug' => $catalog['slug'], 'category_code' => $category,
+                'document_code' => $catalog['document_code'], 'title' => $catalog['title'],
+                'document_type' => $catalog['document_type'], 'source_filename' => $name,
+                'storage_filename' => $filename];
+        }
         $base = trim((string) preg_replace('/\s+/', ' ', pathinfo($name, PATHINFO_FILENAME)));
         $title = mb_substr($base !== '' ? $base : 'Documento jurídico', 0, 240);
         $hash = substr(hash('sha1', $category . '|' . $name), 0, 10);
@@ -118,6 +126,39 @@ final class LegalDocumentImportService
         return ['slug' => $slug, 'category_code' => $category, 'document_code' => mb_substr($title, 0, 80),
             'title' => $title, 'document_type' => $this->inferType($title),
             'source_filename' => $name, 'storage_filename' => $slug . '.pdf'];
+    }
+
+    private function catalogMatch(string $name, string $category): ?array
+    {
+        $base = pathinfo($name, PATHINFO_FILENAME);
+        $needle = $this->normalize($base);
+        $needleToken = $this->legalToken($needle);
+        foreach ($this->documents->catalogCandidates($category) as $candidate) {
+            $title = $this->normalize((string) $candidate['title']);
+            $haystack = $this->normalize($candidate['document_code'] . ' ' . $candidate['title']);
+            if ($needle !== '' && ($needle === $title || str_contains($needle, $title) || str_contains($haystack, $needle))) {
+                return $candidate;
+            }
+            if ($needleToken !== '' && $needleToken === $this->legalToken($haystack)) {
+                return $candidate;
+            }
+        }
+        return null;
+    }
+
+    private function normalize(string $value): string
+    {
+        $ascii = function_exists('iconv') ? iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value) : false;
+        $seed = strtolower($ascii !== false ? $ascii : $value);
+        return (string) preg_replace('/[^a-z0-9]+/', '', $seed);
+    }
+
+    private function legalToken(string $value): string
+    {
+        if (preg_match('/(ley|decreto|resolucion)(?:igac)?(\d+)(?:de)?(\d{4})/', $value, $match)) {
+            return $match[1] . $match[2] . $match[3];
+        }
+        return '';
     }
 
     private function slug(string $value): string
