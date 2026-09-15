@@ -7,6 +7,8 @@ Origen de consulta: `C:\Workspace\desarrollo-skc\inverskc`.
 La base nueva no necesita cargar ningún archivo del proyecto original.
 Contiene acceso y un ciclo real de crear, editar, autoguardar y recuperar fichas privadas.
 Incluye biblioteca inicial de Normas Técnicas Sectoriales con categorías A, B y 1 a 13.
+Incluye menú base de Marco Jurídico Valuatorio con las mismas categorías para cargar
+leyes, decretos, resoluciones y documentos derogados cuando el responsable los entregue.
 Solo implementa datos iniciales, no fórmulas, aprobación ni generación de informes.
 
 ## Referencias encontradas en InversKC

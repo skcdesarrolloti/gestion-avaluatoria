@@ -10,6 +10,7 @@ completos de InversKC. El proyecto original permanece intacto.
 - Mis fichas, creación de borradores y formulario inicial con guardado en BD.
 - Autoguardado, validación, propiedad por usuario y conflictos entre pestañas.
 - Biblioteca inicial de Normas Técnicas Sectoriales, categorizada por A, B y 1 a 13.
+- Menú de Marco Jurídico Valuatorio para leyes, decretos y resoluciones por categoría.
 - Instalador y migraciones automáticas de tablas y columnas.
 - Assets locales compilados y estructura pequeña, sin dependencias PHP externas.
 

@@ -9,6 +9,7 @@ use App\Services\AuthDiagnostics;
 use App\Services\AuthService;
 use App\Services\RateLimiter;
 use App\Models\FuncionarioRepository;
+use App\Models\LegalDocumentRepository;
 use App\Models\ValuationStandardRepository;
 
 // All fixtures are in memory; never connect to the configured production database.
@@ -59,10 +60,23 @@ try {
         ('nts-s04-codigo-conducta', 'A', 'NTS S04', 'Código de conducta', 'NTS', 'S04',
         '01 NTS S04 Codigo conducta.pdf', 'unit-test-norma-inexistente.pdf', '', NULL, NULL, 1,
         '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
+    $db->exec("CREATE TABLE valuation_legal_categories (
+        code TEXT PRIMARY KEY, name TEXT, group_type TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE valuation_legal_documents (
+        slug TEXT PRIMARY KEY, category_code TEXT, document_code TEXT, title TEXT, document_type TEXT,
+        status TEXT, issued_at TEXT, repealed_at TEXT, source_reference TEXT, summary TEXT,
+        sort_order INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("INSERT INTO valuation_legal_categories VALUES
+        ('A', 'Marco jurídico general', 'general', 0, '2026-09-15 00:00:00', '2026-09-15 00:00:00'),
+        ('1', 'Inmuebles urbanos', 'category', 11, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
     $standards = (new ValuationStandardRepository($db))->categoriesWithStandards();
     expect($standards[0]['code'] === 'A', 'categoria general disponible');
     expect($standards[0]['standards'][0]['standard_code'] === 'NTS S04', 'norma tecnica agrupada');
     expect($standards[0]['standards'][0]['has_file'] === false, 'PDF privado no se presume importado');
+    $legal = new LegalDocumentRepository($db);
+    $legalCategories = $legal->categoriesWithDocuments();
+    expect($legalCategories[0]['name'] === 'Marco jurídico general', 'categoria juridica general disponible');
+    expect($legal->stats($legalCategories)['total'] === 0, 'marco juridico inicia sin documentos inventados');
     $normsDir = sys_get_temp_dir() . '/ga_normas_' . bin2hex(random_bytes(4));
     putenv('NTS_STORAGE_DIR=' . $normsDir);
     expect(ValuationStandardRepository::storageDir() === str_replace('\\', '/', $normsDir), 'carpeta privada de normas configurable');

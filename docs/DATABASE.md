@@ -44,6 +44,8 @@ No debes crear tablas ni pegar sentencias SQL. El programa hace esa parte.
 | `appraisals` | Ficha borrador, propietario, título, tipo, dirección, municipio, observaciones, versión y fechas |
 | `valuation_standard_categories` | Grupos A, B y categorías valuatorias 1 a 13 |
 | `valuation_standards` | Catálogo de normas técnicas y metadatos del PDF privado |
+| `valuation_legal_categories` | Grupos jurídicos A, B y categorías valuatorias 1 a 13 |
+| `valuation_legal_documents` | Catálogo futuro de leyes, decretos y resoluciones vigentes o derogadas |
 
 `owner_id` guarda `_ID` del funcionario. No hay FK entre servidores/bases ni copia de
 contraseñas. `id` es aleatorio (32 caracteres hexadecimales), pero siempre se comprueba

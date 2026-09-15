@@ -17,6 +17,7 @@ $isActive = static fn (string $path): bool => $path === '/' ? $currentPath === '
 $tabs = [
     ['label' => 'Inicio', 'href' => url(), 'active' => $isActive('/')],
     ['label' => 'Normas Técnicas Sectoriales', 'href' => url('normas-tecnicas-sectoriales'), 'active' => $isActive('/normas-tecnicas-sectoriales')],
+    ['label' => 'Marco Jurídico Valuatorio', 'href' => url('marco-juridico-valuatorio'), 'active' => $isActive('/marco-juridico-valuatorio')],
 ];
 ?>
 <body class="min-h-dvh bg-slate-50 text-slate-900 antialiased">
@@ -44,6 +45,7 @@ $tabs = [
                     <a class="app-action app-action-blue" href="<?= e(url('#nuevo-avaluo')) ?>">Crear ficha</a>
                     <a class="app-action app-action-orange" href="<?= e(url()) ?>">Mis avalúos</a>
                     <a class="app-action app-action-teal" href="<?= e(url('normas-tecnicas-sectoriales')) ?>">Normas técnicas</a>
+                    <a class="app-action app-action-orange" href="<?= e(url('marco-juridico-valuatorio')) ?>">Marco jurídico</a>
                 </div>
                 <nav class="app-tabs" aria-label="Principal">
                     <?php foreach ($tabs as $tab): ?>

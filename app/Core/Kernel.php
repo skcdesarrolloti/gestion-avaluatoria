@@ -4,10 +4,12 @@ namespace App\Core;
 use App\Controllers\AppraisalController;
 use App\Controllers\AuthController;
 use App\Controllers\DiagnosticController;
+use App\Controllers\LegalFrameworkController;
 use App\Controllers\StandardController;
 use App\Database\Migrator;
 use App\Models\AppraisalRepository;
 use App\Models\FuncionarioRepository;
+use App\Models\LegalDocumentRepository;
 use App\Models\ValuationStandardRepository;
 use App\Services\AuthService;
 
@@ -94,6 +96,7 @@ final class Kernel
             }
             $instance = match ($controller) {
                 'auth' => new AuthController($auth),
+                'legal' => new LegalFrameworkController(new LegalDocumentRepository($db)),
                 'standards' => new StandardController(new ValuationStandardRepository($db)),
                 default => new AppraisalController(new AppraisalRepository($db), $user),
             };

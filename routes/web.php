@@ -9,6 +9,7 @@ return [
     ['POST', '#^/logout$#', 'auth', 'logout', true],
     ['GET', '#^/$#', 'appraisals', 'index', true],
     ['GET', '#^/normas-tecnicas-sectoriales$#', 'standards', 'index', true],
+    ['GET', '#^/marco-juridico-valuatorio$#', 'legal', 'index', true],
     ['POST', '#^/normas-tecnicas-sectoriales/importar$#', 'standards', 'import', true],
     ['GET', '#^/normas-tecnicas-sectoriales/([a-z0-9-]+)$#', 'standards', 'show', true],
     ['GET', '#^/normas-tecnicas-sectoriales/([a-z0-9-]+)/archivo$#', 'standards', 'file', true],
