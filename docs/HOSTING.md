@@ -41,6 +41,12 @@ Para la biblioteca jurídica nacional aplica el mismo patrón con otra carpeta p
 LEGAL_STORAGE_DIR=/home/usuario/gestion-avaluatoria-storage/marco-juridico-nacional
 ```
 
+Si `LEGAL_STORAGE_DIR` queda vacío, la app usa `storage/marco-juridico-nacional/` y
+puede crear esa carpeta automáticamente cuando PHP tenga permisos de escritura. Esa
+carpeta base queda anclada en Git con `.gitkeep`, pero los PDFs se ignoran y algunos
+despliegues limpios pueden borrar archivos privados no versionados. Por eso, para
+producción, usar `LEGAL_STORAGE_DIR` fuera del checkout sigue siendo la opción segura.
+
 La pantalla del Marco Jurídico acepta varios PDFs o un `.zip` con PDFs. El ZIP ayuda
 a evitar seleccionar documentos uno por uno, pero sigue limitado por `post_max_size`.
 
