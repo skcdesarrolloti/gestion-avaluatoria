@@ -7,7 +7,7 @@ Origen de consulta: `C:\Workspace\desarrollo-skc\inverskc`.
 La base nueva no necesita cargar ningún archivo del proyecto original.
 Contiene acceso y un ciclo real de crear, editar, autoguardar y recuperar fichas privadas.
 Incluye biblioteca inicial de Normas Técnicas Sectoriales con categorías A, B y 1 a 13.
-Incluye menú base de Marco Jurídico Nacional con las mismas categorías para cargar
+Incluye menú base de Marco Jurídico Nacional con bibliografía B1 a B13 para cargar
 leyes, decretos, resoluciones y documentos derogados cuando el responsable los entregue.
 Las leyes extensas se modelan como documento fuente más artículos o fragmentos
 pertinentes, no como texto completo indiscriminado. Las IVS quedan en menú separado.
