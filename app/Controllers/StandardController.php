@@ -1,7 +1,9 @@
 <?php
 declare(strict_types=1);
 namespace App\Controllers;
+use App\Core\Http;
 use App\Core\HttpException;
+use App\Core\Session;
 use App\Models\ValuationStandardRepository;
 
 final class StandardController
@@ -10,10 +12,23 @@ final class StandardController
 
     public function index(): void
     {
+        $notice = Session::pullFlash('standards_import');
         view('standards/index', [
             'title' => 'Normas Técnicas Sectoriales',
             'categories' => $this->standards->categoriesWithStandards(),
+            'importNotice' => $notice ? json_decode($notice, true) : null,
         ]);
+    }
+
+    public function import(): void
+    {
+        try {
+            $result = $this->standards->importUploaded($_FILES['standard_files'] ?? []);
+        } catch (\Throwable $error) {
+            $result = ['ok' => false, 'message' => $error->getMessage()];
+        }
+        Session::flash('standards_import', json_encode($result, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
+        Http::redirect('normas-tecnicas-sectoriales');
     }
 
     public function show(string $slug): void

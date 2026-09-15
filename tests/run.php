@@ -63,6 +63,15 @@ try {
     expect($standards[0]['code'] === 'A', 'categoria general disponible');
     expect($standards[0]['standards'][0]['standard_code'] === 'NTS S04', 'norma tecnica agrupada');
     expect($standards[0]['standards'][0]['has_file'] === false, 'PDF privado no se presume importado');
+    $tmpPdf = tempnam(sys_get_temp_dir(), 'ga_pdf_');
+    file_put_contents($tmpPdf, "%PDF-1.4\n%test\n");
+    $import = (new ValuationStandardRepository($db))->importUploaded([
+        'name' => ['01 NTS S04 Codigo conducta.pdf'],
+        'tmp_name' => [$tmpPdf],
+        'error' => [UPLOAD_ERR_OK],
+    ]);
+    expect(count($import['copied']) === 1 && $import['missing'] === [], 'importacion PDF por lote');
+    unlink(ValuationStandardRepository::storagePath('unit-test-norma-inexistente.pdf'));
     $auth = new AuthService(new FuncionarioRepository($db));
     expect(!$auth->attempt('ga_test', 'incorrecta'), 'contraseña incorrecta rechazada');
     expect(!$auth->attempt('inactive', 'Only-test-2026!'), 'funcionario inactivo rechazado');

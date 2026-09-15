@@ -57,6 +57,8 @@ php bin/console.php standards:import "C:\Users\skcge\OneDrive\Escritorio\Nueva L
 
 Los PDFs se copian a `storage/normas-tecnicas-sectoriales/`, carpeta excluida de Git.
 También se puede definir `NTS_SOURCE_DIR` y ejecutar `php bin/console.php standards:import`.
+En producción autenticada, la pantalla de Normas Técnicas Sectoriales permite seleccionar
+varios PDFs a la vez e importarlos por nombre contra el catálogo existente.
 
 ```text
 app/Controllers/     Coordinación de solicitudes

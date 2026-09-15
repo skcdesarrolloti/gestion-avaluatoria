@@ -8,15 +8,9 @@ final class ValuationStandardRepository
 {
     public function __construct(private PDO $db) {}
 
-    public static function storageDir(): string
-    {
-        return BASE_PATH . '/storage/normas-tecnicas-sectoriales';
-    }
+    public static function storageDir(): string { return BASE_PATH . '/storage/normas-tecnicas-sectoriales'; }
 
-    public static function storagePath(string $filename): string
-    {
-        return self::storageDir() . '/' . basename($filename);
-    }
+    public static function storagePath(string $filename): string { return self::storageDir() . '/' . basename($filename); }
 
     public function categoriesWithStandards(): array
     {
@@ -87,10 +81,107 @@ final class ValuationStandardRepository
         return $summary;
     }
 
+    public function importUploaded(array $files): array
+    {
+        $this->ensureStorageDir();
+        $standards = $this->allStandards();
+        $byName = [];
+        foreach ($standards as $standard) {
+            $byName[$this->filenameKey($standard['source_filename'])] = $standard;
+        }
+        $result = ['ok' => true, 'copied' => [], 'skipped' => [], 'unknown' => [], 'errors' => [], 'missing' => []];
+        foreach ($this->uploadedFiles($files) as $file) {
+            $name = $this->cleanUploadName($file['name']);
+            if ($file['error'] !== UPLOAD_ERR_OK) {
+                $result['errors'][] = "$name no se pudo recibir.";
+                continue;
+            }
+            if (!$this->isPdf($file['tmp_name'], $name)) {
+                $result['errors'][] = "$name no es un PDF válido.";
+                continue;
+            }
+            $standard = $byName[$this->filenameKey($name)] ?? null;
+            if (!$standard) {
+                $result['unknown'][] = $name;
+                continue;
+            }
+            $destination = self::storagePath($standard['storage_filename']);
+            $bytes = (int) filesize($file['tmp_name']);
+            $sameFile = is_file($destination) && filesize($destination) === $bytes
+                && hash_file('sha256', $destination) === hash_file('sha256', $file['tmp_name']);
+            if ($sameFile) {
+                $this->markImported($standard['slug'], $bytes);
+                $result['skipped'][] = $standard['source_filename'];
+                continue;
+            }
+            $moved = move_uploaded_file($file['tmp_name'], $destination)
+                || (PHP_SAPI === 'cli' && rename($file['tmp_name'], $destination));
+            if (!$moved) {
+                $result['errors'][] = "$name no se pudo guardar.";
+                continue;
+            }
+            $this->markImported($standard['slug'], (int) filesize($destination));
+            $result['copied'][] = $standard['source_filename'];
+        }
+        foreach ($standards as $standard) {
+            if (!is_file(self::storagePath($standard['storage_filename']))) {
+                $result['missing'][] = $standard['source_filename'];
+            }
+        }
+        return $result;
+    }
+
     private function allStandards(): array
     {
         return $this->db->query('SELECT slug, source_filename, storage_filename
             FROM valuation_standards ORDER BY sort_order')->fetchAll();
+    }
+
+    private function ensureStorageDir(): void
+    {
+        if (!is_dir(self::storageDir()) && !mkdir(self::storageDir(), 0775, true) && !is_dir(self::storageDir())) {
+            throw new \RuntimeException('No se pudo preparar el almacenamiento privado.');
+        }
+    }
+
+    private function uploadedFiles(array $files): array
+    {
+        $names = $files['name'] ?? [];
+        if (!is_array($names) || $names === []) {
+            throw new \RuntimeException('Selecciona al menos un PDF para importar.');
+        }
+        $uploads = [];
+        foreach (array_keys($names) as $index) {
+            $uploads[] = [
+                'name' => (string) ($files['name'][$index] ?? ''),
+                'tmp_name' => (string) ($files['tmp_name'][$index] ?? ''),
+                'error' => (int) ($files['error'][$index] ?? UPLOAD_ERR_NO_FILE),
+            ];
+        }
+        return $uploads;
+    }
+
+    private function cleanUploadName(string $name): string { return basename(str_replace('\\', '/', $name)); }
+
+    private function filenameKey(string $name): string
+    {
+        return mb_strtolower((string) preg_replace('/\s+/', ' ', trim($this->cleanUploadName($name))));
+    }
+
+    private function isPdf(string $path, string $name): bool
+    {
+        if (!is_file($path) || mb_strtolower(pathinfo($name, PATHINFO_EXTENSION)) !== 'pdf') {
+            return false;
+        }
+        $handle = fopen($path, 'rb');
+        if (!$handle) {
+            return false;
+        }
+        try {
+            return fread($handle, 4) === '%PDF';
+        } finally {
+            fclose($handle);
+        }
     }
 
     private function markImported(string $slug, int $bytes): void

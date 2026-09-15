@@ -12,6 +12,36 @@
                 x-model.trim="query">
         </label>
     </div>
+    <section class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
+        <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
+            <div>
+                <h2 class="text-lg font-semibold text-slate-950">Importar PDFs</h2>
+                <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Selecciona todos los archivos PDF de normas. El sistema los cruza por nombre con el catálogo y los guarda en almacenamiento privado.</p>
+            </div>
+            <form class="flex flex-col gap-3 sm:flex-row sm:items-end" method="post" action="<?= e(url('normas-tecnicas-sectoriales/importar')) ?>" enctype="multipart/form-data" x-data="{ busy: false }" @submit="busy = true">
+                <?= csrf_field() ?>
+                <label class="block text-sm font-medium text-slate-700">
+                    Archivos PDF
+                    <input class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700"
+                        type="file" name="standard_files[]" accept="application/pdf,.pdf" multiple required>
+                </label>
+                <button class="btn-primary shrink-0" type="submit" :disabled="busy" x-text="busy ? 'Importando…' : 'Importar'">Importar</button>
+            </form>
+        </div>
+        <?php if (!empty($importNotice)): ?>
+            <?php $ok = (bool) ($importNotice['ok'] ?? false); ?>
+            <div class="mt-4 rounded-lg <?= $ok ? 'bg-teal-50 text-teal-900' : 'bg-red-50 text-red-800' ?> p-4 text-sm">
+                <?php if (!$ok): ?>
+                    <p><?= e($importNotice['message'] ?? 'No se pudo importar.') ?></p>
+                <?php else: ?>
+                    <p><?= count($importNotice['copied'] ?? []) ?> importado(s), <?= count($importNotice['skipped'] ?? []) ?> sin cambios, <?= count($importNotice['missing'] ?? []) ?> pendiente(s).</p>
+                    <?php if (!empty($importNotice['unknown']) || !empty($importNotice['errors'])): ?>
+                        <p class="mt-2">Algunos archivos no coincidieron o no pudieron guardarse; revisa sus nombres y formato PDF.</p>
+                    <?php endif; ?>
+                <?php endif; ?>
+            </div>
+        <?php endif; ?>
+    </section>
     <div class="grid gap-6">
         <?php foreach ($categories as $category): ?>
             <?php
