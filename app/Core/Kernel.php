@@ -4,12 +4,14 @@ namespace App\Core;
 use App\Controllers\AppraisalController;
 use App\Controllers\AuthController;
 use App\Controllers\DiagnosticController;
+use App\Controllers\IgacTypologyController;
 use App\Controllers\InternationalStandardController;
 use App\Controllers\LegalFrameworkController;
 use App\Controllers\StandardController;
 use App\Database\Migrator;
 use App\Models\AppraisalRepository;
 use App\Models\FuncionarioRepository;
+use App\Models\IgacTypologyRepository;
 use App\Models\InternationalStandardRepository;
 use App\Models\LegalDocumentRepository;
 use App\Models\ValuationStandardRepository;
@@ -108,6 +110,7 @@ final class Kernel
             }
             $instance = match ($controller) {
                 'auth' => new AuthController($auth),
+                'typologies' => new IgacTypologyController(new IgacTypologyRepository()),
                 'international' => new InternationalStandardController(new InternationalStandardRepository($db)),
                 'legal' => new LegalFrameworkController(new LegalDocumentRepository($db)),
                 'standards' => new StandardController(new ValuationStandardRepository($db)),

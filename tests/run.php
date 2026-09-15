@@ -10,6 +10,7 @@ use App\Services\AuthService;
 use App\Services\LegalDocumentImportService;
 use App\Services\RateLimiter;
 use App\Models\FuncionarioRepository;
+use App\Models\IgacTypologyRepository;
 use App\Models\InternationalStandardRepository;
 use App\Models\LegalDocumentRepository;
 use App\Models\ValuationStandardRepository;
@@ -143,6 +144,9 @@ try {
     $international = new InternationalStandardRepository($db);
     $ivsGroups = $international->groupsWithStandards();
     expect($ivsGroups[0]['standards'][0]['standard_code'] === 'IVS 400', 'normas internacionales separadas');
+    $igac = new IgacTypologyRepository();
+    expect($igac->stats()['total'] === 202, 'catalogo IGAC contiene 202 tipologias');
+    expect(count($igac->byCategory('RESIDENCIALES')) === 23, 'tipologias IGAC agrupadas por categoria');
     $normsDir = sys_get_temp_dir() . '/ga_normas_' . bin2hex(random_bytes(4));
     putenv('NTS_STORAGE_DIR=' . $normsDir);
     expect(ValuationStandardRepository::storageDir() === str_replace('\\', '/', $normsDir), 'carpeta privada de normas configurable');

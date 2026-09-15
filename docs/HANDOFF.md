@@ -11,6 +11,7 @@ Incluye menú base de Marco Jurídico Nacional con las mismas categorías para c
 leyes, decretos, resoluciones y documentos derogados cuando el responsable los entregue.
 Las leyes extensas se modelan como documento fuente más artículos o fragmentos
 pertinentes, no como texto completo indiscriminado. Las IVS quedan en menú separado.
+Incluye catálogo de Tipologías Constructivas IGAC con imágenes, agrupado por categoría.
 Solo implementa datos iniciales, no fórmulas, aprobación ni generación de informes.
 
 ## Referencias encontradas en InversKC

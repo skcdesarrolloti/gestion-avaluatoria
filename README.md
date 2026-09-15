@@ -13,6 +13,7 @@ completos de InversKC. El proyecto original permanece intacto.
 - Menú de Marco Jurídico Nacional para leyes, decretos y resoluciones por categoría,
   guardando solo artículos o fragmentos pertinentes como material de consulta.
 - Menú separado de Normas Internacionales de Valuación con estructura IVS.
+- Catálogo de Tipologías Constructivas IGAC como referencia visual por categoría.
 - Instalador y migraciones automáticas de tablas y columnas.
 - Assets locales compilados y estructura pequeña, sin dependencias PHP externas.
 

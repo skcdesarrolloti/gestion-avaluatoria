@@ -11,6 +11,7 @@ return [
     ['GET', '#^/normas-tecnicas-sectoriales$#', 'standards', 'index', true],
     ['GET', '#^/marco-juridico-valuatorio$#', 'legal', 'index', true],
     ['GET', '#^/normas-internacionales-valuacion$#', 'international', 'index', true],
+    ['GET', '#^/tipologias-constructivas-igac$#', 'typologies', 'index', true],
     ['POST', '#^/normas-tecnicas-sectoriales/importar$#', 'standards', 'import', true],
     ['POST', '#^/marco-juridico-valuatorio/importar$#', 'legal', 'import', true],
     ['GET', '#^/normas-tecnicas-sectoriales/([a-z0-9-]+)$#', 'standards', 'show', true],
