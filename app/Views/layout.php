@@ -8,29 +8,55 @@
     <link rel="stylesheet" href="<?= e(url('assets/app.css')) ?>">
     <script type="module" src="<?= e(url('assets/app.js')) ?>"></script>
 </head>
+<?php
+$logged = isset($_SESSION['user']);
+$requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
+$basePath = App\Core\Http::basePath();
+$currentPath = '/' . trim(substr($requestPath, strlen($basePath)), '/');
+$isActive = static fn (string $path): bool => $path === '/' ? $currentPath === '/' : str_starts_with($currentPath, $path);
+$tabs = [
+    ['label' => 'Inicio', 'href' => url(), 'active' => $isActive('/')],
+    ['label' => 'Normas Técnicas Sectoriales', 'href' => url('normas-tecnicas-sectoriales'), 'active' => $isActive('/normas-tecnicas-sectoriales')],
+];
+?>
 <body class="min-h-dvh bg-slate-50 text-slate-900 antialiased">
     <a href="#contenido" class="sr-only focus:not-sr-only focus:block focus:p-4">Saltar al contenido</a>
-    <header class="border-b border-slate-200 bg-white">
-        <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-5">
-            <a href="<?= e(url()) ?>" class="flex items-center gap-3 font-semibold">
-                <span aria-hidden="true" class="grid size-11 place-items-center rounded-xl bg-teal-800 text-sm text-white">SC</span>
-                <span>Gestión avaluatoria<span class="block text-xs font-normal tracking-wide text-slate-500">SuCasa Inmobiliaria</span></span>
-            </a>
-            <?php if (isset($_SESSION['user'])): ?>
-                <div class="flex flex-wrap items-center gap-3 text-sm">
-                    <nav class="flex flex-wrap items-center gap-2" aria-label="Principal">
-                        <a class="rounded-lg px-3 py-2 font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-950" href="<?= e(url()) ?>">Avalúos</a>
-                        <a class="rounded-lg px-3 py-2 font-medium text-slate-600 hover:bg-slate-100 hover:text-slate-950" href="<?= e(url('normas-tecnicas-sectoriales')) ?>">Normas Técnicas Sectoriales</a>
-                    </nav>
-                    <span class="max-w-48 break-words text-slate-500"><?= e($_SESSION['user']['name']) ?></span>
+    <header class="<?= $logged ? 'bg-white' : 'border-b border-slate-200 bg-white' ?>">
+        <?php if ($logged): ?>
+            <div class="app-topbar">
+                <div class="flex flex-wrap items-center justify-between gap-4">
+                    <a href="<?= e(url()) ?>" class="brand-frame">
+                        <span aria-hidden="true" class="brand-mark">SC</span>
+                        <span class="brand-title">Gestión avaluatoria<span class="brand-subtitle">SuCasa Inmobiliaria</span></span>
+                    </a>
                     <form method="post" action="<?= e(url('logout')) ?>">
-                        <?= csrf_field() ?><button class="btn-secondary" type="submit">Salir</button>
+                        <?= csrf_field() ?><button class="text-sm font-medium text-slate-100 hover:text-white" type="submit">Cerrar sesión</button>
                     </form>
+                    <span class="max-w-48 break-words text-sm font-semibold text-white"><?= e($_SESSION['user']['name']) ?></span>
                 </div>
-            <?php endif; ?>
-        </div>
+            </div>
+            <div class="app-shell">
+                <div class="flex flex-wrap justify-end gap-3">
+                    <a class="app-action app-action-blue" href="<?= e(url('#nuevo-avaluo')) ?>">Crear ficha</a>
+                    <a class="app-action app-action-orange" href="<?= e(url()) ?>">Mis avalúos</a>
+                    <a class="app-action app-action-teal" href="<?= e(url('normas-tecnicas-sectoriales')) ?>">Normas técnicas</a>
+                </div>
+                <nav class="app-tabs" aria-label="Principal">
+                    <?php foreach ($tabs as $tab): ?>
+                        <a class="app-tab <?= $tab['active'] ? 'app-tab-active' : '' ?>" href="<?= e($tab['href']) ?>"><?= e($tab['label']) ?></a>
+                    <?php endforeach; ?>
+                </nav>
+            </div>
+        <?php else: ?>
+            <div class="mx-auto flex max-w-6xl flex-wrap items-center justify-between gap-4 px-5 py-5">
+                <a href="<?= e(url()) ?>" class="flex items-center gap-3 font-semibold">
+                    <span aria-hidden="true" class="grid size-11 place-items-center rounded-xl bg-teal-800 text-sm text-white">SC</span>
+                    <span>Gestión avaluatoria<span class="block text-xs font-normal tracking-wide text-slate-500">SuCasa Inmobiliaria</span></span>
+                </a>
+            </div>
+        <?php endif; ?>
     </header>
-    <main id="contenido" class="mx-auto max-w-6xl px-5 py-10"><?= $content ?></main>
+    <main id="contenido" class="mx-auto max-w-6xl px-5 <?= $logged ? 'py-8' : 'py-10' ?>"><?= $content ?></main>
     <footer class="mx-auto max-w-6xl px-5 py-8 text-xs text-slate-500">SuCasa · Gestión avaluatoria</footer>
 </body>
 </html>

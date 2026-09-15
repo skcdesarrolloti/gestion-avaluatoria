@@ -1,4 +1,4 @@
-<div class="flex flex-wrap items-end justify-between gap-5">
+<div id="nuevo-avaluo" class="flex flex-wrap items-end justify-between gap-5">
     <div><p class="eyebrow">Espacio de trabajo</p><h1 class="mt-2 text-3xl font-semibold tracking-tight">Mis avalúos</h1>
         <p class="mt-3 text-slate-600">Organiza tus fichas y continúa donde quedaste.</p></div>
     <form method="post" action="<?= e(url('avaluos')) ?>" x-data="{ busy: false }" @submit="busy = true">
