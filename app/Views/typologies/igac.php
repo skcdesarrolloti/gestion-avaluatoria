@@ -48,19 +48,19 @@ $stats = $stats ?? ['total' => 0, 'categories' => 0];
                     $typology['specifications'], $typology['category_name'], $typology['useful_life'], $typology['unit']]));
                 $imageUrl = url('assets/tipologias-igac/images/' . rawurlencode((string) $typology['image_filename']));
                 ?>
-                <article class="grid gap-4 rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[180px_1fr]"
+                <article class="grid max-w-full gap-4 overflow-hidden rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[minmax(140px,180px)_minmax(0,1fr)]"
                     x-show='query === "" || <?= e(json_encode($term, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>.includes(query.toLowerCase())'>
-                    <a class="block overflow-hidden rounded-md border border-slate-200 bg-slate-100" href="<?= e($imageUrl) ?>" target="_blank" rel="noopener" data-no-fetch>
-                        <img class="aspect-[4/3] h-full w-full object-cover" src="<?= e($imageUrl) ?>" alt="<?= e($typology['denomination']) ?>" loading="lazy">
+                    <a class="block self-start overflow-hidden rounded-md border border-slate-200 bg-slate-100" href="<?= e($imageUrl) ?>" target="_blank" rel="noopener" data-no-fetch>
+                        <img class="aspect-[4/3] w-full object-cover" src="<?= e($imageUrl) ?>" alt="<?= e($typology['denomination']) ?>" loading="lazy">
                     </a>
                     <div class="min-w-0">
                         <div class="flex flex-wrap items-start justify-between gap-2">
-                            <h3 class="break-words text-base font-semibold text-slate-950"><?= e($typology['denomination']) ?></h3>
+                            <h3 class="text-anywhere max-w-full text-base font-semibold text-slate-950"><?= e($typology['denomination']) ?></h3>
                             <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-medium text-slate-600"><?= e($typology['category_name']) ?></span>
                         </div>
-                        <p class="mt-3 text-sm leading-6 text-slate-600"><?= e($typology['description']) ?></p>
+                        <p class="text-anywhere mt-3 text-sm leading-6 text-slate-600"><?= e($typology['description']) ?></p>
                         <p class="mt-3 text-xs font-semibold uppercase text-slate-500">Especificaciones técnicas</p>
-                        <p class="mt-1 text-sm leading-6 text-slate-600"><?= e($typology['specifications']) ?></p>
+                        <p class="text-anywhere mt-1 text-sm leading-6 text-slate-600"><?= e($typology['specifications']) ?></p>
                         <dl class="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
                             <div class="rounded-full bg-blue-50 px-3 py-1 text-blue-700">Vida útil: <?= e($typology['useful_life'] ?: 'N/A') ?></div>
                             <div class="rounded-full bg-emerald-50 px-3 py-1 text-emerald-700">Unidad: <?= e($typology['unit'] ?: 'N/A') ?></div>
