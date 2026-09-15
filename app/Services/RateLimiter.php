@@ -9,10 +9,8 @@ final class RateLimiter
 
     public function consume(string $key, int $limit = 30, int $window = 900): void
     {
-        if (!is_dir($this->directory) && !mkdir($this->directory, 0700, true) && !is_dir($this->directory)) {
-            throw new \RuntimeException('No se pudo preparar el control de acceso.');
-        }
-        $handle = fopen($this->directory . '/' . hash('sha256', $key) . '.json', 'c+');
+        $directory = $this->writableDirectory();
+        $handle = fopen($directory . '/' . hash('sha256', $key) . '.json', 'c+');
         if (!$handle || !flock($handle, LOCK_EX)) {
             throw new \RuntimeException('No se pudo verificar el limite de acceso.');
         }
@@ -34,5 +32,25 @@ final class RateLimiter
             flock($handle, LOCK_UN);
             fclose($handle);
         }
+    }
+
+    private function writableDirectory(): string
+    {
+        if ($this->prepare($this->directory)) {
+            return $this->directory;
+        }
+        $fallback = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'gestion-avaluatoria-rate-limits';
+        if ($this->prepare($fallback)) {
+            return $fallback;
+        }
+        throw new \RuntimeException('No se pudo preparar el control de acceso.');
+    }
+
+    private function prepare(string $directory): bool
+    {
+        if (file_exists($directory) && !is_dir($directory)) {
+            return false;
+        }
+        return (is_dir($directory) || mkdir($directory, 0700, true)) && is_writable($directory);
     }
 }

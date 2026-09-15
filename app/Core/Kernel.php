@@ -113,8 +113,23 @@ final class Kernel
     {
         error_log('Gestion avaluatoria login auth ' . get_class($error) . ' code=' . $error->getCode()
             . ' at ' . basename($error->getFile()) . ':' . $error->getLine());
-        Session::flash('login_error', 'No se pudo verificar el acceso. Revisa la conexión de funcionarios y permisos de storage/.');
+        Session::flash('login_error', $this->loginErrorMessage($error));
         Session::flash('login_username', $this->postedUsername());
+    }
+
+    private function loginErrorMessage(\Throwable $error): string
+    {
+        $text = $error->getMessage();
+        if ($error instanceof \PDOException) {
+            if (str_contains($text, '42S02') || str_contains($text, 'Base table or view not found')) {
+                return 'No se encontró la tabla de funcionarios. Revisa AUTH_TABLE.';
+            }
+            if (str_contains($text, '42S22') || str_contains($text, 'Unknown column')) {
+                return 'Faltan columnas de funcionarios. Revisa AUTH_USER_COLUMN y AUTH_PASSWORD_COLUMN.';
+            }
+            return 'No se pudo conectar a la base de funcionarios. Revisa AUTH_DB_* en producción.';
+        }
+        return 'No se pudo verificar el acceso. Revisa la conexión de funcionarios.';
     }
 
     private function loginData(): array

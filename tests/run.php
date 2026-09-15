@@ -81,6 +81,11 @@ try {
     $limiter->consume($key, 2);
     expectStatus(429, fn () => $limiter->consume($key, 2), 'limite persistente de intentos');
     unlink(__DIR__ . '/.runtime/rate-limits/' . hash('sha256', $key) . '.json');
+    $blockedDirectory = __DIR__ . '/.runtime/rate-limit-blocked';
+    file_put_contents($blockedDirectory, 'blocked');
+    (new RateLimiter($blockedDirectory))->consume(bin2hex(random_bytes(8)), 2);
+    expect(true, 'rate limit usa temporal si storage falla');
+    unlink($blockedDirectory);
     report();
 } finally {
     session_destroy();
