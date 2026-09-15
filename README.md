@@ -1,0 +1,93 @@
+# Gestión avaluatoria · SuCasa
+
+Base independiente PHP MVC + Alpine.js + Tailwind para continuar la implementación
+con el responsable del proyecto. No contiene todavía los cálculos ni los módulos
+completos de InversKC. El proyecto original permanece intacto.
+
+## Incluido
+
+- Login con funcionarios de SuCasa, sesiones, CSRF y límite de intentos.
+- Mis fichas, creación de borradores y formulario inicial con guardado en BD.
+- Autoguardado, validación, propiedad por usuario y conflictos entre pestañas.
+- Instalador y migraciones automáticas de tablas y columnas.
+- Assets locales compilados y estructura pequeña, sin dependencias PHP externas.
+
+## Arranque
+
+Requiere PHP 8.2+ con PDO MySQL y mbstring, MySQL 8+ o MariaDB 10.4+.
+Node.js 20+ solo es necesario para reconstruir assets; no en el hosting.
+
+1. Copia `.env.example` a `.env` y configura las dos conexiones. Usa la
+   [guía de base de datos](docs/DATABASE.md); no se incluyen credenciales reales.
+2. En la carpeta de este proyecto ejecuta:
+
+   ```powershell
+   php bin/console.php install --create-database
+   php bin/console.php auth:check
+   php -S 127.0.0.1:8088 -t public public/router.php
+   ```
+
+3. Abre [el acceso local](http://127.0.0.1:8088/login). Usa las credenciales de
+   otras aplicaciones de SuCasa. Si allí las claves están en texto plano, configura
+   `AUTH_ALLOW_LEGACY_PASSWORDS=true`; el valor predeterminado admite hashes PHP.
+
+En Windows: `Copy-Item .env.example .env`. El instalador requiere conexión y permisos
+válidos. Si la base ya existe, usa `php bin/console.php install` sin la opción CREATE.
+No hay endpoint web de instalación ni cuenta demo habilitada.
+
+## Desarrollo
+
+```powershell
+npm ci
+npm run build
+php tests/run.php
+npm test
+npm run check:size
+```
+
+En PowerShell usa `npm.cmd` si la política local bloquea `npm.ps1`.
+Composer es opcional para este esqueleto; el autoload mínimo ya está en `bootstrap.php`.
+
+```text
+app/Controllers/     Coordinación de solicitudes
+app/Models/          Consultas y propiedad de registros
+app/Services/        Autenticación, validación y reglas
+app/Core/            HTTP, sesión, configuración y conexiones
+app/Database/        Ejecutor y ayudas de migración
+app/Views/           Vistas y parciales
+database/migrations/ Cambios versionados del esquema
+resources/           JS y CSS fuente
+public/              Única raíz web; assets compilados incluidos
+routes/              Tabla de rutas
+storage/             Datos privados de ejecución
+tests/               Pruebas aisladas
+```
+
+## Publicar y actualizar
+
+- Configura el document root del dominio en `gestion-avaluatoria/public`.
+  No publiques el directorio raíz ni sirvas `.env` como archivo.
+- En Apache permite `.htaccess` y `mod_rewrite`; el `.htaccess` raíz deniega acceso
+  directo a carpetas privadas. Configura el virtual host para permitir `public/`.
+- En HTTPS usa `APP_ENV=production`, `SESSION_SECURE=true`. Para un subdirectorio
+  servido mediante alias configura `APP_BASE_PATH=/avaluatoria`; deja vacío en raíz.
+- Permite escribir en `storage/`; un único servidor comparte el límite de intentos
+  por filesystem. Para varios servidores implementar un limitador centralizado.
+- Sube assets compilados, código y migraciones. Excluye `node_modules/`, `tests/`,
+  secretos de desarrollo y bases temporales. Configura `.env` en el servidor.
+- Ejecuta `php bin/console.php migrate` durante el despliegue; con `AUTO_MIGRATE=true`
+  el primer acceso autenticado también aplica pendientes. Migraciones costosas deben
+  ejecutarse antes de abrir tráfico. La base inicial no borra tablas ni datos.
+- Para cambiar assets, recompila; se recomienda versionar sus URL al implementar
+  un despliegue con caché/CDN. No configurar caché inmutable para nombres fijos actuales.
+
+## Para continuar
+
+Lee [AGENTS.md](AGENTS.md), [base de datos](docs/DATABASE.md) y
+[entrega al responsable](docs/HANDOFF.md). Las decisiones visuales usan tipografía
+del sistema, superficies claras, acento teal, labels visibles y formularios por secciones.
+
+Los resultados y requisitos de las pruebas están en [validación](docs/VALIDATION.md).
+
+Referencias: [instalación de Alpine](https://alpinejs.dev/essentials/installation) y
+[compilación de Tailwind](https://tailwindcss.com/docs/installation/tailwind-cli).

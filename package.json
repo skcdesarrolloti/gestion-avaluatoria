@@ -1,0 +1,18 @@
+{
+  "name": "gestion-avaluatoria",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "build": "node scripts/build.mjs",
+    "test": "node --test tests/autosave.test.mjs",
+    "check:size": "node scripts/check-size.mjs"
+  },
+  "dependencies": {
+    "alpinejs": "3.17.3"
+  },
+  "devDependencies": {
+    "@tailwindcss/cli": "4.3.3",
+    "esbuild": "0.28.2",
+    "tailwindcss": "4.3.3"
+  }
+}

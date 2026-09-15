@@ -1,0 +1,2 @@
+# A virtual host must serve public/. Deny exposure of .env, app/ and storage/.
+Require all denied
