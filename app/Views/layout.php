@@ -20,6 +20,10 @@ $tabs = [
 ];
 ?>
 <body class="min-h-dvh bg-slate-50 text-slate-900 antialiased">
+    <div id="app-loader" class="app-loader" role="status" aria-live="polite" hidden>
+        <span class="app-spinner" aria-hidden="true"></span>
+        <span data-loader-text>Cargando...</span>
+    </div>
     <a href="#contenido" class="sr-only focus:not-sr-only focus:block focus:p-4">Saltar al contenido</a>
     <header class="<?= $logged ? 'bg-white' : 'border-b border-slate-200 bg-white' ?>">
         <?php if ($logged): ?>

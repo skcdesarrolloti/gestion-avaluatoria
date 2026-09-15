@@ -1,4 +1,10 @@
 export function appraisalForm() {
+    const loader = (active, text) => {
+        if (typeof document === 'undefined' || typeof document.dispatchEvent !== 'function') return;
+        if (typeof CustomEvent !== 'function') return;
+        document.dispatchEvent(new CustomEvent('ga:loader', { detail: { active, text } }));
+    };
+
     return {
         fields: {}, version: 1, endpoint: '', errors: {}, savedAt: '',
         dirty: false, saving: false, blocked: false, message: 'Lista para editar',
@@ -42,6 +48,7 @@ export function appraisalForm() {
             const snapshot = JSON.stringify(this.fields);
             this.saving = true;
             this.message = 'Guardando…';
+            loader(true, 'Guardando borrador...');
             const controller = new AbortController();
             const timeout = setTimeout(() => controller.abort(), 15000);
             let success = false;
@@ -76,6 +83,7 @@ export function appraisalForm() {
             } finally {
                 clearTimeout(timeout);
                 this.saving = false;
+                loader(false);
                 // Only serialize a following save after confirmed success; never overwrite conflicts.
                 if (success && this.dirty) this.timer = setTimeout(() => this.save(), 800);
             }

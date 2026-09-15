@@ -80,6 +80,10 @@ de negocio ni trasladar el controlador monolítico. No modificar InversKC al tra
 - No guardar datos sensibles en localStorage. La base conserva cambios no enviados solo
   en memoria; una futura recuperación offline requiere diseño explícito.
 - Estados vacíos, botones bloqueados durante envío, paginación y carga progresiva.
+- Navegación interna, paginación, formularios y cargas de archivos funcionan con
+  `fetch` estilo SPA, sin recarga completa visible. Toda acción muestra loader o
+  estado de progreso hasta recibir respuesta. Mantener rutas server-rendered como
+  fallback y usar recarga solo para descargas, PDF en nueva pestaña o enlaces externos.
 - No usar `x-html` con datos externos. Escapar con `e()` y validar en servidor.
 
 ## Entrega y verificación
