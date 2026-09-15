@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Core\Http;
 use App\Models\AppraisalRepository;
 use App\Services\AppraisalValidator;
+use App\Support\AppraisalCatalog;
 
 final class AppraisalController
 {
@@ -27,7 +28,8 @@ final class AppraisalController
     public function edit(string $id): void
     {
         $record = $this->appraisals->find($id, $this->user['id']);
-        view('appraisals/edit', ['title' => 'Ficha del avalúo', 'record' => $record]);
+        view('appraisals/edit', ['title' => 'Ficha del avalúo', 'record' => $record,
+            'catalog' => ['selects' => AppraisalCatalog::selectFields(), 'notes' => AppraisalCatalog::notes()]]);
     }
 
     public function save(string $id): never

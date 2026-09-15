@@ -1,11 +1,7 @@
-<?php
-$definitions = [
-    'titulo' => ['Título de la ficha', 'Ej. Apartamento en Laureles', 160],
-    'direccion' => ['Dirección', 'Ej. Calle 10 # 43-20', 220],
-    'municipio' => ['Municipio', 'Ej. Medellín', 120],
-];
-?>
+<?php use App\Support\AppraisalCatalog; ?>
+<?php $definitions = AppraisalCatalog::textFields(); ?>
 <?php foreach ($definitions as $name => [$label, $placeholder, $max]): ?>
+    <?php if ($name === 'observaciones') { continue; } ?>
     <div class="<?= $name === 'titulo' ? 'sm:col-span-2' : '' ?>">
         <label class="label" for="<?= e($name) ?>"><?= e($label) ?></label>
         <input class="input" id="<?= e($name) ?>" name="<?= e($name) ?>" x-model="fields.<?= e($name) ?>"
@@ -14,14 +10,20 @@ $definitions = [
         <p id="error-<?= e($name) ?>" class="field-error" x-text="errors.<?= e($name) ?> || ''"></p>
     </div>
 <?php endforeach; ?>
-<div class="sm:col-span-2">
-    <label for="tipo" class="label">Tipo de avalúo</label>
-    <select id="tipo" name="tipo" class="input" x-model="fields.tipo" :aria-invalid="Boolean(errors.tipo)" aria-describedby="error-tipo">
-        <option value="">Selecciona un tipo de avalúo</option>
-        <option value="urbano">Avalúo urbano</option><option value="posesion">Avalúo de posesión</option>
-    </select>
-    <p id="error-tipo" class="field-error" x-text="errors.tipo || ''"></p>
-</div>
+<?php foreach (AppraisalCatalog::selectFields() as $name => [$label, $placeholder, $max, $help, $options]): ?>
+    <div>
+        <label for="<?= e($name) ?>" class="label"><?= e($label) ?></label>
+        <select id="<?= e($name) ?>" name="<?= e($name) ?>" class="input" x-model="fields.<?= e($name) ?>"
+            :aria-invalid="Boolean(errors.<?= e($name) ?>)" aria-describedby="help-<?= e($name) ?> error-<?= e($name) ?>">
+            <option value=""><?= e($placeholder) ?></option>
+            <?php foreach ($options as $value => $text): ?>
+                <option value="<?= e($value) ?>"><?= e($text) ?></option>
+            <?php endforeach; ?>
+        </select>
+        <p id="help-<?= e($name) ?>" class="mt-1 text-xs leading-5 text-slate-500"><?= e($help) ?></p>
+        <p id="error-<?= e($name) ?>" class="field-error" x-text="errors.<?= e($name) ?> || ''"></p>
+    </div>
+<?php endforeach; ?>
 <div class="sm:col-span-2">
     <label for="observaciones" class="label">Observaciones</label>
     <textarea id="observaciones" name="observaciones" rows="5" class="input resize-y" x-model="fields.observaciones" maxlength="4000"

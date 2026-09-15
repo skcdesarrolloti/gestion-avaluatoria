@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace App\Models;
 use PDO;
 use App\Core\HttpException;
+use App\Support\AppraisalCatalog;
 
 final class AppraisalRepository
 {
@@ -34,8 +35,8 @@ final class AppraisalRepository
         if (!$row) {
             throw new HttpException(404, 'No se encontró la ficha.');
         }
+        $row = array_replace(AppraisalCatalog::defaults(), $row);
         $row['version'] = (int) $row['version'];
-        $row['observaciones'] ??= '';
         return $row;
     }
 
@@ -43,9 +44,14 @@ final class AppraisalRepository
     {
         $now = gmdate('Y-m-d H:i:s');
         $query = $this->db->prepare('UPDATE appraisals SET titulo = ?, tipo = ?, direccion = ?, municipio = ?,
-            observaciones = ?, version = version + 1, updated_at = ? WHERE id = ? AND owner_id = ? AND version = ?');
+            observaciones = ?, tipo_derecho = ?, tipo_negocio = ?, destinacion = ?, tipo_inmueble = ?,
+            subtipo_funcional = ?, finalidad = ?, base_valor = ?, aplica_niif = ?, regimen_ph = ?,
+            estructura_metodo = ?, version = version + 1, updated_at = ?
+            WHERE id = ? AND owner_id = ? AND version = ?');
         $query->execute([$data['titulo'], $data['tipo'], $data['direccion'], $data['municipio'],
-            $data['observaciones'], $now, $id, $owner, $version]);
+            $data['observaciones'], $data['tipo_derecho'], $data['tipo_negocio'], $data['destinacion'],
+            $data['tipo_inmueble'], $data['subtipo_funcional'], $data['finalidad'], $data['base_valor'],
+            $data['aplica_niif'], $data['regimen_ph'], $data['estructura_metodo'], $now, $id, $owner, $version]);
         if ($query->rowCount() !== 1) {
             $this->find($id, $owner);
             throw new HttpException(409, 'Esta ficha cambió en otra pestaña. Copia tus cambios antes de recargar.');

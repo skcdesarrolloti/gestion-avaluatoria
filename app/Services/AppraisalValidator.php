@@ -2,16 +2,27 @@
 declare(strict_types=1);
 namespace App\Services;
 use App\Core\HttpException;
+use App\Support\AppraisalCatalog;
 
 final class AppraisalValidator
 {
     public static function validate(array $input): array
     {
-        $limits = ['titulo' => 160, 'tipo' => 30, 'direccion' => 220, 'municipio' => 120, 'observaciones' => 4000];
+        $limits = [];
+        foreach (AppraisalCatalog::textFields() as $field => $definition) {
+            $limits[$field] = (int) $definition[2];
+        }
+        foreach (AppraisalCatalog::selectFields() as $field => $definition) {
+            $limits[$field] = (int) $definition[2];
+        }
         $errors = [];
         $data = [];
         foreach ($limits as $field => $limit) {
-            if (!isset($input[$field]) || !is_string($input[$field]) || !mb_check_encoding($input[$field], 'UTF-8')) {
+            if (!array_key_exists($field, $input)) {
+                $data[$field] = '';
+                continue;
+            }
+            if (!is_string($input[$field]) || !mb_check_encoding($input[$field], 'UTF-8')) {
                 $errors[$field] = 'Escribe un texto válido.';
                 continue;
             }
@@ -20,8 +31,11 @@ final class AppraisalValidator
                 $errors[$field] = "Usa un máximo de $limit caracteres.";
             }
         }
-        if (isset($data['tipo']) && !in_array($data['tipo'], ['', 'urbano', 'posesion'], true)) {
-            $errors['tipo'] = 'Selecciona una opción válida.';
+        foreach (array_keys(AppraisalCatalog::selectFields()) as $field) {
+            if (isset($data[$field]) && $data[$field] !== ''
+                && !in_array($data[$field], AppraisalCatalog::allowedValues($field), true)) {
+                $errors[$field] = 'Selecciona una opción válida.';
+            }
         }
         if (!isset($input['version']) || !is_int($input['version']) || $input['version'] < 1 || $input['version'] >= 4294967295) {
             throw new HttpException(422, 'La versión del borrador no es válida.');

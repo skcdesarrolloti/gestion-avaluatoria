@@ -19,7 +19,7 @@ $storageReport = $storageReport ?? ['dir' => '', 'configured' => false, 'writabl
     </div>
     <section class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
         <h2 class="text-lg font-semibold text-slate-950">Biblioteca NIIF</h2>
-        <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Las NIIF no sustituyen las NTS ni las IVS; se citan cuando el encargo tenga medición contable, valor razonable, deterioro, arrendamiento, activos financieros o revelación financiera.</p>
+        <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Las NIIF no sustituyen las NTS ni las IVS; se citan cuando el encargo tenga medición contable, valor razonable, deterioro, arrendamiento, activos financieros o revelación financiera. Cada norma tiene su propia caja para subir el PDF correspondiente.</p>
         <div class="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
             <span class="rounded-full bg-slate-100 px-3 py-1 text-slate-600"><?= e($stats['total']) ?> norma(s)</span>
             <span class="rounded-full bg-teal-50 px-3 py-1 text-teal-700"><?= e($stats['available']) ?> PDF cargado(s)</span>
@@ -109,7 +109,7 @@ $storageReport = $storageReport ?? ['dir' => '', 'configured' => false, 'writabl
                             <label class="block text-xs font-semibold uppercase text-slate-500">PDF de <?= e($standard['standard_code']) ?>
                                 <input class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700" type="file" name="ifrs_file[]" accept="application/pdf,.pdf" required>
                             </label>
-                            <button class="btn-primary w-full" type="submit" :disabled="busy" x-text="busy ? 'Importando…' : '<?= $standard['has_file'] ? 'Reemplazar PDF' : 'Importar PDF' ?>'"><?= $standard['has_file'] ? 'Reemplazar PDF' : 'Importar PDF' ?></button>
+                            <button class="btn-primary w-full" type="submit" :disabled="busy" x-text="busy ? 'Subiendo PDF…' : '<?= $standard['has_file'] ? 'Reemplazar PDF NIIF' : 'Subir PDF NIIF' ?>'"><?= $standard['has_file'] ? 'Reemplazar PDF NIIF' : 'Subir PDF NIIF' ?></button>
                         </form>
                     </article>
                 <?php endforeach; ?>

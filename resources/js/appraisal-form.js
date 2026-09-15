@@ -7,12 +7,14 @@ export function appraisalForm() {
 
     return {
         fields: {}, version: 1, endpoint: '', errors: {}, savedAt: '',
+        notes: {},
         dirty: false, saving: false, blocked: false, message: 'Lista para editar',
         timer: null, acknowledged: '', beforeLeave: null, online: null,
 
         init() {
             const initial = JSON.parse(this.$el.dataset.initial);
             this.fields = initial.fields;
+            this.notes = JSON.parse(this.$el.dataset.notes || '{}');
             this.version = initial.version;
             this.endpoint = initial.endpoint;
             this.acknowledged = JSON.stringify(this.fields);
@@ -25,6 +27,19 @@ export function appraisalForm() {
             this.online = () => { if (this.dirty && !this.blocked) this.save(); };
             window.addEventListener('beforeunload', this.beforeLeave);
             window.addEventListener('online', this.online);
+        },
+
+        selectedNotes() {
+            const labels = {
+                tipo: 'Tipo de avalúo', tipo_derecho: 'Tipo de derecho', finalidad: 'Finalidad',
+                base_valor: 'Base/tipo de valor', aplica_niif: '¿Aplica NIIF?',
+                regimen_ph: 'Régimen PH', estructura_metodo: 'Estructura del método',
+            };
+            return Object.keys(labels).map((key) => {
+                const value = this.fields[key] || '';
+                const note = this.notes[key]?.[value];
+                return note ? { key, label: labels[key], ...note } : null;
+            }).filter(Boolean);
         },
 
         changed() {

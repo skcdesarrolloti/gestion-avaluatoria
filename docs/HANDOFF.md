@@ -59,7 +59,10 @@ implementación. Si se generan documentos de SuCasa, aplicar la skill de brandin
 ## Contrato del autoguardado
 
 POST `/avaluos/{id}/borrador`, cookie de sesión, token CSRF y JSON con `version`,
-`titulo`, `tipo`, `direccion`, `municipio`, `observaciones`. Se aceptan borradores vacíos.
+`titulo`, `tipo`, `direccion`, `municipio`, `observaciones`, `tipo_derecho`,
+`tipo_negocio`, `destinacion`, `tipo_inmueble`, `subtipo_funcional`, `finalidad`,
+`base_valor`, `aplica_niif`, `regimen_ph` y `estructura_metodo`.
+Se aceptan borradores vacíos.
 Respuesta 200 confirma versión y fecha. 401 sesión, 419 CSRF, 422 validación,
 404 ficha inexistente/ajena, 409 conflicto de versión. El frontend conserva valores
 en memoria ante error y bloquea sobrescritura ante conflicto; hay que copiar los cambios
@@ -67,6 +70,11 @@ antes de recargar. La pérdida de conexión no equivale a haber guardado.
 
 La base no promete recuperar texto no enviado tras cerrar el navegador. Recupera
 de BD lo confirmado. No se autoguardan credenciales ni acciones definitivas.
+
+El expediente conserva la capa didáctica heredada del avance anterior, pero cada
+campo se clasifica como soporte normativo directo, derivación técnica/metodológica
+u organización operativa interna. Las opciones no deben presentarse como mandato
+legal literal si solo son ayudas de clasificación para el analista.
 
 ## Pruebas aisladas
 
