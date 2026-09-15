@@ -89,6 +89,8 @@ tests/               Pruebas aisladas
   implementar un limitador centralizado.
 - Sube assets compilados, código y migraciones. Excluye `node_modules/`, `tests/`,
   secretos de desarrollo y bases temporales. Configura `.env` en el servidor.
+  Si el despliegue Git borra `.env`, crea `.gestion-avaluatoria.env` en la carpeta
+  padre del proyecto; la app lo lee después de `.env` y no se versiona.
 - Ejecuta `php bin/console.php migrate` durante el despliegue; con `AUTO_MIGRATE=true`
   el primer acceso autenticado también aplica pendientes. Migraciones costosas deben
   ejecutarse antes de abrir tráfico. La base inicial no borra tablas ni datos.

@@ -11,5 +11,12 @@ spl_autoload_register(static function (string $class): void {
     }
 });
 require BASE_PATH . '/app/Support/helpers.php';
-App\Core\Env::load(BASE_PATH . '/.env');
+$envFiles = [
+    BASE_PATH . '/.env',
+    BASE_PATH . '/.env.local',
+    dirname(BASE_PATH) . '/.gestion-avaluatoria.env',
+];
+foreach ($envFiles as $envFile) {
+    App\Core\Env::load($envFile);
+}
 date_default_timezone_set('America/Bogota');

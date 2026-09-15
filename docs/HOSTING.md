@@ -15,6 +15,11 @@ git pull --ff-only origin main
 Si el panel tiene despliegue Git, ejecutar su acción de actualizar/desplegar para que
 la versión nueva llegue a la carpeta que sirve el dominio. Conservar el `.env` local.
 
+Algunos despliegues Git limpian la carpeta y eliminan archivos no versionados. Si eso
+borra `.env`, crea un archivo persistente llamado `.gestion-avaluatoria.env` en la
+carpeta padre del proyecto y coloca allí las mismas variables. El bootstrap lo lee
+después de `.env`, queda fuera del repositorio y no se elimina al actualizar el checkout.
+
 ## Elegir la ruta según la configuración del dominio
 
 | Raíz configurada en el hosting | APP_BASE_PATH en .env | Dirección del login |
