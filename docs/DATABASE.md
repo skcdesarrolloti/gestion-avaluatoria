@@ -48,7 +48,7 @@ No debes crear tablas ni pegar sentencias SQL. El programa hace esa parte.
 | `valuation_legal_documents` | Catálogo fuente de leyes, decretos y resoluciones vigentes o derogadas |
 | `valuation_legal_articles` | Artículos o fragmentos jurídicos pertinentes por categoría |
 | `valuation_international_groups` | Familias de normas internacionales IVS |
-| `valuation_international_standards` | Catálogo IVS separado del marco jurídico colombiano |
+| `valuation_international_standards` | Catálogo IVS separado del marco jurídico colombiano y metadatos del PDF privado |
 
 `owner_id` guarda `_ID` del funcionario. No hay FK entre servidores/bases ni copia de
 contraseñas. `id` es aleatorio (32 caracteres hexadecimales), pero siempre se comprueba

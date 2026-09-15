@@ -32,6 +32,7 @@ Rutas internas esperadas:
 ```dotenv
 NTS_STORAGE_DIR=storage/normas-tecnicas-sectoriales
 LEGAL_STORAGE_DIR=storage/marco-juridico-nacional
+IVS_STORAGE_DIR=storage/normas-internacionales-valuacion
 ```
 
 Si se cargan las 22 normas en un solo intento, revisar `upload_max_filesize`,

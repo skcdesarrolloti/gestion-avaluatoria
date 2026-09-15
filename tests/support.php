@@ -20,6 +20,11 @@ function expectStatus(int $status, callable $callback, string $label): void
     throw new RuntimeException('FALLO: ' . $label . ' no rechazo la solicitud');
 }
 
+function uploadFixture(string $name, string $tmpName, int $error = UPLOAD_ERR_OK): array
+{
+    return ['name' => [$name], 'tmp_name' => [$tmpName], 'error' => [$error]];
+}
+
 function fixture(PDO $db): void
 {
     $db->exec('CREATE TABLE wp_jet_cct_funcionarios (_ID INTEGER PRIMARY KEY, id_empleado VARCHAR(80),

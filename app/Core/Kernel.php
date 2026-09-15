@@ -45,10 +45,18 @@ final class Kernel
             }
             if ($method === 'POST') {
                 if (in_array($action, ['import', 'importFile'], true)
-                    && in_array($controller, ['standards', 'legal'], true)
+                    && in_array($controller, ['standards', 'legal', 'international'], true)
                     && $this->uploadLikelyExceededPostLimit()) {
-                    $flash = $controller === 'legal' ? 'legal_import' : 'standards_import';
-                    $route = $controller === 'legal' ? 'marco-juridico-valuatorio' : 'normas-tecnicas-sectoriales';
+                    $flash = match ($controller) {
+                        'legal' => 'legal_import',
+                        'international' => 'international_import',
+                        default => 'standards_import',
+                    };
+                    $route = match ($controller) {
+                        'legal' => 'marco-juridico-valuatorio',
+                        'international' => 'normas-internacionales-valuacion',
+                        default => 'normas-tecnicas-sectoriales',
+                    };
                     Session::flash($flash, json_encode([
                         'ok' => false,
                         'message' => 'La carga superó el límite post_max_size de PHP. Sube menos archivos por lote o aumenta el límite en el hosting.',

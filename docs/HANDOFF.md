@@ -97,3 +97,5 @@ actos y artículos aplicables por categoría. El menú de Normas Internacionales
 Valuación registra la estructura IVS por familia y su relación con categorías RAA.
 Los PDFs fuente del marco jurídico se importan desde la pantalla del módulo y se guardan
 en `storage/marco-juridico-nacional/`; Git conserva la carpeta base pero ignora los PDFs.
+Los PDFs de IVS se cargan desde cada tarjeta internacional y se guardan en
+`storage/normas-internacionales-valuacion/`.

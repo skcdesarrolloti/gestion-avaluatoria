@@ -8,6 +8,7 @@ use App\Core\Http;
 use App\Services\AppraisalValidator;
 use App\Services\AuthDiagnostics;
 use App\Services\AuthService;
+use App\Services\InternationalStandardFileImportService;
 use App\Services\LegalDocumentFileImportService;
 use App\Services\LegalDocumentImportService;
 use App\Services\RateLimiter;
@@ -81,8 +82,9 @@ try {
         code TEXT PRIMARY KEY, name TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_international_standards (
         slug TEXT PRIMARY KEY, group_code TEXT, standard_code TEXT, title TEXT, applicable_categories TEXT,
-        summary TEXT, effective_from TEXT, status TEXT, source_reference TEXT, sort_order INTEGER,
-        created_at TEXT, updated_at TEXT)");
+        summary TEXT, effective_from TEXT, status TEXT, source_reference TEXT, source_filename TEXT DEFAULT '',
+        storage_filename TEXT DEFAULT '', file_size_bytes INTEGER, imported_at TEXT, sort_order INTEGER, created_at TEXT,
+        updated_at TEXT)");
     $db->exec("INSERT INTO valuation_legal_categories VALUES
         ('A', 'Marco jurídico general', 'general', 0, '2026-09-15 00:00:00', '2026-09-15 00:00:00'),
         ('1', 'Inmuebles urbanos', 'category', 11, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
@@ -98,7 +100,7 @@ try {
         ('400', 'Inmuebles', 1, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
     $db->exec("INSERT INTO valuation_international_standards VALUES
         ('ivs-400-real-property', '400', 'IVS 400', 'Real Property Interests', '1,2',
-        'Derechos sobre inmuebles.', '2025-01-31', 'vigente', 'IVSC', 1,
+        'Derechos sobre inmuebles.', '2025-01-31', 'vigente', 'IVSC', '', '', NULL, NULL, 1,
         '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
     $seedB1 = require dirname(__DIR__) . '/database/migrations/202609150007_seed_b1_urban_legal_bibliography.php';
     $seedB1(new Schema($db));
@@ -116,23 +118,18 @@ try {
     putenv('LEGAL_STORAGE_DIR=' . $legalDir);
     $tmpLegalPdf = tempnam(sys_get_temp_dir(), 'ga_legal_pdf_');
     file_put_contents($tmpLegalPdf, "%PDF-1.4\n%legal\n");
-    $legalImport = (new LegalDocumentImportService($legal))->importUploaded(['name' => ['Ley 1673 de 2013.pdf'],
-        'tmp_name' => [$tmpLegalPdf], 'error' => [UPLOAD_ERR_OK]], 'A', 'vigente');
+    $legalImport = (new LegalDocumentImportService($legal))->importUploaded(uploadFixture('Ley 1673 de 2013.pdf', $tmpLegalPdf), 'A', 'vigente');
     expect(count($legalImport['copied']) === 1, 'importacion PDF juridico');
     $tmpB1Pdf = tempnam(sys_get_temp_dir(), 'ga_b1_pdf_');
     file_put_contents($tmpB1Pdf, "%PDF-1.4\n%b1\n");
-    (new LegalDocumentImportService($legal))->importUploaded(['name' => ['Ley 388 de 1997.pdf'],
-        'tmp_name' => [$tmpB1Pdf], 'error' => [UPLOAD_ERR_OK]], '1', 'vigente');
+    (new LegalDocumentImportService($legal))->importUploaded(uploadFixture('Ley 388 de 1997.pdf', $tmpB1Pdf), '1', 'vigente');
     $urbanDocument = $legal->find('b1-01-ley-388-1997');
-    expect($urbanDocument['has_file'] && $urbanDocument['source_filename'] === 'Ley 388 de 1997.pdf',
-        'importacion juridica enlaza PDF con documento B1');
+    expect($urbanDocument['has_file'] && $urbanDocument['source_filename'] === 'Ley 388 de 1997.pdf', 'importacion juridica enlaza PDF con documento B1');
     $tmpCardPdf = tempnam(sys_get_temp_dir(), 'ga_b1_card_pdf_');
     file_put_contents($tmpCardPdf, "%PDF-1.4\n%b1-card\n");
-    (new LegalDocumentFileImportService($legal))->importFor(['name' => ['archivo consultado.pdf'],
-        'tmp_name' => [$tmpCardPdf], 'error' => [UPLOAD_ERR_OK]], $legal->find('b1-02-decreto-1170-2015-capitulo-3'));
+    (new LegalDocumentFileImportService($legal))->importFor(uploadFixture('archivo consultado.pdf', $tmpCardPdf), $legal->find('b1-02-decreto-1170-2015-capitulo-3'));
     $cardDocument = $legal->find('b1-02-decreto-1170-2015-capitulo-3');
-    expect($cardDocument['has_file'] && $cardDocument['source_filename'] === 'archivo consultado.pdf',
-        'importacion juridica por tarjeta no depende del nombre');
+    expect($cardDocument['has_file'] && $cardDocument['source_filename'] === 'archivo consultado.pdf', 'importacion juridica por tarjeta no depende del nombre');
     if (class_exists(ZipArchive::class)) {
         $zipPath = tempnam(sys_get_temp_dir(), 'ga_legal_zip_');
         $zip = new ZipArchive();
@@ -140,11 +137,7 @@ try {
         $zip->addFromString('Decreto 1420 de 1998.pdf', "%PDF-1.4\n%decreto\n");
         $zip->addFromString('carpeta/Resolucion 620 de 2008.pdf', "%PDF-1.4\n%resolucion\n");
         $zip->close();
-        $zipImport = (new LegalDocumentImportService($legal))->importUploaded([
-            'name' => ['normativa-juridica.zip'],
-            'tmp_name' => [$zipPath],
-            'error' => [UPLOAD_ERR_OK],
-        ], 'A', 'vigente');
+        $zipImport = (new LegalDocumentImportService($legal))->importUploaded(uploadFixture('normativa-juridica.zip', $zipPath), 'A', 'vigente');
         expect(count($zipImport['copied']) === 2, 'importacion ZIP juridico extrae PDFs');
         unlink($zipPath);
     }
@@ -163,6 +156,17 @@ try {
     $international = new InternationalStandardRepository($db);
     $ivsGroups = $international->groupsWithStandards();
     expect($ivsGroups[0]['standards'][0]['standard_code'] === 'IVS 400', 'normas internacionales separadas');
+    $ivsDir = sys_get_temp_dir() . '/ga_ivs_' . bin2hex(random_bytes(4));
+    putenv('IVS_STORAGE_DIR=' . $ivsDir);
+    $tmpIvsPdf = tempnam(sys_get_temp_dir(), 'ga_ivs_pdf_');
+    file_put_contents($tmpIvsPdf, "%PDF-1.4\n%ivs\n");
+    (new InternationalStandardFileImportService($international))->importFor(uploadFixture('IVS 400.pdf', $tmpIvsPdf),
+        $international->find('ivs-400-real-property'));
+    $ivs400 = $international->find('ivs-400-real-property');
+    expect($ivs400['has_file'] && $international->storageReport()['present'] === 1, 'importacion PDF IVS por tarjeta');
+    unlink(InternationalStandardRepository::storagePath($ivs400['storage_filename']));
+    rmdir($ivsDir);
+    putenv('IVS_STORAGE_DIR');
     $igac = new IgacTypologyRepository();
     expect($igac->stats()['total'] === 202, 'catalogo IGAC contiene 202 tipologias');
     expect(count($igac->byCategory('RESIDENCIALES')) === 23, 'tipologias IGAC agrupadas por categoria');
@@ -171,11 +175,7 @@ try {
     expect(ValuationStandardRepository::storageDir() === str_replace('\\', '/', $normsDir), 'carpeta privada de normas configurable');
     $tmpPdf = tempnam(sys_get_temp_dir(), 'ga_pdf_');
     file_put_contents($tmpPdf, "%PDF-1.4\n%test\n");
-    $import = (new ValuationStandardRepository($db))->importUploaded([
-        'name' => ['01 NTS S04 Codigo conducta.pdf'],
-        'tmp_name' => [$tmpPdf],
-        'error' => [UPLOAD_ERR_OK],
-    ]);
+    $import = (new ValuationStandardRepository($db))->importUploaded(uploadFixture('01 NTS S04 Codigo conducta.pdf', $tmpPdf));
     expect(count($import['copied']) === 1 && $import['missing'] === [], 'importacion PDF por lote');
     $report = (new ValuationStandardRepository($db))->storageReport();
     expect($report['configured'] === true && $report['present'] === 1 && $report['marked_missing'] === 0, 'diagnostico confirma PDF persistido');

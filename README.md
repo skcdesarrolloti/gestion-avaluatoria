@@ -12,7 +12,7 @@ completos de InversKC. El proyecto original permanece intacto.
 - Biblioteca inicial de Normas Técnicas Sectoriales, categorizada por A, B y 1 a 13.
 - Menú de Marco Jurídico Nacional con bibliografía inicial B1 a B13 por categoría,
   guardando solo artículos o fragmentos pertinentes como material de consulta.
-- Menú separado de Normas Internacionales de Valuación con estructura IVS.
+- Menú separado de Normas Internacionales de Valuación con estructura IVS y PDFs por norma.
 - Catálogo de Tipologías Constructivas IGAC como referencia visual por categoría.
 - Instalador y migraciones automáticas de tablas y columnas.
 - Assets locales compilados y estructura pequeña, sin dependencias PHP externas.
@@ -74,6 +74,9 @@ El Marco Jurídico Nacional usa el mismo criterio para documentos fuente:
 `LEGAL_STORAGE_DIR=storage/marco-juridico-nacional`. Cada PDF se sube desde la tarjeta
 del documento jurídico correspondiente para evitar duplicados por nombre; los
 artículos o fragmentos aplicables se incorporan después.
+Las Normas Internacionales de Valuación guardan sus PDFs en
+`storage/normas-internacionales-valuacion/`; cada archivo se carga desde la tarjeta
+de la IVS correspondiente.
 
 ```text
 app/Controllers/     Coordinación de solicitudes
