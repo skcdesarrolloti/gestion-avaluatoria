@@ -3,6 +3,7 @@ declare(strict_types=1);
 require dirname(__DIR__) . '/bootstrap.php';
 require __DIR__ . '/support.php';
 use App\Core\Session;
+use App\Core\Http;
 use App\Services\AppraisalValidator;
 use App\Services\AuthService;
 use App\Services\RateLimiter;
@@ -28,6 +29,13 @@ try {
     $_SERVER['HTTP_X_CSRF_TOKEN'] = 'test-token';
     Session::csrf();
     expect(true, 'CSRF valido');
+    $_SERVER['SCRIPT_NAME'] = '/public/index.php';
+    putenv('APP_BASE_PATH');
+    expect(Http::basePath() === '/public' && url('assets/app.css') === '/public/assets/app.css', 'base path public detectado');
+    putenv('APP_BASE_PATH=/avaluatoria');
+    expect(Http::basePath() === '/avaluatoria', 'base path configurado prevalece');
+    putenv('APP_BASE_PATH');
+    unset($_SERVER['SCRIPT_NAME']);
     $db = new PDO('sqlite::memory:', null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
     fixture($db);
     $db->exec("CREATE TABLE valuation_standard_categories (

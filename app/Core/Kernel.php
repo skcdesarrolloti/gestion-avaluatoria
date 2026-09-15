@@ -20,7 +20,7 @@ final class Kernel
         header('Referrer-Policy: same-origin');
         header('Cache-Control: no-store');
         $path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH) ?: '/';
-        $base = rtrim(Env::get('APP_BASE_PATH'), '/');
+        $base = Http::basePath();
         if ($base !== '' && $path !== $base && !str_starts_with($path, $base . '/')) {
             throw new HttpException(404, 'Página no encontrada.');
         }

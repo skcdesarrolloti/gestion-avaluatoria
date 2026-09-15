@@ -8,7 +8,7 @@ function e(mixed $value): string
 
 function url(string $route = ''): string
 {
-    return rtrim(App\Core\Env::get('APP_BASE_PATH'), '/') . '/' . ltrim($route, '/');
+    return App\Core\Http::basePath() . '/' . ltrim($route, '/');
 }
 
 function view(string $template, array $data = []): void

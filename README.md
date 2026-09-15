@@ -80,6 +80,8 @@ tests/               Pruebas aisladas
   No publiques el directorio raíz ni sirvas `.env` como archivo.
 - En Apache permite `.htaccess` y `mod_rewrite`; el `.htaccess` raíz deniega acceso
   directo a carpetas privadas. Configura el virtual host para permitir `public/`.
+- Si temporalmente accedes como `dominio.com/public`, configura `APP_BASE_PATH=/public`
+  hasta cambiar el document root; la aplicación también intenta detectarlo.
 - En HTTPS usa `APP_ENV=production`, `SESSION_SECURE=true`. Para un subdirectorio
   servido mediante alias configura `APP_BASE_PATH=/avaluatoria`; deja vacío en raíz.
 - Permite escribir en `storage/`; un único servidor comparte el límite de intentos

@@ -37,6 +37,19 @@ final class Http
         return $data;
     }
 
+    public static function basePath(): string
+    {
+        $configured = rtrim(Env::get('APP_BASE_PATH'), '/');
+        if ($configured !== '') {
+            return '/' . trim($configured, '/');
+        }
+        $script = str_replace('\\', '/', $_SERVER['SCRIPT_NAME'] ?? '');
+        if (str_ends_with($script, '/public/index.php')) {
+            return substr($script, 0, -strlen('/index.php'));
+        }
+        return '';
+    }
+
     public static function redirect(string $route): never
     {
         header('Location: ' . url($route), true, 303);
