@@ -56,8 +56,9 @@ propiedad. Fechas en UTC; presentación en America/Bogota. Índice por propietar
 Las tablas de cálculos, documentos y flujos se agregarán según la implementación del jefe.
 Los PDFs de normas no se guardan en Git; se importan a `storage/` con
 `php bin/console.php standards:import <carpeta>`.
-Para leyes extensas, la base conserva la ficha del documento fuente y solo almacena
-los artículos, incisos o extractos necesarios para la categoría/finalidad del avalúo.
+Para leyes extensas, la base conserva la ficha del documento fuente y el PDF privado,
+pero solo almacena como consulta los artículos, incisos o extractos necesarios para
+la categoría/finalidad del avalúo.
 
 ## 4. Nueva tabla o columna
 

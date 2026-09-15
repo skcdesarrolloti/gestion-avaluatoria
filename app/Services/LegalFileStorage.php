@@ -2,17 +2,14 @@
 declare(strict_types=1);
 namespace App\Services;
 
-final class StandardFileStorage
+final class LegalFileStorage
 {
-    private const ENV_KEY = 'NTS_STORAGE_DIR';
-    private const DEFAULT_DIR = '/storage/normas-tecnicas-sectoriales';
+    private const ENV_KEY = 'LEGAL_STORAGE_DIR';
+    private const DEFAULT_DIR = '/storage/marco-juridico-nacional';
 
     public static function configured(): bool { return PdfFileStorage::configured(self::ENV_KEY); }
 
-    public static function dir(): string
-    {
-        return PdfFileStorage::dir(self::ENV_KEY, self::DEFAULT_DIR);
-    }
+    public static function dir(): string { return PdfFileStorage::dir(self::ENV_KEY, self::DEFAULT_DIR); }
 
     public static function path(string $filename): string { return PdfFileStorage::path(self::dir(), $filename); }
 

@@ -53,3 +53,21 @@ público siguen devolviendo 403. Se verificaron enlaces, formulario y cookie con
 `/public`. Pasaron nuevamente las pruebas PHP, JS, compilación y control de tamaño.
 La corrección requiere actualizar el despliegue del hosting y configurar APP_BASE_PATH
 según [HOSTING.md](HOSTING.md); no se modificó el servidor remoto desde esta sesión.
+
+## Carga de documentos jurídicos
+
+Se agregó carga privada de PDFs fuente para Marco Jurídico Nacional con diagnóstico
+de ruta, permisos, archivos físicos y registros marcados sin archivo. También se
+reutilizó la verificación de PDF para Normas Técnicas Sectoriales.
+
+Verificación local ejecutada el 15 de septiembre de 2026:
+
+- Sintaxis de todos los PHP del proyecto: correcta.
+- `php tests/run.php`: 39 verificaciones correctas.
+- `npm test`: 9 pruebas correctas.
+- `npm run build`: compilación correcta.
+- `npm run check:size`: CSS + JS 27,1 KB gzip.
+
+`php tests/database.php` no se ejecutó en esta pasada porque `GA_TEST_PORT` no estaba
+definido. En producción falta confirmar `LEGAL_STORAGE_DIR` y `NTS_STORAGE_DIR` en
+carpetas persistentes fuera del checkout del despliegue.

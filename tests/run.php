@@ -7,6 +7,7 @@ use App\Core\Http;
 use App\Services\AppraisalValidator;
 use App\Services\AuthDiagnostics;
 use App\Services\AuthService;
+use App\Services\LegalDocumentImportService;
 use App\Services\RateLimiter;
 use App\Models\FuncionarioRepository;
 use App\Models\InternationalStandardRepository;
@@ -66,6 +67,8 @@ try {
     $db->exec("CREATE TABLE valuation_legal_documents (
         slug TEXT PRIMARY KEY, category_code TEXT, document_code TEXT, title TEXT, document_type TEXT,
         status TEXT, issued_at TEXT, repealed_at TEXT, source_reference TEXT, summary TEXT,
+        source_filename TEXT DEFAULT '', storage_filename TEXT DEFAULT '', file_size_bytes INTEGER,
+        imported_at TEXT,
         sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_legal_articles (
         id INTEGER PRIMARY KEY, document_slug TEXT, category_code TEXT, article_label TEXT, title TEXT,
@@ -81,7 +84,8 @@ try {
         ('1', 'Inmuebles urbanos', 'category', 11, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
     $db->exec("INSERT INTO valuation_legal_documents VALUES
         ('ley-388-1997', 'A', 'Ley 388 de 1997', 'Ordenamiento territorial', 'Ley', 'vigente',
-        NULL, NULL, 'Fuente oficial', 'Documento fuente', 1, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
+        NULL, NULL, 'Fuente oficial', 'Documento fuente', '', '', NULL, NULL, 1,
+        '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
     $db->exec("INSERT INTO valuation_legal_articles VALUES
         (1, 'ley-388-1997', '1', 'Artículo 61', 'Adquisición de inmuebles',
         'Extracto pertinente para avalúos urbanos.', 'Usar solo cuando la finalidad corresponda.',
@@ -101,6 +105,23 @@ try {
     expect($legalCategories[0]['name'] === 'Marco jurídico general', 'categoria juridica general disponible');
     expect(count($legalCategories[1]['articles']) === 1, 'marco juridico guarda articulos pertinentes por categoria');
     expect($legal->stats($legalCategories)['articles'] === 1, 'marco juridico cuenta articulos sin ley completa');
+    $legalDir = sys_get_temp_dir() . '/ga_legal_' . bin2hex(random_bytes(4));
+    putenv('LEGAL_STORAGE_DIR=' . $legalDir);
+    $tmpLegalPdf = tempnam(sys_get_temp_dir(), 'ga_legal_pdf_');
+    file_put_contents($tmpLegalPdf, "%PDF-1.4\n%legal\n");
+    $legalImport = (new LegalDocumentImportService($legal))->importUploaded([
+        'name' => ['Ley 1673 de 2013.pdf'],
+        'tmp_name' => [$tmpLegalPdf],
+        'error' => [UPLOAD_ERR_OK],
+    ], 'A', 'vigente');
+    expect(count($legalImport['copied']) === 1, 'importacion PDF juridico');
+    $legalCategories = $legal->categoriesWithDocuments();
+    $storedLegal = $legalCategories[0]['documents'][1];
+    expect($storedLegal['has_file'] === true && $storedLegal['document_type'] === 'Ley', 'documento juridico queda consultable');
+    unlink(LegalDocumentRepository::storagePath($storedLegal['storage_filename']));
+    expect($legal->storageReport()['marked_missing'] === 1, 'diagnostico juridico detecta PDF faltante');
+    rmdir($legalDir);
+    putenv('LEGAL_STORAGE_DIR');
     $international = new InternationalStandardRepository($db);
     $ivsGroups = $international->groupsWithStandards();
     expect($ivsGroups[0]['standards'][0]['standard_code'] === 'IVS 400', 'normas internacionales separadas');

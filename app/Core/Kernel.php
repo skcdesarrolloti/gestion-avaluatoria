@@ -42,12 +42,15 @@ final class Kernel
                 continue;
             }
             if ($method === 'POST') {
-                if ($controller === 'standards' && $action === 'import' && $this->uploadLikelyExceededPostLimit()) {
-                    Session::flash('standards_import', json_encode([
+                if ($action === 'import' && in_array($controller, ['standards', 'legal'], true)
+                    && $this->uploadLikelyExceededPostLimit()) {
+                    $flash = $controller === 'legal' ? 'legal_import' : 'standards_import';
+                    $route = $controller === 'legal' ? 'marco-juridico-valuatorio' : 'normas-tecnicas-sectoriales';
+                    Session::flash($flash, json_encode([
                         'ok' => false,
                         'message' => 'La carga superó el límite post_max_size de PHP. Sube menos PDFs por lote o aumenta el límite en el hosting.',
                     ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
-                    Http::redirect('normas-tecnicas-sectoriales');
+                    Http::redirect($route);
                 }
                 try {
                     Session::csrf();

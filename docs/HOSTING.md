@@ -35,6 +35,11 @@ NTS_STORAGE_DIR=/home/usuario/gestion-avaluatoria-storage/normas-tecnicas-sector
 Si se cargan las 22 normas en un solo intento, revisar `upload_max_filesize`,
 `post_max_size` y `max_file_uploads`; algunos hostings aceptan solo 20 archivos por
 petición o no permiten PDFs grandes sin subir el límite.
+Para la biblioteca jurídica nacional aplica el mismo patrón con otra carpeta privada:
+
+```dotenv
+LEGAL_STORAGE_DIR=/home/usuario/gestion-avaluatoria-storage/marco-juridico-nacional
+```
 
 ## Elegir la ruta según la configuración del dominio
 
