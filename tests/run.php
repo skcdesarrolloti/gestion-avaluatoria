@@ -31,6 +31,9 @@ try {
     expect(true, 'CSRF valido');
     Session::refreshCsrf();
     expect($_SESSION['csrf'] !== 'test-token', 'CSRF renovado tras vencimiento');
+    Session::flash('login_error', 'Mensaje temporal');
+    expect(Session::pullFlash('login_error') === 'Mensaje temporal', 'flash disponible una vez');
+    expect(Session::pullFlash('login_error') === '', 'flash se limpia al leer');
     $_SERVER['SCRIPT_NAME'] = '/public/index.php';
     putenv('APP_BASE_PATH');
     expect(Http::basePath() === '/public' && url('assets/app.css') === '/public/assets/app.css', 'base path public detectado');

@@ -25,9 +25,9 @@ final class AuthController
         if ($valid && $this->auth->attempt(trim($login), $password)) {
             Http::redirect('');
         }
-        http_response_code(422);
-        view('auth/login', ['title' => 'Iniciar sesión', 'error' => 'Usuario o contraseña incorrectos, o acceso no habilitado.',
-            'username' => is_string($login) ? substr($login, 0, 190) : '']);
+        Session::flash('login_error', 'Usuario o contraseña incorrectos, o acceso no habilitado.');
+        Session::flash('login_username', is_string($login) ? substr($login, 0, 190) : '');
+        Http::redirect('login');
     }
 
     public function logout(): never

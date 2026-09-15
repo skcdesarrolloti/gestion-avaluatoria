@@ -42,20 +42,16 @@ final class Kernel
                 } catch (HttpException $error) {
                     if ($controller === 'auth' && $action === 'attempt') {
                         Session::refreshCsrf();
-                        http_response_code($error->status);
-                        view('auth/login', [
-                            'title' => 'Iniciar sesión',
-                            'error' => $error->getMessage(),
-                            'username' => $this->postedUsername(),
-                        ]);
-                        return;
+                        Session::flash('login_error', $error->getMessage());
+                        Session::flash('login_username', $this->postedUsername());
+                        Http::redirect('login');
                     }
                     throw $error;
                 }
             }
             // The login form is accessible before database credentials are configured.
             if ($controller === 'auth' && $action === 'login') {
-                view('auth/login', ['title' => 'Iniciar sesión']);
+                view('auth/login', $this->loginData());
                 return;
             }
             if ($controller === 'auth' && $action === 'logout') {
@@ -98,5 +94,14 @@ final class Kernel
     {
         $username = $_POST['username'] ?? '';
         return is_string($username) ? substr($username, 0, 190) : '';
+    }
+
+    private function loginData(): array
+    {
+        return [
+            'title' => 'Iniciar sesión',
+            'error' => Session::pullFlash('login_error'),
+            'username' => Session::pullFlash('login_username'),
+        ];
     }
 }

@@ -38,6 +38,18 @@ final class Session
         $_SESSION['csrf'] = bin2hex(random_bytes(32));
     }
 
+    public static function flash(string $key, string $value): void
+    {
+        $_SESSION['_flash'][$key] = $value;
+    }
+
+    public static function pullFlash(string $key): string
+    {
+        $value = $_SESSION['_flash'][$key] ?? '';
+        unset($_SESSION['_flash'][$key]);
+        return is_string($value) ? $value : '';
+    }
+
     public static function logout(): void
     {
         $_SESSION = [];
