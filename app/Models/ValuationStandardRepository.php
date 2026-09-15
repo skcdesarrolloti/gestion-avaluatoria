@@ -1,23 +1,17 @@
 <?php
 declare(strict_types=1);
 namespace App\Models;
-use App\Core\Env;
 use App\Core\HttpException;
+use App\Services\StandardFileStorage;
 use PDO;
 
 final class ValuationStandardRepository
 {
     public function __construct(private PDO $db) {}
 
-    public static function storageDir(): string
-    {
-        $configured = trim(str_replace('\\', '/', Env::get('NTS_STORAGE_DIR')));
-        if ($configured === '') return BASE_PATH . '/storage/normas-tecnicas-sectoriales';
-        $absolute = str_starts_with($configured, '/') || preg_match('/^[A-Z]:\//i', $configured);
-        return rtrim($absolute ? $configured : BASE_PATH . '/' . trim($configured, '/'), '/');
-    }
+    public static function storageDir(): string { return StandardFileStorage::dir(); }
 
-    public static function storagePath(string $filename): string { return self::storageDir() . '/' . basename($filename); }
+    public static function storagePath(string $filename): string { return StandardFileStorage::path($filename); }
 
     public function categoriesWithStandards(): array
     {
@@ -61,9 +55,7 @@ final class ValuationStandardRepository
         if ($sourceRoot === false || !is_dir($sourceRoot)) {
             throw new \RuntimeException('La carpeta de origen no existe o no es accesible.');
         }
-        if (!is_dir(self::storageDir()) && !mkdir(self::storageDir(), 0775, true) && !is_dir(self::storageDir())) {
-            throw new \RuntimeException('No se pudo preparar el almacenamiento privado.');
-        }
+        StandardFileStorage::ensure();
         $summary = ['copied' => [], 'skipped' => [], 'missing' => []];
         foreach ($this->allStandards() as $standard) {
             $source = $sourceRoot . DIRECTORY_SEPARATOR . $standard['source_filename'];
@@ -72,13 +64,17 @@ final class ValuationStandardRepository
                 continue;
             }
             $destination = self::storagePath($standard['storage_filename']);
-            if (is_file($destination) && filesize($destination) === filesize($source)) {
+            if ($this->storedMatchesSource($destination, $source)) {
                 $this->markImported($standard['slug'], (int) filesize($destination));
                 $summary['skipped'][] = $standard['source_filename'];
                 continue;
             }
             if (!copy($source, $destination)) {
                 throw new \RuntimeException('No se pudo copiar ' . $standard['source_filename']);
+            }
+            clearstatcache(true, $destination);
+            if (!StandardFileStorage::isPdf($destination, $standard['source_filename'])) {
+                throw new \RuntimeException('El PDF copiado no quedó verificado: ' . $standard['source_filename']);
             }
             $this->markImported($standard['slug'], (int) filesize($destination));
             $summary['copied'][] = $standard['source_filename'];
@@ -88,7 +84,7 @@ final class ValuationStandardRepository
 
     public function importUploaded(array $files): array
     {
-        $this->ensureStorageDir();
+        StandardFileStorage::ensure();
         $standards = $this->allStandards();
         $byName = [];
         foreach ($standards as $standard) {
@@ -98,10 +94,10 @@ final class ValuationStandardRepository
         foreach ($this->uploadedFiles($files) as $file) {
             $name = $this->cleanUploadName($file['name']);
             if ($file['error'] !== UPLOAD_ERR_OK) {
-                $result['errors'][] = "$name no se pudo recibir.";
+                $result['errors'][] = "$name " . StandardFileStorage::uploadErrorMessage($file['error']);
                 continue;
             }
-            if (!$this->isPdf($file['tmp_name'], $name)) {
+            if (!StandardFileStorage::isPdf($file['tmp_name'], $name)) {
                 $result['errors'][] = "$name no es un PDF válido.";
                 continue;
             }
@@ -119,13 +115,13 @@ final class ValuationStandardRepository
                 $result['skipped'][] = $standard['source_filename'];
                 continue;
             }
-            $moved = move_uploaded_file($file['tmp_name'], $destination)
-                || (PHP_SAPI === 'cli' && rename($file['tmp_name'], $destination));
-            if (!$moved) {
-                $result['errors'][] = "$name no se pudo guardar.";
+            try {
+                $storedBytes = StandardFileStorage::storeUploaded($file['tmp_name'], $destination);
+            } catch (\Throwable $error) {
+                $result['errors'][] = "$name no se pudo guardar: " . $error->getMessage();
                 continue;
             }
-            $this->markImported($standard['slug'], (int) filesize($destination));
+            $this->markImported($standard['slug'], $storedBytes);
             $result['copied'][] = $standard['source_filename'];
         }
         foreach ($standards as $standard) {
@@ -136,17 +132,26 @@ final class ValuationStandardRepository
         return $result;
     }
 
-    private function allStandards(): array
+    public function storageReport(): array
     {
-        return $this->db->query('SELECT slug, source_filename, storage_filename FROM valuation_standards ORDER BY sort_order')
-            ->fetchAll();
+        $standards = $this->allStandards();
+        $present = $markedMissing = 0;
+        foreach ($standards as $standard) {
+            $exists = is_file(self::storagePath($standard['storage_filename']));
+            $present += $exists ? 1 : 0;
+            $markedMissing += (!$exists && $standard['file_size_bytes'] !== null) ? 1 : 0;
+        }
+        return ['dir' => self::storageDir(), 'configured' => StandardFileStorage::configured(),
+            'writable' => StandardFileStorage::writable(), 'present' => $present,
+            'total' => count($standards), 'marked_missing' => $markedMissing,
+            'limits' => StandardFileStorage::limits()];
     }
 
-    private function ensureStorageDir(): void
+    private function allStandards(): array
     {
-        if (!is_dir(self::storageDir()) && !mkdir(self::storageDir(), 0775, true) && !is_dir(self::storageDir())) {
-            throw new \RuntimeException('No se pudo preparar el almacenamiento privado.');
-        }
+        return $this->db->query('SELECT slug, source_filename, storage_filename, file_size_bytes
+            FROM valuation_standards ORDER BY sort_order')
+            ->fetchAll();
     }
 
     private function uploadedFiles(array $files): array
@@ -171,16 +176,10 @@ final class ValuationStandardRepository
         return mb_strtolower((string) preg_replace('/\s+/', ' ', trim($this->cleanUploadName($name))));
     }
 
-    private function isPdf(string $path, string $name): bool
+    private function storedMatchesSource(string $destination, string $source): bool
     {
-        if (!is_file($path) || mb_strtolower(pathinfo($name, PATHINFO_EXTENSION)) !== 'pdf') return false;
-        $handle = fopen($path, 'rb');
-        if (!$handle) return false;
-        try {
-            return fread($handle, 4) === '%PDF';
-        } finally {
-            fclose($handle);
-        }
+        return is_file($destination) && filesize($destination) === filesize($source)
+            && StandardFileStorage::isPdf($destination, $destination);
     }
 
     private function markImported(string $slug, int $bytes): void

@@ -64,6 +64,10 @@ En producción autenticada, la pantalla de Normas Técnicas Sectoriales permite 
 varios PDFs a la vez e importarlos por nombre contra el catálogo existente.
 Si el despliegue del hosting limpia `storage/`, configura `NTS_STORAGE_DIR` apuntando
 a una carpeta privada persistente fuera del checkout y vuelve a importar los PDFs.
+La misma pantalla muestra un diagnóstico de guardado: ruta real, permiso de escritura,
+archivos físicos encontrados, registros marcados en BD sin archivo y límites PHP
+(`upload_max_filesize`, `post_max_size`, `max_file_uploads`). Si `max_file_uploads`
+es menor que el total, importa los PDFs por lotes o aumenta ese límite en el hosting.
 
 ```text
 app/Controllers/     Coordinación de solicitudes

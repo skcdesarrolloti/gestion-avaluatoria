@@ -23,6 +23,7 @@ final class StandardController
             'categories' => $categories,
             'activeCategoryCode' => $active,
             'standardStats' => $stats,
+            'storageReport' => $this->standards->storageReport(),
             'importNotice' => $notice ? json_decode($notice, true) : null,
         ]);
     }

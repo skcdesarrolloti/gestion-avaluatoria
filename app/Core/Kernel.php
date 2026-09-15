@@ -42,6 +42,13 @@ final class Kernel
                 continue;
             }
             if ($method === 'POST') {
+                if ($controller === 'standards' && $action === 'import' && $this->uploadLikelyExceededPostLimit()) {
+                    Session::flash('standards_import', json_encode([
+                        'ok' => false,
+                        'message' => 'La carga superó el límite post_max_size de PHP. Sube menos PDFs por lote o aumenta el límite en el hosting.',
+                    ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
+                    Http::redirect('normas-tecnicas-sectoriales');
+                }
                 try {
                     Session::csrf();
                 } catch (HttpException $error) {
@@ -113,6 +120,31 @@ final class Kernel
     {
         $username = $_POST['username'] ?? '';
         return is_string($username) ? substr($username, 0, 190) : '';
+    }
+
+    private function uploadLikelyExceededPostLimit(): bool
+    {
+        $length = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0);
+        if ($length <= 0 || $_POST || $_FILES) {
+            return false;
+        }
+        $limit = $this->iniBytes((string) ini_get('post_max_size'));
+        return $limit > 0 && $length > $limit;
+    }
+
+    private function iniBytes(string $value): int
+    {
+        $value = trim($value);
+        if ($value === '') {
+            return 0;
+        }
+        $bytes = (int) $value;
+        return match (strtolower(substr($value, -1))) {
+            'g' => $bytes * 1024 * 1024 * 1024,
+            'm' => $bytes * 1024 * 1024,
+            'k' => $bytes * 1024,
+            default => $bytes,
+        };
     }
 
     private function authService(): AuthService

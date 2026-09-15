@@ -115,7 +115,11 @@ try {
         'error' => [UPLOAD_ERR_OK],
     ]);
     expect(count($import['copied']) === 1 && $import['missing'] === [], 'importacion PDF por lote');
+    $report = (new ValuationStandardRepository($db))->storageReport();
+    expect($report['configured'] === true && $report['present'] === 1 && $report['marked_missing'] === 0, 'diagnostico confirma PDF persistido');
     unlink(ValuationStandardRepository::storagePath('unit-test-norma-inexistente.pdf'));
+    $report = (new ValuationStandardRepository($db))->storageReport();
+    expect($report['marked_missing'] === 1, 'diagnostico detecta BD marcada sin archivo fisico');
     rmdir($normsDir);
     putenv('NTS_STORAGE_DIR');
     $auth = new AuthService(new FuncionarioRepository($db));

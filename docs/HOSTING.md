@@ -22,6 +22,19 @@ después de `.env`, queda fuera del repositorio y no se elimina al actualizar el
 Si también se borran los PDFs importados de normas, define `NTS_STORAGE_DIR` en una
 carpeta privada persistente fuera del checkout y vuelve a importarlos desde la pantalla
 de Normas Técnicas Sectoriales o con `php bin/console.php standards:import`.
+La pantalla de Normas Técnicas muestra un diagnóstico con la ruta real, escritura,
+archivos físicos y registros marcados en base sin archivo. Si aparece "Storage interno",
+el hosting puede borrar los PDFs al actualizar el repositorio.
+
+Ejemplo de ruta persistente:
+
+```dotenv
+NTS_STORAGE_DIR=/home/usuario/gestion-avaluatoria-storage/normas-tecnicas-sectoriales
+```
+
+Si se cargan las 22 normas en un solo intento, revisar `upload_max_filesize`,
+`post_max_size` y `max_file_uploads`; algunos hostings aceptan solo 20 archivos por
+petición o no permiten PDFs grandes sin subir el límite.
 
 ## Elegir la ruta según la configuración del dominio
 
