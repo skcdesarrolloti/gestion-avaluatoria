@@ -84,6 +84,10 @@ de negocio ni trasladar el controlador monolítico. No modificar InversKC al tra
   `fetch` estilo SPA, sin recarga completa visible. Toda acción muestra loader o
   estado de progreso hasta recibir respuesta. Mantener rutas server-rendered como
   fallback y usar recarga solo para descargas, PDF en nueva pestaña o enlaces externos.
+- En bibliotecas normativas extensas, registrar el documento fuente, pero cargar como
+  consulta solo artículos, incisos o fragmentos pertinentes por categoría y finalidad.
+  No volcar leyes completas si solo aplica un artículo. Separar normas internacionales
+  del marco jurídico colombiano.
 - No usar `x-html` con datos externos. Escapar con `e()` y validar en servidor.
 
 ## Entrega y verificación

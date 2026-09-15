@@ -7,8 +7,10 @@ Origen de consulta: `C:\Workspace\desarrollo-skc\inverskc`.
 La base nueva no necesita cargar ningún archivo del proyecto original.
 Contiene acceso y un ciclo real de crear, editar, autoguardar y recuperar fichas privadas.
 Incluye biblioteca inicial de Normas Técnicas Sectoriales con categorías A, B y 1 a 13.
-Incluye menú base de Marco Jurídico Valuatorio con las mismas categorías para cargar
+Incluye menú base de Marco Jurídico Nacional con las mismas categorías para cargar
 leyes, decretos, resoluciones y documentos derogados cuando el responsable los entregue.
+Las leyes extensas se modelan como documento fuente más artículos o fragmentos
+pertinentes, no como texto completo indiscriminado. Las IVS quedan en menú separado.
 Solo implementa datos iniciales, no fórmulas, aprobación ni generación de informes.
 
 ## Referencias encontradas en InversKC
@@ -86,3 +88,9 @@ php bin/console.php standards:import "C:\Users\skcge\OneDrive\Escritorio\Nueva L
 
 Las categorías sin normas asignadas quedan visibles como pendientes para conservar la
 estructura oficial de inscripción.
+
+## Marco jurídico e IVS
+
+El menú jurídico nacional queda listo para sembrar leyes, decretos, resoluciones,
+actos y artículos aplicables por categoría. El menú de Normas Internacionales de
+Valuación registra la estructura IVS por familia y su relación con categorías RAA.

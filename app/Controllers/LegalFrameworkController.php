@@ -14,7 +14,7 @@ final class LegalFrameworkController
         $requested = (string) ($_GET['categoria'] ?? '');
         $active = in_array($requested, $codes, true) ? $requested : (string) ($codes[0] ?? 'A');
         view('legal/index', [
-            'title' => 'Marco Jurídico Valuatorio',
+            'title' => 'Marco Jurídico Nacional',
             'categories' => $categories,
             'activeCategoryCode' => $active,
             'legalStats' => $this->documents->stats($categories),

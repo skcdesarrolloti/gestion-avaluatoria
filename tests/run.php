@@ -9,6 +9,7 @@ use App\Services\AuthDiagnostics;
 use App\Services\AuthService;
 use App\Services\RateLimiter;
 use App\Models\FuncionarioRepository;
+use App\Models\InternationalStandardRepository;
 use App\Models\LegalDocumentRepository;
 use App\Models\ValuationStandardRepository;
 
@@ -66,9 +67,31 @@ try {
         slug TEXT PRIMARY KEY, category_code TEXT, document_code TEXT, title TEXT, document_type TEXT,
         status TEXT, issued_at TEXT, repealed_at TEXT, source_reference TEXT, summary TEXT,
         sort_order INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE valuation_legal_articles (
+        id INTEGER PRIMARY KEY, document_slug TEXT, category_code TEXT, article_label TEXT, title TEXT,
+        excerpt TEXT, applicability TEXT, status TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE valuation_international_groups (
+        code TEXT PRIMARY KEY, name TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE valuation_international_standards (
+        slug TEXT PRIMARY KEY, group_code TEXT, standard_code TEXT, title TEXT, applicable_categories TEXT,
+        summary TEXT, effective_from TEXT, status TEXT, source_reference TEXT, sort_order INTEGER,
+        created_at TEXT, updated_at TEXT)");
     $db->exec("INSERT INTO valuation_legal_categories VALUES
         ('A', 'Marco jurídico general', 'general', 0, '2026-09-15 00:00:00', '2026-09-15 00:00:00'),
         ('1', 'Inmuebles urbanos', 'category', 11, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
+    $db->exec("INSERT INTO valuation_legal_documents VALUES
+        ('ley-388-1997', 'A', 'Ley 388 de 1997', 'Ordenamiento territorial', 'Ley', 'vigente',
+        NULL, NULL, 'Fuente oficial', 'Documento fuente', 1, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
+    $db->exec("INSERT INTO valuation_legal_articles VALUES
+        (1, 'ley-388-1997', '1', 'Artículo 61', 'Adquisición de inmuebles',
+        'Extracto pertinente para avalúos urbanos.', 'Usar solo cuando la finalidad corresponda.',
+        'vigente', 1, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
+    $db->exec("INSERT INTO valuation_international_groups VALUES
+        ('400', 'Inmuebles', 1, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
+    $db->exec("INSERT INTO valuation_international_standards VALUES
+        ('ivs-400-real-property', '400', 'IVS 400', 'Real Property Interests', '1,2',
+        'Derechos sobre inmuebles.', '2025-01-31', 'vigente', 'IVSC', 1,
+        '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
     $standards = (new ValuationStandardRepository($db))->categoriesWithStandards();
     expect($standards[0]['code'] === 'A', 'categoria general disponible');
     expect($standards[0]['standards'][0]['standard_code'] === 'NTS S04', 'norma tecnica agrupada');
@@ -76,7 +99,11 @@ try {
     $legal = new LegalDocumentRepository($db);
     $legalCategories = $legal->categoriesWithDocuments();
     expect($legalCategories[0]['name'] === 'Marco jurídico general', 'categoria juridica general disponible');
-    expect($legal->stats($legalCategories)['total'] === 0, 'marco juridico inicia sin documentos inventados');
+    expect(count($legalCategories[1]['articles']) === 1, 'marco juridico guarda articulos pertinentes por categoria');
+    expect($legal->stats($legalCategories)['articles'] === 1, 'marco juridico cuenta articulos sin ley completa');
+    $international = new InternationalStandardRepository($db);
+    $ivsGroups = $international->groupsWithStandards();
+    expect($ivsGroups[0]['standards'][0]['standard_code'] === 'IVS 400', 'normas internacionales separadas');
     $normsDir = sys_get_temp_dir() . '/ga_normas_' . bin2hex(random_bytes(4));
     putenv('NTS_STORAGE_DIR=' . $normsDir);
     expect(ValuationStandardRepository::storageDir() === str_replace('\\', '/', $normsDir), 'carpeta privada de normas configurable');
