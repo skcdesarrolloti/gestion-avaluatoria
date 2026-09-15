@@ -63,7 +63,7 @@ reutilizó la verificación de PDF para Normas Técnicas Sectoriales.
 Verificación local ejecutada el 15 de septiembre de 2026:
 
 - Sintaxis de todos los PHP del proyecto: correcta.
-- `php tests/run.php`: 39 verificaciones correctas.
+- `php tests/run.php`: 40 verificaciones correctas, incluida importación ZIP jurídica.
 - `npm test`: 9 pruebas correctas.
 - `npm run build`: compilación correcta.
 - `npm run check:size`: CSS + JS 27,1 KB gzip.

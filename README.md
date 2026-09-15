@@ -69,8 +69,8 @@ archivos físicos encontrados, registros marcados en BD sin archivo y límites P
 (`upload_max_filesize`, `post_max_size`, `max_file_uploads`). Si `max_file_uploads`
 es menor que el total, importa los PDFs por lotes o aumenta ese límite en el hosting.
 El Marco Jurídico Nacional usa el mismo criterio para documentos fuente: configura
-`LEGAL_STORAGE_DIR` antes de cargar bibliotecas grandes y luego sube PDFs desde su
-pantalla. Cada archivo queda como documento fuente preliminar por categoría; los
+`LEGAL_STORAGE_DIR` antes de cargar bibliotecas grandes y luego sube PDFs o un ZIP
+con PDFs desde su pantalla. Cada archivo queda como documento fuente preliminar por categoría; los
 artículos o fragmentos aplicables se incorporan después.
 
 ```text

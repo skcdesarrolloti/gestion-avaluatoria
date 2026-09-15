@@ -41,6 +41,9 @@ Para la biblioteca jurídica nacional aplica el mismo patrón con otra carpeta p
 LEGAL_STORAGE_DIR=/home/usuario/gestion-avaluatoria-storage/marco-juridico-nacional
 ```
 
+La pantalla del Marco Jurídico acepta varios PDFs o un `.zip` con PDFs. El ZIP ayuda
+a evitar seleccionar documentos uno por uno, pero sigue limitado por `post_max_size`.
+
 ## Elegir la ruta según la configuración del dominio
 
 | Raíz configurada en el hosting | APP_BASE_PATH en .env | Dirección del login |

@@ -51,10 +51,10 @@ $maxFiles = max(0, (int) ($limits['max_file_uploads'] ?? 0));
                     </select>
                 </label>
                 <label class="block text-sm font-medium text-slate-700">
-                    PDFs jurídicos
+                    PDFs jurídicos o ZIP
                     <input class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700"
-                        type="file" name="legal_files[]" accept="application/pdf,.pdf" multiple required>
-                    <span class="mt-1 block text-xs text-slate-500">Sube documentos fuente; los artículos relevantes se clasifican después.</span>
+                        type="file" name="legal_files[]" accept="application/pdf,.pdf,application/zip,.zip" multiple required>
+                    <span class="mt-1 block text-xs text-slate-500">Puedes subir varios PDFs o un ZIP con PDFs; los artículos relevantes se clasifican después.</span>
                 </label>
                 <button class="btn-primary" type="submit" :disabled="busy" x-text="busy ? 'Importando…' : 'Importar documentos'">Importar documentos</button>
             </form>

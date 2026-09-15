@@ -19,28 +19,79 @@ final class LegalDocumentImportService
                 $result['errors'][] = "$name " . LegalFileStorage::uploadErrorMessage($file['error']);
                 continue;
             }
-            if (!LegalFileStorage::isPdf($file['tmp_name'], $name)) {
-                $result['errors'][] = "$name no es un PDF válido.";
+            if ($this->isZipName($name)) {
+                $this->importZip($file['tmp_name'], $name, $category, $status, $result);
+            } else {
+                $this->importPdf($file['tmp_name'], $name, $category, $status, $result);
+            }
+        }
+        return $result;
+    }
+
+    private function importZip(string $path, string $name, string $category, string $status, array &$result): void
+    {
+        if (!class_exists(\ZipArchive::class)) {
+            $result['errors'][] = "$name no se pudo abrir porque PHP no tiene ZipArchive.";
+            return;
+        }
+        $zip = new \ZipArchive();
+        if ($zip->open($path) !== true) {
+            $result['errors'][] = "$name no es un ZIP válido.";
+            return;
+        }
+        for ($index = 0; $index < $zip->numFiles; $index++) {
+            $entry = $zip->getNameIndex($index);
+            if (!is_string($entry) || str_ends_with($entry, '/') || !$this->isPdfName($entry)) continue;
+            $stream = $zip->getStream($entry);
+            if (!$stream) {
+                $result['errors'][] = "$entry no se pudo leer dentro de $name.";
                 continue;
+            }
+            $tmp = tempnam(sys_get_temp_dir(), 'ga_legal_zip_');
+            $out = fopen($tmp, 'wb');
+            if (!$out) {
+                fclose($stream);
+                $result['errors'][] = "$entry no se pudo preparar temporalmente.";
+                continue;
+            }
+            stream_copy_to_stream($stream, $out);
+            fclose($out);
+            fclose($stream);
+            $this->importPdf($tmp, $this->cleanUploadName($entry), $category, $status, $result, true);
+        }
+        $zip->close();
+    }
+
+    private function importPdf(
+        string $tmpName,
+        string $name,
+        string $category,
+        string $status,
+        array &$result,
+        bool $temporary = false
+    ): void {
+        try {
+            if (!LegalFileStorage::isPdf($tmpName, $name)) {
+                $result['errors'][] = "$name no es un PDF válido.";
+                return;
             }
             $meta = $this->documentMeta($name, $category);
             $destination = LegalDocumentRepository::storagePath($meta['storage_filename']);
-            $bytes = (int) filesize($file['tmp_name']);
-            if ($this->sameFile($destination, $file['tmp_name'], $bytes)) {
+            $bytes = (int) filesize($tmpName);
+            if ($this->sameFile($destination, $tmpName, $bytes)) {
                 $this->documents->saveImportedDocument($meta, $status, $bytes);
                 $result['skipped'][] = $name;
-                continue;
+                return;
             }
-            try {
-                $storedBytes = LegalFileStorage::storeUploaded($file['tmp_name'], $destination);
-            } catch (\Throwable $error) {
-                $result['errors'][] = "$name no se pudo guardar: " . $error->getMessage();
-                continue;
-            }
+            $storedBytes = $temporary ? $this->copyTemporaryPdf($tmpName, $destination)
+                : LegalFileStorage::storeUploaded($tmpName, $destination);
             $this->documents->saveImportedDocument($meta, $status, $storedBytes);
             $result['copied'][] = $name;
+        } catch (\Throwable $error) {
+            $result['errors'][] = "$name no se pudo guardar: " . $error->getMessage();
+        } finally {
+            if ($temporary && is_file($tmpName)) unlink($tmpName);
         }
-        return $result;
     }
 
     private function uploadedFiles(array $files): array
@@ -96,6 +147,22 @@ final class LegalDocumentImportService
         return is_file($destination) && filesize($destination) === $bytes
             && hash_file('sha256', $destination) === hash_file('sha256', $source);
     }
+
+    private function copyTemporaryPdf(string $tmpName, string $destination): int
+    {
+        if (!copy($tmpName, $destination)) {
+            throw new \RuntimeException('No se pudo copiar el PDF extraído del ZIP.');
+        }
+        clearstatcache(true, $destination);
+        if (!LegalFileStorage::isPdf($destination, $destination)) {
+            throw new \RuntimeException('El PDF extraído no quedó verificado.');
+        }
+        return (int) filesize($destination);
+    }
+
+    private function isPdfName(string $name): bool { return mb_strtolower(pathinfo($name, PATHINFO_EXTENSION)) === 'pdf'; }
+
+    private function isZipName(string $name): bool { return mb_strtolower(pathinfo($name, PATHINFO_EXTENSION)) === 'zip'; }
 
     private function cleanUploadName(string $name): string { return basename(str_replace('\\', '/', $name)); }
 }

@@ -48,7 +48,7 @@ final class Kernel
                     $route = $controller === 'legal' ? 'marco-juridico-valuatorio' : 'normas-tecnicas-sectoriales';
                     Session::flash($flash, json_encode([
                         'ok' => false,
-                        'message' => 'La carga superó el límite post_max_size de PHP. Sube menos PDFs por lote o aumenta el límite en el hosting.',
+                        'message' => 'La carga superó el límite post_max_size de PHP. Sube menos archivos por lote o aumenta el límite en el hosting.',
                     ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
                     Http::redirect($route);
                 }

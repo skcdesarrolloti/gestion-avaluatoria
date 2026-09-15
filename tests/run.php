@@ -115,11 +115,29 @@ try {
         'error' => [UPLOAD_ERR_OK],
     ], 'A', 'vigente');
     expect(count($legalImport['copied']) === 1, 'importacion PDF juridico');
+    if (class_exists(ZipArchive::class)) {
+        $zipPath = tempnam(sys_get_temp_dir(), 'ga_legal_zip_');
+        $zip = new ZipArchive();
+        $zip->open($zipPath, ZipArchive::OVERWRITE);
+        $zip->addFromString('Decreto 1420 de 1998.pdf', "%PDF-1.4\n%decreto\n");
+        $zip->addFromString('carpeta/Resolucion 620 de 2008.pdf', "%PDF-1.4\n%resolucion\n");
+        $zip->close();
+        $zipImport = (new LegalDocumentImportService($legal))->importUploaded([
+            'name' => ['normativa-juridica.zip'],
+            'tmp_name' => [$zipPath],
+            'error' => [UPLOAD_ERR_OK],
+        ], 'A', 'vigente');
+        expect(count($zipImport['copied']) === 2, 'importacion ZIP juridico extrae PDFs');
+        unlink($zipPath);
+    }
     $legalCategories = $legal->categoriesWithDocuments();
     $storedLegal = $legalCategories[0]['documents'][1];
     expect($storedLegal['has_file'] === true && $storedLegal['document_type'] === 'Ley', 'documento juridico queda consultable');
     unlink(LegalDocumentRepository::storagePath($storedLegal['storage_filename']));
     expect($legal->storageReport()['marked_missing'] === 1, 'diagnostico juridico detecta PDF faltante');
+    foreach ($legal->categoriesWithDocuments()[0]['documents'] as $document) {
+        if ($document['has_file']) unlink(LegalDocumentRepository::storagePath($document['storage_filename']));
+    }
     rmdir($legalDir);
     putenv('LEGAL_STORAGE_DIR');
     $international = new InternationalStandardRepository($db);
