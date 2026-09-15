@@ -33,6 +33,7 @@ Rutas internas esperadas:
 NTS_STORAGE_DIR=storage/normas-tecnicas-sectoriales
 LEGAL_STORAGE_DIR=storage/marco-juridico-nacional
 IVS_STORAGE_DIR=storage/normas-internacionales-valuacion
+IFRS_STORAGE_DIR=storage/normas-niif
 ```
 
 Si se cargan las 22 normas en un solo intento, revisar `upload_max_filesize`,
@@ -44,6 +45,7 @@ carpetas base quedan ancladas en Git con `.gitkeep`, pero los PDFs se ignoran.
 
 La pantalla del Marco Jurídico acepta varios PDFs o un `.zip` con PDFs. El ZIP ayuda
 a evitar seleccionar documentos uno por uno, pero sigue limitado por `post_max_size`.
+Las pantallas IVS y NIIF cargan un PDF por tarjeta para evitar asignaciones ambiguas.
 
 ## Elegir la ruta según la configuración del dominio
 

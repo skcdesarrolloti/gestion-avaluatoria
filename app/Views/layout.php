@@ -19,6 +19,7 @@ $tabs = [
     ['label' => 'Normas Técnicas Sectoriales', 'href' => url('normas-tecnicas-sectoriales'), 'active' => $isActive('/normas-tecnicas-sectoriales')],
     ['label' => 'Marco Jurídico Nacional', 'href' => url('marco-juridico-valuatorio'), 'active' => $isActive('/marco-juridico-valuatorio')],
     ['label' => 'Normas Internacionales', 'href' => url('normas-internacionales-valuacion'), 'active' => $isActive('/normas-internacionales-valuacion')],
+    ['label' => 'Normas NIIF', 'href' => url('normas-niif'), 'active' => $isActive('/normas-niif')],
     ['label' => 'Tipologías Constructivas IGAC', 'href' => url('tipologias-constructivas-igac'), 'active' => $isActive('/tipologias-constructivas-igac')],
 ];
 ?>
@@ -49,6 +50,7 @@ $tabs = [
                     <a class="app-action app-action-teal" href="<?= e(url('normas-tecnicas-sectoriales')) ?>">Normas técnicas</a>
                     <a class="app-action app-action-orange" href="<?= e(url('marco-juridico-valuatorio')) ?>">Marco jurídico</a>
                     <a class="app-action app-action-blue" href="<?= e(url('normas-internacionales-valuacion')) ?>">Internacionales</a>
+                    <a class="app-action app-action-teal" href="<?= e(url('normas-niif')) ?>">NIIF</a>
                     <a class="app-action app-action-teal" href="<?= e(url('tipologias-constructivas-igac')) ?>">Tipologías IGAC</a>
                 </div>
                 <nav class="app-tabs" aria-label="Principal">

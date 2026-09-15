@@ -11,6 +11,7 @@ Incluye menú base de Marco Jurídico Nacional con bibliografía B1 a B13 para c
 leyes, decretos, resoluciones y documentos derogados cuando el responsable los entregue.
 Las leyes extensas se modelan como documento fuente más artículos o fragmentos
 pertinentes, no como texto completo indiscriminado. Las IVS quedan en menú separado.
+Las NIIF quedan en otro menú independiente para consultas de medición contable.
 Incluye catálogo de Tipologías Constructivas IGAC con imágenes, agrupado por categoría.
 Solo implementa datos iniciales, no fórmulas, aprobación ni generación de informes.
 
@@ -99,3 +100,6 @@ Los PDFs fuente del marco jurídico se importan desde la pantalla del módulo y 
 en `storage/marco-juridico-nacional/`; Git conserva la carpeta base pero ignora los PDFs.
 Los PDFs de IVS se cargan desde cada tarjeta internacional y se guardan en
 `storage/normas-internacionales-valuacion/`.
+Los PDFs de NIIF se cargan desde cada tarjeta NIIF y se guardan en `storage/normas-niif/`.
+El menú también enumera los campos del expediente y separa soporte normativo directo,
+derivación metodológica y control operativo interno.

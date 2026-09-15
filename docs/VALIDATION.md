@@ -63,11 +63,12 @@ reutilizó la verificación de PDF para Normas Técnicas Sectoriales.
 Verificación local ejecutada el 15 de septiembre de 2026:
 
 - Sintaxis de todos los PHP del proyecto: correcta.
-- `php tests/run.php`: 40 verificaciones correctas, incluida importación ZIP jurídica.
+- `php tests/run.php`: 50 verificaciones correctas, incluida importación NIIF por tarjeta.
 - `npm test`: 9 pruebas correctas.
 - `npm run build`: compilación correcta.
 - `npm run check:size`: CSS + JS 27,3 KB gzip.
 
 `php tests/database.php` no se ejecutó en esta pasada porque `GA_TEST_PORT` no estaba
 definido. En producción falta confirmar escritura en `storage/normas-tecnicas-sectoriales`,
-`storage/marco-juridico-nacional` y `storage/normas-internacionales-valuacion`.
+`storage/marco-juridico-nacional`, `storage/normas-internacionales-valuacion` y
+`storage/normas-niif`.

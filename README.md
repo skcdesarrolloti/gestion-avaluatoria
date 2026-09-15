@@ -13,6 +13,7 @@ completos de InversKC. El proyecto original permanece intacto.
 - Menú de Marco Jurídico Nacional con bibliografía inicial B1 a B13 por categoría,
   guardando solo artículos o fragmentos pertinentes como material de consulta.
 - Menú separado de Normas Internacionales de Valuación con estructura IVS y PDFs por norma.
+- Menú de Normas NIIF aplicables a medición contable, con PDFs por norma.
 - Catálogo de Tipologías Constructivas IGAC como referencia visual por categoría.
 - Instalador y migraciones automáticas de tablas y columnas.
 - Assets locales compilados y estructura pequeña, sin dependencias PHP externas.
@@ -77,6 +78,8 @@ artículos o fragmentos aplicables se incorporan después.
 Las Normas Internacionales de Valuación guardan sus PDFs en
 `storage/normas-internacionales-valuacion/`; cada archivo se carga desde la tarjeta
 de la IVS correspondiente.
+Las Normas NIIF guardan sus PDFs en `storage/normas-niif/`; sirven como referencia
+contable y ayudan a distinguir campos normativos, metodológicos y operativos.
 
 ```text
 app/Controllers/     Coordinación de solicitudes

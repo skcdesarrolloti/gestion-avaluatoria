@@ -5,6 +5,7 @@ use App\Controllers\AppraisalController;
 use App\Controllers\AuthController;
 use App\Controllers\DiagnosticController;
 use App\Controllers\IgacTypologyController;
+use App\Controllers\IfrsStandardController;
 use App\Controllers\InternationalStandardController;
 use App\Controllers\LegalFrameworkController;
 use App\Controllers\StandardController;
@@ -12,6 +13,7 @@ use App\Database\Migrator;
 use App\Models\AppraisalRepository;
 use App\Models\FuncionarioRepository;
 use App\Models\IgacTypologyRepository;
+use App\Models\IfrsStandardRepository;
 use App\Models\InternationalStandardRepository;
 use App\Models\LegalDocumentRepository;
 use App\Models\ValuationStandardRepository;
@@ -45,16 +47,18 @@ final class Kernel
             }
             if ($method === 'POST') {
                 if (in_array($action, ['import', 'importFile'], true)
-                    && in_array($controller, ['standards', 'legal', 'international'], true)
+                    && in_array($controller, ['standards', 'legal', 'international', 'ifrs'], true)
                     && $this->uploadLikelyExceededPostLimit()) {
                     $flash = match ($controller) {
                         'legal' => 'legal_import',
                         'international' => 'international_import',
+                        'ifrs' => 'ifrs_import',
                         default => 'standards_import',
                     };
                     $route = match ($controller) {
                         'legal' => 'marco-juridico-valuatorio',
                         'international' => 'normas-internacionales-valuacion',
+                        'ifrs' => 'normas-niif',
                         default => 'normas-tecnicas-sectoriales',
                     };
                     Session::flash($flash, json_encode([
@@ -119,6 +123,7 @@ final class Kernel
             }
             $instance = match ($controller) {
                 'auth' => new AuthController($auth),
+                'ifrs' => new IfrsStandardController(new IfrsStandardRepository($db)),
                 'typologies' => new IgacTypologyController(new IgacTypologyRepository()),
                 'international' => new InternationalStandardController(new InternationalStandardRepository($db)),
                 'legal' => new LegalFrameworkController(new LegalDocumentRepository($db)),

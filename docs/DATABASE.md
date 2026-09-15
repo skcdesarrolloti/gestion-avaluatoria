@@ -49,6 +49,9 @@ No debes crear tablas ni pegar sentencias SQL. El programa hace esa parte.
 | `valuation_legal_articles` | Artículos o fragmentos jurídicos pertinentes por categoría |
 | `valuation_international_groups` | Familias de normas internacionales IVS |
 | `valuation_international_standards` | Catálogo IVS separado del marco jurídico colombiano y metadatos del PDF privado |
+| `valuation_ifrs_groups` | Familias NIIF/NIC aplicables a medición contable |
+| `valuation_ifrs_standards` | Catálogo NIIF/NIC y metadatos del PDF privado |
+| `valuation_field_considerations` | Clasificación de campos del expediente como normativos, derivados u operativos |
 
 `owner_id` guarda `_ID` del funcionario. No hay FK entre servidores/bases ni copia de
 contraseñas. `id` es aleatorio (32 caracteres hexadecimales), pero siempre se comprueba
@@ -59,6 +62,8 @@ Los PDFs de normas no se guardan en Git; se importan a `storage/` con
 Para leyes extensas, la base conserva la ficha del documento fuente y el PDF privado,
 pero solo almacena como consulta los artículos, incisos o extractos necesarios para
 la categoría/finalidad del avalúo.
+Las NIIF se guardan separadas de IVS y del marco jurídico nacional; se consultan
+cuando el encargo tenga finalidad financiera, valor razonable, deterioro o revelación.
 
 ## 4. Nueva tabla o columna
 
