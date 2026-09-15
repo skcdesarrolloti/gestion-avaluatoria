@@ -59,6 +59,8 @@ Los PDFs se copian a `storage/normas-tecnicas-sectoriales/`, carpeta excluida de
 También se puede definir `NTS_SOURCE_DIR` y ejecutar `php bin/console.php standards:import`.
 En producción autenticada, la pantalla de Normas Técnicas Sectoriales permite seleccionar
 varios PDFs a la vez e importarlos por nombre contra el catálogo existente.
+Si el despliegue del hosting limpia `storage/`, configura `NTS_STORAGE_DIR` apuntando
+a una carpeta privada persistente fuera del checkout y vuelve a importar los PDFs.
 
 ```text
 app/Controllers/     Coordinación de solicitudes
@@ -93,6 +95,8 @@ tests/               Pruebas aisladas
   secretos de desarrollo y bases temporales. Configura `.env` en el servidor.
   Si el despliegue Git borra `.env`, crea `.gestion-avaluatoria.env` en la carpeta
   padre del proyecto; la app lo lee después de `.env` y no se versiona.
+- Si el despliegue Git borra archivos privados de `storage/`, define `NTS_STORAGE_DIR`
+  en una carpeta persistente no pública, por ejemplo una carpeta hermana del proyecto.
 - Ejecuta `php bin/console.php migrate` durante el despliegue; con `AUTO_MIGRATE=true`
   el primer acceso autenticado también aplica pendientes. Migraciones costosas deben
   ejecutarse antes de abrir tráfico. La base inicial no borra tablas ni datos.

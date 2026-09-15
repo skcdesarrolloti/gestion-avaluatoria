@@ -12,10 +12,17 @@ final class StandardController
 
     public function index(): void
     {
+        $categories = $this->standards->categoriesWithStandards();
+        $codes = array_column($categories, 'code');
+        $requested = (string) ($_GET['categoria'] ?? '');
+        $active = in_array($requested, $codes, true) ? $requested : (string) ($codes[0] ?? 'A');
+        $stats = $this->stats($categories);
         $notice = Session::pullFlash('standards_import');
         view('standards/index', [
             'title' => 'Normas Técnicas Sectoriales',
-            'categories' => $this->standards->categoriesWithStandards(),
+            'categories' => $categories,
+            'activeCategoryCode' => $active,
+            'standardStats' => $stats,
             'importNotice' => $notice ? json_decode($notice, true) : null,
         ]);
     }
@@ -28,7 +35,20 @@ final class StandardController
             $result = ['ok' => false, 'message' => $error->getMessage()];
         }
         Session::flash('standards_import', json_encode($result, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
-        Http::redirect('normas-tecnicas-sectoriales');
+        $category = preg_replace('/[^A-Za-z0-9]/', '', (string) ($_POST['categoria'] ?? ''));
+        Http::redirect('normas-tecnicas-sectoriales' . ($category ? '?categoria=' . rawurlencode($category) : ''));
+    }
+
+    private function stats(array $categories): array
+    {
+        $stats = ['total' => 0, 'available' => 0, 'missing' => 0];
+        foreach ($categories as $category) {
+            foreach ($category['standards'] as $standard) {
+                $stats['total']++;
+                $standard['has_file'] ? $stats['available']++ : $stats['missing']++;
+            }
+        }
+        return $stats;
     }
 
     public function show(string $slug): void

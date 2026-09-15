@@ -1,4 +1,8 @@
-<section class="space-y-7" x-data="{ query: '', active: 'A' }">
+<?php
+$activeCategoryCode = $activeCategoryCode ?? ($categories[0]['code'] ?? 'A');
+$standardStats = $standardStats ?? ['total' => 0, 'available' => 0, 'missing' => 0];
+?>
+<section class="space-y-7" x-data="{ query: '' }">
     <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
             <p class="text-sm font-semibold uppercase tracking-wide text-teal-800">Biblioteca valuatoria</p>
@@ -17,9 +21,13 @@
             <div>
                 <h2 class="text-lg font-semibold text-slate-950">Importar PDFs</h2>
                 <p class="mt-2 max-w-2xl text-sm leading-6 text-slate-600">Selecciona todos los archivos PDF de normas. El sistema los cruza por nombre con el catálogo y los guarda en almacenamiento privado.</p>
+                <p class="mt-3 text-sm font-medium <?= $standardStats['missing'] === 0 ? 'text-emerald-700' : 'text-amber-700' ?>">
+                    <?= e($standardStats['available']) ?> de <?= e($standardStats['total']) ?> PDF cargados<?= $standardStats['missing'] === 0 ? '. Biblioteca completa.' : '; faltan ' . e($standardStats['missing']) . '.' ?>
+                </p>
             </div>
             <form class="flex flex-col gap-3 sm:flex-row sm:items-end" method="post" action="<?= e(url('normas-tecnicas-sectoriales/importar')) ?>" enctype="multipart/form-data" x-data="{ busy: false }" @submit="busy = true">
                 <?= csrf_field() ?>
+                <input type="hidden" name="categoria" value="<?= e($activeCategoryCode) ?>">
                 <label class="block text-sm font-medium text-slate-700">
                     Archivos PDF
                     <input class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2.5 text-sm text-slate-700"
@@ -45,23 +53,24 @@
     <nav class="rounded-lg bg-slate-200/70 p-2" aria-label="Categorías de normas técnicas">
         <div class="flex gap-2 overflow-x-auto">
             <?php foreach ($categories as $category): ?>
-                <?php $code = json_encode($category['code'], JSON_THROW_ON_ERROR); ?>
-                <button class="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold transition"
-                    type="button" @click='active = <?= e($code) ?>; query = ""'
-                    :class='active === <?= e($code) ?> ? "bg-white text-orange-600 shadow-sm" : "text-slate-600 hover:bg-white/70"'>
+                <?php
+                $isActive = $category['code'] === $activeCategoryCode;
+                $available = count(array_filter($category['standards'], static fn (array $item): bool => (bool) $item['has_file']));
+                ?>
+                <a class="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold transition <?= $isActive ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70' ?>"
+                    href="<?= e(url('normas-tecnicas-sectoriales?categoria=' . rawurlencode((string) $category['code']))) ?>"
+                    <?= $isActive ? 'aria-current="page"' : '' ?>>
                     <span class="inline-flex size-7 items-center justify-center rounded-full bg-teal-800 text-xs text-white"><?= e($category['code']) ?></span>
                     <span class="max-w-44 truncate"><?= e($category['name']) ?></span>
-                    <span class="rounded-full bg-white/80 px-2 py-0.5 text-[11px] text-slate-500"><?= count($category['standards']) ?></span>
-                </button>
+                    <span class="rounded-full bg-white/80 px-2 py-0.5 text-[11px] text-slate-500"><?= $available ?>/<?= count($category['standards']) ?></span>
+                </a>
             <?php endforeach; ?>
         </div>
     </nav>
     <div class="grid gap-6">
         <?php foreach ($categories as $category): ?>
-            <?php
-            $categoryCode = json_encode($category['code'], JSON_THROW_ON_ERROR);
-            ?>
-            <section class="pt-2" x-cloak x-show='active === <?= e($categoryCode) ?>'>
+            <?php if ($category['code'] !== $activeCategoryCode) { continue; } ?>
+            <section class="pt-2">
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <h2 class="text-xl font-semibold text-slate-950">
                         <span class="mr-2 inline-flex size-9 items-center justify-center rounded-full bg-teal-800 text-sm text-white"><?= e($category['code']) ?></span>

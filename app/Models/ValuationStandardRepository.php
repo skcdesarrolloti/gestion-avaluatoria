@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace App\Models;
+use App\Core\Env;
 use App\Core\HttpException;
 use PDO;
 
@@ -8,7 +9,13 @@ final class ValuationStandardRepository
 {
     public function __construct(private PDO $db) {}
 
-    public static function storageDir(): string { return BASE_PATH . '/storage/normas-tecnicas-sectoriales'; }
+    public static function storageDir(): string
+    {
+        $configured = trim(str_replace('\\', '/', Env::get('NTS_STORAGE_DIR')));
+        if ($configured === '') return BASE_PATH . '/storage/normas-tecnicas-sectoriales';
+        $absolute = str_starts_with($configured, '/') || preg_match('/^[A-Z]:\//i', $configured);
+        return rtrim($absolute ? $configured : BASE_PATH . '/' . trim($configured, '/'), '/');
+    }
 
     public static function storagePath(string $filename): string { return self::storageDir() . '/' . basename($filename); }
 
@@ -44,9 +51,7 @@ final class ValuationStandardRepository
             WHERE s.slug = ?");
         $query->execute([$slug]);
         $row = $query->fetch();
-        if (!$row) {
-            throw new HttpException(404, 'No se encontró la norma técnica.');
-        }
+        if (!$row) throw new HttpException(404, 'No se encontró la norma técnica.');
         return $this->hydrateStandard($row);
     }
 
@@ -133,8 +138,8 @@ final class ValuationStandardRepository
 
     private function allStandards(): array
     {
-        return $this->db->query('SELECT slug, source_filename, storage_filename
-            FROM valuation_standards ORDER BY sort_order')->fetchAll();
+        return $this->db->query('SELECT slug, source_filename, storage_filename FROM valuation_standards ORDER BY sort_order')
+            ->fetchAll();
     }
 
     private function ensureStorageDir(): void
@@ -152,11 +157,9 @@ final class ValuationStandardRepository
         }
         $uploads = [];
         foreach (array_keys($names) as $index) {
-            $uploads[] = [
-                'name' => (string) ($files['name'][$index] ?? ''),
+            $uploads[] = ['name' => (string) ($files['name'][$index] ?? ''),
                 'tmp_name' => (string) ($files['tmp_name'][$index] ?? ''),
-                'error' => (int) ($files['error'][$index] ?? UPLOAD_ERR_NO_FILE),
-            ];
+                'error' => (int) ($files['error'][$index] ?? UPLOAD_ERR_NO_FILE)];
         }
         return $uploads;
     }
@@ -170,13 +173,9 @@ final class ValuationStandardRepository
 
     private function isPdf(string $path, string $name): bool
     {
-        if (!is_file($path) || mb_strtolower(pathinfo($name, PATHINFO_EXTENSION)) !== 'pdf') {
-            return false;
-        }
+        if (!is_file($path) || mb_strtolower(pathinfo($name, PATHINFO_EXTENSION)) !== 'pdf') return false;
         $handle = fopen($path, 'rb');
-        if (!$handle) {
-            return false;
-        }
+        if (!$handle) return false;
         try {
             return fread($handle, 4) === '%PDF';
         } finally {

@@ -19,6 +19,9 @@ Algunos despliegues Git limpian la carpeta y eliminan archivos no versionados. S
 borra `.env`, crea un archivo persistente llamado `.gestion-avaluatoria.env` en la
 carpeta padre del proyecto y coloca allí las mismas variables. El bootstrap lo lee
 después de `.env`, queda fuera del repositorio y no se elimina al actualizar el checkout.
+Si también se borran los PDFs importados de normas, define `NTS_STORAGE_DIR` en una
+carpeta privada persistente fuera del checkout y vuelve a importarlos desde la pantalla
+de Normas Técnicas Sectoriales o con `php bin/console.php standards:import`.
 
 ## Elegir la ruta según la configuración del dominio
 
