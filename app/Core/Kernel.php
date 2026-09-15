@@ -37,7 +37,21 @@ final class Kernel
                 continue;
             }
             if ($method === 'POST') {
-                Session::csrf();
+                try {
+                    Session::csrf();
+                } catch (HttpException $error) {
+                    if ($controller === 'auth' && $action === 'attempt') {
+                        Session::refreshCsrf();
+                        http_response_code($error->status);
+                        view('auth/login', [
+                            'title' => 'Iniciar sesión',
+                            'error' => $error->getMessage(),
+                            'username' => $this->postedUsername(),
+                        ]);
+                        return;
+                    }
+                    throw $error;
+                }
             }
             // The login form is accessible before database credentials are configured.
             if ($controller === 'auth' && $action === 'login') {
@@ -78,5 +92,11 @@ final class Kernel
             return;
         }
         throw new HttpException($matchedPath ? 405 : 404, $matchedPath ? 'Método no permitido.' : 'Página no encontrada.');
+    }
+
+    private function postedUsername(): string
+    {
+        $username = $_POST['username'] ?? '';
+        return is_string($username) ? substr($username, 0, 190) : '';
     }
 }

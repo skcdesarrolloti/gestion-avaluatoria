@@ -15,10 +15,11 @@ final class Session
         session_save_path($directory);
         ini_set('session.gc_maxlifetime', (string) max(60, (int) Env::get('SESSION_IDLE_SECONDS', '28800')));
         session_name('gestion_avaluatoria');
+        $path = Http::basePath() . '/';
         session_set_cookie_params([
             'httponly' => true, 'samesite' => 'Lax',
             'secure' => Env::bool('SESSION_SECURE', true),
-            'path' => rtrim(Env::get('APP_BASE_PATH'), '/') . '/',
+            'path' => $path === '//' ? '/' : $path,
         ]);
         session_start();
         $_SESSION['csrf'] ??= bin2hex(random_bytes(32));
@@ -30,6 +31,11 @@ final class Session
         if (!is_string($token) || !hash_equals($_SESSION['csrf'], $token)) {
             throw new HttpException(419, 'La sesión de seguridad venció. Recarga la página.');
         }
+    }
+
+    public static function refreshCsrf(): void
+    {
+        $_SESSION['csrf'] = bin2hex(random_bytes(32));
     }
 
     public static function logout(): void

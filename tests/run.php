@@ -29,6 +29,8 @@ try {
     $_SERVER['HTTP_X_CSRF_TOKEN'] = 'test-token';
     Session::csrf();
     expect(true, 'CSRF valido');
+    Session::refreshCsrf();
+    expect($_SESSION['csrf'] !== 'test-token', 'CSRF renovado tras vencimiento');
     $_SERVER['SCRIPT_NAME'] = '/public/index.php';
     putenv('APP_BASE_PATH');
     expect(Http::basePath() === '/public' && url('assets/app.css') === '/public/assets/app.css', 'base path public detectado');
