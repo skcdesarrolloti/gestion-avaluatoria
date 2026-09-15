@@ -1,4 +1,4 @@
-<section class="space-y-8" x-data="{ query: '' }">
+<section class="space-y-7" x-data="{ query: '', active: 'A' }">
     <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
             <p class="text-sm font-semibold uppercase tracking-wide text-teal-800">Biblioteca valuatoria</p>
@@ -42,14 +42,26 @@
             </div>
         <?php endif; ?>
     </section>
+    <nav class="rounded-lg bg-slate-200/70 p-2" aria-label="Categorías de normas técnicas">
+        <div class="flex gap-2 overflow-x-auto">
+            <?php foreach ($categories as $category): ?>
+                <?php $code = json_encode($category['code'], JSON_THROW_ON_ERROR); ?>
+                <button class="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold transition"
+                    type="button" @click='active = <?= e($code) ?>; query = ""'
+                    :class='active === <?= e($code) ?> ? "bg-white text-orange-600 shadow-sm" : "text-slate-600 hover:bg-white/70"'>
+                    <span class="inline-flex size-7 items-center justify-center rounded-full bg-teal-800 text-xs text-white"><?= e($category['code']) ?></span>
+                    <span class="max-w-44 truncate"><?= e($category['name']) ?></span>
+                    <span class="rounded-full bg-white/80 px-2 py-0.5 text-[11px] text-slate-500"><?= count($category['standards']) ?></span>
+                </button>
+            <?php endforeach; ?>
+        </div>
+    </nav>
     <div class="grid gap-6">
         <?php foreach ($categories as $category): ?>
             <?php
-            $parts = array_merge([$category['code'], $category['name']], array_column($category['standards'], 'standard_code'),
-                array_column($category['standards'], 'title'), array_column($category['standards'], 'source_filename'));
-            $term = mb_strtolower(implode(' ', $parts));
+            $categoryCode = json_encode($category['code'], JSON_THROW_ON_ERROR);
             ?>
-            <section class="border-t border-slate-200 pt-6" x-show='<?= e(json_encode($term, JSON_UNESCAPED_UNICODE)) ?>.includes(query.toLowerCase()) || query === ""'>
+            <section class="pt-2" x-cloak x-show='active === <?= e($categoryCode) ?>'>
                 <div class="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
                     <h2 class="text-xl font-semibold text-slate-950">
                         <span class="mr-2 inline-flex size-9 items-center justify-center rounded-full bg-teal-800 text-sm text-white"><?= e($category['code']) ?></span>
@@ -60,8 +72,14 @@
                 <?php if ($category['standards']): ?>
                     <div class="mt-4 grid gap-3 md:grid-cols-2">
                         <?php foreach ($category['standards'] as $standard): ?>
-                            <?php $status = $standard['has_file'] ? 'PDF disponible' : 'Pendiente de importar'; ?>
-                            <article class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm">
+                            <?php
+                            $status = $standard['has_file'] ? 'PDF disponible' : 'Pendiente de importar';
+                            $standardTerm = mb_strtolower(implode(' ', [
+                                $standard['standard_code'], $standard['title'], $standard['source_filename'], $standard['kind'],
+                            ]));
+                            ?>
+                            <article class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
+                                x-show='query === "" || <?= e(json_encode($standardTerm, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>.includes(query.toLowerCase())'>
                                 <div class="flex items-start justify-between gap-3">
                                     <div>
                                         <p class="text-sm font-semibold text-teal-800"><?= e($standard['standard_code']) ?></p>
