@@ -3,13 +3,20 @@ declare(strict_types=1);
 require dirname(__DIR__) . '/bootstrap.php';
 use App\Core\Database;
 use App\Database\Migrator;
+use App\Services\AuthDiagnostics;
 use App\Models\ValuationStandardRepository;
 
 try {
     $command = $argv[1] ?? 'help';
-    if (!in_array($command, ['install', 'migrate', 'auth:check', 'standards:import'], true)) {
-        echo "Comandos:\n  install [--create-database]\n  migrate\n  auth:check\n  standards:import <carpeta>\n";
+    if (!in_array($command, ['install', 'migrate', 'auth:check', 'auth:diagnose', 'standards:import'], true)) {
+        echo "Comandos:\n  install [--create-database]\n  migrate\n  auth:check\n  auth:diagnose\n  standards:import <carpeta>\n";
         exit($command === 'help' ? 0 : 1);
+    }
+    if ($command === 'auth:diagnose') {
+        foreach ((new AuthDiagnostics())->run() as $check) {
+            echo ($check['ok'] ? 'OK ' : 'ERROR ') . $check['message'] . "\n";
+        }
+        exit(0);
     }
     Database::assertSeparate();
     if ($command === 'auth:check') {

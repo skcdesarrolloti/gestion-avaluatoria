@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace App\Core;
 use App\Controllers\AppraisalController;
 use App\Controllers\AuthController;
+use App\Controllers\DiagnosticController;
 use App\Controllers\StandardController;
 use App\Database\Migrator;
 use App\Models\AppraisalRepository;
@@ -57,6 +58,10 @@ final class Kernel
             if ($controller === 'auth' && $action === 'logout') {
                 Session::logout();
                 Http::redirect('login');
+            }
+            if ($controller === 'diagnostics') {
+                (new DiagnosticController())->$action(...array_slice($matches, 1));
+                return;
             }
             if ($protected && empty($_SESSION['user'])) {
                 if (Http::wantsJson()) {
@@ -128,6 +133,15 @@ final class Kernel
                 return 'Faltan columnas de funcionarios. Revisa AUTH_USER_COLUMN y AUTH_PASSWORD_COLUMN.';
             }
             return 'No se pudo conectar a la base de funcionarios. Revisa AUTH_DB_* en producción.';
+        }
+        if (str_contains($text, 'Falta configurar la base de datos')) {
+            return 'Falta configurar AUTH_DB_DATABASE en producción.';
+        }
+        if (str_contains($text, 'Configuracion de base invalida')) {
+            return 'La configuración AUTH_DB_* contiene un valor inválido.';
+        }
+        if ($error instanceof \InvalidArgumentException) {
+            return 'AUTH_TABLE o las columnas AUTH_* tienen un nombre inválido.';
         }
         return 'No se pudo verificar el acceso. Revisa la conexión de funcionarios.';
     }

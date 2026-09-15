@@ -5,6 +5,7 @@ require __DIR__ . '/support.php';
 use App\Core\Session;
 use App\Core\Http;
 use App\Services\AppraisalValidator;
+use App\Services\AuthDiagnostics;
 use App\Services\AuthService;
 use App\Services\RateLimiter;
 use App\Models\FuncionarioRepository;
@@ -41,6 +42,9 @@ try {
     expect(Http::basePath() === '/avaluatoria', 'base path configurado prevalece');
     putenv('APP_BASE_PATH');
     unset($_SERVER['SCRIPT_NAME']);
+    putenv('AUTH_DB_DATABASE=');
+    $diagnostics = (new AuthDiagnostics())->run();
+    expect($diagnostics[array_key_last($diagnostics)]['ok'] === false, 'diagnostico auth falla sin base configurada');
     $db = new PDO('sqlite::memory:', null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
     fixture($db);
     $db->exec("CREATE TABLE valuation_standard_categories (

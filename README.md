@@ -92,6 +92,9 @@ tests/               Pruebas aisladas
 - Ejecuta `php bin/console.php migrate` durante el despliegue; con `AUTO_MIGRATE=true`
   el primer acceso autenticado también aplica pendientes. Migraciones costosas deben
   ejecutarse antes de abrir tráfico. La base inicial no borra tablas ni datos.
+- Para diagnosticar el login en hosting, ejecuta `php bin/console.php auth:diagnose`.
+  También puedes activar temporalmente `APP_DIAGNOSTICS=true` y abrir
+  `/diagnostico/login`; vuelve a dejarlo en `false` al terminar.
 - Para cambiar assets, recompila; se recomienda versionar sus URL al implementar
   un despliegue con caché/CDN. No configurar caché inmutable para nombres fijos actuales.
 

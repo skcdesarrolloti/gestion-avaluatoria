@@ -5,6 +5,7 @@ declare(strict_types=1);
 return [
     ['GET', '#^/login$#', 'auth', 'login', false],
     ['POST', '#^/login$#', 'auth', 'attempt', false],
+    ['GET', '#^/diagnostico/login$#', 'diagnostics', 'login', false],
     ['POST', '#^/logout$#', 'auth', 'logout', true],
     ['GET', '#^/$#', 'appraisals', 'index', true],
     ['GET', '#^/normas-tecnicas-sectoriales$#', 'standards', 'index', true],
