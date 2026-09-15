@@ -64,7 +64,15 @@ final class Kernel
                 }
                 Http::redirect('login');
             }
-            $auth = new AuthService(new FuncionarioRepository(Database::connection('auth')));
+            try {
+                $auth = $this->authService();
+            } catch (\Throwable $error) {
+                if ($controller === 'auth' && $action === 'attempt') {
+                    $this->loginInfrastructureError($error);
+                    Http::redirect('login');
+                }
+                throw $error;
+            }
             $user = $protected ? $auth->current() : null;
             if ($protected && !$user) {
                 if (Http::wantsJson()) {
@@ -94,6 +102,19 @@ final class Kernel
     {
         $username = $_POST['username'] ?? '';
         return is_string($username) ? substr($username, 0, 190) : '';
+    }
+
+    private function authService(): AuthService
+    {
+        return new AuthService(new FuncionarioRepository(Database::connection('auth')));
+    }
+
+    private function loginInfrastructureError(\Throwable $error): void
+    {
+        error_log('Gestion avaluatoria login auth ' . get_class($error) . ' code=' . $error->getCode()
+            . ' at ' . basename($error->getFile()) . ':' . $error->getLine());
+        Session::flash('login_error', 'No se pudo verificar el acceso con funcionarios. Contacta al administrador.');
+        Session::flash('login_username', $this->postedUsername());
     }
 
     private function loginData(): array
