@@ -3,4 +3,10 @@
 /vendor/
 /storage/*
 !/storage/.gitkeep
+!/storage/normas-tecnicas-sectoriales/
+!/storage/normas-tecnicas-sectoriales/.gitkeep
+!/storage/rate-limits/
+!/storage/rate-limits/.gitkeep
+!/storage/sessions/
+!/storage/sessions/.gitkeep
 /tests/.runtime/

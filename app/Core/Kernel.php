@@ -113,7 +113,7 @@ final class Kernel
     {
         error_log('Gestion avaluatoria login auth ' . get_class($error) . ' code=' . $error->getCode()
             . ' at ' . basename($error->getFile()) . ':' . $error->getLine());
-        Session::flash('login_error', 'No se pudo verificar el acceso con funcionarios. Contacta al administrador.');
+        Session::flash('login_error', 'No se pudo verificar el acceso. Revisa la conexión de funcionarios y permisos de storage/.');
         Session::flash('login_username', $this->postedUsername());
     }
 

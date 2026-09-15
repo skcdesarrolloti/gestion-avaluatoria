@@ -84,8 +84,9 @@ tests/               Pruebas aisladas
   hasta cambiar el document root; la aplicación también intenta detectarlo.
 - En HTTPS usa `APP_ENV=production`, `SESSION_SECURE=true`. Para un subdirectorio
   servido mediante alias configura `APP_BASE_PATH=/avaluatoria`; deja vacío en raíz.
-- Permite escribir en `storage/`; un único servidor comparte el límite de intentos
-  por filesystem. Para varios servidores implementar un limitador centralizado.
+- Permite escribir en `storage/`, `storage/sessions/` y `storage/rate-limits/`; un
+  único servidor comparte el límite de intentos por filesystem. Para varios servidores
+  implementar un limitador centralizado.
 - Sube assets compilados, código y migraciones. Excluye `node_modules/`, `tests/`,
   secretos de desarrollo y bases temporales. Configura `.env` en el servidor.
 - Ejecuta `php bin/console.php migrate` durante el despliegue; con `AUTO_MIGRATE=true`

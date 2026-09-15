@@ -51,7 +51,7 @@ final class AuthController
         error_log('Gestion avaluatoria login ' . $scope . ' ' . get_class($error) . ' code=' . $error->getCode()
             . ' at ' . basename($error->getFile()) . ':' . $error->getLine());
         $login = $_POST['username'] ?? '';
-        Session::flash('login_error', 'No se pudo verificar el acceso con funcionarios. Contacta al administrador.');
+        Session::flash('login_error', 'No se pudo verificar el acceso. Revisa la conexión de funcionarios y permisos de storage/.');
         Session::flash('login_username', is_string($login) ? substr($login, 0, 190) : '');
         Http::redirect('login');
     }
