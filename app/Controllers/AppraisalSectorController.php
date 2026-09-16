@@ -6,6 +6,7 @@ use App\Core\Session;
 use App\Models\AppraisalRepository;
 use App\Models\AppraisalSectorRepository;
 use App\Models\AppraisalSubjectRepository;
+use App\Models\GeoMasterRepository;
 use App\Models\NeighborhoodSectorRepository;
 use App\Services\AppraisalSectorInput;
 use App\Services\AppraisalSectorPrefill;
@@ -18,6 +19,7 @@ final class AppraisalSectorController
         private AppraisalSectorRepository $sectors,
         private AppraisalSubjectRepository $subjects,
         private NeighborhoodSectorRepository $neighborhoodSectors,
+        private GeoMasterRepository $geo,
         private array $user
     ) {}
 
@@ -25,6 +27,7 @@ final class AppraisalSectorController
     {
         $record = $this->appraisals->find($id, $this->user['id']);
         $subject = $this->subjects->find($id, $this->user['id']);
+        $master = $this->neighborhoodSectors->find((string) ($subject['neighborhood_id'] ?? ''));
         $hasSector = $this->sectors->exists($id, $this->user['id']);
         if ($hasSector) {
             $sector = $this->sectors->find($id, $this->user['id']);
@@ -40,6 +43,9 @@ final class AppraisalSectorController
             'sectorPrefilled' => $source !== 'expediente' && array_filter($sector) !== [],
             'sectorPrefillSource' => $source,
             'sectorUpdatedAt' => $updatedAt,
+            'sectorNeighborhoods' => $this->geo->neighborhoods(),
+            'sectorHasNeighborhoodBank' => (bool) $master,
+            'sectorNeighborhoodUpdatedAt' => $master['updated_at'] ?? null,
             'sectorSections' => AppraisalSectorCatalog::sections(),
             'sectorOptions' => AppraisalSectorCatalog::options(),
             'sectorHelps' => AppraisalSectorCatalog::helps(),
@@ -64,6 +70,31 @@ final class AppraisalSectorController
             ? '#' . (string) $_POST['active_sector']
             : '';
         Http::redirect('avaluos/' . $id . '/sector' . $hash);
+    }
+
+    public function selectNeighborhood(string $id): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        try {
+            $neighborhoodId = trim((string) ($_POST['neighborhood_id'] ?? ''));
+            if (!preg_match('/^[a-f0-9]{32}$/', $neighborhoodId)) {
+                throw new \InvalidArgumentException('Selecciona un barrio válido.');
+            }
+            $subject = $this->subjects->find($id, $this->user['id']);
+            $subject['neighborhood_id'] = $neighborhoodId;
+            $this->subjects->save($id, $this->user['id'], $subject);
+            $subject = $this->subjects->find($id, $this->user['id']);
+            $master = $this->neighborhoodSectors->find($neighborhoodId);
+            $data = $master ? AppraisalSectorInput::data($master)
+                : AppraisalSectorInput::data(AppraisalSectorPrefill::fromSubject($subject));
+            $this->sectors->save($id, $this->user['id'], $data);
+            Session::flash('sector_message', $master
+                ? 'Barrio cargado desde el banco barrial.'
+                : 'Barrio sin ficha guardada: se preparó una generación inicial para completar.');
+        } catch (\Throwable $error) {
+            Session::flash('sector_error', $error->getMessage());
+        }
+        Http::redirect('avaluos/' . $id . '/sector');
     }
 
     private function initialSector(string $id, array $subject): array

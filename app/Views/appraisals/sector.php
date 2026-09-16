@@ -16,7 +16,17 @@ if (!empty($sectorUpdatedAt)) {
         $updatedAtText = (string) $sectorUpdatedAt;
     }
 }
+$bankUpdatedAtText = '';
+if (!empty($sectorNeighborhoodUpdatedAt)) {
+    try {
+        $bankUpdatedAtText = (new DateTimeImmutable((string) $sectorNeighborhoodUpdatedAt, new DateTimeZone('UTC')))
+            ->setTimezone(new DateTimeZone('America/Bogota'))->format('d/m/Y H:i');
+    } catch (Throwable) {
+        $bankUpdatedAtText = (string) $sectorNeighborhoodUpdatedAt;
+    }
+}
 $neighborhoodLabel = trim((string) ($subject['neighborhood_name'] ?? ''));
+$neighborhoodsJson = json_encode($sectorNeighborhoods ?? [], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
@@ -38,6 +48,55 @@ $neighborhoodLabel = trim((string) ($subject['neighborhood_name'] ?? ''));
 <?php if ($sectorError): ?>
     <p class="mt-6 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($sectorError) ?></p>
 <?php endif; ?>
+
+<section class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
+    x-data="{
+        neighborhoods: <?= e($neighborhoodsJson) ?>,
+        query: <?= e(json_encode($neighborhoodLabel, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+        selectedId: <?= e(json_encode((string) ($subject['neighborhood_id'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+        label(item) { return [item.name, item.locality_name, item.commune_ucg, item.city_name].filter(Boolean).join(' · ') },
+        get filtered() {
+            const q = this.query.toLowerCase().trim();
+            if (!q) return this.neighborhoods.slice(0, 8);
+            return this.neighborhoods.filter(item => this.label(item).toLowerCase().includes(q)).slice(0, 8);
+        },
+        choose(item) { this.selectedId = item.id; this.query = this.label(item) }
+    }">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+            <p class="eyebrow">Banco barrial</p>
+            <h2 class="mt-2 text-2xl font-semibold">Buscar y cargar barrio</h2>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+                Busca el barrio del avalúo. Si ya existe ficha sectorial, se carga completa; si no existe,
+                se prepara una generación inicial para completar y guardar.
+            </p>
+        </div>
+        <?php if ($bankUpdatedAtText): ?>
+            <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-800">
+                Banco actualizado <?= e($bankUpdatedAtText) ?>
+            </span>
+        <?php endif; ?>
+    </div>
+    <form class="mt-5 grid gap-4 lg:grid-cols-[1fr_auto]" method="post"
+        action="<?= e(url('avaluos/' . $record['id'] . '/sector/barrio')) ?>">
+        <?= csrf_field() ?>
+        <input type="hidden" name="neighborhood_id" :value="selectedId">
+        <label class="label">Barrio / microsector
+            <input class="input mt-2" type="search" x-model="query" placeholder="Busca por nombre del barrio, localidad o comuna">
+        </label>
+        <button class="btn-primary min-h-11 self-end" type="submit">Cargar ficha del barrio</button>
+        <div class="lg:col-span-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4" x-show="filtered.length">
+            <template x-for="item in filtered" :key="item.id">
+                <button type="button" class="min-h-11 rounded-lg border px-3 py-2 text-left text-sm"
+                    @click="choose(item)"
+                    :class="selectedId === item.id ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'">
+                    <span class="font-semibold" x-text="item.name"></span>
+                    <span class="block text-xs text-slate-500" x-text="[item.locality_name, item.commune_ucg].filter(Boolean).join(' · ')"></span>
+                </button>
+            </template>
+        </div>
+    </form>
+</section>
 
 <form id="sector-form" class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     method="post" action="<?= e(url('avaluos/' . $record['id'] . '/sector')) ?>"
@@ -69,6 +128,9 @@ $neighborhoodLabel = trim((string) ($subject['neighborhood_name'] ?? ''));
             <?php else: ?>
                 Estás trabajando con la ficha ya fijada en este avalúo.
                 <span class="font-semibold">Última actualización: <?= e($updatedAtText ?: 'sin fecha registrada') ?>.</span>
+                <?php if (empty($sectorHasNeighborhoodBank)): ?>
+                    <span class="block font-semibold text-amber-800">Este barrio aún no tiene banco barrial consolidado; al guardar se creará o actualizará.</span>
+                <?php endif; ?>
             <?php endif; ?>
             <?php if ($locationLine): ?>
                 <span class="block text-blue-900/80">Referencia territorial: <?= e($locationLine) ?>.</span>

@@ -127,7 +127,7 @@ final class Kernel
                 'standards' => new StandardController(new ValuationStandardRepository($db)),
                 'sector' => new \App\Controllers\AppraisalSectorController(new AppraisalRepository($db),
                     new \App\Models\AppraisalSectorRepository($db), new AppraisalSubjectRepository($db),
-                    new \App\Models\NeighborhoodSectorRepository($db), $user),
+                    new \App\Models\NeighborhoodSectorRepository($db), new GeoMasterRepository($db), $user),
                 'valuations' => new ValuationController(),
                 default => new AppraisalController(new AppraisalRepository($db), $user,
                     new AppraiserRepository($db), new IgacTypologyRepository(),
