@@ -7,6 +7,16 @@ $locationLine = trim(implode(' · ', array_filter([
     $subject['commune_ucg'] ?? '',
     $subject['city_name'] ?? '',
 ])));
+$updatedAtText = '';
+if (!empty($sectorUpdatedAt)) {
+    try {
+        $updatedAtText = (new DateTimeImmutable((string) $sectorUpdatedAt, new DateTimeZone('UTC')))
+            ->setTimezone(new DateTimeZone('America/Bogota'))->format('d/m/Y H:i');
+    } catch (Throwable) {
+        $updatedAtText = (string) $sectorUpdatedAt;
+    }
+}
+$neighborhoodLabel = trim((string) ($subject['neighborhood_name'] ?? ''));
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
@@ -47,19 +57,22 @@ $locationLine = trim(implode(' · ', array_filter([
         <button class="btn-primary min-h-11" type="submit">Guardar numeral 2</button>
     </div>
 
-    <?php if ($locationLine): ?>
+    <?php if ($locationLine || ($sectorPrefillSource ?? '') !== 'expediente'): ?>
         <div class="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
-            <strong>Ubicación tomada del bien sujeto:</strong> <?= e($locationLine) ?>.
-            Puedes ajustar la lectura sectorial sin modificar la ficha básica del inmueble.
-        </div>
-    <?php endif; ?>
-    <?php if (!empty($sectorPrefilled)): ?>
-        <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
-            <strong><?= ($sectorPrefillSource ?? '') === 'banco_barrial' ? 'Banco barrial encontrado:' : 'Precarga automática:' ?></strong>
-            <?= ($sectorPrefillSource ?? '') === 'banco_barrial'
-                ? 'esta ficha viene de una caracterización previa del mismo barrio.'
-                : 'estos datos vienen de Bien sujeto y del maestro geográfico.' ?>
-            Revísala, completa lo que falte y guarda el numeral 2 para fijarla en este expediente y actualizar el barrio.
+            <strong>Barrio de trabajo:</strong> <?= e($neighborhoodLabel !== '' ? $neighborhoodLabel : 'sin barrio seleccionado') ?>.
+            <?php if (($sectorPrefillSource ?? '') === 'banco_barrial'): ?>
+                Se cargó la ficha sectorial completa guardada para este barrio.
+                <span class="font-semibold">Última actualización: <?= e($updatedAtText ?: 'sin fecha registrada') ?>.</span>
+            <?php elseif (($sectorPrefillSource ?? '') === 'bien_sujeto'): ?>
+                Este barrio todavía no tiene ficha sectorial guardada. Completa o genera esta lectura y guárdala para crear el banco barrial.
+                <span class="font-semibold">Fecha de actualización: se registrará al guardar.</span>
+            <?php else: ?>
+                Estás trabajando con la ficha ya fijada en este avalúo.
+                <span class="font-semibold">Última actualización: <?= e($updatedAtText ?: 'sin fecha registrada') ?>.</span>
+            <?php endif; ?>
+            <?php if ($locationLine): ?>
+                <span class="block text-blue-900/80">Referencia territorial: <?= e($locationLine) ?>.</span>
+            <?php endif; ?>
         </div>
     <?php endif; ?>
 

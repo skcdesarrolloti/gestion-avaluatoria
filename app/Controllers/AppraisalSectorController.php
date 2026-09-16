@@ -26,9 +26,12 @@ final class AppraisalSectorController
         $record = $this->appraisals->find($id, $this->user['id']);
         $subject = $this->subjects->find($id, $this->user['id']);
         $hasSector = $this->sectors->exists($id, $this->user['id']);
-        [$sector, $source] = $hasSector
-            ? [$this->sectors->find($id, $this->user['id']), 'expediente']
-            : $this->initialSector($id, $subject);
+        if ($hasSector) {
+            $sector = $this->sectors->find($id, $this->user['id']);
+            [$source, $updatedAt] = ['expediente', $sector['updated_at'] ?? null];
+        } else {
+            [$sector, $source, $updatedAt] = $this->initialSector($id, $subject);
+        }
         view('appraisals/sector', [
             'title' => 'Sector y entorno',
             'record' => $record,
@@ -36,6 +39,7 @@ final class AppraisalSectorController
             'subject' => $subject,
             'sectorPrefilled' => $source !== 'expediente' && array_filter($sector) !== [],
             'sectorPrefillSource' => $source,
+            'sectorUpdatedAt' => $updatedAt,
             'sectorSections' => AppraisalSectorCatalog::sections(),
             'sectorOptions' => AppraisalSectorCatalog::options(),
             'sectorHelps' => AppraisalSectorCatalog::helps(),
@@ -67,8 +71,8 @@ final class AppraisalSectorController
         $empty = $this->sectors->find($id, $this->user['id']);
         $master = $this->neighborhoodSectors->find((string) ($subject['neighborhood_id'] ?? ''));
         if ($master) {
-            return [array_replace($empty, $master), 'banco_barrial'];
+            return [array_replace($empty, $master), 'banco_barrial', $master['updated_at'] ?? null];
         }
-        return [array_replace($empty, AppraisalSectorPrefill::fromSubject($subject)), 'bien_sujeto'];
+        return [array_replace($empty, AppraisalSectorPrefill::fromSubject($subject)), 'bien_sujeto', null];
     }
 }
