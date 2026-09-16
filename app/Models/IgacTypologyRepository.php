@@ -41,6 +41,9 @@ final class IgacTypologyRepository
             $options[$item['category_code']][] = [
                 'value' => $item['denomination'],
                 'label' => $item['denomination'],
+                'description' => $item['description'],
+                'specifications' => $item['specifications'],
+                'image' => $item['image_filename'],
             ];
         }
         return $options;
