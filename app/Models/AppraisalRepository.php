@@ -30,10 +30,14 @@ final class AppraisalRepository
 
     public function photos(string $id, int $owner): array
     {
-        $query = $this->db->prepare('SELECT * FROM appraisal_photos WHERE appraisal_id = ? AND owner_id = ?
+        $query = $this->db->prepare('SELECT id, appraisal_id, owner_id, source_filename, storage_filename,
+            mime_type, file_size_bytes, caption, created_at, file_blob IS NOT NULL AS has_blob
+            FROM appraisal_photos WHERE appraisal_id = ? AND owner_id = ?
             ORDER BY created_at DESC, id DESC');
         $query->execute([$id, $owner]);
-        return $query->fetchAll();
+        return array_map(fn (array $row): array => $row + [
+            'file_available' => is_file(self::photoPath((string) $row['storage_filename'])),
+        ], $query->fetchAll());
     }
 
     public function findPhoto(string $photoId, int $owner): array
@@ -84,10 +88,10 @@ final class AppraisalRepository
     {
         $now = gmdate('Y-m-d H:i:s');
         $query = $this->db->prepare('INSERT INTO appraisal_photos
-            (id, appraisal_id, owner_id, source_filename, storage_filename, mime_type, file_size_bytes, caption, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+            (id, appraisal_id, owner_id, source_filename, storage_filename, mime_type, file_size_bytes, caption, created_at, file_blob)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
         $query->execute([$photo['id'], $id, $owner, $photo['source_filename'], $photo['storage_filename'],
-            $photo['mime_type'], $photo['file_size_bytes'], $photo['caption'], $now]);
+            $photo['mime_type'], $photo['file_size_bytes'], $photo['caption'], $now, $photo['file_blob']]);
     }
 
     public static function photoPath(string $filename): string { return AppraisalPhotoStorage::path($filename); }

@@ -74,10 +74,19 @@ final class AppraisalController
         $this->appraisals->find($id, $this->user['id']);
         $photo = $this->appraisals->findPhoto($photoId, $this->user['id']);
         $path = AppraisalRepository::photoPath((string) $photo['storage_filename']);
-        if (!is_file($path)) throw new HttpException(404, 'No se encontró la foto.');
+        $blob = $photo['file_blob'] ?? null;
+        if (!is_file($path) && !is_string($blob)) throw new HttpException(404, 'No se encontró la foto.');
+        while (ob_get_level() > 0) ob_end_clean();
         header('Content-Type: ' . $photo['mime_type']);
         header('Content-Disposition: inline; filename="' . basename((string) $photo['source_filename']) . '"');
-        readfile($path);
+        header('X-Content-Type-Options: nosniff');
+        if (is_file($path)) {
+            header('Content-Length: ' . filesize($path));
+            readfile($path);
+        } else {
+            header('Content-Length: ' . strlen($blob));
+            echo $blob;
+        }
         exit;
     }
 
@@ -135,9 +144,11 @@ final class AppraisalController
             $storage = 'foto-' . $id . '-' . $photoId . '.' . $info['extension'];
             $bytes = AppraisalPhotoStorage::storeUploaded((string) $files['tmp_name'][$index],
                 AppraisalPhotoStorage::path($storage));
+            $blob = file_get_contents(AppraisalPhotoStorage::path($storage));
+            if (!is_string($blob)) throw new \RuntimeException('La foto no pudo quedar respaldada.');
             $this->appraisals->addPhoto($id, $this->user['id'], ['id' => $photoId,
                 'source_filename' => $source, 'storage_filename' => $storage,
-                'mime_type' => $info['mime'], 'file_size_bytes' => $bytes, 'caption' => '']);
+                'mime_type' => $info['mime'], 'file_size_bytes' => $bytes, 'caption' => '', 'file_blob' => $blob]);
             $stored++;
         }
         if ($stored === 0) throw new \InvalidArgumentException('Selecciona al menos una foto.');
