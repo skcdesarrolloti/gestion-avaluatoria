@@ -26,7 +26,9 @@ use App\Models\IgacTypologyRepository;
 use App\Models\IfrsStandardRepository;
 use App\Models\InternationalStandardRepository;
 use App\Models\LegalDocumentRepository;
+use App\Models\NeighborhoodSectorRepository;
 use App\Models\ValuationStandardRepository;
+use App\Support\AppraisalSectorCatalog;
 
 // All fixtures are in memory; never connect to the configured production database.
 foreach (['AUTH_TABLE' => 'wp_jet_cct_funcionarios', 'AUTH_USER_COLUMN' => 'user_others_apss',
@@ -296,6 +298,19 @@ try {
         && $prefill['services_status'] === 'completa'
         && $prefill['road_hierarchy'] === 'arterial'
         && str_contains($prefill['sector_report_text'], 'Cartagena'), 'sector precargado desde sujeto');
+    $sectorColumnsSql = implode(', ', array_map(static fn (string $key): string => $key . ' TEXT',
+        AppraisalSectorCatalog::keys()));
+    $db->exec("CREATE TABLE master_sector_profiles (neighborhood_id TEXT PRIMARY KEY,
+        source_appraisal_id TEXT, updated_by_owner_id INTEGER, version INTEGER DEFAULT 1,
+        $sectorColumnsSql, updated_at TEXT)");
+    $neighborhoodSectors = new NeighborhoodSectorRepository($db);
+    $neighborhoodId = str_repeat('e', 32);
+    $masterSector = AppraisalSectorInput::data(['sector_name' => 'Bruselas',
+        'services_status' => 'completa', 'sector_report_text' => 'Ficha reutilizable del barrio.']);
+    $neighborhoodSectors->save($neighborhoodId, 1, str_repeat('f', 32), $masterSector);
+    $storedSector = $neighborhoodSectors->find($neighborhoodId);
+    expect($storedSector && $storedSector['sector_name'] === 'Bruselas'
+        && $storedSector['sector_report_text'] === 'Ficha reutilizable del barrio.', 'banco barrial reutilizable');
     $photoRecordId = str_repeat('c', 32);
     $photoUnitId = str_repeat('d', 32);
     $photoController = (new ReflectionClass(AppraisalController::class))->newInstanceWithoutConstructor();

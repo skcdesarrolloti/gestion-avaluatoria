@@ -55,8 +55,11 @@ $locationLine = trim(implode(' · ', array_filter([
     <?php endif; ?>
     <?php if (!empty($sectorPrefilled)): ?>
         <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
-            <strong>Precarga automática:</strong> estos datos vienen de Bien sujeto y del maestro geográfico.
-            Revísalos, completa lo que falte y guarda el numeral 2 para dejarlo fijado en el expediente.
+            <strong><?= ($sectorPrefillSource ?? '') === 'banco_barrial' ? 'Banco barrial encontrado:' : 'Precarga automática:' ?></strong>
+            <?= ($sectorPrefillSource ?? '') === 'banco_barrial'
+                ? 'esta ficha viene de una caracterización previa del mismo barrio.'
+                : 'estos datos vienen de Bien sujeto y del maestro geográfico.' ?>
+            Revísala, completa lo que falte y guarda el numeral 2 para fijarla en este expediente y actualizar el barrio.
         </div>
     <?php endif; ?>
 

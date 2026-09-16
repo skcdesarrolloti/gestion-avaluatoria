@@ -6,6 +6,7 @@ use App\Core\Session;
 use App\Models\AppraisalRepository;
 use App\Models\AppraisalSectorRepository;
 use App\Models\AppraisalSubjectRepository;
+use App\Models\NeighborhoodSectorRepository;
 use App\Services\AppraisalSectorInput;
 use App\Services\AppraisalSectorPrefill;
 use App\Support\AppraisalSectorCatalog;
@@ -16,6 +17,7 @@ final class AppraisalSectorController
         private AppraisalRepository $appraisals,
         private AppraisalSectorRepository $sectors,
         private AppraisalSubjectRepository $subjects,
+        private NeighborhoodSectorRepository $neighborhoodSectors,
         private array $user
     ) {}
 
@@ -24,16 +26,16 @@ final class AppraisalSectorController
         $record = $this->appraisals->find($id, $this->user['id']);
         $subject = $this->subjects->find($id, $this->user['id']);
         $hasSector = $this->sectors->exists($id, $this->user['id']);
-        $sector = $hasSector ? $this->sectors->find($id, $this->user['id']) : array_replace(
-            $this->sectors->find($id, $this->user['id']),
-            AppraisalSectorPrefill::fromSubject($subject)
-        );
+        [$sector, $source] = $hasSector
+            ? [$this->sectors->find($id, $this->user['id']), 'expediente']
+            : $this->initialSector($id, $subject);
         view('appraisals/sector', [
             'title' => 'Sector y entorno',
             'record' => $record,
             'sector' => $sector,
             'subject' => $subject,
-            'sectorPrefilled' => !$hasSector && array_filter($sector) !== [],
+            'sectorPrefilled' => $source !== 'expediente' && array_filter($sector) !== [],
+            'sectorPrefillSource' => $source,
             'sectorSections' => AppraisalSectorCatalog::sections(),
             'sectorOptions' => AppraisalSectorCatalog::options(),
             'sectorHelps' => AppraisalSectorCatalog::helps(),
@@ -46,8 +48,11 @@ final class AppraisalSectorController
     {
         $this->appraisals->find($id, $this->user['id']);
         try {
-            $this->sectors->save($id, $this->user['id'], AppraisalSectorInput::data($_POST));
-            Session::flash('sector_message', 'Numeral 2 guardado correctamente.');
+            $data = AppraisalSectorInput::data($_POST);
+            $subject = $this->subjects->find($id, $this->user['id']);
+            $this->sectors->save($id, $this->user['id'], $data);
+            $this->neighborhoodSectors->save((string) ($subject['neighborhood_id'] ?? ''), $this->user['id'], $id, $data);
+            Session::flash('sector_message', 'Numeral 2 guardado y banco barrial actualizado.');
         } catch (\Throwable $error) {
             Session::flash('sector_error', $error->getMessage());
         }
@@ -55,5 +60,15 @@ final class AppraisalSectorController
             ? '#' . (string) $_POST['active_sector']
             : '';
         Http::redirect('avaluos/' . $id . '/sector' . $hash);
+    }
+
+    private function initialSector(string $id, array $subject): array
+    {
+        $empty = $this->sectors->find($id, $this->user['id']);
+        $master = $this->neighborhoodSectors->find((string) ($subject['neighborhood_id'] ?? ''));
+        if ($master) {
+            return [array_replace($empty, $master), 'banco_barrial'];
+        }
+        return [array_replace($empty, AppraisalSectorPrefill::fromSubject($subject)), 'bien_sujeto'];
     }
 }
