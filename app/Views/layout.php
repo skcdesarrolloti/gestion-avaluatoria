@@ -16,6 +16,7 @@ $currentPath = '/' . trim(substr($requestPath, strlen($basePath)), '/');
 $isActive = static fn (string $path): bool => $path === '/' ? $currentPath === '/' : str_starts_with($currentPath, $path);
 $tabs = [
     ['label' => 'Valuaciones', 'href' => url('valuaciones'), 'active' => $isActive('/valuaciones')],
+    ['label' => 'Creación de Maestros', 'href' => url('maestros'), 'active' => $isActive('/maestros')],
     ['label' => 'Mis avalúos', 'href' => url(), 'active' => $isActive('/')],
     ['label' => 'Normas Técnicas Sectoriales', 'href' => url('normas-tecnicas-sectoriales'), 'active' => $isActive('/normas-tecnicas-sectoriales')],
     ['label' => 'Marco Jurídico Nacional', 'href' => url('marco-juridico-valuatorio'), 'active' => $isActive('/marco-juridico-valuatorio')],
@@ -47,6 +48,7 @@ $tabs = [
             <div class="app-shell">
                 <div class="flex flex-wrap justify-end gap-3">
                     <a class="app-action app-action-blue" href="<?= e(url('valuaciones')) ?>">Valuaciones</a>
+                    <a class="app-action app-action-teal" href="<?= e(url('maestros')) ?>">Maestros</a>
                     <a class="app-action app-action-orange" href="<?= e(url()) ?>">Mis avalúos</a>
                     <a class="app-action app-action-teal" href="<?= e(url('normas-tecnicas-sectoriales')) ?>">Normas técnicas</a>
                     <a class="app-action app-action-orange" href="<?= e(url('marco-juridico-valuatorio')) ?>">Marco jurídico</a>

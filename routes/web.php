@@ -8,6 +8,7 @@ return [
     ['GET', '#^/diagnostico/login$#', 'diagnostics', 'login', false],
     ['POST', '#^/logout$#', 'auth', 'logout', true],
     ['GET', '#^/valuaciones$#', 'valuations', 'index', true],
+    ['GET', '#^/maestros$#', 'masters', 'index', true],
     ['GET', '#^/$#', 'appraisals', 'index', true],
     ['GET', '#^/normas-tecnicas-sectoriales$#', 'standards', 'index', true],
     ['GET', '#^/marco-juridico-valuatorio$#', 'legal', 'index', true],

@@ -8,6 +8,7 @@ use App\Controllers\IgacTypologyController;
 use App\Controllers\IfrsStandardController;
 use App\Controllers\InternationalStandardController;
 use App\Controllers\LegalFrameworkController;
+use App\Controllers\MasterDataController;
 use App\Controllers\StandardController;
 use App\Controllers\ValuationController;
 use App\Database\Migrator;
@@ -128,6 +129,7 @@ final class Kernel
                 'typologies' => new IgacTypologyController(new IgacTypologyRepository()),
                 'international' => new InternationalStandardController(new InternationalStandardRepository($db)),
                 'legal' => new LegalFrameworkController(new LegalDocumentRepository($db)),
+                'masters' => new MasterDataController(),
                 'standards' => new StandardController(new ValuationStandardRepository($db)),
                 'valuations' => new ValuationController(),
                 default => new AppraisalController(new AppraisalRepository($db), $user),
