@@ -3,6 +3,7 @@ use App\Support\AppraisalCatalog;
 
 $selected = static fn (string $name, string $value): string => (string) ($record[$name] ?? '') === $value ? 'selected' : '';
 $field = static fn (string $name): string => (string) ($record[$name] ?? '');
+$count = static fn (string $name): int => max(0, (int) ($record[$name] ?? 0));
 $notes = $catalog['notes'] ?? [];
 $initial = ['notes' => $notes];
 ?>
@@ -21,67 +22,13 @@ $initial = ['notes' => $notes];
 
 <div class="mt-8 space-y-7" x-data="{
     typologyHint: <?= e(json_encode($field('igac_typology_hint'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
-    igacCategory: <?= e(json_encode($field('igac_category'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>
+    igacCategory: <?= e(json_encode($field('igac_category'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+    propertyUnits: <?= e((string) $count('igac_property_units_count')) ?>,
+    annexUnits: <?= e((string) $count('igac_annex_units_count')) ?>
 }">
-    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-        <div class="flex flex-wrap items-start justify-between gap-4">
-            <div>
-                <p class="eyebrow">Evidencia inicial</p>
-                <h2 class="mt-2 text-2xl font-semibold">Fotos del inmueble</h2>
-                <p class="mt-2 text-sm leading-6 text-slate-600">
-                    Sube las fotos que permitan reconocer qué se va a valorar. Con ellas se hace la
-                    preclasificación frente a las tipologías constructivas IGAC.
-                </p>
-            </div>
-            <a class="btn-secondary" href="<?= e(url('tipologias-constructivas-igac')) ?>">Ver tipologías IGAC</a>
-        </div>
-        <?php if ($photoMessage): ?>
-            <p class="mt-5 rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($photoMessage) ?></p>
-        <?php endif; ?>
-        <?php if ($photoError): ?>
-            <p class="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($photoError) ?></p>
-        <?php endif; ?>
-        <form class="mt-6 grid gap-4 lg:grid-cols-[1fr_auto]" method="post" enctype="multipart/form-data"
-            action="<?= e(url('avaluos/' . $record['id'] . '/capitulo-0/fotos')) ?>"
-            x-data="{ busy: false, hasFiles: false }" @submit="busy = true">
-            <?= csrf_field() ?>
-            <label class="label">Agregar fotos
-                <input class="input" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple
-                    @change="hasFiles = $event.target.files.length > 0">
-            </label>
-            <div class="flex items-end">
-                <button class="btn-primary min-h-11 w-full lg:w-auto" type="submit" :disabled="busy || !hasFiles"
-                    x-text="busy ? 'Subiendo...' : 'Subir fotos'">Subir fotos</button>
-            </div>
-        </form>
-        <?php if ($photos): ?>
-            <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <?php foreach ($photos as $photo): ?>
-                    <?php $canRender = !empty($photo['file_available']) || !empty($photo['has_blob']); ?>
-                    <div class="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
-                        <?php if ($canRender): ?>
-                            <a class="block" href="<?= e(url('avaluos/' . $record['id'] . '/fotos/' . $photo['id'])) ?>" target="_blank" rel="noopener">
-                                <img class="aspect-[4/3] w-full object-contain" alt="Foto del inmueble"
-                                    src="<?= e(url('avaluos/' . $record['id'] . '/fotos/' . $photo['id'])) ?>" loading="lazy">
-                            </a>
-                            <?php if (empty($photo['file_available']) && !empty($photo['has_blob'])): ?>
-                                <p class="border-t border-amber-100 bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-800">
-                                    Mostrada desde respaldo interno.
-                                </p>
-                            <?php endif; ?>
-                        <?php else: ?>
-                            <p class="p-4 text-sm font-semibold text-red-700">Archivo físico no encontrado. Vuelve a subir esta foto.</p>
-                        <?php endif; ?>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        <?php else: ?>
-            <p class="mt-5 rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-600">
-                Aún no hay fotos cargadas para este expediente.
-            </p>
-        <?php endif; ?>
-    </section>
+    <?php require BASE_PATH . '/app/Views/appraisals/preclassification.php'; ?>
 
+    <?php require BASE_PATH . '/app/Views/appraisals/photo-upload.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/igac-comparison.php'; ?>
 
     <form class="grid gap-7 lg:grid-cols-[1fr_18rem]" method="post"
@@ -94,6 +41,10 @@ $initial = ['notes' => $notes];
         @submit="busy = true">
         <?= csrf_field() ?>
         <input type="hidden" name="version" value="<?= e($record['version']) ?>">
+        <input type="hidden" name="igac_category" x-model="igacCategory">
+        <input type="hidden" name="igac_typology_hint" x-model="typologyHint">
+        <input type="hidden" name="igac_property_units_count" x-model="propertyUnits">
+        <input type="hidden" name="igac_annex_units_count" x-model="annexUnits">
         <div id="datos-base-capitulo-0" class="scroll-mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <p class="eyebrow">Configuración</p>
             <h2 class="mt-2 text-2xl font-semibold">Datos base del encargo</h2>
@@ -119,20 +70,6 @@ $initial = ['notes' => $notes];
                             </option>
                         <?php endforeach; ?>
                     </select>
-                </label>
-                <label class="label">Categoría IGAC probable
-                    <select class="input" name="igac_category" x-model="igacCategory">
-                        <option value="">Por definir</option>
-                        <?php foreach ($igacCategories as $category): ?>
-                            <option value="<?= e($category['code']) ?>" <?= $selected('igac_category', $category['code']) ?>>
-                                <?= e($category['name']) ?>
-                            </option>
-                        <?php endforeach; ?>
-                    </select>
-                </label>
-                <label class="label md:col-span-2">Tipología IGAC probable
-                    <input class="input" name="igac_typology_hint" maxlength="190"
-                        x-model="typologyHint" placeholder="Nombre o referencia de tipología probable">
                 </label>
                 <?php foreach (['tipo', 'tipo_derecho', 'tipo_negocio', 'finalidad', 'tipo_inmueble',
                     'subtipo_funcional', 'destinacion', 'base_valor', 'aplica_niif', 'regimen_ph',

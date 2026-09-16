@@ -44,6 +44,8 @@ final class AppraisalController
             'igacCandidates' => $this->typologies->candidates($record),
             'photoMessage' => Session::pullFlash('chapter_zero_photo_message'),
             'photoError' => Session::pullFlash('chapter_zero_photo_error'),
+            'preclassMessage' => Session::pullFlash('chapter_zero_preclass_message'),
+            'preclassError' => Session::pullFlash('chapter_zero_preclass_error'),
             'catalog' => ['selects' => AppraisalCatalog::selectFields(), 'notes' => AppraisalCatalog::notes()]]);
     }
 
@@ -52,6 +54,19 @@ final class AppraisalController
         $record = $this->appraisals->find($id, $this->user['id']);
         $data = $this->chapterZeroData((int) ($_POST['version'] ?? 0));
         $this->appraisals->saveChapterZero($id, $this->user['id'], (int) $_POST['version'], $data);
+        Http::redirect('avaluos/' . $record['id'] . '/capitulo-0');
+    }
+
+    public function saveChapterZeroPreclassification(string $id): never
+    {
+        $record = $this->appraisals->find($id, $this->user['id']);
+        try {
+            $this->appraisals->savePreclassification($id, $this->user['id'], (int) ($_POST['version'] ?? 0),
+                $this->preclassificationData());
+            Session::flash('chapter_zero_preclass_message', 'Lectura inicial guardada correctamente.');
+        } catch (\Throwable $error) {
+            Session::flash('chapter_zero_preclass_error', $error->getMessage());
+        }
         Http::redirect('avaluos/' . $record['id'] . '/capitulo-0');
     }
 
@@ -115,6 +130,8 @@ final class AppraisalController
         foreach (['appraiser_id', 'igac_category', 'igac_typology_hint', 'inspection_notes'] as $field) {
             $extra[$field] = trim((string) ($_POST[$field] ?? ''));
         }
+        $extra['igac_property_units_count'] = $this->boundedCount('igac_property_units_count');
+        $extra['igac_annex_units_count'] = $this->boundedCount('igac_annex_units_count');
         $extra['configuration_status'] = 'borrador';
         if ($extra['appraiser_id'] !== '' && !$this->appraiserExists($extra['appraiser_id'])) {
             throw new HttpException(422, 'Selecciona un perito válido.');
@@ -125,6 +142,29 @@ final class AppraisalController
         $extra['igac_typology_hint'] = mb_substr($extra['igac_typology_hint'], 0, 190);
         $extra['inspection_notes'] = mb_substr($extra['inspection_notes'], 0, 2000);
         return $data + $extra;
+    }
+
+    private function preclassificationData(): array
+    {
+        $category = trim((string) ($_POST['igac_category'] ?? ''));
+        if ($category !== '' && !in_array($category, $this->igacCodes(), true)) {
+            throw new HttpException(422, 'Selecciona una categoría IGAC válida.');
+        }
+        return [
+            'igac_category' => $category,
+            'igac_typology_hint' => mb_substr(trim((string) ($_POST['igac_typology_hint'] ?? '')), 0, 190),
+            'igac_property_units_count' => $this->boundedCount('igac_property_units_count'),
+            'igac_annex_units_count' => $this->boundedCount('igac_annex_units_count'),
+        ];
+    }
+
+    private function boundedCount(string $field): int
+    {
+        $value = filter_var($_POST[$field] ?? 0, FILTER_VALIDATE_INT);
+        if ($value === false || $value < 0 || $value > 50) {
+            throw new HttpException(422, 'Los conteos de unidades deben estar entre 0 y 50.');
+        }
+        return $value;
     }
 
     private function storePhotos(string $id): int
