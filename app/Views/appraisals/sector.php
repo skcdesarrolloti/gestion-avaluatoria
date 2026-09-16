@@ -55,10 +55,29 @@ $neighborhoodsJson = json_encode($sectorNeighborhoods ?? [], JSON_UNESCAPED_UNIC
         query: <?= e(json_encode($neighborhoodLabel, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         selectedId: <?= e(json_encode((string) ($subject['neighborhood_id'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         label(item) { return [item.name, item.locality_name, item.commune_ucg, item.city_name].filter(Boolean).join(' · ') },
+        uniqueNeighborhoods() {
+            const seen = new Set();
+            return this.neighborhoods.filter(item => {
+                const key = this.label(item).toLowerCase();
+                if (seen.has(key)) return false;
+                seen.add(key);
+                return true;
+            });
+        },
         get filtered() {
             const q = this.query.toLowerCase().trim();
-            if (!q) return this.neighborhoods.slice(0, 8);
-            return this.neighborhoods.filter(item => this.label(item).toLowerCase().includes(q)).slice(0, 8);
+            if (!q) return [];
+            return this.uniqueNeighborhoods().filter(item => this.label(item).toLowerCase().includes(q)).slice(0, 8);
+        },
+        syncSelection() {
+            const q = this.query.toLowerCase().trim();
+            if (!q) { this.selectedId = ''; return; }
+            const exact = this.uniqueNeighborhoods().find(item => {
+                return this.label(item).toLowerCase() === q || String(item.name || '').toLowerCase() === q;
+            });
+            if (exact) { this.selectedId = exact.id; return; }
+            const matches = this.filtered;
+            this.selectedId = matches.length === 1 ? matches[0].id : '';
         },
         choose(item) { this.selectedId = item.id; this.query = this.label(item) }
     }">
@@ -77,12 +96,23 @@ $neighborhoodsJson = json_encode($sectorNeighborhoods ?? [], JSON_UNESCAPED_UNIC
             </span>
         <?php endif; ?>
     </div>
-    <form class="mt-5 grid gap-4 lg:grid-cols-[1fr_auto]" method="post"
+    <form class="mt-5 grid gap-4 lg:grid-cols-[1fr_auto]" method="post" @submit="syncSelection()"
         action="<?= e(url('avaluos/' . $record['id'] . '/sector/barrio')) ?>">
         <?= csrf_field() ?>
         <input type="hidden" name="neighborhood_id" :value="selectedId">
         <label class="label">Barrio / microsector
-            <input class="input mt-2" type="search" x-model="query" placeholder="Busca por nombre del barrio, localidad o comuna">
+            <input class="input mt-2" type="search" name="neighborhood_query" x-model="query"
+                @input="selectedId = ''; syncSelection()" @blur="syncSelection()"
+                placeholder="Busca por nombre del barrio, localidad o comuna">
+            <span class="mt-2 block text-xs font-normal text-slate-500" x-show="query.trim() === ''">
+                Escribe el barrio o microsector para ver coincidencias.
+            </span>
+            <span class="mt-2 block text-xs font-normal text-emerald-700" x-show="selectedId">
+                Barrio listo para cargar.
+            </span>
+            <span class="mt-2 block text-xs font-normal text-amber-700" x-show="query.trim() !== '' && !selectedId && filtered.length > 1">
+                Hay varias coincidencias; selecciona una tarjeta.
+            </span>
         </label>
         <button class="btn-primary min-h-11 self-end" type="submit">Cargar ficha del barrio</button>
         <div class="lg:col-span-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4" x-show="filtered.length">

@@ -87,7 +87,7 @@ final class AppraisalSectorController
     {
         $this->appraisals->find($id, $this->user['id']);
         try {
-            $neighborhoodId = trim((string) ($_POST['neighborhood_id'] ?? ''));
+            $neighborhoodId = $this->resolveNeighborhoodId();
             if (!preg_match('/^[a-f0-9]{32}$/', $neighborhoodId)) {
                 throw new \InvalidArgumentException('Selecciona un barrio válido.');
             }
@@ -118,5 +118,31 @@ final class AppraisalSectorController
             return [array_replace($empty, $master), 'banco_barrial', $master['updated_at'] ?? null];
         }
         return [array_replace($empty, AppraisalSectorPrefill::fromSubject($subject)), 'bien_sujeto', null];
+    }
+
+    private function resolveNeighborhoodId(): string
+    {
+        $neighborhoodId = trim((string) ($_POST['neighborhood_id'] ?? ''));
+        if (preg_match('/^[a-f0-9]{32}$/', $neighborhoodId)) return $neighborhoodId;
+
+        $query = mb_strtolower(trim((string) ($_POST['neighborhood_query'] ?? '')));
+        if ($query === '') return '';
+
+        $matches = [];
+        foreach ($this->geo->neighborhoods() as $item) {
+            $label = mb_strtolower(trim(implode(' · ', array_filter([
+                $item['name'] ?? '',
+                $item['locality_name'] ?? '',
+                $item['commune_ucg'] ?? '',
+                $item['city_name'] ?? '',
+            ]))));
+            $name = mb_strtolower((string) ($item['name'] ?? ''));
+            if ($label === $query || $name === $query) return (string) $item['id'];
+            if (str_contains($label, $query) || str_contains($name, $query)) {
+                $matches[(string) $item['id']] = (string) $item['id'];
+            }
+        }
+
+        return count($matches) === 1 ? array_key_first($matches) : '';
     }
 }
