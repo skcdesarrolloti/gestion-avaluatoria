@@ -13,6 +13,11 @@ $typologyOptions = $igacTypologiesByCategory ?? [];
         imageUrl(item) { return item?.image ? this.imageBase + '/' + encodeURIComponent(item.image) : '' },
         selectedItem(category, hint) {
             return (this.typologies[category] || []).find(item => item.value === hint) || null
+        },
+        descriptionDraft(item) {
+            if (!item) return ''
+            return [item.description, item.specifications ? 'Especificaciones IGAC: ' + item.specifications : '']
+                .filter(Boolean).join('\n\n')
         }
     }">
     <div class="flex flex-wrap items-start justify-between gap-4">
@@ -20,8 +25,8 @@ $typologyOptions = $igacTypologiesByCategory ?? [];
             <p class="eyebrow">Unidades del predio</p>
             <h2 class="mt-2 text-2xl font-semibold">Tipología por unidad</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                La primera pestaña conserva la información común. Luego cada inmueble o anexo recibe su propia
-                clasificación preliminar para no mezclar componentes distintos.
+                Primero clasifica cada unidad o anexo; luego sube las fotos para comprobar si la evidencia
+                coincide. La tipología IGAC ayuda a orientar descripción y valor de reposición.
             </p>
         </div>
         <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"><?= count($units) ?> pestaña(s)</span>
@@ -43,6 +48,7 @@ $typologyOptions = $igacTypologiesByCategory ?? [];
                 x-data="{
                     category: <?= e(json_encode((string) $unit['igac_category'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
                     hint: <?= e(json_encode((string) $unit['igac_typology_hint'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+                    notes: <?= e(json_encode((string) $unit['notes'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
                     browserOpen: false
                 }">
                 <div class="grid gap-5 md:grid-cols-2">
@@ -90,6 +96,10 @@ $typologyOptions = $igacTypologiesByCategory ?? [];
                                     x-text="selectedItem(category, hint)?.description"></p>
                                 <p class="text-anywhere mt-2 line-clamp-2 text-xs leading-5 text-slate-500"
                                     x-text="selectedItem(category, hint)?.specifications"></p>
+                                <button class="btn-secondary mt-3 min-h-10 text-xs" type="button"
+                                    @click="notes = descriptionDraft(selectedItem(category, hint))">
+                                    Usar como descripción base
+                                </button>
                             </div>
                         </article>
                         <div class="mt-4" x-show="category">
@@ -122,7 +132,7 @@ $typologyOptions = $igacTypologiesByCategory ?? [];
                     </label>
                     <label class="label md:col-span-2">Notas de la unidad
                         <textarea class="input" name="units[<?= e($unit['id']) ?>][notes]" rows="3" maxlength="2000"
-                            placeholder="Describe rasgos propios de esta unidad o anexo."><?= e((string) $unit['notes']) ?></textarea>
+                            x-model="notes" placeholder="Describe rasgos propios de esta unidad o anexo."></textarea>
                     </label>
                 </div>
             </div>
@@ -132,4 +142,5 @@ $typologyOptions = $igacTypologiesByCategory ?? [];
                 x-text="busy ? 'Guardando...' : 'Guardar unidades'">Guardar unidades</button>
         </div>
     </form>
+    <?php $photoUploadEmbedded = true; require BASE_PATH . '/app/Views/appraisals/photo-upload.php'; unset($photoUploadEmbedded); ?>
 </section>

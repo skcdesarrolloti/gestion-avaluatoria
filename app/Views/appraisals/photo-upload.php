@@ -1,11 +1,12 @@
-    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+<?php $embedded = $photoUploadEmbedded ?? false; ?>
+    <<?= $embedded ? 'div' : 'section' ?> class="<?= $embedded ? 'mt-8 rounded-xl border border-slate-200 bg-slate-50 p-5' : 'rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8' ?>">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
-                <p class="eyebrow">Evidencia inicial</p>
-                <h2 class="mt-2 text-2xl font-semibold">Fotos del inmueble</h2>
+                <p class="eyebrow">Evidencia posterior a la tipología</p>
+                <h2 class="mt-2 text-2xl font-semibold">Fotos para comprobar la unidad</h2>
                 <p class="mt-2 text-sm leading-6 text-slate-600">
-                    Sube las fotos que permitan reconocer qué se va a valorar. Con ellas se hace la
-                    preclasificación frente a las tipologías constructivas IGAC.
+                    Sube las fotos después de escoger la tipología probable. La imagen real permite confirmar
+                    o ajustar la clasificación constructiva antes de usarla en reposición o descripción.
                 </p>
             </div>
         </div>
@@ -61,5 +62,4 @@
                 Aún no hay fotos cargadas para este expediente.
             </p>
         <?php endif; ?>
-    </section>
-
+    </<?= $embedded ? 'div' : 'section' ?>>
