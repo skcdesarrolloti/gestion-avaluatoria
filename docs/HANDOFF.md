@@ -76,6 +76,16 @@ campo se clasifica como soporte normativo directo, derivación técnica/metodol�
 u organización operativa interna. Las opciones no deben presentarse como mandato
 legal literal si solo son ayudas de clasificación para el analista.
 
+## Requisito para el entregable del avalúo
+
+Las ayudas contextuales de los campos, visibles como `?`, también son insumo del
+informe final. Cuando una opción seleccionada requiera explicación técnica, el
+generador del entregable debe usar esa ayuda como base narrativa y ajustarla al
+valor elegido. Ejemplo: si `Centralidad` queda en `Alta`, el informe puede explicar
+que la centralidad mide la inserción urbana, cercanía a equipamientos, servicios y
+nodos de actividad, siempre que aplique al caso. La fuente de estas ayudas debe ser
+el catálogo del módulo, no una redacción duplicada en la plantilla del documento.
+
 ## Pruebas aisladas
 
 `php tests/run.php` comprueba validación y autenticación con SQLite en memoria.
