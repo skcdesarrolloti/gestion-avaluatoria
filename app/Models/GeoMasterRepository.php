@@ -23,11 +23,22 @@ final class GeoMasterRepository
 
     public function neighborhoods(): array
     {
-        return $this->db->query("SELECT n.*, c.name AS city_name, d.name AS department_name
+        return $this->db->query("SELECT n.*, c.name AS city_name, d.name AS department_name,
+                l.name AS locality_name
             FROM master_neighborhoods n
             JOIN master_cities c ON c.id = n.city_id
             JOIN master_departments d ON d.id = c.department_id
+            LEFT JOIN master_localities l ON l.id = n.locality_id
             ORDER BY d.name, c.name, CASE WHEN n.active = 'Si' THEN 0 ELSE 1 END, n.name")->fetchAll();
+    }
+
+    public function localities(): array
+    {
+        return $this->db->query("SELECT l.*, c.name AS city_name, d.name AS department_name
+            FROM master_localities l
+            JOIN master_cities c ON c.id = l.city_id
+            JOIN master_departments d ON d.id = c.department_id
+            ORDER BY d.name, c.name, CASE WHEN l.active = 'Si' THEN 0 ELSE 1 END, l.name")->fetchAll();
     }
 
     public function createDepartment(array $data): void
@@ -48,7 +59,17 @@ final class GeoMasterRepository
     public function createNeighborhood(array $data): void
     {
         $this->assertCity((string) $data['city_id']);
+        if (($data['locality_id'] ?? '') !== '') $this->assertLocalityForCity((string) $data['locality_id'], (string) $data['city_id']);
         $this->insert('master_neighborhoods',
+            ['id', 'city_id', 'locality_id', 'name', 'active', 'notes', 'created_at', 'updated_at'],
+            [bin2hex(random_bytes(16)), $data['city_id'], $data['locality_id'] ?: null,
+                $data['name'], $data['active'], $data['notes']]);
+    }
+
+    public function createLocality(array $data): void
+    {
+        $this->assertCity((string) $data['city_id']);
+        $this->insert('master_localities',
             ['id', 'city_id', 'name', 'active', 'notes', 'created_at', 'updated_at'],
             [bin2hex(random_bytes(16)), $data['city_id'], $data['name'], $data['active'], $data['notes']]);
     }
@@ -65,6 +86,13 @@ final class GeoMasterRepository
         $query = $this->db->prepare('SELECT COUNT(*) FROM master_cities WHERE id = ?');
         $query->execute([$id]);
         if ((int) $query->fetchColumn() !== 1) throw new HttpException(422, 'Selecciona una ciudad válida.');
+    }
+
+    private function assertLocalityForCity(string $id, string $cityId): void
+    {
+        $query = $this->db->prepare('SELECT COUNT(*) FROM master_localities WHERE id = ? AND city_id = ?');
+        $query->execute([$id, $cityId]);
+        if ((int) $query->fetchColumn() !== 1) throw new HttpException(422, 'Selecciona una localidad válida para la ciudad.');
     }
 
     private function insert(string $table, array $columns, array $values): void

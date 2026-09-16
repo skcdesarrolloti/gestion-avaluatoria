@@ -89,7 +89,9 @@ try {
         active TEXT, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE master_cities (id TEXT PRIMARY KEY, department_id TEXT, code TEXT, name TEXT,
         active TEXT, created_at TEXT, updated_at TEXT, UNIQUE(department_id, name))");
-    $db->exec("CREATE TABLE master_neighborhoods (id TEXT PRIMARY KEY, city_id TEXT, name TEXT,
+    $db->exec("CREATE TABLE master_localities (id TEXT PRIMARY KEY, city_id TEXT, name TEXT,
+        active TEXT, notes TEXT, created_at TEXT, updated_at TEXT, UNIQUE(city_id, name))");
+    $db->exec("CREATE TABLE master_neighborhoods (id TEXT PRIMARY KEY, city_id TEXT, locality_id TEXT, name TEXT,
         active TEXT, notes TEXT, created_at TEXT, updated_at TEXT, UNIQUE(city_id, name))");
     $db->exec("INSERT INTO valuation_legal_categories VALUES
         ('A', 'Marco jurídico general', 'general', 0, '2026-09-15 00:00:00', '2026-09-15 00:00:00'),
@@ -131,8 +133,11 @@ try {
     $departmentId = $geo->departments()[0]['id'];
     $geo->createCity(['department_id' => $departmentId, 'code' => '05001', 'name' => 'Medellín', 'active' => 'Si']);
     $cityId = $geo->cities()[0]['id'];
-    $geo->createNeighborhood(['city_id' => $cityId, 'name' => 'El Poblado', 'active' => 'Si', 'notes' => 'Comuna 14']);
-    expect($geo->neighborhoods()[0]['department_name'] === 'Antioquia', 'maestros geograficos enlazan barrio con ciudad y departamento');
+    $geo->createLocality(['city_id' => $cityId, 'name' => 'Zona urbana', 'active' => 'Si', 'notes' => 'Base']);
+    $localityId = $geo->localities()[0]['id'];
+    $geo->createNeighborhood(['city_id' => $cityId, 'locality_id' => $localityId,
+        'name' => 'El Poblado', 'active' => 'Si', 'notes' => 'Comuna 14']);
+    expect($geo->neighborhoods()[0]['locality_name'] === 'Zona urbana', 'maestros geograficos enlazan barrio con localidad');
     $seedB1 = require dirname(__DIR__) . '/database/migrations/202609150007_seed_b1_urban_legal_bibliography.php';
     $seedB1(new Schema($db));
     $standards = (new ValuationStandardRepository($db))->categoriesWithStandards();

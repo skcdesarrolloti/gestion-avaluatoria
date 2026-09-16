@@ -23,6 +23,7 @@ final class MasterDataController
             'appraisers' => $this->appraisers->all(),
             'departments' => $this->geo->departments(),
             'cities' => $this->geo->cities(),
+            'localities' => $this->geo->localities(),
             'neighborhoods' => $this->geo->neighborhoods(),
             'categories' => RaaCategoryCatalog::all(),
             'message' => Session::pullFlash('masters_message'),
@@ -67,7 +68,12 @@ final class MasterDataController
 
     public function createNeighborhood(): never
     {
-        $this->createGeo('Barrio / sector', fn () => $this->geo->createNeighborhood($this->geoData(['city_id', 'name', 'notes'])));
+        $this->createGeo('Barrio / sector', fn () => $this->geo->createNeighborhood($this->geoData(['city_id', 'locality_id', 'name', 'notes'])));
+    }
+
+    public function createLocality(): never
+    {
+        $this->createGeo('Localidad', fn () => $this->geo->createLocality($this->geoData(['city_id', 'name', 'notes'])));
     }
 
     public function raaFile(string $id): never
