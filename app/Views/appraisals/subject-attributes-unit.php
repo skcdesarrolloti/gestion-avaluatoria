@@ -83,14 +83,21 @@ $firstAttributeGroup = (string) array_key_first($specialAttributeCatalog);
                                         x-show="evidence === 'foto'"
                                         @paste="paste($event)" tabindex="0">
                                         <div class="flex flex-wrap items-center gap-2">
-                                            <label class="btn-secondary min-h-10 text-xs">Adjuntar foto
+                                            <label class="btn-secondary min-h-10 text-xs">Elegir archivo
                                                 <input class="sr-only" type="file" name="attribute_photos[<?= e($unitId) ?>][<?= e($key) ?>][]"
                                                     accept="image/jpeg,image/png,image/webp" multiple x-ref="photos"
                                                     @change="update($event.target)">
                                             </label>
-                                            <span class="text-xs text-slate-500">o pega la imagen aquí o en la observación</span>
+                                            <span class="rounded-lg border border-dashed border-slate-300 px-3 py-2 text-xs text-slate-600"
+                                                tabindex="0" @paste="paste($event)">Haz clic aquí y pega con Ctrl+V</span>
                                         </div>
                                         <p class="mt-1 text-xs font-semibold text-teal-800" x-show="fileNames" x-text="fileNames"></p>
+                                        <div class="mt-2 flex flex-wrap gap-2" x-show="previews.length">
+                                            <template x-for="preview in previews" :key="preview.url">
+                                                <img class="size-16 rounded-md border border-slate-200 object-contain"
+                                                    :src="preview.url" :alt="preview.name">
+                                            </template>
+                                        </div>
                                     </div>
                                     <?php $evidencePhotos = $photosForAttribute($unitId, $key); ?>
                                     <?php if ($evidencePhotos): ?>

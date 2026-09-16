@@ -4,10 +4,13 @@ export function photoUpload(initialEvidence = '') {
         evidence: initialEvidence,
         hasFiles: false,
         fileNames: '',
+        previews: [],
         update(input) {
             const files = Array.from(input.files || []);
             this.hasFiles = files.length > 0;
             this.fileNames = files.map(file => file.name).join(', ');
+            this.previews.forEach(preview => URL.revokeObjectURL(preview.url));
+            this.previews = files.map(file => ({ name: file.name, url: URL.createObjectURL(file) }));
         },
         paste(event) {
             const input = this.$refs.photos;
@@ -25,6 +28,9 @@ export function photoUpload(initialEvidence = '') {
             input.files = transfer.files;
             this.update(input);
             event.preventDefault();
+        },
+        destroy() {
+            this.previews.forEach(preview => URL.revokeObjectURL(preview.url));
         },
     };
 }

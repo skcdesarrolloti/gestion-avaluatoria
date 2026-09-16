@@ -51,6 +51,12 @@ $visiblePhotos = $photoUnitId === '' ? $photos : array_values(array_filter($phot
                         El botón abre archivos; el recuadro derecho recibe imágenes copiadas.
                     </p>
                     <p class="mt-1 text-xs font-semibold text-teal-800" x-show="fileNames" x-text="fileNames"></p>
+                    <div class="mt-2 flex flex-wrap gap-2 sm:col-span-2" x-show="previews.length">
+                        <template x-for="preview in previews" :key="preview.url">
+                            <img class="size-20 rounded-md border border-slate-200 object-contain"
+                                :src="preview.url" :alt="preview.name">
+                        </template>
+                    </div>
                 </div>
             </div>
             <div class="flex items-end">
