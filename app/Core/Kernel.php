@@ -13,6 +13,7 @@ use App\Controllers\StandardController;
 use App\Controllers\ValuationController;
 use App\Database\Migrator;
 use App\Models\AppraisalRepository;
+use App\Models\AppraiserRepository;
 use App\Models\FuncionarioRepository;
 use App\Models\IgacTypologyRepository;
 use App\Models\IfrsStandardRepository;
@@ -81,7 +82,6 @@ final class Kernel
                     throw $error;
                 }
             }
-            // The login form is accessible before database credentials are configured.
             if ($controller === 'auth' && $action === 'login') {
                 view('auth/login', $this->loginData());
                 return;
@@ -129,7 +129,7 @@ final class Kernel
                 'typologies' => new IgacTypologyController(new IgacTypologyRepository()),
                 'international' => new InternationalStandardController(new InternationalStandardRepository($db)),
                 'legal' => new LegalFrameworkController(new LegalDocumentRepository($db)),
-                'masters' => new MasterDataController(),
+                'masters' => new MasterDataController(new AppraiserRepository($db)),
                 'standards' => new StandardController(new ValuationStandardRepository($db)),
                 'valuations' => new ValuationController(),
                 default => new AppraisalController(new AppraisalRepository($db), $user),

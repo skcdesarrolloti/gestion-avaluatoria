@@ -9,6 +9,7 @@ return [
     ['POST', '#^/logout$#', 'auth', 'logout', true],
     ['GET', '#^/valuaciones$#', 'valuations', 'index', true],
     ['GET', '#^/maestros$#', 'masters', 'index', true],
+    ['POST', '#^/maestros/peritos$#', 'masters', 'createAppraiser', true],
     ['GET', '#^/$#', 'appraisals', 'index', true],
     ['GET', '#^/normas-tecnicas-sectoriales$#', 'standards', 'index', true],
     ['GET', '#^/marco-juridico-valuatorio$#', 'legal', 'index', true],

@@ -13,6 +13,7 @@ use App\Services\InternationalStandardFileImportService;
 use App\Services\LegalDocumentFileImportService;
 use App\Services\LegalDocumentImportService;
 use App\Services\RateLimiter;
+use App\Models\AppraiserRepository;
 use App\Models\FuncionarioRepository;
 use App\Models\IgacTypologyRepository;
 use App\Models\IfrsStandardRepository;
@@ -73,6 +74,7 @@ try {
     $db->exec("CREATE TABLE valuation_ifrs_groups (code TEXT PRIMARY KEY, name TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_ifrs_standards (slug TEXT PRIMARY KEY, group_code TEXT, standard_code TEXT, title TEXT, applicable_categories TEXT, measurement_focus TEXT, summary TEXT, field_relevance TEXT, source_reference TEXT, status TEXT, source_filename TEXT DEFAULT '', storage_filename TEXT DEFAULT '', file_size_bytes INTEGER, imported_at TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_field_considerations (field_key TEXT PRIMARY KEY, field_label TEXT, classification TEXT, normative_basis TEXT, operational_use TEXT, ifrs_relation TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE valuation_appraisers (id TEXT PRIMARY KEY, code TEXT UNIQUE, full_name TEXT, email TEXT, phone TEXT, raa_number TEXT, raa_categories TEXT, active TEXT, notes TEXT, created_at TEXT, updated_at TEXT)");
     $db->exec("INSERT INTO valuation_legal_categories VALUES
         ('A', 'Marco jurídico general', 'general', 0, '2026-09-15 00:00:00', '2026-09-15 00:00:00'),
         ('1', 'Inmuebles urbanos', 'category', 11, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
@@ -97,6 +99,13 @@ try {
     $removeDuplicate = require dirname(__DIR__) . '/database/migrations/202609150014_remove_duplicate_appraisal_consideration.php';
     $removeDuplicate(new Schema($db));
     expect($db->query("SELECT COUNT(*) FROM valuation_field_considerations WHERE field_key = 'tipo_avaluo'")->fetchColumn() === 0, 'consideracion duplicada de tipo de avaluo eliminada');
+    $appraisers = new AppraiserRepository($db);
+    $appraisers->create(['code' => '02', 'full_name' => 'Nassif Abuita', 'email' => '', 'phone' => '',
+        'raa_number' => '', 'raa_categories' => 'Inmuebles urbanos', 'active' => 'Si', 'notes' => '']);
+    $appraisers->create(['code' => '01', 'full_name' => 'Said', 'email' => '', 'phone' => '',
+        'raa_number' => '', 'raa_categories' => '', 'active' => 'No', 'notes' => '']);
+    $appraiserRows = $appraisers->all();
+    expect(count($appraiserRows) === 2 && $appraiserRows[0]['code'] === '02', 'maestro de peritos ordena activos primero');
     $seedB1 = require dirname(__DIR__) . '/database/migrations/202609150007_seed_b1_urban_legal_bibliography.php';
     $seedB1(new Schema($db));
     $standards = (new ValuationStandardRepository($db))->categoriesWithStandards();
