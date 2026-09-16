@@ -29,6 +29,7 @@ use App\Models\LegalDocumentRepository;
 use App\Models\NeighborhoodSectorRepository;
 use App\Models\ValuationStandardRepository;
 use App\Support\AppraisalSectorCatalog;
+use App\Support\SectorBankCatalog;
 
 // All fixtures are in memory; never connect to the configured production database.
 foreach (['AUTH_TABLE' => 'wp_jet_cct_funcionarios', 'AUTH_USER_COLUMN' => 'user_others_apss',
@@ -311,6 +312,9 @@ try {
     $storedSector = $neighborhoodSectors->find($neighborhoodId);
     expect($storedSector && $storedSector['sector_name'] === 'Bruselas'
         && $storedSector['sector_report_text'] === 'Ficha reutilizable del barrio.', 'banco barrial reutilizable');
+    expect(count(SectorBankCatalog::sections()) === 17
+        && (SectorBankCatalog::sections()['05'][0] ?? '') === 'Normatividad urbanística',
+        'banco sectorial conserva secciones avanzadas');
     $photoRecordId = str_repeat('c', 32);
     $photoUnitId = str_repeat('d', 32);
     $photoController = (new ReflectionClass(AppraisalController::class))->newInstanceWithoutConstructor();
