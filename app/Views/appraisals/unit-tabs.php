@@ -1,21 +1,15 @@
 <?php
 $unitLabel = static function (array $unit): string {
-    if ($unit['unit_kind'] === 'common') return 'Común';
     return ($unit['unit_kind'] === 'annex' ? 'Anexo ' : 'Unidad ') . (int) $unit['unit_index'];
 };
-$commonUnitId = '';
-foreach ($units as $unit) {
-    if ($unit['unit_kind'] === 'common') {
-        $commonUnitId = (string) $unit['id'];
-        break;
-    }
-}
+$visibleUnits = array_values(array_filter($units, static fn (array $unit): bool => $unit['unit_kind'] !== 'common'));
+$hasPhotos = !empty($photos);
 $typologyOptions = $igacTypologiesByCategory ?? [];
 $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitulo-0';
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{
-        active: '<?= e($units[0]['id'] ?? '') ?>',
+        active: '<?= e($visibleUnits[0]['id'] ?? '') ?>',
         typologies: <?= e(json_encode($typologyOptions, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         imageBase: <?= e(json_encode(url('assets/tipologias-igac/images'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         imageUrl(item) { return item?.image ? this.imageBase + '/' + encodeURIComponent(item.image) : '' },
@@ -37,22 +31,27 @@ $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitu
                 coincide. La tipología IGAC ayuda a orientar descripción y valor de reposición.
             </p>
         </div>
-        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"><?= count($units) ?> pestaña(s)</span>
+        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"><?= count($visibleUnits) ?> pestaña(s)</span>
     </div>
     <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/unidades')) ?>"
         x-data="{ busy: false }" @submit="busy = true">
         <?= csrf_field() ?>
-        <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
-            <?php foreach ($units as $unit): ?>
+        <?php if (!$visibleUnits): ?>
+            <p class="rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-600">
+                Aún no hay unidades ni anexos configurados. Define los conteos en la lectura inicial del predio.
+            </p>
+        <?php else: ?>
+            <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
+                <?php foreach ($visibleUnits as $unit): ?>
                 <button class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
                     type="button" @click="active = '<?= e($unit['id']) ?>'"
                     :class="active === '<?= e($unit['id']) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'">
                     <?= e($unitLabel($unit)) ?>
                 </button>
-            <?php endforeach; ?>
-        </div>
-        <?php foreach ($units as $unit): ?>
-            <?php $isCommon = $unit['unit_kind'] === 'common'; ?>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
+        <?php foreach ($visibleUnits as $unit): ?>
             <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="active === '<?= e($unit['id']) ?>'"
                 x-data="{
                     category: <?= e(json_encode((string) $unit['igac_category'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
@@ -65,14 +64,6 @@ $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitu
                         <input class="input" name="units[<?= e($unit['id']) ?>][label]" maxlength="120"
                             value="<?= e($unit['label']) ?>" placeholder="<?= e($unitLabel($unit)) ?>">
                     </label>
-                    <?php if ($isCommon): ?>
-                        <input type="hidden" name="units[<?= e($unit['id']) ?>][igac_category]" value="">
-                        <input type="hidden" name="units[<?= e($unit['id']) ?>][igac_typology_hint]" value="">
-                        <div class="rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">
-                            Usa esta pestaña solo para datos compartidos del predio. La tipología, la descripción
-                            constructiva y la comprobación fotográfica se diligencian en cada unidad o anexo.
-                        </div>
-                    <?php else: ?>
                     <label class="label">Categoría IGAC de esta unidad
                         <select class="input" name="units[<?= e($unit['id']) ?>][igac_category]" x-model="category"
                             @change="if (!(typologies[category] || []).some(item => item.value === hint)) hint = ''">
@@ -147,13 +138,21 @@ $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitu
                             </div>
                         </div>
                     </label>
-                    <?php endif; ?>
                     <label class="label md:col-span-2">
-                        <?= $isCommon ? 'Notas comunes del predio' : 'Descripción editable para el informe' ?>
+                        Descripción editable para el informe
+                        <?php if ($hasPhotos): ?>
+                            <span class="mt-3 block rounded-xl border border-emerald-50 bg-emerald-50 p-3 text-xs leading-5 text-emerald-800"
+                                x-show="selectedItem(category, hint)">
+                                <strong class="block">Sugerencia IGAC para contrastar con la foto real</strong>
+                                <span class="mt-1 block" x-text="descriptionDraft(selectedItem(category, hint))"></span>
+                                <button class="btn-secondary mt-3 min-h-10 bg-white text-xs" type="button"
+                                    @click="notes = descriptionDraft(selectedItem(category, hint))">
+                                    Pasar sugerencia al campo editable
+                                </button>
+                            </span>
+                        <?php endif; ?>
                         <textarea class="input" name="units[<?= e($unit['id']) ?>][notes]" rows="3" maxlength="2000"
-                            x-model="notes" placeholder="<?= $isCommon
-                                ? 'Anota información general que aplique a todo el predio.'
-                                : 'Ajusta la descripción base según la foto, la visita y el criterio del perito.' ?>"></textarea>
+                            x-model="notes" placeholder="Ajusta la descripción base según la foto, la visita y el criterio del perito."></textarea>
                     </label>
                 </div>
             </div>
@@ -163,7 +162,7 @@ $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitu
                 x-text="busy ? 'Guardando...' : 'Guardar unidades'">Guardar unidades</button>
         </div>
     </form>
-    <div x-show="active !== '<?= e($commonUnitId) ?>'">
+    <div x-show="active">
         <?php $photoUploadEmbedded = true; require BASE_PATH . '/app/Views/appraisals/photo-upload.php'; unset($photoUploadEmbedded); ?>
     </div>
 </section>

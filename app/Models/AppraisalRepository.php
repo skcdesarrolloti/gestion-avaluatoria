@@ -133,7 +133,6 @@ final class AppraisalRepository
 
     public function ensureUnits(string $id, int $owner, int $propertyCount, int $annexCount): void
     {
-        $this->ensureUnit($id, $owner, 'common', 0, 'Información común del predio');
         for ($i = 1; $i <= $propertyCount; $i++) $this->ensureUnit($id, $owner, 'property', $i, 'Unidad ' . $i);
         for ($i = 1; $i <= $annexCount; $i++) $this->ensureUnit($id, $owner, 'annex', $i, 'Anexo ' . $i);
     }
