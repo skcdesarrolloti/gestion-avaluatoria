@@ -15,6 +15,7 @@ use App\Database\Migrator;
 use App\Models\AppraisalRepository;
 use App\Models\AppraiserRepository;
 use App\Models\FuncionarioRepository;
+use App\Models\GeoMasterRepository;
 use App\Models\IgacTypologyRepository;
 use App\Models\IfrsStandardRepository;
 use App\Models\InternationalStandardRepository;
@@ -128,7 +129,7 @@ final class Kernel
                 'typologies' => new IgacTypologyController(new IgacTypologyRepository()),
                 'international' => new InternationalStandardController(new InternationalStandardRepository($db)),
                 'legal' => new LegalFrameworkController(new LegalDocumentRepository($db)),
-                'masters' => new MasterDataController(new AppraiserRepository($db)),
+                'masters' => new MasterDataController(new AppraiserRepository($db), new GeoMasterRepository($db)),
                 'standards' => new StandardController(new ValuationStandardRepository($db)),
                 'valuations' => new ValuationController(),
                 default => new AppraisalController(new AppraisalRepository($db), $user,
@@ -210,10 +211,7 @@ final class Kernel
 
     private function loginData(): array
     {
-        return [
-            'title' => 'Iniciar sesión',
-            'error' => Session::pullFlash('login_error'),
-            'username' => Session::pullFlash('login_username'),
-        ];
+        return ['title' => 'Iniciar sesión', 'error' => Session::pullFlash('login_error'),
+            'username' => Session::pullFlash('login_username')];
     }
 }
