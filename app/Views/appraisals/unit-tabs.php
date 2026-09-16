@@ -6,10 +6,14 @@ $visibleUnits = array_values(array_filter($units, static fn (array $unit): bool 
 $hasPhotos = !empty($photos);
 $typologyOptions = $igacTypologiesByCategory ?? [];
 $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitulo-0';
+$labelInput = static fn (array $unit): string => (string) $unit['label'] === $unitLabel($unit) ? '' : (string) $unit['label'];
+$labelMap = [];
+foreach ($visibleUnits as $unit) $labelMap[$unit['id']] = $labelInput($unit);
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{
         active: '<?= e($visibleUnits[0]['id'] ?? '') ?>',
+        labels: <?= e(json_encode($labelMap, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         typologies: <?= e(json_encode($typologyOptions, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         imageBase: <?= e(json_encode(url('assets/tipologias-igac/images'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         imageUrl(item) { return item?.image ? this.imageBase + '/' + encodeURIComponent(item.image) : '' },
@@ -46,7 +50,7 @@ $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitu
                 <button class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
                     type="button" @click="active = '<?= e($unit['id']) ?>'"
                     :class="active === '<?= e($unit['id']) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'">
-                    <?= e($unitLabel($unit)) ?>
+                    <span x-text="labels['<?= e($unit['id']) ?>'] || 'Nombrar <?= e(strtolower($unitLabel($unit))) ?>'"></span>
                 </button>
                 <?php endforeach; ?>
             </div>
@@ -60,9 +64,10 @@ $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitu
                     browserOpen: false
                 }">
                 <div class="grid gap-5 md:grid-cols-2">
-                    <label class="label">Nombre de la pestaña
+                    <label class="label">Nombre de la unidad definido por el analista
                         <input class="input" name="units[<?= e($unit['id']) ?>][label]" maxlength="120"
-                            value="<?= e($unit['label']) ?>" placeholder="<?= e($unitLabel($unit)) ?>">
+                            x-model="labels['<?= e($unit['id']) ?>']" placeholder="Ej. Casa principal, Local 1, Piscina">
+                        <input type="hidden" name="units[<?= e($unit['id']) ?>][default_label]" value="<?= e($unitLabel($unit)) ?>">
                     </label>
                     <label class="label">Categoría IGAC de esta unidad
                         <select class="input" name="units[<?= e($unit['id']) ?>][igac_category]" x-model="category"
@@ -162,7 +167,16 @@ $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitu
                 x-text="busy ? 'Guardando...' : 'Guardar unidades'">Guardar unidades</button>
         </div>
     </form>
-    <div x-show="active">
-        <?php $photoUploadEmbedded = true; require BASE_PATH . '/app/Views/appraisals/photo-upload.php'; unset($photoUploadEmbedded); ?>
-    </div>
+    <?php foreach ($visibleUnits as $unit): ?>
+        <div x-show="active === '<?= e($unit['id']) ?>'">
+            <?php
+            $photoUploadEmbedded = true;
+            $photoUploadUnitId = (string) $unit['id'];
+            $photoUploadUnitLabel = $labelInput($unit) ?: $unitLabel($unit);
+            $photoUploadTypology = (string) $unit['igac_typology_hint'];
+            require BASE_PATH . '/app/Views/appraisals/photo-upload.php';
+            unset($photoUploadEmbedded, $photoUploadUnitId, $photoUploadUnitLabel, $photoUploadTypology);
+            ?>
+        </div>
+    <?php endforeach; ?>
 </section>

@@ -30,7 +30,7 @@ final class AppraisalRepository
 
     public function photos(string $id, int $owner): array
     {
-        $query = $this->db->prepare('SELECT id, appraisal_id, owner_id, source_filename, storage_filename,
+        $query = $this->db->prepare('SELECT id, appraisal_id, owner_id, unit_id, source_filename, storage_filename,
             mime_type, file_size_bytes, caption, created_at, file_blob IS NOT NULL AS has_blob
             FROM appraisal_photos WHERE appraisal_id = ? AND owner_id = ?
             ORDER BY created_at DESC, id DESC');
@@ -136,12 +136,16 @@ final class AppraisalRepository
         $now = gmdate('Y-m-d H:i:s');
         $query = $this->db->prepare('UPDATE appraisal_units SET area_land_m2 = ?, area_built_m2 = ?,
             area_private_m2 = ?, area_common_m2 = ?, front_length_m = ?, depth_length_m = ?,
-            surface_source = ?, surface_notes = ?, updated_at = ?
+            surface_source = ?, surface_notes = ?, lot_shape = ?, topography = ?, boundaries = ?,
+            enclosure = ?, equivalent_depth_m = ?, front_depth_ratio = ?, dynamic_surface_notes = ?,
+            surface_report_text = ?, updated_at = ?
             WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
         foreach ($units as $unit) {
             $query->execute([$unit['area_land_m2'], $unit['area_built_m2'], $unit['area_private_m2'],
                 $unit['area_common_m2'], $unit['front_length_m'], $unit['depth_length_m'],
-                $unit['surface_source'], $unit['surface_notes'], $now, $unit['id'], $id, $owner]);
+                $unit['surface_source'], $unit['surface_notes'], $unit['lot_shape'], $unit['topography'],
+                $unit['boundaries'], $unit['enclosure'], $unit['equivalent_depth_m'], $unit['front_depth_ratio'],
+                $unit['dynamic_surface_notes'], $unit['surface_report_text'], $now, $unit['id'], $id, $owner]);
         }
     }
 
@@ -164,9 +168,9 @@ final class AppraisalRepository
     {
         $now = gmdate('Y-m-d H:i:s');
         $query = $this->db->prepare('INSERT INTO appraisal_photos
-            (id, appraisal_id, owner_id, source_filename, storage_filename, mime_type, file_size_bytes, caption, created_at, file_blob)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
-        $query->execute([$photo['id'], $id, $owner, $photo['source_filename'], $photo['storage_filename'],
+            (id, appraisal_id, owner_id, unit_id, source_filename, storage_filename, mime_type,
+            file_size_bytes, caption, created_at, file_blob) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $query->execute([$photo['id'], $id, $owner, $photo['unit_id'], $photo['source_filename'], $photo['storage_filename'],
             $photo['mime_type'], $photo['file_size_bytes'], $photo['caption'], $now, $photo['file_blob']]);
     }
 

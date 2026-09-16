@@ -248,6 +248,10 @@ try {
     expect(count($igac->optionsByCategory()['ANEXOS']) === 136, 'selector IGAC filtra tipologias por categoria');
     expect(($igac->optionsByCategory()['RESIDENCIALES'][0]['image'] ?? '') !== '', 'selector IGAC incluye imagen de referencia');
     $unitId = str_repeat('b', 32);
+    $_POST = ['units' => [$unitId => ['label' => 'Unidad 1', 'default_label' => 'Unidad 1']]];
+    expectStatus(422, fn () => AppraisalChapterZeroInput::unitData([], []), 'nombre generico de unidad rechazado');
+    $_POST = ['units' => [$unitId => ['label' => 'Casa principal', 'default_label' => 'Unidad 1']]];
+    expect(AppraisalChapterZeroInput::unitData([], [])[0]['label'] === 'Casa principal', 'nombre propio de unidad aceptado');
     $_POST = ['unit_surfaces' => [$unitId => ['area_land_m2' => '123,45',
         'area_built_m2' => '85', 'surface_source' => 'visita']]];
     $surfaceRows = AppraisalChapterZeroInput::unitSurfaceData();

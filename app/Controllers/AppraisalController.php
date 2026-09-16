@@ -82,7 +82,7 @@ final class AppraisalController
         } catch (\Throwable $error) {
             Session::flash('subject_error', $error->getMessage());
         }
-        Http::redirect('avaluos/' . $id . '/bien-sujeto');
+        Http::redirect('avaluos/' . $id . '/bien-sujeto#ficha-basica');
     }
 
     public function saveChapterZero(string $id): never
@@ -105,7 +105,7 @@ final class AppraisalController
         } catch (\Throwable $error) {
             Session::flash('subject_error', $error->getMessage());
         }
-        Http::redirect('avaluos/' . $id . '/bien-sujeto');
+        Http::redirect('avaluos/' . $id . '/bien-sujeto#superficies');
     }
 
     private function saveUnitsAndRedirect(string $id, string $target): never
@@ -142,8 +142,9 @@ final class AppraisalController
     {
         $record = $this->appraisals->find($id, $this->user['id']);
         try {
+            $unitId = preg_match('/^[a-f0-9]{32}$/', (string) ($_POST['unit_id'] ?? '')) ? (string) $_POST['unit_id'] : null;
             $count = (new AppraisalPhotoUploadService())->store($_FILES['photos'] ?? [], $record['id'],
-                $this->user['id'], $this->appraisals);
+                $this->user['id'], $this->appraisals, $unitId);
             Session::flash('chapter_zero_photo_message', $count === 1
                 ? 'Foto cargada correctamente.'
                 : $count . ' fotos cargadas correctamente.');

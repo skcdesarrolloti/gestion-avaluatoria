@@ -1,6 +1,11 @@
 <?php
 $embedded = $photoUploadEmbedded ?? false;
 $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitulo-0';
+$photoUnitId = $photoUploadUnitId ?? '';
+$photoUnitLabel = $photoUploadUnitLabel ?? '';
+$photoUnitTypology = $photoUploadTypology ?? '';
+$visiblePhotos = $photoUnitId === '' ? $photos : array_values(array_filter($photos,
+    static fn (array $photo): bool => (string) ($photo['unit_id'] ?? '') === $photoUnitId));
 ?>
     <<?= $embedded ? 'div' : 'section' ?> class="<?= $embedded ? 'mt-8 rounded-xl border border-slate-200 bg-slate-50 p-5' : 'rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8' ?>">
         <div class="flex flex-wrap items-start justify-between gap-4">
@@ -11,6 +16,11 @@ $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitu
                     Sube las fotos después de escoger la tipología probable. La imagen real permite confirmar
                     o ajustar la clasificación constructiva antes de usarla en reposición o descripción.
                 </p>
+                <?php if ($photoUnitLabel): ?>
+                    <p class="mt-2 text-xs font-semibold text-teal-800">
+                        <?= e($photoUnitLabel) ?><?= $photoUnitTypology ? ' · ' . e($photoUnitTypology) : '' ?>
+                    </p>
+                <?php endif; ?>
             </div>
         </div>
         <?php if ($photoMessage): ?>
@@ -23,6 +33,7 @@ $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitu
             action="<?= e(url($subjectActionBase . '/fotos')) ?>"
             x-data="{ busy: false, hasFiles: false }" @submit="busy = true">
             <?= csrf_field() ?>
+            <?php if ($photoUnitId): ?><input type="hidden" name="unit_id" value="<?= e($photoUnitId) ?>"><?php endif; ?>
             <label class="label">Agregar fotos
                 <input class="input" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple
                     @change="hasFiles = $event.target.files.length > 0">
@@ -32,9 +43,9 @@ $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitu
                     x-text="busy ? 'Subiendo...' : 'Subir fotos'">Subir fotos</button>
             </div>
         </form>
-        <?php if ($photos): ?>
+        <?php if ($visiblePhotos): ?>
             <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
-                <?php foreach ($photos as $photo): ?>
+                <?php foreach ($visiblePhotos as $photo): ?>
                     <?php $canRender = !empty($photo['file_available']) || !empty($photo['has_blob']); ?>
                     <div class="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
                         <?php if ($canRender): ?>
@@ -63,7 +74,7 @@ $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitu
             </div>
         <?php else: ?>
             <p class="mt-5 rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-600">
-                Aún no hay fotos cargadas para este expediente.
+                Aún no hay fotos cargadas para <?= $photoUnitId ? 'esta unidad' : 'este expediente' ?>.
             </p>
         <?php endif; ?>
     </<?= $embedded ? 'div' : 'section' ?>>

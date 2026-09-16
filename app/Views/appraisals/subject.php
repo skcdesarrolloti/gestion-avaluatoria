@@ -19,7 +19,27 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
 </div>
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
-<div class="mt-7 space-y-7">
-    <?php require BASE_PATH . '/app/Views/appraisals/subject-basic.php'; ?>
-    <?php require BASE_PATH . '/app/Views/appraisals/subject-surface.php'; ?>
+<div class="mt-7" x-data="{ activeSubject: location.hash === '#superficies' ? 'surface' : 'basic' }">
+    <div class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
+        <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
+            <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
+                @click="activeSubject = 'basic'; history.replaceState(null, '', '#ficha-basica')"
+                :class="activeSubject === 'basic' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:border-blue-700'">
+                <span class="block text-base">2.1 Ficha básica del sujeto</span>
+                <span class="block text-xs font-medium opacity-80">Identificación y características</span>
+            </button>
+            <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
+                @click="activeSubject = 'surface'; history.replaceState(null, '', '#superficies')"
+                :class="activeSubject === 'surface' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:border-blue-700'">
+                <span class="block text-base">2.2 Datos de la superficie</span>
+                <span class="block text-xs font-medium opacity-80">Áreas, fondo y variables del terreno</span>
+            </button>
+        </div>
+    </div>
+    <div class="mt-7" x-show="activeSubject === 'basic'">
+        <?php require BASE_PATH . '/app/Views/appraisals/subject-basic.php'; ?>
+    </div>
+    <div class="mt-7" x-show="activeSubject === 'surface'">
+        <?php require BASE_PATH . '/app/Views/appraisals/subject-surface.php'; ?>
+    </div>
 </div>

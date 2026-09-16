@@ -51,9 +51,14 @@ final class AppraisalChapterZeroInput
             self::assertIgacCategory($category, $igacCodes, 'Selecciona categorías IGAC válidas por unidad.');
             $hint = mb_substr(trim((string) ($unit['igac_typology_hint'] ?? '')), 0, 190);
             self::assertIgacTypology($category, $hint, $typologiesByCategory);
+            $label = mb_substr(trim((string) ($unit['label'] ?? '')), 0, 120);
+            $defaultLabel = trim((string) ($unit['default_label'] ?? ''));
+            if ($label === '' || ($defaultLabel !== '' && $label === $defaultLabel)) {
+                throw new HttpException(422, 'Asigna un nombre propio a cada unidad o anexo.');
+            }
             $rows[] = [
                 'id' => $id,
-                'label' => mb_substr(trim((string) ($unit['label'] ?? '')), 0, 120),
+                'label' => $label,
                 'igac_category' => $category,
                 'igac_typology_hint' => $hint,
                 'notes' => mb_substr(trim((string) ($unit['notes'] ?? '')), 0, 2000),
@@ -79,6 +84,14 @@ final class AppraisalChapterZeroInput
                 'depth_length_m' => self::decimalOrNull($unit['depth_length_m'] ?? null),
                 'surface_source' => mb_substr(trim((string) ($unit['surface_source'] ?? '')), 0, 120),
                 'surface_notes' => mb_substr(trim((string) ($unit['surface_notes'] ?? '')), 0, 1000),
+                'lot_shape' => mb_substr(trim((string) ($unit['lot_shape'] ?? '')), 0, 80),
+                'topography' => mb_substr(trim((string) ($unit['topography'] ?? '')), 0, 80),
+                'boundaries' => mb_substr(trim((string) ($unit['boundaries'] ?? '')), 0, 1000),
+                'enclosure' => mb_substr(trim((string) ($unit['enclosure'] ?? '')), 0, 80),
+                'equivalent_depth_m' => self::decimalOrNull($unit['equivalent_depth_m'] ?? null),
+                'front_depth_ratio' => self::decimalOrNull($unit['front_depth_ratio'] ?? null),
+                'dynamic_surface_notes' => mb_substr(trim((string) ($unit['dynamic_surface_notes'] ?? '')), 0, 1000),
+                'surface_report_text' => mb_substr(trim((string) ($unit['surface_report_text'] ?? '')), 0, 1500),
             ];
         }
         return $rows;
