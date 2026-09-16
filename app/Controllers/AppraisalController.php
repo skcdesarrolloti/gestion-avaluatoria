@@ -45,6 +45,7 @@ final class AppraisalController
             'photos' => $this->appraisals->photos($id, $this->user['id']),
             'units' => $this->appraisals->units($id, $this->user['id']),
             'appraisers' => $this->appraisers->all(), 'igacCategories' => $this->typologies->categories(),
+            'igacTypologiesByCategory' => $this->typologies->optionsByCategory(),
             'igacCandidates' => $this->typologies->candidates($record),
             'photoMessage' => Session::pullFlash('chapter_zero_photo_message'),
             'photoError' => Session::pullFlash('chapter_zero_photo_error'),
@@ -67,7 +68,7 @@ final class AppraisalController
         $this->appraisals->find($id, $this->user['id']);
         try {
             $this->appraisals->saveUnits($id, $this->user['id'],
-                AppraisalChapterZeroInput::unitData($this->igacCodes()));
+                AppraisalChapterZeroInput::unitData($this->igacCodes(), $this->typologies->optionsByCategory()));
             Session::flash('chapter_zero_preclass_message', 'Unidades guardadas correctamente.');
         } catch (\Throwable $error) {
             Session::flash('chapter_zero_preclass_error', $error->getMessage());

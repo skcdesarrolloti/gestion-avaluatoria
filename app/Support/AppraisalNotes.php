@@ -7,29 +7,6 @@ final class AppraisalNotes
     public static function all(): array
     {
         $notes = [
-            'tipo' => [
-                'comercial' => self::note(
-                    'Estima el valor comercial o de mercado del bien o derecho en la fecha de valoración.',
-                    'Cuando se requiere una conclusión técnica sobre el valor probable de intercambio.',
-                    'La metodología puede apoyarse en mercado, renta, costo/reposición o residual según el activo y la información disponible.',
-                    'El informe se estructura como avalúo comercial porque estima el valor bajo condiciones objetivas de mercado, sin depender de una postura particular.'
-                ),
-                'posesion' => self::note('Valora una tenencia material sin dominio pleno consolidado.', 'Procesos de pertenencia, ocupaciones o controversias.', 'Exige advertir riesgo jurídico y no concluir como dominio.'),
-                'mejoras' => self::note('Valora construcciones, adecuaciones o inversiones sobre un predio.', 'Cuando la mejora es separable del derecho sobre el suelo.', 'Debe separar terreno, construcción y soporte jurídico.'),
-                'remate' => self::note('Soporta una actuación de venta forzada o subasta.', 'Procesos ejecutivos o liquidaciones con finalidad judicial.', 'Debe reforzar trazabilidad, fecha y supuestos.'),
-                'negociacion' => self::note(
-                    'No es un método valuatorio diferente; es el uso del avalúo para discutir precio, canon o condiciones económicas.',
-                    'Aplica cuando las partes necesitan una referencia técnica para comprar, vender, arrendar, renegociar o sustentar una oferta.',
-                    'La base puede ser mercado, renta, reposición o residual. El resultado orienta la negociación y no impone el precio final.',
-                    'El informe se emite para negociación porque servirá como referente técnico entre partes; no obliga a contratar por ese monto.'
-                ),
-                'conciliacion' => self::note('Apoya una solución acordada entre partes.', 'Audiencias, arreglos directos o controversias patrimoniales.', 'Debe explicar alcance y límites del acuerdo.'),
-                'zona_franca' => self::note('Avalúa bienes bajo régimen o entorno especial.', 'Inmuebles o activos ubicados en zona franca.', 'Requiere revisar norma especial, uso y restricciones.'),
-                'catastral' => self::note('Se relaciona con información o finalidad catastral.', 'Referencias administrativas y consistencia predial.', 'No debe confundirse con valor comercial ordinario.'),
-                'seguro' => self::note('Busca base para cobertura, reposición o indemnización.', 'Pólizas, siniestros o administración de riesgo.', 'Normalmente exige costo de reposición y exclusiones claras.'),
-                'hipotecario' => self::note('Soporta garantía crediticia sobre el bien o derecho.', 'Crédito, garantía real o análisis de riesgo.', 'Debe diferenciar valor comercial, realizable y restricciones.'),
-                'interno' => self::note('Ordena análisis interno sin destinatario externo principal.', 'Control patrimonial, decisiones internas o escenarios.', 'Debe marcarse como uso interno y no informe final.'),
-            ],
             'tipo_derecho' => [
                 'dominio_pleno' => self::note('Derecho completo de propiedad sobre el bien.', 'Cuando el certificado y títulos respaldan propiedad plena.', 'Base civil e inmobiliaria; verificar gravámenes y limitaciones.'),
                 'nuda_propiedad' => self::note('Propiedad separada del goce o usufructo.', 'Cuando el uso económico pertenece temporalmente a otro.', 'Se valora el derecho limitado, no el inmueble completo.'),
@@ -73,7 +50,7 @@ final class AppraisalNotes
             ],
         ];
 
-        return $notes + AppraisalPropertyNotes::all();
+        return AppraisalTypeNotes::all() + $notes + AppraisalPropertyNotes::all();
     }
 
     private static function note(string $what, string $when, string $basis, string $report = ''): array { return ['what' => $what, 'when' => $when, 'basis' => $basis, 'report' => $report]; }

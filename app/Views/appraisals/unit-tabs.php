@@ -3,9 +3,13 @@ $unitLabel = static function (array $unit): string {
     if ($unit['unit_kind'] === 'common') return 'Común';
     return ($unit['unit_kind'] === 'annex' ? 'Anexo ' : 'Unidad ') . (int) $unit['unit_index'];
 };
+$typologyOptions = $igacTypologiesByCategory ?? [];
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
-    x-data="{ active: '<?= e($units[0]['id'] ?? '') ?>' }">
+    x-data="{
+        active: '<?= e($units[0]['id'] ?? '') ?>',
+        typologies: <?= e(json_encode($typologyOptions, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>
+    }">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Unidades del predio</p>
@@ -30,14 +34,19 @@ $unitLabel = static function (array $unit): string {
             <?php endforeach; ?>
         </div>
         <?php foreach ($units as $unit): ?>
-            <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="active === '<?= e($unit['id']) ?>'">
+            <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="active === '<?= e($unit['id']) ?>'"
+                x-data="{
+                    category: <?= e(json_encode((string) $unit['igac_category'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+                    hint: <?= e(json_encode((string) $unit['igac_typology_hint'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>
+                }">
                 <div class="grid gap-5 md:grid-cols-2">
                     <label class="label">Nombre de la pestaña
                         <input class="input" name="units[<?= e($unit['id']) ?>][label]" maxlength="120"
                             value="<?= e($unit['label']) ?>" placeholder="<?= e($unitLabel($unit)) ?>">
                     </label>
                     <label class="label">Categoría IGAC de esta unidad
-                        <select class="input" name="units[<?= e($unit['id']) ?>][igac_category]">
+                        <select class="input" name="units[<?= e($unit['id']) ?>][igac_category]" x-model="category"
+                            @change="if (!(typologies[category] || []).some(item => item.value === hint)) hint = ''">
                             <option value="">Por definir</option>
                             <?php foreach ($igacCategories as $category): ?>
                                 <option value="<?= e($category['code']) ?>" <?= (string) $unit['igac_category'] === (string) $category['code'] ? 'selected' : '' ?>>
@@ -47,8 +56,20 @@ $unitLabel = static function (array $unit): string {
                         </select>
                     </label>
                     <label class="label md:col-span-2">Tipología preliminar de esta unidad
-                        <input class="input" name="units[<?= e($unit['id']) ?>][igac_typology_hint]" maxlength="190"
-                            value="<?= e($unit['igac_typology_hint']) ?>" placeholder="Ej. Residencial Tipo 2, cerramiento, ramada...">
+                        <select class="input" name="units[<?= e($unit['id']) ?>][igac_typology_hint]"
+                            x-model="hint" :disabled="!category">
+                            <option value="">Selecciona primero la categoría IGAC</option>
+                            <template x-for="item in (typologies[category] || [])" :key="item.value">
+                                <option :value="item.value" x-text="item.label"></option>
+                            </template>
+                        </select>
+                        <span class="mt-1 block text-xs leading-5 text-slate-500" x-show="category">
+                            <span x-text="(typologies[category] || []).length"></span>
+                            tipologías disponibles para esta categoría.
+                        </span>
+                        <span class="mt-1 block text-xs leading-5 text-slate-500" x-show="!category">
+                            Selecciona una categoría para reducir la búsqueda del catálogo IGAC.
+                        </span>
                     </label>
                     <label class="label md:col-span-2">Notas de la unidad
                         <textarea class="input" name="units[<?= e($unit['id']) ?>][notes]" rows="3" maxlength="2000"

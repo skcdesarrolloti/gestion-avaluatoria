@@ -34,6 +34,18 @@ final class IgacTypologyRepository
         ));
     }
 
+    public function optionsByCategory(): array
+    {
+        $options = array_fill_keys(array_keys(self::LABELS), []);
+        foreach ($this->all() as $item) {
+            $options[$item['category_code']][] = [
+                'value' => $item['denomination'],
+                'label' => $item['denomination'],
+            ];
+        }
+        return $options;
+    }
+
     public function candidates(array $record, int $limit = 6): array
     {
         $text = $this->normalize(implode(' ', [
