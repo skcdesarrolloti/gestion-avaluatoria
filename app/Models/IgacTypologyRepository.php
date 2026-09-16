@@ -34,6 +34,37 @@ final class IgacTypologyRepository
         ));
     }
 
+    public function candidates(array $record, int $limit = 6): array
+    {
+        $text = $this->normalize(implode(' ', [
+            $record['titulo'] ?? '', $record['tipo_inmueble'] ?? '', $record['destinacion'] ?? '',
+            $record['subtipo_funcional'] ?? '', $record['igac_typology_hint'] ?? '',
+            $record['inspection_notes'] ?? '', $record['observaciones'] ?? '',
+        ]));
+        $preferred = $this->preferredCategories($record, $text);
+        $items = [];
+        foreach ($this->all() as $item) {
+            $haystack = $this->normalize(implode(' ', [$item['denomination'], $item['description'],
+                $item['specifications'], $item['category_name']]));
+            $score = in_array($item['category_code'], $preferred, true) ? 25 : 0;
+            if ($item['category_code'] === 'RESIDENCIALES' && str_contains($text, 'lote')) {
+                if (preg_match('/tipo\s+(0|1|2)\b/', $haystack)) $score += 15;
+            }
+            if ($item['category_code'] === 'ANEXOS' && str_contains($text, 'lote')) {
+                if (preg_match('/(cimientos|cerramiento|urbanismo|cocina|bano|deposito)/', $haystack)) $score += 10;
+            }
+            foreach ($this->tokens($text) as $token) {
+                if (mb_strlen($token) >= 4 && str_contains($haystack, $token)) $score += 8;
+            }
+            if ($score === 0 && $preferred !== []) continue;
+            $item['match_score'] = $score;
+            $items[] = $item;
+        }
+        usort($items, static fn (array $a, array $b): int =>
+            ($b['match_score'] <=> $a['match_score']) ?: strcmp($a['denomination'], $b['denomination']));
+        return array_slice($items, 0, $limit);
+    }
+
     public function stats(): array
     {
         $items = $this->all();
@@ -70,5 +101,35 @@ final class IgacTypologyRepository
             'unit' => (string) ($item['unidad'] ?? ''),
             'image_filename' => $image,
         ];
+    }
+
+    private function preferredCategories(array $record, string $text): array
+    {
+        $selected = (string) ($record['igac_category'] ?? '');
+        if ($selected !== '') return [$selected];
+        $rules = [
+            'RESIDENCIALES' => ['casa', 'apartamento', 'residencial', 'vivienda', 'lote urbano'],
+            'COMERCIALES' => ['local', 'oficina', 'comercial', 'hotel', 'hospedaje'],
+            'INDUSTRIALES' => ['industrial', 'bodega', 'planta', 'fabrica'],
+            'INSTITUCIONALES' => ['institucional', 'salud', 'educacion', 'religioso'],
+            'EDIFICIOS' => ['edificio', 'multifamiliar'],
+            'ANEXOS' => ['anexo', 'ramada', 'cobertizo', 'caney', 'galpon', 'caseta', 'kiosco', 'cerca'],
+        ];
+        foreach ($rules as $category => $words) {
+            foreach ($words as $word) if (str_contains($text, $this->normalize($word))) return [$category];
+        }
+        if (str_contains($text, 'lote')) return ['RESIDENCIALES', 'ANEXOS'];
+        return ['RESIDENCIALES', 'ANEXOS'];
+    }
+
+    private function tokens(string $text): array
+    {
+        return array_values(array_unique(array_filter(preg_split('/\s+/', $text) ?: [])));
+    }
+
+    private function normalize(string $text): string
+    {
+        $value = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', mb_strtolower($text)) ?: mb_strtolower($text);
+        return preg_replace('/[^a-z0-9]+/', ' ', $value) ?? $value;
     }
 }

@@ -41,6 +41,7 @@ final class AppraisalController
         view('appraisals/chapter-zero', ['title' => 'Capítulo 0', 'record' => $record,
             'photos' => $this->appraisals->photos($id, $this->user['id']),
             'appraisers' => $this->appraisers->all(), 'igacCategories' => $this->typologies->categories(),
+            'igacCandidates' => $this->typologies->candidates($record),
             'photoMessage' => Session::pullFlash('chapter_zero_photo_message'),
             'photoError' => Session::pullFlash('chapter_zero_photo_error'),
             'catalog' => ['selects' => AppraisalCatalog::selectFields(), 'notes' => AppraisalCatalog::notes()]]);
