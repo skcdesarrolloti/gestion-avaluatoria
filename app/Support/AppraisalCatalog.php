@@ -45,11 +45,8 @@ final class AppraisalCatalog
                 'edificio' => 'Edificio', 'finca' => 'Finca', 'hotel' => 'Hotel / hospedaje',
                 'parqueadero' => 'Parqueadero',
             ]],
-            'subtipo_funcional' => ['Subtipo funcional', 'Selecciona subtipo', 50, 'Afina la clasificación interna del activo.', [
-                'lote_urbano' => 'Lote urbano', 'lote_rural' => 'Lote rural',
-                'lote_comercial' => 'Lote comercial', 'lote_industrial' => 'Lote industrial',
-                'lote_institucional' => 'Lote institucional',
-            ]],
+            'subtipo_funcional' => ['Subtipo funcional', 'Selecciona subtipo', 50,
+                'Afina la clasificación interna del activo.', self::subtypeOptions()],
             'finalidad' => ['Finalidad', 'Selecciona finalidad', 40, 'Indica para qué será usado el informe.', [
                 'judicial' => 'Judicial', 'extrajudicial' => 'Extrajudicial', 'interna' => 'Interna',
                 'patrimonial' => 'Patrimonial', 'negociacion' => 'Negociación',
@@ -88,8 +85,55 @@ final class AppraisalCatalog
         return array_keys(self::selectFields()[$field][4] ?? []);
     }
 
+    public static function subtypeOptions(): array
+    {
+        return [
+            'casa_unifamiliar' => 'Casa unifamiliar', 'casa_bifamiliar' => 'Casa bifamiliar',
+            'casa_campestre' => 'Casa campestre', 'apartamento' => 'Apartamento',
+            'apartaestudio' => 'Apartaestudio', 'lote_urbano' => 'Lote urbano',
+            'lote_rural' => 'Lote rural', 'lote_comercial' => 'Lote comercial',
+            'lote_industrial' => 'Lote industrial', 'lote_institucional' => 'Lote institucional',
+            'local_calle' => 'Local a la calle', 'local_centro_comercial' => 'Local en centro comercial',
+            'oficina_privada' => 'Oficina privada', 'oficina_corporativa' => 'Oficina corporativa',
+            'bodega_urbana' => 'Bodega urbana', 'bodega_industrial' => 'Bodega industrial',
+            'consultorio_medico' => 'Consultorio médico', 'edificio_residencial' => 'Edificio residencial',
+            'edificio_comercial' => 'Edificio comercial', 'edificio_mixto' => 'Edificio mixto',
+            'finca_recreativa' => 'Finca recreativa', 'finca_agropecuaria' => 'Finca agropecuaria',
+            'hotel_urbano' => 'Hotel urbano', 'hospedaje_rural' => 'Hospedaje rural',
+            'parqueadero_independiente' => 'Parqueadero independiente',
+        ];
+    }
+
+    public static function subtypesByPropertyType(): array
+    {
+        return [
+            'casa' => self::onlySubtypes(['casa_unifamiliar', 'casa_bifamiliar', 'casa_campestre']),
+            'apartamento' => self::onlySubtypes(['apartamento', 'apartaestudio']),
+            'lote' => self::onlySubtypes(['lote_urbano', 'lote_rural', 'lote_comercial',
+                'lote_industrial', 'lote_institucional']),
+            'local' => self::onlySubtypes(['local_calle', 'local_centro_comercial']),
+            'oficina' => self::onlySubtypes(['oficina_privada', 'oficina_corporativa']),
+            'bodega' => self::onlySubtypes(['bodega_urbana', 'bodega_industrial']),
+            'consultorio' => self::onlySubtypes(['consultorio_medico', 'oficina_privada']),
+            'edificio' => self::onlySubtypes(['edificio_residencial', 'edificio_comercial', 'edificio_mixto']),
+            'finca' => self::onlySubtypes(['finca_recreativa', 'finca_agropecuaria', 'casa_campestre']),
+            'hotel' => self::onlySubtypes(['hotel_urbano', 'hospedaje_rural']),
+            'parqueadero' => self::onlySubtypes(['parqueadero_independiente']),
+        ];
+    }
+
+    public static function subtypeBelongsToPropertyType(string $type, string $subtype): bool
+    {
+        return $type === '' || $subtype === '' || array_key_exists($subtype, self::subtypesByPropertyType()[$type] ?? []);
+    }
+
     public static function notes(): array
     {
         return AppraisalNotes::all();
+    }
+
+    private static function onlySubtypes(array $keys): array
+    {
+        return array_intersect_key(self::subtypeOptions(), array_flip($keys));
     }
 }

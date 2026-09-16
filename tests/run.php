@@ -36,6 +36,12 @@ try {
     expectStatus(422, fn () => AppraisalValidator::validate(array_replace($data, ['tipo' => 'invalido'])), 'catalogo invalidado');
     expectStatus(422, fn () => AppraisalValidator::validate(array_replace($data, ['version' => '1'])), 'version debe ser entero');
     expectStatus(422, fn () => AppraisalValidator::validate(array_replace($data, ['municipio' => []])), 'rechazo de arrays en campos');
+    expect(AppraisalValidator::validate(array_replace($data, [
+        'tipo_inmueble' => 'edificio', 'subtipo_funcional' => 'edificio_mixto',
+    ]))['subtipo_funcional'] === 'edificio_mixto', 'subtipo acorde al tipo de inmueble');
+    expectStatus(422, fn () => AppraisalValidator::validate(array_replace($data, [
+        'tipo_inmueble' => 'edificio', 'subtipo_funcional' => 'lote_urbano',
+    ])), 'subtipo incompatible rechazado');
     expectStatus(419, fn () => Session::csrf(), 'CSRF obligatorio');
     $_SERVER['HTTP_X_CSRF_TOKEN'] = 'test-token';
     Session::csrf();

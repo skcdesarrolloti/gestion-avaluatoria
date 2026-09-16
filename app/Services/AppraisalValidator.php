@@ -37,6 +37,9 @@ final class AppraisalValidator
                 $errors[$field] = 'Selecciona una opción válida.';
             }
         }
+        if (!AppraisalCatalog::subtypeBelongsToPropertyType($data['tipo_inmueble'] ?? '', $data['subtipo_funcional'] ?? '')) {
+            $errors['subtipo_funcional'] = 'Selecciona un subtipo acorde con el tipo de inmueble.';
+        }
         if (!isset($input['version']) || !is_int($input['version']) || $input['version'] < 1 || $input['version'] >= 4294967295) {
             throw new HttpException(422, 'La versión del borrador no es válida.');
         }
