@@ -19,7 +19,7 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
 </div>
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
-<div class="mt-7" x-data="{ activeSubject: location.hash === '#superficies' ? 'surface' : 'basic' }">
+<div class="mt-7" x-data="{ activeSubject: location.hash === '#superficies' ? 'surface' : (location.hash === '#construccion' ? 'construction' : 'basic') }">
     <div class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
         <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
             <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
@@ -34,6 +34,12 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
                 <span class="block text-base">2.2 Datos de la superficie</span>
                 <span class="block text-xs font-medium opacity-80">Áreas, fondo y variables del terreno</span>
             </button>
+            <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
+                @click="activeSubject = 'construction'; history.replaceState(null, '', '#construccion')"
+                :class="activeSubject === 'construction' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:border-blue-700'">
+                <span class="block text-base">2.3 Datos de la construcción</span>
+                <span class="block text-xs font-medium opacity-80">Áreas, vetustez, estado y conservación</span>
+            </button>
         </div>
     </div>
     <div class="mt-7" x-show="activeSubject === 'basic'">
@@ -41,5 +47,8 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
     </div>
     <div class="mt-7" x-show="activeSubject === 'surface'">
         <?php require BASE_PATH . '/app/Views/appraisals/subject-surface.php'; ?>
+    </div>
+    <div class="mt-7" x-show="activeSubject === 'construction'">
+        <?php require BASE_PATH . '/app/Views/appraisals/subject-construction.php'; ?>
     </div>
 </div>

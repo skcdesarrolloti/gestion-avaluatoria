@@ -134,33 +134,41 @@ final class AppraisalRepository
     public function saveUnitSurfaces(string $id, int $owner, array $units): void
     {
         $now = gmdate('Y-m-d H:i:s');
-        $query = $this->db->prepare('UPDATE appraisal_units SET area_land_m2 = ?, area_built_m2 = ?,
-            area_private_m2 = ?, area_common_m2 = ?, front_length_m = ?, depth_length_m = ?,
-            surface_source = ?, surface_notes = ?, lot_shape = ?, topography = ?, boundaries = ?,
-            boundary_source = ?, boundary_front = ?, boundary_right = ?, boundary_left = ?, boundary_back = ?,
-            boundary_zenith = ?, boundary_nadir = ?, area_manual_m2 = ?, area_midas_m2 = ?, area_tax_m2 = ?,
-            area_deed_m2 = ?, area_certificate_m2 = ?, area_other_m2 = ?, area_adopted_m2 = ?,
-            area_adopted_source = ?, enclosure = ?, equivalent_depth_m = ?, front_depth_ratio = ?,
-            dynamic_surface_notes = ?, dynamic_normative_compatibility = ?, dynamic_environment_conditions = ?,
-            dynamic_service_quality = ?, dynamic_service_availability = ?, dynamic_road_condition = ?,
-            dynamic_urban_development = ?, dynamic_affectations = ?, dynamic_restrictions = ?,
-            surface_report_text = ?, updated_at = ?
-            WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
+        $fields = ['area_land_m2', 'area_built_m2', 'area_private_m2', 'area_common_m2', 'front_length_m',
+            'depth_length_m', 'surface_source', 'surface_notes', 'lot_shape', 'topography', 'boundaries',
+            'boundary_source', 'boundary_front', 'boundary_right', 'boundary_left', 'boundary_back',
+            'boundary_zenith', 'boundary_nadir', 'area_manual_m2', 'area_midas_m2', 'area_tax_m2',
+            'area_deed_m2', 'area_certificate_m2', 'area_other_m2', 'area_adopted_m2', 'area_adopted_source',
+            'enclosure', 'equivalent_depth_m', 'front_depth_ratio', 'dynamic_surface_notes',
+            'dynamic_normative_compatibility', 'dynamic_environment_conditions', 'dynamic_service_quality',
+            'dynamic_service_availability', 'dynamic_road_condition', 'dynamic_urban_development',
+            'dynamic_affectations', 'dynamic_restrictions', 'surface_report_text'];
+        $query = $this->unitUpdate($fields);
         foreach ($units as $unit) {
-            $query->execute([$unit['area_land_m2'], $unit['area_built_m2'], $unit['area_private_m2'],
-                $unit['area_common_m2'], $unit['front_length_m'], $unit['depth_length_m'],
-                $unit['surface_source'], $unit['surface_notes'], $unit['lot_shape'], $unit['topography'],
-                $unit['boundaries'], $unit['boundary_source'], $unit['boundary_front'], $unit['boundary_right'],
-                $unit['boundary_left'], $unit['boundary_back'], $unit['boundary_zenith'], $unit['boundary_nadir'],
-                $unit['area_manual_m2'], $unit['area_midas_m2'], $unit['area_tax_m2'], $unit['area_deed_m2'],
-                $unit['area_certificate_m2'], $unit['area_other_m2'], $unit['area_adopted_m2'],
-                $unit['area_adopted_source'], $unit['enclosure'], $unit['equivalent_depth_m'], $unit['front_depth_ratio'],
-                $unit['dynamic_surface_notes'], $unit['dynamic_normative_compatibility'], $unit['dynamic_environment_conditions'],
-                $unit['dynamic_service_quality'], $unit['dynamic_service_availability'], $unit['dynamic_road_condition'],
-                $unit['dynamic_urban_development'], $unit['dynamic_affectations'], $unit['dynamic_restrictions'],
-                $unit['surface_report_text'], $now, $unit['id'], $id, $owner]);
+            $query->execute([...array_map(static fn (string $field): mixed => $unit[$field], $fields),
+                $now, $unit['id'], $id, $owner]);
         }
     }
+
+    public function saveUnitConstructions(string $id, int $owner, array $units): void
+    {
+        $now = gmdate('Y-m-d H:i:s');
+        $fields = ['construction_type', 'construction_measure_unit', 'construction_quantity', 'construction_floors',
+            'construction_basements', 'built_area_manual_m2', 'built_area_midas_m2', 'built_area_tax_m2',
+            'built_area_deed_m2', 'built_area_certificate_m2', 'built_area_other_m2', 'built_area_adopted_m2',
+            'built_area_adopted_source', 'construction_year', 'construction_age_years', 'construction_state',
+            'construction_progress_percent', 'construction_integrity_percent', 'construction_conservation_json',
+            'construction_general_aspects', 'construction_services_json', 'construction_specifics_json',
+            'construction_report_text'];
+        $query = $this->unitUpdate($fields);
+        foreach ($units as $unit) {
+            $query->execute([...array_map(static fn (string $field): mixed => $unit[$field], $fields),
+                $now, $unit['id'], $id, $owner]);
+        }
+    }
+
+    private function unitUpdate(array $fields): \PDOStatement
+    { $set = implode(', ', array_map(static fn (string $field): string => $field . ' = ?', $fields)); return $this->db->prepare('UPDATE appraisal_units SET ' . $set . ', updated_at = ? WHERE id = ? AND appraisal_id = ? AND owner_id = ?'); }
 
     public function ensureUnits(string $id, int $owner, int $propertyCount, int $annexCount): void
     {

@@ -261,6 +261,13 @@ try {
         && $surfaceRows[0]['boundary_front'] === 'Calle principal', 'superficie adoptada y linderos por unidad');
     $_POST = ['unit_surfaces' => [$unitId => ['area_land_m2' => '-1']]];
     expectStatus(422, fn () => AppraisalChapterZeroInput::unitSurfaceData(), 'superficie negativa rechazada');
+    $_POST = ['unit_constructions' => [$unitId => ['construction_type' => 'casa',
+        'built_area_adopted_m2' => '85,25', 'construction_year' => '2010',
+        'conservation' => ['estructura' => 'B'], 'services' => ['energia' => 'si'],
+        'specifics' => ['estructura' => 'Concreto']]]];
+    $constructionRows = AppraisalChapterZeroInput::unitConstructionData();
+    expect($constructionRows[0]['built_area_adopted_m2'] === '85.25'
+        && str_contains($constructionRows[0]['construction_conservation_json'], 'estructura'), 'construccion por unidad normalizada');
     $_POST = [];
     $normsDir = sys_get_temp_dir() . '/ga_normas_' . bin2hex(random_bytes(4));
     putenv('NTS_STORAGE_DIR=' . $normsDir);

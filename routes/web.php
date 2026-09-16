@@ -38,6 +38,7 @@ return [
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/preclasificacion$#', 'appraisals', 'saveSubjectPreclassification', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/unidades$#', 'appraisals', 'saveSubjectUnits', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/superficies$#', 'appraisals', 'saveSubjectSurfaces', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/construcciones$#', 'appraisals', 'saveSubjectConstructions', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/fotos$#', 'appraisals', 'uploadSubjectPhotos', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/fotos/([a-f0-9]{32})/eliminar$#', 'appraisals', 'deletePhoto', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/fotos/([a-f0-9]{32})$#', 'appraisals', 'photo', true],

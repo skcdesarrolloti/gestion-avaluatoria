@@ -17,14 +17,9 @@ use App\Support\AppraisalSubjectCatalog;
 
 final class AppraisalController
 {
-    public function __construct(
-        private AppraisalRepository $appraisals,
-        private array $user,
-        private AppraiserRepository $appraisers,
-        private IgacTypologyRepository $typologies,
-        private AppraisalSubjectRepository $subjects,
-        private GeoMasterRepository $geo,
-    ) {}
+    public function __construct(private AppraisalRepository $appraisals, private array $user,
+        private AppraiserRepository $appraisers, private IgacTypologyRepository $typologies,
+        private AppraisalSubjectRepository $subjects, private GeoMasterRepository $geo) {}
 
     public function index(): void
     {
@@ -75,14 +70,8 @@ final class AppraisalController
 
     public function saveSubjectBasic(string $id): never
     {
-        $this->appraisals->find($id, $this->user['id']);
-        try {
-            $this->subjects->save($id, $this->user['id'], $_POST);
-            Session::flash('subject_message', 'Ficha básica del sujeto guardada correctamente.');
-        } catch (\Throwable $error) {
-            Session::flash('subject_error', $error->getMessage());
-        }
-        Http::redirect('avaluos/' . $id . '/bien-sujeto#ficha-basica');
+        $this->saveSubjectData($id, fn () => $this->subjects->save($id, $this->user['id'], $_POST),
+            'Ficha básica del sujeto guardada correctamente.', '#ficha-basica');
     }
 
     public function saveChapterZero(string $id): never
@@ -98,14 +87,26 @@ final class AppraisalController
 
     public function saveSubjectSurfaces(string $id): never
     {
+        $this->saveSubjectData($id, fn () => $this->appraisals->saveUnitSurfaces($id, $this->user['id'],
+            AppraisalChapterZeroInput::unitSurfaceData()), 'Datos de superficie guardados correctamente.', '#superficies');
+    }
+
+    public function saveSubjectConstructions(string $id): never
+    {
+        $this->saveSubjectData($id, fn () => $this->appraisals->saveUnitConstructions($id, $this->user['id'],
+            AppraisalChapterZeroInput::unitConstructionData()), 'Datos de construcción guardados correctamente.', '#construccion');
+    }
+
+    private function saveSubjectData(string $id, callable $save, string $message, string $hash): never
+    {
         $this->appraisals->find($id, $this->user['id']);
         try {
-            $this->appraisals->saveUnitSurfaces($id, $this->user['id'], AppraisalChapterZeroInput::unitSurfaceData());
-            Session::flash('subject_message', 'Datos de superficie guardados correctamente.');
+            $save();
+            Session::flash('subject_message', $message);
         } catch (\Throwable $error) {
             Session::flash('subject_error', $error->getMessage());
         }
-        Http::redirect('avaluos/' . $id . '/bien-sujeto#superficies');
+        Http::redirect('avaluos/' . $id . '/bien-sujeto' . $hash);
     }
 
     private function saveUnitsAndRedirect(string $id, string $target): never
@@ -207,13 +208,7 @@ final class AppraisalController
         Http::json(['ok' => true] + $result);
     }
 
-    private function appraiserIds(): array
-    {
-        return array_column($this->appraisers->all(), 'id');
-    }
+    private function appraiserIds(): array { return array_column($this->appraisers->all(), 'id'); }
 
-    private function igacCodes(): array
-    {
-        return array_column($this->typologies->categories(), 'code');
-    }
+    private function igacCodes(): array { return array_column($this->typologies->categories(), 'code'); }
 }

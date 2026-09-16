@@ -120,6 +120,43 @@ final class AppraisalChapterZeroInput
         return $rows;
     }
 
+    public static function unitConstructionData(): array
+    {
+        $posted = $_POST['unit_constructions'] ?? [];
+        if (!is_array($posted)) throw new HttpException(422, 'No se recibieron construcciones válidas.');
+        $rows = [];
+        foreach ($posted as $id => $unit) {
+            if (!is_string($id) || !preg_match('/^[a-f0-9]{32}$/', $id) || !is_array($unit)) continue;
+            $rows[] = [
+                'id' => $id,
+                'construction_type' => self::selectValue($unit['construction_type'] ?? ''),
+                'construction_measure_unit' => self::selectValue($unit['construction_measure_unit'] ?? 'm2'),
+                'construction_quantity' => self::decimalOrNull($unit['construction_quantity'] ?? null),
+                'construction_floors' => self::smallIntOrNull($unit['construction_floors'] ?? null),
+                'construction_basements' => self::smallIntOrNull($unit['construction_basements'] ?? null),
+                'built_area_manual_m2' => self::decimalOrNull($unit['built_area_manual_m2'] ?? null),
+                'built_area_midas_m2' => self::decimalOrNull($unit['built_area_midas_m2'] ?? null),
+                'built_area_tax_m2' => self::decimalOrNull($unit['built_area_tax_m2'] ?? null),
+                'built_area_deed_m2' => self::decimalOrNull($unit['built_area_deed_m2'] ?? null),
+                'built_area_certificate_m2' => self::decimalOrNull($unit['built_area_certificate_m2'] ?? null),
+                'built_area_other_m2' => self::decimalOrNull($unit['built_area_other_m2'] ?? null),
+                'built_area_adopted_m2' => self::decimalOrNull($unit['built_area_adopted_m2'] ?? null),
+                'built_area_adopted_source' => self::selectValue($unit['built_area_adopted_source'] ?? ''),
+                'construction_year' => self::yearOrNull($unit['construction_year'] ?? null),
+                'construction_age_years' => self::smallIntOrNull($unit['construction_age_years'] ?? null),
+                'construction_state' => self::selectValue($unit['construction_state'] ?? ''),
+                'construction_progress_percent' => self::percentOrNull($unit['construction_progress_percent'] ?? null),
+                'construction_integrity_percent' => self::percentOrNull($unit['construction_integrity_percent'] ?? null),
+                'construction_conservation_json' => self::jsonMap($unit['conservation'] ?? []),
+                'construction_services_json' => self::jsonMap($unit['services'] ?? []),
+                'construction_specifics_json' => self::jsonMap($unit['specifics'] ?? []),
+                'construction_general_aspects' => self::shortText($unit['construction_general_aspects'] ?? ''),
+                'construction_report_text' => mb_substr(trim((string) ($unit['construction_report_text'] ?? '')), 0, 1500),
+            ];
+        }
+        return $rows;
+    }
+
     private static function assertIgacCategory(string $category, array $codes, string $message = 'Selecciona una categoría IGAC válida.'): void
     {
         if ($category !== '' && !in_array($category, $codes, true)) throw new HttpException(422, $message);
@@ -153,13 +190,30 @@ final class AppraisalChapterZeroInput
         return number_format((float) $normalized, 2, '.', '');
     }
 
-    private static function shortText(mixed $value): string
+    private static function shortText(mixed $value): string { return mb_substr(trim((string) $value), 0, 1000); }
+
+    private static function selectValue(mixed $value): string { return mb_substr(trim((string) $value), 0, 60); }
+
+    private static function smallIntOrNull(mixed $value): ?int
     {
-        return mb_substr(trim((string) $value), 0, 1000);
+        $value = trim((string) $value);
+        if ($value === '') return null;
+        $number = filter_var($value, FILTER_VALIDATE_INT);
+        if ($number === false || $number < 0 || $number > 500) throw new HttpException(422, 'Los enteros deben estar entre 0 y 500.');
+        return $number;
     }
 
-    private static function selectValue(mixed $value): string
+    private static function yearOrNull(mixed $value): ?int { $value = trim((string) $value); if ($value === '') return null; $year = filter_var($value, FILTER_VALIDATE_INT); if ($year === false || $year < 1800 || $year > (int) date('Y')) throw new HttpException(422, 'El año de construcción no es válido.'); return $year; }
+
+    private static function percentOrNull(mixed $value): ?string { $decimal = self::decimalOrNull($value); if ($decimal !== null && ((float) $decimal < 0 || (float) $decimal > 100)) throw new HttpException(422, 'Los porcentajes deben estar entre 0 y 100.'); return $decimal; }
+
+    private static function jsonMap(mixed $values): string
     {
-        return mb_substr(trim((string) $value), 0, 60);
+        if (!is_array($values)) return '{}';
+        $clean = [];
+        foreach ($values as $key => $value) {
+            if (is_string($key)) $clean[mb_substr($key, 0, 60)] = mb_substr(trim((string) $value), 0, 120);
+        }
+        return json_encode($clean, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
     }
 }
