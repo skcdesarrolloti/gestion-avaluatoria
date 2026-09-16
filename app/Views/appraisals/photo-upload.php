@@ -10,6 +10,7 @@ $photoDescription = $photoUploadDescription ?? 'Sube las fotos después de escog
 $photoReturnTo = $photoUploadReturnTo ?? $subjectActionBase;
 $photoCaption = $photoUploadCaption ?? '';
 $photoNamePlaceholder = $photoUploadNamePlaceholder ?? 'Ej. Portada principal, cocina, vista lateral o detalle de cubierta';
+$photoFieldId = 'photo_upload_' . substr(hash('sha1', $photoUnitId . '|' . $photoCaption . '|' . $photoTitle), 0, 10);
 $compact = $photoUploadCompact ?? false;
 $visiblePhotos = $photoUnitId === '' ? $photos : array_values(array_filter($photos,
     static fn (array $photo): bool => (string) ($photo['unit_id'] ?? '') === $photoUnitId));
@@ -30,6 +31,8 @@ $visiblePhotos = $photoCaption === '' ? $visiblePhotos : array_values(array_filt
                     </p>
                 <?php endif; ?>
             </div>
+            <button class="btn-secondary min-h-10 text-xs" type="button"
+                @click="document.getElementById('<?= e($photoFieldId) ?>_name')?.focus()">Agregar fotos</button>
         </div>
         <?php if ($photoMessage): ?>
             <p class="mt-5 rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($photoMessage) ?></p>
@@ -47,7 +50,7 @@ $visiblePhotos = $photoCaption === '' ? $visiblePhotos : array_values(array_filt
             <div class="label">Agregar fotos
                 <div class="mt-2 grid gap-3 rounded-xl border border-dashed border-slate-300 bg-white p-4 sm:grid-cols-2">
                     <label class="label sm:col-span-2">Nombre de la foto
-                        <input class="input" name="photo_name" maxlength="190"
+                        <input class="input" id="<?= e($photoFieldId) ?>_name" name="photo_name" maxlength="190"
                             placeholder="<?= e($photoNamePlaceholder) ?>">
                     </label>
                     <label class="btn-secondary min-h-11">Elegir archivos
@@ -72,7 +75,7 @@ $visiblePhotos = $photoCaption === '' ? $visiblePhotos : array_values(array_filt
             </div>
             <div class="flex items-end">
                 <button class="btn-primary min-h-11 w-full lg:w-auto" type="submit" :disabled="busy || !hasFiles"
-                    x-text="busy ? 'Subiendo...' : 'Subir fotos'">Subir fotos</button>
+                    x-text="busy ? 'Subiendo...' : 'Agregar fotos'">Agregar fotos</button>
             </div>
         </form>
         <?php if ($visiblePhotos): ?>

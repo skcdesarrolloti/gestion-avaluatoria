@@ -195,7 +195,7 @@ final class AppraisalController
         $target = (string) ($_POST['return_to'] ?? '');
         $subject = 'avaluos/' . $id . '/bien-sujeto';
         return in_array($target, ['avaluos/' . $id . '/expediente', $subject, $subject . '#atributos', $subject . '#fotos'], true)
-            || preg_match('#^' . preg_quote($subject, '#') . '#fotos(?:-general|-[a-f0-9]{32})$#', $target)
+            || preg_match('#^' . preg_quote($subject, '#') . '\#fotos(?:-general|-[a-f0-9]{32})$#', $target)
             ? $target
             : $subject . '#fotos';
     }

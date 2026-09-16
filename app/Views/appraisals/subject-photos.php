@@ -20,7 +20,8 @@ foreach ($photoUnits as $photoUnit) {
 }
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
-    x-data="{ activePhotoUnit: (<?= e(json_encode($photoTabMap, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>)[location.hash.slice(1)] || '<?= e($photoUnits[0]['kind'] . ':' . $photoUnits[0]['id']) ?>' }">
+    x-data="{ activePhotoUnit: '', photoMap: <?= e(json_encode($photoTabMap, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>, syncPhotoUnit() { this.activePhotoUnit = this.photoMap[location.hash.slice(1)] || '<?= e($photoUnits[0]['kind'] . ':' . $photoUnits[0]['id']) ?>' } }"
+    x-init="syncPhotoUnit()" @hashchange.window="syncPhotoUnit()">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">3.5 Registro fotográfico del sujeto</p>

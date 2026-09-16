@@ -15,6 +15,7 @@ use App\Services\InternationalStandardFileImportService;
 use App\Services\LegalDocumentFileImportService;
 use App\Services\LegalDocumentImportService;
 use App\Services\RateLimiter;
+use App\Controllers\AppraisalController;
 use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraiserRepository;
 use App\Models\FuncionarioRepository;
@@ -276,6 +277,15 @@ try {
     $attributeRows = AppraisalAttributeInput::unitAttributeData();
     expect(str_contains($attributeRows[0]['special_attributes_json'], 'esquinero')
         && !str_contains($attributeRows[0]['special_attributes_json'], 'desconocido'), 'atributos especiales normalizados');
+    $photoRecordId = str_repeat('c', 32);
+    $photoUnitId = str_repeat('d', 32);
+    $photoController = (new ReflectionClass(AppraisalController::class))->newInstanceWithoutConstructor();
+    $safePhotoReturn = new ReflectionMethod(AppraisalController::class, 'safePhotoReturn');
+    $safePhotoReturn->setAccessible(true);
+    $_POST = ['return_to' => 'avaluos/' . $photoRecordId . '/bien-sujeto#fotos-general'];
+    expect($safePhotoReturn->invoke($photoController, $photoRecordId) === $_POST['return_to'], 'retorno a fotos generales conservado');
+    $_POST = ['return_to' => 'avaluos/' . $photoRecordId . '/bien-sujeto#fotos-' . $photoUnitId];
+    expect($safePhotoReturn->invoke($photoController, $photoRecordId) === $_POST['return_to'], 'retorno a fotos de unidad conservado');
     $_POST = [];
     $normsDir = sys_get_temp_dir() . '/ga_normas_' . bin2hex(random_bytes(4));
     putenv('NTS_STORAGE_DIR=' . $normsDir);
