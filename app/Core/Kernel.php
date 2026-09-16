@@ -9,6 +9,7 @@ use App\Controllers\IfrsStandardController;
 use App\Controllers\InternationalStandardController;
 use App\Controllers\LegalFrameworkController;
 use App\Controllers\StandardController;
+use App\Controllers\ValuationController;
 use App\Database\Migrator;
 use App\Models\AppraisalRepository;
 use App\Models\FuncionarioRepository;
@@ -128,6 +129,7 @@ final class Kernel
                 'international' => new InternationalStandardController(new InternationalStandardRepository($db)),
                 'legal' => new LegalFrameworkController(new LegalDocumentRepository($db)),
                 'standards' => new StandardController(new ValuationStandardRepository($db)),
+                'valuations' => new ValuationController(),
                 default => new AppraisalController(new AppraisalRepository($db), $user),
             };
             $instance->$action(...array_slice($matches, 1));

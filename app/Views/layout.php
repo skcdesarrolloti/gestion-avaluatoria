@@ -15,7 +15,8 @@ $basePath = App\Core\Http::basePath();
 $currentPath = '/' . trim(substr($requestPath, strlen($basePath)), '/');
 $isActive = static fn (string $path): bool => $path === '/' ? $currentPath === '/' : str_starts_with($currentPath, $path);
 $tabs = [
-    ['label' => 'Inicio', 'href' => url(), 'active' => $isActive('/')],
+    ['label' => 'Valuaciones', 'href' => url('valuaciones'), 'active' => $isActive('/valuaciones')],
+    ['label' => 'Mis avalúos', 'href' => url(), 'active' => $isActive('/')],
     ['label' => 'Normas Técnicas Sectoriales', 'href' => url('normas-tecnicas-sectoriales'), 'active' => $isActive('/normas-tecnicas-sectoriales')],
     ['label' => 'Marco Jurídico Nacional', 'href' => url('marco-juridico-valuatorio'), 'active' => $isActive('/marco-juridico-valuatorio')],
     ['label' => 'Normas Internacionales', 'href' => url('normas-internacionales-valuacion'), 'active' => $isActive('/normas-internacionales-valuacion')],
@@ -33,7 +34,7 @@ $tabs = [
         <?php if ($logged): ?>
             <div class="app-topbar">
                 <div class="flex flex-wrap items-center justify-between gap-4">
-                    <a href="<?= e(url()) ?>" class="brand-frame">
+                    <a href="<?= e(url('valuaciones')) ?>" class="brand-frame">
                         <span aria-hidden="true" class="brand-mark">SC</span>
                         <span class="brand-title">Gestión avaluatoria<span class="brand-subtitle">SuCasa Inmobiliaria</span></span>
                     </a>
@@ -45,7 +46,7 @@ $tabs = [
             </div>
             <div class="app-shell">
                 <div class="flex flex-wrap justify-end gap-3">
-                    <a class="app-action app-action-blue" href="<?= e(url('#nuevo-avaluo')) ?>">Crear ficha</a>
+                    <a class="app-action app-action-blue" href="<?= e(url('valuaciones')) ?>">Valuaciones</a>
                     <a class="app-action app-action-orange" href="<?= e(url()) ?>">Mis avalúos</a>
                     <a class="app-action app-action-teal" href="<?= e(url('normas-tecnicas-sectoriales')) ?>">Normas técnicas</a>
                     <a class="app-action app-action-orange" href="<?= e(url('marco-juridico-valuatorio')) ?>">Marco jurídico</a>
