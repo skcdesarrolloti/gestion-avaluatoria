@@ -1,5 +1,6 @@
 <?php
 $unitId = (string) $unit['id'];
+$igacUsefulLife = $typologyUsefulLife($unit);
 $builtAreaFields = [
     'built_area_manual_m2' => ['Manual', 'Área digitada o calculada por el analista'],
     'built_area_midas_m2' => ['MIDAS', 'Área construida desde visor o ficha territorial'],
@@ -14,8 +15,15 @@ $builtAreaFields = [
         activeConstructionDetail: 'basicos',
         yearBuilt: '<?= e($cv($unit, 'construction_year')) ?>',
         age: '<?= e($cv($unit, 'construction_age_years')) ?>',
+        apparentAge: '<?= e($cv($unit, 'construction_apparent_age_years')) ?>',
+        usefulLife: '<?= e($cv($unit, 'construction_useful_life_years')) ?>',
         currentYear: new Date().getFullYear(),
-        calcAge() { const year = parseInt(this.yearBuilt || '0'); return year > 0 ? Math.max(0, this.currentYear - year) : '' }
+        calcAge() { const year = parseInt(this.yearBuilt || '0'); return year > 0 ? Math.max(0, this.currentYear - year) : '' },
+        calcRemaining() {
+            const life = parseInt(this.usefulLife || '0');
+            const used = parseInt(this.apparentAge || this.age || this.calcAge() || '0');
+            return life > 0 ? Math.max(0, life - used) : '';
+        }
     }">
     <div class="flex flex-wrap items-center justify-between gap-3">
         <h3 class="text-base font-semibold"><?= e($unit['label'] ?: $constructionUnitLabel($unit)) ?></h3>
@@ -88,19 +96,7 @@ $builtAreaFields = [
             </label>
         </div>
     </div>
-    <div class="mt-5 grid gap-5 md:grid-cols-3" x-show="activeConstructionDetail === 'vetustez'">
-        <label class="label">Año de construcción
-            <input class="input" name="unit_constructions[<?= e($unitId) ?>][construction_year]"
-                inputmode="numeric" x-model="yearBuilt" value="<?= e($cv($unit, 'construction_year')) ?>" placeholder="Ej. 2010">
-        </label>
-        <label class="label">Vetustez adoptada (años)
-            <input class="input" name="unit_constructions[<?= e($unitId) ?>][construction_age_years]"
-                inputmode="numeric" x-model="age" :placeholder="calcAge() || 'Año referencia - año construcción'">
-        </label>
-        <p class="rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">
-            Fórmula guía: <strong>Vetustez = año de referencia - año de construcción</strong>. Puede ajustarse si hubo remodelación integral.
-        </p>
-    </div>
+    <?php require BASE_PATH . '/app/Views/appraisals/subject-construction-life.php'; ?>
     <div class="mt-5 grid gap-5 md:grid-cols-3" x-show="activeConstructionDetail === 'estado'">
         <label class="label">Estado de la construcción
             <select class="input" name="unit_constructions[<?= e($unitId) ?>][construction_state]">
@@ -169,10 +165,6 @@ $builtAreaFields = [
             </table>
         </div>
     </div>
-    <label class="label mt-5 block" x-show="activeConstructionDetail === 'aspectos'">Aspectos generales
-        <textarea class="input" name="unit_constructions[<?= e($unitId) ?>][construction_general_aspects]" rows="4" maxlength="1000"
-            placeholder="Describe materiales, acabados, distribución, calidad constructiva y observaciones de visita."><?= e($cv($unit, 'construction_general_aspects')) ?></textarea>
-    </label>
     <div class="mt-5 grid gap-5 md:grid-cols-3" x-show="activeConstructionDetail === 'servicios'">
         <?php foreach ($serviceOptions as $key => $label): ?>
             <label class="label"><?= e($label) ?>

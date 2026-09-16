@@ -154,7 +154,9 @@ final class AppraisalRepository
         $fields = ['construction_type', 'construction_measure_unit', 'construction_quantity', 'construction_floors',
             'construction_basements', 'built_area_manual_m2', 'built_area_midas_m2', 'built_area_tax_m2',
             'built_area_deed_m2', 'built_area_certificate_m2', 'built_area_other_m2', 'built_area_adopted_m2',
-            'built_area_adopted_source', 'construction_year', 'construction_age_years', 'construction_state',
+            'built_area_adopted_source', 'construction_year', 'construction_age_years',
+            'construction_apparent_age_years', 'construction_useful_life_years',
+            'construction_remaining_life_years', 'construction_rentable_units', 'construction_state',
             'construction_progress_percent', 'construction_integrity_percent', 'construction_conservation_json',
             'construction_general_aspects', 'construction_services_json', 'construction_specifics_json',
             'construction_report_text'];

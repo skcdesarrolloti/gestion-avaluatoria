@@ -9,10 +9,10 @@ $jsonValue = static function (array $unit, string $field, string $key): string {
     return is_array($data) ? (string) ($data[$key] ?? '') : '';
 };
 $constructionTabs = ['basicos' => ['1', 'Datos básicos'], 'pisos' => ['2', 'Pisos y sótanos'],
-    'area' => ['3', 'Área construida'], 'vetustez' => ['4', 'Vetustez'], 'estado' => ['5', 'Estado de obra'],
-    'conservacion' => ['6', 'Conservación'], 'aspectos' => ['7', 'Aspectos generales'],
-    'servicios' => ['8', 'Servicios'], 'especificos' => ['9', 'Características específicas'],
-    'informe' => ['10', 'Informe para el entregable']];
+    'area' => ['3', 'Área construida'], 'vetustez' => ['4', 'Vetustez y vida útil'],
+    'estado' => ['5', 'Estado de obra'], 'conservacion' => ['6', 'Conservación'],
+    'servicios' => ['7', 'Servicios'], 'especificos' => ['8', 'Características específicas'],
+    'informe' => ['9', 'Informe para el entregable']];
 $constructionTypes = ['' => 'Selecciona tipo', 'galpon' => 'Galpón / nave industrial', 'bodega' => 'Bodega',
     'casa' => 'Casa', 'apartamento' => 'Apartamento', 'local' => 'Local comercial', 'oficina' => 'Oficina',
     'deposito' => 'Depósito / cuarto útil', 'mezanine' => 'Mezanine', 'cubierta' => 'Cubierta / techo',
@@ -96,6 +96,10 @@ $componentRows = static function (array $unit) use ($typologyLookup, $componentS
         'suggestion' => $suggestFromTypology($key, $text),
         'materials' => $materialOptions[$key] ?? ['Según tipología IGAC', 'Bueno / convencional', 'Sencillo', 'Especial', 'No aplica'],
     ], $keys);
+};
+$typologyUsefulLife = static function (array $unit) use ($typologyLookup): string {
+    $value = (string) ($typologyLookup[(string) ($unit['igac_category'] ?? '')][(string) ($unit['igac_typology_hint'] ?? '')]['useful_life'] ?? '');
+    return preg_replace('/[^0-9]/', '', $value) ?: $value;
 };
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"

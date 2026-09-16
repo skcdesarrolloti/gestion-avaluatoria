@@ -152,7 +152,7 @@ final class AppraisalChapterZeroInput
                 'construction_specifics_json' => self::jsonMap($unit['specifics'] ?? []),
                 'construction_general_aspects' => self::shortText($unit['construction_general_aspects'] ?? ''),
                 'construction_report_text' => mb_substr(trim((string) ($unit['construction_report_text'] ?? '')), 0, 1500),
-            ];
+            ] + AppraisalConstructionInput::lifeData($unit);
         }
         return $rows;
     }
