@@ -37,6 +37,16 @@ final class AppraisalSpecialAttributeCatalog
                 'exclusividad' => ['Exclusividad / prestigio', 'Reconocimiento o posicionamiento diferencial del sector o activo.',
                     ['' => 'No verificado', 'baja' => 'Baja', 'media' => 'Media', 'alta' => 'Alta', 'muy_alta' => 'Muy alta']],
             ]],
+            'ph' => ['Amenidades del conjunto PH', [
+                'ph_amenidades' => ['Amenidades del conjunto', 'Zonas comunes que pueden incidir en el atractivo de mercado.',
+                    ['' => 'No verificado', 'sin_amenidades' => 'Sin amenidades', 'basicas' => 'Básicas', 'varias' => 'Varias', 'premium' => 'Premium']],
+                'ph_zonas_comunes' => ['Zonas comunes relevantes', 'Piscina, gimnasio, salón social, juegos, parqueaderos de visitantes u otras áreas.',
+                    ['' => 'No verificado', 'ninguna' => 'Ninguna relevante', 'limitadas' => 'Limitadas', 'completas' => 'Completas', 'superiores' => 'Superiores']],
+                'ph_seguridad' => ['Seguridad del conjunto', 'Portería, control de acceso, vigilancia, cámaras o cerramiento.',
+                    ['' => 'No verificado', 'basica' => 'Básica', 'controlada' => 'Controlada', 'alta' => 'Alta']],
+                'ph_operacion' => ['Operación y mantenimiento', 'Calidad observable de administración, conservación y funcionamiento de áreas comunes.',
+                    ['' => 'No verificado', 'deficiente' => 'Deficiente', 'regular' => 'Regular', 'buena' => 'Buena', 'superior' => 'Superior']],
+            ]],
             'constructivos' => ['Rasgos constructivos diferenciales', [
                 'uso_especifico' => ['Uso específico', 'Uso observado de la unidad cuando no basta la categoría general.',
                     ['' => 'No verificado', 'residencial' => 'Residencial', 'comercial' => 'Comercial', 'industrial' => 'Industrial', 'servicios' => 'Servicios', 'mixto' => 'Mixto']],

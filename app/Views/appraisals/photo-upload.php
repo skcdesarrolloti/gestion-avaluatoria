@@ -4,17 +4,20 @@ $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/expedi
 $photoUnitId = $photoUploadUnitId ?? '';
 $photoUnitLabel = $photoUploadUnitLabel ?? '';
 $photoUnitTypology = $photoUploadTypology ?? '';
+$photoEyebrow = $photoUploadEyebrow ?? 'Evidencia posterior a la tipología';
+$photoTitle = $photoUploadTitle ?? 'Fotos para comprobar la unidad';
+$photoDescription = $photoUploadDescription ?? 'Sube las fotos después de escoger la tipología probable. La imagen real permite confirmar o ajustar la clasificación constructiva antes de usarla en reposición o descripción.';
+$photoReturnTo = $photoUploadReturnTo ?? $subjectActionBase;
 $visiblePhotos = $photoUnitId === '' ? $photos : array_values(array_filter($photos,
     static fn (array $photo): bool => (string) ($photo['unit_id'] ?? '') === $photoUnitId));
 ?>
     <<?= $embedded ? 'div' : 'section' ?> class="<?= $embedded ? 'mt-8 rounded-xl border border-slate-200 bg-slate-50 p-5' : 'rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8' ?>">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
-                <p class="eyebrow">Evidencia posterior a la tipología</p>
-                <h2 class="mt-2 text-2xl font-semibold">Fotos para comprobar la unidad</h2>
+                <p class="eyebrow"><?= e($photoEyebrow) ?></p>
+                <h2 class="mt-2 text-2xl font-semibold"><?= e($photoTitle) ?></h2>
                 <p class="mt-2 text-sm leading-6 text-slate-600">
-                    Sube las fotos después de escoger la tipología probable. La imagen real permite confirmar
-                    o ajustar la clasificación constructiva antes de usarla en reposición o descripción.
+                    <?= e($photoDescription) ?>
                 </p>
                 <?php if ($photoUnitLabel): ?>
                     <p class="mt-2 text-xs font-semibold text-teal-800">
@@ -31,13 +34,20 @@ $visiblePhotos = $photoUnitId === '' ? $photos : array_values(array_filter($phot
         <?php endif; ?>
         <form class="mt-6 grid gap-4 lg:grid-cols-[1fr_auto]" method="post" enctype="multipart/form-data"
             action="<?= e(url($subjectActionBase . '/fotos')) ?>"
-            x-data="{ busy: false, hasFiles: false }" @submit="busy = true">
+            x-data="photoUpload" @submit="busy = true">
             <?= csrf_field() ?>
             <?php if ($photoUnitId): ?><input type="hidden" name="unit_id" value="<?= e($photoUnitId) ?>"><?php endif; ?>
-            <label class="label">Agregar fotos
-                <input class="input" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple
-                    @change="hasFiles = $event.target.files.length > 0">
-            </label>
+            <div class="label">Agregar fotos
+                <div class="mt-2 rounded-xl border border-dashed border-slate-300 bg-white p-4"
+                    tabindex="0" @click="$el.focus()" @paste="paste($event)">
+                    <input class="input mt-0" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple
+                        x-ref="photos" @change="update($event.target)">
+                    <p class="mt-2 text-xs leading-5 text-slate-500">
+                        También puedes copiar una imagen y pegarla aquí con Ctrl+V.
+                    </p>
+                    <p class="mt-1 text-xs font-semibold text-teal-800" x-show="fileNames" x-text="fileNames"></p>
+                </div>
+            </div>
             <div class="flex items-end">
                 <button class="btn-primary min-h-11 w-full lg:w-auto" type="submit" :disabled="busy || !hasFiles"
                     x-text="busy ? 'Subiendo...' : 'Subir fotos'">Subir fotos</button>
@@ -65,7 +75,7 @@ $visiblePhotos = $photoUnitId === '' ? $photos : array_values(array_filter($phot
                             action="<?= e(url('avaluos/' . $record['id'] . '/fotos/' . $photo['id'] . '/eliminar')) ?>"
                             x-data="{ busy: false }" @submit="busy = true">
                             <?= csrf_field() ?>
-                            <input type="hidden" name="return_to" value="<?= e($subjectActionBase) ?>">
+                            <input type="hidden" name="return_to" value="<?= e($photoReturnTo) ?>">
                             <button class="btn-secondary min-h-10 w-full text-sm" type="submit" :disabled="busy"
                                 x-text="busy ? 'Quitando...' : 'Quitar foto'">Quitar foto</button>
                         </form>

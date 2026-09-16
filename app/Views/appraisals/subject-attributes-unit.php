@@ -10,8 +10,15 @@
         Selecciona solo atributos que realmente diferencian al sujeto. Si un atributo no aplica, déjalo sin diligenciar.
         Esta lectura servirá luego para orientar la búsqueda y homologación de comparables en el numeral 3.
     </div>
+    <?php if (($record['regimen_ph'] ?? '') === 'si'): ?>
+        <div class="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm leading-6 text-emerald-950">
+            Como el encargo está marcado en PH, registra también las amenidades del conjunto y usa evidencia fotográfica
+            cuando el atributo sea relevante.
+        </div>
+    <?php endif; ?>
     <div class="mt-5 space-y-5">
         <?php foreach ($specialAttributeCatalog as $groupKey => [$groupLabel, $attributes]): ?>
+            <?php if ($groupKey === 'ph' && ($record['regimen_ph'] ?? '') !== 'si') continue; ?>
             <div class="overflow-x-auto rounded-xl border border-slate-200">
                 <div class="bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800"><?= e($groupLabel) ?></div>
                 <table class="min-w-full text-left text-sm">

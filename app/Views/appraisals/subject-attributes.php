@@ -49,4 +49,21 @@ $attrValue = static function (array $unit, string $key, string $field): string {
             </div>
         <?php endif; ?>
     </form>
+    <?php foreach ($attributeUnits as $unit): ?>
+        <div x-show="activeAttributes === '<?= e($unit['id']) ?>'">
+            <?php
+            $photoUploadEmbedded = true;
+            $photoUploadUnitId = (string) $unit['id'];
+            $photoUploadUnitLabel = $unit['label'] ?: $attributeUnitLabel($unit);
+            $photoUploadTypology = (string) $unit['igac_typology_hint'];
+            $photoUploadEyebrow = 'Evidencia de atributos';
+            $photoUploadTitle = 'Fotos de amenidades y diferenciales';
+            $photoUploadDescription = 'Pega o sube imágenes que soporten amenidades PH, seguridad, ubicación especial u otros atributos diferenciales de esta unidad.';
+            $photoUploadReturnTo = $subjectActionBase . '#atributos';
+            require BASE_PATH . '/app/Views/appraisals/photo-upload.php';
+            unset($photoUploadEmbedded, $photoUploadUnitId, $photoUploadUnitLabel, $photoUploadTypology,
+                $photoUploadEyebrow, $photoUploadTitle, $photoUploadDescription, $photoUploadReturnTo);
+            ?>
+        </div>
+    <?php endforeach; ?>
 </section>

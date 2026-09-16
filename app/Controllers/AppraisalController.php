@@ -186,7 +186,8 @@ final class AppraisalController
     private function safePhotoReturn(string $id): string
     {
         $target = (string) ($_POST['return_to'] ?? '');
-        return in_array($target, ['avaluos/' . $id . '/expediente', 'avaluos/' . $id . '/bien-sujeto'], true)
+        return in_array($target, ['avaluos/' . $id . '/expediente', 'avaluos/' . $id . '/bien-sujeto',
+            'avaluos/' . $id . '/bien-sujeto#atributos'], true)
             ? $target
             : 'avaluos/' . $id . '/expediente';
     }
