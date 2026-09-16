@@ -6,6 +6,7 @@ use App\Core\Session;
 use App\Database\Schema;
 use App\Core\Http;
 use App\Services\AppraisalValidator;
+use App\Services\AppraisalChapterZeroInput;
 use App\Services\AuthDiagnostics;
 use App\Services\AuthService;
 use App\Services\IfrsStandardFileImportService;
@@ -246,6 +247,15 @@ try {
     expect(count($igac->byCategory('RESIDENCIALES')) === 23, 'tipologias IGAC agrupadas por categoria');
     expect(count($igac->optionsByCategory()['ANEXOS']) === 136, 'selector IGAC filtra tipologias por categoria');
     expect(($igac->optionsByCategory()['RESIDENCIALES'][0]['image'] ?? '') !== '', 'selector IGAC incluye imagen de referencia');
+    $unitId = str_repeat('b', 32);
+    $_POST = ['unit_surfaces' => [$unitId => ['area_land_m2' => '123,45',
+        'area_built_m2' => '85', 'surface_source' => 'visita']]];
+    $surfaceRows = AppraisalChapterZeroInput::unitSurfaceData();
+    expect($surfaceRows[0]['area_land_m2'] === '123.45'
+        && $surfaceRows[0]['area_built_m2'] === '85.00', 'superficies por unidad normalizadas');
+    $_POST = ['unit_surfaces' => [$unitId => ['area_land_m2' => '-1']]];
+    expectStatus(422, fn () => AppraisalChapterZeroInput::unitSurfaceData(), 'superficie negativa rechazada');
+    $_POST = [];
     $normsDir = sys_get_temp_dir() . '/ga_normas_' . bin2hex(random_bytes(4));
     putenv('NTS_STORAGE_DIR=' . $normsDir);
     expect(ValuationStandardRepository::storageDir() === str_replace('\\', '/', $normsDir), 'carpeta privada de normas configurable');

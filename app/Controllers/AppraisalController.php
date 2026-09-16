@@ -96,6 +96,18 @@ final class AppraisalController
 
     public function saveSubjectUnits(string $id): never { $this->saveUnitsAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }
 
+    public function saveSubjectSurfaces(string $id): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        try {
+            $this->appraisals->saveUnitSurfaces($id, $this->user['id'], AppraisalChapterZeroInput::unitSurfaceData());
+            Session::flash('subject_message', 'Datos de superficie guardados correctamente.');
+        } catch (\Throwable $error) {
+            Session::flash('subject_error', $error->getMessage());
+        }
+        Http::redirect('avaluos/' . $id . '/bien-sujeto');
+    }
+
     private function saveUnitsAndRedirect(string $id, string $target): never
     {
         $this->appraisals->find($id, $this->user['id']);

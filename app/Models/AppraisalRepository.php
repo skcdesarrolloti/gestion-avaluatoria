@@ -131,6 +131,20 @@ final class AppraisalRepository
         }
     }
 
+    public function saveUnitSurfaces(string $id, int $owner, array $units): void
+    {
+        $now = gmdate('Y-m-d H:i:s');
+        $query = $this->db->prepare('UPDATE appraisal_units SET area_land_m2 = ?, area_built_m2 = ?,
+            area_private_m2 = ?, area_common_m2 = ?, front_length_m = ?, depth_length_m = ?,
+            surface_source = ?, surface_notes = ?, updated_at = ?
+            WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
+        foreach ($units as $unit) {
+            $query->execute([$unit['area_land_m2'], $unit['area_built_m2'], $unit['area_private_m2'],
+                $unit['area_common_m2'], $unit['front_length_m'], $unit['depth_length_m'],
+                $unit['surface_source'], $unit['surface_notes'], $now, $unit['id'], $id, $owner]);
+        }
+    }
+
     public function ensureUnits(string $id, int $owner, int $propertyCount, int $annexCount): void
     {
         for ($i = 1; $i <= $propertyCount; $i++) $this->ensureUnit($id, $owner, 'property', $i, 'Unidad ' . $i);

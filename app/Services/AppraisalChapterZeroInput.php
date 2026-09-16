@@ -62,6 +62,28 @@ final class AppraisalChapterZeroInput
         return $rows;
     }
 
+    public static function unitSurfaceData(): array
+    {
+        $posted = $_POST['unit_surfaces'] ?? [];
+        if (!is_array($posted)) throw new HttpException(422, 'No se recibieron superficies válidas.');
+        $rows = [];
+        foreach ($posted as $id => $unit) {
+            if (!is_string($id) || !preg_match('/^[a-f0-9]{32}$/', $id) || !is_array($unit)) continue;
+            $rows[] = [
+                'id' => $id,
+                'area_land_m2' => self::decimalOrNull($unit['area_land_m2'] ?? null),
+                'area_built_m2' => self::decimalOrNull($unit['area_built_m2'] ?? null),
+                'area_private_m2' => self::decimalOrNull($unit['area_private_m2'] ?? null),
+                'area_common_m2' => self::decimalOrNull($unit['area_common_m2'] ?? null),
+                'front_length_m' => self::decimalOrNull($unit['front_length_m'] ?? null),
+                'depth_length_m' => self::decimalOrNull($unit['depth_length_m'] ?? null),
+                'surface_source' => mb_substr(trim((string) ($unit['surface_source'] ?? '')), 0, 120),
+                'surface_notes' => mb_substr(trim((string) ($unit['surface_notes'] ?? '')), 0, 1000),
+            ];
+        }
+        return $rows;
+    }
+
     private static function assertIgacCategory(string $category, array $codes, string $message = 'Selecciona una categoría IGAC válida.'): void
     {
         if ($category !== '' && !in_array($category, $codes, true)) throw new HttpException(422, $message);
@@ -83,5 +105,15 @@ final class AppraisalChapterZeroInput
             throw new HttpException(422, 'Los conteos de unidades deben estar entre 0 y 50.');
         }
         return $value;
+    }
+
+    private static function decimalOrNull(mixed $value): ?string
+    {
+        $normalized = str_replace(',', '.', trim((string) $value));
+        if ($normalized === '') return null;
+        if (!preg_match('/^\d{1,9}(\.\d{1,2})?$/', $normalized)) {
+            throw new HttpException(422, 'Las superficies y medidas deben ser números positivos con máximo dos decimales.');
+        }
+        return number_format((float) $normalized, 2, '.', '');
     }
 }

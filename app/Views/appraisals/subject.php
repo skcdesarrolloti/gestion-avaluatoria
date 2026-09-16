@@ -21,4 +21,5 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
 
 <div class="mt-7 space-y-7">
     <?php require BASE_PATH . '/app/Views/appraisals/subject-basic.php'; ?>
+    <?php require BASE_PATH . '/app/Views/appraisals/subject-surface.php'; ?>
 </div>
