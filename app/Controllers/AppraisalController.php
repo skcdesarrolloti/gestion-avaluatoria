@@ -192,10 +192,11 @@ final class AppraisalController
     private function safePhotoReturn(string $id): string
     {
         $target = (string) ($_POST['return_to'] ?? '');
-        return in_array($target, ['avaluos/' . $id . '/expediente', 'avaluos/' . $id . '/bien-sujeto',
-            'avaluos/' . $id . '/bien-sujeto#atributos', 'avaluos/' . $id . '/bien-sujeto#fotos'], true)
+        $subject = 'avaluos/' . $id . '/bien-sujeto';
+        return in_array($target, ['avaluos/' . $id . '/expediente', $subject, $subject . '#atributos', $subject . '#fotos'], true)
+            || preg_match('#^' . preg_quote($subject, '#') . '#fotos(?:-general|-[a-f0-9]{32})$#', $target)
             ? $target
-            : 'avaluos/' . $id . '/bien-sujeto#fotos';
+            : $subject . '#fotos';
     }
 
     public function edit(string $id): void
@@ -214,6 +215,5 @@ final class AppraisalController
     }
 
     private function appraiserIds(): array { return array_column($this->appraisers->all(), 'id'); }
-
     private function igacCodes(): array { return array_column($this->typologies->categories(), 'code'); }
 }

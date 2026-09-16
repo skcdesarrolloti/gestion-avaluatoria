@@ -19,7 +19,7 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
 </div>
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
-<div class="mt-7" x-data="{ activeSubject: location.hash === '#superficies' ? 'surface' : (location.hash === '#construccion' ? 'construction' : (location.hash === '#atributos' ? 'attributes' : (location.hash === '#fotos' ? 'photos' : 'basic'))) }">
+<div class="mt-7" x-data="{ activeSubject: location.hash === '#superficies' ? 'surface' : (location.hash === '#construccion' ? 'construction' : (location.hash === '#atributos' ? 'attributes' : (location.hash.startsWith('#fotos') ? 'photos' : 'basic'))) }">
     <div class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
         <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
             <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
