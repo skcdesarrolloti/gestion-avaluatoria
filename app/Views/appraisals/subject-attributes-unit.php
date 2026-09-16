@@ -1,5 +1,10 @@
-<?php $unitId = (string) $unit['id']; ?>
-<div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="activeAttributes === '<?= e($unitId) ?>'">
+<?php
+$unitId = (string) $unit['id'];
+$firstAttributeGroup = (string) array_key_first($specialAttributeCatalog);
+?>
+<div class="mt-5 rounded-xl border border-slate-200 p-5"
+    x-data="{ activeAttributeGroup: '<?= e($firstAttributeGroup) ?>' }"
+    x-show="activeAttributes === '<?= e($unitId) ?>'">
     <div class="flex flex-wrap items-center justify-between gap-3">
         <h3 class="text-base font-semibold"><?= e($unit['label'] ?: $attributeUnitLabel($unit)) ?></h3>
         <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
@@ -15,9 +20,25 @@
         Como el encargo está marcado en PH, registra también las amenidades del conjunto y usa evidencia fotográfica
         cuando el atributo sea relevante.
     </div>
-    <div class="mt-5 space-y-5">
+    <div class="mt-5 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
+        <?php $attributeGroupNumber = 1; ?>
         <?php foreach ($specialAttributeCatalog as $groupKey => [$groupLabel, $attributes]): ?>
-            <div class="overflow-x-auto rounded-xl border border-slate-200" <?= $groupKey === 'ph' ? 'x-show="showPh"' : '' ?>>
+            <button class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold" type="button"
+                <?= $groupKey === 'ph' ? 'x-show="showPh"' : '' ?>
+                @click="activeAttributeGroup = '<?= e($groupKey) ?>'"
+                :class="activeAttributeGroup === '<?= e($groupKey) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'">
+                <span class="mr-1 inline-flex size-6 items-center justify-center rounded-full bg-blue-700 text-xs text-white">
+                    <?= $attributeGroupNumber ?>
+                </span>
+                <?= e($groupLabel) ?>
+            </button>
+            <?php $attributeGroupNumber++; ?>
+        <?php endforeach; ?>
+    </div>
+    <div class="mt-5">
+        <?php foreach ($specialAttributeCatalog as $groupKey => [$groupLabel, $attributes]): ?>
+            <div class="overflow-x-auto rounded-xl border border-slate-200"
+                x-show="activeAttributeGroup === '<?= e($groupKey) ?>'<?= $groupKey === 'ph' ? ' && showPh' : '' ?>">
                 <div class="bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800"><?= e($groupLabel) ?></div>
                 <table class="min-w-full text-left text-sm">
                     <thead class="bg-blue-900 text-xs uppercase tracking-wide text-white">
