@@ -34,6 +34,7 @@ return [
     ['GET', '#^/avaluos/([a-f0-9]{32})/capitulo-0$#', 'appraisals', 'chapterZero', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/capitulo-0$#', 'appraisals', 'saveChapterZero', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/bien-sujeto$#', 'appraisals', 'subject', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ficha-basica$#', 'appraisals', 'saveSubjectBasic', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/preclasificacion$#', 'appraisals', 'saveSubjectPreclassification', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/unidades$#', 'appraisals', 'saveSubjectUnits', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/fotos$#', 'appraisals', 'uploadSubjectPhotos', true],

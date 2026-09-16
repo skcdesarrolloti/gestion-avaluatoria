@@ -5,12 +5,15 @@ use App\Core\Http;
 use App\Core\HttpException;
 use App\Core\Session;
 use App\Models\AppraisalRepository;
+use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraiserRepository;
+use App\Models\GeoMasterRepository;
 use App\Models\IgacTypologyRepository;
 use App\Services\AppraisalChapterZeroInput;
-use App\Services\AppraisalPhotoStorage;
+use App\Services\AppraisalPhotoUploadService;
 use App\Services\AppraisalValidator;
 use App\Support\AppraisalCatalog;
+use App\Support\AppraisalSubjectCatalog;
 
 final class AppraisalController
 {
@@ -19,6 +22,8 @@ final class AppraisalController
         private array $user,
         private AppraiserRepository $appraisers,
         private IgacTypologyRepository $typologies,
+        private AppraisalSubjectRepository $subjects,
+        private GeoMasterRepository $geo,
     ) {}
 
     public function index(): void
@@ -50,15 +55,33 @@ final class AppraisalController
         $this->appraisals->ensureUnits($id, $this->user['id'],
             (int) ($record['igac_property_units_count'] ?? 0), (int) ($record['igac_annex_units_count'] ?? 0));
         view('appraisals/subject', ['title' => 'Bien sujeto', 'record' => $record,
+            'subject' => $this->subjects->find($id, $this->user['id']),
+            'geo' => ['departments' => $this->geo->departments(), 'cities' => $this->geo->cities(),
+                'neighborhoods' => $this->geo->neighborhoods()],
             'photos' => $this->appraisals->photos($id, $this->user['id']),
             'units' => $this->appraisals->units($id, $this->user['id']),
             'igacCategories' => $this->typologies->categories(),
             'igacTypologiesByCategory' => $this->typologies->optionsByCategory(),
+            'subjectCatalog' => AppraisalSubjectCatalog::selects(),
+            'subjectMessage' => Session::pullFlash('subject_message'),
+            'subjectError' => Session::pullFlash('subject_error'),
             'photoMessage' => Session::pullFlash('chapter_zero_photo_message'),
             'photoError' => Session::pullFlash('chapter_zero_photo_error'),
             'preclassMessage' => Session::pullFlash('chapter_zero_preclass_message'),
             'preclassError' => Session::pullFlash('chapter_zero_preclass_error'),
             'catalog' => ['selects' => AppraisalCatalog::selectFields(), 'notes' => AppraisalCatalog::notes()]]);
+    }
+
+    public function saveSubjectBasic(string $id): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        try {
+            $this->subjects->save($id, $this->user['id'], $_POST);
+            Session::flash('subject_message', 'Ficha básica del sujeto guardada correctamente.');
+        } catch (\Throwable $error) {
+            Session::flash('subject_error', $error->getMessage());
+        }
+        Http::redirect('avaluos/' . $id . '/bien-sujeto');
     }
 
     public function saveChapterZero(string $id): never
@@ -106,7 +129,8 @@ final class AppraisalController
     {
         $record = $this->appraisals->find($id, $this->user['id']);
         try {
-            $count = $this->storePhotos($record['id']);
+            $count = (new AppraisalPhotoUploadService())->store($_FILES['photos'] ?? [], $record['id'],
+                $this->user['id'], $this->appraisals);
             Session::flash('chapter_zero_photo_message', $count === 1
                 ? 'Foto cargada correctamente.'
                 : $count . ' fotos cargadas correctamente.');
@@ -167,34 +191,6 @@ final class AppraisalController
         $data = AppraisalValidator::validate($input);
         $result = $this->appraisals->save($id, $this->user['id'], $input['version'], $data);
         Http::json(['ok' => true] + $result);
-    }
-
-    private function storePhotos(string $id): int
-    {
-        $files = $_FILES['photos'] ?? null;
-        if (!is_array($files) || !is_array($files['name'] ?? null)) {
-            throw new \InvalidArgumentException('Selecciona al menos una foto.');
-        }
-        $stored = 0;
-        foreach (array_keys($files['name']) as $index) {
-            $error = (int) ($files['error'][$index] ?? UPLOAD_ERR_NO_FILE);
-            if ($error === UPLOAD_ERR_NO_FILE) continue;
-            if ($error !== UPLOAD_ERR_OK) throw new \RuntimeException('No se pudo recibir una de las fotos.');
-            $photoId = bin2hex(random_bytes(16));
-            $source = basename(str_replace('\\', '/', (string) $files['name'][$index]));
-            $info = AppraisalPhotoStorage::inspect((string) $files['tmp_name'][$index], $source);
-            $storage = 'foto-' . $id . '-' . $photoId . '.' . $info['extension'];
-            $bytes = AppraisalPhotoStorage::storeUploaded((string) $files['tmp_name'][$index],
-                AppraisalPhotoStorage::path($storage));
-            $blob = file_get_contents(AppraisalPhotoStorage::path($storage));
-            if (!is_string($blob)) throw new \RuntimeException('La foto no pudo quedar respaldada.');
-            $this->appraisals->addPhoto($id, $this->user['id'], ['id' => $photoId,
-                'source_filename' => $source, 'storage_filename' => $storage,
-                'mime_type' => $info['mime'], 'file_size_bytes' => $bytes, 'caption' => '', 'file_blob' => $blob]);
-            $stored++;
-        }
-        if ($stored === 0) throw new \InvalidArgumentException('Selecciona al menos una foto.');
-        return $stored;
     }
 
     private function appraiserIds(): array

@@ -13,6 +13,7 @@ use App\Services\InternationalStandardFileImportService;
 use App\Services\LegalDocumentFileImportService;
 use App\Services\LegalDocumentImportService;
 use App\Services\RateLimiter;
+use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraiserRepository;
 use App\Models\FuncionarioRepository;
 use App\Models\GeoMasterRepository;
@@ -94,6 +95,19 @@ try {
     $db->exec("CREATE TABLE master_neighborhoods (id TEXT PRIMARY KEY, city_id TEXT, locality_id TEXT, name TEXT,
         commune_ucg TEXT, zone_sector TEXT, active TEXT, notes TEXT, created_at TEXT, updated_at TEXT,
         UNIQUE(city_id, name))");
+    $db->exec("CREATE TABLE appraisal_subjects (appraisal_id TEXT PRIMARY KEY, owner_id INTEGER,
+        department_id TEXT, department_name TEXT, city_id TEXT, city_name TEXT, neighborhood_id TEXT,
+        neighborhood_name TEXT, locality_name TEXT, commune_ucg TEXT, zone_sector TEXT,
+        point_reference TEXT, address TEXT, alternate_nomenclature TEXT, horizontal_property TEXT,
+        centrality TEXT, immediate_environment TEXT, stratum TEXT, property_registry TEXT,
+        cadastral_reference TEXT, registry_office TEXT, urban_license TEXT, permitted_use TEXT,
+        urban_treatment TEXT, restrictions TEXT, legal_urban_affectations TEXT, road_condition TEXT,
+        access_facility TEXT, transport_connectivity TEXT, loading_unloading TEXT, current_use TEXT,
+        main_potential_use TEXT, complementary_potential_uses TEXT, main_complementary_activity TEXT,
+        secondary_complementary_activities TEXT, current_occupation TEXT, water_service TEXT,
+        energy_service TEXT, gas_service TEXT, sewer_service TEXT, internet_service TEXT,
+        service_continuity TEXT, subject_reference_date TEXT, latitude TEXT, longitude TEXT,
+        notes TEXT, updated_at TEXT)");
     $db->exec("INSERT INTO valuation_legal_categories VALUES
         ('A', 'Marco jurídico general', 'general', 0, '2026-09-15 00:00:00', '2026-09-15 00:00:00'),
         ('1', 'Inmuebles urbanos', 'category', 11, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
@@ -140,6 +154,13 @@ try {
     $neighborhood = $geo->neighborhoods()[0];
     expect($neighborhood['locality_name'] === 'Zona urbana'
         && $neighborhood['commune_ucg'] === 'Comuna 14', 'maestro barrio trae localidad y comuna');
+    $subjectRepo = new AppraisalSubjectRepository($db);
+    $subjectRepo->save(str_repeat('a', 32), 1, ['neighborhood_id' => $neighborhood['id'],
+        'point_reference' => 'Zona residencial consolidada', 'horizontal_property' => 'no',
+        'centrality' => 'alta', 'current_use' => 'Residencial']);
+    $subject = $subjectRepo->find(str_repeat('a', 32), 1);
+    expect($subject['neighborhood_name'] === 'El Poblado' && $subject['locality_name'] === 'Zona urbana'
+        && $subject['commune_ucg'] === 'Comuna 14', 'ficha sujeto deriva ubicacion desde barrio');
     $seedB1 = require dirname(__DIR__) . '/database/migrations/202609150007_seed_b1_urban_legal_bibliography.php';
     $seedB1(new Schema($db));
     $standards = (new ValuationStandardRepository($db))->categoriesWithStandards();

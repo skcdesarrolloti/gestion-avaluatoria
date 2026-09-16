@@ -22,9 +22,10 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
 <div class="mt-7 space-y-7" x-data="{
     typologyHint: <?= e(json_encode($field('igac_typology_hint'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
     igacCategory: <?= e(json_encode($field('igac_category'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
-    propertyUnits: <?= e((string) $count('igac_property_units_count')) ?>,
-    annexUnits: <?= e((string) $count('igac_annex_units_count')) ?>
+        propertyUnits: <?= e((string) $count('igac_property_units_count')) ?>,
+        annexUnits: <?= e((string) $count('igac_annex_units_count')) ?>
 }">
+    <?php require BASE_PATH . '/app/Views/appraisals/subject-basic.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/preclassification.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/unit-tabs.php'; ?>
 </div>

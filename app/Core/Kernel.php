@@ -13,6 +13,7 @@ use App\Controllers\StandardController;
 use App\Controllers\ValuationController;
 use App\Database\Migrator;
 use App\Models\AppraisalRepository;
+use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraiserRepository;
 use App\Models\FuncionarioRepository;
 use App\Models\GeoMasterRepository;
@@ -133,7 +134,8 @@ final class Kernel
                 'standards' => new StandardController(new ValuationStandardRepository($db)),
                 'valuations' => new ValuationController(),
                 default => new AppraisalController(new AppraisalRepository($db), $user,
-                    new AppraiserRepository($db), new IgacTypologyRepository()),
+                    new AppraiserRepository($db), new IgacTypologyRepository(),
+                    new AppraisalSubjectRepository($db), new GeoMasterRepository($db)),
             };
             $instance->$action(...array_slice($matches, 1));
             return;
