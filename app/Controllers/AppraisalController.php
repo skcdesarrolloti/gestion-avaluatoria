@@ -46,7 +46,6 @@ final class AppraisalController
             'units' => $this->appraisals->units($id, $this->user['id']),
             'appraisers' => $this->appraisers->all(), 'igacCategories' => $this->typologies->categories(),
             'igacTypologiesByCategory' => $this->typologies->optionsByCategory(),
-            'igacCandidates' => $this->typologies->candidates($record),
             'photoMessage' => Session::pullFlash('chapter_zero_photo_message'),
             'photoError' => Session::pullFlash('chapter_zero_photo_error'),
             'preclassMessage' => Session::pullFlash('chapter_zero_preclass_message'),

@@ -30,8 +30,6 @@ $initial = ['notes' => $notes];
 
     <?php require BASE_PATH . '/app/Views/appraisals/unit-tabs.php'; ?>
 
-    <?php require BASE_PATH . '/app/Views/appraisals/igac-comparison.php'; ?>
-
     <form class="grid gap-7 lg:grid-cols-[1fr_18rem]" method="post"
         action="<?= e(url('avaluos/' . $record['id'] . '/capitulo-0')) ?>"
         x-data="{
