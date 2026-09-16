@@ -4,11 +4,13 @@ export function photoUpload(initialEvidence = '') {
         evidence: initialEvidence,
         hasFiles: false,
         fileNames: '',
+        fileCountLabel: '',
         previews: [],
         update(input) {
             const files = Array.from(input.files || []);
             this.hasFiles = files.length > 0;
             this.fileNames = files.map(file => file.name).join(', ');
+            this.fileCountLabel = files.length === 0 ? '' : (files.length === 1 ? '1 foto lista' : `${files.length} fotos listas`);
             this.previews.forEach(preview => URL.revokeObjectURL(preview.url));
             this.previews = files.map(file => ({ name: file.name, url: URL.createObjectURL(file) }));
         },

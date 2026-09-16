@@ -40,7 +40,16 @@ $firstAttributeGroup = (string) array_key_first($specialAttributeCatalog);
             <div class="overflow-x-auto rounded-xl border border-slate-200"
                 x-show="activeAttributeGroup === '<?= e($groupKey) ?>'<?= $groupKey === 'ph' ? ' && showPh' : '' ?>">
                 <div class="bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800"><?= e($groupLabel) ?></div>
-                <table class="min-w-full text-left text-sm">
+                <table class="table-fixed text-left text-sm" style="min-width: 104rem;">
+                    <colgroup>
+                        <col style="width: 17rem;">
+                        <col style="width: 13rem;">
+                        <col style="width: 12rem;">
+                        <col style="width: 12rem;">
+                        <col style="width: 12rem;">
+                        <col style="width: 22rem;">
+                        <col style="width: 16rem;">
+                    </colgroup>
                     <thead class="bg-blue-900 text-xs uppercase tracking-wide text-white">
                         <tr>
                             <th class="px-3 py-3">Atributo</th>
@@ -77,25 +86,26 @@ $firstAttributeGroup = (string) array_key_first($specialAttributeCatalog);
                                     </td>
                                 <?php endforeach; ?>
                                 <td class="px-3 py-3 align-top">
-                                    <textarea class="input min-w-64" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][notes]"
+                                    <textarea class="input" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][notes]"
                                         rows="3" maxlength="220" placeholder="Criterio escrito del perito."><?= e($attrValue($unit, $key, 'notes')) ?></textarea>
                                 </td>
                                 <td class="px-3 py-3 align-top">
                                     <div class="rounded-lg border border-dashed border-slate-300 bg-white p-2"
                                         x-show="evidence === 'foto'" @paste="paste($event)" tabindex="0">
-                                        <div class="flex flex-wrap items-center gap-2">
-                                            <label class="btn-secondary min-h-10 text-xs">Elegir archivo
+                                        <div class="grid gap-2">
+                                            <label class="btn-secondary min-h-10 w-full text-xs">Elegir archivo
                                                 <input class="sr-only" type="file" name="attribute_photos[<?= e($unitId) ?>][<?= e($key) ?>][]"
                                                     accept="image/jpeg,image/png,image/webp" multiple x-ref="photos"
                                                     @change="update($event.target)">
                                             </label>
-                                            <span class="rounded-lg border border-dashed border-slate-300 px-3 py-2 text-xs text-slate-600"
-                                                tabindex="0" @paste="paste($event)">Haz clic aquí y pega con Ctrl+V</span>
+                                            <span class="rounded-lg border border-dashed border-slate-300 px-3 py-2 text-center text-xs text-slate-600"
+                                                tabindex="0" @paste="paste($event)">Pegar Ctrl+V</span>
                                         </div>
-                                        <p class="mt-1 text-xs font-semibold text-teal-800" x-show="fileNames" x-text="fileNames"></p>
-                                        <div class="mt-2 flex flex-wrap gap-2" x-show="previews.length">
+                                        <p class="mt-2 truncate text-xs font-semibold text-teal-800" x-show="fileCountLabel"
+                                            x-text="fileCountLabel" :title="fileNames"></p>
+                                        <div class="mt-2 grid grid-cols-2 gap-2" x-show="previews.length">
                                             <template x-for="preview in previews" :key="preview.url">
-                                                <img class="size-16 rounded-md border border-slate-200 object-contain"
+                                                <img class="aspect-[4/3] w-full rounded-md border border-slate-200 object-contain"
                                                     :src="preview.url" :alt="preview.name">
                                             </template>
                                         </div>
