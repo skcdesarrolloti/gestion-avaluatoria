@@ -101,6 +101,11 @@ $initial = ['notes' => $notes];
                                 <strong>Soporte:</strong>
                                 <span x-text="academy('<?= e($name) ?>', selected)?.basis"></span>
                             </span>
+                            <span class="mt-2 block rounded-lg bg-white/70 p-2"
+                                x-show="academy('<?= e($name) ?>', selected)?.report">
+                                <strong>Justificación para el informe:</strong>
+                                <span x-text="academy('<?= e($name) ?>', selected)?.report"></span>
+                            </span>
                         </span>
                     </label>
                 <?php endforeach; ?>
