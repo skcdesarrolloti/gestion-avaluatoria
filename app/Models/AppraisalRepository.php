@@ -158,7 +158,7 @@ final class AppraisalRepository
             'construction_apparent_age_years', 'construction_useful_life_years',
             'construction_remaining_life_years', 'construction_rentable_units', 'construction_state',
             'construction_progress_percent', 'construction_integrity_percent', 'construction_conservation_json',
-            'construction_general_aspects', 'construction_services_json', 'construction_specifics_json',
+            'construction_general_aspects', 'construction_specifics_json',
             'construction_report_text'];
         $query = $this->unitUpdate($fields);
         foreach ($units as $unit) {

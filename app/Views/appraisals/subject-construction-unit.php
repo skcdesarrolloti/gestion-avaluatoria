@@ -165,17 +165,6 @@ $builtAreaFields = [
             </table>
         </div>
     </div>
-    <div class="mt-5 grid gap-5 md:grid-cols-3" x-show="activeConstructionDetail === 'servicios'">
-        <?php foreach ($serviceOptions as $key => $label): ?>
-            <label class="label"><?= e($label) ?>
-                <select class="input" name="unit_constructions[<?= e($unitId) ?>][services][<?= e($key) ?>]">
-                    <?php foreach (['' => 'No verificado', 'si' => 'Sí', 'no' => 'No', 'parcial' => 'Parcial'] as $value => $text): ?>
-                        <option value="<?= e($value) ?>" <?= $jsonValue($unit, 'construction_services_json', $key) === $value ? 'selected' : '' ?>><?= e($text) ?></option>
-                    <?php endforeach; ?>
-                </select>
-            </label>
-        <?php endforeach; ?>
-    </div>
     <div class="mt-5 grid gap-5 md:grid-cols-2" x-show="activeConstructionDetail === 'especificos'">
         <?php foreach (['uso' => 'Uso específico', 'altura_libre' => 'Altura libre (m)', 'cubierta' => 'Tipo de cubierta', 'estructura' => 'Material estructura'] as $key => $label): ?>
             <label class="label"><?= e($label) ?>

@@ -148,7 +148,6 @@ final class AppraisalChapterZeroInput
                 'construction_progress_percent' => self::percentOrNull($unit['construction_progress_percent'] ?? null),
                 'construction_integrity_percent' => self::percentOrNull($unit['construction_integrity_percent'] ?? null),
                 'construction_conservation_json' => self::jsonMap($unit['conservation'] ?? []),
-                'construction_services_json' => self::jsonMap($unit['services'] ?? []),
                 'construction_specifics_json' => self::jsonMap($unit['specifics'] ?? []),
                 'construction_general_aspects' => self::shortText($unit['construction_general_aspects'] ?? ''),
                 'construction_report_text' => mb_substr(trim((string) ($unit['construction_report_text'] ?? '')), 0, 1500),
