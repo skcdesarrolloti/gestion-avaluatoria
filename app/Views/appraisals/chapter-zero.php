@@ -53,7 +53,7 @@ $reportText = $field('assignment_report_text') !== '' ? $field('assignment_repor
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
 <div class="mt-8 space-y-7">
-    <form class="grid gap-7 lg:grid-cols-[1fr_18rem]" method="post"
+    <form id="expediente-form" class="grid gap-7 lg:grid-cols-[1fr_18rem]" method="post"
         action="<?= e(url('avaluos/' . $record['id'] . '/expediente')) ?>"
         x-data="{
             busy: false, active: 'configuracion',
@@ -199,9 +199,9 @@ $reportText = $field('assignment_report_text') !== '' ? $field('assignment_repor
             <p class="px-2 text-xs leading-5 text-slate-500">
                 El consecutivo técnico se asignará cuando el expediente quede formalmente configurado.
             </p>
-            <a class="btn-secondary w-full" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto')) ?>">
-                Continuar a Bien sujeto
-            </a>
+            <button class="btn-secondary w-full" type="submit" name="next" value="subject">
+                Guardar y continuar a Bien sujeto
+            </button>
         </aside>
     </form>
 </div>

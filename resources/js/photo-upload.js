@@ -1,6 +1,7 @@
-export function photoUpload() {
+export function photoUpload(initialEvidence = '') {
     return {
         busy: false,
+        evidence: initialEvidence,
         hasFiles: false,
         fileNames: '',
         update(input) {

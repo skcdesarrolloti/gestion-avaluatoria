@@ -80,11 +80,10 @@ final class AppraisalController
 
     public function saveChapterZero(string $id): never
     {
-        $record = $this->appraisals->find($id, $this->user['id']);
         $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
             $this->igacCodes(), $this->appraiserIds());
         $this->appraisals->saveChapterZero($id, $this->user['id'], (int) $_POST['version'], $data);
-        Http::redirect('avaluos/' . $record['id'] . '/expediente');
+        Http::redirect('avaluos/' . $id . ((string) ($_POST['next'] ?? '') === 'subject' ? '/bien-sujeto#atributos' : '/expediente'));
     }
 
     public function saveSubjectUnits(string $id): never { $this->saveUnitsAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }

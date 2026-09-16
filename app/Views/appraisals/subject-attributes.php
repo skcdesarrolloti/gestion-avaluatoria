@@ -13,7 +13,7 @@ $photosForAttribute = static function (string $unitId, string $key) use ($photos
 };
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
-    x-data="{ activeAttributes: '<?= e($attributeUnits[0]['id'] ?? '') ?>', busyAttributes: false }">
+    x-data="{ activeAttributes: '<?= e($attributeUnits[0]['id'] ?? '') ?>', busyAttributes: false, showPh: <?= $hasHorizontalProperty ? 'true' : 'false' ?> }">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">2.4 Atributos especiales del sujeto</p>
@@ -22,6 +22,9 @@ $photosForAttribute = static function (string $unitId, string $key) use ($photos
                 Aquí solo se registra qué atributos especiales tiene cada unidad, su evidencia e impacto técnico.
                 Las condiciones de búsqueda y filtros de portales se trabajan después en el numeral 3.
             </p>
+            <button class="btn-secondary mt-4 min-h-10 text-xs" type="button" x-show="!showPh" @click="showPh = true">
+                Mostrar amenidades PH
+            </button>
         </div>
         <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
             <?= count($attributeUnits) ?> unidad(es)

@@ -10,16 +10,14 @@
         Selecciona solo atributos que realmente diferencian al sujeto. Si un atributo no aplica, déjalo sin diligenciar.
         Esta lectura servirá luego para orientar la búsqueda y homologación de comparables en el numeral 3.
     </div>
-    <?php if ($hasHorizontalProperty): ?>
-        <div class="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm leading-6 text-emerald-950">
-            Como el encargo está marcado en PH, registra también las amenidades del conjunto y usa evidencia fotográfica
-            cuando el atributo sea relevante.
-        </div>
-    <?php endif; ?>
+    <div class="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm leading-6 text-emerald-950"
+        x-show="showPh">
+        Como el encargo está marcado en PH, registra también las amenidades del conjunto y usa evidencia fotográfica
+        cuando el atributo sea relevante.
+    </div>
     <div class="mt-5 space-y-5">
         <?php foreach ($specialAttributeCatalog as $groupKey => [$groupLabel, $attributes]): ?>
-            <?php if ($groupKey === 'ph' && !$hasHorizontalProperty) continue; ?>
-            <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <div class="overflow-x-auto rounded-xl border border-slate-200" <?= $groupKey === 'ph' ? 'x-show="showPh"' : '' ?>>
                 <div class="bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800"><?= e($groupLabel) ?></div>
                 <table class="min-w-full text-left text-sm">
                     <thead class="bg-blue-900 text-xs uppercase tracking-wide text-white">
@@ -34,7 +32,7 @@
                     </thead>
                     <tbody class="divide-y divide-slate-200">
                         <?php foreach ($attributes as $key => [$label, $help, $options]): ?>
-                            <tr x-data="{ evidence: '<?= e($attrValue($unit, $key, 'evidence')) ?>' }">
+                            <tr x-data="photoUpload('<?= e($attrValue($unit, $key, 'evidence')) ?>')">
                                 <td class="px-3 py-3 align-top">
                                     <strong class="block text-slate-950"><?= e($label) ?></strong>
                                     <span class="mt-1 block max-w-xs text-xs leading-5 text-slate-500"><?= e($help) ?></span>
@@ -57,18 +55,19 @@
                                     </td>
                                 <?php endforeach; ?>
                                 <td class="px-3 py-3 align-top">
-                                    <input class="input min-w-64" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][notes]"
-                                        value="<?= e($attrValue($unit, $key, 'notes')) ?>" placeholder="Soporte o criterio del perito">
+                                    <textarea class="input min-w-64" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][notes]"
+                                        rows="2" maxlength="220" placeholder="Soporte o criterio del perito"
+                                        @paste="paste($event); if (hasFiles) evidence = 'foto'"><?= e($attrValue($unit, $key, 'notes')) ?></textarea>
                                     <div class="mt-2 rounded-lg border border-dashed border-slate-300 bg-white p-2"
                                         x-show="evidence === 'foto'"
-                                        x-data="photoUpload" @paste="paste($event)" tabindex="0">
+                                        @paste="paste($event)" tabindex="0">
                                         <div class="flex flex-wrap items-center gap-2">
                                             <label class="btn-secondary min-h-10 text-xs">Adjuntar foto
                                                 <input class="sr-only" type="file" name="attribute_photos[<?= e($unitId) ?>][<?= e($key) ?>][]"
                                                     accept="image/jpeg,image/png,image/webp" multiple x-ref="photos"
                                                     @change="update($event.target)">
                                             </label>
-                                            <span class="text-xs text-slate-500">o pega aquí con Ctrl+V</span>
+                                            <span class="text-xs text-slate-500">o pega la imagen aquí o en la observación</span>
                                         </div>
                                         <p class="mt-1 text-xs font-semibold text-teal-800" x-show="fileNames" x-text="fileNames"></p>
                                     </div>
