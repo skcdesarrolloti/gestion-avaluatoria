@@ -53,6 +53,12 @@ $locationLine = trim(implode(' · ', array_filter([
             Puedes ajustar la lectura sectorial sin modificar la ficha básica del inmueble.
         </div>
     <?php endif; ?>
+    <?php if (!empty($sectorPrefilled)): ?>
+        <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-900">
+            <strong>Precarga automática:</strong> estos datos vienen de Bien sujeto y del maestro geográfico.
+            Revísalos, completa lo que falte y guarda el numeral 2 para dejarlo fijado en el expediente.
+        </div>
+    <?php endif; ?>
 
     <nav class="mt-6 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Subsecciones de sector">
         <?php foreach ($sectorSections as $key => [$number, $label]): ?>

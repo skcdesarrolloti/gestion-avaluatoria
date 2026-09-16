@@ -9,6 +9,7 @@ use App\Services\AppraisalValidator;
 use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalSectorInput;
+use App\Services\AppraisalSectorPrefill;
 use App\Services\AuthDiagnostics;
 use App\Services\AuthService;
 use App\Services\IfrsStandardFileImportService;
@@ -285,6 +286,16 @@ try {
         && $sectorData['services_status'] === 'completa'
         && $sectorData['connectivity'] === ''
         && mb_strlen($sectorData['sector_report_text']) === 2400, 'sector normalizado');
+    $prefill = AppraisalSectorPrefill::fromSubject(['neighborhood_name' => 'Bruselas',
+        'locality_name' => 'Histórica', 'commune_ucg' => 'UCG 1', 'city_name' => 'Cartagena',
+        'water_service' => 'si', 'energy_service' => 'si', 'sewer_service' => 'si',
+        'internet_service' => 'no_verificado', 'road_condition' => 'via_principal',
+        'transport_connectivity' => 'alta', 'current_use' => 'mixto', 'centrality' => 'alta',
+        'stratum' => '4']);
+    expect($prefill['sector_name'] === 'Bruselas'
+        && $prefill['services_status'] === 'completa'
+        && $prefill['road_hierarchy'] === 'arterial'
+        && str_contains($prefill['sector_report_text'], 'Cartagena'), 'sector precargado desde sujeto');
     $photoRecordId = str_repeat('c', 32);
     $photoUnitId = str_repeat('d', 32);
     $photoController = (new ReflectionClass(AppraisalController::class))->newInstanceWithoutConstructor();

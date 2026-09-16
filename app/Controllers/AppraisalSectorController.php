@@ -7,6 +7,7 @@ use App\Models\AppraisalRepository;
 use App\Models\AppraisalSectorRepository;
 use App\Models\AppraisalSubjectRepository;
 use App\Services\AppraisalSectorInput;
+use App\Services\AppraisalSectorPrefill;
 use App\Support\AppraisalSectorCatalog;
 
 final class AppraisalSectorController
@@ -21,11 +22,18 @@ final class AppraisalSectorController
     public function show(string $id): void
     {
         $record = $this->appraisals->find($id, $this->user['id']);
+        $subject = $this->subjects->find($id, $this->user['id']);
+        $hasSector = $this->sectors->exists($id, $this->user['id']);
+        $sector = $hasSector ? $this->sectors->find($id, $this->user['id']) : array_replace(
+            $this->sectors->find($id, $this->user['id']),
+            AppraisalSectorPrefill::fromSubject($subject)
+        );
         view('appraisals/sector', [
             'title' => 'Sector y entorno',
             'record' => $record,
-            'sector' => $this->sectors->find($id, $this->user['id']),
-            'subject' => $this->subjects->find($id, $this->user['id']),
+            'sector' => $sector,
+            'subject' => $subject,
+            'sectorPrefilled' => !$hasSector && array_filter($sector) !== [],
             'sectorSections' => AppraisalSectorCatalog::sections(),
             'sectorOptions' => AppraisalSectorCatalog::options(),
             'sectorHelps' => AppraisalSectorCatalog::helps(),

@@ -27,7 +27,7 @@ final class AppraisalSectorRepository
         $this->insert($appraisalId, $owner, $data, $now);
     }
 
-    private function exists(string $appraisalId, int $owner): bool
+    public function exists(string $appraisalId, int $owner): bool
     {
         $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_sector_profiles
             WHERE appraisal_id = ? AND owner_id = ?');
