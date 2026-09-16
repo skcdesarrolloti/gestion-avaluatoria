@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isFetchableUrl, shouldHandleLink } from '../resources/js/fetch-navigation.js';
+import { isFetchableUrl, redirectedUrl, shouldHandleLink } from '../resources/js/fetch-navigation.js';
 
 const current = 'https://example.test/public/avaluos?page=1';
 
@@ -41,4 +41,13 @@ test('keeps external, modified and native links out of fetch navigation', () => 
 test('lets same-page anchors scroll normally', () => {
     const anchor = 'https://example.test/public/avaluos?page=1#nuevo-avaluo';
     assert.equal(isFetchableUrl(anchor, current), false);
+});
+
+test('keeps return_to hash after post redirects', () => {
+    const body = new FormData();
+    body.set('return_to', '/public/avaluos/abc/bien-sujeto#atributos');
+    assert.equal(
+        redirectedUrl('https://example.test/public/avaluos/abc/bien-sujeto', current, body, current),
+        'https://example.test/public/avaluos/abc/bien-sujeto#atributos',
+    );
 });

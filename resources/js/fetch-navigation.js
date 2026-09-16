@@ -61,21 +61,33 @@ async function renderFetchedPage(response, fallbackUrl, focusMain) {
     return true;
 }
 
+export function redirectedUrl(responseUrl, fallbackUrl, body = null, currentHref = window.location.href) {
+    const url = new URL(responseUrl || fallbackUrl, currentHref);
+    if (url.hash || !(body instanceof FormData)) return url.toString();
+    const returnTo = body.get('return_to');
+    if (typeof returnTo !== 'string' || returnTo === '') return url.toString();
+    const target = new URL(returnTo, currentHref);
+    if (target.origin === url.origin && target.pathname === url.pathname && target.search === url.search && target.hash) {
+        url.hash = target.hash;
+    }
+    return url.toString();
+}
+
 async function visit(url, { method = 'GET', body = null, replace = false, text } = {}) {
     setBusy(true, text);
     try {
         const headers = { Accept: 'text/html', 'X-Requested-With': 'fetch' };
         if (method !== 'GET') headers['X-CSRF-Token'] = csrfToken();
         const response = await fetch(url, { method, body, headers, credentials: 'same-origin' });
+        const nextUrl = redirectedUrl(response.url, url, body);
+        if (method !== 'GET') history.replaceState({}, '', nextUrl);
         const rendered = await renderFetchedPage(response, url, method === 'GET');
         if (!rendered) return;
-        const nextUrl = response.url || url;
         if (method === 'GET') {
             history[replace ? 'replaceState' : 'pushState']({}, '', nextUrl);
             scrollToTarget(new URL(nextUrl).hash);
         } else {
-            history.replaceState({}, '', nextUrl);
-            window.scrollTo({ top: 0, behavior: 'auto' });
+            scrollToTarget(new URL(nextUrl).hash);
         }
     } catch {
         setBusy(false);
