@@ -49,6 +49,7 @@ $firstAttributeGroup = (string) array_key_first($specialAttributeCatalog);
                             <th class="px-3 py-3">Impacto</th>
                             <th class="px-3 py-3">Evidencia</th>
                             <th class="px-3 py-3">Observación</th>
+                            <th class="px-3 py-3">Foto soporte</th>
                         </tr>
                     </thead>
                     <tbody class="divide-y divide-slate-200">
@@ -77,11 +78,11 @@ $firstAttributeGroup = (string) array_key_first($specialAttributeCatalog);
                                 <?php endforeach; ?>
                                 <td class="px-3 py-3 align-top">
                                     <textarea class="input min-w-64" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][notes]"
-                                        rows="2" maxlength="220" placeholder="Soporte o criterio del perito"
-                                        @paste="paste($event); if (hasFiles) evidence = 'foto'"><?= e($attrValue($unit, $key, 'notes')) ?></textarea>
-                                    <div class="mt-2 rounded-lg border border-dashed border-slate-300 bg-white p-2"
-                                        x-show="evidence === 'foto'"
-                                        @paste="paste($event)" tabindex="0">
+                                        rows="3" maxlength="220" placeholder="Criterio escrito del perito."><?= e($attrValue($unit, $key, 'notes')) ?></textarea>
+                                </td>
+                                <td class="px-3 py-3 align-top">
+                                    <div class="rounded-lg border border-dashed border-slate-300 bg-white p-2"
+                                        x-show="evidence === 'foto'" @paste="paste($event)" tabindex="0">
                                         <div class="flex flex-wrap items-center gap-2">
                                             <label class="btn-secondary min-h-10 text-xs">Elegir archivo
                                                 <input class="sr-only" type="file" name="attribute_photos[<?= e($unitId) ?>][<?= e($key) ?>][]"
@@ -99,6 +100,10 @@ $firstAttributeGroup = (string) array_key_first($specialAttributeCatalog);
                                             </template>
                                         </div>
                                     </div>
+                                    <p class="min-w-52 rounded-lg bg-slate-50 p-3 text-xs text-slate-500"
+                                        x-show="evidence !== 'foto'">
+                                        Selecciona Foto en evidencia cuando necesites soporte visual.
+                                    </p>
                                     <?php $evidencePhotos = $photosForAttribute($unitId, $key); ?>
                                     <?php if ($evidencePhotos): ?>
                                         <div class="mt-2 flex flex-wrap gap-2">
