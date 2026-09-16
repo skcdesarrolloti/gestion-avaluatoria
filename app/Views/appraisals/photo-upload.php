@@ -46,6 +46,13 @@
                         <?php else: ?>
                             <p class="p-4 text-sm font-semibold text-red-700">Archivo físico no encontrado. Vuelve a subir esta foto.</p>
                         <?php endif; ?>
+                        <form class="border-t border-slate-200 bg-white p-3" method="post"
+                            action="<?= e(url('avaluos/' . $record['id'] . '/fotos/' . $photo['id'] . '/eliminar')) ?>"
+                            x-data="{ busy: false }" @submit="busy = true">
+                            <?= csrf_field() ?>
+                            <button class="btn-secondary min-h-10 w-full text-sm" type="submit" :disabled="busy"
+                                x-text="busy ? 'Quitando...' : 'Quitar foto'">Quitar foto</button>
+                        </form>
                     </div>
                 <?php endforeach; ?>
             </div>

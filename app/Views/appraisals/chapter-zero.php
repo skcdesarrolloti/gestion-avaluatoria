@@ -28,6 +28,8 @@ $initial = ['notes' => $notes];
 }">
     <?php require BASE_PATH . '/app/Views/appraisals/preclassification.php'; ?>
 
+    <?php require BASE_PATH . '/app/Views/appraisals/unit-tabs.php'; ?>
+
     <?php require BASE_PATH . '/app/Views/appraisals/photo-upload.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/igac-comparison.php'; ?>
 

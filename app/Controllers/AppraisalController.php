@@ -7,6 +7,7 @@ use App\Core\Session;
 use App\Models\AppraisalRepository;
 use App\Models\AppraiserRepository;
 use App\Models\IgacTypologyRepository;
+use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalPhotoStorage;
 use App\Services\AppraisalValidator;
 use App\Support\AppraisalCatalog;
@@ -38,8 +39,11 @@ final class AppraisalController
     public function chapterZero(string $id): void
     {
         $record = $this->appraisals->find($id, $this->user['id']);
+        $this->appraisals->ensureUnits($id, $this->user['id'],
+            (int) ($record['igac_property_units_count'] ?? 0), (int) ($record['igac_annex_units_count'] ?? 0));
         view('appraisals/chapter-zero', ['title' => 'Capítulo 0', 'record' => $record,
             'photos' => $this->appraisals->photos($id, $this->user['id']),
+            'units' => $this->appraisals->units($id, $this->user['id']),
             'appraisers' => $this->appraisers->all(), 'igacCategories' => $this->typologies->categories(),
             'igacCandidates' => $this->typologies->candidates($record),
             'photoMessage' => Session::pullFlash('chapter_zero_photo_message'),
@@ -52,9 +56,23 @@ final class AppraisalController
     public function saveChapterZero(string $id): never
     {
         $record = $this->appraisals->find($id, $this->user['id']);
-        $data = $this->chapterZeroData((int) ($_POST['version'] ?? 0));
+        $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
+            $this->igacCodes(), $this->appraiserIds());
         $this->appraisals->saveChapterZero($id, $this->user['id'], (int) $_POST['version'], $data);
         Http::redirect('avaluos/' . $record['id'] . '/capitulo-0');
+    }
+
+    public function saveChapterZeroUnits(string $id): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        try {
+            $this->appraisals->saveUnits($id, $this->user['id'],
+                AppraisalChapterZeroInput::unitData($this->igacCodes()));
+            Session::flash('chapter_zero_preclass_message', 'Unidades guardadas correctamente.');
+        } catch (\Throwable $error) {
+            Session::flash('chapter_zero_preclass_error', $error->getMessage());
+        }
+        Http::redirect('avaluos/' . $id . '/capitulo-0');
     }
 
     public function saveChapterZeroPreclassification(string $id): never
@@ -62,7 +80,7 @@ final class AppraisalController
         $record = $this->appraisals->find($id, $this->user['id']);
         try {
             $this->appraisals->savePreclassification($id, $this->user['id'], (int) ($_POST['version'] ?? 0),
-                $this->preclassificationData());
+                AppraisalChapterZeroInput::preclassificationData($this->igacCodes()));
             Session::flash('chapter_zero_preclass_message', 'Lectura inicial guardada correctamente.');
         } catch (\Throwable $error) {
             Session::flash('chapter_zero_preclass_error', $error->getMessage());
@@ -105,6 +123,15 @@ final class AppraisalController
         exit;
     }
 
+    public function deletePhoto(string $id, string $photoId): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        $path = $this->appraisals->deletePhoto($id, $photoId, $this->user['id']);
+        if ($path && is_file($path)) @unlink($path);
+        Session::flash('chapter_zero_photo_message', 'Foto retirada del expediente.');
+        Http::redirect('avaluos/' . $id . '/capitulo-0');
+    }
+
     public function edit(string $id): void
     {
         $record = $this->appraisals->find($id, $this->user['id']);
@@ -118,53 +145,6 @@ final class AppraisalController
         $data = AppraisalValidator::validate($input);
         $result = $this->appraisals->save($id, $this->user['id'], $input['version'], $data);
         Http::json(['ok' => true] + $result);
-    }
-
-    private function chapterZeroData(int $version): array
-    {
-        if ($version < 1) throw new HttpException(422, 'La versión del borrador no es válida.');
-        $input = ['version' => $version];
-        foreach (AppraisalCatalog::fieldKeys() as $field) $input[$field] = (string) ($_POST[$field] ?? '');
-        $data = AppraisalValidator::validate($input);
-        $extra = [];
-        foreach (['appraiser_id', 'igac_category', 'igac_typology_hint', 'inspection_notes'] as $field) {
-            $extra[$field] = trim((string) ($_POST[$field] ?? ''));
-        }
-        $extra['igac_property_units_count'] = $this->boundedCount('igac_property_units_count');
-        $extra['igac_annex_units_count'] = $this->boundedCount('igac_annex_units_count');
-        $extra['configuration_status'] = 'borrador';
-        if ($extra['appraiser_id'] !== '' && !$this->appraiserExists($extra['appraiser_id'])) {
-            throw new HttpException(422, 'Selecciona un perito válido.');
-        }
-        if ($extra['igac_category'] !== '' && !in_array($extra['igac_category'], $this->igacCodes(), true)) {
-            throw new HttpException(422, 'Selecciona una categoría IGAC válida.');
-        }
-        $extra['igac_typology_hint'] = mb_substr($extra['igac_typology_hint'], 0, 190);
-        $extra['inspection_notes'] = mb_substr($extra['inspection_notes'], 0, 2000);
-        return $data + $extra;
-    }
-
-    private function preclassificationData(): array
-    {
-        $category = trim((string) ($_POST['igac_category'] ?? ''));
-        if ($category !== '' && !in_array($category, $this->igacCodes(), true)) {
-            throw new HttpException(422, 'Selecciona una categoría IGAC válida.');
-        }
-        return [
-            'igac_category' => $category,
-            'igac_typology_hint' => mb_substr(trim((string) ($_POST['igac_typology_hint'] ?? '')), 0, 190),
-            'igac_property_units_count' => $this->boundedCount('igac_property_units_count'),
-            'igac_annex_units_count' => $this->boundedCount('igac_annex_units_count'),
-        ];
-    }
-
-    private function boundedCount(string $field): int
-    {
-        $value = filter_var($_POST[$field] ?? 0, FILTER_VALIDATE_INT);
-        if ($value === false || $value < 0 || $value > 50) {
-            throw new HttpException(422, 'Los conteos de unidades deben estar entre 0 y 50.');
-        }
-        return $value;
     }
 
     private function storePhotos(string $id): int
@@ -195,10 +175,9 @@ final class AppraisalController
         return $stored;
     }
 
-    private function appraiserExists(string $id): bool
+    private function appraiserIds(): array
     {
-        foreach ($this->appraisers->all() as $appraiser) if ($appraiser['id'] === $id) return true;
-        return false;
+        return array_column($this->appraisers->all(), 'id');
     }
 
     private function igacCodes(): array

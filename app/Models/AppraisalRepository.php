@@ -40,6 +40,14 @@ final class AppraisalRepository
         ], $query->fetchAll());
     }
 
+    public function units(string $id, int $owner): array
+    {
+        $query = $this->db->prepare('SELECT * FROM appraisal_units WHERE appraisal_id = ? AND owner_id = ?
+            ORDER BY unit_kind = "common" DESC, unit_kind, unit_index');
+        $query->execute([$id, $owner]);
+        return $query->fetchAll();
+    }
+
     public function findPhoto(string $photoId, int $owner): array
     {
         $query = $this->db->prepare('SELECT * FROM appraisal_photos WHERE id = ? AND owner_id = ?');
@@ -47,6 +55,17 @@ final class AppraisalRepository
         $row = $query->fetch();
         if (!$row) throw new HttpException(404, 'No se encontró la foto.');
         return $row;
+    }
+
+    public function deletePhoto(string $id, string $photoId, int $owner): ?string
+    {
+        $photo = $this->findPhoto($photoId, $owner);
+        if ((string) $photo['appraisal_id'] !== $id) throw new HttpException(404, 'No se encontró la foto.');
+        $query = $this->db->prepare('DELETE FROM appraisal_photos WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
+        $query->execute([$photoId, $id, $owner]);
+        return is_file(self::photoPath((string) $photo['storage_filename']))
+            ? self::photoPath((string) $photo['storage_filename'])
+            : null;
     }
 
     public function find(string $id, int $owner): array
@@ -98,6 +117,34 @@ final class AppraisalRepository
             $this->find($id, $owner);
             throw new HttpException(409, 'Esta lectura inicial cambió en otra pestaña. Revisa antes de guardar.');
         }
+        $this->ensureUnits($id, $owner, (int) $data['igac_property_units_count'], (int) $data['igac_annex_units_count']);
+    }
+
+    public function saveUnits(string $id, int $owner, array $units): void
+    {
+        $now = gmdate('Y-m-d H:i:s');
+        $query = $this->db->prepare('UPDATE appraisal_units SET label = ?, igac_category = ?,
+            igac_typology_hint = ?, notes = ?, updated_at = ? WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
+        foreach ($units as $unit) {
+            $query->execute([$unit['label'], $unit['igac_category'], $unit['igac_typology_hint'],
+                $unit['notes'], $now, $unit['id'], $id, $owner]);
+        }
+    }
+
+    public function ensureUnits(string $id, int $owner, int $propertyCount, int $annexCount): void
+    {
+        $this->ensureUnit($id, $owner, 'common', 0, 'Información común del predio');
+        for ($i = 1; $i <= $propertyCount; $i++) $this->ensureUnit($id, $owner, 'property', $i, 'Unidad ' . $i);
+        for ($i = 1; $i <= $annexCount; $i++) $this->ensureUnit($id, $owner, 'annex', $i, 'Anexo ' . $i);
+    }
+
+    private function ensureUnit(string $id, int $owner, string $kind, int $index, string $label): void
+    {
+        $now = gmdate('Y-m-d H:i:s');
+        $query = $this->db->prepare('INSERT IGNORE INTO appraisal_units
+            (id, appraisal_id, owner_id, unit_kind, unit_index, label, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
+        $query->execute([bin2hex(random_bytes(16)), $id, $owner, $kind, $index, $label, $now, $now]);
     }
 
     public function addPhoto(string $id, int $owner, array $photo): void
