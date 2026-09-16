@@ -3,6 +3,13 @@ $unitLabel = static function (array $unit): string {
     if ($unit['unit_kind'] === 'common') return 'Común';
     return ($unit['unit_kind'] === 'annex' ? 'Anexo ' : 'Unidad ') . (int) $unit['unit_index'];
 };
+$commonUnitId = '';
+foreach ($units as $unit) {
+    if ($unit['unit_kind'] === 'common') {
+        $commonUnitId = (string) $unit['id'];
+        break;
+    }
+}
 $typologyOptions = $igacTypologiesByCategory ?? [];
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
@@ -44,6 +51,7 @@ $typologyOptions = $igacTypologiesByCategory ?? [];
             <?php endforeach; ?>
         </div>
         <?php foreach ($units as $unit): ?>
+            <?php $isCommon = $unit['unit_kind'] === 'common'; ?>
             <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="active === '<?= e($unit['id']) ?>'"
                 x-data="{
                     category: <?= e(json_encode((string) $unit['igac_category'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
@@ -56,6 +64,14 @@ $typologyOptions = $igacTypologiesByCategory ?? [];
                         <input class="input" name="units[<?= e($unit['id']) ?>][label]" maxlength="120"
                             value="<?= e($unit['label']) ?>" placeholder="<?= e($unitLabel($unit)) ?>">
                     </label>
+                    <?php if ($isCommon): ?>
+                        <input type="hidden" name="units[<?= e($unit['id']) ?>][igac_category]" value="">
+                        <input type="hidden" name="units[<?= e($unit['id']) ?>][igac_typology_hint]" value="">
+                        <div class="rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+                            Usa esta pestaña solo para datos compartidos del predio. La tipología, la descripción
+                            constructiva y la comprobación fotográfica se diligencian en cada unidad o anexo.
+                        </div>
+                    <?php else: ?>
                     <label class="label">Categoría IGAC de esta unidad
                         <select class="input" name="units[<?= e($unit['id']) ?>][igac_category]" x-model="category"
                             @change="if (!(typologies[category] || []).some(item => item.value === hint)) hint = ''">
@@ -130,9 +146,13 @@ $typologyOptions = $igacTypologiesByCategory ?? [];
                             </div>
                         </div>
                     </label>
-                    <label class="label md:col-span-2">Notas de la unidad
+                    <?php endif; ?>
+                    <label class="label md:col-span-2">
+                        <?= $isCommon ? 'Notas comunes del predio' : 'Descripción editable para el informe' ?>
                         <textarea class="input" name="units[<?= e($unit['id']) ?>][notes]" rows="3" maxlength="2000"
-                            x-model="notes" placeholder="Describe rasgos propios de esta unidad o anexo."></textarea>
+                            x-model="notes" placeholder="<?= $isCommon
+                                ? 'Anota información general que aplique a todo el predio.'
+                                : 'Ajusta la descripción base según la foto, la visita y el criterio del perito.' ?>"></textarea>
                     </label>
                 </div>
             </div>
@@ -142,5 +162,7 @@ $typologyOptions = $igacTypologiesByCategory ?? [];
                 x-text="busy ? 'Guardando...' : 'Guardar unidades'">Guardar unidades</button>
         </div>
     </form>
-    <?php $photoUploadEmbedded = true; require BASE_PATH . '/app/Views/appraisals/photo-upload.php'; unset($photoUploadEmbedded); ?>
+    <div x-show="active !== '<?= e($commonUnitId) ?>'">
+        <?php $photoUploadEmbedded = true; require BASE_PATH . '/app/Views/appraisals/photo-upload.php'; unset($photoUploadEmbedded); ?>
+    </div>
 </section>
