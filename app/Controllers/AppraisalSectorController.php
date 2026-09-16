@@ -88,7 +88,7 @@ final class AppraisalSectorController
         $this->appraisals->find($id, $this->user['id']);
         try {
             $neighborhoodId = $this->resolveNeighborhoodId();
-            if (!preg_match('/^[a-f0-9]{32}$/', $neighborhoodId)) {
+            if ($neighborhoodId === '') {
                 throw new \InvalidArgumentException('Selecciona un barrio válido.');
             }
             $subject = $this->subjects->find($id, $this->user['id']);
@@ -123,7 +123,7 @@ final class AppraisalSectorController
     private function resolveNeighborhoodId(): string
     {
         $neighborhoodId = trim((string) ($_POST['neighborhood_id'] ?? ''));
-        if (preg_match('/^[a-f0-9]{32}$/', $neighborhoodId)) return $neighborhoodId;
+        if ($neighborhoodId !== '') return mb_substr($neighborhoodId, 0, 80);
 
         $query = mb_strtolower(trim((string) ($_POST['neighborhood_query'] ?? '')));
         if ($query === '') return '';
