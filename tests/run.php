@@ -8,6 +8,7 @@ use App\Core\Http;
 use App\Services\AppraisalValidator;
 use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterZeroInput;
+use App\Services\AppraisalSectorInput;
 use App\Services\AuthDiagnostics;
 use App\Services\AuthService;
 use App\Services\IfrsStandardFileImportService;
@@ -277,6 +278,13 @@ try {
     $attributeRows = AppraisalAttributeInput::unitAttributeData();
     expect(str_contains($attributeRows[0]['special_attributes_json'], 'esquinero')
         && !str_contains($attributeRows[0]['special_attributes_json'], 'desconocido'), 'atributos especiales normalizados');
+    $sectorData = AppraisalSectorInput::data(['sector_name' => ' Bruselas ampliado ',
+        'services_status' => 'completa', 'connectivity' => 'invalida',
+        'sector_report_text' => str_repeat('x', 2500)]);
+    expect($sectorData['sector_name'] === 'Bruselas ampliado'
+        && $sectorData['services_status'] === 'completa'
+        && $sectorData['connectivity'] === ''
+        && mb_strlen($sectorData['sector_report_text']) === 2400, 'sector normalizado');
     $photoRecordId = str_repeat('c', 32);
     $photoUnitId = str_repeat('d', 32);
     $photoController = (new ReflectionClass(AppraisalController::class))->newInstanceWithoutConstructor();
