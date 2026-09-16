@@ -9,11 +9,11 @@
             </p>
         </div>
         <div class="flex flex-wrap gap-3">
-            <a class="btn-secondary" href="<?= e(url('#configuracion-avaluo')) ?>">Ver Capítulo 0</a>
+            <a class="btn-secondary" href="<?= e(url('#configuracion-avaluo')) ?>">Qué incluye Capítulo 0</a>
             <form method="post" action="<?= e(url('avaluos')) ?>" x-data="{ busy: false }" @submit="busy = true">
                 <?= csrf_field() ?>
                 <button class="btn-primary" type="submit" :disabled="busy"
-                    x-text="busy ? 'Creando...' : 'Crear ficha'">Crear ficha</button>
+                    x-text="busy ? 'Creando...' : 'Crear ficha y abrir Capítulo 0'">Crear ficha y abrir Capítulo 0</button>
             </form>
         </div>
     </div>
@@ -69,7 +69,12 @@
     </div>
 
     <div class="flex flex-wrap gap-3">
-        <a class="btn-primary" href="<?= e(url()) ?>">Ver mis avalúos</a>
+        <form method="post" action="<?= e(url('avaluos')) ?>" x-data="{ busy: false }" @submit="busy = true">
+            <?= csrf_field() ?>
+            <button class="btn-primary" type="submit" :disabled="busy"
+                x-text="busy ? 'Creando...' : 'Crear ficha y abrir Capítulo 0'">Crear ficha y abrir Capítulo 0</button>
+        </form>
+        <a class="btn-secondary" href="<?= e(url()) ?>">Ver mis avalúos</a>
         <a class="btn-secondary" href="<?= e(url('maestros')) ?>">Creación de Maestros</a>
         <a class="btn-secondary" href="<?= e(url('normas-tecnicas-sectoriales')) ?>">Consultar NTS</a>
         <a class="btn-secondary" href="<?= e(url('marco-juridico-valuatorio')) ?>">Consultar marco jurídico</a>
