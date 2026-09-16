@@ -85,7 +85,7 @@ final class AppraisalRepository
     {
         $now = gmdate('Y-m-d H:i:s');
         $fields = ['titulo', 'tipo', 'direccion', 'municipio', 'client_name', 'requester_name',
-            'report_recipient', 'observaciones', 'tipo_derecho', 'tipo_negocio', 'destinacion',
+            'property_owner_name', 'report_recipient', 'observaciones', 'tipo_derecho', 'tipo_negocio', 'destinacion',
             'tipo_inmueble', 'subtipo_funcional', 'finalidad', 'intended_use', 'visit_date', 'value_date',
             'report_date', 'assignment_scope', 'assignment_limitations', 'assignment_hypotheses',
             'base_valor', 'aplica_niif', 'regimen_ph', 'estructura_metodo', 'appraiser_id',

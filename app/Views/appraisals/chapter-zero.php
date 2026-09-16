@@ -94,9 +94,17 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
                     <input class="input" name="titulo" maxlength="160" value="<?= e($field('titulo')) ?>"
                         placeholder="Ej. Avalúo comercial Lote Bruselas">
                 </label>
-                <label class="label md:col-span-2">Cliente / solicitante
+                <label class="label">Cliente / contratante
                     <input class="input" name="client_name" maxlength="160" value="<?= e($field('client_name')) ?>"
-                        placeholder="Persona o entidad que solicita el encargo">
+                        placeholder="Persona o entidad que contrata el encargo">
+                </label>
+                <label class="label">Solicitante
+                    <input class="input" name="requester_name" maxlength="160" value="<?= e($field('requester_name')) ?>"
+                        placeholder="Quien pide o radica el avalúo">
+                </label>
+                <label class="label">Propietario del inmueble
+                    <input class="input" name="property_owner_name" maxlength="160" value="<?= e($field('property_owner_name')) ?>"
+                        placeholder="Nombre del propietario, si se conoce">
                 </label>
                 <label class="label">Destinatario del informe
                     <input class="input" name="report_recipient" maxlength="160" value="<?= e($field('report_recipient')) ?>"
