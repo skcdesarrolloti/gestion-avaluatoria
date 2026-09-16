@@ -39,12 +39,20 @@ final class AppraisalController
     public function chapterZero(string $id): void
     {
         $record = $this->appraisals->find($id, $this->user['id']);
+        view('appraisals/chapter-zero', ['title' => 'Capítulo 0', 'record' => $record,
+            'appraisers' => $this->appraisers->all(),
+            'catalog' => ['selects' => AppraisalCatalog::selectFields(), 'notes' => AppraisalCatalog::notes()]]);
+    }
+
+    public function subject(string $id): void
+    {
+        $record = $this->appraisals->find($id, $this->user['id']);
         $this->appraisals->ensureUnits($id, $this->user['id'],
             (int) ($record['igac_property_units_count'] ?? 0), (int) ($record['igac_annex_units_count'] ?? 0));
-        view('appraisals/chapter-zero', ['title' => 'Capítulo 0', 'record' => $record,
+        view('appraisals/subject', ['title' => 'Bien sujeto', 'record' => $record,
             'photos' => $this->appraisals->photos($id, $this->user['id']),
             'units' => $this->appraisals->units($id, $this->user['id']),
-            'appraisers' => $this->appraisers->all(), 'igacCategories' => $this->typologies->categories(),
+            'igacCategories' => $this->typologies->categories(),
             'igacTypologiesByCategory' => $this->typologies->optionsByCategory(),
             'photoMessage' => Session::pullFlash('chapter_zero_photo_message'),
             'photoError' => Session::pullFlash('chapter_zero_photo_error'),
@@ -62,7 +70,9 @@ final class AppraisalController
         Http::redirect('avaluos/' . $record['id'] . '/capitulo-0');
     }
 
-    public function saveChapterZeroUnits(string $id): never
+    public function saveSubjectUnits(string $id): never { $this->saveUnitsAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }
+
+    private function saveUnitsAndRedirect(string $id, string $target): never
     {
         $this->appraisals->find($id, $this->user['id']);
         try {
@@ -72,12 +82,14 @@ final class AppraisalController
         } catch (\Throwable $error) {
             Session::flash('chapter_zero_preclass_error', $error->getMessage());
         }
-        Http::redirect('avaluos/' . $id . '/capitulo-0');
+        Http::redirect($target);
     }
 
-    public function saveChapterZeroPreclassification(string $id): never
+    public function saveSubjectPreclassification(string $id): never { $this->savePreclassificationAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }
+
+    private function savePreclassificationAndRedirect(string $id, string $target): never
     {
-        $record = $this->appraisals->find($id, $this->user['id']);
+        $this->appraisals->find($id, $this->user['id']);
         try {
             $this->appraisals->savePreclassification($id, $this->user['id'], (int) ($_POST['version'] ?? 0),
                 AppraisalChapterZeroInput::preclassificationData($this->igacCodes()));
@@ -85,10 +97,12 @@ final class AppraisalController
         } catch (\Throwable $error) {
             Session::flash('chapter_zero_preclass_error', $error->getMessage());
         }
-        Http::redirect('avaluos/' . $record['id'] . '/capitulo-0');
+        Http::redirect($target);
     }
 
-    public function uploadChapterZeroPhotos(string $id): never
+    public function uploadSubjectPhotos(string $id): never { $this->uploadPhotosAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }
+
+    private function uploadPhotosAndRedirect(string $id, string $target): never
     {
         $record = $this->appraisals->find($id, $this->user['id']);
         try {
@@ -99,7 +113,7 @@ final class AppraisalController
         } catch (\Throwable $error) {
             Session::flash('chapter_zero_photo_error', $error->getMessage());
         }
-        Http::redirect('avaluos/' . $record['id'] . '/capitulo-0');
+        Http::redirect($target);
     }
 
     public function photo(string $id, string $photoId): never
@@ -129,7 +143,15 @@ final class AppraisalController
         $path = $this->appraisals->deletePhoto($id, $photoId, $this->user['id']);
         if ($path && is_file($path)) @unlink($path);
         Session::flash('chapter_zero_photo_message', 'Foto retirada del expediente.');
-        Http::redirect('avaluos/' . $id . '/capitulo-0');
+        Http::redirect($this->safePhotoReturn($id));
+    }
+
+    private function safePhotoReturn(string $id): string
+    {
+        $target = (string) ($_POST['return_to'] ?? '');
+        return in_array($target, ['avaluos/' . $id . '/capitulo-0', 'avaluos/' . $id . '/bien-sujeto'], true)
+            ? $target
+            : 'avaluos/' . $id . '/capitulo-0';
     }
 
     public function edit(string $id): void

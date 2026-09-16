@@ -11,6 +11,7 @@ foreach ($units as $unit) {
     }
 }
 $typologyOptions = $igacTypologiesByCategory ?? [];
+$subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitulo-0';
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{
@@ -38,7 +39,7 @@ $typologyOptions = $igacTypologiesByCategory ?? [];
         </div>
         <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"><?= count($units) ?> pestaña(s)</span>
     </div>
-    <form class="mt-6" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/capitulo-0/unidades')) ?>"
+    <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/unidades')) ?>"
         x-data="{ busy: false }" @submit="busy = true">
         <?= csrf_field() ?>
         <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">

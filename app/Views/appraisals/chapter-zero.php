@@ -6,6 +6,7 @@ $field = static fn (string $name): string => (string) ($record[$name] ?? '');
 $count = static fn (string $name): int => max(0, (int) ($record[$name] ?? 0));
 $notes = $catalog['notes'] ?? [];
 $initial = ['notes' => $notes];
+$currentStep = 'expediente';
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
@@ -19,17 +20,9 @@ $initial = ['notes' => $notes];
     </div>
     <span class="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-800">Borrador</span>
 </div>
+<?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
-<div class="mt-8 space-y-7" x-data="{
-    typologyHint: <?= e(json_encode($field('igac_typology_hint'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
-    igacCategory: <?= e(json_encode($field('igac_category'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
-    propertyUnits: <?= e((string) $count('igac_property_units_count')) ?>,
-    annexUnits: <?= e((string) $count('igac_annex_units_count')) ?>
-}">
-    <?php require BASE_PATH . '/app/Views/appraisals/preclassification.php'; ?>
-
-    <?php require BASE_PATH . '/app/Views/appraisals/unit-tabs.php'; ?>
-
+<div class="mt-8 space-y-7">
     <form class="grid gap-7 lg:grid-cols-[1fr_18rem]" method="post"
         action="<?= e(url('avaluos/' . $record['id'] . '/capitulo-0')) ?>"
         x-data="{
@@ -40,10 +33,10 @@ $initial = ['notes' => $notes];
         @submit="busy = true">
         <?= csrf_field() ?>
         <input type="hidden" name="version" value="<?= e($record['version']) ?>">
-        <input type="hidden" name="igac_category" x-model="igacCategory">
-        <input type="hidden" name="igac_typology_hint" x-model="typologyHint">
-        <input type="hidden" name="igac_property_units_count" x-model="propertyUnits">
-        <input type="hidden" name="igac_annex_units_count" x-model="annexUnits">
+        <input type="hidden" name="igac_category" value="<?= e($field('igac_category')) ?>">
+        <input type="hidden" name="igac_typology_hint" value="<?= e($field('igac_typology_hint')) ?>">
+        <input type="hidden" name="igac_property_units_count" value="<?= e((string) $count('igac_property_units_count')) ?>">
+        <input type="hidden" name="igac_annex_units_count" value="<?= e((string) $count('igac_annex_units_count')) ?>">
         <div id="datos-base-capitulo-0" class="scroll-mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <p class="eyebrow">Configuración</p>
             <h2 class="mt-2 text-2xl font-semibold">Datos base del encargo</h2>
@@ -128,6 +121,9 @@ $initial = ['notes' => $notes];
             <p class="px-2 text-xs leading-5 text-slate-500">
                 El consecutivo técnico se asignará cuando el expediente quede formalmente configurado.
             </p>
+            <a class="btn-secondary w-full" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto')) ?>">
+                Continuar a Bien sujeto
+            </a>
         </aside>
     </form>
 </div>

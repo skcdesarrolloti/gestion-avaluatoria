@@ -1,4 +1,7 @@
-<?php $embedded = $photoUploadEmbedded ?? false; ?>
+<?php
+$embedded = $photoUploadEmbedded ?? false;
+$subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitulo-0';
+?>
     <<?= $embedded ? 'div' : 'section' ?> class="<?= $embedded ? 'mt-8 rounded-xl border border-slate-200 bg-slate-50 p-5' : 'rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8' ?>">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
@@ -17,7 +20,7 @@
             <p class="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($photoError) ?></p>
         <?php endif; ?>
         <form class="mt-6 grid gap-4 lg:grid-cols-[1fr_auto]" method="post" enctype="multipart/form-data"
-            action="<?= e(url('avaluos/' . $record['id'] . '/capitulo-0/fotos')) ?>"
+            action="<?= e(url($subjectActionBase . '/fotos')) ?>"
             x-data="{ busy: false, hasFiles: false }" @submit="busy = true">
             <?= csrf_field() ?>
             <label class="label">Agregar fotos
@@ -51,6 +54,7 @@
                             action="<?= e(url('avaluos/' . $record['id'] . '/fotos/' . $photo['id'] . '/eliminar')) ?>"
                             x-data="{ busy: false }" @submit="busy = true">
                             <?= csrf_field() ?>
+                            <input type="hidden" name="return_to" value="<?= e($subjectActionBase) ?>">
                             <button class="btn-secondary min-h-10 w-full text-sm" type="submit" :disabled="busy"
                                 x-text="busy ? 'Quitando...' : 'Quitar foto'">Quitar foto</button>
                         </form>
