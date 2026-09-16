@@ -47,6 +47,11 @@ $groups = [
         filteredNeighborhoods() { return this.neighborhoods.filter(item => !this.cityId || item.city_id === this.cityId) },
         selectedNeighborhood() { return this.neighborhoods.find(item => item.id === this.neighborhoodId) || null },
         locationValue(key) { const row = this.selectedNeighborhood(); return row ? (row[key] || '') : (this.saved[key] || '') },
+        locationDisplay(key) {
+            const row = this.selectedNeighborhood();
+            if (!row) return this.saved[key] || '';
+            return row[key] || 'Pendiente en maestro';
+        },
         changeDepartment() { this.cityId = ''; this.neighborhoodId = '' },
         changeCity() { this.neighborhoodId = '' }
     }">
@@ -98,13 +103,13 @@ $groups = [
                     </select>
                 </label>
                 <label class="label">Localidad
-                    <input class="input bg-slate-50" readonly :value="locationValue('locality_name')" placeholder="Se completa con el barrio">
+                    <input class="input bg-slate-50" readonly :value="locationDisplay('locality_name')" placeholder="Se completa con el barrio">
                 </label>
                 <label class="label">Comuna / UCG
-                    <input class="input bg-slate-50" readonly :value="locationValue('commune_ucg')" placeholder="Se completa con el barrio">
+                    <input class="input bg-slate-50" readonly :value="locationDisplay('commune_ucg')" placeholder="Se completa con el barrio">
                 </label>
                 <label class="label">Zona / sector
-                    <input class="input bg-slate-50" readonly :value="locationValue('zone_sector')" placeholder="Se completa con el barrio">
+                    <input class="input bg-slate-50" readonly :value="locationDisplay('zone_sector')" placeholder="Se completa con el barrio">
                 </label>
             </div>
         </div>
