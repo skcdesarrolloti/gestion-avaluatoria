@@ -7,8 +7,8 @@ $count = static fn (string $name): int => max(0, (int) ($record[$name] ?? 0));
 $notes = $catalog['notes'] ?? [];
 $initial = ['notes' => $notes];
 $currentStep = 'expediente';
-$configurationSelects = ['tipo', 'tipo_derecho', 'tipo_negocio', 'tipo_inmueble', 'subtipo_funcional',
-    'destinacion', 'base_valor', 'aplica_niif', 'regimen_ph', 'estructura_metodo'];
+$configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', 'destinacion',
+    'base_valor', 'aplica_niif', 'regimen_ph', 'estructura_metodo'];
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
@@ -102,6 +102,8 @@ $configurationSelects = ['tipo', 'tipo_derecho', 'tipo_negocio', 'tipo_inmueble'
                     <input class="input" name="report_recipient" maxlength="160" value="<?= e($field('report_recipient')) ?>"
                         placeholder="A quien va dirigido el entregable">
                 </label>
+                <?php $name = 'tipo'; require BASE_PATH . '/app/Views/appraisals/chapter-zero-select-field.php'; ?>
+                <?php $name = 'tipo_derecho'; require BASE_PATH . '/app/Views/appraisals/chapter-zero-select-field.php'; ?>
                 <?php $name = 'finalidad'; require BASE_PATH . '/app/Views/appraisals/chapter-zero-select-field.php'; ?>
                 <label class="label md:col-span-2">Uso previsto del informe
                     <input class="input" name="intended_use" maxlength="220" value="<?= e($field('intended_use')) ?>"
