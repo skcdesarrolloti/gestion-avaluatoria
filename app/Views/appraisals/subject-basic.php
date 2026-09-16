@@ -40,12 +40,17 @@ $tabs = [
     'servicios' => ['Servicios', ['water_service', 'energy_service', 'gas_service',
         'sewer_service', 'internet_service', 'service_continuity']],
     'cierre' => ['Fecha, coordenadas y notas', ['subject_reference_date', 'latitude', 'longitude']],
+    'tipologias' => ['Tipologías IGAC', []],
 ];
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{
         activeTab: 'identificacion',
         busy: false,
+        typologyHint: <?= e(json_encode($field('igac_typology_hint'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+        igacCategory: <?= e(json_encode($field('igac_category'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+        propertyUnits: <?= e((string) $count('igac_property_units_count')) ?>,
+        annexUnits: <?= e((string) $count('igac_annex_units_count')) ?>,
         departments: <?= e(json_encode($geo['departments'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         cities: <?= e(json_encode($geo['cities'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         neighborhoods: <?= e(json_encode($geo['neighborhoods'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
@@ -100,7 +105,7 @@ $tabs = [
             </div>
         </div>
         <?php foreach ($tabs as $tabKey => [$title, $keys]): ?>
-            <?php if (in_array($tabKey, ['identificacion', 'ubicacion'], true)) continue; ?>
+            <?php if (in_array($tabKey, ['identificacion', 'ubicacion', 'tipologias'], true)) continue; ?>
             <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="activeTab === '<?= e($tabKey) ?>'">
                 <h3 class="text-base font-semibold"><?= e($title) ?></h3>
                 <div class="mt-5 grid gap-5 md:grid-cols-3">
@@ -116,7 +121,12 @@ $tabs = [
         <?php endforeach; ?>
         <div class="mt-5 flex justify-end">
             <button class="btn-primary" type="submit" :disabled="busy"
+                x-show="activeTab !== 'tipologias'"
                 x-text="busy ? 'Guardando...' : 'Guardar ficha básica'">Guardar ficha básica</button>
         </div>
     </form>
+    <div class="mt-5 space-y-5" x-show="activeTab === 'tipologias'">
+        <?php require BASE_PATH . '/app/Views/appraisals/preclassification.php'; ?>
+        <?php require BASE_PATH . '/app/Views/appraisals/unit-tabs.php'; ?>
+    </div>
 </section>
