@@ -43,6 +43,8 @@ $configurationSelects = ['tipo', 'tipo_derecho', 'tipo_negocio', 'tipo_inmueble'
         <input type="hidden" name="igac_typology_hint" value="<?= e($field('igac_typology_hint')) ?>">
         <input type="hidden" name="igac_property_units_count" value="<?= e((string) $count('igac_property_units_count')) ?>">
         <input type="hidden" name="igac_annex_units_count" value="<?= e((string) $count('igac_annex_units_count')) ?>">
+        <input type="hidden" name="direccion" value="<?= e($field('direccion')) ?>">
+        <input type="hidden" name="municipio" value="<?= e($field('municipio')) ?>">
 
         <section class="scroll-mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex flex-wrap items-start justify-between gap-4">
@@ -92,13 +94,9 @@ $configurationSelects = ['tipo', 'tipo_derecho', 'tipo_negocio', 'tipo_inmueble'
                     <input class="input" name="titulo" maxlength="160" value="<?= e($field('titulo')) ?>"
                         placeholder="Ej. Avalúo comercial Lote Bruselas">
                 </label>
-                <label class="label">Cliente
+                <label class="label md:col-span-2">Cliente / solicitante
                     <input class="input" name="client_name" maxlength="160" value="<?= e($field('client_name')) ?>"
-                        placeholder="Persona o entidad contratante">
-                </label>
-                <label class="label">Solicitante
-                    <input class="input" name="requester_name" maxlength="160" value="<?= e($field('requester_name')) ?>"
-                        placeholder="Quien solicita o radica el encargo">
+                        placeholder="Persona o entidad que solicita el encargo">
                 </label>
                 <label class="label">Destinatario del informe
                     <input class="input" name="report_recipient" maxlength="160" value="<?= e($field('report_recipient')) ?>"
@@ -117,14 +115,6 @@ $configurationSelects = ['tipo', 'tipo_derecho', 'tipo_negocio', 'tipo_inmueble'
                 </label>
                 <label class="label">Fecha del informe
                     <input class="input" type="date" name="report_date" value="<?= e($field('report_date')) ?>">
-                </label>
-                <label class="label">Municipio base del encargo
-                    <input class="input" name="municipio" maxlength="120" value="<?= e($field('municipio')) ?>"
-                        placeholder="Municipio">
-                </label>
-                <label class="label md:col-span-2">Dirección o referencia base
-                    <input class="input" name="direccion" maxlength="220" value="<?= e($field('direccion')) ?>"
-                        placeholder="Dirección o referencia de ubicación">
                 </label>
                 <label class="label md:col-span-2">Alcance del encargo
                     <textarea class="input" name="assignment_scope" rows="3" maxlength="2000"
