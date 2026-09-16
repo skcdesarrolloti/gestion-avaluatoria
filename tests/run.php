@@ -6,6 +6,7 @@ use App\Core\Session;
 use App\Database\Schema;
 use App\Core\Http;
 use App\Services\AppraisalValidator;
+use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AuthDiagnostics;
 use App\Services\AuthService;
@@ -268,6 +269,13 @@ try {
     $constructionRows = AppraisalChapterZeroInput::unitConstructionData();
     expect($constructionRows[0]['built_area_adopted_m2'] === '85.25'
         && str_contains($constructionRows[0]['construction_conservation_json'], 'estructura'), 'construccion por unidad normalizada');
+    $_POST = ['unit_attributes' => [$unitId => ['items' => ['esquina' => ['value' => 'esquinero',
+        'state' => 'bueno', 'impact' => 'positivo_medio', 'evidence' => 'visita',
+        'notes' => 'Frente comercial observado'], 'desconocido' => ['value' => 'x']],
+        'report_text' => 'Unidad con condición esquinera verificable.']]];
+    $attributeRows = AppraisalAttributeInput::unitAttributeData();
+    expect(str_contains($attributeRows[0]['special_attributes_json'], 'esquinero')
+        && !str_contains($attributeRows[0]['special_attributes_json'], 'desconocido'), 'atributos especiales normalizados');
     $_POST = [];
     $normsDir = sys_get_temp_dir() . '/ga_normas_' . bin2hex(random_bytes(4));
     putenv('NTS_STORAGE_DIR=' . $normsDir);

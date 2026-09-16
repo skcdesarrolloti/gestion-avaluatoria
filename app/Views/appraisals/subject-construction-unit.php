@@ -165,14 +165,6 @@ $builtAreaFields = [
             </table>
         </div>
     </div>
-    <div class="mt-5 grid gap-5 md:grid-cols-2" x-show="activeConstructionDetail === 'especificos'">
-        <?php foreach (['uso' => 'Uso específico', 'altura_libre' => 'Altura libre (m)', 'cubierta' => 'Tipo de cubierta', 'estructura' => 'Material estructura'] as $key => $label): ?>
-            <label class="label"><?= e($label) ?>
-                <input class="input" name="unit_constructions[<?= e($unitId) ?>][specifics][<?= e($key) ?>]"
-                    value="<?= e($jsonValue($unit, 'construction_specifics_json', $key)) ?>" placeholder="<?= e($label) ?>">
-            </label>
-        <?php endforeach; ?>
-    </div>
     <label class="label mt-5 block" x-show="activeConstructionDetail === 'informe'">Texto editable para el entregable
         <textarea class="input" name="unit_constructions[<?= e($unitId) ?>][construction_report_text]" rows="5" maxlength="1500"
             placeholder="Redacción que alimentará la descripción constructiva del informe."><?= e($cv($unit, 'construction_report_text')) ?></textarea>

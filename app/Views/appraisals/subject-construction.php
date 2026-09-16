@@ -11,7 +11,7 @@ $jsonValue = static function (array $unit, string $field, string $key): string {
 $constructionTabs = ['basicos' => ['1', 'Datos básicos'], 'pisos' => ['2', 'Pisos y sótanos'],
     'area' => ['3', 'Área construida'], 'vetustez' => ['4', 'Vetustez y vida útil'],
     'estado' => ['5', 'Estado de obra'], 'conservacion' => ['6', 'Conservación'],
-    'especificos' => ['7', 'Características específicas'], 'informe' => ['8', 'Informe para el entregable']];
+    'informe' => ['7', 'Informe para el entregable']];
 $constructionTypes = ['' => 'Selecciona tipo', 'galpon' => 'Galpón / nave industrial', 'bodega' => 'Bodega',
     'casa' => 'Casa', 'apartamento' => 'Apartamento', 'local' => 'Local comercial', 'oficina' => 'Oficina',
     'deposito' => 'Depósito / cuarto útil', 'mezanine' => 'Mezanine', 'cubierta' => 'Cubierta / techo',

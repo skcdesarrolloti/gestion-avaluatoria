@@ -166,6 +166,8 @@ final class AppraisalRepository
                 $now, $unit['id'], $id, $owner]);
         }
     }
+    public function saveUnitAttributes(string $id, int $owner, array $units): void
+    { $query = $this->unitUpdate(['special_attributes_json', 'special_attributes_report_text']); $now = gmdate('Y-m-d H:i:s'); foreach ($units as $unit) $query->execute([$unit['special_attributes_json'], $unit['special_attributes_report_text'], $now, $unit['id'], $id, $owner]); }
 
     private function unitUpdate(array $fields): \PDOStatement
     { $set = implode(', ', array_map(static fn (string $field): string => $field . ' = ?', $fields)); return $this->db->prepare('UPDATE appraisal_units SET ' . $set . ', updated_at = ? WHERE id = ? AND appraisal_id = ? AND owner_id = ?'); }
@@ -196,7 +198,6 @@ final class AppraisalRepository
     }
 
     public static function photoPath(string $filename): string { return AppraisalPhotoStorage::path($filename); }
-
     public function save(string $id, int $owner, int $version, array $data): array
     {
         $now = gmdate('Y-m-d H:i:s');

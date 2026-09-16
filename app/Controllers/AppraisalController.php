@@ -9,10 +9,12 @@ use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraiserRepository;
 use App\Models\GeoMasterRepository;
 use App\Models\IgacTypologyRepository;
+use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalPhotoUploadService;
 use App\Services\AppraisalValidator;
 use App\Support\AppraisalCatalog;
+use App\Support\AppraisalSpecialAttributeCatalog;
 use App\Support\AppraisalSubjectCatalog;
 
 final class AppraisalController
@@ -57,6 +59,8 @@ final class AppraisalController
             'units' => $this->appraisals->units($id, $this->user['id']),
             'igacCategories' => $this->typologies->categories(),
             'igacTypologiesByCategory' => $this->typologies->optionsByCategory(),
+            'specialAttributeCatalog' => AppraisalSpecialAttributeCatalog::groups(),
+            'specialAttributeOptions' => AppraisalSpecialAttributeCatalog::selectOptions(),
             'subjectCatalog' => AppraisalSubjectCatalog::selects(),
             'subjectHelp' => AppraisalSubjectCatalog::helps(),
             'subjectMessage' => Session::pullFlash('subject_message'),
@@ -85,17 +89,11 @@ final class AppraisalController
 
     public function saveSubjectUnits(string $id): never { $this->saveUnitsAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }
 
-    public function saveSubjectSurfaces(string $id): never
-    {
-        $this->saveSubjectData($id, fn () => $this->appraisals->saveUnitSurfaces($id, $this->user['id'],
-            AppraisalChapterZeroInput::unitSurfaceData()), 'Datos de superficie guardados correctamente.', '#superficies');
-    }
+    public function saveSubjectSurfaces(string $id): never { $this->saveSubjectData($id, fn () => $this->appraisals->saveUnitSurfaces($id, $this->user['id'], AppraisalChapterZeroInput::unitSurfaceData()), 'Datos de superficie guardados correctamente.', '#superficies'); }
 
-    public function saveSubjectConstructions(string $id): never
-    {
-        $this->saveSubjectData($id, fn () => $this->appraisals->saveUnitConstructions($id, $this->user['id'],
-            AppraisalChapterZeroInput::unitConstructionData()), 'Datos de construcción guardados correctamente.', '#construccion');
-    }
+    public function saveSubjectConstructions(string $id): never { $this->saveSubjectData($id, fn () => $this->appraisals->saveUnitConstructions($id, $this->user['id'], AppraisalChapterZeroInput::unitConstructionData()), 'Datos de construcción guardados correctamente.', '#construccion'); }
+
+    public function saveSubjectAttributes(string $id): never { $this->saveSubjectData($id, fn () => $this->appraisals->saveUnitAttributes($id, $this->user['id'], AppraisalAttributeInput::unitAttributeData()), 'Atributos especiales guardados correctamente.', '#atributos'); }
 
     private function saveSubjectData(string $id, callable $save, string $message, string $hash): never
     {
