@@ -12,7 +12,6 @@ return [
     ['POST', '#^/maestros/peritos$#', 'masters', 'createAppraiser', true],
     ['POST', '#^/maestros/departamentos$#', 'masters', 'createDepartment', true],
     ['POST', '#^/maestros/ciudades$#', 'masters', 'createCity', true],
-    ['POST', '#^/maestros/localidades$#', 'masters', 'createLocality', true],
     ['POST', '#^/maestros/barrios$#', 'masters', 'createNeighborhood', true],
     ['GET', '#^/maestros/peritos/([a-f0-9]{32})/raa$#', 'masters', 'raaFile', true],
     ['GET', '#^/$#', 'appraisals', 'index', true],

@@ -68,12 +68,8 @@ final class MasterDataController
 
     public function createNeighborhood(): never
     {
-        $this->createGeo('Barrio / sector', fn () => $this->geo->createNeighborhood($this->geoData(['city_id', 'locality_id', 'name', 'notes'])));
-    }
-
-    public function createLocality(): never
-    {
-        $this->createGeo('Localidad', fn () => $this->geo->createLocality($this->geoData(['city_id', 'name', 'notes'])));
+        $fields = ['city_id', 'name', 'locality_name', 'commune_ucg', 'zone_sector', 'notes'];
+        $this->createGeo('Barrio / microsector', fn () => $this->geo->createNeighborhood($this->geoData($fields)));
     }
 
     public function raaFile(string $id): never
@@ -157,7 +153,8 @@ final class MasterDataController
     {
         $data = ['active' => ($_POST['active'] ?? 'Si') === 'No' ? 'No' : 'Si'];
         foreach ($fields as $field) $data[$field] = trim((string) ($_POST[$field] ?? ''));
-        foreach (['name' => 160, 'code' => 20, 'notes' => 240] as $field => $limit) {
+        foreach (['name' => 160, 'code' => 20, 'locality_name' => 160,
+            'commune_ucg' => 80, 'zone_sector' => 120, 'notes' => 240] as $field => $limit) {
             if (isset($data[$field])) $data[$field] = mb_substr($data[$field], 0, $limit);
         }
         if (($data['name'] ?? '') === '') throw new \InvalidArgumentException('El nombre es obligatorio.');

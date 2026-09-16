@@ -59,11 +59,12 @@ final class GeoMasterRepository
     public function createNeighborhood(array $data): void
     {
         $this->assertCity((string) $data['city_id']);
-        if (($data['locality_id'] ?? '') !== '') $this->assertLocalityForCity((string) $data['locality_id'], (string) $data['city_id']);
+        $localityId = $this->localityId((string) $data['city_id'], (string) ($data['locality_name'] ?? ''));
         $this->insert('master_neighborhoods',
-            ['id', 'city_id', 'locality_id', 'name', 'active', 'notes', 'created_at', 'updated_at'],
-            [bin2hex(random_bytes(16)), $data['city_id'], $data['locality_id'] ?: null,
-                $data['name'], $data['active'], $data['notes']]);
+            ['id', 'city_id', 'locality_id', 'name', 'commune_ucg', 'zone_sector',
+                'active', 'notes', 'created_at', 'updated_at'],
+            [bin2hex(random_bytes(16)), $data['city_id'], $localityId,
+                $data['name'], $data['commune_ucg'], $data['zone_sector'], $data['active'], $data['notes']]);
     }
 
     public function createLocality(array $data): void
@@ -93,6 +94,21 @@ final class GeoMasterRepository
         $query = $this->db->prepare('SELECT COUNT(*) FROM master_localities WHERE id = ? AND city_id = ?');
         $query->execute([$id, $cityId]);
         if ((int) $query->fetchColumn() !== 1) throw new HttpException(422, 'Selecciona una localidad válida para la ciudad.');
+    }
+
+    private function localityId(string $cityId, string $name): ?string
+    {
+        $name = trim($name);
+        if ($name === '') return null;
+        $query = $this->db->prepare('SELECT id FROM master_localities WHERE city_id = ? AND name = ?');
+        $query->execute([$cityId, $name]);
+        $id = $query->fetchColumn();
+        if (is_string($id) && $id !== '') return $id;
+        $id = bin2hex(random_bytes(16));
+        $this->insert('master_localities',
+            ['id', 'city_id', 'name', 'active', 'notes', 'created_at', 'updated_at'],
+            [$id, $cityId, $name, 'Si', 'Creada desde barrio/microsector.']);
+        return $id;
     }
 
     private function insert(string $table, array $columns, array $values): void
