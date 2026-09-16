@@ -140,15 +140,16 @@ final class AppraisalController
         Http::redirect($target);
     }
 
-    public function uploadSubjectPhotos(string $id): never { $this->uploadPhotosAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }
+    public function uploadSubjectPhotos(string $id): never { $this->uploadPhotosAndRedirect($id, $this->safePhotoReturn($id)); }
 
     private function uploadPhotosAndRedirect(string $id, string $target): never
     {
         $record = $this->appraisals->find($id, $this->user['id']);
         try {
             $unitId = preg_match('/^[a-f0-9]{32}$/', (string) ($_POST['unit_id'] ?? '')) ? (string) $_POST['unit_id'] : null;
+            $caption = mb_substr(trim((string) ($_POST['photo_caption'] ?? '')), 0, 190);
             $count = (new AppraisalPhotoUploadService())->store($_FILES['photos'] ?? [], $record['id'],
-                $this->user['id'], $this->appraisals, $unitId);
+                $this->user['id'], $this->appraisals, $unitId, $caption);
             Session::flash('chapter_zero_photo_message', $count === 1
                 ? 'Foto cargada correctamente.'
                 : $count . ' fotos cargadas correctamente.');
@@ -192,9 +193,9 @@ final class AppraisalController
     {
         $target = (string) ($_POST['return_to'] ?? '');
         return in_array($target, ['avaluos/' . $id . '/expediente', 'avaluos/' . $id . '/bien-sujeto',
-            'avaluos/' . $id . '/bien-sujeto#atributos'], true)
+            'avaluos/' . $id . '/bien-sujeto#atributos', 'avaluos/' . $id . '/bien-sujeto#fotos'], true)
             ? $target
-            : 'avaluos/' . $id . '/expediente';
+            : 'avaluos/' . $id . '/bien-sujeto#fotos';
     }
 
     public function edit(string $id): void

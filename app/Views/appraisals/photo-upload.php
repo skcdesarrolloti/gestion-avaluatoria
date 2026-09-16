@@ -8,14 +8,18 @@ $photoEyebrow = $photoUploadEyebrow ?? 'Evidencia posterior a la tipología';
 $photoTitle = $photoUploadTitle ?? 'Fotos para comprobar la unidad';
 $photoDescription = $photoUploadDescription ?? 'Sube las fotos después de escoger la tipología probable. La imagen real permite confirmar o ajustar la clasificación constructiva antes de usarla en reposición o descripción.';
 $photoReturnTo = $photoUploadReturnTo ?? $subjectActionBase;
+$photoCaption = $photoUploadCaption ?? '';
+$compact = $photoUploadCompact ?? false;
 $visiblePhotos = $photoUnitId === '' ? $photos : array_values(array_filter($photos,
     static fn (array $photo): bool => (string) ($photo['unit_id'] ?? '') === $photoUnitId));
+$visiblePhotos = $photoCaption === '' ? $visiblePhotos : array_values(array_filter($visiblePhotos,
+    static fn (array $photo): bool => (string) ($photo['caption'] ?? '') === $photoCaption));
 ?>
-    <<?= $embedded ? 'div' : 'section' ?> class="<?= $embedded ? 'mt-8 rounded-xl border border-slate-200 bg-slate-50 p-5' : 'rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8' ?>">
+    <<?= $embedded ? 'div' : 'section' ?> class="<?= $embedded ? ($compact ? 'rounded-xl border border-slate-200 bg-slate-50 p-5' : 'mt-8 rounded-xl border border-slate-200 bg-slate-50 p-5') : 'rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8' ?>">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
                 <p class="eyebrow"><?= e($photoEyebrow) ?></p>
-                <h2 class="mt-2 text-2xl font-semibold"><?= e($photoTitle) ?></h2>
+                <h2 class="mt-2 <?= $compact ? 'text-lg' : 'text-2xl' ?> font-semibold"><?= e($photoTitle) ?></h2>
                 <p class="mt-2 text-sm leading-6 text-slate-600">
                     <?= e($photoDescription) ?>
                 </p>
@@ -37,6 +41,8 @@ $visiblePhotos = $photoUnitId === '' ? $photos : array_values(array_filter($phot
             x-data="photoUpload" @submit="busy = true">
             <?= csrf_field() ?>
             <?php if ($photoUnitId): ?><input type="hidden" name="unit_id" value="<?= e($photoUnitId) ?>"><?php endif; ?>
+            <input type="hidden" name="photo_caption" value="<?= e($photoCaption) ?>">
+            <input type="hidden" name="return_to" value="<?= e($photoReturnTo) ?>">
             <div class="label">Agregar fotos
                 <div class="mt-2 grid gap-3 rounded-xl border border-dashed border-slate-300 bg-white p-4 sm:grid-cols-2">
                     <label class="btn-secondary min-h-11">Elegir archivos
@@ -65,7 +71,7 @@ $visiblePhotos = $photoUnitId === '' ? $photos : array_values(array_filter($phot
             </div>
         </form>
         <?php if ($visiblePhotos): ?>
-            <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
+            <div class="mt-6 grid gap-4 sm:grid-cols-2">
                 <?php foreach ($visiblePhotos as $photo): ?>
                     <?php $canRender = !empty($photo['file_available']) || !empty($photo['has_blob']); ?>
                     <div class="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">

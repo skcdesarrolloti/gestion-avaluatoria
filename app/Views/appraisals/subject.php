@@ -19,7 +19,7 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
 </div>
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
-<div class="mt-7" x-data="{ activeSubject: location.hash === '#superficies' ? 'surface' : (location.hash === '#construccion' ? 'construction' : (location.hash === '#atributos' ? 'attributes' : 'basic')) }">
+<div class="mt-7" x-data="{ activeSubject: location.hash === '#superficies' ? 'surface' : (location.hash === '#construccion' ? 'construction' : (location.hash === '#atributos' ? 'attributes' : (location.hash === '#fotos' ? 'photos' : 'basic'))) }">
     <div class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
         <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
             <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
@@ -46,6 +46,12 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
                 <span class="block text-base">2.4 Atributos especiales</span>
                 <span class="block text-xs font-medium opacity-80">Diferenciales del sujeto por unidad</span>
             </button>
+            <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
+                @click="activeSubject = 'photos'; history.replaceState(null, '', '#fotos')"
+                :class="activeSubject === 'photos' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:border-blue-700'">
+                <span class="block text-base">2.5 Registro fotográfico</span>
+                <span class="block text-xs font-medium opacity-80">Fotos para el entregable</span>
+            </button>
         </div>
     </div>
     <div class="mt-7" x-show="activeSubject === 'basic'">
@@ -59,5 +65,8 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
     </div>
     <div class="mt-7" x-show="activeSubject === 'attributes'">
         <?php require BASE_PATH . '/app/Views/appraisals/subject-attributes.php'; ?>
+    </div>
+    <div class="mt-7" x-show="activeSubject === 'photos'">
+        <?php require BASE_PATH . '/app/Views/appraisals/subject-photos.php'; ?>
     </div>
 </div>
