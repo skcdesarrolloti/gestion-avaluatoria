@@ -23,12 +23,80 @@ $areaSources = ['manual' => 'Manual', 'midas' => 'MIDAS', 'tax' => 'Impuesto pre
     'deed' => 'Escritura', 'certificate' => 'Certificado de Tradición', 'other' => 'Otra fuente'];
 $stateOptions = ['' => 'Selecciona estado', 'completa' => 'Obra completa', 'en_construccion' => 'En construcción',
     'desmantelamiento' => 'En desmantelamiento', 'inconclusa' => 'Sin avance / obra inconclusa'];
-$conservationElements = ['estructura' => 'Estructura', 'cubierta' => 'Cubierta', 'fachada' => 'Fachada',
-    'muros' => 'Muros', 'pisos' => 'Pisos', 'cielorraso' => 'Cielorraso', 'carpinteria' => 'Carpintería',
-    'ventaneria' => 'Ventanería', 'banos' => 'Baños', 'cocina' => 'Cocina', 'red_hidraulica' => 'Red hidráulica',
-    'red_electrica' => 'Red eléctrica', 'acabados' => 'Acabados', 'pintura' => 'Pintura', 'instalaciones' => 'Instalaciones especiales'];
 $serviceOptions = ['acueducto' => 'Acueducto', 'energia' => 'Energía', 'alcantarillado' => 'Alcantarillado',
     'gas' => 'Gas', 'internet' => 'Internet / datos', 'incendio' => 'Sistema contra incendio'];
+$typologyLookup = [];
+foreach (($igacTypologiesByCategory ?? []) as $category => $items) {
+    foreach ($items as $item) $typologyLookup[$category][$item['value']] = $item;
+}
+$componentDefinitions = [
+    'estructura' => ['Estructura', 'Sistema portante que sostiene la construcción.'],
+    'fachada' => ['Fachada', 'Acabado exterior y presentación visible de la unidad.'],
+    'cubierta' => ['Cubierta', 'Sistema de protección superior o techo.'],
+    'dependencias' => ['Dependencias', 'Distribución de espacios interiores o funcionales.'],
+    'iluminacion' => ['Iluminación', 'Condiciones naturales o artificiales de iluminación.'],
+    'ventilacion' => ['Ventilación', 'Condiciones naturales o mecánicas de ventilación.'],
+    'acabados' => ['Acabados', 'Calidad general de terminaciones y presentación.'],
+    'pisos' => ['Pisos', 'Material y estado de los acabados de piso.'],
+    'paredes' => ['Paredes', 'Material y acabado de muros interiores.'],
+    'cielorraso' => ['Cielo raso', 'Acabado inferior de cubierta o entrepiso.'],
+    'puertas' => ['Puertas', 'Material y estado de accesos interiores o exteriores.'],
+    'ventanas' => ['Ventanas', 'Material, perfilería y estado de vanos.'],
+    'banos' => ['Baños', 'Acabados, aparatos e instalaciones sanitarias.'],
+    'cocina' => ['Cocina', 'Acabados, mesones, muebles e instalaciones de cocina.'],
+    'instalaciones' => ['Instalaciones', 'Redes eléctricas, hidrosanitarias o especiales.'],
+    'cerramiento' => ['Cerramiento', 'Elementos perimetrales, muros, rejas o mallas.'],
+    'porton' => ['Portón', 'Acceso vehicular o peatonal asociado.'],
+    'equipos' => ['Equipos', 'Equipos fijos o especiales de la construcción.'],
+];
+$componentSets = [
+    'ANEXOS' => ['estructura', 'cubierta', 'pisos', 'cerramiento', 'porton', 'instalaciones', 'equipos'],
+    'INDUSTRIALES' => ['estructura', 'fachada', 'cubierta', 'pisos', 'paredes', 'iluminacion',
+        'ventilacion', 'instalaciones', 'porton', 'banos'],
+    'default' => ['estructura', 'fachada', 'cubierta', 'dependencias', 'iluminacion', 'ventilacion',
+        'acabados', 'pisos', 'paredes', 'cielorraso', 'puertas', 'ventanas', 'banos', 'cocina', 'instalaciones'],
+];
+$materialOptions = [
+    'estructura' => ['Concreto reforzado', 'Acero', 'Mampostería estructural', 'Madera', 'Mixta'],
+    'fachada' => ['Pañete y pintura', 'Ladrillo a la vista', 'Prefabricado', 'Vidrio / aluminio', 'Sin acabado'],
+    'cubierta' => ['Placa de concreto', 'Teja fibrocemento', 'Teja metálica', 'Teja de barro', 'Policarbonato'],
+    'pisos' => ['Cerámica', 'Baldosa', 'Concreto afinado', 'Porcelanato', 'Tierra / sin acabado'],
+    'paredes' => ['Mampostería revocada', 'Drywall', 'Concreto a la vista', 'Madera', 'Sin acabado'],
+    'cielorraso' => ['Drywall', 'Machimbre', 'PVC', 'Concreto a la vista', 'No aplica'],
+    'puertas' => ['Madera', 'Metálica', 'Aluminio', 'Vidrio templado', 'No aplica'],
+    'ventanas' => ['Aluminio y vidrio', 'Madera', 'Metálica', 'PVC', 'No aplica'],
+    'banos' => ['Enchape cerámico', 'Aparatos básicos', 'Sin baño', 'No aplica'],
+    'cocina' => ['Mesón en granito', 'Enchape cerámico', 'Cocina sencilla', 'Sin cocina', 'No aplica'],
+];
+$componentAliases = [
+    'estructura' => ['estructura', 'concreto', 'acero', 'cimientos', 'vigas', 'columnas'],
+    'fachada' => ['fachada', 'exterior'], 'cubierta' => ['cubierta', 'teja', 'placa', 'techo'],
+    'acabados' => ['acabado', 'enchape'], 'pisos' => ['piso', 'baldosa', 'ceramica'],
+    'paredes' => ['pared', 'muro', 'mamposteria'], 'puertas' => ['puerta'], 'ventanas' => ['ventana'],
+    'banos' => ['bano', 'sanitario'], 'cocina' => ['cocina', 'meson'], 'cerramiento' => ['cerramiento', 'malla'],
+    'porton' => ['porton', 'acceso'], 'instalaciones' => ['instalacion', 'red', 'electrica', 'hidraulica'],
+];
+$suggestFromTypology = static function (string $key, string $text) use ($componentAliases): string {
+    $phrases = preg_split('/[.;]/', $text) ?: [];
+    $aliases = $componentAliases[$key] ?? [$key];
+    foreach ($phrases as $phrase) {
+        $plain = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', mb_strtolower($phrase)) ?: mb_strtolower($phrase);
+        foreach ($aliases as $alias) if (str_contains($plain, $alias)) return mb_substr(trim($phrase), 0, 120);
+    }
+    return '';
+};
+$componentRows = static function (array $unit) use ($typologyLookup, $componentSets, $componentDefinitions,
+    $materialOptions, $suggestFromTypology): array {
+    $category = (string) ($unit['igac_category'] ?? '');
+    $typology = $typologyLookup[$category][(string) ($unit['igac_typology_hint'] ?? '')] ?? [];
+    $text = trim((string) ($typology['description'] ?? '') . ' ' . (string) ($typology['specifications'] ?? ''));
+    $keys = $componentSets[$category] ?? $componentSets['default'];
+    return array_map(static fn (string $key): array => [
+        'key' => $key, 'label' => $componentDefinitions[$key][0], 'definition' => $componentDefinitions[$key][1],
+        'suggestion' => $suggestFromTypology($key, $text),
+        'materials' => $materialOptions[$key] ?? ['Según tipología IGAC', 'Bueno / convencional', 'Sencillo', 'Especial', 'No aplica'],
+    ], $keys);
+};
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{ activeConstruction: '<?= e($constructionUnits[0]['id'] ?? '') ?>', busyConstruction: false }">

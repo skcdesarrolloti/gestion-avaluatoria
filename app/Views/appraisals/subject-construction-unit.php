@@ -118,16 +118,56 @@ $builtAreaFields = [
                 inputmode="decimal" value="<?= e($cv($unit, 'construction_integrity_percent')) ?>" placeholder="Ej. 65">
         </label>
     </div>
-    <div class="mt-5 grid gap-5 md:grid-cols-3" x-show="activeConstructionDetail === 'conservacion'">
-        <?php foreach ($conservationElements as $key => $label): ?>
-            <label class="label"><?= e($label) ?>
-                <select class="input" name="unit_constructions[<?= e($unitId) ?>][conservation][<?= e($key) ?>]">
-                    <?php foreach (['' => 'No verificado', 'B' => 'Bueno', 'R' => 'Regular', 'M' => 'Malo', 'NA' => 'No aplica'] as $value => $text): ?>
-                        <option value="<?= e($value) ?>" <?= $jsonValue($unit, 'construction_conservation_json', $key) === $value ? 'selected' : '' ?>><?= e($text) ?></option>
+    <div class="mt-5 space-y-4" x-show="activeConstructionDetail === 'conservacion'">
+        <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
+            Los componentes se proponen desde la tipología constructiva de esta unidad. Marca B = Bueno,
+            R = Regular, M = Malo o N/A cuando el elemento no exista en esta construcción.
+        </div>
+        <div class="overflow-x-auto rounded-xl border border-slate-200">
+            <table class="min-w-full text-left text-sm">
+                <thead class="bg-blue-900 text-xs uppercase tracking-wide text-white">
+                    <tr>
+                        <th class="px-3 py-3">#</th>
+                        <th class="px-3 py-3">Elemento</th>
+                        <th class="px-3 py-3">Definición</th>
+                        <th class="px-3 py-3">Material / descripción</th>
+                        <th class="px-3 py-3">Estado</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-200">
+                    <?php foreach ($componentRows($unit) as $index => $row): ?>
+                        <?php $materialKey = 'material_' . $row['key']; ?>
+                        <tr class="<?= $index % 2 === 0 ? 'bg-white' : 'bg-slate-50' ?>">
+                            <td class="px-3 py-3 text-slate-600"><?= $index + 1 ?></td>
+                            <td class="px-3 py-3 font-semibold text-slate-950"><?= e($row['label']) ?></td>
+                            <td class="px-3 py-3 text-slate-600"><?= e($row['definition']) ?></td>
+                            <td class="px-3 py-3">
+                                <select class="input min-w-64" name="unit_constructions[<?= e($unitId) ?>][specifics][<?= e($materialKey) ?>]">
+                                    <option value="">Selecciona material</option>
+                                    <?php if ($row['suggestion'] !== ''): ?>
+                                        <option value="<?= e($row['suggestion']) ?>" <?= $jsonValue($unit, 'construction_specifics_json', $materialKey) === $row['suggestion'] ? 'selected' : '' ?>>
+                                            Según tipología: <?= e($row['suggestion']) ?>
+                                        </option>
+                                    <?php endif; ?>
+                                    <?php foreach ($row['materials'] as $material): ?>
+                                        <option value="<?= e($material) ?>" <?= $jsonValue($unit, 'construction_specifics_json', $materialKey) === $material ? 'selected' : '' ?>>
+                                            <?= e($material) ?>
+                                        </option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </td>
+                            <td class="px-3 py-3">
+                                <select class="input min-w-36" name="unit_constructions[<?= e($unitId) ?>][conservation][<?= e($row['key']) ?>]">
+                                    <?php foreach (['' => 'No verificado', 'B' => 'Bueno', 'R' => 'Regular', 'M' => 'Malo', 'NA' => 'No aplica'] as $value => $text): ?>
+                                        <option value="<?= e($value) ?>" <?= $jsonValue($unit, 'construction_conservation_json', $row['key']) === $value ? 'selected' : '' ?>><?= e($text) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </td>
+                        </tr>
                     <?php endforeach; ?>
-                </select>
-            </label>
-        <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
     </div>
     <label class="label mt-5 block" x-show="activeConstructionDetail === 'aspectos'">Aspectos generales
         <textarea class="input" name="unit_constructions[<?= e($unitId) ?>][construction_general_aspects]" rows="4" maxlength="1000"
