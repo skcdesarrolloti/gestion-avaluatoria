@@ -134,8 +134,4 @@ $firstAttributeGroup = (string) array_key_first($specialAttributeCatalog);
             </div>
         <?php endforeach; ?>
     </div>
-    <label class="label mt-5 block">Texto editable para el entregable del numeral 2.4
-        <textarea class="input" name="unit_attributes[<?= e($unitId) ?>][report_text]" rows="5" maxlength="1500"
-            placeholder="Redacción técnica sobre atributos diferenciales del sujeto."><?= e((string) ($unit['special_attributes_report_text'] ?? '')) ?></textarea>
-    </label>
 </div>

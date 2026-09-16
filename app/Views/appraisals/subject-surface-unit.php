@@ -152,15 +152,9 @@ $boundaries = [
             <textarea class="input" name="unit_surfaces[<?= e($unitId) ?>][dynamic_surface_notes]" rows="4" maxlength="1000"
                 placeholder="Explica inconsistencias entre fuentes, afectaciones, servidumbres, retiros, forma o frente real."><?= e($surfaceValue($unit, 'dynamic_surface_notes')) ?></textarea>
         </label>
-    </div>
-    <div class="mt-5 grid gap-5" x-show="activeSurfaceDetail === 'informe'">
-        <label class="label">Observaciones de superficie
+        <label class="label block">Observaciones de superficie
             <textarea class="input" name="unit_surfaces[<?= e($unitId) ?>][surface_notes]" rows="3" maxlength="1000"
                 placeholder="Justifica la fuente adoptada y las diferencias encontradas."><?= e($surfaceValue($unit, 'surface_notes')) ?></textarea>
-        </label>
-        <label class="label">Texto editable para el entregable
-            <textarea class="input" name="unit_surfaces[<?= e($unitId) ?>][surface_report_text]" rows="4" maxlength="1500"
-                placeholder="Redacción que alimentará la sección de superficies del informe."><?= e($surfaceValue($unit, 'surface_report_text')) ?></textarea>
         </label>
     </div>
 </div>

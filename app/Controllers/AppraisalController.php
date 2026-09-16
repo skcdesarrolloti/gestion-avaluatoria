@@ -19,9 +19,7 @@ use App\Support\AppraisalSubjectCatalog;
 
 final class AppraisalController
 {
-    public function __construct(private AppraisalRepository $appraisals, private array $user,
-        private AppraiserRepository $appraisers, private IgacTypologyRepository $typologies,
-        private AppraisalSubjectRepository $subjects, private GeoMasterRepository $geo) {}
+    public function __construct(private AppraisalRepository $appraisals, private array $user, private AppraiserRepository $appraisers, private IgacTypologyRepository $typologies, private AppraisalSubjectRepository $subjects, private GeoMasterRepository $geo) {}
 
     public function index(): void
     {
@@ -72,6 +70,9 @@ final class AppraisalController
             'catalog' => ['selects' => AppraisalCatalog::selectFields(), 'notes' => AppraisalCatalog::notes()]]);
     }
 
+    public function sector(string $id): void { view('appraisals/sector', ['title' => 'Sector y entorno', 'record' => $this->appraisals->find($id, $this->user['id'])]); }
+    public function deliverable(string $id): void { view('appraisals/deliverable', ['title' => 'Entregable', 'record' => $this->appraisals->find($id, $this->user['id'])]); }
+
     public function saveSubjectBasic(string $id): never
     {
         $this->saveSubjectData($id, fn () => $this->subjects->save($id, $this->user['id'], $_POST),
@@ -83,7 +84,7 @@ final class AppraisalController
         $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
             $this->igacCodes(), $this->appraiserIds());
         $this->appraisals->saveChapterZero($id, $this->user['id'], (int) $_POST['version'], $data);
-        Http::redirect('avaluos/' . $id . ((string) ($_POST['next'] ?? '') === 'subject' ? '/bien-sujeto#atributos' : '/expediente'));
+        Http::redirect('avaluos/' . $id . ((string) ($_POST['next'] ?? '') === 'sector' ? '/sector' : ((string) ($_POST['next'] ?? '') === 'subject' ? '/bien-sujeto#atributos' : ((string) ($_POST['next'] ?? '') === 'deliverable' ? '/entregable' : '/expediente'))));
     }
 
     public function saveSubjectUnits(string $id): never { $this->saveUnitsAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }
@@ -214,6 +215,5 @@ final class AppraisalController
         Http::json(['ok' => true] + $result);
     }
 
-    private function appraiserIds(): array { return array_column($this->appraisers->all(), 'id'); }
-    private function igacCodes(): array { return array_column($this->typologies->categories(), 'code'); }
+    private function appraiserIds(): array { return array_column($this->appraisers->all(), 'id'); } private function igacCodes(): array { return array_column($this->typologies->categories(), 'code'); }
 }

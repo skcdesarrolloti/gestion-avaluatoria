@@ -10,7 +10,6 @@ $surfaceTabs = [
     'fondo' => ['3', 'Fondo equivalente'],
     'relacion' => ['4', 'Relación frente-fondo'],
     'dinamicas' => ['5', 'Variables dinámicas'],
-    'informe' => ['6', 'Informe para el entregable'],
 ];
 $surfaceSources = ['manual' => 'Manual', 'midas' => 'MIDAS', 'tax' => 'Impuesto predial',
     'deed' => 'Escritura', 'certificate' => 'Certificado de Tradición', 'other' => 'Otra fuente'];
@@ -43,7 +42,7 @@ $dynamicOptions = [
     x-data="{ activeSurface: '<?= e($surfaceUnits[0]['id'] ?? '') ?>', busySurface: false }">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">2.2 Datos de la superficie</p>
+            <p class="eyebrow">3.2 Datos de la superficie</p>
             <h2 class="mt-2 text-2xl font-semibold">Superficies por unidad del predio</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Primero captura las fuentes de área, luego adopta la superficie técnica. El fondo equivalente

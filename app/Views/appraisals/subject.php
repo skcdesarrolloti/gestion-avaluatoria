@@ -8,11 +8,11 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
     <div>
-        <p class="eyebrow">Bien sujeto</p>
+        <p class="eyebrow">Numeral 3 · Bien sujeto</p>
         <h1 class="mt-2 text-3xl font-semibold tracking-tight">Características y tipologías del inmueble</h1>
         <p class="mt-3 max-w-3xl text-slate-600">
             Aquí se documentan las unidades y anexos del predio, sus tipologías IGAC, fotos y
-            descripciones editables para alimentar el informe.
+            descripciones técnicas para alimentar la caracterización del avalúo.
         </p>
     </div>
     <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Sujeto del avalúo</span>
@@ -25,31 +25,31 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
             <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
                 @click="activeSubject = 'basic'; history.replaceState(null, '', '#ficha-basica')"
                 :class="activeSubject === 'basic' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:border-blue-700'">
-                <span class="block text-base">2.1 Ficha básica del sujeto</span>
+                <span class="block text-base">3.1 Ficha básica del sujeto</span>
                 <span class="block text-xs font-medium opacity-80">Identificación y características</span>
             </button>
             <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
                 @click="activeSubject = 'surface'; history.replaceState(null, '', '#superficies')"
                 :class="activeSubject === 'surface' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:border-blue-700'">
-                <span class="block text-base">2.2 Datos de la superficie</span>
+                <span class="block text-base">3.2 Datos de la superficie</span>
                 <span class="block text-xs font-medium opacity-80">Áreas, fondo y variables del terreno</span>
             </button>
             <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
                 @click="activeSubject = 'construction'; history.replaceState(null, '', '#construccion')"
                 :class="activeSubject === 'construction' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:border-blue-700'">
-                <span class="block text-base">2.3 Datos de la construcción</span>
+                <span class="block text-base">3.3 Datos de la construcción</span>
                 <span class="block text-xs font-medium opacity-80">Áreas, vetustez, estado y conservación</span>
             </button>
             <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
                 @click="activeSubject = 'attributes'; history.replaceState(null, '', '#atributos')"
                 :class="activeSubject === 'attributes' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:border-blue-700'">
-                <span class="block text-base">2.4 Atributos especiales</span>
+                <span class="block text-base">3.4 Atributos especiales</span>
                 <span class="block text-xs font-medium opacity-80">Diferenciales del sujeto por unidad</span>
             </button>
             <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
                 @click="activeSubject = 'photos'; history.replaceState(null, '', '#fotos')"
                 :class="activeSubject === 'photos' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:border-blue-700'">
-                <span class="block text-base">2.5 Registro fotográfico</span>
+                <span class="block text-base">3.5 Registro fotográfico</span>
                 <span class="block text-xs font-medium opacity-80">Fotos para el entregable</span>
             </button>
         </div>

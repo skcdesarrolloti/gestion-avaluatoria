@@ -9,34 +9,6 @@ $initial = ['notes' => $notes];
 $currentStep = 'expediente';
 $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', 'destinacion',
     'base_valor', 'aplica_niif', 'regimen_ph', 'estructura_metodo'];
-$optionText = static function (string $name) use ($record): string {
-    $value = (string) ($record[$name] ?? '');
-    return AppraisalCatalog::selectFields()[$name][4][$value] ?? '';
-};
-$academyText = static function (string $name) use ($record, $notes): string {
-    $value = (string) ($record[$name] ?? '');
-    return (string) ($notes[$name][$value]['report'] ?? $notes[$name][$value]['what'] ?? '');
-};
-$parts = array_filter([
-    $field('titulo') !== '' ? 'El encargo valuatorio se identifica como ' . $field('titulo') . '.' : '',
-    trim('El cliente o contratante es ' . ($field('client_name') ?: '[cliente por definir]') . '; el solicitante es '
-        . ($field('requester_name') ?: '[solicitante por definir]') . '; y el propietario del inmueble es '
-        . ($field('property_owner_name') ?: '[propietario por verificar]') . '.'),
-    trim('El informe se dirige a ' . ($field('report_recipient') ?: '[destinatario por definir]') . '.'),
-    trim('Corresponde a ' . ($optionText('tipo') ?: '[tipo de avalúo por definir]')
-        . ', sobre el derecho ' . ($optionText('tipo_derecho') ?: '[derecho por definir]')
-        . ', con finalidad ' . ($optionText('finalidad') ?: '[finalidad por definir]') . '.'),
-    $field('intended_use') !== '' ? 'El uso previsto del informe es: ' . $field('intended_use') . '.' : '',
-    trim('Fechas del encargo: visita ' . ($field('visit_date') ?: '[por definir]') . ', valor '
-        . ($field('value_date') ?: '[por definir]') . ' e informe ' . ($field('report_date') ?: '[por definir]') . '.'),
-    $field('assignment_scope') !== '' ? 'Alcance: ' . $field('assignment_scope') : '',
-    $field('assignment_limitations') !== '' ? 'Limitaciones y salvedades: ' . $field('assignment_limitations') : '',
-    $field('assignment_hypotheses') !== '' ? 'Hipótesis de trabajo: ' . $field('assignment_hypotheses') : '',
-    trim('Justificación técnica: ' . implode(' ', array_filter([
-        $academyText('tipo'), $academyText('tipo_derecho'), $academyText('finalidad'),
-    ]))),
-]);
-$reportText = $field('assignment_report_text') !== '' ? $field('assignment_report_text') : implode("\n\n", $parts);
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
@@ -80,7 +52,7 @@ $reportText = $field('assignment_report_text') !== '' ? $field('assignment_repor
                     <p class="eyebrow">Expediente valuatorio</p>
                     <h2 class="mt-2 text-2xl font-semibold">Configuración e identificación del encargo</h2>
                 </div>
-                <div class="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-800">1.1 / 1.3</div>
+                <div class="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-800">1.1 / 1.2</div>
             </div>
             <nav class="mt-6 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Subsecciones del expediente">
                 <button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
@@ -89,9 +61,6 @@ $reportText = $field('assignment_report_text') !== '' ? $field('assignment_repor
                 <button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
                     :class="active === 'identificacion' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800'"
                     @click="active = 'identificacion'">1.2 Identificación del encargo</button>
-                <button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
-                    :class="active === 'entregable' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800'"
-                    @click="active = 'entregable'">1.3 Entregable cap. 1</button>
             </nav>
 
             <div class="mt-6 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950"
@@ -175,23 +144,13 @@ $reportText = $field('assignment_report_text') !== '' ? $field('assignment_repor
                 </label>
             </div>
 
-            <div class="mt-6 space-y-5" x-show="active === 'entregable'">
-                <div class="rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm leading-6 text-emerald-950">
-                    Este borrador toma los datos de 1.1 y 1.2, incluida la academia de los campos,
-                    para proponer el texto del numeral 1. El analista puede ajustarlo antes del informe final.
-                </div>
-                <label class="label">Texto editable para el entregable
-                    <textarea class="input min-h-80" name="assignment_report_text" rows="16" maxlength="5000"
-                        placeholder="Redacta aquí el numeral 1 del informe."><?= e($reportText) ?></textarea>
-                </label>
-            </div>
         </section>
 
         <aside class="space-y-4">
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
                 <h2 class="font-semibold">Guardar expediente</h2>
                 <p class="mt-3 text-sm leading-6 text-slate-600">
-                    Guarda 1.1, 1.2 y 1.3 antes de continuar con Bien sujeto.
+                    Guarda 1.1 y 1.2 antes de continuar con Sector o Bien sujeto.
                 </p>
                 <button class="btn-primary mt-5 w-full" type="submit" :disabled="busy"
                     x-text="busy ? 'Guardando...' : 'Guardar expediente'">Guardar expediente</button>
@@ -199,8 +158,8 @@ $reportText = $field('assignment_report_text') !== '' ? $field('assignment_repor
             <p class="px-2 text-xs leading-5 text-slate-500">
                 El consecutivo técnico se asignará cuando el expediente quede formalmente configurado.
             </p>
-            <button class="btn-secondary w-full" type="submit" name="next" value="subject">
-                Guardar y continuar a Bien sujeto
+            <button class="btn-secondary w-full" type="submit" name="next" value="sector">
+                Guardar y continuar a Sector
             </button>
         </aside>
     </form>

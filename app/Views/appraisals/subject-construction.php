@@ -10,8 +10,7 @@ $jsonValue = static function (array $unit, string $field, string $key): string {
 };
 $constructionTabs = ['basicos' => ['1', 'Datos básicos'], 'pisos' => ['2', 'Pisos y sótanos'],
     'area' => ['3', 'Área construida'], 'vetustez' => ['4', 'Vetustez y vida útil'],
-    'estado' => ['5', 'Estado de obra'], 'conservacion' => ['6', 'Conservación'],
-    'informe' => ['7', 'Informe para el entregable']];
+    'estado' => ['5', 'Estado de obra'], 'conservacion' => ['6', 'Conservación']];
 $constructionTypes = ['' => 'Selecciona tipo', 'galpon' => 'Galpón / nave industrial', 'bodega' => 'Bodega',
     'casa' => 'Casa', 'apartamento' => 'Apartamento', 'local' => 'Local comercial', 'oficina' => 'Oficina',
     'deposito' => 'Depósito / cuarto útil', 'mezanine' => 'Mezanine', 'cubierta' => 'Cubierta / techo',
@@ -103,11 +102,11 @@ $typologyUsefulLife = static function (array $unit) use ($typologyLookup): strin
     x-data="{ activeConstruction: '<?= e($constructionUnits[0]['id'] ?? '') ?>', busyConstruction: false }">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">2.3 Datos de la construcción</p>
+            <p class="eyebrow">3.3 Datos de la construcción</p>
             <h2 class="mt-2 text-2xl font-semibold">Construcciones por unidad del predio</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Caracteriza cada unidad o anexo: tipo constructivo, áreas por fuente, vetustez, estado,
-                conservación y texto editable para el entregable. Los servicios públicos se capturan en 2.1.
+                conservación y componentes constructivos. Los servicios públicos se capturan en 3.1.
             </p>
         </div>
         <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"><?= count($constructionUnits) ?> unidad(es)</span>

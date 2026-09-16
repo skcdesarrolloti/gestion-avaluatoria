@@ -16,11 +16,11 @@ $photosForAttribute = static function (string $unitId, string $key) use ($photos
     x-data="{ activeAttributes: '<?= e($attributeUnits[0]['id'] ?? '') ?>', busyAttributes: false, showPh: <?= $hasHorizontalProperty ? 'true' : 'false' ?> }">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">2.4 Atributos especiales del sujeto</p>
+            <p class="eyebrow">3.4 Atributos especiales del sujeto</p>
             <h2 class="mt-2 text-2xl font-semibold">Lectura diferencial por unidad</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Aquí solo se registra qué atributos especiales tiene cada unidad, su evidencia e impacto técnico.
-                Las condiciones de búsqueda y filtros de portales se trabajan después en el numeral 3.
+                Las condiciones de búsqueda y filtros de portales se trabajan después en Comparables.
             </p>
             <button class="btn-secondary mt-4 min-h-10 text-xs" type="button" x-show="!showPh" @click="showPh = true">
                 Mostrar amenidades PH

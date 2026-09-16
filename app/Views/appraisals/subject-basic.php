@@ -68,7 +68,7 @@ $tabs = [
     }">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">2.1 Ficha básica del sujeto</p>
+            <p class="eyebrow">3.1 Ficha básica del sujeto</p>
             <h2 class="mt-2 text-2xl font-semibold">Identificación y características del inmueble</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Misma lógica base de InversKC, organizada en subpestañas para diligenciar sin perderse.

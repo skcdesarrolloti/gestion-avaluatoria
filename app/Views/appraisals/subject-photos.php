@@ -22,7 +22,7 @@ foreach ($photoUnits as $photoUnit) {
     x-data="{ activePhotoUnit: (<?= e(json_encode($photoTabMap, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>)[location.hash.slice(1)] || '<?= e($photoUnits[0]['kind'] . ':' . $photoUnits[0]['id']) ?>' }">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">2.5 Registro fotográfico del sujeto</p>
+            <p class="eyebrow">3.5 Registro fotográfico del sujeto</p>
             <h2 class="mt-2 text-2xl font-semibold">Fotos organizadas para el entregable</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Carga o pega las imágenes que irán al informe. Todas se muestran con el mismo formato visual;

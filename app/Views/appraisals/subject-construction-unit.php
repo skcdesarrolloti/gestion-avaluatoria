@@ -165,8 +165,4 @@ $builtAreaFields = [
             </table>
         </div>
     </div>
-    <label class="label mt-5 block" x-show="activeConstructionDetail === 'informe'">Texto editable para el entregable
-        <textarea class="input" name="unit_constructions[<?= e($unitId) ?>][construction_report_text]" rows="5" maxlength="1500"
-            placeholder="Redacción que alimentará la descripción constructiva del informe."><?= e($cv($unit, 'construction_report_text')) ?></textarea>
-    </label>
 </div>
