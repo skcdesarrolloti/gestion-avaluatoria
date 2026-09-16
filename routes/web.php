@@ -10,6 +10,7 @@ return [
     ['GET', '#^/valuaciones$#', 'valuations', 'index', true],
     ['GET', '#^/maestros$#', 'masters', 'index', true],
     ['POST', '#^/maestros/peritos$#', 'masters', 'createAppraiser', true],
+    ['GET', '#^/maestros/peritos/([a-f0-9]{32})/raa$#', 'masters', 'raaFile', true],
     ['GET', '#^/$#', 'appraisals', 'index', true],
     ['GET', '#^/normas-tecnicas-sectoriales$#', 'standards', 'index', true],
     ['GET', '#^/marco-juridico-valuatorio$#', 'legal', 'index', true],
