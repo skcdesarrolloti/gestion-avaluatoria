@@ -253,10 +253,12 @@ try {
     $_POST = ['units' => [$unitId => ['label' => 'Casa principal', 'default_label' => 'Unidad 1']]];
     expect(AppraisalChapterZeroInput::unitData([], [])[0]['label'] === 'Casa principal', 'nombre propio de unidad aceptado');
     $_POST = ['unit_surfaces' => [$unitId => ['area_land_m2' => '123,45',
-        'area_built_m2' => '85', 'surface_source' => 'visita']]];
+        'area_built_m2' => '85', 'area_adopted_m2' => '120,50', 'boundary_front' => 'Calle principal']]];
     $surfaceRows = AppraisalChapterZeroInput::unitSurfaceData();
     expect($surfaceRows[0]['area_land_m2'] === '123.45'
         && $surfaceRows[0]['area_built_m2'] === '85.00', 'superficies por unidad normalizadas');
+    expect($surfaceRows[0]['area_adopted_m2'] === '120.50'
+        && $surfaceRows[0]['boundary_front'] === 'Calle principal', 'superficie adoptada y linderos por unidad');
     $_POST = ['unit_surfaces' => [$unitId => ['area_land_m2' => '-1']]];
     expectStatus(422, fn () => AppraisalChapterZeroInput::unitSurfaceData(), 'superficie negativa rechazada');
     $_POST = [];

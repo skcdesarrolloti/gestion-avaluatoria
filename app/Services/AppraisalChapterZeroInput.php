@@ -87,10 +87,33 @@ final class AppraisalChapterZeroInput
                 'lot_shape' => mb_substr(trim((string) ($unit['lot_shape'] ?? '')), 0, 80),
                 'topography' => mb_substr(trim((string) ($unit['topography'] ?? '')), 0, 80),
                 'boundaries' => mb_substr(trim((string) ($unit['boundaries'] ?? '')), 0, 1000),
+                'boundary_source' => mb_substr(trim((string) ($unit['boundary_source'] ?? '')), 0, 220),
+                'boundary_front' => self::shortText($unit['boundary_front'] ?? ''),
+                'boundary_right' => self::shortText($unit['boundary_right'] ?? ''),
+                'boundary_left' => self::shortText($unit['boundary_left'] ?? ''),
+                'boundary_back' => self::shortText($unit['boundary_back'] ?? ''),
+                'boundary_zenith' => self::shortText($unit['boundary_zenith'] ?? ''),
+                'boundary_nadir' => self::shortText($unit['boundary_nadir'] ?? ''),
+                'area_manual_m2' => self::decimalOrNull($unit['area_manual_m2'] ?? null),
+                'area_midas_m2' => self::decimalOrNull($unit['area_midas_m2'] ?? null),
+                'area_tax_m2' => self::decimalOrNull($unit['area_tax_m2'] ?? null),
+                'area_deed_m2' => self::decimalOrNull($unit['area_deed_m2'] ?? null),
+                'area_certificate_m2' => self::decimalOrNull($unit['area_certificate_m2'] ?? null),
+                'area_other_m2' => self::decimalOrNull($unit['area_other_m2'] ?? null),
+                'area_adopted_m2' => self::decimalOrNull($unit['area_adopted_m2'] ?? null),
+                'area_adopted_source' => mb_substr(trim((string) ($unit['area_adopted_source'] ?? '')), 0, 40),
                 'enclosure' => mb_substr(trim((string) ($unit['enclosure'] ?? '')), 0, 80),
                 'equivalent_depth_m' => self::decimalOrNull($unit['equivalent_depth_m'] ?? null),
                 'front_depth_ratio' => self::decimalOrNull($unit['front_depth_ratio'] ?? null),
                 'dynamic_surface_notes' => mb_substr(trim((string) ($unit['dynamic_surface_notes'] ?? '')), 0, 1000),
+                'dynamic_normative_compatibility' => self::selectValue($unit['dynamic_normative_compatibility'] ?? ''),
+                'dynamic_environment_conditions' => self::selectValue($unit['dynamic_environment_conditions'] ?? ''),
+                'dynamic_service_quality' => self::selectValue($unit['dynamic_service_quality'] ?? ''),
+                'dynamic_service_availability' => self::selectValue($unit['dynamic_service_availability'] ?? ''),
+                'dynamic_road_condition' => self::selectValue($unit['dynamic_road_condition'] ?? ''),
+                'dynamic_urban_development' => self::selectValue($unit['dynamic_urban_development'] ?? ''),
+                'dynamic_affectations' => self::selectValue($unit['dynamic_affectations'] ?? ''),
+                'dynamic_restrictions' => self::selectValue($unit['dynamic_restrictions'] ?? ''),
                 'surface_report_text' => mb_substr(trim((string) ($unit['surface_report_text'] ?? '')), 0, 1500),
             ];
         }
@@ -128,5 +151,15 @@ final class AppraisalChapterZeroInput
             throw new HttpException(422, 'Las superficies y medidas deben ser números positivos con máximo dos decimales.');
         }
         return number_format((float) $normalized, 2, '.', '');
+    }
+
+    private static function shortText(mixed $value): string
+    {
+        return mb_substr(trim((string) $value), 0, 1000);
+    }
+
+    private static function selectValue(mixed $value): string
+    {
+        return mb_substr(trim((string) $value), 0, 60);
     }
 }
