@@ -6,7 +6,7 @@ use App\Models\AppraisalRepository;
 final class AppraisalPhotoUploadService
 {
     public function store(array $files, string $appraisalId, int $owner, AppraisalRepository $repo,
-        ?string $unitId = null, string $caption = ''): int
+        ?string $unitId = null, string $caption = '', string $displayName = ''): int
     {
         if (!is_array($files['name'] ?? null)) {
             throw new \InvalidArgumentException('Selecciona al menos una foto.');
@@ -16,7 +16,7 @@ final class AppraisalPhotoUploadService
             $error = (int) ($files['error'][$index] ?? UPLOAD_ERR_NO_FILE);
             if ($error === UPLOAD_ERR_NO_FILE) continue;
             if ($error !== UPLOAD_ERR_OK) throw new \RuntimeException('No se pudo recibir una de las fotos.');
-            $this->storeOne($files, $index, $appraisalId, $owner, $repo, $unitId, $caption);
+            $this->storeOne($files, $index, $appraisalId, $owner, $repo, $unitId, $caption, $displayName);
             $stored++;
         }
         if ($stored === 0) throw new \InvalidArgumentException('Selecciona al menos una foto.');
@@ -34,7 +34,7 @@ final class AppraisalPhotoUploadService
                     $error = (int) ($flat['error'][$index] ?? UPLOAD_ERR_NO_FILE);
                     if ($error === UPLOAD_ERR_NO_FILE) continue;
                     if ($error !== UPLOAD_ERR_OK) throw new \RuntimeException('No se pudo recibir una evidencia.');
-                    $this->storeOne($flat, $index, $appraisalId, $owner, $repo, (string) $unitId, 'attribute:' . $key);
+                    $this->storeOne($flat, $index, $appraisalId, $owner, $repo, (string) $unitId, 'attribute:' . $key, '');
                     $stored++;
                 }
             }
@@ -48,7 +48,7 @@ final class AppraisalPhotoUploadService
     }
 
     private function storeOne(array $files, int $index, string $appraisalId, int $owner, AppraisalRepository $repo,
-        ?string $unitId, string $caption): void
+        ?string $unitId, string $caption, string $displayName): void
     {
         $photoId = bin2hex(random_bytes(16));
         $source = basename(str_replace('\\', '/', (string) $files['name'][$index]));
@@ -60,6 +60,7 @@ final class AppraisalPhotoUploadService
         if (!is_string($blob)) throw new \RuntimeException('La foto no pudo quedar respaldada.');
         $repo->addPhoto($appraisalId, $owner, ['id' => $photoId, 'source_filename' => $source,
             'storage_filename' => $storage, 'mime_type' => $info['mime'], 'file_size_bytes' => $bytes,
-            'caption' => $caption, 'file_blob' => $blob, 'unit_id' => $unitId]);
+            'caption' => $caption, 'display_name' => mb_substr(trim($displayName), 0, 190),
+            'file_blob' => $blob, 'unit_id' => $unitId]);
     }
 }

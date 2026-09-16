@@ -148,9 +148,9 @@ final class AppraisalController
         $record = $this->appraisals->find($id, $this->user['id']);
         try {
             $unitId = preg_match('/^[a-f0-9]{32}$/', (string) ($_POST['unit_id'] ?? '')) ? (string) $_POST['unit_id'] : null;
-            $caption = mb_substr(trim((string) ($_POST['photo_caption'] ?? '')), 0, 190);
+            $caption = mb_substr(trim((string) ($_POST['photo_caption'] ?? '')), 0, 190); $displayName = mb_substr(trim((string) ($_POST['photo_name'] ?? '')), 0, 190);
             $count = (new AppraisalPhotoUploadService())->store($_FILES['photos'] ?? [], $record['id'],
-                $this->user['id'], $this->appraisals, $unitId, $caption);
+                $this->user['id'], $this->appraisals, $unitId, $caption, $displayName);
             Session::flash('chapter_zero_photo_message', $count === 1
                 ? 'Foto cargada correctamente.'
                 : $count . ' fotos cargadas correctamente.');

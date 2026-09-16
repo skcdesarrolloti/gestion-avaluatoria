@@ -9,6 +9,7 @@ $photoTitle = $photoUploadTitle ?? 'Fotos para comprobar la unidad';
 $photoDescription = $photoUploadDescription ?? 'Sube las fotos después de escoger la tipología probable. La imagen real permite confirmar o ajustar la clasificación constructiva antes de usarla en reposición o descripción.';
 $photoReturnTo = $photoUploadReturnTo ?? $subjectActionBase;
 $photoCaption = $photoUploadCaption ?? '';
+$photoNamePlaceholder = $photoUploadNamePlaceholder ?? 'Ej. Portada principal, cocina, vista lateral o detalle de cubierta';
 $compact = $photoUploadCompact ?? false;
 $visiblePhotos = $photoUnitId === '' ? $photos : array_values(array_filter($photos,
     static fn (array $photo): bool => (string) ($photo['unit_id'] ?? '') === $photoUnitId));
@@ -45,6 +46,10 @@ $visiblePhotos = $photoCaption === '' ? $visiblePhotos : array_values(array_filt
             <input type="hidden" name="return_to" value="<?= e($photoReturnTo) ?>">
             <div class="label">Agregar fotos
                 <div class="mt-2 grid gap-3 rounded-xl border border-dashed border-slate-300 bg-white p-4 sm:grid-cols-2">
+                    <label class="label sm:col-span-2">Nombre de la foto
+                        <input class="input" name="photo_name" maxlength="190"
+                            placeholder="<?= e($photoNamePlaceholder) ?>">
+                    </label>
                     <label class="btn-secondary min-h-11">Elegir archivos
                         <input class="sr-only" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple
                             x-ref="photos" @change="update($event.target)">
@@ -88,6 +93,11 @@ $visiblePhotos = $photoCaption === '' ? $visiblePhotos : array_values(array_filt
                         <?php else: ?>
                             <p class="p-4 text-sm font-semibold text-red-700">Archivo físico no encontrado. Vuelve a subir esta foto.</p>
                         <?php endif; ?>
+                        <div class="border-t border-slate-200 bg-white px-3 py-2">
+                            <p class="text-sm font-semibold text-slate-800">
+                                <?= e((string) (($photo['display_name'] ?? '') ?: $photo['source_filename'])) ?>
+                            </p>
+                        </div>
                         <form class="border-t border-slate-200 bg-white p-3" method="post"
                             action="<?= e(url('avaluos/' . $record['id'] . '/fotos/' . $photo['id'] . '/eliminar')) ?>"
                             x-data="{ busy: false }" @submit="busy = true">

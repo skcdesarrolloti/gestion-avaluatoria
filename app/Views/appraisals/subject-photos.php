@@ -12,6 +12,7 @@ $photoCategories = [
     'terreno' => ['Lote / terreno', 'Panorámica del suelo, áreas libres o forma del lote.'],
     'construccion' => ['Construcción', 'Fachadas secundarias, cubiertas, anexos o detalles constructivos.'],
     'documento' => ['Documento / soporte', 'Capturas o fotos de documentos útiles para el entregable.'],
+    'adicional' => ['Fotos adicionales', 'Agrega evidencias complementarias con nombre propio para el informe.'],
 ];
 $photoTabMap = [];
 foreach ($photoUnits as $photoUnit) {
