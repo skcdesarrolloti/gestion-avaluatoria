@@ -19,6 +19,7 @@
     .btn-secondary { @apply inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100; }
     .eyebrow { @apply text-xs font-semibold uppercase text-teal-800; letter-spacing: 0; }
     .field-error { @apply mt-1 min-h-4 text-xs text-red-800; }
+    .help-dot { @apply ml-1 inline-flex size-4 items-center justify-center rounded-full bg-blue-50 text-[11px] font-semibold text-blue-700; }
     .app-topbar { @apply border-b px-5 py-3 text-white; background: #243136; border-color: #f19001; }
     .app-shell { @apply px-5 py-5; background: #f5f6f7; }
     .brand-frame { @apply inline-flex min-h-11 items-center gap-3 rounded-lg border px-3 py-2; border-color: #f19001; background: #202b30; }

@@ -1,5 +1,6 @@
 <?php
 $sv = static fn (string $key): string => (string) ($subject[$key] ?? '');
+$fieldHelp = static fn (string $key): string => (string) ($subjectHelp[$key] ?? '');
 $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/bien-sujeto';
 $textLabels = [
     'point_reference' => ['Punto de referencia', 'Ej. Zona residencial consolidada'],
@@ -21,7 +22,7 @@ $textLabels = [
 $groups = [
     'Ubicación y referencia' => ['point_reference', 'address', 'alternate_nomenclature'],
     'Identificación jurídica y urbana' => ['property_registry', 'cadastral_reference', 'registry_office',
-        'horizontal_property', 'centrality', 'immediate_environment', 'stratum', 'urban_license',
+        'centrality', 'immediate_environment', 'stratum', 'urban_license',
         'permitted_use', 'urban_treatment', 'restrictions', 'legal_urban_affectations', 'road_condition'],
     'Uso, acceso y servicios' => ['access_facility', 'transport_connectivity', 'loading_unloading',
         'current_use', 'main_potential_use', 'complementary_potential_uses', 'main_complementary_activity',
@@ -78,7 +79,7 @@ $groups = [
         <div class="rounded-xl border border-slate-200 p-5">
             <h3 class="text-base font-semibold">Ubicación del inmueble</h3>
             <div class="mt-5 grid gap-5 md:grid-cols-3">
-                <label class="label">Departamento
+                <label class="label">Departamento <span class="help-dot" title="<?= e($fieldHelp('department_id')) ?>">?</span>
                     <select class="input" name="department_id" x-model="departmentId" @change="changeDepartment()">
                         <option value="">Selecciona departamento</option>
                         <template x-for="item in departments" :key="item.id">
@@ -86,7 +87,7 @@ $groups = [
                         </template>
                     </select>
                 </label>
-                <label class="label">Municipio / distrito
+                <label class="label">Municipio / distrito <span class="help-dot" title="<?= e($fieldHelp('city_id')) ?>">?</span>
                     <select class="input" name="city_id" x-model="cityId" @change="changeCity()">
                         <option value="">Selecciona municipio</option>
                         <template x-for="item in filteredCities()" :key="item.id">
@@ -94,7 +95,7 @@ $groups = [
                         </template>
                     </select>
                 </label>
-                <label class="label">Barrio / microsector
+                <label class="label">Barrio / microsector <span class="help-dot" title="<?= e($fieldHelp('neighborhood_id')) ?>">?</span>
                     <select class="input" name="neighborhood_id" x-model="neighborhoodId">
                         <option value="">Selecciona barrio</option>
                         <template x-for="item in filteredNeighborhoods()" :key="item.id">
@@ -102,13 +103,13 @@ $groups = [
                         </template>
                     </select>
                 </label>
-                <label class="label">Localidad
+                <label class="label">Localidad <span class="help-dot" title="<?= e($fieldHelp('locality_name')) ?>">?</span>
                     <input class="input bg-slate-50" readonly :value="locationDisplay('locality_name')" placeholder="Se completa con el barrio">
                 </label>
-                <label class="label">Comuna / UCG
+                <label class="label">Comuna / UCG <span class="help-dot" title="<?= e($fieldHelp('commune_ucg')) ?>">?</span>
                     <input class="input bg-slate-50" readonly :value="locationDisplay('commune_ucg')" placeholder="Se completa con el barrio">
                 </label>
-                <label class="label">Zona / sector
+                <label class="label">Zona / sector <span class="help-dot" title="<?= e($fieldHelp('zone_sector')) ?>">?</span>
                     <input class="input bg-slate-50" readonly :value="locationDisplay('zone_sector')" placeholder="Se completa con el barrio">
                 </label>
             </div>
@@ -120,6 +121,7 @@ $groups = [
                     <?php foreach ($keys as $key): ?>
                         <?php if (isset($subjectCatalog[$key])): [$label, $options] = $subjectCatalog[$key]; ?>
                             <label class="label"><?= e($label) ?>
+                                <?php if ($fieldHelp($key) !== ''): ?><span class="help-dot" title="<?= e($fieldHelp($key)) ?>">?</span><?php endif; ?>
                                 <select class="input" name="<?= e($key) ?>">
                                     <option value="">Selecciona opción</option>
                                     <?php foreach ($options as $value => $option): ?>
@@ -128,12 +130,13 @@ $groups = [
                                 </select>
                             </label>
                         <?php elseif ($key === 'subject_reference_date'): ?>
-                            <label class="label">Fecha de referencia del sujeto
+                            <label class="label">Fecha de referencia del sujeto <span class="help-dot" title="<?= e($fieldHelp($key)) ?>">?</span>
                                 <input class="input" type="date" name="subject_reference_date" value="<?= e($sv($key)) ?>">
                             </label>
                         <?php else: [$label, $placeholder] = $textLabels[$key]; ?>
                             <label class="label <?= in_array($key, ['restrictions', 'legal_urban_affectations'], true) ? 'md:col-span-2' : '' ?>">
                                 <?= e($label) ?>
+                                <?php if ($fieldHelp($key) !== ''): ?><span class="help-dot" title="<?= e($fieldHelp($key)) ?>">?</span><?php endif; ?>
                                 <input class="input" name="<?= e($key) ?>" value="<?= e($sv($key)) ?>" placeholder="<?= e($placeholder) ?>">
                             </label>
                         <?php endif; ?>
@@ -141,7 +144,7 @@ $groups = [
                 </div>
             </div>
         <?php endforeach; ?>
-        <label class="label block">Notas de la ficha básica
+        <label class="label block">Notas de la ficha básica <span class="help-dot" title="<?= e($fieldHelp('notes')) ?>">?</span>
             <textarea class="input" name="notes" rows="4" maxlength="2000"
                 placeholder="Observaciones del sujeto que deban pasar al análisis o al informe."><?= e($sv('notes')) ?></textarea>
         </label>

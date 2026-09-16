@@ -63,6 +63,7 @@ final class AppraisalController
             'igacCategories' => $this->typologies->categories(),
             'igacTypologiesByCategory' => $this->typologies->optionsByCategory(),
             'subjectCatalog' => AppraisalSubjectCatalog::selects(),
+            'subjectHelp' => AppraisalSubjectCatalog::helps(),
             'subjectMessage' => Session::pullFlash('subject_message'),
             'subjectError' => Session::pullFlash('subject_error'),
             'photoMessage' => Session::pullFlash('chapter_zero_photo_message'),
