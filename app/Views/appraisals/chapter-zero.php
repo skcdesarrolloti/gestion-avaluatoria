@@ -19,13 +19,7 @@ $initial = ['notes' => $notes];
     <span class="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-800">Borrador</span>
 </div>
 
-<form class="mt-8 space-y-7" method="post" enctype="multipart/form-data"
-    action="<?= e(url('avaluos/' . $record['id'] . '/capitulo-0')) ?>"
-    x-data="{ busy: false, notes: <?= e(json_encode($initial['notes'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?> }"
-    @submit="busy = true">
-    <?= csrf_field() ?>
-    <input type="hidden" name="version" value="<?= e($record['version']) ?>">
-
+<div class="mt-8 space-y-7">
     <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
@@ -38,9 +32,25 @@ $initial = ['notes' => $notes];
             </div>
             <a class="btn-secondary" href="<?= e(url('tipologias-constructivas-igac')) ?>">Ver tipologías IGAC</a>
         </div>
-        <label class="label mt-6">Agregar fotos
-            <input class="input" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple>
-        </label>
+        <?php if ($photoMessage): ?>
+            <p class="mt-5 rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($photoMessage) ?></p>
+        <?php endif; ?>
+        <?php if ($photoError): ?>
+            <p class="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($photoError) ?></p>
+        <?php endif; ?>
+        <form class="mt-6 grid gap-4 lg:grid-cols-[1fr_auto]" method="post" enctype="multipart/form-data"
+            action="<?= e(url('avaluos/' . $record['id'] . '/capitulo-0/fotos')) ?>"
+            x-data="{ busy: false, hasFiles: false }" @submit="busy = true">
+            <?= csrf_field() ?>
+            <label class="label">Agregar fotos
+                <input class="input" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple
+                    @change="hasFiles = $event.target.files.length > 0">
+            </label>
+            <div class="flex items-end">
+                <button class="btn-primary min-h-11 w-full lg:w-auto" type="submit" :disabled="busy || !hasFiles"
+                    x-text="busy ? 'Subiendo...' : 'Subir fotos'">Subir fotos</button>
+            </div>
+        </form>
         <?php if ($photos): ?>
             <div class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
                 <?php foreach ($photos as $photo): ?>
@@ -58,7 +68,12 @@ $initial = ['notes' => $notes];
         <?php endif; ?>
     </section>
 
-    <section class="grid gap-7 lg:grid-cols-[1fr_18rem]">
+    <form class="grid gap-7 lg:grid-cols-[1fr_18rem]" method="post"
+        action="<?= e(url('avaluos/' . $record['id'] . '/capitulo-0')) ?>"
+        x-data="{ busy: false, notes: <?= e(json_encode($initial['notes'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?> }"
+        @submit="busy = true">
+        <?= csrf_field() ?>
+        <input type="hidden" name="version" value="<?= e($record['version']) ?>">
         <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <p class="eyebrow">Configuración</p>
             <h2 class="mt-2 text-2xl font-semibold">Datos base del encargo</h2>
@@ -136,5 +151,5 @@ $initial = ['notes' => $notes];
                 El consecutivo técnico se asignará cuando el expediente quede formalmente configurado.
             </p>
         </aside>
-    </section>
-</form>
+    </form>
+</div>
