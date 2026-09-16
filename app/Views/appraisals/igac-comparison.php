@@ -1,5 +1,5 @@
 <?php if ($photos && $igacCandidates): ?>
-    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ open: true }">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
                 <p class="eyebrow">Preclasificación IGAC</p>
@@ -9,9 +9,13 @@
                     Confirma siempre la tipología con criterio técnico antes de guardar.
                 </p>
             </div>
-            <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">Sugerencia no automática</span>
+            <div class="flex flex-wrap items-center gap-2">
+                <span class="rounded-full bg-amber-50 px-3 py-1 text-xs font-semibold text-amber-800">Sugerencia no automática</span>
+                <button class="btn-secondary min-h-10 text-sm" type="button" @click="open = !open"
+                    x-text="open ? 'Cerrar comparativo' : 'Abrir comparativo'">Cerrar comparativo</button>
+            </div>
         </div>
-        <div class="mt-6 grid gap-5 lg:grid-cols-[18rem_1fr]">
+        <div class="mt-6 grid gap-5 lg:grid-cols-[18rem_1fr]" x-show="open">
             <div class="space-y-3">
                 <p class="text-sm font-semibold text-slate-700">Foto de referencia</p>
                 <?php foreach (array_slice($photos, 0, 2) as $photo): ?>
@@ -46,6 +50,7 @@
                             <button class="btn-secondary mt-3 min-h-10 text-sm" type="button"
                                 @click="igacCategory = <?= e(json_encode($candidate['category_code'], JSON_THROW_ON_ERROR)) ?>;
                                     typologyHint = <?= e(json_encode($candidate['denomination'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>;
+                                    open = false;
                                     document.getElementById('datos-base-capitulo-0').scrollIntoView({ behavior: 'smooth', block: 'start' });">
                                 Usar esta tipología
                             </button>

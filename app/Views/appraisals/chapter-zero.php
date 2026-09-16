@@ -86,7 +86,11 @@ $initial = ['notes' => $notes];
 
     <form class="grid gap-7 lg:grid-cols-[1fr_18rem]" method="post"
         action="<?= e(url('avaluos/' . $record['id'] . '/capitulo-0')) ?>"
-        x-data="{ busy: false, notes: <?= e(json_encode($initial['notes'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?> }"
+        x-data="{
+            busy: false,
+            notes: <?= e(json_encode($initial['notes'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+            academy(field, value) { return value && this.notes[field] ? this.notes[field][value] : null }
+        }"
         @submit="busy = true">
         <?= csrf_field() ?>
         <input type="hidden" name="version" value="<?= e($record['version']) ?>">
@@ -130,18 +134,35 @@ $initial = ['notes' => $notes];
                     <input class="input" name="igac_typology_hint" maxlength="190"
                         x-model="typologyHint" placeholder="Nombre o referencia de tipología probable">
                 </label>
-                <?php foreach (['tipo', 'tipo_derecho', 'finalidad', 'tipo_inmueble', 'destinacion',
-                    'base_valor', 'aplica_niif', 'regimen_ph', 'estructura_metodo'] as $name): ?>
+                <?php foreach (['tipo', 'tipo_derecho', 'tipo_negocio', 'finalidad', 'tipo_inmueble',
+                    'subtipo_funcional', 'destinacion', 'base_valor', 'aplica_niif', 'regimen_ph',
+                    'estructura_metodo'] as $name): ?>
                     <?php [$label, $placeholder, , $help, $options] = AppraisalCatalog::selectFields()[$name]; ?>
                     <?php $label = $name === 'aplica_niif' ? 'Activo empresarial' : $label; ?>
-                    <label class="label"><?= e($label) ?>
-                        <select class="input" name="<?= e($name) ?>">
+                    <label class="label" x-data="{ selected: <?= e(json_encode($field($name), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?> }"><?= e($label) ?>
+                        <select class="input" name="<?= e($name) ?>" x-model="selected">
                             <option value=""><?= e($placeholder) ?></option>
                             <?php foreach ($options as $value => $text): ?>
                                 <option value="<?= e($value) ?>" <?= $selected($name, $value) ?>><?= e($text) ?></option>
                             <?php endforeach; ?>
                         </select>
                         <span class="mt-1 block text-xs leading-5 text-slate-500"><?= e($help) ?></span>
+                        <span class="mt-3 block rounded-xl border border-teal-100 bg-teal-50 p-3 text-xs leading-5 text-teal-950"
+                            x-show="academy('<?= e($name) ?>', selected)">
+                            <strong class="block text-teal-900">Academia del campo</strong>
+                            <span class="mt-1 block">
+                                <strong>Qué es:</strong>
+                                <span x-text="academy('<?= e($name) ?>', selected)?.what"></span>
+                            </span>
+                            <span class="mt-1 block">
+                                <strong>Cuándo aplica:</strong>
+                                <span x-text="academy('<?= e($name) ?>', selected)?.when"></span>
+                            </span>
+                            <span class="mt-1 block">
+                                <strong>Soporte:</strong>
+                                <span x-text="academy('<?= e($name) ?>', selected)?.basis"></span>
+                            </span>
+                        </span>
                     </label>
                 <?php endforeach; ?>
                 <label class="label md:col-span-2">Notas de inspección y configuración
