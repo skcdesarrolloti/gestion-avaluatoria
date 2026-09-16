@@ -9,27 +9,27 @@
             </p>
         </div>
         <div class="flex flex-wrap gap-3">
-            <a class="btn-secondary" href="<?= e(url('#configuracion-avaluo')) ?>">Qué incluye Capítulo 0</a>
+            <a class="btn-secondary" href="<?= e(url('#expediente-valuatorio')) ?>">Qué incluye el expediente</a>
             <form method="post" action="<?= e(url('avaluos')) ?>" x-data="{ busy: false }" @submit="busy = true">
                 <?= csrf_field() ?>
                 <button class="btn-primary" type="submit" :disabled="busy"
-                    x-text="busy ? 'Creando...' : 'Crear ficha y abrir Capítulo 0'">Crear ficha y abrir Capítulo 0</button>
+                    x-text="busy ? 'Creando...' : 'Crear ficha y abrir expediente'">Crear ficha y abrir expediente</button>
             </form>
         </div>
     </div>
 
-    <div id="configuracion-avaluo" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <div id="expediente-valuatorio" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
-                <p class="eyebrow">Antes del capítulo 1</p>
-                <h2 class="mt-2 text-2xl font-semibold">Capítulo 0 · Configuración del avalúo</h2>
+                <p class="eyebrow">Numeral 1</p>
+                <h2 class="mt-2 text-2xl font-semibold">Expediente valuatorio</h2>
             </div>
             <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Inicial activo</span>
         </div>
         <p class="mt-4 max-w-3xl text-sm leading-6 text-slate-600">
-            Aquí se definirá el encargo antes de abrir los capítulos del informe: fotos del inmueble,
-            tipología constructiva probable, perito responsable seleccionado desde maestros,
-            finalidad, derecho, activo empresarial, componentes del bien y métodos aplicables.
+            Aquí se define el encargo y su identificación formal: nombre del avalúo, cliente,
+            solicitante, destinatario, finalidad, uso previsto, fechas, alcance, limitaciones,
+            hipótesis y configuración técnica que orienta el informe.
         </p>
         <div class="mt-6 grid gap-4 md:grid-cols-2">
             <article class="rounded-xl border border-slate-200 p-5">
@@ -58,7 +58,7 @@
             ['title' => 'Fotos del inmueble', 'text' => 'La evidencia visual abre el análisis y ayuda a identificar qué se va a valorar.'],
             ['title' => 'Definiciones guiadas', 'text' => 'Cada lista desplegable mostrará qué es, cuándo aplica y su soporte normativo.'],
             ['title' => 'Preclasificación IGAC', 'text' => 'Las fotos se contrastarán con el catálogo IGAC y sus imágenes de referencia.'],
-            ['title' => 'Capítulos del informe', 'text' => 'El capítulo 1 tomará lo configurado sin duplicar datos del encargo.'],
+            ['title' => 'Numerales del informe', 'text' => 'El Bien sujeto tomará lo configurado sin duplicar datos del encargo.'],
         ];
         foreach ($items as $item): ?>
             <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -72,7 +72,7 @@
         <form method="post" action="<?= e(url('avaluos')) ?>" x-data="{ busy: false }" @submit="busy = true">
             <?= csrf_field() ?>
             <button class="btn-primary" type="submit" :disabled="busy"
-                x-text="busy ? 'Creando...' : 'Crear ficha y abrir Capítulo 0'">Crear ficha y abrir Capítulo 0</button>
+                x-text="busy ? 'Creando...' : 'Crear ficha y abrir expediente'">Crear ficha y abrir expediente</button>
         </form>
         <a class="btn-secondary" href="<?= e(url()) ?>">Ver mis avalúos</a>
         <a class="btn-secondary" href="<?= e(url('maestros')) ?>">Creación de Maestros</a>

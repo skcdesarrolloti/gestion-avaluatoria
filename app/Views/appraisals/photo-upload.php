@@ -1,6 +1,6 @@
 <?php
 $embedded = $photoUploadEmbedded ?? false;
-$subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitulo-0';
+$subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/expediente';
 $photoUnitId = $photoUploadUnitId ?? '';
 $photoUnitLabel = $photoUploadUnitLabel ?? '';
 $photoUnitTypology = $photoUploadTypology ?? '';

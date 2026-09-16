@@ -33,13 +33,13 @@ final class AppraisalController
     public function create(): never
     {
         $id = $this->appraisals->create($this->user['id']);
-        Http::redirect('avaluos/' . $id . '/capitulo-0');
+        Http::redirect('avaluos/' . $id . '/expediente');
     }
 
     public function chapterZero(string $id): void
     {
         $record = $this->appraisals->find($id, $this->user['id']);
-        view('appraisals/chapter-zero', ['title' => 'Capítulo 0', 'record' => $record,
+        view('appraisals/chapter-zero', ['title' => 'Expediente valuatorio', 'record' => $record,
             'appraisers' => $this->appraisers->all(),
             'catalog' => ['selects' => AppraisalCatalog::selectFields(), 'notes' => AppraisalCatalog::notes()]]);
     }
@@ -80,7 +80,7 @@ final class AppraisalController
         $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
             $this->igacCodes(), $this->appraiserIds());
         $this->appraisals->saveChapterZero($id, $this->user['id'], (int) $_POST['version'], $data);
-        Http::redirect('avaluos/' . $record['id'] . '/capitulo-0');
+        Http::redirect('avaluos/' . $record['id'] . '/expediente');
     }
 
     public function saveSubjectUnits(string $id): never { $this->saveUnitsAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }
@@ -188,9 +188,9 @@ final class AppraisalController
     private function safePhotoReturn(string $id): string
     {
         $target = (string) ($_POST['return_to'] ?? '');
-        return in_array($target, ['avaluos/' . $id . '/capitulo-0', 'avaluos/' . $id . '/bien-sujeto'], true)
+        return in_array($target, ['avaluos/' . $id . '/expediente', 'avaluos/' . $id . '/bien-sujeto'], true)
             ? $target
-            : 'avaluos/' . $id . '/capitulo-0';
+            : 'avaluos/' . $id . '/expediente';
     }
 
     public function edit(string $id): void

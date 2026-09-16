@@ -5,7 +5,7 @@ $unitLabel = static function (array $unit): string {
 $visibleUnits = array_values(array_filter($units, static fn (array $unit): bool => $unit['unit_kind'] !== 'common'));
 $hasPhotos = !empty($photos);
 $typologyOptions = $igacTypologiesByCategory ?? [];
-$subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitulo-0';
+$subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/expediente';
 $labelInput = static fn (array $unit): string => (string) $unit['label'] === $unitLabel($unit) ? '' : (string) $unit['label'];
 $labelMap = [];
 foreach ($visibleUnits as $unit) $labelMap[$unit['id']] = $labelInput($unit);

@@ -75,9 +75,20 @@ final class AppraisalCatalog
         return array_merge(array_keys(self::textFields()), array_keys(self::selectFields()));
     }
 
+    public static function assignmentFields(): array
+    {
+        return [
+            'client_name' => 160, 'requester_name' => 160, 'report_recipient' => 160,
+            'intended_use' => 220, 'assignment_scope' => 2000,
+            'assignment_limitations' => 2000, 'assignment_hypotheses' => 2000,
+        ];
+    }
+
     public static function defaults(): array
     {
-        return array_fill_keys(self::fieldKeys(), '');
+        return array_fill_keys(array_merge(self::fieldKeys(), array_keys(self::assignmentFields()), [
+            'visit_date', 'value_date', 'report_date',
+        ]), '');
     }
 
     public static function allowedValues(string $field): array

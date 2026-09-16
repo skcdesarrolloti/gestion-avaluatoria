@@ -25,7 +25,7 @@ final class AppraisalChapterZeroInput
         self::assertIgacCategory($extra['igac_category'], $igacCodes);
         $extra['igac_typology_hint'] = mb_substr($extra['igac_typology_hint'], 0, 190);
         $extra['inspection_notes'] = mb_substr($extra['inspection_notes'], 0, 2000);
-        return $data + $extra;
+        return $data + $extra + AppraisalAssignmentInput::data();
     }
 
     public static function preclassificationData(array $igacCodes): array

@@ -1,7 +1,7 @@
 <?php
 $currentStep = $currentStep ?? '';
 $steps = [
-    ['key' => 'expediente', 'label' => '1 · Expediente valuatorio', 'href' => url('avaluos/' . $record['id'] . '/capitulo-0')],
+    ['key' => 'expediente', 'label' => '1 · Expediente valuatorio', 'href' => url('avaluos/' . $record['id'] . '/expediente')],
     ['key' => 'sujeto', 'label' => '2 · Bien sujeto', 'href' => url('avaluos/' . $record['id'] . '/bien-sujeto')],
 ];
 ?>

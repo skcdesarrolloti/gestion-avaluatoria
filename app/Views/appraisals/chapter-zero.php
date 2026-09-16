@@ -7,15 +7,17 @@ $count = static fn (string $name): int => max(0, (int) ($record[$name] ?? 0));
 $notes = $catalog['notes'] ?? [];
 $initial = ['notes' => $notes];
 $currentStep = 'expediente';
+$configurationSelects = ['tipo', 'tipo_derecho', 'tipo_negocio', 'tipo_inmueble', 'subtipo_funcional',
+    'destinacion', 'base_valor', 'aplica_niif', 'regimen_ph', 'estructura_metodo'];
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
     <div>
-        <p class="eyebrow">Capítulo 0</p>
-        <h1 class="mt-2 text-3xl font-semibold tracking-tight">Configuración del avalúo</h1>
+        <p class="eyebrow">Numeral 1</p>
+        <h1 class="mt-2 text-3xl font-semibold tracking-tight">Expediente valuatorio</h1>
         <p class="mt-3 max-w-3xl text-slate-600">
-            Primero dejamos clara la evidencia visual, el perito responsable y la ruta técnica antes
-            de abrir los capítulos del informe.
+            Primero dejamos clara la configuración técnica y la identificación formal del encargo.
+            Estos datos alimentan el cuerpo del informe y sus justificaciones.
         </p>
     </div>
     <span class="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-800">Borrador</span>
@@ -24,9 +26,9 @@ $currentStep = 'expediente';
 
 <div class="mt-8 space-y-7">
     <form class="grid gap-7 lg:grid-cols-[1fr_18rem]" method="post"
-        action="<?= e(url('avaluos/' . $record['id'] . '/capitulo-0')) ?>"
+        action="<?= e(url('avaluos/' . $record['id'] . '/expediente')) ?>"
         x-data="{
-            busy: false,
+            busy: false, active: 'configuracion',
             notes: <?= e(json_encode($initial['notes'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             subtypeByProperty: <?= e(json_encode(AppraisalCatalog::subtypesByPropertyType(), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             selectedPropertyType: <?= e(json_encode($field('tipo_inmueble'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
@@ -34,30 +36,38 @@ $currentStep = 'expediente';
             subtypeOptions() { return this.subtypeByProperty[this.selectedPropertyType] || {} },
             syncSubtype() { if (this.selectedSubtype && !this.subtypeOptions()[this.selectedSubtype]) this.selectedSubtype = '' },
             academy(field, value) { return value && this.notes[field] ? this.notes[field][value] : null }
-        }"
-        @submit="busy = true">
+        }" @submit="busy = true">
         <?= csrf_field() ?>
         <input type="hidden" name="version" value="<?= e($record['version']) ?>">
         <input type="hidden" name="igac_category" value="<?= e($field('igac_category')) ?>">
         <input type="hidden" name="igac_typology_hint" value="<?= e($field('igac_typology_hint')) ?>">
         <input type="hidden" name="igac_property_units_count" value="<?= e((string) $count('igac_property_units_count')) ?>">
         <input type="hidden" name="igac_annex_units_count" value="<?= e((string) $count('igac_annex_units_count')) ?>">
-        <div id="datos-base-capitulo-0" class="scroll-mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <p class="eyebrow">Configuración</p>
-            <h2 class="mt-2 text-2xl font-semibold">Datos base del encargo</h2>
-            <div class="mt-6 grid gap-5 md:grid-cols-2">
-                <label class="label md:col-span-2">Nombre del inmueble
-                    <input class="input" name="titulo" maxlength="160" value="<?= e($field('titulo')) ?>"
-                        placeholder="Ej. Lote Bruselas">
-                </label>
-                <label class="label">Dirección
-                    <input class="input" name="direccion" maxlength="220" value="<?= e($field('direccion')) ?>"
-                        placeholder="Dirección o referencia de ubicación">
-                </label>
-                <label class="label">Municipio
-                    <input class="input" name="municipio" maxlength="120" value="<?= e($field('municipio')) ?>"
-                        placeholder="Municipio">
-                </label>
+
+        <section class="scroll-mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+            <div class="flex flex-wrap items-start justify-between gap-4">
+                <div>
+                    <p class="eyebrow">Expediente valuatorio</p>
+                    <h2 class="mt-2 text-2xl font-semibold">Configuración e identificación del encargo</h2>
+                </div>
+                <div class="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-800">1.1 / 1.2</div>
+            </div>
+            <nav class="mt-6 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Subsecciones del expediente">
+                <button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
+                    :class="active === 'configuracion' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800'"
+                    @click="active = 'configuracion'">1.1 Configuración</button>
+                <button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
+                    :class="active === 'identificacion' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800'"
+                    @click="active = 'identificacion'">1.2 Identificación del encargo</button>
+            </nav>
+
+            <div class="mt-6 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950"
+                x-show="active === 'identificacion'">
+                Esta sección deja explícito quién solicita el informe, para qué se usa, cuál es su alcance y
+                cuáles salvedades deben mencionarse en el entregable conforme al marco normativo aplicable.
+            </div>
+
+            <div class="mt-6 grid gap-5 md:grid-cols-2" x-show="active === 'configuracion'">
                 <label class="label">Perito responsable
                     <select class="input" name="appraiser_id">
                         <option value="">Selecciona perito</option>
@@ -68,72 +78,81 @@ $currentStep = 'expediente';
                         <?php endforeach; ?>
                     </select>
                 </label>
-                <?php foreach (['tipo', 'tipo_derecho', 'tipo_negocio', 'finalidad', 'tipo_inmueble',
-                    'subtipo_funcional', 'destinacion', 'base_valor', 'aplica_niif', 'regimen_ph',
-                    'estructura_metodo'] as $name): ?>
-                    <?php [$label, $placeholder, , $help, $options] = AppraisalCatalog::selectFields()[$name]; ?>
-                    <?php $label = $name === 'aplica_niif' ? 'Activo empresarial' : $label; ?>
-                    <label class="label" <?= in_array($name, ['tipo_inmueble', 'subtipo_funcional'], true) ? '' : 'x-data="{ selected: ' . e(json_encode($field($name), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) . ' }"' ?>><?= e($label) ?>
-                        <?php if ($name === 'tipo_inmueble'): ?>
-                            <select class="input" name="<?= e($name) ?>" x-model="selectedPropertyType" @change="syncSubtype()">
-                                <option value=""><?= e($placeholder) ?></option>
-                                <?php foreach ($options as $value => $text): ?>
-                                    <option value="<?= e($value) ?>"><?= e($text) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        <?php elseif ($name === 'subtipo_funcional'): ?>
-                            <select class="input" name="<?= e($name) ?>" x-model="selectedSubtype" :disabled="!selectedPropertyType">
-                                <option value="" x-text="selectedPropertyType ? '<?= e($placeholder) ?>' : 'Selecciona primero tipo de inmueble'"></option>
-                                <template x-for="(text, value) in subtypeOptions()" :key="value">
-                                    <option :value="value" x-text="text"></option>
-                                </template>
-                            </select>
-                        <?php else: ?>
-                            <select class="input" name="<?= e($name) ?>" x-model="selected">
-                                <option value=""><?= e($placeholder) ?></option>
-                                <?php foreach ($options as $value => $text): ?>
-                                    <option value="<?= e($value) ?>" <?= $selected($name, $value) ?>><?= e($text) ?></option>
-                                <?php endforeach; ?>
-                            </select>
-                        <?php endif; ?>
-                        <span class="mt-1 block text-xs leading-5 text-slate-500"><?= e($help) ?></span>
-                        <?php $academyValue = $name === 'tipo_inmueble' ? 'selectedPropertyType'
-                            : ($name === 'subtipo_funcional' ? 'selectedSubtype' : 'selected'); ?>
-                        <span class="mt-3 block rounded-xl border border-teal-100 bg-teal-50 p-3 text-xs leading-5 text-teal-950"
-                            x-show="academy('<?= e($name) ?>', <?= $academyValue ?>)">
-                            <strong class="block text-teal-900">Academia del campo</strong>
-                            <span class="mt-1 block"><strong>Qué es:</strong>
-                                <span x-text="academy('<?= e($name) ?>', <?= $academyValue ?>)?.what"></span></span>
-                            <span class="mt-1 block"><strong>Cuándo aplica:</strong>
-                                <span x-text="academy('<?= e($name) ?>', <?= $academyValue ?>)?.when"></span></span>
-                            <span class="mt-1 block"><strong>Soporte:</strong>
-                                <span x-text="academy('<?= e($name) ?>', <?= $academyValue ?>)?.basis"></span></span>
-                            <span class="mt-2 block rounded-lg bg-white/70 p-2"
-                                x-show="academy('<?= e($name) ?>', <?= $academyValue ?>)?.report">
-                                <strong>Justificación para el informe:</strong>
-                                <span x-text="academy('<?= e($name) ?>', <?= $academyValue ?>)?.report"></span>
-                            </span>
-                        </span>
-                    </label>
-                <?php endforeach; ?>
+                <?php foreach ($configurationSelects as $name) {
+                    require BASE_PATH . '/app/Views/appraisals/chapter-zero-select-field.php';
+                } ?>
                 <label class="label md:col-span-2">Notas de inspección y configuración
                     <textarea class="input" name="inspection_notes" rows="4" maxlength="2000"
-                        placeholder="Anota dudas de campo, tipología probable, componentes o alertas técnicas."><?= e($field('inspection_notes')) ?></textarea>
+                        placeholder="Anota dudas de campo, componentes del bien o alertas técnicas."><?= e($field('inspection_notes')) ?></textarea>
+                </label>
+            </div>
+
+            <div class="mt-6 grid gap-5 md:grid-cols-2" x-show="active === 'identificacion'">
+                <label class="label md:col-span-2">Nombre del avalúo
+                    <input class="input" name="titulo" maxlength="160" value="<?= e($field('titulo')) ?>"
+                        placeholder="Ej. Avalúo comercial Lote Bruselas">
+                </label>
+                <label class="label">Cliente
+                    <input class="input" name="client_name" maxlength="160" value="<?= e($field('client_name')) ?>"
+                        placeholder="Persona o entidad contratante">
+                </label>
+                <label class="label">Solicitante
+                    <input class="input" name="requester_name" maxlength="160" value="<?= e($field('requester_name')) ?>"
+                        placeholder="Quien solicita o radica el encargo">
+                </label>
+                <label class="label">Destinatario del informe
+                    <input class="input" name="report_recipient" maxlength="160" value="<?= e($field('report_recipient')) ?>"
+                        placeholder="A quien va dirigido el entregable">
+                </label>
+                <?php $name = 'finalidad'; require BASE_PATH . '/app/Views/appraisals/chapter-zero-select-field.php'; ?>
+                <label class="label md:col-span-2">Uso previsto del informe
+                    <input class="input" name="intended_use" maxlength="220" value="<?= e($field('intended_use')) ?>"
+                        placeholder="Ej. negociación, garantía, conciliación, decisión interna o proceso judicial">
+                </label>
+                <label class="label">Fecha de visita
+                    <input class="input" type="date" name="visit_date" value="<?= e($field('visit_date')) ?>">
+                </label>
+                <label class="label">Fecha de valor
+                    <input class="input" type="date" name="value_date" value="<?= e($field('value_date')) ?>">
+                </label>
+                <label class="label">Fecha del informe
+                    <input class="input" type="date" name="report_date" value="<?= e($field('report_date')) ?>">
+                </label>
+                <label class="label">Municipio base del encargo
+                    <input class="input" name="municipio" maxlength="120" value="<?= e($field('municipio')) ?>"
+                        placeholder="Municipio">
+                </label>
+                <label class="label md:col-span-2">Dirección o referencia base
+                    <input class="input" name="direccion" maxlength="220" value="<?= e($field('direccion')) ?>"
+                        placeholder="Dirección o referencia de ubicación">
+                </label>
+                <label class="label md:col-span-2">Alcance del encargo
+                    <textarea class="input" name="assignment_scope" rows="3" maxlength="2000"
+                        placeholder="Define qué cubre el avalúo, fuentes consultadas y unidad de análisis."><?= e($field('assignment_scope')) ?></textarea>
+                </label>
+                <label class="label md:col-span-2">Limitaciones y salvedades
+                    <textarea class="input" name="assignment_limitations" rows="3" maxlength="2000"
+                        placeholder="Registra documentos faltantes, restricciones de acceso o información no verificada."><?= e($field('assignment_limitations')) ?></textarea>
+                </label>
+                <label class="label md:col-span-2">Hipótesis de trabajo
+                    <textarea class="input" name="assignment_hypotheses" rows="3" maxlength="2000"
+                        placeholder="Supuestos razonables usados para producir el informe, si aplican."><?= e($field('assignment_hypotheses')) ?></textarea>
                 </label>
                 <label class="label md:col-span-2">Observaciones generales
                     <textarea class="input" name="observaciones" rows="4" maxlength="4000"
-                        placeholder="Observaciones generales del encargo."><?= e($field('observaciones')) ?></textarea>
+                        placeholder="Notas generales del encargo que deban quedar disponibles para el informe."><?= e($field('observaciones')) ?></textarea>
                 </label>
             </div>
-        </div>
+        </section>
+
         <aside class="space-y-4">
             <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 class="font-semibold">Guardar Capítulo 0</h2>
+                <h2 class="font-semibold">Guardar expediente</h2>
                 <p class="mt-3 text-sm leading-6 text-slate-600">
-                    Guarda la configuración y las fotos antes de avanzar al Capítulo 1.
+                    Guarda 1.1 y 1.2 antes de continuar con Bien sujeto.
                 </p>
                 <button class="btn-primary mt-5 w-full" type="submit" :disabled="busy"
-                    x-text="busy ? 'Guardando...' : 'Guardar configuración'">Guardar configuración</button>
+                    x-text="busy ? 'Guardando...' : 'Guardar expediente'">Guardar expediente</button>
             </div>
             <p class="px-2 text-xs leading-5 text-slate-500">
                 El consecutivo técnico se asignará cuando el expediente quede formalmente configurado.

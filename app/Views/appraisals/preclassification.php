@@ -16,7 +16,7 @@
         <?php if ($preclassError): ?>
             <p class="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($preclassError) ?></p>
         <?php endif; ?>
-        <?php $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/capitulo-0'; ?>
+        <?php $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/expediente'; ?>
         <form class="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-4" method="post"
             action="<?= e(url($subjectActionBase . '/preclasificacion')) ?>"
             x-data="{ busy: false }" @submit="busy = true">

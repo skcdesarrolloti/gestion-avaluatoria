@@ -31,6 +31,8 @@ return [
     ['GET', '#^/normas-internacionales-valuacion/([a-z0-9-]+)/archivo$#', 'international', 'file', true],
     ['GET', '#^/normas-niif/([a-z0-9-]+)/archivo$#', 'ifrs', 'file', true],
     ['POST', '#^/avaluos$#', 'appraisals', 'create', true],
+    ['GET', '#^/avaluos/([a-f0-9]{32})/expediente$#', 'appraisals', 'chapterZero', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/expediente$#', 'appraisals', 'saveChapterZero', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/capitulo-0$#', 'appraisals', 'chapterZero', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/capitulo-0$#', 'appraisals', 'saveChapterZero', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/bien-sujeto$#', 'appraisals', 'subject', true],
