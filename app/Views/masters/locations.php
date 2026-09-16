@@ -1,15 +1,15 @@
 <section id="maestros-geograficos" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">Cobertura nacional</p>
-            <h2 class="mt-2 text-2xl font-semibold">Maestros geográficos</h2>
+            <p class="eyebrow">Ubicación del inmueble</p>
+            <h2 class="mt-2 text-2xl font-semibold">Crear opciones de ubicación</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                Crea departamentos, ciudades o municipios, localidades, y finalmente barrios, veredas o sectores.
-                Esta estructura alimentará Bien sujeto sin volver a digitar ubicaciones.
+                Estos datos solo sirven para escoger la ubicación del inmueble en Bien sujeto:
+                departamento, ciudad o municipio, localidad y barrio, vereda o sector.
             </p>
         </div>
         <span class="rounded-full bg-teal-50 px-3 py-1 text-sm font-semibold text-teal-800">
-            <?= e(count($departments)) ?> depto(s) · <?= e(count($cities)) ?> ciudad(es) · <?= e(count($localities)) ?> localidad(es)
+            Maestro de ubicación
         </span>
     </div>
 
@@ -18,7 +18,7 @@
             action="<?= e(url('maestros/departamentos')) ?>" x-data="{ busy: false }" @submit="busy = true">
             <?= csrf_field() ?>
             <h3 class="font-semibold">Departamento</h3>
-            <label class="label mt-4">Código
+            <label class="label mt-4">Código DANE opcional
                 <input class="input" name="code" maxlength="20" placeholder="Ej. 05">
             </label>
             <label class="label mt-4">Nombre
@@ -40,7 +40,7 @@
                     <?php endforeach; ?>
                 </select>
             </label>
-            <label class="label mt-4">Código
+            <label class="label mt-4">Código DANE opcional
                 <input class="input" name="code" maxlength="20" placeholder="Ej. 05001">
             </label>
             <label class="label mt-4">Nombre
@@ -103,21 +103,7 @@
         </form>
     </div>
 
-    <div class="mt-6 grid gap-4 lg:grid-cols-4">
-        <?php foreach ([['Departamentos', $departments], ['Ciudades', $cities],
-            ['Localidades', $localities], ['Barrios / sectores', $neighborhoods]] as [$title, $rows]): ?>
-            <div class="rounded-xl bg-slate-50 p-4">
-                <h3 class="font-semibold"><?= e($title) ?></h3>
-                <?php if (!$rows): ?>
-                    <p class="mt-3 text-sm text-slate-600">Sin registros aún.</p>
-                <?php else: ?>
-                    <ul class="mt-3 space-y-1 text-sm text-slate-700">
-                        <?php foreach (array_slice($rows, 0, 8) as $row): ?>
-                            <li><?= e(($row['department_name'] ?? '') ? ($row['department_name'] . ' · ') : '') ?><?= e(($row['city_name'] ?? '') ? ($row['city_name'] . ' · ') : '') ?><?= e(($row['locality_name'] ?? '') ? ($row['locality_name'] . ' · ') : '') ?><?= e($row['name']) ?></li>
-                        <?php endforeach; ?>
-                    </ul>
-                <?php endif; ?>
-            </div>
-        <?php endforeach; ?>
-    </div>
+    <p class="mt-5 rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-600">
+        Jerarquía usada por el módulo: Departamento → Ciudad/Municipio → Localidad → Barrio/Sector.
+    </p>
 </section>
