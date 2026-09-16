@@ -29,19 +29,27 @@ final class AppraisalSectorController
     {
         $record = $this->appraisals->find($id, $this->user['id']);
         $subject = $this->subjects->find($id, $this->user['id']);
-        $master = $this->neighborhoodSectors->find((string) ($subject['neighborhood_id'] ?? ''));
+        $sectorError = Session::pullFlash('sector_error');
+        $neighborhoodId = (string) ($subject['neighborhood_id'] ?? '');
+        $master = $this->safeMasterSector($neighborhoodId, $sectorError);
         $hasSector = $this->sectors->exists($id, $this->user['id']);
         if ($hasSector) {
             $sector = $this->sectors->find($id, $this->user['id']);
             [$source, $updatedAt] = ['expediente', $sector['updated_at'] ?? null];
         } else {
-            [$sector, $source, $updatedAt] = $this->initialSector($id, $subject);
+            [$sector, $source, $updatedAt] = $this->initialSector($id, $subject, $master);
         }
-        $neighborhoodId = (string) ($subject['neighborhood_id'] ?? '');
-        if ($neighborhoodId !== '') {
-            $this->sectorBank->ensureSections($neighborhoodId, $subject, $sector);
+        $bankSections = [];
+        $bankSummary = ['total' => 0, 'ready' => 0, 'percent' => 0, 'level' => 'ROJO'];
+        try {
+            if ($neighborhoodId !== '') {
+                $this->sectorBank->ensureSections($neighborhoodId, $subject, $sector);
+            }
+            $bankSections = $this->sectorBank->sections($neighborhoodId);
+            $bankSummary = $this->sectorBank->summary($neighborhoodId);
+        } catch (\Throwable $error) {
+            $sectorError = $this->sectorWarning($sectorError, $error, 'sector_bank_show');
         }
-        $bankSections = $this->sectorBank->sections($neighborhoodId);
         view('appraisals/sector', [
             'title' => 'Sector y entorno',
             'record' => $record,
@@ -54,12 +62,12 @@ final class AppraisalSectorController
             'sectorHasNeighborhoodBank' => (bool) $master,
             'sectorNeighborhoodUpdatedAt' => $master['updated_at'] ?? null,
             'sectorBankSections' => $bankSections,
-            'sectorBankSummary' => $this->sectorBank->summary($neighborhoodId),
+            'sectorBankSummary' => $bankSummary,
             'sectorSections' => AppraisalSectorCatalog::sections(),
             'sectorOptions' => AppraisalSectorCatalog::options(),
             'sectorHelps' => AppraisalSectorCatalog::helps(),
             'sectorMessage' => Session::pullFlash('sector_message'),
-            'sectorError' => Session::pullFlash('sector_error'),
+            'sectorError' => $sectorError,
         ]);
     }
 
@@ -95,25 +103,30 @@ final class AppraisalSectorController
             $subject['neighborhood_id'] = $neighborhoodId;
             $this->subjects->save($id, $this->user['id'], $subject);
             $subject = $this->subjects->find($id, $this->user['id']);
-            $master = $this->neighborhoodSectors->find($neighborhoodId);
+            $warning = null;
+            $master = $this->safeMasterSector($neighborhoodId, $warning);
             $data = $master ? AppraisalSectorInput::data($master)
                 : AppraisalSectorInput::data(AppraisalSectorPrefill::fromSubject($subject));
             $this->sectors->save($id, $this->user['id'], $data);
-            $this->sectorBank->ensureSections($neighborhoodId, $subject, $data);
-            $this->sectorBank->saveSnapshot($id, $this->user['id'], $neighborhoodId, $data);
+            try {
+                $this->sectorBank->ensureSections($neighborhoodId, $subject, $data);
+                $this->sectorBank->saveSnapshot($id, $this->user['id'], $neighborhoodId, $data);
+            } catch (\Throwable $error) {
+                $warning = $this->sectorWarning($warning, $error, 'sector_bank_select');
+            }
             Session::flash('sector_message', $master
                 ? 'Barrio cargado desde el banco barrial.'
                 : 'Barrio sin ficha guardada: se preparó una generación inicial para completar.');
+            if ($warning) Session::flash('sector_error', $warning);
         } catch (\Throwable $error) {
             Session::flash('sector_error', $error->getMessage());
         }
         Http::redirect('avaluos/' . $id . '/sector');
     }
 
-    private function initialSector(string $id, array $subject): array
+    private function initialSector(string $id, array $subject, ?array $master): array
     {
         $empty = $this->sectors->find($id, $this->user['id']);
-        $master = $this->neighborhoodSectors->find((string) ($subject['neighborhood_id'] ?? ''));
         if ($master) {
             return [array_replace($empty, $master), 'banco_barrial', $master['updated_at'] ?? null];
         }
@@ -144,5 +157,25 @@ final class AppraisalSectorController
         }
 
         return count($matches) === 1 ? array_key_first($matches) : '';
+    }
+
+    private function safeMasterSector(string $neighborhoodId, ?string &$sectorError): ?array
+    {
+        try {
+            return $this->neighborhoodSectors->find($neighborhoodId);
+        } catch (\Throwable $error) {
+            $sectorError = $this->sectorWarning($sectorError, $error, 'sector_master_profile');
+            return null;
+        }
+    }
+
+    private function sectorWarning(?string $current, \Throwable $error, string $context): string
+    {
+        $reference = substr(hash('sha256', $context . '|' . $error->getMessage() . '|' . microtime(true)), 0, 12);
+        error_log('Gestion avaluatoria sector [' . $reference . '] ' . $context . ' '
+            . get_class($error) . ' code=' . $error->getCode() . ' message=' . $error->getMessage());
+        $message = 'No fue posible cargar completamente el banco sectorial avanzado. '
+            . 'La ficha base del sector sigue disponible. Referencia: ' . $reference . '.';
+        return $current ? $current . ' ' . $message : $message;
     }
 }
