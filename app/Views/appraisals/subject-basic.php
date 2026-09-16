@@ -2,57 +2,62 @@
 $sv = static fn (string $key): string => (string) ($subject[$key] ?? '');
 $fieldHelp = static fn (string $key): string => (string) ($subjectHelp[$key] ?? '');
 $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/bien-sujeto';
+$internalCode = 'INT_' . preg_replace('/[^A-Za-z0-9_]+/', '_', (string) ($record['titulo'] ?: substr($record['id'], 0, 8)));
 $textLabels = [
+    'subject_title' => ['Título o identificación', 'Ej. Lote Bruselas'],
+    'address' => ['Dirección física', 'Ej. Barrio Bruselas D 25 No. 49-72'],
+    'address_certificate' => ['Dirección desde Certificado de Tradición', 'Ej. Barrio Bruselas D 23 No. 44-72'],
+    'address_midas' => ['Dirección desde MIDAS', 'Ej. D 23 44 72'],
+    'address_tax' => ['Dirección desde Impuesto predial', 'Ej. D 23 44 72'],
+    'address_deed' => ['Dirección desde Escritura', 'Ej. Barrio Bruselas D 23 No. 44-72'],
+    'address_other' => ['Dirección desde otra fuente', 'Portal, visita, certificado adicional, etc.'],
+    'adopted_address' => ['Ubicación adoptada', 'Dirección que se adopta técnicamente'],
     'point_reference' => ['Punto de referencia', 'Ej. Zona residencial consolidada'],
-    'address' => ['Dirección / nomenclatura', 'Ej. Barrio Bruselas D 25 No. 49-72'],
     'alternate_nomenclature' => ['Nomenclatura alterna', 'Ej. N/A'],
     'property_registry' => ['Matrícula inmobiliaria', 'Ej. 060-260018'],
     'cadastral_reference' => ['Referencia catastral', 'Ej. 01-09-0130-0016-000'],
     'registry_office' => ['Oficina de registro / círculo registral', 'Ej. Cartagena'],
     'restrictions' => ['Restricciones / limitaciones', 'Ej. N/A'],
     'legal_urban_affectations' => ['Afectaciones jurídicas o urbanas', 'Ej. Sin afectaciones reportadas'],
-    'current_use' => ['Uso actual', 'Ej. Residencial'],
-    'main_potential_use' => ['Uso potencial principal', 'Ej. Residencial'],
     'complementary_potential_uses' => ['Usos potenciales complementarios', 'Ej. Comercial'],
-    'main_complementary_activity' => ['Actividad complementaria principal observada', 'Ej. Servicios'],
     'secondary_complementary_activities' => ['Actividades complementarias secundarias', 'Ej. Logística'],
     'latitude' => ['Latitud', 'Ej. 10.41534968'],
     'longitude' => ['Longitud', 'Ej. -75.53213628'],
 ];
-$groups = [
-    'Ubicación y referencia' => ['point_reference', 'address', 'alternate_nomenclature'],
-    'Identificación jurídica y urbana' => ['property_registry', 'cadastral_reference', 'registry_office',
-        'centrality', 'immediate_environment', 'stratum', 'urban_license',
-        'permitted_use', 'urban_treatment', 'restrictions', 'legal_urban_affectations', 'road_condition'],
-    'Uso, acceso y servicios' => ['access_facility', 'transport_connectivity', 'loading_unloading',
-        'current_use', 'main_potential_use', 'complementary_potential_uses', 'main_complementary_activity',
-        'secondary_complementary_activities', 'current_occupation', 'water_service', 'energy_service',
-        'gas_service', 'sewer_service', 'internet_service', 'service_continuity'],
-    'Fecha y coordenadas' => ['subject_reference_date', 'latitude', 'longitude'],
+$tabs = [
+    'identificacion' => ['Identificación', ['subject_title', 'address']],
+    'fuentes' => ['Fuentes de dirección', ['address_certificate', 'address_midas', 'address_tax',
+        'address_deed', 'address_other', 'adopted_source', 'adopted_address']],
+    'ubicacion' => ['Ubicación territorial', []],
+    'referencia' => ['Referencia', ['point_reference', 'alternate_nomenclature']],
+    'registro' => ['Registro y catastro', ['property_registry', 'cadastral_reference', 'registry_office', 'stratum']],
+    'norma' => ['Norma urbana', ['urban_license', 'permitted_use', 'urban_treatment']],
+    'restricciones' => ['Restricciones', ['restrictions', 'legal_urban_affectations']],
+    'entorno' => ['Entorno', ['centrality', 'immediate_environment', 'road_condition']],
+    'acceso' => ['Acceso y movilidad', ['access_facility', 'transport_connectivity', 'loading_unloading']],
+    'usos' => ['Usos y ocupación', ['current_use', 'main_potential_use', 'complementary_potential_uses',
+        'main_complementary_activity', 'secondary_complementary_activities', 'current_occupation']],
+    'servicios' => ['Servicios', ['water_service', 'energy_service', 'gas_service',
+        'sewer_service', 'internet_service', 'service_continuity']],
+    'cierre' => ['Fecha, coordenadas y notas', ['subject_reference_date', 'latitude', 'longitude']],
 ];
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{
+        activeTab: 'identificacion',
+        busy: false,
         departments: <?= e(json_encode($geo['departments'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         cities: <?= e(json_encode($geo['cities'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         neighborhoods: <?= e(json_encode($geo['neighborhoods'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         departmentId: <?= e(json_encode($sv('department_id'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         cityId: <?= e(json_encode($sv('city_id'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         neighborhoodId: <?= e(json_encode($sv('neighborhood_id'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
-        saved: <?= e(json_encode([
-            'department_name' => $sv('department_name'), 'city_name' => $sv('city_name'),
-            'neighborhood_name' => $sv('neighborhood_name'), 'locality_name' => $sv('locality_name'),
-            'commune_ucg' => $sv('commune_ucg'), 'zone_sector' => $sv('zone_sector'),
-        ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+        saved: <?= e(json_encode(['locality_name' => $sv('locality_name'), 'commune_ucg' => $sv('commune_ucg'),
+            'zone_sector' => $sv('zone_sector')], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         filteredCities() { return this.cities.filter(city => !this.departmentId || city.department_id === this.departmentId) },
         filteredNeighborhoods() { return this.neighborhoods.filter(item => !this.cityId || item.city_id === this.cityId) },
         selectedNeighborhood() { return this.neighborhoods.find(item => item.id === this.neighborhoodId) || null },
-        locationValue(key) { const row = this.selectedNeighborhood(); return row ? (row[key] || '') : (this.saved[key] || '') },
-        locationDisplay(key) {
-            const row = this.selectedNeighborhood();
-            if (!row) return this.saved[key] || '';
-            return row[key] || 'Pendiente en maestro';
-        },
+        locationDisplay(key) { const row = this.selectedNeighborhood(); return row ? (row[key] || 'Pendiente en maestro') : (this.saved[key] || '') },
         changeDepartment() { this.cityId = ''; this.neighborhoodId = '' },
         changeCity() { this.neighborhoodId = '' }
     }">
@@ -61,94 +66,55 @@ $groups = [
             <p class="eyebrow">2.1 Ficha básica del sujeto</p>
             <h2 class="mt-2 text-2xl font-semibold">Identificación y características del inmueble</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                Esta ficha concentra los datos que describen el bien sujeto. Al seleccionar barrio o microsector,
-                el sistema trae localidad, comuna/UCG y zona/sector desde los maestros.
+                Misma lógica base de InversKC, organizada en subpestañas para diligenciar sin perderse.
             </p>
         </div>
         <a class="btn-secondary" href="<?= e(url('maestros')) ?>">Abrir maestros</a>
     </div>
-    <?php if ($subjectMessage): ?>
-        <p class="mt-5 rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($subjectMessage) ?></p>
-    <?php endif; ?>
-    <?php if ($subjectError): ?>
-        <p class="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($subjectError) ?></p>
-    <?php endif; ?>
-    <form class="mt-6 space-y-7" method="post" action="<?= e(url($subjectActionBase . '/ficha-basica')) ?>"
-        x-data="{ busy: false }" @submit="busy = true">
+    <?php if ($subjectMessage): ?><p class="mt-5 rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($subjectMessage) ?></p><?php endif; ?>
+    <?php if ($subjectError): ?><p class="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($subjectError) ?></p><?php endif; ?>
+    <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/ficha-basica')) ?>" @submit="busy = true">
         <?= csrf_field() ?>
-        <div class="rounded-xl border border-slate-200 p-5">
-            <h3 class="text-base font-semibold">Ubicación del inmueble</h3>
+        <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
+            <?php foreach ($tabs as $key => [$title]): ?>
+                <button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
+                    @click="activeTab = '<?= e($key) ?>'"
+                    :class="activeTab === '<?= e($key) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'">
+                    <?= e($title) ?>
+                </button>
+            <?php endforeach; ?>
+        </div>
+        <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="activeTab === 'identificacion'">
+            <h3 class="text-base font-semibold">Identificación</h3>
             <div class="mt-5 grid gap-5 md:grid-cols-3">
-                <label class="label">Departamento <span class="help-dot" title="<?= e($fieldHelp('department_id')) ?>">?</span>
-                    <select class="input" name="department_id" x-model="departmentId" @change="changeDepartment()">
-                        <option value="">Selecciona departamento</option>
-                        <template x-for="item in departments" :key="item.id">
-                            <option :value="item.id" x-text="item.name"></option>
-                        </template>
-                    </select>
+                <label class="label">Código interno <span class="help-dot" title="Llave interna del sujeto. Se genera automáticamente y no debe editarse manualmente.">?</span>
+                    <input class="input bg-slate-50" value="<?= e($internalCode) ?>" readonly>
                 </label>
-                <label class="label">Municipio / distrito <span class="help-dot" title="<?= e($fieldHelp('city_id')) ?>">?</span>
-                    <select class="input" name="city_id" x-model="cityId" @change="changeCity()">
-                        <option value="">Selecciona municipio</option>
-                        <template x-for="item in filteredCities()" :key="item.id">
-                            <option :value="item.id" x-text="item.name"></option>
-                        </template>
-                    </select>
-                </label>
-                <label class="label">Barrio / microsector <span class="help-dot" title="<?= e($fieldHelp('neighborhood_id')) ?>">?</span>
-                    <select class="input" name="neighborhood_id" x-model="neighborhoodId">
-                        <option value="">Selecciona barrio</option>
-                        <template x-for="item in filteredNeighborhoods()" :key="item.id">
-                            <option :value="item.id" x-text="item.name"></option>
-                        </template>
-                    </select>
-                </label>
-                <label class="label">Localidad <span class="help-dot" title="<?= e($fieldHelp('locality_name')) ?>">?</span>
-                    <input class="input bg-slate-50" readonly :value="locationDisplay('locality_name')" placeholder="Se completa con el barrio">
-                </label>
-                <label class="label">Comuna / UCG <span class="help-dot" title="<?= e($fieldHelp('commune_ucg')) ?>">?</span>
-                    <input class="input bg-slate-50" readonly :value="locationDisplay('commune_ucg')" placeholder="Se completa con el barrio">
-                </label>
-                <label class="label">Zona / sector <span class="help-dot" title="<?= e($fieldHelp('zone_sector')) ?>">?</span>
-                    <input class="input bg-slate-50" readonly :value="locationDisplay('zone_sector')" placeholder="Se completa con el barrio">
-                </label>
+                <?php foreach ($tabs['identificacion'][1] as $key) require BASE_PATH . '/app/Views/appraisals/subject-basic-field.php'; ?>
             </div>
         </div>
-        <?php foreach ($groups as $title => $keys): ?>
-            <div class="rounded-xl border border-slate-200 p-5">
+        <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="activeTab === 'ubicacion'">
+            <h3 class="text-base font-semibold">Ubicación territorial</h3>
+            <div class="mt-5 grid gap-5 md:grid-cols-3">
+                <?php require BASE_PATH . '/app/Views/appraisals/subject-location-fields.php'; ?>
+            </div>
+        </div>
+        <?php foreach ($tabs as $tabKey => [$title, $keys]): ?>
+            <?php if (in_array($tabKey, ['identificacion', 'ubicacion'], true)) continue; ?>
+            <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="activeTab === '<?= e($tabKey) ?>'">
                 <h3 class="text-base font-semibold"><?= e($title) ?></h3>
                 <div class="mt-5 grid gap-5 md:grid-cols-3">
-                    <?php foreach ($keys as $key): ?>
-                        <?php if (isset($subjectCatalog[$key])): [$label, $options] = $subjectCatalog[$key]; ?>
-                            <label class="label"><?= e($label) ?>
-                                <?php if ($fieldHelp($key) !== ''): ?><span class="help-dot" title="<?= e($fieldHelp($key)) ?>">?</span><?php endif; ?>
-                                <select class="input" name="<?= e($key) ?>">
-                                    <option value="">Selecciona opción</option>
-                                    <?php foreach ($options as $value => $option): ?>
-                                        <option value="<?= e($value) ?>" <?= $sv($key) === (string) $value ? 'selected' : '' ?>><?= e($option) ?></option>
-                                    <?php endforeach; ?>
-                                </select>
-                            </label>
-                        <?php elseif ($key === 'subject_reference_date'): ?>
-                            <label class="label">Fecha de referencia del sujeto <span class="help-dot" title="<?= e($fieldHelp($key)) ?>">?</span>
-                                <input class="input" type="date" name="subject_reference_date" value="<?= e($sv($key)) ?>">
-                            </label>
-                        <?php else: [$label, $placeholder] = $textLabels[$key]; ?>
-                            <label class="label <?= in_array($key, ['restrictions', 'legal_urban_affectations'], true) ? 'md:col-span-2' : '' ?>">
-                                <?= e($label) ?>
-                                <?php if ($fieldHelp($key) !== ''): ?><span class="help-dot" title="<?= e($fieldHelp($key)) ?>">?</span><?php endif; ?>
-                                <input class="input" name="<?= e($key) ?>" value="<?= e($sv($key)) ?>" placeholder="<?= e($placeholder) ?>">
-                            </label>
-                        <?php endif; ?>
-                    <?php endforeach; ?>
+                    <?php foreach ($keys as $key) require BASE_PATH . '/app/Views/appraisals/subject-basic-field.php'; ?>
                 </div>
+                <?php if ($tabKey === 'cierre'): ?>
+                    <label class="label mt-5 block">Observaciones generales <span class="help-dot" title="<?= e($fieldHelp('notes')) ?>">?</span>
+                        <textarea class="input" name="notes" rows="4" maxlength="2000"
+                            placeholder="Criterio técnico, salvedades o notas útiles para las siguientes pestañas."><?= e($sv('notes')) ?></textarea>
+                    </label>
+                <?php endif; ?>
             </div>
         <?php endforeach; ?>
-        <label class="label block">Notas de la ficha básica <span class="help-dot" title="<?= e($fieldHelp('notes')) ?>">?</span>
-            <textarea class="input" name="notes" rows="4" maxlength="2000"
-                placeholder="Observaciones del sujeto que deban pasar al análisis o al informe."><?= e($sv('notes')) ?></textarea>
-        </label>
-        <div class="flex justify-end">
+        <div class="mt-5 flex justify-end">
             <button class="btn-primary" type="submit" :disabled="busy"
                 x-text="busy ? 'Guardando...' : 'Guardar ficha básica'">Guardar ficha básica</button>
         </div>

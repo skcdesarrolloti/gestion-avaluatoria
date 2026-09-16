@@ -56,7 +56,9 @@ final class AppraisalSubjectRepository
 
     private function normalized(array $input): array
     {
-        $limits = ['notes' => 2000, 'point_reference' => 220, 'address' => 220,
+        $limits = ['notes' => 2000, 'subject_title' => 160, 'point_reference' => 220, 'address' => 220,
+            'address_certificate' => 220, 'address_midas' => 220, 'address_tax' => 220,
+            'address_deed' => 220, 'address_other' => 220, 'adopted_address' => 220,
             'alternate_nomenclature' => 160, 'property_registry' => 80, 'cadastral_reference' => 120,
             'registry_office' => 120, 'restrictions' => 220, 'legal_urban_affectations' => 220,
             'complementary_potential_uses' => 160, 'secondary_complementary_activities' => 160,
@@ -69,8 +71,7 @@ final class AppraisalSubjectRepository
             $value = (string) ($input[$key] ?? '');
             $data[$key] = array_key_exists($value, $options) ? $value : '';
         }
-        foreach (['department_id', 'city_id', 'neighborhood_id', 'current_use',
-            'main_potential_use', 'main_complementary_activity'] as $key) {
+        foreach (['department_id', 'city_id', 'neighborhood_id'] as $key) {
             $data[$key] = mb_substr(trim((string) ($input[$key] ?? '')), 0, 80);
         }
         $date = trim((string) ($input['subject_reference_date'] ?? ''));
