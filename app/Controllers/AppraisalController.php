@@ -93,7 +93,13 @@ final class AppraisalController
 
     public function saveSubjectConstructions(string $id): never { $this->saveSubjectData($id, fn () => $this->appraisals->saveUnitConstructions($id, $this->user['id'], AppraisalChapterZeroInput::unitConstructionData()), 'Datos de construcción guardados correctamente.', '#construccion'); }
 
-    public function saveSubjectAttributes(string $id): never { $this->saveSubjectData($id, fn () => $this->appraisals->saveUnitAttributes($id, $this->user['id'], AppraisalAttributeInput::unitAttributeData()), 'Atributos especiales guardados correctamente.', '#atributos'); }
+    public function saveSubjectAttributes(string $id): never { $this->saveSubjectData($id, fn () => $this->saveAttributesAndPhotos($id), 'Atributos especiales guardados correctamente.', '#atributos'); }
+
+    private function saveAttributesAndPhotos(string $id): void
+    {
+        $this->appraisals->saveUnitAttributes($id, $this->user['id'], AppraisalAttributeInput::unitAttributeData());
+        (new AppraisalPhotoUploadService())->storeAttributeEvidence($_FILES['attribute_photos'] ?? [], $id, $this->user['id'], $this->appraisals);
+    }
 
     private function saveSubjectData(string $id, callable $save, string $message, string $hash): never
     {

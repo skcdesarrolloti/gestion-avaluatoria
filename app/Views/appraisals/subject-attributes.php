@@ -5,6 +5,12 @@ $attrValue = static function (array $unit, string $key, string $field): string {
     $data = json_decode((string) ($unit['special_attributes_json'] ?? '{}'), true);
     return is_array($data) ? (string) ($data[$key][$field] ?? '') : '';
 };
+$phValue = mb_strtolower(trim((string) (($record['regimen_ph'] ?? '') ?: ($subject['horizontal_property'] ?? ''))));
+$hasHorizontalProperty = in_array($phValue, ['si', 'sí', 's', 'yes', '1'], true);
+$photosForAttribute = static function (string $unitId, string $key) use ($photos): array {
+    return array_values(array_filter($photos, static fn (array $photo): bool =>
+        (string) ($photo['unit_id'] ?? '') === $unitId && (string) ($photo['caption'] ?? '') === 'attribute:' . $key));
+};
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{ activeAttributes: '<?= e($attributeUnits[0]['id'] ?? '') ?>', busyAttributes: false }">
@@ -21,7 +27,7 @@ $attrValue = static function (array $unit, string $key, string $field): string {
             <?= count($attributeUnits) ?> unidad(es)
         </span>
     </div>
-    <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/atributos')) ?>"
+    <form class="mt-6" method="post" enctype="multipart/form-data" action="<?= e(url($subjectActionBase . '/atributos')) ?>"
         @submit="busyAttributes = true">
         <?= csrf_field() ?>
         <?php if (!$attributeUnits): ?>

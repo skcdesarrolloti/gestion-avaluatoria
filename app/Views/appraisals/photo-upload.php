@@ -38,12 +38,17 @@ $visiblePhotos = $photoUnitId === '' ? $photos : array_values(array_filter($phot
             <?= csrf_field() ?>
             <?php if ($photoUnitId): ?><input type="hidden" name="unit_id" value="<?= e($photoUnitId) ?>"><?php endif; ?>
             <div class="label">Agregar fotos
-                <div class="mt-2 rounded-xl border border-dashed border-slate-300 bg-white p-4"
-                    tabindex="0" @click="$el.focus()" @paste="paste($event)">
-                    <input class="input mt-0" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple
-                        x-ref="photos" @change="update($event.target)">
+                <div class="mt-2 grid gap-3 rounded-xl border border-dashed border-slate-300 bg-white p-4 sm:grid-cols-2">
+                    <label class="btn-secondary min-h-11">Elegir archivos
+                        <input class="sr-only" type="file" name="photos[]" accept="image/jpeg,image/png,image/webp" multiple
+                            x-ref="photos" @change="update($event.target)">
+                    </label>
+                    <div class="min-h-11 rounded-lg border border-slate-300 px-3 py-2 text-sm text-slate-600"
+                        tabindex="0" @paste="paste($event)">
+                        Pegar imagen aquí con Ctrl+V
+                    </div>
                     <p class="mt-2 text-xs leading-5 text-slate-500">
-                        También puedes copiar una imagen y pegarla aquí con Ctrl+V.
+                        El botón abre archivos; el recuadro derecho recibe imágenes copiadas.
                     </p>
                     <p class="mt-1 text-xs font-semibold text-teal-800" x-show="fileNames" x-text="fileNames"></p>
                 </div>
