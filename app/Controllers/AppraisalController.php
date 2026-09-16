@@ -41,6 +41,8 @@ final class AppraisalController
         $record = $this->appraisals->find($id, $this->user['id']);
         view('appraisals/chapter-zero', ['title' => 'Expediente valuatorio', 'record' => $record,
             'appraisers' => $this->appraisers->all(),
+            'chapterZeroMessage' => Session::pullFlash('chapter_zero_message'),
+            'chapterZeroError' => Session::pullFlash('chapter_zero_error'),
             'catalog' => ['selects' => AppraisalCatalog::selectFields(), 'notes' => AppraisalCatalog::notes()]]);
     }
 
@@ -72,7 +74,6 @@ final class AppraisalController
 
     public function sector(string $id): void { view('appraisals/sector', ['title' => 'Sector y entorno', 'record' => $this->appraisals->find($id, $this->user['id'])]); }
     public function deliverable(string $id): void { view('appraisals/deliverable', ['title' => 'Entregable', 'record' => $this->appraisals->find($id, $this->user['id'])]); }
-
     public function saveSubjectBasic(string $id): never
     {
         $this->saveSubjectData($id, fn () => $this->subjects->save($id, $this->user['id'], $_POST),
@@ -81,26 +82,26 @@ final class AppraisalController
 
     public function saveChapterZero(string $id): never
     {
-        $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
-            $this->igacCodes(), $this->appraiserIds());
-        $this->appraisals->saveChapterZero($id, $this->user['id'], (int) $_POST['version'], $data);
-        Http::redirect('avaluos/' . $id . ((string) ($_POST['next'] ?? '') === 'sector' ? '/sector' : ((string) ($_POST['next'] ?? '') === 'subject' ? '/bien-sujeto#atributos' : ((string) ($_POST['next'] ?? '') === 'deliverable' ? '/entregable' : '/expediente'))));
+        try {
+            $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
+                $this->igacCodes(), $this->appraiserIds());
+            $this->appraisals->saveChapterZero($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $data);
+            Session::flash('chapter_zero_message', 'Expediente guardado correctamente.');
+            Http::redirect('avaluos/' . $id . ((string) ($_POST['next'] ?? '') === 'sector' ? '/sector' : ((string) ($_POST['next'] ?? '') === 'subject' ? '/bien-sujeto#atributos' : ((string) ($_POST['next'] ?? '') === 'deliverable' ? '/entregable' : '/expediente'))));
+        } catch (\Throwable $error) {
+            Session::flash('chapter_zero_error', $this->chapterZeroErrorMessage($error));
+            Http::redirect('avaluos/' . $id . '/expediente');
+        }
     }
-
     public function saveSubjectUnits(string $id): never { $this->saveUnitsAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }
-
     public function saveSubjectSurfaces(string $id): never { $this->saveSubjectData($id, fn () => $this->appraisals->saveUnitSurfaces($id, $this->user['id'], AppraisalChapterZeroInput::unitSurfaceData()), 'Datos de superficie guardados correctamente.', '#superficies'); }
-
     public function saveSubjectConstructions(string $id): never { $this->saveSubjectData($id, fn () => $this->appraisals->saveUnitConstructions($id, $this->user['id'], AppraisalChapterZeroInput::unitConstructionData()), 'Datos de construcción guardados correctamente.', '#construccion'); }
-
     public function saveSubjectAttributes(string $id): never { $this->saveSubjectData($id, fn () => $this->saveAttributesAndPhotos($id), 'Atributos especiales guardados correctamente.', '#atributos'); }
-
     private function saveAttributesAndPhotos(string $id): void
     {
         $this->appraisals->saveUnitAttributes($id, $this->user['id'], AppraisalAttributeInput::unitAttributeData());
         (new AppraisalPhotoUploadService())->storeAttributeEvidence($_FILES['attribute_photos'] ?? [], $id, $this->user['id'], $this->appraisals);
     }
-
     private function saveSubjectData(string $id, callable $save, string $message, string $hash): never
     {
         $this->appraisals->find($id, $this->user['id']);
@@ -112,7 +113,6 @@ final class AppraisalController
         }
         Http::redirect('avaluos/' . $id . '/bien-sujeto' . $hash);
     }
-
     private function saveUnitsAndRedirect(string $id, string $target): never
     {
         $this->appraisals->find($id, $this->user['id']);
@@ -125,9 +125,7 @@ final class AppraisalController
         }
         Http::redirect($target);
     }
-
     public function saveSubjectPreclassification(string $id): never { $this->savePreclassificationAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }
-
     private function savePreclassificationAndRedirect(string $id, string $target): never
     {
         $this->appraisals->find($id, $this->user['id']);
@@ -140,9 +138,7 @@ final class AppraisalController
         }
         Http::redirect($target);
     }
-
     public function uploadSubjectPhotos(string $id): never { $this->uploadPhotosAndRedirect($id, $this->safePhotoReturn($id)); }
-
     private function uploadPhotosAndRedirect(string $id, string $target): never
     {
         $record = $this->appraisals->find($id, $this->user['id']);
@@ -159,7 +155,6 @@ final class AppraisalController
         }
         Http::redirect($target);
     }
-
     public function photo(string $id, string $photoId): never
     {
         $this->appraisals->find($id, $this->user['id']);
@@ -180,7 +175,6 @@ final class AppraisalController
         }
         exit;
     }
-
     public function deletePhoto(string $id, string $photoId): never
     {
         $this->appraisals->find($id, $this->user['id']);
@@ -189,7 +183,6 @@ final class AppraisalController
         Session::flash('chapter_zero_photo_message', 'Foto retirada del expediente.');
         Http::redirect($this->safePhotoReturn($id));
     }
-
     private function safePhotoReturn(string $id): string
     {
         $target = (string) ($_POST['return_to'] ?? '');
@@ -199,14 +192,12 @@ final class AppraisalController
             ? $target
             : $subject . '#fotos';
     }
-
     public function edit(string $id): void
     {
         $record = $this->appraisals->find($id, $this->user['id']);
         view('appraisals/edit', ['title' => 'Ficha del avalúo', 'record' => $record,
             'catalog' => ['selects' => AppraisalCatalog::selectFields(), 'notes' => AppraisalCatalog::notes()]]);
     }
-
     public function save(string $id): never
     {
         $input = Http::input();
@@ -214,6 +205,14 @@ final class AppraisalController
         $result = $this->appraisals->save($id, $this->user['id'], $input['version'], $data);
         Http::json(['ok' => true] + $result);
     }
-
     private function appraiserIds(): array { return array_column($this->appraisers->all(), 'id'); } private function igacCodes(): array { return array_column($this->typologies->categories(), 'code'); }
+    private function chapterZeroErrorMessage(\Throwable $error): string
+    {
+        $reference = substr(hash('sha256', 'chapter_zero|' . $error->getMessage() . '|' . microtime(true)), 0, 12);
+        error_log('Gestion avaluatoria expediente [' . $reference . '] '
+            . get_class($error) . ' code=' . $error->getCode() . ' message=' . $error->getMessage());
+        return $error instanceof HttpException
+            ? $error->getMessage()
+            : 'No fue posible guardar el expediente. Referencia: ' . $reference . '.';
+    }
 }

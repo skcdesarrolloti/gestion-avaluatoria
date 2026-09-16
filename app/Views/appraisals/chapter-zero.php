@@ -24,6 +24,13 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
 </div>
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
+<?php if (!empty($chapterZeroMessage)): ?>
+    <p class="mt-6 rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($chapterZeroMessage) ?></p>
+<?php endif; ?>
+<?php if (!empty($chapterZeroError)): ?>
+    <p class="mt-6 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($chapterZeroError) ?></p>
+<?php endif; ?>
+
 <div class="mt-8 space-y-7">
     <form id="expediente-form" class="grid gap-7 lg:grid-cols-[1fr_18rem]" method="post"
         action="<?= e(url('avaluos/' . $record['id'] . '/expediente')) ?>"
