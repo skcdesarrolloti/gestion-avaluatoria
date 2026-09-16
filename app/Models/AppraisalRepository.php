@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace App\Models;
 use PDO;
 use App\Core\HttpException;
+use App\Services\AppraisalPhotoStorage;
 use App\Support\AppraisalCatalog;
 
 final class AppraisalRepository
@@ -27,6 +28,23 @@ final class AppraisalRepository
         return $id;
     }
 
+    public function photos(string $id, int $owner): array
+    {
+        $query = $this->db->prepare('SELECT * FROM appraisal_photos WHERE appraisal_id = ? AND owner_id = ?
+            ORDER BY created_at DESC, id DESC');
+        $query->execute([$id, $owner]);
+        return $query->fetchAll();
+    }
+
+    public function findPhoto(string $photoId, int $owner): array
+    {
+        $query = $this->db->prepare('SELECT * FROM appraisal_photos WHERE id = ? AND owner_id = ?');
+        $query->execute([$photoId, $owner]);
+        $row = $query->fetch();
+        if (!$row) throw new HttpException(404, 'No se encontró la foto.');
+        return $row;
+    }
+
     public function find(string $id, int $owner): array
     {
         $query = $this->db->prepare('SELECT * FROM appraisals WHERE id = ? AND owner_id = ?');
@@ -39,6 +57,40 @@ final class AppraisalRepository
         $row['version'] = (int) $row['version'];
         return $row;
     }
+
+    public function saveChapterZero(string $id, int $owner, int $version, array $data): array
+    {
+        $now = gmdate('Y-m-d H:i:s');
+        $query = $this->db->prepare('UPDATE appraisals SET titulo = ?, tipo = ?, direccion = ?, municipio = ?,
+            observaciones = ?, tipo_derecho = ?, tipo_negocio = ?, destinacion = ?, tipo_inmueble = ?,
+            subtipo_funcional = ?, finalidad = ?, base_valor = ?, aplica_niif = ?, regimen_ph = ?,
+            estructura_metodo = ?, appraiser_id = ?, igac_category = ?, igac_typology_hint = ?,
+            inspection_notes = ?, configuration_status = ?, version = version + 1, updated_at = ?
+            WHERE id = ? AND owner_id = ? AND version = ?');
+        $query->execute([$data['titulo'], $data['tipo'], $data['direccion'], $data['municipio'],
+            $data['observaciones'], $data['tipo_derecho'], $data['tipo_negocio'], $data['destinacion'],
+            $data['tipo_inmueble'], $data['subtipo_funcional'], $data['finalidad'], $data['base_valor'],
+            $data['aplica_niif'], $data['regimen_ph'], $data['estructura_metodo'], $data['appraiser_id'],
+            $data['igac_category'], $data['igac_typology_hint'], $data['inspection_notes'],
+            $data['configuration_status'], $now, $id, $owner, $version]);
+        if ($query->rowCount() !== 1) {
+            $this->find($id, $owner);
+            throw new HttpException(409, 'Esta configuración cambió en otra pestaña. Revisa antes de guardar.');
+        }
+        return ['version' => $version + 1, 'saved_at' => str_replace(' ', 'T', $now) . 'Z'];
+    }
+
+    public function addPhoto(string $id, int $owner, array $photo): void
+    {
+        $now = gmdate('Y-m-d H:i:s');
+        $query = $this->db->prepare('INSERT INTO appraisal_photos
+            (id, appraisal_id, owner_id, source_filename, storage_filename, mime_type, file_size_bytes, caption, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $query->execute([$photo['id'], $id, $owner, $photo['source_filename'], $photo['storage_filename'],
+            $photo['mime_type'], $photo['file_size_bytes'], $photo['caption'], $now]);
+    }
+
+    public static function photoPath(string $filename): string { return AppraisalPhotoStorage::path($filename); }
 
     public function save(string $id, int $owner, int $version, array $data): array
     {

@@ -21,7 +21,6 @@ use App\Models\InternationalStandardRepository;
 use App\Models\LegalDocumentRepository;
 use App\Models\ValuationStandardRepository;
 use App\Services\AuthService;
-
 final class Kernel
 {
     public function run(): void
@@ -132,7 +131,8 @@ final class Kernel
                 'masters' => new MasterDataController(new AppraiserRepository($db)),
                 'standards' => new StandardController(new ValuationStandardRepository($db)),
                 'valuations' => new ValuationController(),
-                default => new AppraisalController(new AppraisalRepository($db), $user),
+                default => new AppraisalController(new AppraisalRepository($db), $user,
+                    new AppraiserRepository($db), new IgacTypologyRepository()),
             };
             $instance->$action(...array_slice($matches, 1));
             return;

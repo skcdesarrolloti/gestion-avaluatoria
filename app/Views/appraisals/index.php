@@ -13,7 +13,7 @@
 <?php else: ?>
     <div class="mt-9 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
         <?php foreach ($rows as $row): ?>
-            <a href="<?= e(url('avaluos/' . $row['id'])) ?>" class="rounded-xl border border-slate-200 bg-white p-6 transition hover:border-teal-700">
+            <a href="<?= e(url('avaluos/' . $row['id'] . '/capitulo-0')) ?>" class="rounded-xl border border-slate-200 bg-white p-6 transition hover:border-teal-700">
                 <span class="rounded-md bg-teal-50 px-2 py-1 text-xs font-medium text-teal-800">Borrador</span>
                 <h2 class="mt-4 break-words text-lg font-semibold"><?= e($row['titulo'] ?: 'Ficha sin título') ?></h2>
                 <p class="mt-2 break-words text-sm text-slate-600"><?= e($row['municipio'] ?: 'Municipio por definir') ?></p>

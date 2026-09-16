@@ -24,7 +24,7 @@
                 <p class="eyebrow">Antes del capítulo 1</p>
                 <h2 class="mt-2 text-2xl font-semibold">Capítulo 0 · Configuración del avalúo</h2>
             </div>
-            <span class="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-800">En diseño</span>
+            <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Inicial activo</span>
         </div>
         <p class="mt-4 max-w-3xl text-sm leading-6 text-slate-600">
             Aquí se definirá el encargo antes de abrir los capítulos del informe: fotos del inmueble,
