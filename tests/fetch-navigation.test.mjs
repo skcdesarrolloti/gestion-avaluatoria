@@ -51,3 +51,12 @@ test('keeps return_to hash after post redirects', () => {
         'https://example.test/public/avaluos/abc/bien-sujeto#atributos',
     );
 });
+
+test('keeps app-route return_to hash after post redirects', () => {
+    const body = new FormData();
+    body.set('return_to', 'avaluos/abc/bien-sujeto#fotos-general');
+    assert.equal(
+        redirectedUrl('https://example.test/public/avaluos/abc/bien-sujeto', current, body, current),
+        'https://example.test/public/avaluos/abc/bien-sujeto#fotos-general',
+    );
+});

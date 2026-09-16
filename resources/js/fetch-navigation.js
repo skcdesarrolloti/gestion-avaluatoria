@@ -66,11 +66,25 @@ export function redirectedUrl(responseUrl, fallbackUrl, body = null, currentHref
     if (url.hash || !(body instanceof FormData)) return url.toString();
     const returnTo = body.get('return_to');
     if (typeof returnTo !== 'string' || returnTo === '') return url.toString();
-    const target = new URL(returnTo, currentHref);
+    const target = appRouteUrl(returnTo, url, currentHref);
     if (target.origin === url.origin && target.pathname === url.pathname && target.search === url.search && target.hash) {
         url.hash = target.hash;
     }
     return url.toString();
+}
+
+function appRouteUrl(value, targetUrl, currentHref) {
+    const route = value.trim();
+    if (/^[a-z][a-z\d+.-]*:/i.test(route) || route.startsWith('/') || route.startsWith('#')) {
+        return new URL(route, currentHref);
+    }
+    const firstSegment = route.split(/[/?#]/, 1)[0];
+    const marker = `/${firstSegment}/`;
+    const index = targetUrl.pathname.indexOf(marker);
+    if (firstSegment && index >= 0) {
+        return new URL(targetUrl.pathname.slice(0, index + 1) + route, targetUrl.origin);
+    }
+    return new URL(route, currentHref);
 }
 
 async function visit(url, { method = 'GET', body = null, replace = false, text } = {}) {

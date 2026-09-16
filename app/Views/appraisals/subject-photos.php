@@ -20,7 +20,7 @@ foreach ($photoUnits as $photoUnit) {
 }
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
-    x-data="{ activePhotoUnit: '', photoMap: <?= e(json_encode($photoTabMap, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>, syncPhotoUnit() { this.activePhotoUnit = this.photoMap[location.hash.slice(1)] || '<?= e($photoUnits[0]['kind'] . ':' . $photoUnits[0]['id']) ?>' } }"
+    x-data="{ activePhotoUnit: '', photoMap: <?= e(json_encode($photoTabMap, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>, syncPhotoUnit() { this.activePhotoUnit = this.photoMap[location.hash.slice(1)] || '<?= e($photoUnits[0]['kind'] . ':' . $photoUnits[0]['id']) ?>' }, activeAnchor() { return Object.keys(this.photoMap).find(key => this.photoMap[key] === this.activePhotoUnit) || 'fotos-general' }, focusAdditional() { const card = document.getElementById(this.activeAnchor() + '-adicional'); card?.scrollIntoView({ behavior: 'smooth', block: 'start' }); card?.querySelector('input[name=photo_name]')?.focus({ preventScroll: true }) } }"
     x-init="syncPhotoUnit()" @hashchange.window="syncPhotoUnit()">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
@@ -31,9 +31,12 @@ foreach ($photoUnits as $photoUnit) {
                 la portada puede tomarse horizontal cuando sea necesario para cubrir toda la propiedad.
             </p>
         </div>
-        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-            <?= count($photoUnits) ?> grupo(s)
-        </span>
+        <div class="flex flex-wrap items-center gap-3">
+            <button class="btn-secondary min-h-10 text-xs" type="button" @click="focusAdditional()">Agregar foto</button>
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                <?= count($photoUnits) ?> grupo(s)
+            </span>
+        </div>
     </div>
     <div class="mt-6 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
         <?php foreach ($photoUnits as $photoUnit): ?>
@@ -56,7 +59,8 @@ foreach ($photoUnits as $photoUnit) {
             </div>
             <div class="mt-5 grid gap-5 xl:grid-cols-2">
                 <?php foreach ($photoCategories as $categoryKey => [$title, $description]): ?>
-                    <?php
+                    <div id="<?= e($tabAnchor . '-' . $categoryKey) ?>" class="scroll-mt-6">
+                        <?php
                     $photoUploadEmbedded = true;
                     $photoUploadUnitId = $photoUnit['id'];
                     $photoUploadUnitLabel = $photoUnit['label'];
@@ -72,6 +76,7 @@ foreach ($photoUnits as $photoUnit) {
                         $photoUploadEyebrow, $photoUploadTitle, $photoUploadDescription, $photoUploadCaption,
                         $photoUploadReturnTo, $photoUploadCompact);
                     ?>
+                    </div>
                 <?php endforeach; ?>
             </div>
         </div>
