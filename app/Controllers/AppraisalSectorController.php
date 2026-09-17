@@ -92,12 +92,12 @@ final class AppraisalSectorController
         } catch (\Throwable $error) {
             Session::flash('sector_error', $error->getMessage());
         }
+        if ((string) ($_POST['after_sector_save'] ?? '') === 'bien-sujeto') Http::redirect('avaluos/' . $id . '/bien-sujeto');
         $hash = preg_match('/^(?:[a-z_]+|banco-\d{2})$/', (string) ($_POST['active_sector'] ?? ''))
             ? '#' . (string) $_POST['active_sector']
             : '';
         Http::redirect('avaluos/' . $id . '/sector' . $hash);
     }
-
     public function selectNeighborhood(string $id): never
     {
         $this->appraisals->find($id, $this->user['id']);

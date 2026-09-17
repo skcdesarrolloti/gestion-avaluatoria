@@ -1,6 +1,5 @@
 <?php
 $currentStep = 'sector';
-$firstSectorTab = array_key_first($sectorSections);
 $locationLine = trim(implode(' · ', array_filter([
     $subject['neighborhood_name'] ?? '',
     $subject['locality_name'] ?? '',
@@ -28,6 +27,7 @@ if (!empty($sectorNeighborhoodUpdatedAt)) {
 $neighborhoodLabel = trim((string) ($subject['neighborhood_name'] ?? ''));
 $bankVersion = trim((string) ($sectorBankProfileVersion ?? ''));
 $neighborhoodsJson = json_encode($sectorNeighborhoods ?? [], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+$bankSectionCodesJson = json_encode(array_keys($sectorAdvancedCatalog ?? []), JSON_THROW_ON_ERROR);
 $sectorFormId = 'sector-form';
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
@@ -156,11 +156,16 @@ $sectorFormId = 'sector-form';
 </form>
 <section class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{
-        activeSector: location.hash && !location.hash.startsWith('#banco-') ? location.hash.slice(1) : '<?= e($firstSectorTab) ?>',
-        activeBankSection: (location.hash.match(/^#banco-(\d{2})$/) || [])[1] || '01'
+        sectionCodes: <?= e($bankSectionCodesJson) ?>,
+        activeBankSection: (location.hash.match(/^#banco-(\d{2})$/) || [])[1] || '01',
+        afterSectorSave: '',
+        nextBankSection() { const i = this.sectionCodes.indexOf(this.activeBankSection); return this.sectionCodes[i + 1] || ''; },
+        advanceLabel() { const next = this.nextBankSection(); return next ? 'Guardar y pasar a 2.' + parseInt(next, 10) : 'Guardar y pasar al numeral 3'; },
+        prepareSectorSave() { const next = this.nextBankSection(); this.afterSectorSave = next ? '' : 'bien-sujeto'; this.activeBankSection = next || this.activeBankSection; this.$refs.activeSector.value = 'banco-' + this.activeBankSection; this.$refs.afterSectorSave.value = this.afterSectorSave; }
     }">
     <input form="<?= e($sectorFormId) ?>" x-ref="activeSector" type="hidden" name="active_sector"
         :value="'banco-' + activeBankSection">
+    <input form="<?= e($sectorFormId) ?>" x-ref="afterSectorSave" type="hidden" name="after_sector_save" :value="afterSectorSave">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Ficha sectorial del avalúo</p>
@@ -170,7 +175,8 @@ $sectorFormId = 'sector-form';
                 el capítulo sectorial del informe.
             </p>
         </div>
-        <button form="<?= e($sectorFormId) ?>" class="btn-primary min-h-11" type="submit">Guardar numeral 2</button>
+        <button form="<?= e($sectorFormId) ?>" class="btn-primary min-h-11" type="submit"
+            @click="prepareSectorSave()" x-text="advanceLabel()">Guardar y pasar</button>
     </div>
 
     <?php if ($locationLine || ($sectorPrefillSource ?? '') !== 'expediente'): ?>
@@ -201,9 +207,7 @@ $sectorFormId = 'sector-form';
     <?php require BASE_PATH . '/app/Views/appraisals/sector-advanced-sections.php'; ?>
 
     <div class="mt-6 flex flex-wrap justify-end gap-3">
-        <a class="btn-secondary min-h-11" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto')) ?>">
-            Continuar a Bien sujeto
-        </a>
-        <button form="<?= e($sectorFormId) ?>" class="btn-primary min-h-11" type="submit">Guardar numeral 2</button>
+        <button form="<?= e($sectorFormId) ?>" class="btn-primary min-h-11" type="submit"
+            @click="prepareSectorSave()" x-text="advanceLabel()">Guardar y pasar</button>
     </div>
 </section>
