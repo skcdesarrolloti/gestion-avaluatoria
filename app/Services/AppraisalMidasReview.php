@@ -81,25 +81,6 @@ final class AppraisalMidasReview
 
     private static function automaticPlan(): array
     {
-        return [
-            '01' => ['localidad' => 'MIDAS no devolvió localidad para este barrio.',
-                'comuna' => 'MIDAS no devolvió UCG/comuna para este barrio.',
-                'fuente_base_delimitacion' => 'Falta fuente territorial MIDAS del barrio.',
-                'area_hectareas' => 'MIDAS no devolvió área del polígono barrial.',
-                'perimetro_metros' => 'MIDAS no devolvió perímetro del polígono barrial.'],
-            '03' => ['fuente_servicios' => 'Falta lectura de capas MIDAS de servicios públicos.',
-                'acueducto_detalle' => 'Pendiente validar prestador/cobertura de acueducto.',
-                'alcantarillado_detalle' => 'Pendiente validar prestador/cobertura de alcantarillado.',
-                'energia_detalle' => 'Pendiente validar prestador/cobertura de energía.',
-                'gas_detalle' => 'Pendiente validar cobertura de gas.',
-                'aseo_detalle' => 'Pendiente empresa, frecuencia o microrruta de aseo.'],
-            '06' => ['vias_detalle' => 'Pendiente lectura de capas de vías y señalización.'],
-            '07' => ['equipamientos_seleccionados' => 'Pendiente activar capas de equipamiento urbano.',
-                'comentario_amoblamiento' => 'Pendiente lectura de amoblamiento o equipamientos visibles.'],
-            '11' => ['detalle_rutas_transporte' => 'Pendiente lectura de rutas de transporte.',
-                'detalle_paraderos_transporte' => 'Pendiente lectura de paraderos asociados al barrio.'],
-            '12' => ['edificaciones_ancla' => 'Pendiente identificar hitos o edificaciones relevantes.'],
-            '13' => ['observacion_externalidades' => 'Pendiente lectura de externalidades, riesgos o ambiente.'],
-        ];
+        return MidasLayerPlan::pendingReasons();
     }
 }

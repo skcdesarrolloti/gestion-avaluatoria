@@ -19,6 +19,7 @@ use App\Services\IfrsStandardFileImportService;
 use App\Services\InternationalStandardFileImportService;
 use App\Services\LegalDocumentFileImportService;
 use App\Services\LegalDocumentImportService;
+use App\Services\MidasLayerPlan;
 use App\Services\RateLimiter;
 use App\Controllers\AppraisalController;
 use App\Models\AppraisalSubjectRepository;
@@ -360,6 +361,15 @@ try {
     expect((AppraisalMidasReview::stats($genericMidas)['pending'] ?? 0) > 0
         && isset(AppraisalMidasReview::pending($genericMidas)['01']['area_hectareas']),
         'revision MIDAS deja pendientes los datos no cargados automaticamente');
+    $midasPlan = MidasLayerPlan::components();
+    expect(MidasLayerPlan::missingModuleFields() === []
+        && isset($midasPlan['servicios'], $midasPlan['movilidad'], $midasPlan['equipamientos']),
+        'plan MIDAS por capas apunta solo a campos existentes');
+    $castilloPending = AppraisalMidasReview::pending($castilloMidas);
+    expect(isset($castilloPending['03']['aseo_prestadores'])
+        && isset($castilloPending['07']['amoblamiento_seleccionado'])
+        && isset($castilloPending['13']['externalidades_negativas']),
+        'plan MIDAS exige servicios equipamientos y riesgos sin inventar resultados');
     expect(count(AppraisalSectorFieldGuidance::legend()) === 4
         && AppraisalSectorFieldGuidance::field('midas_lectura_manual')['mode'] === 'oficial'
         && AppraisalSectorFieldGuidance::field('observacion_localizacion')['mode'] === 'sugerido',
