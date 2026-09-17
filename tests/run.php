@@ -340,7 +340,7 @@ try {
     $mergedMidas = AppraisalMidasReview::mergeEmpty(['05' => ['norma_base' => 'Manual vigente']], $midas);
     expect(($midas['01']['fuente_base_delimitacion'] ?? '') !== ''
         && ($midas['01']['area_hectareas'] ?? '') === '141,70'
-        && ($midas['03']['energia_detalle'] ?? '') !== ''
+        && !isset($midas['03']['energia_detalle'])
         && $mergedMidas['05']['norma_base'] === 'Manual vigente'
         && str_contains((string) $mergedMidas['05']['midas_lectura_manual'], 'Barrio Crespo'),
         'revision MIDAS conserva manual y propone datos');
@@ -350,9 +350,12 @@ try {
         && ($castilloMidas['01']['perimetro_metros'] ?? '') === '4.358,82'
         && ($castilloMidas['01']['comuna'] ?? '') === 'UCG 1'
         && !isset($castilloMidas['01']['latitud_centro'])
-        && in_array('Educativo', $castilloMidas['07']['equipamientos_seleccionados'] ?? [], true)
+        && !isset($castilloMidas['07']['equipamientos_seleccionados'])
         && str_contains((string) $castilloMidas['05']['midas_lectura_manual'], 'Castillogrande'),
         'revision MIDAS incorpora perfil verificado de Castillogrande');
+    expect(isset(AppraisalMidasReview::pending($castilloMidas)['07']['equipamientos_seleccionados'])
+        && isset(AppraisalMidasReview::pending($castilloMidas)['11']['detalle_paraderos_transporte']),
+        'revision MIDAS no inventa capas no leidas de Castillogrande');
     $genericMidas = AppraisalMidasReview::suggestions(['neighborhood_name' => 'Barrio por verificar']);
     expect((AppraisalMidasReview::stats($genericMidas)['pending'] ?? 0) > 0
         && isset(AppraisalMidasReview::pending($genericMidas)['01']['area_hectareas']),

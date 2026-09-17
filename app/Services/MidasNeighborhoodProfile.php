@@ -28,6 +28,8 @@ final class MidasNeighborhoodProfile
                 . 'y del Caribe Norte, fuente POT/Acuerdo 006 de 2003.',
             'vias' => 'MIDAS reporta 2 rutas y 47 paraderos asociados a Crespo; validar jerarquía vial, '
                 . 'señalización y accesos en visita.',
+            'transporte' => ['Bus urbano', 'Taxi', 'Peatonal'],
+            'paraderos' => 'MIDAS reporta 47 paraderos asociados a Crespo.',
             'amoblamiento' => 'MIDAS muestra puestos de votación, una institución educativa y escenarios '
                 . 'deportivos en resultados del sector.',
             'equipamientos' => ['Educativo', 'Recreativo', 'Deportivo', 'Institucional'],
@@ -57,20 +59,6 @@ final class MidasNeighborhoodProfile
                 . 'y perímetro 4.358,82 m; confirmar en mapa el alcance real frente al inmueble.',
             'midas' => 'Resultado Territorios: Barrio Castillogrande, categoría barrio, UCG 1, Localidad '
                 . 'Histórica y del Caribe Norte, fuente Decreto 0977 de 2001 (POT) - Acuerdo 006 de 2003.',
-            'vias' => 'Activar en MIDAS las capas de transporte y movilidad para identificar rutas, paraderos, '
-                . 'jerarquía vial y accesos; por localización peninsular, validar congestión y accesibilidad real.',
-            'amoblamiento' => 'MIDAS permite revisar equipamiento urbano; en la consulta del barrio se observan capas '
-                . 'de instituciones educativas y equipamientos urbanos que deben marcarse si quedan dentro '
-                . 'del área de influencia del inmueble.',
-            'equipamientos' => ['Educativo', 'Institucional', 'Recreativo'],
-            'edificaciones' => ['Educación', 'Institucional', 'Recreativo / deportivo'],
-            'edificaciones_texto' => 'Instituciones educativas y equipamientos urbanos revisables en MIDAS; registrar '
-                . 'solo los hitos presentes dentro del sector de influencia del inmueble.',
-            'externalidades' => 'Entorno residencial de alta densidad con frente marítimo y de bahía; validar ruido, '
-                . 'congestión, actividad turística y relación inmediata con comercio y servicios.',
-            'dinamica' => 'Residencial de alta densidad con actividad turística y servicios complementarios.',
-            'alertas' => 'Validar movilidad de acceso, presión turística, exposición costera, estacionamiento, '
-                . 'condiciones ambientales y normas urbanísticas puntuales.',
         ]);
     }
 
@@ -78,7 +66,7 @@ final class MidasNeighborhoodProfile
     {
         $barrio = (string) $data['barrio'];
         $microsector = self::pick($subject['zone_sector'] ?? '', $data['microsector']);
-        return [
+        $suggestions = [
             '01' => [
                 'pais' => 'Colombia', 'departamento' => 'Bolívar',
                 'municipio_distrito' => 'Cartagena de Indias', 'barrio' => $barrio,
@@ -95,53 +83,37 @@ final class MidasNeighborhoodProfile
                     . rawurlencode($barrio . ', Cartagena de Indias, Bolívar, Colombia'),
                 'medicion_source' => 'MIDAS Cartagena / Secretaría de Planeación Distrital.',
                 'cartografia_status' => 'AUTOMATICO'],
-            '03' => self::services($barrio),
-            '04' => ['descripcion_general_sector' => $data['dinamica'],
-                'uso_predominante' => 'Residencial', 'usos_complementarios' => 'Servicios, comercio de soporte y turismo.',
-                'actividad_economica_predominante' => 'Servicios'],
             '05' => ['norma_base' => 'Decreto 0977 de 2001 (POT) - Acuerdo 006 de 2003.',
                 'fuente_normativa' => 'MIDAS Cartagena / Secretaría de Planeación Distrital.',
                 'midas_lectura_manual' => $data['midas']],
-            '06' => ['vias_detalle' => $data['vias'],
-                'comentario_vias_senalizacion' => $data['vias']],
-            '07' => ['equipamientos_seleccionados' => $data['equipamientos'],
-                'comentario_amoblamiento' => $data['amoblamiento']],
-            '08' => ['comentario_estratificacion' => 'Complementar con consulta oficial de estratificación; '
-                . 'MIDAS aporta base territorial y capas urbanas para orientar la revisión.'],
-            '11' => ['servicio_transporte_predominante' => 'Taxi y rutas complementarias',
-                'tipos_transporte_identificados' => ['Bus urbano', 'Taxi', 'Peatonal'],
-                'detalle_rutas_transporte' => 'Revisar en MIDAS capas de transporte y paraderos para el barrio.',
-                'detalle_paraderos_transporte' => 'Identificar paraderos visibles en MIDAS y validar distancia al inmueble.'],
-            '12' => ['categorias_edificaciones' => $data['edificaciones'],
-                'edificaciones_ancla' => $data['edificaciones_texto']],
-            '13' => ['externalidades_positivas' => ['Buena conectividad urbana', 'Proximidad a equipamientos',
-                'Entorno residencial consolidado'], 'observacion_externalidades' => $data['externalidades']],
-            '15' => ['dinamica_sectorial' => $data['dinamica'],
-                'fortalezas_sector' => 'Soporte territorial MIDAS, localización consolidada, accesibilidad urbana '
-                    . 'y presencia de equipamientos revisables por capas.',
-                'condicionantes_sector' => $data['alertas']],
             '16' => ['literal_a_localizacion' => $data['observacion'],
-                'literal_c_accesibilidad' => $data['vias'],
-                'literal_g_servicios' => 'Servicios públicos urbanos disponibles a escala sectorial; confirmar '
-                    . 'prestador, acometida, continuidad y microrruta del inmueble.',
                 'literal_h_uso_suelo' => $data['midas']],
         ];
-    }
-
-    private static function services(string $barrio): array
-    {
-        return ['fuente_servicios' => 'MIDAS Cartagena: servicios públicos, alumbrado, aseo y drenaje urbano.',
-            'acueducto' => 'SI',
-            'acueducto_detalle' => 'Aguas de Cartagena S.A. E.S.P. - Acuacar. Confirmar cobertura puntual.',
-            'alcantarillado' => 'SI',
-            'alcantarillado_detalle' => 'Aguas de Cartagena S.A. E.S.P. - Acuacar. Confirmar cobertura puntual.',
-            'energia' => 'SI', 'energia_detalle' => 'Afinia - Grupo EPM. Confirmar continuidad en campo.',
-            'gas' => 'SI', 'gas_detalle' => 'Surtigas S.A. E.S.P. Confirmar acometida o cobertura.',
-            'aseo_prestadores' => ['Pacaribe', 'Veolia', 'No verificado'],
-            'aguas_lluvias_detalle' => 'Activar capas MIDAS de drenaje, alcantarillado pluvial, canales y estaciones '
-                . 'si aplican al barrio; conservar solo lo verificable para el inmueble.',
-            'aseo_detalle' => 'Para ' . $barrio . ', consultar empresa y microrruta de aseo en el prestador; '
-                . 'registrar frecuencia y evidencia si el dato queda confirmado.'];
+        if (!empty($data['vias'])) {
+            $suggestions['06'] = ['vias_detalle' => $data['vias'], 'comentario_vias_senalizacion' => $data['vias']];
+            $suggestions['11'] = ['tipos_transporte_identificados' => $data['transporte'] ?? [],
+                'detalle_paraderos_transporte' => (string) ($data['paraderos'] ?? '')];
+            $suggestions['16']['literal_c_accesibilidad'] = $data['vias'];
+        }
+        if (!empty($data['equipamientos'])) {
+            $suggestions['07'] = ['equipamientos_seleccionados' => $data['equipamientos'],
+                'comentario_amoblamiento' => $data['amoblamiento'] ?? ''];
+            $suggestions['12'] = ['categorias_edificaciones' => $data['edificaciones'] ?? [],
+                'edificaciones_ancla' => $data['edificaciones_texto'] ?? ''];
+        }
+        if (!empty($data['externalidades'])) {
+            $suggestions['13'] = ['externalidades_positivas' => ['Buena conectividad urbana',
+                'Proximidad a equipamientos', 'Entorno residencial consolidado'],
+                'observacion_externalidades' => $data['externalidades']];
+        }
+        if (!empty($data['dinamica'])) {
+            $suggestions['04'] = ['descripcion_general_sector' => $data['dinamica'],
+                'uso_predominante' => 'Residencial'];
+            $suggestions['15'] = ['dinamica_sectorial' => $data['dinamica'],
+                'fortalezas_sector' => 'Localización consolidada con soporte territorial MIDAS.',
+                'condicionantes_sector' => (string) ($data['alertas'] ?? '')];
+        }
+        return $suggestions;
     }
 
     private static function key(string $value): string
