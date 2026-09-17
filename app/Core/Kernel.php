@@ -1,9 +1,8 @@
 <?php
 declare(strict_types=1);
 namespace App\Core;
-use App\Controllers\{AppraisalController, AuthController, DiagnosticController, IgacTypologyController,
-    IfrsStandardController, InternationalStandardController, LegalFrameworkController, MaintenanceController, MasterDataController,
-    StandardController, ValuationController};
+use App\Controllers\{AppraisalController, AuthController, DiagnosticController, IgacTypologyController, IfrsStandardController,
+    InternationalStandardController, LegalFrameworkController, MaintenanceController, MasterDataController, StandardController, ValuationController};
 use App\Database\Migrator;
 use App\Models\AppraisalRepository;
 use App\Models\AppraisalSubjectRepository;
@@ -131,6 +130,8 @@ final class Kernel
                     new \App\Models\AppraisalSectorSectionRepository($db), new AppraisalSubjectRepository($db),
                     new \App\Models\NeighborhoodSectorRepository($db), new \App\Models\SectorBankRepository($db),
                     new GeoMasterRepository($db), $user),
+                'sectorMidas' => new \App\Controllers\AppraisalSectorMidasController(new AppraisalRepository($db), new \App\Models\AppraisalSectorRepository($db),
+                    new \App\Models\AppraisalSectorSectionRepository($db), new AppraisalSubjectRepository($db), new \App\Models\SectorBankRepository($db), $user),
                 'valuations' => new ValuationController(),
                 default => new AppraisalController(new AppraisalRepository($db), $user,
                     new AppraiserRepository($db), new IgacTypologyRepository(),

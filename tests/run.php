@@ -9,6 +9,7 @@ use App\Services\AppraisalValidator;
 use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalSectorInput;
+use App\Services\AppraisalMidasReview;
 use App\Services\AppraisalSectorAdvancedPrefill;
 use App\Services\AppraisalSectorSectionInput;
 use App\Services\AppraisalSectorPrefill;
@@ -332,6 +333,12 @@ try {
     expect($advancedPrefill['01']['microsector'] === 'Residencial y servicios aeroportuarios'
         && str_contains($advancedPrefill['01']['fuente_base_satelital'], 'maps/search'),
         'sector avanzado hereda datos base del barrio');
+    $midas = AppraisalMidasReview::suggestions(['neighborhood_name' => 'Crespo']);
+    $mergedMidas = AppraisalMidasReview::mergeEmpty(['05' => ['norma_base' => 'Manual vigente']], $midas);
+    expect(($midas['01']['fuente_base_delimitacion'] ?? '') !== ''
+        && $mergedMidas['05']['norma_base'] === 'Manual vigente'
+        && str_contains((string) $mergedMidas['05']['midas_lectura_manual'], 'Barrio Crespo'),
+        'revision MIDAS conserva manual y propone datos');
     $sectorColumnsSql = implode(', ', array_map(static fn (string $key): string => $key . ' TEXT',
         AppraisalSectorCatalog::keys()));
     $db->exec("CREATE TABLE master_sector_profiles (neighborhood_id TEXT PRIMARY KEY,

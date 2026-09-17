@@ -131,16 +131,16 @@ $sectorFormId = 'sector-form';
             </div>
         </form>
         <form class="rounded-xl border border-blue-100 bg-blue-50 p-4" method="post"
-            action="<?= e(url('avaluos/' . $record['id'] . '/sector/fuentes/actualizar')) ?>">
+            action="<?= e(url('avaluos/' . $record['id'] . '/sector/midas/consultar')) ?>">
             <?= csrf_field() ?>
             <p class="text-xs font-semibold uppercase text-blue-900">Paso 2</p>
-            <h3 class="mt-2 text-lg font-semibold text-slate-900">Actualizar barrio desde fuentes</h3>
+            <h3 class="mt-2 text-lg font-semibold text-slate-900">Consultar MIDAS para este barrio</h3>
             <p class="mt-2 text-sm leading-6 text-blue-950">
-                Ejecuta este paso después de cargar el barrio. El sistema revisa las fuentes conectables,
-                actualiza la matriz de soporte y conserva intacto lo escrito manualmente.
+                Ejecuta este paso después de cargar el barrio. El sistema prepara datos sugeridos,
+                muestra qué encontró y te deja aplicar solo los campos vacíos.
             </p>
             <button class="btn-secondary mt-4 min-h-11" type="submit" <?= $neighborhoodLabel === '' ? 'disabled' : '' ?>>
-                2. Actualizar desde fuentes
+                2. Consultar MIDAS
             </button>
             <p class="mt-3 text-xs font-semibold <?= $neighborhoodLabel === '' ? 'text-amber-700' : 'text-blue-900' ?>">
                 <?= e($neighborhoodLabel === '' ? 'Primero carga un barrio para activar este paso.' : 'Barrio activo: ' . $neighborhoodLabel) ?>
@@ -148,6 +148,8 @@ $sectorFormId = 'sector-form';
         </form>
     </div>
 </section>
+
+<?php require BASE_PATH . '/app/Views/appraisals/sector-midas-review.php'; ?>
 
 <form id="<?= e($sectorFormId) ?>" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/sector')) ?>">
     <?= csrf_field() ?>
