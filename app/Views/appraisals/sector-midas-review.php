@@ -30,12 +30,12 @@ if ($showMidasReview):
             <p class="eyebrow">Revisión MIDAS</p>
             <h2 class="mt-2 text-2xl font-semibold text-slate-950">Datos encontrados para revisar</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-emerald-950">
-                Esta revisión no borra información manual. Al aplicar, solo se llenan campos vacíos y cada dato queda
-                como soporte proveniente de MIDAS Cartagena.
+                Esta revisión no borra información manual. Al aplicar, solo se llenan campos vacíos con datos encontrados;
+                lo no leído queda pendiente y visible en gris para completar manualmente.
             </p>
         </div>
         <span class="rounded-full border border-emerald-300 bg-white px-3 py-1 text-sm font-semibold text-emerald-800">
-            <?= e((string) $midasStats['fields']) ?> datos · <?= e((string) $midasStats['sections']) ?> pestañas
+            <?= e((string) $midasStats['fields']) ?> datos · <?= e((string) $midasStats['pending']) ?> pendientes
         </span>
     </div>
     <form class="mt-5 flex flex-wrap items-center justify-between gap-3" method="post"
@@ -50,7 +50,7 @@ if ($showMidasReview):
         <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-emerald-900">
             <span>Ver detalle MIDAS encontrado</span>
             <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs">
-                <?= e((string) $midasStats['fields']) ?> datos sugeridos
+                <?= e((string) $midasStats['fields']) ?> datos sugeridos · <?= e((string) $midasStats['pending']) ?> pendientes
             </span>
         </summary>
         <div class="overflow-x-auto border-t border-emerald-100">
@@ -65,7 +65,8 @@ if ($showMidasReview):
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     <?php foreach ($midasRows as $row): ?>
-                        <?php $modeClass = $row['mode'] === 'Aplicable' ? 'text-emerald-800' : 'text-amber-700'; ?>
+                        <?php $modeClass = $row['mode'] === 'Aplicable' ? 'text-emerald-800'
+                            : ($row['mode'] === 'Pendiente' ? 'text-slate-500' : 'text-amber-700'); ?>
                         <tr>
                             <td class="px-4 py-3 font-semibold text-slate-800">
                                 <?= e('2.' . (int) $row['code'] . ' ' . ($midasLabels[$row['code']]['_title'] ?? '')) ?>

@@ -19,11 +19,11 @@ final class MidasNeighborhoodProfile
         return self::base($subject, [
             'barrio' => 'Crespo', 'localidad' => 'Histórica y del Caribe Norte', 'comuna' => 'UCG 1',
             'microsector' => 'Residencial y servicios aeroportuarios', 'area' => '141,70',
-            'perimetro' => '9.535,82', 'latitud' => '10.4329', 'longitud' => '-75.5197',
+            'perimetro' => '9.535,82',
             'norte' => 'Avenida Santander.', 'sur' => 'Calle 70 y sectores de Cabrero y Marbella.',
             'este' => 'Ciénaga de la Virgen.', 'oeste' => 'Mar Caribe.',
-            'observacion' => $place . '. MIDAS reporta área 141,70 ha, perímetro 9.535,82 m, '
-                . '5.021 personas, 2.182 viviendas y 1.754 hogares según DANE 2018.',
+            'observacion' => $place . '. MIDAS reporta área 141,70 ha y perímetro 9.535,82 m. '
+                . 'Confirmar linderos, accesos e influencia real frente al inmueble.',
             'midas' => 'Resultado Territorios: Barrio Crespo, categoría barrio, UCG 1, Localidad Histórica '
                 . 'y del Caribe Norte, fuente POT/Acuerdo 006 de 2003.',
             'vias' => 'MIDAS reporta 2 rutas y 47 paraderos asociados a Crespo; validar jerarquía vial, '
@@ -48,7 +48,7 @@ final class MidasNeighborhoodProfile
         return self::base($subject, [
             'barrio' => 'Castillogrande', 'localidad' => 'Histórica y del Caribe Norte', 'comuna' => 'UCG 1',
             'microsector' => 'Residencial de alta densidad', 'area' => '41,96',
-            'perimetro' => '4.358,82', 'latitud' => '10.3939', 'longitud' => '-75.5450',
+            'perimetro' => '4.358,82',
             'norte' => 'Bocagrande y conexión vial hacia la península.',
             'sur' => 'Club Naval y frente de bahía de Cartagena.',
             'este' => 'Bahía de Cartagena.',
@@ -86,7 +86,6 @@ final class MidasNeighborhoodProfile
                 'mapa_barrio_url' => 'https://midas.cartagena.gov.co/#/home',
                 'fuente_base_delimitacion' => 'MIDAS Cartagena: Territorios - Barrio ' . $barrio . '.',
                 'fuente_base_satelital' => 'MIDAS Cartagena / Google Maps como apoyo visual.',
-                'latitud_centro' => $data['latitud'], 'longitud_centro' => $data['longitud'],
                 'area_hectareas' => $data['area'], 'perimetro_metros' => $data['perimetro'],
                 'norte' => $data['norte'], 'sur' => $data['sur'], 'este' => $data['este'],
                 'oeste' => $data['oeste'], 'observacion_localizacion' => $data['observacion'],

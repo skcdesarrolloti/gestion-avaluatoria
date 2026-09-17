@@ -349,9 +349,14 @@ try {
     expect(($castilloMidas['01']['area_hectareas'] ?? '') === '41,96'
         && ($castilloMidas['01']['perimetro_metros'] ?? '') === '4.358,82'
         && ($castilloMidas['01']['comuna'] ?? '') === 'UCG 1'
+        && !isset($castilloMidas['01']['latitud_centro'])
         && in_array('Educativo', $castilloMidas['07']['equipamientos_seleccionados'] ?? [], true)
         && str_contains((string) $castilloMidas['05']['midas_lectura_manual'], 'Castillogrande'),
         'revision MIDAS incorpora perfil verificado de Castillogrande');
+    $genericMidas = AppraisalMidasReview::suggestions(['neighborhood_name' => 'Barrio por verificar']);
+    expect((AppraisalMidasReview::stats($genericMidas)['pending'] ?? 0) > 0
+        && isset(AppraisalMidasReview::pending($genericMidas)['01']['area_hectareas']),
+        'revision MIDAS deja pendientes los datos no cargados automaticamente');
     expect(count(AppraisalSectorFieldGuidance::legend()) === 4
         && AppraisalSectorFieldGuidance::field('midas_lectura_manual')['mode'] === 'oficial'
         && AppraisalSectorFieldGuidance::field('observacion_localizacion')['mode'] === 'sugerido',

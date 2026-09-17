@@ -27,9 +27,7 @@ final class AppraisalSectorFieldGuidance
 
     public static function emptyClass(string $mode): string
     {
-        return in_array($mode, ['manual', 'validar'], true)
-            ? 'border-rose-200 bg-rose-50 text-rose-800'
-            : 'border-slate-200 bg-slate-50 text-slate-600';
+        return 'border-slate-200 bg-slate-50 text-slate-600';
     }
 
     public static function valueClass(string $mode): string
