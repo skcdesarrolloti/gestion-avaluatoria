@@ -60,6 +60,17 @@ final class AppraisalLegalRepository
         return $row;
     }
 
+    public function deleteCertificate(string $id, string $appraisalId, int $owner): ?string
+    {
+        $file = $this->findCertificate($id, $appraisalId, $owner);
+        $query = $this->db->prepare('DELETE FROM appraisal_legal_certificates
+            WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
+        $query->execute([$id, $appraisalId, $owner]);
+        $this->clearSourceIfMatches($appraisalId, $owner, $id);
+        $path = self::path((string) $file['storage_filename']);
+        return is_file($path) ? $path : null;
+    }
+
     public function latestCertificate(string $appraisalId, int $owner): array
     {
         $query = $this->db->prepare('SELECT * FROM appraisal_legal_certificates
@@ -121,6 +132,15 @@ final class AppraisalLegalRepository
         $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_legal_profiles WHERE appraisal_id = ? AND owner_id = ?');
         $query->execute([$appraisalId, $owner]);
         return (int) $query->fetchColumn() > 0;
+    }
+
+    private function clearSourceIfMatches(string $appraisalId, int $owner, string $certificateId): void
+    {
+        $now = gmdate('Y-m-d H:i:s');
+        $query = $this->db->prepare('UPDATE appraisal_legal_profiles
+            SET source_certificate_id = NULL, status = ?, updated_at = ?
+            WHERE appraisal_id = ? AND owner_id = ? AND source_certificate_id = ?');
+        $query->execute(['Soporte retirado; revisar datos conservados', $now, $appraisalId, $owner, $certificateId]);
     }
 
     private function json(string $json, array $default): array

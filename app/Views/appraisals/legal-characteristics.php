@@ -71,7 +71,7 @@ $isTextarea = static fn (string $key): bool => str_starts_with($key, 'reporte_')
         <div class="mt-6 overflow-x-auto rounded-xl border border-slate-200">
             <table class="min-w-full text-sm">
                 <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500">
-                    <tr><th class="px-4 py-3">Archivo</th><th class="px-4 py-3">Lectura</th><th class="px-4 py-3">Fecha</th></tr>
+                    <tr><th class="px-4 py-3">Archivo</th><th class="px-4 py-3">Lectura</th><th class="px-4 py-3">Fecha</th><th class="px-4 py-3">Acción</th></tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
                     <?php foreach ($certificates as $certificate): ?>
@@ -84,6 +84,14 @@ $isTextarea = static fn (string $key): bool => str_starts_with($key, 'reporte_')
                             </td>
                             <td class="px-4 py-3 text-slate-700"><?= e($certificate['analysis_message']) ?></td>
                             <td class="px-4 py-3 text-slate-600"><?= e($certificate['created_at']) ?></td>
+                            <td class="px-4 py-3">
+                                <form method="post"
+                                    action="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas/certificados/' . $certificate['id'] . '/eliminar')) ?>"
+                                    onsubmit="return confirm('¿Eliminar este certificado del avalúo? Los campos ya diligenciados se conservarán.');">
+                                    <?= csrf_field() ?>
+                                    <button class="btn-secondary min-h-9 px-3 py-1 text-xs text-red-700" type="submit">Eliminar</button>
+                                </form>
+                            </td>
                         </tr>
                     <?php endforeach; ?>
                 </tbody>

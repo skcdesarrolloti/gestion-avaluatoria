@@ -106,6 +106,19 @@ final class AppraisalLegalController
         exit;
     }
 
+    public function deleteCertificate(string $id, string $certificateId): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        try {
+            $path = $this->legal->deleteCertificate($certificateId, $id, $this->user['id']);
+            if ($path && is_file($path)) @unlink($path);
+            Session::flash('legal_message', 'Certificado eliminado. Los campos ya diligenciados se conservaron.');
+        } catch (\Throwable $error) {
+            Session::flash('legal_error', $error->getMessage());
+        }
+        Http::redirect('avaluos/' . $id . '/caracteristicas-juridicas');
+    }
+
     private function certificatePath(array $file): string
     {
         $path = AppraisalLegalRepository::path((string) $file['storage_filename']);
