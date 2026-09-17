@@ -9,7 +9,7 @@ final class AppraisalSectorAdvancedCatalog
         return [
             '01' => ['Identificación y localización', [
                 ['microsector', 'Microsector', 'text'], ['fuente_base_delimitacion', 'Fuente base de delimitación', 'text'],
-                ['fuente_base_satelital', 'Fuente base satelital', 'text'], ['observacion_localizacion', 'Observación de localización', 'textarea'],
+                ['observacion_localizacion', 'Observación de localización', 'textarea'],
             ]],
             '02' => ['Soporte cartográfico', [
                 ['mapa_delimitacion_url', 'Enlace delimitación o georreferencia', 'text'],
@@ -124,7 +124,6 @@ final class AppraisalSectorAdvancedCatalog
         return [
             'microsector' => 'Escribe la zona precisa que estás analizando dentro del barrio. Ejemplo: residencial y servicios aeroportuarios.',
             'fuente_base_delimitacion' => 'Coloca de dónde sale el límite del barrio: Datos Abiertos, Geoportal, POT/MIDAS, plano oficial, Google Maps provisional o visita de campo.',
-            'fuente_base_satelital' => 'Pega el enlace o identifica la imagen usada para mirar el barrio desde arriba: Google Maps, Google Earth, geoportal o captura satelital.',
             'observacion_localizacion' => 'Redacta en lenguaje de informe: dónde queda el barrio, qué lo rodea y qué falta confirmar en campo o cartografía.',
             'mapa_delimitacion_url' => 'Pega el enlace al mapa que permita abrir o revisar el límite usado para la caracterización.',
             'imagen_satelital_url' => 'Pega el enlace o describe la imagen satelital que soporta la lectura espacial.',

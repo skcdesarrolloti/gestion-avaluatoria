@@ -13,8 +13,7 @@ final class AppraisalSectorAdvancedPrefill
         $location = self::locationText($place, $sector);
         return [
             '01' => ['microsector' => self::pick($sector['sector_microsector'] ?? '', $subject['zone_sector'] ?? ''),
-                'fuente_base_delimitacion' => $source, 'fuente_base_satelital' => $map,
-                'observacion_localizacion' => $location],
+                'fuente_base_delimitacion' => $source, 'observacion_localizacion' => $location],
             '02' => ['mapa_delimitacion_url' => $map, 'imagen_satelital_url' => $map,
                 'medicion_source' => $source, 'cartografia_status' => $map ? 'MANUAL' : 'PENDIENTE'],
             '03' => ['fuente_servicios' => $source, 'acueducto' => self::yesNo($subject['water_service'] ?? ''),
