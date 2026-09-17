@@ -8,9 +8,9 @@ final class AppraisalSectorAdvancedPrefill
     {
         $place = self::join([$subject['neighborhood_name'] ?? '', $subject['locality_name'] ?? '',
             $subject['commune_ucg'] ?? '', $subject['city_name'] ?? '']);
-        $source = self::pick($sector['sector_source'] ?? '', $place ? 'Bien sujeto y maestro barrial.' : '');
+        $source = self::sourceText((string) ($sector['sector_source'] ?? ''), $place);
         $map = self::pick($sector['sector_map_url'] ?? '', self::mapUrl($subject));
-        $location = self::join([$sector['influence_area'] ?? '', $sector['sector_boundaries'] ?? ''], ' ');
+        $location = self::locationText($place, $sector);
         return [
             '01' => ['microsector' => self::pick($sector['sector_microsector'] ?? '', $subject['zone_sector'] ?? ''),
                 'fuente_base_delimitacion' => $source, 'fuente_base_satelital' => $map,
@@ -73,6 +73,22 @@ final class AppraisalSectorAdvancedPrefill
         $place = self::join([$subject['neighborhood_name'] ?? '', $subject['city_name'] ?? 'Cartagena de Indias',
             $subject['department_name'] ?? 'Bolívar', 'Colombia']);
         return $place ? 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($place) : '';
+    }
+
+    private static function sourceText(string $value, string $place): string
+    {
+        $text = trim($value);
+        if ($text !== '' && !str_starts_with($text, 'Precarga desde')) return $text;
+        return $place === '' ? '' : 'Fuente interna inicial: Bien sujeto y maestro de barrios SuCasa. '
+            . 'Confirmar con cartografía oficial, geoportal, POT/MIDAS o visita de campo.';
+    }
+
+    private static function locationText(string $place, array $sector): string
+    {
+        $stored = self::join([$sector['influence_area'] ?? '', $sector['sector_boundaries'] ?? ''], ' ');
+        if ($stored !== '' && !str_contains($stored, 'Validar alcance real')) return $stored;
+        return $place === '' ? '' : 'El sector de influencia se toma inicialmente como ' . $place
+            . '. Para el informe, confirma en mapa y visita sus límites, accesos principales, entorno inmediato y relación con el inmueble.';
     }
 
     private static function yesNo(mixed $value): string
