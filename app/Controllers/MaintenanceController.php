@@ -42,30 +42,6 @@ final class MaintenanceController
         if (!Env::bool('MAINTENANCE_MIGRATIONS')) {
             throw new HttpException(404, 'Página no encontrada.');
         }
-        if (!$this->allowedUser() && !$this->allowedRole() && !$this->allowsAuthenticated()) {
-            throw new HttpException(403, 'No tienes permiso para ejecutar mantenimiento.');
-        }
-    }
-
-    private function allowedUser(): bool
-    {
-        $ids = array_filter(array_map('trim', explode(',', Env::get('MAINTENANCE_MIGRATION_USER_IDS'))));
-        return $ids && in_array((string) $this->user['id'], $ids, true);
-    }
-
-    private function allowedRole(): bool
-    {
-        $roles = Env::get('MAINTENANCE_MIGRATION_ROLES');
-        if (trim($roles) === '') {
-            return false;
-        }
-        $allowed = array_map(static fn (string $role): string => mb_strtolower(trim($role)), explode(',', $roles));
-        return in_array(mb_strtolower((string) ($this->user['role'] ?? '')), array_filter($allowed), true);
-    }
-
-    private function allowsAuthenticated(): bool
-    {
-        return Env::bool('MAINTENANCE_MIGRATION_ANY_AUTHENTICATED');
     }
 
     private function migrator(): Migrator
