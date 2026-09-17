@@ -332,11 +332,15 @@ try {
     $advancedPrefill = AppraisalSectorAdvancedPrefill::sections(['neighborhood_name' => 'Crespo',
         'zone_sector' => 'Residencial y servicios aeroportuarios', 'city_name' => 'Cartagena'], $prefill);
     expect($advancedPrefill['01']['microsector'] === 'Residencial y servicios aeroportuarios'
+        && $advancedPrefill['01']['pais'] === 'Colombia'
+        && $advancedPrefill['03']['energia_detalle'] !== ''
         && str_contains($advancedPrefill['02']['imagen_satelital_url'], 'maps/search'),
         'sector avanzado hereda datos base del barrio');
     $midas = AppraisalMidasReview::suggestions(['neighborhood_name' => 'Crespo']);
     $mergedMidas = AppraisalMidasReview::mergeEmpty(['05' => ['norma_base' => 'Manual vigente']], $midas);
     expect(($midas['01']['fuente_base_delimitacion'] ?? '') !== ''
+        && ($midas['01']['area_hectareas'] ?? '') === '141,70'
+        && ($midas['03']['energia_detalle'] ?? '') !== ''
         && $mergedMidas['05']['norma_base'] === 'Manual vigente'
         && str_contains((string) $mergedMidas['05']['midas_lectura_manual'], 'Barrio Crespo'),
         'revision MIDAS conserva manual y propone datos');

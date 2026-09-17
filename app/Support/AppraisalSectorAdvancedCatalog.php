@@ -8,7 +8,15 @@ final class AppraisalSectorAdvancedCatalog
     {
         return [
             '01' => ['Identificación y localización', [
-                ['microsector', 'Microsector', 'text'], ['fuente_base_delimitacion', 'Fuente base de delimitación', 'text'],
+                ['pais', 'País', 'text'], ['departamento', 'Departamento', 'text'],
+                ['municipio_distrito', 'Municipio / distrito', 'text'], ['barrio', 'Barrio', 'text'],
+                ['localidad', 'Localidad', 'text'], ['comuna', 'Comuna / UCG', 'text'],
+                ['microsector', 'Microsector', 'text'], ['mapa_barrio_url', 'Mapa base del barrio', 'text'],
+                ['fuente_base_delimitacion', 'Fuente base de delimitación', 'text'],
+                ['fuente_base_satelital', 'Fuente base satelital', 'text'],
+                ['latitud_centro', 'Latitud centro', 'text'], ['longitud_centro', 'Longitud centro', 'text'],
+                ['area_hectareas', 'Área (ha)', 'text'], ['perimetro_metros', 'Perímetro (m)', 'text'],
+                ['norte', 'Norte', 'text'], ['sur', 'Sur', 'text'], ['este', 'Este', 'text'], ['oeste', 'Oeste', 'text'],
                 ['observacion_localizacion', 'Observación de localización', 'textarea'],
             ]],
             '02' => ['Soporte cartográfico', [
@@ -18,9 +26,14 @@ final class AppraisalSectorAdvancedCatalog
             ]],
             '03' => ['Servicios públicos', [
                 ['fuente_servicios', 'Fuente de validación', 'text'], ['acueducto', 'Acueducto', 'select', 'yesno'],
+                ['acueducto_detalle', 'Empresa / soporte de acueducto', 'text'],
                 ['alcantarillado', 'Alcantarillado', 'select', 'yesno'], ['energia', 'Energía', 'select', 'yesno'],
-                ['gas', 'Gas', 'select', 'yesno'], ['internet_operadores', 'Operadores de internet', 'multiselect', 'internet'],
+                ['alcantarillado_detalle', 'Empresa / soporte de alcantarillado', 'text'],
+                ['energia_detalle', 'Empresa / soporte de energía', 'text'],
+                ['gas', 'Gas', 'select', 'yesno'], ['gas_detalle', 'Empresa / soporte de gas', 'text'],
+                ['internet_operadores', 'Operadores de internet', 'multiselect', 'internet'],
                 ['aseo_prestadores', 'Prestador de aseo', 'multiselect', 'aseo'], ['aguas_lluvias_detalle', 'Lectura de drenaje pluvial', 'textarea'],
+                ['aseo_detalle', 'Frecuencia o soporte de aseo', 'textarea'],
             ]],
             '04' => ['Uso predominante', [
                 ['descripcion_general_sector', 'Descripción general del sector', 'textarea'],
@@ -121,24 +134,7 @@ final class AppraisalSectorAdvancedCatalog
 
     public static function helps(): array
     {
-        return [
-            'microsector' => 'Escribe la zona precisa que estás analizando dentro del barrio. Ejemplo: residencial y servicios aeroportuarios.',
-            'fuente_base_delimitacion' => 'Coloca de dónde sale el límite del barrio: Datos Abiertos, Geoportal, POT/MIDAS, plano oficial, Google Maps provisional o visita de campo.',
-            'observacion_localizacion' => 'Redacta en lenguaje de informe: dónde queda el barrio, qué lo rodea y qué falta confirmar en campo o cartografía.',
-            'mapa_delimitacion_url' => 'Pega el enlace al mapa que permita abrir o revisar el límite usado para la caracterización.',
-            'imagen_satelital_url' => 'Pega el enlace o describe la imagen satelital que soporta la lectura espacial.',
-            'medicion_source' => 'Indica quién da el área o perímetro. Si no hay dato oficial, escribe medición manual pendiente de validar.',
-            'fuente_servicios' => 'Indica si la información viene de observación de campo, empresa de servicios, ficha interna o consulta pública.',
-            'descripcion_general_sector' => 'Describe el carácter del barrio: residencial, comercial, mixto, turístico, institucional o de transición.',
-            'fuente_normativa' => 'Indica la fuente normativa consultada: POT, MIDAS, Secretaría de Planeación, norma especial o pendiente de consulta.',
-            'midas_lectura_manual' => 'Resume lo que encontraste en MIDAS/POT: tratamiento, uso permitido, restricciones o pendientes.',
-            'vias_detalle' => 'Describe accesos, estado vial, señalización, jerarquía de vías y facilidad de llegada al inmueble.',
-            'comentario_vias_senalizacion' => 'Convierte la revisión vial en un párrafo técnico listo para el informe.',
-            'fuente_estratificacion' => 'Indica de dónde sale el estrato: recibo, consulta pública, visita, ficha del inmueble o dato pendiente.',
-            'observacion_externalidades' => 'Registra factores externos que suben o bajan valor: parques, comercio, ruido, tráfico, riesgo o deterioro.',
-            'soportes_fotograficos_plan' => 'Define qué evidencias vas a subir: mapa, satelital, vías, entorno inmediato, equipamientos y externalidades.',
-            'comentario_conclusion_sectorial' => 'Cierra con criterio profesional: cómo el sector incide en el valor y qué debe validar el analista.',
-        ];
+        return AppraisalSectorAdvancedHelps::all();
     }
 
     public static function options(string $key): array

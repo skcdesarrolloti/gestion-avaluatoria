@@ -11,17 +11,40 @@ final class AppraisalSectorAdvancedPrefill
         $source = self::sourceText((string) ($sector['sector_source'] ?? ''), $place);
         $map = self::pick($sector['sector_map_url'] ?? '', self::mapUrl($subject));
         $location = self::locationText($place, $sector);
+        $city = self::pick($subject['city_name'] ?? '', $sector['sector_city'] ?? '', 'Cartagena de Indias');
+        $department = self::pick($subject['department_name'] ?? '', $sector['sector_department'] ?? '', 'Bolívar');
+        $neighborhood = self::pick($subject['neighborhood_name'] ?? '', $sector['sector_neighborhood'] ?? '');
         return [
-            '01' => ['microsector' => self::pick($sector['sector_microsector'] ?? '', $subject['zone_sector'] ?? ''),
-                'fuente_base_delimitacion' => $source, 'observacion_localizacion' => $location],
+            '01' => ['pais' => self::pick($sector['sector_country'] ?? '', 'Colombia'),
+                'departamento' => $department, 'municipio_distrito' => $city, 'barrio' => $neighborhood,
+                'localidad' => self::pick($subject['locality_name'] ?? '', $sector['sector_locality'] ?? ''),
+                'comuna' => self::pick($subject['commune_ucg'] ?? '', $sector['sector_commune'] ?? ''),
+                'microsector' => self::pick($sector['sector_microsector'] ?? '', $subject['zone_sector'] ?? ''),
+                'mapa_barrio_url' => $map, 'fuente_base_delimitacion' => $source,
+                'fuente_base_satelital' => self::pick($sector['satellite_source'] ?? '', $map),
+                'latitud_centro' => self::pick($sector['sector_latitude'] ?? '', $subject['latitude'] ?? ''),
+                'longitud_centro' => self::pick($sector['sector_longitude'] ?? '', $subject['longitude'] ?? ''),
+                'area_hectareas' => (string) ($sector['sector_area_ha'] ?? ''),
+                'perimetro_metros' => (string) ($sector['sector_perimeter_m'] ?? ''),
+                'norte' => (string) ($sector['sector_north_boundary'] ?? ''),
+                'sur' => (string) ($sector['sector_south_boundary'] ?? ''),
+                'este' => (string) ($sector['sector_east_boundary'] ?? ''),
+                'oeste' => (string) ($sector['sector_west_boundary'] ?? ''),
+                'observacion_localizacion' => $location],
             '02' => ['mapa_delimitacion_url' => $map, 'imagen_satelital_url' => $map,
                 'medicion_source' => $source, 'cartografia_status' => $map ? 'MANUAL' : 'PENDIENTE'],
             '03' => ['fuente_servicios' => $source, 'acueducto' => self::yesNo($subject['water_service'] ?? ''),
+                'acueducto_detalle' => self::serviceDetail('acueducto', $city),
                 'alcantarillado' => self::yesNo($subject['sewer_service'] ?? ''),
+                'alcantarillado_detalle' => self::serviceDetail('alcantarillado', $city),
                 'energia' => self::yesNo($subject['energy_service'] ?? ''),
+                'energia_detalle' => self::serviceDetail('energia', $city),
                 'gas' => self::yesNo($subject['gas_service'] ?? ''),
+                'gas_detalle' => self::serviceDetail('gas', $city),
                 'internet_operadores' => self::internet($subject['internet_service'] ?? ''),
-                'aguas_lluvias_detalle' => (string) ($sector['infrastructure_notes'] ?? '')],
+                'aseo_prestadores' => ['No verificado'],
+                'aguas_lluvias_detalle' => (string) ($sector['infrastructure_notes'] ?? ''),
+                'aseo_detalle' => self::serviceDetail('aseo', $city)],
             '04' => ['descripcion_general_sector' => (string) ($sector['daily_dynamics'] ?? ''),
                 'uso_predominante' => self::titleOption($sector['predominant_use'] ?? ''),
                 'actividad_economica_predominante' => self::titleOption($sector['predominant_use'] ?? '')],
@@ -105,5 +128,17 @@ final class AppraisalSectorAdvancedPrefill
     {
         $text = trim((string) $value);
         return $text === '' ? '' : mb_convert_case($text, MB_CASE_TITLE, 'UTF-8');
+    }
+
+    private static function serviceDetail(string $service, string $city): string
+    {
+        if (!str_contains(mb_strtolower($city), 'cartagena')) return '';
+        return [
+            'acueducto' => 'Aguas de Cartagena S.A. E.S.P. - Acuacar. Confirmar con recibo, empresa o visita.',
+            'alcantarillado' => 'Aguas de Cartagena S.A. E.S.P. - Acuacar. Confirmar cobertura puntual.',
+            'energia' => 'Afinia - Grupo EPM. Confirmar disponibilidad y continuidad en campo.',
+            'gas' => 'Surtigas S.A. E.S.P. Confirmar acometida o cobertura en el inmueble.',
+            'aseo' => 'Pacaribe o Veolia según microrruta. Consultar frecuencia por barrio y validar en visita.',
+        ][$service] ?? '';
     }
 }
