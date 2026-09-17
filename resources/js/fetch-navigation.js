@@ -80,6 +80,11 @@ async function refreshCsrf() {
 export function redirectedUrl(responseUrl, fallbackUrl, body = null, currentHref = window.location.href) {
     const url = new URL(responseUrl || fallbackUrl, currentHref);
     if (url.hash || !(body instanceof FormData)) return url.toString();
+    const activeSector = body.get('active_sector');
+    if (typeof activeSector === 'string' && /^banco-\d{2}$/.test(activeSector)) {
+        url.hash = activeSector;
+        return url.toString();
+    }
     const returnTo = body.get('return_to');
     if (typeof returnTo !== 'string' || returnTo === '') return url.toString();
     const target = appRouteUrl(returnTo, url, currentHref);
