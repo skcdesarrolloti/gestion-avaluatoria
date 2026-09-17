@@ -125,7 +125,8 @@ tests/               Pruebas aisladas
 - Durante migraciones funcionales puede activarse temporalmente
   `MAINTENANCE_MIGRATIONS=true` para aplicar pendientes desde
   `/mantenimiento/migraciones`; restringe roles/usuarios con
-  `MAINTENANCE_MIGRATION_ROLES` o `MAINTENANCE_MIGRATION_USER_IDS` y vuelve a apagarlo.
+  `MAINTENANCE_MIGRATION_ROLES` o `MAINTENANCE_MIGRATION_USER_IDS`, o usa
+  `MAINTENANCE_MIGRATION_ANY_AUTHENTICATED=true` solo durante la intervención.
 - Para diagnosticar el login en hosting, ejecuta `php bin/console.php auth:diagnose`.
   También puedes activar temporalmente `APP_DIAGNOSTICS=true` y abrir
   `/diagnostico/login`; vuelve a dejarlo en `false` al terminar.
