@@ -7,6 +7,8 @@ use App\Models\AppraisalLegalRepository;
 use App\Models\AppraisalRepository;
 use App\Services\AppraisalLegalCertificateUploadService;
 use App\Services\AppraisalLegalInput;
+use App\Services\LegalCertificateParser;
+use App\Services\LegalCertificateTextExtractor;
 use App\Support\AppraisalLegalCatalog;
 
 final class AppraisalLegalController
@@ -60,6 +62,27 @@ final class AppraisalLegalController
         Http::redirect($target);
     }
 
+    public function reanalyze(string $id): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        try {
+            $file = $this->legal->latestCertificate($id, $this->user['id']);
+            $path = $this->certificatePath($file);
+            $extension = mb_strtolower(pathinfo((string) $file['source_filename'], PATHINFO_EXTENSION));
+            $text = (new LegalCertificateTextExtractor())->extract($path, $extension);
+            $parsed = (new LegalCertificateParser())->parse($text, (string) $file['source_filename']);
+            $this->legal->updateCertificateAnalysis((string) $file['id'], $id, $this->user['id'],
+                mb_strlen($text), (string) $parsed['status'], (string) $parsed['message']);
+            $this->legal->mergeAnalysis($id, $this->user['id'], (string) $file['id'],
+                $parsed['data'], $parsed['annotations'], $parsed['alerts'], $text);
+            Session::flash('legal_message', 'Último certificado reanalizado: ' . mb_strlen($text) . ' caracteres leídos.');
+            if (!is_file(AppraisalLegalRepository::path((string) $file['storage_filename']))) @unlink($path);
+        } catch (\Throwable $error) {
+            Session::flash('legal_error', $error->getMessage());
+        }
+        Http::redirect('avaluos/' . $id . '/caracteristicas-juridicas');
+    }
+
     public function certificate(string $id, string $certificateId): never
     {
         $this->appraisals->find($id, $this->user['id']);
@@ -81,5 +104,19 @@ final class AppraisalLegalController
             echo $blob;
         }
         exit;
+    }
+
+    private function certificatePath(array $file): string
+    {
+        $path = AppraisalLegalRepository::path((string) $file['storage_filename']);
+        if (is_file($path)) return $path;
+        if (!is_string($file['file_blob'] ?? null)) {
+            throw new \RuntimeException('El certificado no está disponible para reanalizar.');
+        }
+        $tmp = tempnam(sys_get_temp_dir(), 'ga_ctl_');
+        if ($tmp === false || file_put_contents($tmp, $file['file_blob']) === false) {
+            throw new \RuntimeException('No se pudo preparar el certificado temporal.');
+        }
+        return $tmp;
     }
 }

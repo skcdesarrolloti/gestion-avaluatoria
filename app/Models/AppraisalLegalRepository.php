@@ -60,6 +60,24 @@ final class AppraisalLegalRepository
         return $row;
     }
 
+    public function latestCertificate(string $appraisalId, int $owner): array
+    {
+        $query = $this->db->prepare('SELECT * FROM appraisal_legal_certificates
+            WHERE appraisal_id = ? AND owner_id = ? ORDER BY created_at DESC, id DESC LIMIT 1');
+        $query->execute([$appraisalId, $owner]);
+        $row = $query->fetch();
+        if (!$row) throw new HttpException(404, 'Primero carga un certificado.');
+        return $row;
+    }
+
+    public function updateCertificateAnalysis(string $id, string $appraisalId, int $owner,
+        int $chars, string $status, string $message): void
+    {
+        $query = $this->db->prepare('UPDATE appraisal_legal_certificates SET extracted_chars = ?,
+            analysis_status = ?, analysis_message = ? WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
+        $query->execute([$chars, $status, $message, $id, $appraisalId, $owner]);
+    }
+
     public function mergeAnalysis(string $appraisalId, int $owner, string $certificateId, array $data,
         array $annotations, array $alerts, string $text): void
     {

@@ -55,8 +55,18 @@ $isTextarea = static fn (string $key): bool => str_starts_with($key, 'reporte_')
                 Formatos permitidos: PDF, DOCX o TXT. Máximo 25 MB.
             </span>
         </label>
-        <button class="btn-primary self-start lg:mt-8" type="submit">Analizar certificado</button>
+        <button class="btn-primary self-start lg:mt-8" type="submit">Subir y analizar certificado</button>
     </form>
+    <?php if ($latest): ?>
+        <form class="mt-4 flex flex-wrap items-center gap-3" method="post"
+            action="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas/reanalizar')) ?>">
+            <?= csrf_field() ?>
+            <button class="btn-secondary" type="submit">Reanalizar último certificado cargado</button>
+            <span class="text-sm leading-6 text-slate-500">
+                Usa esta opción si el archivo ya aparece en la tabla y quieres volver a llenar campos vacíos.
+            </span>
+        </form>
+    <?php endif; ?>
     <?php if ($certificates): ?>
         <div class="mt-6 overflow-x-auto rounded-xl border border-slate-200">
             <table class="min-w-full text-sm">
