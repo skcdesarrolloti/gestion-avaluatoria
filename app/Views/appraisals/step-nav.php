@@ -4,6 +4,7 @@ $steps = [
     ['key' => 'expediente', 'label' => '1 · Expediente valuatorio', 'href' => url('avaluos/' . $record['id'] . '/expediente')],
     ['key' => 'sector', 'label' => '2 · Sector y entorno', 'href' => url('avaluos/' . $record['id'] . '/sector')],
     ['key' => 'sujeto', 'label' => '3 · Bien sujeto', 'href' => url('avaluos/' . $record['id'] . '/bien-sujeto')],
+    ['key' => 'juridicas', 'label' => '4 · Características jurídicas', 'href' => url('avaluos/' . $record['id'] . '/caracteristicas-juridicas')],
     ['key' => 'entregable', 'label' => 'Entregable', 'href' => url('avaluos/' . $record['id'] . '/entregable')],
 ];
 ?>

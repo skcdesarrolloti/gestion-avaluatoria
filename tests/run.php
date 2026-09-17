@@ -11,6 +11,7 @@ use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalSectorInput;
 use App\Services\AppraisalMidasReview;
 use App\Services\AppraisalMidasSupportUploadService;
+use App\Services\AppraisalLegalInput;
 use App\Services\AppraisalSectorAdvancedPrefill;
 use App\Services\AppraisalSectorSectionInput;
 use App\Services\AppraisalSectorPrefill;
@@ -25,6 +26,7 @@ use App\Services\MidasGeometry;
 use App\Services\MidasWfsLayerAnalyzer;
 use App\Services\MidasWfsLayerCatalog;
 use App\Services\MidasWfsSearch;
+use App\Services\LegalCertificateParser;
 use App\Services\RateLimiter;
 use App\Controllers\AppraisalController;
 use App\Models\AppraisalSubjectRepository;
@@ -433,6 +435,23 @@ try {
     $splitReview = AppraisalSectorFieldGuidance::splitReview('Dato real. Para el informe, confirma en visita.');
     expect($splitReview[0] === 'Dato real.' && str_starts_with($splitReview[1], 'Para el informe'),
         'guia visual separa dato base de alerta');
+    $legalText = "Matrícula inmobiliaria: 060-123456\nMunicipio: Cartagena\nDepartamento: Bolívar\n"
+        . "Dirección: Calle 1 No 2-3\nCódigo catastral actual: 130010101000000000001000000000\n"
+        . "ANOTACION: Nro 1 Fecha: 01/01/2020 Doc: ESCRITURA 123 Valor Acto: \$1000000 "
+        . "Especificación: COMPRAVENTA.\nANOTACION: Nro 2 Fecha: 02/02/2021 Doc: ESCRITURA 456 "
+        . "Valor Acto: \$500000 Especificación: HIPOTECA a favor de Banco.\nANOTACION: Nro 3 "
+        . "Fecha: 03/03/2022 Doc: OFICIO 789 Especificación: EMBARGO.";
+    $legalParsed = (new LegalCertificateParser())->parse($legalText, 'certificado.txt');
+    expect(($legalParsed['data']['matricula_inmobiliaria'] ?? '') === '060-123456'
+        && ($legalParsed['data']['municipio'] ?? '') === 'Cartagena'
+        && count($legalParsed['annotations']) === 3
+        && ($legalParsed['annotations'][1]['categoria'] ?? '') === 'gravamen'
+        && ($legalParsed['annotations'][2]['categoria'] ?? '') === 'medida_cautelar'
+        && count($legalParsed['alerts']) >= 2,
+        'parser juridico extrae y clasifica certificado');
+    $legalMerged = AppraisalLegalInput::mergeEmpty(['matricula_inmobiliaria' => 'manual'], $legalParsed['data']);
+    expect($legalMerged['matricula_inmobiliaria'] === 'manual'
+        && ($legalMerged['codigo_catastral_actual'] ?? '') !== '', 'juridico conserva dato manual y llena vacios');
     $sectorColumnsSql = implode(', ', array_map(static fn (string $key): string => $key . ' TEXT',
         AppraisalSectorCatalog::keys()));
     $db->exec("CREATE TABLE master_sector_profiles (neighborhood_id TEXT PRIMARY KEY,

@@ -5,7 +5,7 @@
         <p class="eyebrow">Entregable</p>
         <h1 class="mt-2 text-3xl font-semibold tracking-tight">Informe consolidado del avalúo</h1>
         <p class="mt-3 max-w-3xl text-slate-600">
-            Aquí se concentrará la redacción final del informe. Los numerales técnicos solo capturan datos,
+            Aquí se concentrará la redacción final del informe. Los numerales técnicos y jurídicos capturan datos,
             ayudas, evidencias y criterios; la narrativa del entregable se prepara en este módulo.
         </p>
     </div>
