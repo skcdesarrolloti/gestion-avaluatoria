@@ -62,6 +62,34 @@ $changed = array_values(array_filter($items, static fn (array $item): bool => $i
         </div>
     </div>
 
+    <?php $failedProbe = array_filter($sectorProbe['steps'], static fn (array $step): bool => !$step['ok']); ?>
+    <div class="card p-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h2 class="text-xl font-semibold">Prueba del banco sectorial</h2>
+                <p class="mt-1 text-sm text-slate-600">
+                    Reproduce la carga que usa Sector para detectar el error sin entrar por consola.
+                </p>
+            </div>
+            <span class="rounded-full px-3 py-1 text-xs font-semibold <?= $failedProbe ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-800' ?>">
+                <?= $failedProbe ? 'Con error' : 'Sin error' ?>
+            </span>
+        </div>
+        <p class="mt-4 font-mono text-xs text-slate-500">Avalúo probado: <?= e($sectorProbe['appraisal']) ?></p>
+        <div class="mt-5 space-y-3">
+            <?php foreach ($sectorProbe['steps'] as $step): ?>
+                <div class="rounded-lg border <?= $step['ok'] ? 'border-emerald-100 bg-emerald-50' : 'border-red-200 bg-red-50' ?> p-4">
+                    <p class="text-sm font-semibold <?= $step['ok'] ? 'text-emerald-800' : 'text-red-700' ?>">
+                        <?= e($step['label']) ?>
+                    </p>
+                    <p class="mt-1 text-sm <?= $step['ok'] ? 'text-emerald-800' : 'text-red-700' ?>">
+                        <?= e($step['message']) ?>
+                    </p>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
     <div class="card p-6">
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div>

@@ -3,6 +3,8 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Env, Http, HttpException, Session};
 use App\Database\Migrator;
+use App\Models\{AppraisalSectorRepository, AppraisalSectorSectionRepository, AppraisalSubjectRepository,
+    SectorBankRepository};
 use PDO;
 
 final class MaintenanceController
@@ -18,6 +20,7 @@ final class MaintenanceController
             'enabled' => Env::bool('MAINTENANCE_MIGRATIONS'),
             'items' => $migrator->status(),
             'checks' => $this->databaseChecks(),
+            'sectorProbe' => $this->sectorProbe(),
             'message' => Session::pullFlash('migrations_message'),
             'error' => Session::pullFlash('migrations_error'),
         ]);
@@ -82,5 +85,42 @@ final class MaintenanceController
     {
         $query = $this->db->query('SHOW COLUMNS FROM ' . $table);
         return array_map(static fn (array $row): string => (string) $row['Field'], $query->fetchAll());
+    }
+
+    private function sectorProbe(): array
+    {
+        $row = $this->latestAppraisal();
+        if (!$row) return ['appraisal' => 'Sin avalúos para probar.', 'steps' => []];
+        $subject = (new AppraisalSubjectRepository($this->db))->find((string) $row['id'], $this->user['id']);
+        $neighborhoodId = (string) ($subject['neighborhood_id'] ?? '');
+        $sector = (new AppraisalSectorRepository($this->db))->find((string) $row['id'], $this->user['id']);
+        $steps = [];
+        $this->probeStep($steps, 'Sujeto y barrio', fn (): string =>
+            'Barrio: ' . ($subject['neighborhood_name'] ?: 'sin barrio') . ' · ID: ' . ($neighborhoodId ?: 'sin ID'));
+        $bank = new SectorBankRepository($this->db);
+        $this->probeStep($steps, 'Banco sectorial', function () use ($bank, $neighborhoodId, $subject, $sector): string {
+            $bank->ensureSections($neighborhoodId, $subject, $sector);
+            return count($bank->sections($neighborhoodId)) . ' secciones maestras disponibles.';
+        });
+        $this->probeStep($steps, 'Secciones del avalúo', fn (): string =>
+            count((new AppraisalSectorSectionRepository($this->db))->sections((string) $row['id'], $this->user['id']))
+            . ' secciones guardadas en el avalúo.');
+        return ['appraisal' => (string) $row['id'], 'steps' => $steps];
+    }
+
+    private function latestAppraisal(): ?array
+    {
+        $query = $this->db->prepare('SELECT id FROM appraisals WHERE owner_id = ? ORDER BY updated_at DESC LIMIT 1');
+        $query->execute([$this->user['id']]);
+        return $query->fetch() ?: null;
+    }
+
+    private function probeStep(array &$steps, string $label, callable $callback): void
+    {
+        try {
+            $steps[] = ['label' => $label, 'ok' => true, 'message' => $callback()];
+        } catch (\Throwable $error) {
+            $steps[] = ['label' => $label, 'ok' => false, 'message' => $error->getMessage()];
+        }
     }
 }
