@@ -32,6 +32,36 @@ $changed = array_values(array_filter($items, static fn (array $item): bool => $i
         </div>
     <?php endif; ?>
 
+    <?php $brokenChecks = array_filter($checks, static fn (array $check): bool => !$check['ok']); ?>
+    <div class="card p-6">
+        <div class="flex flex-wrap items-center justify-between gap-4">
+            <div>
+                <h2 class="text-xl font-semibold">Chequeo del esquema sectorial</h2>
+                <p class="mt-1 text-sm text-slate-600">
+                    Verifica las tablas que alimentan el banco barrial avanzado dentro del avalúo.
+                </p>
+            </div>
+            <span class="rounded-full px-3 py-1 text-xs font-semibold <?= $brokenChecks ? 'bg-red-50 text-red-700' : 'bg-emerald-50 text-emerald-800' ?>">
+                <?= $brokenChecks ? 'Revisar' : 'Completo' ?>
+            </span>
+        </div>
+        <div class="mt-5 grid gap-3 md:grid-cols-2">
+            <?php foreach ($checks as $check): ?>
+                <div class="rounded-lg border <?= $check['ok'] ? 'border-emerald-100 bg-emerald-50' : 'border-red-200 bg-red-50' ?> p-4">
+                    <p class="font-mono text-xs font-semibold <?= $check['ok'] ? 'text-emerald-800' : 'text-red-700' ?>">
+                        <?= e($check['table']) ?>
+                    </p>
+                    <p class="mt-2 text-sm <?= $check['ok'] ? 'text-emerald-800' : 'text-red-700' ?>">
+                        <?= $check['ok'] ? 'Tabla y columnas críticas disponibles.' : 'Faltan: ' . e(implode(', ', $check['missing'])) ?>
+                    </p>
+                    <?php if ($check['error']): ?>
+                        <p class="mt-2 text-xs text-red-700"><?= e($check['error']) ?></p>
+                    <?php endif; ?>
+                </div>
+            <?php endforeach; ?>
+        </div>
+    </div>
+
     <div class="card p-6">
         <div class="flex flex-wrap items-center justify-between gap-4">
             <div>
