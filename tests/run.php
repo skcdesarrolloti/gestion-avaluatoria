@@ -344,6 +344,14 @@ try {
         && $mergedMidas['05']['norma_base'] === 'Manual vigente'
         && str_contains((string) $mergedMidas['05']['midas_lectura_manual'], 'Barrio Crespo'),
         'revision MIDAS conserva manual y propone datos');
+    $castilloMidas = AppraisalMidasReview::suggestions(['neighborhood_name' => 'Castillogrande',
+        'zone_sector' => 'Residencial de alta densidad']);
+    expect(($castilloMidas['01']['area_hectareas'] ?? '') === '41,96'
+        && ($castilloMidas['01']['perimetro_metros'] ?? '') === '4.358,82'
+        && ($castilloMidas['01']['comuna'] ?? '') === 'UCG 1'
+        && in_array('Educativo', $castilloMidas['07']['equipamientos_seleccionados'] ?? [], true)
+        && str_contains((string) $castilloMidas['05']['midas_lectura_manual'], 'Castillogrande'),
+        'revision MIDAS incorpora perfil verificado de Castillogrande');
     expect(count(AppraisalSectorFieldGuidance::legend()) === 4
         && AppraisalSectorFieldGuidance::field('midas_lectura_manual')['mode'] === 'oficial'
         && AppraisalSectorFieldGuidance::field('observacion_localizacion')['mode'] === 'sugerido',
