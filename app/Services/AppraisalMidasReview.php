@@ -7,9 +7,11 @@ final class AppraisalMidasReview
     public static function suggestions(array $subject): array
     {
         $profile = MidasNeighborhoodProfile::forSubject($subject);
-        if ($profile) return $profile;
+        $wfs = MidasWfsSearch::suggestions($subject);
+        if ($profile) return $wfs !== [] ? array_replace_recursive($profile, $wfs) : $profile;
         $live = MidasLiveSearch::suggestions($subject);
-        return $live !== [] ? array_replace_recursive(self::generic($subject), $live) : self::generic($subject);
+        $suggestions = $live !== [] ? array_replace_recursive(self::generic($subject), $live) : self::generic($subject);
+        return $wfs !== [] ? array_replace_recursive($suggestions, $wfs) : $suggestions;
     }
 
     public static function mergeEmpty(array $current, array $suggestions): array

@@ -20,6 +20,8 @@ use App\Services\InternationalStandardFileImportService;
 use App\Services\LegalDocumentFileImportService;
 use App\Services\LegalDocumentImportService;
 use App\Services\MidasLayerPlan;
+use App\Services\MidasWfsLayerCatalog;
+use App\Services\MidasWfsSearch;
 use App\Services\RateLimiter;
 use App\Controllers\AppraisalController;
 use App\Models\AppraisalSubjectRepository;
@@ -370,6 +372,24 @@ try {
         && isset($castilloPending['07']['amoblamiento_seleccionado'])
         && isset($castilloPending['13']['externalidades_negativas']),
         'plan MIDAS exige servicios equipamientos y riesgos sin inventar resultados');
+    $wfsLayers = MidasWfsLayerCatalog::layers();
+    expect(MidasWfsLayerCatalog::missingModuleFields() === []
+        && isset($wfsLayers['barrios'], $wfsLayers['paraderos'], $wfsLayers['aseo']),
+        'catalogo WFS MIDAS apunta solo a campos existentes');
+    $paraderosUrl = MidasWfsLayerCatalog::url('paraderos');
+    expect(str_contains($paraderosUrl, 'map=transcaribe')
+        && str_contains($paraderosUrl, 'TYPENAME=Transcaribe_Paraderos'),
+        'catalogo WFS construye URL de capa tecnica');
+    $wfsFixture = ['features' => [[
+        'properties' => ['barrio' => 'Castillogrande', 'localidad' => 'Histórica y del Caribe Norte',
+            'ucg' => 'UCG 1', 'fuente' => 'Decreto 0977 de 2001 (POT) - Acuerdo 006 de 2003',
+            'area_ha' => '41.96', 'perimetro_m' => '4358.82'],
+    ]]];
+    $wfsParsed = MidasWfsSearch::fromFeatureCollection($wfsFixture, 'Castillogrande');
+    expect(($wfsParsed['01']['area_hectareas'] ?? '') === '41,96'
+        && ($wfsParsed['01']['perimetro_metros'] ?? '') === '4.358,82'
+        && ($wfsParsed['05']['norma_base'] ?? '') !== '',
+        'busqueda WFS interpreta ficha territorial de MIDAS');
     expect(count(AppraisalSectorFieldGuidance::legend()) === 4
         && AppraisalSectorFieldGuidance::field('midas_lectura_manual')['mode'] === 'oficial'
         && AppraisalSectorFieldGuidance::field('observacion_localizacion')['mode'] === 'sugerido',
