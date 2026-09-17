@@ -62,11 +62,21 @@ final class LegalFrameworkController
         if (!$document['has_file']) {
             throw new HttpException(404, 'El PDF de este documento jurídico todavía no fue importado.');
         }
-        $name = str_replace(['"', '\\'], '', (string) $document['source_filename']);
+        $name = str_replace(['"', '\\'], '', (string) ($document['source_filename'] ?: $document['title'] . '.pdf'));
+        $blob = is_string($document['pdf_blob'] ?? null) ? $document['pdf_blob'] : null;
+        $fromDisk = is_string($document['file_path']) && is_file($document['file_path']);
+        if (!$fromDisk && $blob === null) {
+            throw new HttpException(404, 'El PDF de este documento jurídico todavía no fue importado.');
+        }
+        while (ob_get_level() > 0) ob_end_clean();
         header('Content-Type: application/pdf');
-        header('Content-Length: ' . filesize($document['file_path']));
+        header('Content-Length: ' . ($fromDisk ? filesize($document['file_path']) : strlen($blob)));
         header('Content-Disposition: inline; filename="' . $name . '"');
-        readfile($document['file_path']);
+        if ($fromDisk) {
+            readfile($document['file_path']);
+        } else {
+            echo $blob;
+        }
         exit;
     }
 }

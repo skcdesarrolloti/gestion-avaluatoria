@@ -18,7 +18,7 @@ final class LegalDocumentRepository
         $rows = $this->db->query("SELECT c.code category_code, c.name category_name, c.group_type,
             d.slug, d.document_code, d.title, d.document_type, d.status, d.issued_at,
             d.repealed_at, d.source_reference, d.summary, d.source_filename, d.storage_filename,
-            d.file_size_bytes, d.imported_at, d.sort_order document_sort
+            d.file_size_bytes, d.imported_at, d.pdf_blob IS NOT NULL AS has_blob, d.sort_order document_sort
             FROM valuation_legal_categories c
             LEFT JOIN valuation_legal_documents d ON d.category_code = c.code
             ORDER BY c.sort_order ASC, d.sort_order ASC")->fetchAll();
@@ -62,8 +62,9 @@ final class LegalDocumentRepository
         foreach ($documents as $document) {
             $exists = $document['storage_filename'] !== ''
                 && is_file(self::storagePath((string) $document['storage_filename']));
-            $present += $exists ? 1 : 0;
-            $markedMissing += (!$exists && $document['file_size_bytes'] !== null) ? 1 : 0;
+            $backed = !$exists && !empty($document['has_blob']);
+            $present += ($exists || $backed) ? 1 : 0;
+            $markedMissing += (!$exists && !$backed && $document['file_size_bytes'] !== null) ? 1 : 0;
         }
         return ['dir' => self::storageDir(), 'configured' => LegalFileStorage::configured(),
             'writable' => LegalFileStorage::writable(), 'present' => $present,
@@ -102,32 +103,35 @@ final class LegalDocumentRepository
         return $query->fetchAll();
     }
 
-    public function saveImportedDocument(array $meta, string $status, int $bytes): void
+    public function saveImportedDocument(array $meta, string $status, int $bytes, ?string $blob = null): void
     {
         $now = gmdate('Y-m-d H:i:s');
         $values = [$meta['slug'], $meta['category_code'], $meta['document_code'], $meta['title'],
             $meta['document_type'], $status, $meta['source_filename'], $meta['storage_filename'],
-            $bytes, $this->nextSortOrder($meta['category_code']), $now, $now];
+            $bytes, $blob, $this->nextSortOrder($meta['category_code']), $now, $now];
         if ($this->db->getAttribute(PDO::ATTR_DRIVER_NAME) === 'sqlite') {
             $sql = "INSERT INTO valuation_legal_documents
                 (slug, category_code, document_code, title, document_type, status, source_filename,
-                storage_filename, file_size_bytes, imported_at, sort_order, created_at, updated_at)
-                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+                storage_filename, file_size_bytes, pdf_blob, imported_at, sort_order, created_at, updated_at)
+                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
                 ON CONFLICT(slug) DO UPDATE SET status = excluded.status,
                 source_filename = excluded.source_filename, storage_filename = excluded.storage_filename,
-                file_size_bytes = excluded.file_size_bytes, imported_at = excluded.imported_at,
+                file_size_bytes = excluded.file_size_bytes,
+                pdf_blob = COALESCE(excluded.pdf_blob, valuation_legal_documents.pdf_blob),
+                imported_at = excluded.imported_at,
                 updated_at = excluded.updated_at";
-            $this->db->prepare($sql)->execute([...array_slice($values, 0, 9), $now, ...array_slice($values, 9)]);
+            $this->db->prepare($sql)->execute([...array_slice($values, 0, 10), $now, ...array_slice($values, 10)]);
             return;
         }
         $sql = "INSERT INTO valuation_legal_documents
             (slug, category_code, document_code, title, document_type, status, source_filename,
-            storage_filename, file_size_bytes, imported_at, sort_order, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+            storage_filename, file_size_bytes, pdf_blob, imported_at, sort_order, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE status = VALUES(status), source_filename = VALUES(source_filename),
             storage_filename = VALUES(storage_filename), file_size_bytes = VALUES(file_size_bytes),
+            pdf_blob = COALESCE(VALUES(pdf_blob), pdf_blob),
             imported_at = VALUES(imported_at), updated_at = VALUES(updated_at)";
-        $this->db->prepare($sql)->execute([...array_slice($values, 0, 9), $now, ...array_slice($values, 9)]);
+        $this->db->prepare($sql)->execute([...array_slice($values, 0, 10), $now, ...array_slice($values, 10)]);
     }
 
     private function articles(): array
@@ -141,7 +145,7 @@ final class LegalDocumentRepository
 
     private function documentsWithStorage(): array
     {
-        return $this->db->query("SELECT slug, storage_filename, file_size_bytes
+        return $this->db->query("SELECT slug, storage_filename, file_size_bytes, pdf_blob IS NOT NULL AS has_blob
             FROM valuation_legal_documents WHERE storage_filename <> '' ORDER BY sort_order")->fetchAll();
     }
 
@@ -157,6 +161,8 @@ final class LegalDocumentRepository
     {
         $filename = (string) ($row['storage_filename'] ?? '');
         $path = $filename !== '' ? self::storagePath($filename) : '';
+        $blob = $row['pdf_blob'] ?? null;
+        $hasBlob = isset($row['has_blob']) ? (bool) $row['has_blob'] : (is_string($blob) && $blob !== '');
         return [
             'slug' => $row['slug'],
             'category_code' => $row['category_code'],
@@ -173,7 +179,9 @@ final class LegalDocumentRepository
             'storage_filename' => $filename,
             'file_size_bytes' => $row['file_size_bytes'] !== null ? (int) $row['file_size_bytes'] : null,
             'imported_at' => $row['imported_at'] ?? null,
-            'has_file' => $path !== '' && is_file($path),
+            'has_blob' => $hasBlob,
+            'pdf_blob' => $blob,
+            'has_file' => ($path !== '' && is_file($path)) || $hasBlob,
             'file_path' => $path,
         ];
     }

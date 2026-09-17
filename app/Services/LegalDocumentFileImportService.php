@@ -24,6 +24,10 @@ final class LegalDocumentFileImportService
         if (!$this->sameFile($destination, (string) $file['tmp_name'], $bytes)) {
             $bytes = LegalFileStorage::storeUploaded((string) $file['tmp_name'], $destination);
         }
+        $blob = file_get_contents($destination);
+        if (!is_string($blob)) {
+            throw new \RuntimeException('El PDF se guardó en disco, pero no se pudo crear el respaldo interno.');
+        }
         $this->documents->saveImportedDocument([
             'slug' => $document['slug'],
             'category_code' => $document['category_code'],
@@ -32,7 +36,7 @@ final class LegalDocumentFileImportService
             'document_type' => $document['document_type'],
             'source_filename' => $name,
             'storage_filename' => $storageName,
-        ], (string) $document['status'], $bytes);
+        ], (string) $document['status'], $bytes, $blob);
         return ['ok' => true, 'copied' => [$name], 'skipped' => []];
     }
 

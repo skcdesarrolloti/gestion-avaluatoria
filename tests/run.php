@@ -27,6 +27,7 @@ use App\Models\IfrsStandardRepository;
 use App\Models\InternationalStandardRepository;
 use App\Models\LegalDocumentRepository;
 use App\Models\NeighborhoodSectorRepository;
+use App\Models\SectorBankRepository;
 use App\Models\ValuationStandardRepository;
 use App\Support\AppraisalSectorCatalog;
 use App\Support\SectorBankCatalog;
@@ -83,7 +84,7 @@ try {
         '01 NTS S04 Codigo conducta.pdf', 'unit-test-norma-inexistente.pdf', '', NULL, NULL, 1,
         '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
     $db->exec("CREATE TABLE valuation_legal_categories (code TEXT PRIMARY KEY, name TEXT, group_type TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
-    $db->exec("CREATE TABLE valuation_legal_documents (slug TEXT PRIMARY KEY, category_code TEXT, document_code TEXT, title TEXT, document_type TEXT, status TEXT, issued_at TEXT, repealed_at TEXT, source_reference TEXT, summary TEXT, source_filename TEXT DEFAULT '', storage_filename TEXT DEFAULT '', file_size_bytes INTEGER, imported_at TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE valuation_legal_documents (slug TEXT PRIMARY KEY, category_code TEXT, document_code TEXT, title TEXT, document_type TEXT, status TEXT, issued_at TEXT, repealed_at TEXT, source_reference TEXT, summary TEXT, source_filename TEXT DEFAULT '', storage_filename TEXT DEFAULT '', file_size_bytes INTEGER, pdf_blob BLOB, imported_at TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_legal_articles (id INTEGER PRIMARY KEY, document_slug TEXT, category_code TEXT, article_label TEXT, title TEXT, excerpt TEXT, applicability TEXT, status TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_international_groups (code TEXT PRIMARY KEY, name TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_international_standards (slug TEXT PRIMARY KEY, group_code TEXT, standard_code TEXT, title TEXT, applicable_categories TEXT, summary TEXT, effective_from TEXT, status TEXT, source_reference TEXT, source_filename TEXT DEFAULT '', storage_filename TEXT DEFAULT '', file_size_bytes INTEGER, imported_at TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
@@ -123,7 +124,7 @@ try {
         ('1', 'Inmuebles urbanos', 'category', 11, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
     $db->exec("INSERT INTO valuation_legal_documents VALUES
         ('ley-388-1997', 'A', 'Ley 388 de 1997', 'Ordenamiento territorial', 'Ley', 'vigente',
-        NULL, NULL, 'Fuente oficial', 'Documento fuente', '', '', NULL, NULL, 1,
+        NULL, NULL, 'Fuente oficial', 'Documento fuente', '', '', NULL, NULL, NULL, 1,
         '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
     $db->exec("INSERT INTO valuation_legal_articles VALUES
         (1, 'ley-388-1997', '1', 'Artículo 61', 'Adquisición de inmuebles',
@@ -232,7 +233,11 @@ try {
     $storedLegal = $legalCategories[0]['documents'][1];
     expect($storedLegal['has_file'] === true && $storedLegal['document_type'] === 'Ley', 'documento juridico queda consultable');
     unlink(LegalDocumentRepository::storagePath($storedLegal['storage_filename']));
-    expect($legal->storageReport()['marked_missing'] === 1, 'diagnostico juridico detecta PDF faltante');
+    $storedLegalAgain = $legal->find((string) $storedLegal['slug']);
+    expect($storedLegalAgain['has_file'] === true && $legal->storageReport()['marked_missing'] === 0,
+        'documento juridico conserva respaldo interno sin archivo fisico');
+    $db->prepare('UPDATE valuation_legal_documents SET pdf_blob = NULL WHERE slug = ?')->execute([$storedLegal['slug']]);
+    expect($legal->storageReport()['marked_missing'] === 1, 'diagnostico juridico detecta PDF faltante sin respaldo');
     foreach ($legal->categoriesWithDocuments() as $category) {
         foreach ($category['documents'] as $document) {
             if ($document['has_file']) unlink(LegalDocumentRepository::storagePath($document['storage_filename']));
@@ -322,14 +327,37 @@ try {
     $db->exec("CREATE TABLE master_sector_profiles (neighborhood_id TEXT PRIMARY KEY,
         source_appraisal_id TEXT, updated_by_owner_id INTEGER, version INTEGER DEFAULT 1,
         $sectorColumnsSql, updated_at TEXT)");
+    $db->exec("CREATE TABLE master_sector_profile_sections (id INTEGER PRIMARY KEY,
+        neighborhood_id TEXT, section_code TEXT, section_title TEXT, status TEXT, version INTEGER DEFAULT 1,
+        source_name TEXT, source_updated_at TEXT, requires_field_validation TEXT, requires_photo_support TEXT,
+        content_text TEXT, data_json TEXT, updated_at TEXT, UNIQUE(neighborhood_id, section_code))");
     $neighborhoodSectors = new NeighborhoodSectorRepository($db);
+    $sectorBank = new SectorBankRepository($db);
     $neighborhoodId = str_repeat('e', 32);
     $masterSector = AppraisalSectorInput::data(['sector_name' => 'Bruselas',
         'services_status' => 'completa', 'sector_report_text' => 'Ficha reutilizable del barrio.']);
     $neighborhoodSectors->save($neighborhoodId, 1, str_repeat('f', 32), $masterSector);
+    $neighborhoodSectors->save($neighborhoodId, 1, str_repeat('f', 32), $masterSector);
     $storedSector = $neighborhoodSectors->find($neighborhoodId);
     expect($storedSector && $storedSector['sector_name'] === 'Bruselas'
         && $storedSector['sector_report_text'] === 'Ficha reutilizable del barrio.', 'banco barrial reutilizable');
+    $db->prepare('INSERT INTO master_sector_profile_sections
+        (neighborhood_id, section_code, section_title, status, source_name, requires_field_validation,
+        requires_photo_support, content_text, data_json, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        ->execute([$neighborhoodId, '01', 'Identificación', 'Generada', 'Datos Abiertos Cartagena',
+            'SI', 'NO', 'Base creada', '{}', date('c')]);
+    $db->prepare('INSERT INTO master_sector_profile_sections
+        (neighborhood_id, section_code, section_title, status, source_name, requires_field_validation,
+        requires_photo_support, content_text, data_json, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+        ->execute([$neighborhoodId, '02', 'Soporte cartográfico', 'Validada', 'MIDAS',
+            'SI', 'SI', 'Base validada', '{}', date('c')]);
+    $sectorSummary = $sectorBank->summary($neighborhoodId);
+    expect($sectorSummary['total'] === 2 && $sectorSummary['ready'] === 1,
+        'semaforo sectorial solo cuenta secciones validadas');
+    $profileVersion = new ReflectionMethod(SectorBankRepository::class, 'profileVersion');
+    $profileVersion->setAccessible(true);
+    expect($profileVersion->invoke($sectorBank, $neighborhoodId) === 2,
+        'instantanea sectorial toma version del banco');
     expect(count(SectorBankCatalog::sections()) === 17
         && (SectorBankCatalog::sections()['05'][0] ?? '') === 'Normatividad urbanística',
         'banco sectorial conserva secciones avanzadas');

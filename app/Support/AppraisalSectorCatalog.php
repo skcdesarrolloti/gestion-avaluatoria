@@ -8,7 +8,23 @@ final class AppraisalSectorCatalog
     {
         return [
             'localizacion' => ['2.1', 'Localización y delimitación', [
+                ['sector_country', 'País', 'text'],
+                ['sector_department', 'Departamento', 'text'],
+                ['sector_city', 'Municipio / distrito', 'text'],
+                ['sector_neighborhood', 'Barrio', 'text'],
+                ['sector_locality', 'Localidad', 'text'],
+                ['sector_commune', 'Comuna / UCG', 'text'],
                 ['sector_name', 'Nombre sectorial de trabajo', 'text'],
+                ['sector_microsector', 'Microsector', 'text'],
+                ['sector_map_url', 'Mapa base del barrio', 'text'],
+                ['sector_latitude', 'Latitud centro', 'text'],
+                ['sector_longitude', 'Longitud centro', 'text'],
+                ['sector_area_ha', 'Área (ha)', 'text'],
+                ['sector_perimeter_m', 'Perímetro (m)', 'text'],
+                ['sector_north_boundary', 'Norte', 'text'],
+                ['sector_east_boundary', 'Este', 'text'],
+                ['sector_south_boundary', 'Sur', 'text'],
+                ['sector_west_boundary', 'Oeste', 'text'],
                 ['influence_area', 'Área de influencia', 'textarea'],
                 ['sector_boundaries', 'Delimitación y referencias', 'textarea'],
                 ['sector_source', 'Fuente de información sectorial', 'text'],
@@ -81,6 +97,9 @@ final class AppraisalSectorCatalog
     {
         return [
             'sector_name' => 'Nombre técnico del barrio, microsector o zona que se usará como unidad de lectura sectorial.',
+            'sector_map_url' => 'Enlace de apoyo para abrir ubicación. La delimitación técnica y medidas deben validarse.',
+            'sector_latitude' => 'Coordenada central tomada de la fuente disponible o digitada por el analista.',
+            'sector_area_ha' => 'Área aproximada del barrio o microsector. Mantener fuente y fecha cuando provenga de entidad externa.',
             'influence_area' => 'Delimita el entorno que incide en el valor: manzanas, corredores, hitos, usos o barreras urbanas.',
             'services_status' => 'Lee disponibilidad real y continuidad de servicios públicos y redes de soporte urbano.',
             'predominant_use' => 'Uso que domina el comportamiento del sector y orienta el universo de comparables.',

@@ -168,6 +168,8 @@ $neighborhoodsJson = json_encode($sectorNeighborhoods ?? [], JSON_UNESCAPED_UNIC
         </div>
     <?php endif; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/sector-bank-status.php'; ?>
+    <?php require BASE_PATH . '/app/Views/appraisals/sector-bank-guidance.php'; ?>
+    <?php require BASE_PATH . '/app/Views/appraisals/sector-photo-support.php'; ?>
 
     <nav class="mt-6 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Subsecciones de sector">
         <?php foreach ($sectorSections as $key => [$number, $label]): ?>

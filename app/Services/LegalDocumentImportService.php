@@ -79,13 +79,13 @@ final class LegalDocumentImportService
             $destination = LegalDocumentRepository::storagePath($meta['storage_filename']);
             $bytes = (int) filesize($tmpName);
             if ($this->sameFile($destination, $tmpName, $bytes)) {
-                $this->documents->saveImportedDocument($meta, $status, $bytes);
+                $this->documents->saveImportedDocument($meta, $status, $bytes, $this->pdfBlob($destination));
                 $result['skipped'][] = $name;
                 return;
             }
             $storedBytes = $temporary ? $this->copyTemporaryPdf($tmpName, $destination)
                 : LegalFileStorage::storeUploaded($tmpName, $destination);
-            $this->documents->saveImportedDocument($meta, $status, $storedBytes);
+            $this->documents->saveImportedDocument($meta, $status, $storedBytes, $this->pdfBlob($destination));
             $result['copied'][] = $name;
         } catch (\Throwable $error) {
             $result['errors'][] = "$name no se pudo guardar: " . $error->getMessage();
@@ -187,6 +187,15 @@ final class LegalDocumentImportService
     {
         return is_file($destination) && filesize($destination) === $bytes
             && hash_file('sha256', $destination) === hash_file('sha256', $source);
+    }
+
+    private function pdfBlob(string $path): string
+    {
+        $blob = file_get_contents($path);
+        if (!is_string($blob)) {
+            throw new \RuntimeException('El PDF se guardó en disco, pero no se pudo crear el respaldo interno.');
+        }
+        return $blob;
     }
 
     private function copyTemporaryPdf(string $tmpName, string $destination): int

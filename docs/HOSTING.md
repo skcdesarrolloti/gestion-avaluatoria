@@ -20,9 +20,9 @@ borra `.env`, crea un archivo persistente llamado `.gestion-avaluatoria.env` en 
 carpeta padre del proyecto y coloca allí las mismas variables. El bootstrap lo lee
 después de `.env`, queda fuera del repositorio y no se elimina al actualizar el checkout.
 Los PDFs importados se guardan dentro de `storage/`. Si se borran al desplegar, revisa
-que el proceso de actualización no limpie archivos privados existentes de esa carpeta
-y vuelve a importarlos desde la pantalla de Normas Técnicas Sectoriales o con
-`php bin/console.php standards:import`.
+que el proceso de actualización no limpie archivos privados existentes de esa carpeta.
+Marco Jurídico también conserva un respaldo interno en BD de cada PDF importado; Normas
+Técnicas Sectoriales, IVS y NIIF deben reimportarse si su archivo físico desaparece.
 La pantalla de Normas Técnicas muestra un diagnóstico con la ruta real, escritura,
 archivos físicos y registros marcados en base sin archivo. El modo normal esperado es
 `storage/ del proyecto`.
@@ -45,7 +45,9 @@ carpetas base quedan ancladas en Git con `.gitkeep`, pero los PDFs se ignoran.
 
 La pantalla del Marco Jurídico acepta varios PDFs o un `.zip` con PDFs. El ZIP ayuda
 a evitar seleccionar documentos uno por uno, pero sigue limitado por `post_max_size`.
-Las pantallas IVS y NIIF cargan un PDF por tarjeta para evitar asignaciones ambiguas.
+Al ejecutar la migración nueva, los PDFs jurídicos ya existentes en `storage/` se copian
+al respaldo interno. Las pantallas IVS y NIIF cargan un PDF por tarjeta para evitar
+asignaciones ambiguas.
 
 ## Elegir la ruta según la configuración del dominio
 

@@ -72,3 +72,18 @@ Verificación local ejecutada el 15 de septiembre de 2026:
 definido. En producción falta confirmar escritura en `storage/normas-tecnicas-sectoriales`,
 `storage/marco-juridico-nacional`, `storage/normas-internacionales-valuacion` y
 `storage/normas-niif`.
+
+## Respaldo de PDFs jurídicos y sector avanzado
+
+Verificación local ejecutada el 17 de septiembre de 2026:
+
+- `php tests/run.php`: 76 verificaciones correctas.
+- `npm test`: 11 pruebas correctas.
+- `npm run build`: compilación correcta.
+- `npm run check:size`: CSS + JS 29,0 KB gzip.
+
+Se comprobó que Marco Jurídico conserva el PDF desde respaldo interno aun cuando el
+archivo físico ya no existe, y que el diagnóstico solo marca faltante cuando tampoco
+hay respaldo. También se comprobó que el banco sectorial conserva las secciones
+avanzadas, cuenta como listas solo las secciones validadas y toma la versión real del
+banco al generar la instantánea.

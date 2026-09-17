@@ -1,9 +1,14 @@
 <?php
 $value = (string) ($sector[$field] ?? '');
 $help = (string) ($sectorHelps[$field] ?? '');
-$placeholder = $type === 'textarea' ? 'Redacta la lectura técnica observada en campo.' : 'Diligencia según soporte o visita.';
+$placeholder = match ($field) {
+    'sector_map_url' => 'https://www.google.com/maps/search/?api=1&query=...',
+    'sector_latitude', 'sector_longitude' => 'Ej. 10.407952',
+    'sector_area_ha', 'sector_perimeter_m' => 'Dato de fuente oficial o medición manual',
+    default => $type === 'textarea' ? 'Redacta la lectura técnica observada en campo.' : 'Diligencia según soporte o visita.',
+};
 ?>
-<label class="label"> <?= e($label) ?>
+<label class="label"> <?= e($fieldLabel) ?>
     <?php if ($help): ?><span class="help-dot" title="<?= e($help) ?>">?</span><?php endif; ?>
     <?php if ($type === 'select'): ?>
         <select class="input" name="<?= e($field) ?>">

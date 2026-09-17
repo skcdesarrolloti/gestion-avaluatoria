@@ -73,8 +73,9 @@ es menor que el total, importa los PDFs por lotes o aumenta ese límite en el ho
 El Marco Jurídico Nacional usa el mismo criterio para documentos fuente:
 `storage/marco-juridico-nacional/` es la ruta predeterminada y se puede fijar con
 `LEGAL_STORAGE_DIR=storage/marco-juridico-nacional`. Cada PDF se sube desde la tarjeta
-del documento jurídico correspondiente para evitar duplicados por nombre; los
-artículos o fragmentos aplicables se incorporan después.
+del documento jurídico correspondiente para evitar duplicados por nombre. Además queda
+un respaldo interno en BD para que el documento siga disponible si una actualización
+borra el archivo físico; los artículos o fragmentos aplicables se incorporan después.
 Las Normas Internacionales de Valuación guardan sus PDFs en
 `storage/normas-internacionales-valuacion/`; cada archivo se carga desde la tarjeta
 de la IVS correspondiente.
@@ -116,7 +117,8 @@ tests/               Pruebas aisladas
   padre del proyecto; la app lo lee después de `.env` y no se versiona.
 - Las carpetas privadas de PDFs quedan dentro de `storage/` y Git solo conserva su
   `.gitkeep`: no versiona los PDFs. No uses un despliegue que elimine archivos
-  privados existentes dentro de `storage/`.
+  privados existentes dentro de `storage/`. Marco Jurídico mantiene un respaldo en BD
+  de los PDFs cargados; Normas Técnicas, IVS y NIIF siguen dependiendo de su carpeta.
 - Ejecuta `php bin/console.php migrate` durante el despliegue; con `AUTO_MIGRATE=true`
   el primer acceso autenticado también aplica pendientes. Migraciones costosas deben
   ejecutarse antes de abrir tráfico. La base inicial no borra tablas ni datos.

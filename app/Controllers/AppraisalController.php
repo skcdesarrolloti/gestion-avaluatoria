@@ -186,9 +186,10 @@ final class AppraisalController
     private function safePhotoReturn(string $id): string
     {
         $target = (string) ($_POST['return_to'] ?? '');
-        $subject = 'avaluos/' . $id . '/bien-sujeto';
+        [$subject, $sector] = ['avaluos/' . $id . '/bien-sujeto', 'avaluos/' . $id . '/sector'];
         return in_array($target, ['avaluos/' . $id . '/expediente', $subject, $subject . '#atributos', $subject . '#fotos'], true)
             || preg_match('#^' . preg_quote($subject, '#') . '\#fotos(?:-general|-[a-f0-9]{32})$#', $target)
+            || preg_match('#^' . preg_quote($sector, '#') . '(?:\#[a-z_]+)?$#', $target)
             ? $target
             : $subject . '#fotos';
     }

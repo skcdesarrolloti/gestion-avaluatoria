@@ -67,7 +67,7 @@ final class SectorBankRepository
         $sections = $this->sections($neighborhoodId);
         $total = count($sections);
         $ready = count(array_filter($sections, static fn (array $row): bool =>
-            trim((string) ($row['data_json'] ?? '')) !== '' || trim((string) ($row['content_text'] ?? '')) !== ''));
+            in_array((string) ($row['status'] ?? ''), ['Validada', 'Aprobada', 'Disponible'], true)));
         return ['total' => $total, 'ready' => $ready, 'percent' => $total > 0 ? (int) round($ready * 100 / $total) : 0,
             'level' => $ready >= 15 ? 'VERDE' : ($ready >= 8 ? 'AMARILLO' : 'ROJO')];
     }
@@ -77,12 +77,15 @@ final class SectorBankRepository
         $now = gmdate('Y-m-d H:i:s');
         $snapshot = ['sector' => $sector, 'sections' => $this->sections($neighborhoodId)];
         $json = json_encode($snapshot, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES);
+        $profileVersion = $this->profileVersion($neighborhoodId);
         $sql = 'INSERT INTO appraisal_sector_snapshots
             (appraisal_id, owner_id, neighborhood_id, profile_version, snapshot_json, copied_at, updated_at)
-            VALUES (?, ?, ?, 1, ?, ?, ?)
+            VALUES (?, ?, ?, ?, ?, ?, ?)
             ON DUPLICATE KEY UPDATE neighborhood_id = VALUES(neighborhood_id),
-                snapshot_json = VALUES(snapshot_json), updated_at = VALUES(updated_at)';
-        $this->db->prepare($sql)->execute([$appraisalId, $owner, $neighborhoodId ?: null, $json, $now, $now]);
+                profile_version = VALUES(profile_version), snapshot_json = VALUES(snapshot_json),
+                updated_at = VALUES(updated_at)';
+        $this->db->prepare($sql)->execute([$appraisalId, $owner, $neighborhoodId ?: null,
+            $profileVersion, $json, $now, $now]);
     }
 
     private function linkSource(string $neighborhoodId, string $code, string $source, string $now): void
@@ -96,7 +99,13 @@ final class SectorBankRepository
     {
         return match ($code) {
             '01', '02' => 'barrios_cartagena',
+            '03' => 'planeacion_cartagena',
             '05' => 'midas_normatividad',
+            '06', '11' => 'transcaribe',
+            '08', '13' => 'epa_cartagena',
+            '09' => 'ipcc_pemp',
+            '10', '15' => 'investigacion_mercado',
+            '12' => 'imagenes_apoyo',
             '14' => 'registro_fotografico',
             default => 'campo_analista',
         };
@@ -106,9 +115,23 @@ final class SectorBankRepository
     {
         return match ($this->sourceKeyFor($code)) {
             'barrios_cartagena' => 'Datos Abiertos Cartagena - Barrios',
+            'planeacion_cartagena' => 'Secretaría de Planeación / POT',
             'midas_normatividad' => 'MIDAS Cartagena / POT',
+            'transcaribe' => 'Transcaribe / movilidad',
+            'epa_cartagena' => 'EPA Cartagena / riesgos ambientales',
+            'ipcc_pemp' => 'IPCC / PEMP',
+            'investigacion_mercado' => 'Investigación del mercado',
+            'imagenes_apoyo' => 'Imágenes viales y satelitales de apoyo',
             'registro_fotografico' => 'Registro fotográfico de campo',
             default => 'Validación del analista',
         };
+    }
+
+    private function profileVersion(string $neighborhoodId): int
+    {
+        if ($neighborhoodId === '') return 1;
+        $query = $this->db->prepare('SELECT version FROM master_sector_profiles WHERE neighborhood_id = ?');
+        $query->execute([$neighborhoodId]);
+        return max(1, (int) ($query->fetchColumn() ?: 1));
     }
 }

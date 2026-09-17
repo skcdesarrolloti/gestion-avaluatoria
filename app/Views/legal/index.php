@@ -22,7 +22,7 @@ $maxFiles = max(0, (int) ($limits['max_file_uploads'] ?? 0));
     <section class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
         <div>
             <h2 class="text-lg font-semibold text-slate-950">Repositorio jurídico</h2>
-            <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Cada ley o decreto se registra como documento fuente. El PDF se carga desde su propia tarjeta para conservar la relación exacta con la categoría y el código.</p>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Cada ley o decreto se registra como documento fuente. El PDF se carga desde su propia tarjeta y queda respaldado internamente para conservar la relación exacta con la categoría y el código.</p>
             <div class="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
                 <span class="rounded-full bg-slate-100 px-3 py-1 text-slate-600"><?= e($legalStats['total']) ?> documento(s)</span>
                 <span class="rounded-full bg-indigo-50 px-3 py-1 text-indigo-700"><?= e($legalStats['articles']) ?> artículo(s)</span>
@@ -60,15 +60,15 @@ $maxFiles = max(0, (int) ($limits['max_file_uploads'] ?? 0));
             </div>
             <dl class="mt-4 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
                 <div><dt class="text-xs font-semibold uppercase text-slate-500">Modo</dt><dd><?= $storageReport['configured'] ? 'LEGAL_STORAGE_DIR' : 'storage/ del proyecto' ?></dd></div>
-                <div><dt class="text-xs font-semibold uppercase text-slate-500">Archivos físicos</dt><dd><?= e($storageReport['present']) ?> / <?= e($storageReport['total']) ?></dd></div>
-                <div><dt class="text-xs font-semibold uppercase text-slate-500">BD sin archivo</dt><dd><?= e($storageReport['marked_missing']) ?></dd></div>
+                <div><dt class="text-xs font-semibold uppercase text-slate-500">PDFs disponibles</dt><dd><?= e($storageReport['present']) ?> / <?= e($storageReport['total']) ?></dd></div>
+                <div><dt class="text-xs font-semibold uppercase text-slate-500">Sin respaldo</dt><dd><?= e($storageReport['marked_missing']) ?></dd></div>
                 <div><dt class="text-xs font-semibold uppercase text-slate-500">Límite por lote</dt><dd><?= e($maxFiles ?: ($limits['max_file_uploads'] ?? '')) ?> archivo(s)</dd></div>
             </dl>
             <?php if (!$storageReport['configured']): ?>
                 <p class="mt-3 rounded-lg bg-blue-50 p-3 text-sm text-blue-800">Usando la ruta interna storage/marco-juridico-nacional. La app crea la carpeta si PHP tiene permisos y Git conserva la carpeta base sin versionar los PDFs.</p>
             <?php endif; ?>
             <?php if ((int) $storageReport['marked_missing'] > 0): ?>
-                <p class="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-800">Hay documentos marcados en base, pero el PDF no existe en disco. Revisa la ruta persistente antes de seguir cargando.</p>
+                <p class="mt-3 rounded-lg bg-red-50 p-3 text-sm text-red-800">Hay documentos marcados en base, pero el PDF no existe en disco ni en el respaldo interno. Reimporta esos documentos antes de seguir cargando.</p>
             <?php endif; ?>
         </div>
     </section>

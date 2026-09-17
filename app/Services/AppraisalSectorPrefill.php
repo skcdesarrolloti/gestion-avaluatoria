@@ -11,7 +11,17 @@ final class AppraisalSectorPrefill
         $place = self::join([$subject['neighborhood_name'] ?? '', $subject['locality_name'] ?? '',
             $subject['commune_ucg'] ?? '', $subject['city_name'] ?? '']);
         return array_filter([
+            'sector_country' => 'Colombia',
+            'sector_department' => (string) ($subject['department_name'] ?? ''),
+            'sector_city' => (string) ($subject['city_name'] ?? ''),
+            'sector_neighborhood' => (string) ($subject['neighborhood_name'] ?? ''),
+            'sector_locality' => (string) ($subject['locality_name'] ?? ''),
+            'sector_commune' => (string) ($subject['commune_ucg'] ?? ''),
             'sector_name' => self::join([$subject['neighborhood_name'] ?? '', $subject['zone_sector'] ?? ''], ' - '),
+            'sector_microsector' => (string) ($subject['zone_sector'] ?? ''),
+            'sector_map_url' => self::mapUrl($subject),
+            'sector_latitude' => (string) ($subject['latitude'] ?? ''),
+            'sector_longitude' => (string) ($subject['longitude'] ?? ''),
             'influence_area' => $place ? 'Área de influencia inicial asociada a ' . $place . '. Validar alcance real en visita y soporte sectorial.' : '',
             'sector_boundaries' => ($subject['neighborhood_name'] ?? '') !== '' ? 'Delimitación preliminar tomada del barrio o microsector seleccionado en Bien sujeto.' : '',
             'sector_source' => $place ? 'Precarga desde Bien sujeto y maestro de barrios/microsectores.' : '',
@@ -47,6 +57,13 @@ final class AppraisalSectorPrefill
     private static function join(array $parts, string $separator = ', '): string
     {
         return implode($separator, array_values(array_filter(array_map('trim', $parts))));
+    }
+
+    private static function mapUrl(array $subject): string
+    {
+        $place = self::join([$subject['neighborhood_name'] ?? '', $subject['city_name'] ?? 'Cartagena de Indias',
+            $subject['department_name'] ?? 'Bolívar', 'Colombia']);
+        return $place ? 'https://www.google.com/maps/search/?api=1&query=' . rawurlencode($place) : '';
     }
 
     private static function servicesStatus(array $subject): string

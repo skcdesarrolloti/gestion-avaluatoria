@@ -38,6 +38,7 @@ return [
     ['GET', '#^/avaluos/([a-f0-9]{32})/sector$#', 'sector', 'show', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/sector$#', 'sector', 'save', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/sector/barrio$#', 'sector', 'selectNeighborhood', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/sector/fotos$#', 'sector', 'uploadPhotos', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/bien-sujeto$#', 'appraisals', 'subject', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/entregable$#', 'appraisals', 'deliverable', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ficha-basica$#', 'appraisals', 'saveSubjectBasic', true],

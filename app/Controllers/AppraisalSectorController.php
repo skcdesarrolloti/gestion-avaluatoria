@@ -11,7 +11,9 @@ use App\Models\NeighborhoodSectorRepository;
 use App\Models\SectorBankRepository;
 use App\Services\AppraisalSectorInput;
 use App\Services\AppraisalSectorPrefill;
+use App\Services\AppraisalPhotoUploadService;
 use App\Support\AppraisalSectorCatalog;
+use App\Support\SectorBankCatalog;
 
 final class AppraisalSectorController
 {
@@ -63,6 +65,10 @@ final class AppraisalSectorController
             'sectorNeighborhoodUpdatedAt' => $master['updated_at'] ?? null,
             'sectorBankSections' => $bankSections,
             'sectorBankSummary' => $bankSummary,
+            'sectorBankSources' => SectorBankCatalog::sources(),
+            'photos' => $this->appraisals->photos($id, $this->user['id']),
+            'photoMessage' => Session::pullFlash('sector_photo_message'),
+            'photoError' => Session::pullFlash('sector_photo_error'),
             'sectorSections' => AppraisalSectorCatalog::sections(),
             'sectorOptions' => AppraisalSectorCatalog::options(),
             'sectorHelps' => AppraisalSectorCatalog::helps(),
@@ -124,6 +130,23 @@ final class AppraisalSectorController
         Http::redirect('avaluos/' . $id . '/sector');
     }
 
+    public function uploadPhotos(string $id): never
+    {
+        $record = $this->appraisals->find($id, $this->user['id']);
+        try {
+            $caption = mb_substr(trim((string) ($_POST['photo_caption'] ?? 'sector')), 0, 190);
+            $displayName = mb_substr(trim((string) ($_POST['photo_name'] ?? '')), 0, 190);
+            $count = (new AppraisalPhotoUploadService())->store($_FILES['photos'] ?? [], $record['id'],
+                $this->user['id'], $this->appraisals, null, $caption, $displayName);
+            Session::flash('sector_photo_message', $count === 1
+                ? 'Imagen sectorial cargada correctamente.'
+                : $count . ' imágenes sectoriales cargadas correctamente.');
+        } catch (\Throwable $error) {
+            Session::flash('sector_photo_error', $error->getMessage());
+        }
+        Http::redirect($this->safeReturn($id));
+    }
+
     private function initialSector(string $id, array $subject, ?array $master): array
     {
         $empty = $this->sectors->find($id, $this->user['id']);
@@ -167,6 +190,14 @@ final class AppraisalSectorController
             $sectorError = $this->sectorWarning($sectorError, $error, 'sector_master_profile');
             return null;
         }
+    }
+
+    private function safeReturn(string $id): string
+    {
+        $target = (string) ($_POST['return_to'] ?? '');
+        return preg_match('#^avaluos/' . preg_quote($id, '#') . '/sector(?:\#[a-z_]+)?$#', $target)
+            ? $target
+            : 'avaluos/' . $id . '/sector#localizacion';
     }
 
     private function sectorWarning(?string $current, \Throwable $error, string $context): string
