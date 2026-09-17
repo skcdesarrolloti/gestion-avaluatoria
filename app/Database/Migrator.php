@@ -41,14 +41,29 @@ final class Migrator
         }
     }
 
+    public function status(): array
+    {
+        $files = glob($this->directory . '/*.php');
+        sort($files, SORT_STRING);
+        $rows = $this->migrationRows();
+        $items = [];
+        foreach ($files as $file) {
+            $version = basename($file);
+            $checksum = hash_file('sha256', $file);
+            $items[] = [
+                'version' => $version,
+                'checksum' => $checksum,
+                'status' => isset($rows[$version]) ? 'Aplicada' : 'Pendiente',
+                'changed' => isset($rows[$version]) && !hash_equals($rows[$version], $checksum),
+            ];
+        }
+        return $items;
+    }
+
     private function pending(array $files): array
     {
-        try {
-            $rows = $this->db->query('SELECT version, checksum FROM schema_migrations')->fetchAll(PDO::FETCH_KEY_PAIR);
-        } catch (\PDOException $error) {
-            if (($error->errorInfo[1] ?? null) !== 1146) {
-                throw $error;
-            }
+        $rows = $this->migrationRows();
+        if (!$rows) {
             return $files;
         }
         $available = array_map('basename', $files);
@@ -65,5 +80,17 @@ final class Migrator
             }
         }
         return $pending;
+    }
+
+    private function migrationRows(): array
+    {
+        try {
+            return $this->db->query('SELECT version, checksum FROM schema_migrations')->fetchAll(PDO::FETCH_KEY_PAIR);
+        } catch (\PDOException $error) {
+            if (($error->errorInfo[1] ?? null) === 1146 || str_contains($error->getMessage(), 'no such table')) {
+                return [];
+            }
+            throw $error;
+        }
     }
 }

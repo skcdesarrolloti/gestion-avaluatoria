@@ -122,6 +122,10 @@ tests/               Pruebas aisladas
 - Ejecuta `php bin/console.php migrate` durante el despliegue; con `AUTO_MIGRATE=true`
   el primer acceso autenticado también aplica pendientes. Migraciones costosas deben
   ejecutarse antes de abrir tráfico. La base inicial no borra tablas ni datos.
+- Durante migraciones funcionales puede activarse temporalmente
+  `MAINTENANCE_MIGRATIONS=true` para aplicar pendientes desde
+  `/mantenimiento/migraciones`; restringe roles/usuarios con
+  `MAINTENANCE_MIGRATION_ROLES` o `MAINTENANCE_MIGRATION_USER_IDS` y vuelve a apagarlo.
 - Para diagnosticar el login en hosting, ejecuta `php bin/console.php auth:diagnose`.
   También puedes activar temporalmente `APP_DIAGNOSTICS=true` y abrir
   `/diagnostico/login`; vuelve a dejarlo en `false` al terminar.

@@ -20,6 +20,8 @@ return [
     ['GET', '#^/normas-internacionales-valuacion$#', 'international', 'index', true],
     ['GET', '#^/normas-niif$#', 'ifrs', 'index', true],
     ['GET', '#^/tipologias-constructivas-igac$#', 'typologies', 'index', true],
+    ['GET', '#^/mantenimiento/migraciones$#', 'maintenance', 'migrations', true],
+    ['POST', '#^/mantenimiento/migraciones/ejecutar$#', 'maintenance', 'runMigrations', true],
     ['POST', '#^/normas-tecnicas-sectoriales/importar$#', 'standards', 'import', true],
     ['POST', '#^/marco-juridico-valuatorio/importar$#', 'legal', 'import', true],
     ['POST', '#^/marco-juridico-valuatorio/([a-z0-9-]+)/importar$#', 'legal', 'importFile', true],

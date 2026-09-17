@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace App\Core;
 use App\Controllers\{AppraisalController, AuthController, DiagnosticController, IgacTypologyController,
-    IfrsStandardController, InternationalStandardController, LegalFrameworkController, MasterDataController,
+    IfrsStandardController, InternationalStandardController, LegalFrameworkController, MaintenanceController, MasterDataController,
     StandardController, ValuationController};
 use App\Database\Migrator;
 use App\Models\AppraisalRepository;
@@ -123,6 +123,7 @@ final class Kernel
                 'typologies' => new IgacTypologyController(new IgacTypologyRepository()),
                 'international' => new InternationalStandardController(new InternationalStandardRepository($db)),
                 'legal' => new LegalFrameworkController(new LegalDocumentRepository($db)),
+                'maintenance' => new MaintenanceController($db, $user),
                 'masters' => new MasterDataController(new AppraiserRepository($db), new GeoMasterRepository($db)),
                 'standards' => new StandardController(new ValuationStandardRepository($db)),
                 'sector' => new \App\Controllers\AppraisalSectorController(new AppraisalRepository($db),

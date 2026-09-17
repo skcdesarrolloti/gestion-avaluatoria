@@ -13,6 +13,7 @@ $logged = isset($_SESSION['user']);
 $requestPath = parse_url($_SERVER['REQUEST_URI'] ?? '/', PHP_URL_PATH) ?: '/';
 $basePath = App\Core\Http::basePath();
 $currentPath = '/' . trim(substr($requestPath, strlen($basePath)), '/');
+$maintenanceEnabled = App\Core\Env::bool('MAINTENANCE_MIGRATIONS');
 $isActive = static fn (string $path): bool => $path === '/' ? $currentPath === '/' : str_starts_with($currentPath, $path);
 $tabs = [
     ['label' => 'Valuaciones', 'href' => url('valuaciones'), 'active' => $isActive('/valuaciones')],
@@ -24,6 +25,9 @@ $tabs = [
     ['label' => 'Normas NIIF', 'href' => url('normas-niif'), 'active' => $isActive('/normas-niif')],
     ['label' => 'Tipologías Constructivas IGAC', 'href' => url('tipologias-constructivas-igac'), 'active' => $isActive('/tipologias-constructivas-igac')],
 ];
+if ($maintenanceEnabled) {
+    $tabs[] = ['label' => 'Migraciones', 'href' => url('mantenimiento/migraciones'), 'active' => $isActive('/mantenimiento')];
+}
 ?>
 <body class="min-h-dvh bg-slate-50 text-slate-900 antialiased">
     <div id="app-loader" class="app-loader" role="status" aria-live="polite" hidden>
@@ -55,6 +59,9 @@ $tabs = [
                     <a class="app-action app-action-blue" href="<?= e(url('normas-internacionales-valuacion')) ?>">Internacionales</a>
                     <a class="app-action app-action-teal" href="<?= e(url('normas-niif')) ?>">NIIF</a>
                     <a class="app-action app-action-teal" href="<?= e(url('tipologias-constructivas-igac')) ?>">Tipologías IGAC</a>
+                    <?php if ($maintenanceEnabled): ?>
+                        <a class="app-action app-action-blue" href="<?= e(url('mantenimiento/migraciones')) ?>">Migraciones</a>
+                    <?php endif; ?>
                 </div>
                 <nav class="app-tabs" aria-label="Principal">
                     <?php foreach ($tabs as $tab): ?>
