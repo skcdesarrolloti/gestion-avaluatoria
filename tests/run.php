@@ -34,6 +34,7 @@ use App\Models\AppraisalSectorSectionRepository;
 use App\Models\SectorBankRepository;
 use App\Models\ValuationStandardRepository;
 use App\Support\AppraisalSectorCatalog;
+use App\Support\AppraisalSectorFieldGuidance;
 use App\Support\SectorBankCatalog;
 
 // All fixtures are in memory; never connect to the configured production database.
@@ -339,6 +340,10 @@ try {
         && $mergedMidas['05']['norma_base'] === 'Manual vigente'
         && str_contains((string) $mergedMidas['05']['midas_lectura_manual'], 'Barrio Crespo'),
         'revision MIDAS conserva manual y propone datos');
+    expect(count(AppraisalSectorFieldGuidance::legend()) === 4
+        && AppraisalSectorFieldGuidance::field('midas_lectura_manual')['mode'] === 'oficial'
+        && AppraisalSectorFieldGuidance::field('observacion_localizacion')['mode'] === 'sugerido',
+        'guia visual sectorial clasifica campos');
     $sectorColumnsSql = implode(', ', array_map(static fn (string $key): string => $key . ' TEXT',
         AppraisalSectorCatalog::keys()));
     $db->exec("CREATE TABLE master_sector_profiles (neighborhood_id TEXT PRIMARY KEY,
