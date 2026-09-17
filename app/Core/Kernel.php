@@ -41,7 +41,7 @@ final class Kernel
             if ($method !== $verb) {
                 continue;
             }
-            if ($method === 'POST') {
+            if ($method === 'POST' && !($controller === 'sectorMidas' && $action === 'consult')) {
                 if (in_array($action, ['import', 'importFile'], true)
                     && in_array($controller, ['standards', 'legal', 'international', 'ifrs'], true)
                     && $this->uploadLikelyExceededPostLimit()) {

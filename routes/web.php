@@ -41,6 +41,7 @@ return [
     ['POST', '#^/avaluos/([a-f0-9]{32})/sector$#', 'sector', 'save', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/sector/barrio$#', 'sector', 'selectNeighborhood', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/sector/fuentes/actualizar$#', 'sector', 'refreshSources', true],
+    ['GET', '#^/avaluos/([a-f0-9]{32})/sector/midas/consultar$#', 'sectorMidas', 'consult', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/sector/midas/consultar$#', 'sectorMidas', 'consult', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/sector/midas/aplicar$#', 'sectorMidas', 'apply', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/sector/fotos$#', 'sector', 'uploadPhotos', true],
