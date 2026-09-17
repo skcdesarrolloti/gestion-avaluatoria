@@ -45,6 +45,7 @@ final class SectorBankRepository
                 version = CASE WHEN ? = 1 THEN version + 1 ELSE version END';
         $query = $this->db->prepare($sql);
         foreach (SectorBankCatalog::sections() as $code => [$title]) {
+            $code = (string) $code;
             $data = SectorBankCatalog::defaultData($code, $subject, $sector);
             $query->execute([$neighborhoodId, $code, $title, 'Generada',
                 $this->sourceFor($code), $now, 'SI', in_array($code, ['02', '06', '07', '12', '13', '14'], true) ? 'SI' : 'NO',
