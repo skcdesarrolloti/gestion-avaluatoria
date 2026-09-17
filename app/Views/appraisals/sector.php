@@ -26,6 +26,7 @@ if (!empty($sectorNeighborhoodUpdatedAt)) {
     }
 }
 $neighborhoodLabel = trim((string) ($subject['neighborhood_name'] ?? ''));
+$bankVersion = trim((string) ($sectorBankProfileVersion ?? ''));
 $neighborhoodsJson = json_encode($sectorNeighborhoods ?? [], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
@@ -130,7 +131,7 @@ $neighborhoodsJson = json_encode($sectorNeighborhoods ?? [], JSON_UNESCAPED_UNIC
 
 <form id="sector-form" class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     method="post" action="<?= e(url('avaluos/' . $record['id'] . '/sector')) ?>"
-    x-data="{ activeSector: location.hash ? location.hash.slice(1) : '<?= e($firstSectorTab) ?>' }"
+    x-data="{ activeSector: location.hash ? location.hash.slice(1) : '<?= e($firstSectorTab) ?>', activeBankSection: '01' }"
     @submit="$refs.activeSector.value = activeSector">
     <?= csrf_field() ?>
     <input x-ref="activeSector" type="hidden" name="active_sector" value="<?= e($firstSectorTab) ?>">
@@ -165,11 +166,15 @@ $neighborhoodsJson = json_encode($sectorNeighborhoods ?? [], JSON_UNESCAPED_UNIC
             <?php if ($locationLine): ?>
                 <span class="block text-blue-900/80">Referencia territorial: <?= e($locationLine) ?>.</span>
             <?php endif; ?>
+            <span class="block text-blue-900/80">
+                Banco barrial interno: <?= e($sectorHasNeighborhoodBank ? 'existente' : 'se creará al guardar') ?><?= $bankVersion !== '' ? ' · versión ' . e($bankVersion) : '' ?>.
+            </span>
         </div>
     <?php endif; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/sector-bank-status.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/sector-bank-guidance.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/sector-photo-support.php'; ?>
+    <?php require BASE_PATH . '/app/Views/appraisals/sector-advanced-sections.php'; ?>
 
     <nav class="mt-6 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Subsecciones de sector">
         <?php foreach ($sectorSections as $key => [$number, $label]): ?>

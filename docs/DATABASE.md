@@ -52,6 +52,7 @@ No debes crear tablas ni pegar sentencias SQL. El programa hace esa parte.
 | `valuation_ifrs_groups` | Familias NIIF/NIC aplicables a medición contable |
 | `valuation_ifrs_standards` | Catálogo NIIF/NIC y metadatos del PDF privado |
 | `valuation_field_considerations` | Clasificación de campos del expediente como normativos, derivados u operativos |
+| `appraisal_sector_profile_sections` | Borradores avanzados por sección sectorial dentro de cada avalúo |
 
 `owner_id` guarda `_ID` del funcionario. No hay FK entre servidores/bases ni copia de
 contraseñas. `id` es aleatorio (32 caracteres hexadecimales), pero siempre se comprueba

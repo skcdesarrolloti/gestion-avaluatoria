@@ -3,23 +3,18 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\Http;
 use App\Core\Session;
-use App\Models\AppraisalRepository;
-use App\Models\AppraisalSectorRepository;
-use App\Models\AppraisalSubjectRepository;
-use App\Models\GeoMasterRepository;
-use App\Models\NeighborhoodSectorRepository;
-use App\Models\SectorBankRepository;
-use App\Services\AppraisalSectorInput;
-use App\Services\AppraisalSectorPrefill;
-use App\Services\AppraisalPhotoUploadService;
-use App\Support\AppraisalSectorCatalog;
-use App\Support\SectorBankCatalog;
+use App\Models\{AppraisalRepository, AppraisalSectorRepository, AppraisalSectorSectionRepository,
+    AppraisalSubjectRepository, GeoMasterRepository, NeighborhoodSectorRepository, SectorBankRepository};
+use App\Services\{AppraisalPhotoUploadService, AppraisalSectorInput, AppraisalSectorPrefill,
+    AppraisalSectorSectionInput};
+use App\Support\{AppraisalSectorAdvancedCatalog, AppraisalSectorCatalog, SectorBankCatalog};
 
 final class AppraisalSectorController
 {
     public function __construct(
         private AppraisalRepository $appraisals,
         private AppraisalSectorRepository $sectors,
+        private AppraisalSectorSectionRepository $sectorSections,
         private AppraisalSubjectRepository $subjects,
         private NeighborhoodSectorRepository $neighborhoodSectors,
         private SectorBankRepository $sectorBank,
@@ -52,6 +47,12 @@ final class AppraisalSectorController
         } catch (\Throwable $error) {
             $sectorError = $this->sectorWarning($sectorError, $error, 'sector_bank_show');
         }
+        try {
+            $advancedRows = $this->sectorSections->sections($id, $this->user['id']);
+        } catch (\Throwable $error) {
+            $advancedRows = [];
+            $sectorError = $this->sectorWarning($sectorError, $error, 'sector_advanced_show');
+        }
         view('appraisals/sector', [
             'title' => 'Sector y entorno',
             'record' => $record,
@@ -63,8 +64,11 @@ final class AppraisalSectorController
             'sectorNeighborhoods' => $this->geo->neighborhoods(),
             'sectorHasNeighborhoodBank' => (bool) $master,
             'sectorNeighborhoodUpdatedAt' => $master['updated_at'] ?? null,
+            'sectorBankProfileVersion' => $master['version'] ?? null,
             'sectorBankSections' => $bankSections,
             'sectorBankSummary' => $bankSummary,
+            'sectorAdvancedRows' => $advancedRows,
+            'sectorAdvancedCatalog' => AppraisalSectorAdvancedCatalog::sections(),
             'sectorBankSources' => SectorBankCatalog::sources(),
             'photos' => $this->appraisals->photos($id, $this->user['id']),
             'photoMessage' => Session::pullFlash('sector_photo_message'),
@@ -82,10 +86,13 @@ final class AppraisalSectorController
         $this->appraisals->find($id, $this->user['id']);
         try {
             $data = AppraisalSectorInput::data($_POST);
+            $advanced = AppraisalSectorSectionInput::data($_POST);
             $subject = $this->subjects->find($id, $this->user['id']);
             $this->sectors->save($id, $this->user['id'], $data);
             $this->neighborhoodSectors->save((string) ($subject['neighborhood_id'] ?? ''), $this->user['id'], $id, $data);
+            $this->sectorSections->saveAll($id, $this->user['id'], (string) ($subject['neighborhood_id'] ?? ''), $advanced);
             $this->sectorBank->ensureSections((string) ($subject['neighborhood_id'] ?? ''), $subject, $data, true);
+            $this->sectorBank->saveAdvancedSections((string) ($subject['neighborhood_id'] ?? ''), $advanced);
             $this->sectorBank->saveSnapshot($id, $this->user['id'], (string) ($subject['neighborhood_id'] ?? ''), $data);
             Session::flash('sector_message', 'Numeral 2 guardado y banco barrial actualizado.');
         } catch (\Throwable $error) {

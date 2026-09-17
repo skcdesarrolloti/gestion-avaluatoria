@@ -9,6 +9,7 @@ use App\Services\AppraisalValidator;
 use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalSectorInput;
+use App\Services\AppraisalSectorSectionInput;
 use App\Services\AppraisalSectorPrefill;
 use App\Services\AuthDiagnostics;
 use App\Services\AuthService;
@@ -27,6 +28,7 @@ use App\Models\IfrsStandardRepository;
 use App\Models\InternationalStandardRepository;
 use App\Models\LegalDocumentRepository;
 use App\Models\NeighborhoodSectorRepository;
+use App\Models\AppraisalSectorSectionRepository;
 use App\Models\SectorBankRepository;
 use App\Models\ValuationStandardRepository;
 use App\Support\AppraisalSectorCatalog;
@@ -312,6 +314,14 @@ try {
         && $sectorData['services_status'] === 'completa'
         && $sectorData['connectivity'] === ''
         && mb_strlen($sectorData['sector_report_text']) === 2400, 'sector normalizado');
+    $advancedSectorData = AppraisalSectorSectionInput::data(['sector_sections' => [
+        '03' => ['acueducto' => 'SI', 'internet_operadores' => ['Claro', 'Desconocido']],
+        '06' => ['corredor_actividad' => 'PARCIAL', 'vias_detalle' => str_repeat('x', 4100)],
+    ]]);
+    expect($advancedSectorData['03']['acueducto'] === 'SI'
+        && $advancedSectorData['03']['internet_operadores'] === ['Claro']
+        && mb_strlen($advancedSectorData['06']['vias_detalle']) === 4000,
+        'sector avanzado normaliza secciones heredadas');
     $prefill = AppraisalSectorPrefill::fromSubject(['neighborhood_name' => 'Bruselas',
         'locality_name' => 'Histórica', 'commune_ucg' => 'UCG 1', 'city_name' => 'Cartagena',
         'water_service' => 'si', 'energy_service' => 'si', 'sewer_service' => 'si',
@@ -331,6 +341,13 @@ try {
         neighborhood_id TEXT, section_code TEXT, section_title TEXT, status TEXT, version INTEGER DEFAULT 1,
         source_name TEXT, source_updated_at TEXT, requires_field_validation TEXT, requires_photo_support TEXT,
         content_text TEXT, data_json TEXT, updated_at TEXT, UNIQUE(neighborhood_id, section_code))");
+    $db->exec("CREATE TABLE master_sector_section_sources (neighborhood_id TEXT, section_code TEXT,
+        source_key TEXT, relation_status TEXT, source_data_at TEXT, updated_at TEXT,
+        PRIMARY KEY (neighborhood_id, section_code, source_key))");
+    $db->exec("CREATE TABLE appraisal_sector_profile_sections (id INTEGER PRIMARY KEY,
+        appraisal_id TEXT, owner_id INTEGER, neighborhood_id TEXT, section_code TEXT,
+        section_title TEXT, status TEXT, version INTEGER DEFAULT 1, data_json TEXT,
+        content_text TEXT, updated_at TEXT, UNIQUE(appraisal_id, section_code))");
     $neighborhoodSectors = new NeighborhoodSectorRepository($db);
     $sectorBank = new SectorBankRepository($db);
     $neighborhoodId = str_repeat('e', 32);
@@ -354,6 +371,14 @@ try {
     $sectorSummary = $sectorBank->summary($neighborhoodId);
     expect($sectorSummary['total'] === 2 && $sectorSummary['ready'] === 1,
         'semaforo sectorial solo cuenta secciones validadas');
+    $advancedRepo = new AppraisalSectorSectionRepository($db);
+    $advancedRepo->saveAll(str_repeat('f', 32), 1, $neighborhoodId, $advancedSectorData);
+    $storedAdvanced = $advancedRepo->sections(str_repeat('f', 32), 1);
+    expect(isset($storedAdvanced['03']) && str_contains((string) $storedAdvanced['03']['data_json'], 'Claro'),
+        'ficha sectorial avanzada queda dentro del avaluo');
+    $sectorBank->saveAdvancedSections($neighborhoodId, $advancedSectorData);
+    $bankAdvanced = $sectorBank->sections($neighborhoodId);
+    expect(count($bankAdvanced) === 17, 'banco barrial recibe secciones avanzadas del avaluo');
     $profileVersion = new ReflectionMethod(SectorBankRepository::class, 'profileVersion');
     $profileVersion->setAccessible(true);
     expect($profileVersion->invoke($sectorBank, $neighborhoodId) === 2,

@@ -14,5 +14,15 @@
     $photoUploadDescription = 'Pega con Ctrl+V o sube la imagen satelital que soporte la lectura espacial del sector.';
     $photoUploadNamePlaceholder = 'Ej. Imagen satelital del barrio ' . ($neighborhoodLabel ?: 'seleccionado');
     require BASE_PATH . '/app/Views/appraisals/photo-upload.php';
+    $photoUploadCaption = 'sector:mapa-vias';
+    $photoUploadTitle = 'Figura 3 · Mapa vial';
+    $photoUploadDescription = 'Pega con Ctrl+V o sube la captura con vías principales, accesos, corredores o señalización relevante.';
+    $photoUploadNamePlaceholder = 'Ej. Vías y accesos del barrio ' . ($neighborhoodLabel ?: 'seleccionado');
+    require BASE_PATH . '/app/Views/appraisals/photo-upload.php';
+    $photoUploadCaption = 'sector:registro-campo';
+    $photoUploadTitle = 'Figura 4 · Registro de campo';
+    $photoUploadDescription = 'Pega con Ctrl+V o sube fotos de visita, equipamientos, externalidades, entorno inmediato o evidencias del sector.';
+    $photoUploadNamePlaceholder = 'Ej. Evidencia de campo del sector';
+    require BASE_PATH . '/app/Views/appraisals/photo-upload.php';
     ?>
 </div>
