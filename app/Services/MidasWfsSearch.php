@@ -5,6 +5,7 @@ namespace App\Services;
 final class MidasWfsSearch
 {
     private static array $diagnostics = [];
+    private static string $lastHttpStatus = '';
 
     public static function suggestions(array $subject): array
     {
@@ -20,7 +21,8 @@ final class MidasWfsSearch
         }
         $json = self::request(MidasWfsLayerCatalog::url('barrios'));
         if (!is_array($json)) {
-            self::$diagnostics[] = 'No fue posible leer la capa Barrios de MIDAS/WFS; se conserva ficha base o manual.';
+            self::$diagnostics[] = 'No fue posible leer la capa Barrios de MIDAS/WFS'
+                . self::lastStatusText() . '; se conserva ficha base o manual.';
             return [];
         }
         $base = self::fromFeatureCollection($json, $name);
@@ -93,15 +95,27 @@ final class MidasWfsSearch
     private static function request(string $url): ?array
     {
         if ($url === '') return null;
+        self::$lastHttpStatus = '';
         $headers = "Accept: application/json,*/*\r\n"
             . "Referer: https://midas.cartagena.gov.co/\r\n"
             . "User-Agent: Mozilla/5.0\r\n";
         $context = stream_context_create(['http' => ['method' => 'GET', 'header' => $headers,
             'timeout' => 4, 'ignore_errors' => true]]);
         $response = @file_get_contents($url, false, $context);
+        foreach ($http_response_header ?? [] as $header) {
+            if (preg_match('/^HTTP\/\S+\s+(\d+)/', (string) $header, $match)) {
+                self::$lastHttpStatus = $match[1];
+                break;
+            }
+        }
         if (!is_string($response) || !str_starts_with(ltrim($response), '{')) return null;
         $json = json_decode($response, true);
         return is_array($json) ? $json : null;
+    }
+
+    private static function lastStatusText(): string
+    {
+        return self::$lastHttpStatus === '' ? '' : ' (respuesta HTTP ' . self::$lastHttpStatus . ')';
     }
 
     private static function bestFeature(array $json, string $name): array
