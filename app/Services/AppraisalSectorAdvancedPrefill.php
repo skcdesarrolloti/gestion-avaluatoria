@@ -88,7 +88,7 @@ final class AppraisalSectorAdvancedPrefill
         $stored = self::join([$sector['influence_area'] ?? '', $sector['sector_boundaries'] ?? ''], ' ');
         if ($stored !== '' && !str_contains($stored, 'Validar alcance real')) return $stored;
         return $place === '' ? '' : 'El sector de influencia se toma inicialmente como ' . $place
-            . '. Para el informe, confirma en mapa y visita sus límites, accesos principales, entorno inmediato y relación con el inmueble.';
+            . '.';
     }
 
     private static function yesNo(mixed $value): string

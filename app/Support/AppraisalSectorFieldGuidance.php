@@ -52,6 +52,20 @@ final class AppraisalSectorFieldGuidance
         };
     }
 
+    public static function splitReview(string $value): array
+    {
+        $text = trim($value);
+        $patterns = [' Para el informe, confirma ', ' Validar ', ' Complementar ', ' Confirmar '];
+        foreach ($patterns as $pattern) {
+            $position = mb_stripos($text, trim($pattern));
+            if ($position === false || $position === 0) {
+                continue;
+            }
+            return [trim(mb_substr($text, 0, $position)), trim(mb_substr($text, $position))];
+        }
+        return [$text, ''];
+    }
+
     private static function fieldModes(): array
     {
         return [

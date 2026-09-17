@@ -344,6 +344,9 @@ try {
         && AppraisalSectorFieldGuidance::field('midas_lectura_manual')['mode'] === 'oficial'
         && AppraisalSectorFieldGuidance::field('observacion_localizacion')['mode'] === 'sugerido',
         'guia visual sectorial clasifica campos');
+    $splitReview = AppraisalSectorFieldGuidance::splitReview('Dato real. Para el informe, confirma en visita.');
+    expect($splitReview[0] === 'Dato real.' && str_starts_with($splitReview[1], 'Para el informe'),
+        'guia visual separa dato base de alerta');
     $sectorColumnsSql = implode(', ', array_map(static fn (string $key): string => $key . ' TEXT',
         AppraisalSectorCatalog::keys()));
     $db->exec("CREATE TABLE master_sector_profiles (neighborhood_id TEXT PRIMARY KEY,
