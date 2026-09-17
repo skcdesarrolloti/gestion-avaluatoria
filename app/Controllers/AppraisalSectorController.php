@@ -149,12 +149,16 @@ final class AppraisalSectorController
             $sector = $this->sectors->find($id, $this->user['id']);
             $this->sectorBank->ensureSections($neighborhoodId, $subject, $sector);
             $this->sectorBank->saveSnapshot($id, $this->user['id'], $neighborhoodId, $sector);
+            $checkedAt = (new \DateTimeImmutable('now', new \DateTimeZone('America/Bogota')))->format('d/m/Y H:i');
             Session::flash('sector_message',
-                'Fuentes del barrio actualizadas sin sobrescribir la información manual guardada.');
+                'Actualización desde fuentes ejecutada: se verificaron '
+                . count($this->sectorBank->sections($neighborhoodId)) . ' pestañas y '
+                . count(SectorBankCatalog::sources()) . ' fuentes disponibles o conectables. '
+                . 'No se sobrescribió información manual. Hora: ' . $checkedAt . '.');
         } catch (\Throwable $error) {
             Session::flash('sector_error', $error->getMessage());
         }
-        Http::redirect('avaluos/' . $id . '/sector#banco-01');
+        Http::redirect('avaluos/' . $id . '/sector');
     }
 
     public function uploadPhotos(string $id): never

@@ -85,10 +85,6 @@ final class AppraisalSectorAdvancedCatalog
                 ['literal_e_amenazas', 'E. Amenazas o afectaciones', 'textarea'], ['literal_g_servicios', 'G. Disponibilidad de servicios', 'textarea'],
                 ['literal_h_uso_suelo', 'H. Uso del suelo', 'textarea'],
             ]],
-            '17' => ['Impresión del documento', [
-                ['cap9_apertura', 'Apertura sugerida para capítulo 9', 'textarea'], ['cap9_cierre', 'Cierre sugerido para capítulo 9', 'textarea'],
-                ['criterio_editorial', 'Criterio editorial', 'textarea'], ['nota_calidad_impresion', 'Nota de control de calidad', 'textarea'],
-            ]],
         ];
     }
 
@@ -111,7 +107,6 @@ final class AppraisalSectorAdvancedCatalog
             '14' => ['registro_fotografico', 'imagenes_apoyo', 'campo_analista'],
             '15' => ['investigacion_mercado', 'campo_analista'],
             '16' => ['campo_analista', 'base_interna_skc'],
-            '17' => ['campo_analista', 'base_interna_skc'],
         ][$code] ?? ['campo_analista'];
     }
 

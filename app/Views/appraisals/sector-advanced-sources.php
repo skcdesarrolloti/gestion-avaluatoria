@@ -29,7 +29,7 @@ $photoSupports = AppraisalSectorAdvancedCatalog::photoSupports((string) $section
         <?php if ($photoSupports): ?>
             <p class="mt-2 text-xs font-semibold text-teal-800">
                 Soportes: <?= e(implode(' · ', $photoSupports)) ?>.
-                Se cargan en el submenú de soportes gráficos.
+                Se cargan en esta misma pestaña.
             </p>
         <?php endif; ?>
     </div>

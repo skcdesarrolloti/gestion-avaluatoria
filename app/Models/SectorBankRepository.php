@@ -62,7 +62,9 @@ final class SectorBankRepository
         $query = $this->db->prepare('SELECT * FROM master_sector_profile_sections
             WHERE neighborhood_id = ? ORDER BY section_code ASC');
         $query->execute([$neighborhoodId]);
-        return $query->fetchAll() ?: [];
+        $allowed = array_flip(array_keys(SectorBankCatalog::sections()));
+        return array_values(array_filter($query->fetchAll() ?: [],
+            static fn (array $row): bool => isset($allowed[(string) ($row['section_code'] ?? '')])));
     }
 
     public function summary(string $neighborhoodId): array

@@ -28,6 +28,7 @@ if (!empty($sectorNeighborhoodUpdatedAt)) {
 $neighborhoodLabel = trim((string) ($subject['neighborhood_name'] ?? ''));
 $bankVersion = trim((string) ($sectorBankProfileVersion ?? ''));
 $neighborhoodsJson = json_encode($sectorNeighborhoods ?? [], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+$sectorFormId = 'sector-form';
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
@@ -91,59 +92,73 @@ $neighborhoodsJson = json_encode($sectorNeighborhoods ?? [], JSON_UNESCAPED_UNIC
                 se prepara una generación inicial para completar y guardar.
             </p>
         </div>
-        <div class="flex flex-wrap gap-2">
-            <?php if ($bankUpdatedAtText): ?>
-                <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-800">
-                    Banco actualizado <?= e($bankUpdatedAtText) ?>
-                </span>
-            <?php endif; ?>
-            <form method="post" action="<?= e(url('avaluos/' . $record['id'] . '/sector/fuentes/actualizar')) ?>">
-                <?= csrf_field() ?>
-                <button class="btn-secondary min-h-11" type="submit">Actualizar barrio desde fuentes</button>
-            </form>
-        </div>
+        <?php if ($bankUpdatedAtText): ?>
+            <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-800">
+                Banco actualizado <?= e($bankUpdatedAtText) ?>
+            </span>
+        <?php endif; ?>
     </div>
-    <form class="mt-5 grid gap-4 lg:grid-cols-[1fr_auto]" method="post" @submit="syncSelection()"
-        action="<?= e(url('avaluos/' . $record['id'] . '/sector/barrio')) ?>">
-        <?= csrf_field() ?>
-        <input type="hidden" name="neighborhood_id" :value="selectedId">
-        <label class="label">Barrio / microsector
-            <input class="input mt-2" type="search" name="neighborhood_query" x-model="query"
-                @input="selectedId = ''; syncSelection()" @blur="syncSelection()"
-                placeholder="Busca por nombre del barrio, localidad o comuna">
-            <span class="mt-2 block text-xs font-normal text-slate-500" x-show="query.trim() === ''">
-                Escribe el barrio o microsector para ver coincidencias.
-            </span>
-            <span class="mt-2 block text-xs font-normal text-emerald-700" x-show="selectedId">
-                Barrio listo para cargar.
-            </span>
-            <span class="mt-2 block text-xs font-normal text-amber-700" x-show="query.trim() !== '' && !selectedId && filtered.length > 1">
-                Hay varias coincidencias; selecciona una tarjeta.
-            </span>
-        </label>
-        <button class="btn-primary min-h-11 self-end" type="submit">Cargar ficha del barrio</button>
-        <div class="lg:col-span-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4" x-show="filtered.length">
-            <template x-for="item in filtered" :key="item.id">
-                <button type="button" class="min-h-11 rounded-lg border px-3 py-2 text-left text-sm"
-                    @click="choose(item)"
-                    :class="selectedId === item.id ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50'">
-                    <span class="font-semibold" x-text="item.name"></span>
-                    <span class="block text-xs text-slate-500" x-text="[item.locality_name, item.commune_ucg].filter(Boolean).join(' · ')"></span>
-                </button>
-            </template>
-        </div>
-    </form>
+    <div class="mt-5 grid gap-4 xl:grid-cols-2">
+        <form class="rounded-xl border border-slate-200 bg-slate-50 p-4" method="post" @submit="syncSelection()"
+            action="<?= e(url('avaluos/' . $record['id'] . '/sector/barrio')) ?>">
+            <?= csrf_field() ?>
+            <input type="hidden" name="neighborhood_id" :value="selectedId">
+            <p class="text-xs font-semibold uppercase text-teal-800">Paso 1</p>
+            <label class="label mt-2">Cargar barrio / microsector
+                <input class="input mt-2" type="search" name="neighborhood_query" x-model="query"
+                    @input="selectedId = ''; syncSelection()" @blur="syncSelection()"
+                    placeholder="Busca por nombre del barrio, localidad o comuna">
+                <span class="mt-2 block text-xs font-normal text-slate-500" x-show="query.trim() === ''">
+                    Escribe el barrio o microsector para ver coincidencias.
+                </span>
+                <span class="mt-2 block text-xs font-normal text-emerald-700" x-show="selectedId">
+                    Barrio listo para cargar.
+                </span>
+                <span class="mt-2 block text-xs font-normal text-amber-700" x-show="query.trim() !== '' && !selectedId && filtered.length > 1">
+                    Hay varias coincidencias; selecciona una tarjeta.
+                </span>
+            </label>
+            <button class="btn-primary mt-4 min-h-11" type="submit">1. Cargar ficha del barrio</button>
+            <div class="mt-4 grid gap-2 sm:grid-cols-2" x-show="filtered.length">
+                <template x-for="item in filtered" :key="item.id">
+                    <button type="button" class="min-h-11 rounded-lg border px-3 py-2 text-left text-sm"
+                        @click="choose(item)"
+                        :class="selectedId === item.id ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-200 bg-white text-slate-700 hover:bg-white'">
+                        <span class="font-semibold" x-text="item.name"></span>
+                        <span class="block text-xs text-slate-500" x-text="[item.locality_name, item.commune_ucg].filter(Boolean).join(' · ')"></span>
+                    </button>
+                </template>
+            </div>
+        </form>
+        <form class="rounded-xl border border-blue-100 bg-blue-50 p-4" method="post"
+            action="<?= e(url('avaluos/' . $record['id'] . '/sector/fuentes/actualizar')) ?>">
+            <?= csrf_field() ?>
+            <p class="text-xs font-semibold uppercase text-blue-900">Paso 2</p>
+            <h3 class="mt-2 text-lg font-semibold text-slate-900">Actualizar barrio desde fuentes</h3>
+            <p class="mt-2 text-sm leading-6 text-blue-950">
+                Ejecuta este paso después de cargar el barrio. El sistema revisa las fuentes conectables,
+                actualiza la matriz de soporte y conserva intacto lo escrito manualmente.
+            </p>
+            <button class="btn-secondary mt-4 min-h-11" type="submit" <?= $neighborhoodLabel === '' ? 'disabled' : '' ?>>
+                2. Actualizar desde fuentes
+            </button>
+            <p class="mt-3 text-xs font-semibold <?= $neighborhoodLabel === '' ? 'text-amber-700' : 'text-blue-900' ?>">
+                <?= e($neighborhoodLabel === '' ? 'Primero carga un barrio para activar este paso.' : 'Barrio activo: ' . $neighborhoodLabel) ?>
+            </p>
+        </form>
+    </div>
 </section>
 
-<form id="sector-form" class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
-    method="post" action="<?= e(url('avaluos/' . $record['id'] . '/sector')) ?>"
+<form id="<?= e($sectorFormId) ?>" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/sector')) ?>">
+    <?= csrf_field() ?>
+</form>
+<section class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{
         activeSector: location.hash && !location.hash.startsWith('#banco-') ? location.hash.slice(1) : '<?= e($firstSectorTab) ?>',
         activeBankSection: (location.hash.match(/^#banco-(\d{2})$/) || [])[1] || '01'
-    }"
-    @submit="$refs.activeSector.value = 'banco-' + activeBankSection">
-    <?= csrf_field() ?>
-    <input x-ref="activeSector" type="hidden" name="active_sector" value="<?= e($firstSectorTab) ?>">
+    }">
+    <input form="<?= e($sectorFormId) ?>" x-ref="activeSector" type="hidden" name="active_sector"
+        :value="'banco-' + activeBankSection">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Ficha sectorial del avalúo</p>
@@ -153,7 +168,7 @@ $neighborhoodsJson = json_encode($sectorNeighborhoods ?? [], JSON_UNESCAPED_UNIC
                 el capítulo sectorial del informe.
             </p>
         </div>
-        <button class="btn-primary min-h-11" type="submit">Guardar numeral 2</button>
+        <button form="<?= e($sectorFormId) ?>" class="btn-primary min-h-11" type="submit">Guardar numeral 2</button>
     </div>
 
     <?php if ($locationLine || ($sectorPrefillSource ?? '') !== 'expediente'): ?>
@@ -187,7 +202,6 @@ $neighborhoodsJson = json_encode($sectorNeighborhoods ?? [], JSON_UNESCAPED_UNIC
         <a class="btn-secondary min-h-11" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto')) ?>">
             Continuar a Bien sujeto
         </a>
-        <button class="btn-primary min-h-11" type="submit">Guardar numeral 2</button>
+        <button form="<?= e($sectorFormId) ?>" class="btn-primary min-h-11" type="submit">Guardar numeral 2</button>
     </div>
-</form>
-<?php require BASE_PATH . '/app/Views/appraisals/sector-photo-tabs.php'; ?>
+</section>

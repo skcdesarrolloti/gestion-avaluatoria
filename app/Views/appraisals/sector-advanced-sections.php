@@ -75,6 +75,7 @@ $fmtAdvancedDate = static function ($value): string {
                 <?php endforeach; ?>
             </div>
             <?php require BASE_PATH . '/app/Views/appraisals/sector-advanced-sources.php'; ?>
+            <?php require BASE_PATH . '/app/Views/appraisals/sector-advanced-photos.php'; ?>
         </section>
     <?php endforeach; ?>
 </section>

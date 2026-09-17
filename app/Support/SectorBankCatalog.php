@@ -27,7 +27,6 @@ final class SectorBankCatalog
             '14' => ['Soporte gráfico', ['field_sources']],
             '15' => ['Conclusión sectorial', ['sector_conclusion']],
             '16' => ['Consideraciones generales del sector', ['sector_report_text']],
-            '17' => ['Impresión del documento', ['sector_report_text']],
         ];
     }
 

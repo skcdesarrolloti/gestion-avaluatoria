@@ -372,12 +372,12 @@ try {
         'ficha sectorial avanzada queda dentro del avaluo');
     $sectorBank->saveAdvancedSections($neighborhoodId, $advancedSectorData);
     $bankAdvanced = $sectorBank->sections($neighborhoodId);
-    expect(count($bankAdvanced) === 17, 'banco barrial recibe secciones avanzadas del avaluo');
+    expect(count($bankAdvanced) === 16, 'banco barrial recibe secciones avanzadas del avaluo');
     $profileVersion = new ReflectionMethod(SectorBankRepository::class, 'profileVersion');
     $profileVersion->setAccessible(true);
     expect($profileVersion->invoke($sectorBank, $neighborhoodId) === 2,
         'instantanea sectorial toma version del banco');
-    expect(count(SectorBankCatalog::sections()) === 17
+    expect(count(SectorBankCatalog::sections()) === 16
         && (SectorBankCatalog::sections()['05'][0] ?? '') === 'Normatividad urbanística',
         'banco sectorial conserva secciones avanzadas');
     $photoRecordId = str_repeat('c', 32);
