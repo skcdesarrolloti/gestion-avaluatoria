@@ -80,6 +80,15 @@ test('prefers target sector over current sector after save', () => {
     );
 });
 
+test('normalizes one digit sector anchors after save', () => {
+    const body = new FormData();
+    body.set('active_sector', 'banco-4');
+    assert.equal(
+        redirectedUrl('https://example.test/public/avaluos/abc/sector', current, body, current),
+        'https://example.test/public/avaluos/abc/sector#banco-04',
+    );
+});
+
 test('syncs hidden csrf field before form post', () => {
     const body = new FormData();
     body.set('_token', 'old');

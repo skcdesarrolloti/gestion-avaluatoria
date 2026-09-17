@@ -80,13 +80,13 @@ async function refreshCsrf() {
 export function redirectedUrl(responseUrl, fallbackUrl, body = null, currentHref = window.location.href) {
     const url = new URL(responseUrl || fallbackUrl, currentHref);
     if (url.hash || !(body instanceof FormData)) return url.toString();
-    const targetSector = body.get('target_sector');
-    if (typeof targetSector === 'string' && /^banco-\d{2}$/.test(targetSector)) {
+    const targetSector = sectorAnchor(body.get('target_sector'));
+    if (targetSector) {
         url.hash = targetSector;
         return url.toString();
     }
-    const activeSector = body.get('active_sector');
-    if (typeof activeSector === 'string' && /^banco-\d{2}$/.test(activeSector)) {
+    const activeSector = sectorAnchor(body.get('active_sector'));
+    if (activeSector) {
         url.hash = activeSector;
         return url.toString();
     }
@@ -97,6 +97,12 @@ export function redirectedUrl(responseUrl, fallbackUrl, body = null, currentHref
         url.hash = target.hash;
     }
     return url.toString();
+}
+
+function sectorAnchor(value) {
+    if (typeof value !== 'string') return '';
+    const match = value.match(/^banco-(\d{1,2})$/);
+    return match ? `banco-${match[1].padStart(2, '0')}` : '';
 }
 
 function appRouteUrl(value, targetUrl, currentHref) {

@@ -155,18 +155,10 @@ $sectorFormId = 'sector-form';
     <?= csrf_field() ?>
 </form>
 <section class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
-    x-data="{
-        sectionCodes: <?= e($bankSectionCodesJson) ?>,
-        activeBankSection: (location.hash.match(/^#banco-(\d{2})$/) || [])[1] || '01',
-        afterSectorSave: '',
-        nextBankSection() { const i = this.sectionCodes.indexOf(this.activeBankSection); return this.sectionCodes[i + 1] || ''; },
-        targetSector() { const next = this.nextBankSection(); return next ? 'banco-' + next : 'bien-sujeto'; },
-        advanceLabel() { const next = this.nextBankSection(); return next ? 'Guardar y pasar a 2.' + parseInt(next, 10) : 'Guardar y pasar al numeral 3'; },
-        prepareSectorSave() { this.afterSectorSave = this.targetSector() === 'bien-sujeto' ? 'bien-sujeto' : ''; this.$refs.afterSectorSave.value = this.afterSectorSave; }
-    }">
+    x-data="sectorBankTabs(<?= e($bankSectionCodesJson) ?>)">
     <input form="<?= e($sectorFormId) ?>" x-ref="activeSector" type="hidden" name="active_sector"
         :value="'banco-' + activeBankSection">
-    <input form="<?= e($sectorFormId) ?>" type="hidden" name="target_sector" :value="targetSector()">
+    <input form="<?= e($sectorFormId) ?>" x-ref="targetSector" type="hidden" name="target_sector" :value="targetSector()">
     <input form="<?= e($sectorFormId) ?>" x-ref="afterSectorSave" type="hidden" name="after_sector_save" :value="afterSectorSave">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>

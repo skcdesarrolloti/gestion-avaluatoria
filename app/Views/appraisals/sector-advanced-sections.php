@@ -54,7 +54,7 @@ $fieldLegend = \App\Support\AppraisalSectorFieldGuidance::legend();
         <?php foreach ($advancedCatalog as $sectionCode => [$sectionTitle]): ?>
             <?php $sectionNumber = '2.' . (int) $sectionCode; ?>
             <button type="button" class="min-h-12 shrink-0 rounded-lg px-4 py-2 text-left text-sm font-semibold"
-                @click="activeBankSection = '<?= e((string) $sectionCode) ?>'; history.replaceState(null, '', '#banco-<?= e((string) $sectionCode) ?>')"
+                @click="selectSection('<?= e((string) $sectionCode) ?>')"
                 :class="activeBankSection === '<?= e((string) $sectionCode) ?>' ? 'bg-teal-700 text-white shadow-sm' : 'bg-white text-teal-800 hover:bg-white/70'">
                 <span class="block text-xs opacity-80"><?= e($sectionNumber) ?></span>
                 <?= e((string) $sectionTitle) ?>
@@ -72,7 +72,7 @@ $fieldLegend = \App\Support\AppraisalSectorFieldGuidance::legend();
         $sectionDate = $fmtAdvancedDate(($row['updated_at'] ?? null) ?: ($bankRow['updated_at'] ?? null));
         $sectionNumber = '2.' . (int) $sectionCode;
         ?>
-        <section class="mt-5 rounded-xl border border-slate-200 p-5 scroll-mt-6"
+        <section id="banco-<?= e((string) $sectionCode) ?>" class="mt-5 rounded-xl border border-slate-200 p-5 scroll-mt-6"
             x-show="activeBankSection === '<?= e((string) $sectionCode) ?>'">
             <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
