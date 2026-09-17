@@ -9,6 +9,7 @@ use App\Services\AppraisalValidator;
 use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalSectorInput;
+use App\Services\AppraisalSectorAdvancedPrefill;
 use App\Services\AppraisalSectorSectionInput;
 use App\Services\AppraisalSectorPrefill;
 use App\Services\AuthDiagnostics;
@@ -326,6 +327,11 @@ try {
         && $prefill['services_status'] === 'completa'
         && $prefill['road_hierarchy'] === 'arterial'
         && str_contains($prefill['sector_report_text'], 'Cartagena'), 'sector precargado desde sujeto');
+    $advancedPrefill = AppraisalSectorAdvancedPrefill::sections(['neighborhood_name' => 'Crespo',
+        'zone_sector' => 'Residencial y servicios aeroportuarios', 'city_name' => 'Cartagena'], $prefill);
+    expect($advancedPrefill['01']['microsector'] === 'Residencial y servicios aeroportuarios'
+        && str_contains($advancedPrefill['01']['fuente_base_satelital'], 'maps/search'),
+        'sector avanzado hereda datos base del barrio');
     $sectorColumnsSql = implode(', ', array_map(static fn (string $key): string => $key . ' TEXT',
         AppraisalSectorCatalog::keys()));
     $db->exec("CREATE TABLE master_sector_profiles (neighborhood_id TEXT PRIMARY KEY,

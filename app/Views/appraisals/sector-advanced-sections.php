@@ -3,6 +3,7 @@ $advancedCatalog = is_array($sectorAdvancedCatalog ?? null) ? $sectorAdvancedCat
 $advancedRows = is_array($sectorAdvancedRows ?? null) ? $sectorAdvancedRows : [];
 $bankRows = array_column(is_array($sectorBankSections ?? null) ? $sectorBankSections : [], null, 'section_code');
 $sectorBankSourcesByKey = array_column(is_array($sectorBankSources ?? null) ? $sectorBankSources : [], null, 0);
+$advancedDefaults = \App\Services\AppraisalSectorAdvancedPrefill::sections($subject ?? [], $sector ?? []);
 $summary = is_array($sectorBankSummary ?? null) ? $sectorBankSummary : [];
 $level = (string) ($summary['level'] ?? 'ROJO');
 $levelClass = $level === 'VERDE' ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
@@ -50,7 +51,9 @@ $fmtAdvancedDate = static function ($value): string {
         <?php
         $row = $advancedRows[$sectionCode] ?? null;
         $bankRow = $bankRows[$sectionCode] ?? null;
-        $sectionValues = $decodeData($row) ?: $decodeData($bankRow);
+        $storedValues = $decodeData($row) ?: $decodeData($bankRow);
+        $sectionValues = \App\Services\AppraisalSectorAdvancedPrefill::merge(
+            $advancedDefaults[(string) $sectionCode] ?? [], $storedValues);
         $sectionStatus = (string) (($row['status'] ?? null) ?: ($bankRow['status'] ?? 'Pendiente'));
         $sectionDate = $fmtAdvancedDate(($row['updated_at'] ?? null) ?: ($bankRow['updated_at'] ?? null));
         ?>
