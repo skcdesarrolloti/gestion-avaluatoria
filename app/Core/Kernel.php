@@ -4,16 +4,9 @@ namespace App\Core;
 use App\Controllers\{AppraisalController, AuthController, DiagnosticController, IgacTypologyController, IfrsStandardController,
     InternationalStandardController, LegalFrameworkController, MaintenanceController, MasterDataController, StandardController, ValuationController};
 use App\Database\Migrator;
-use App\Models\AppraisalRepository;
-use App\Models\AppraisalSubjectRepository;
-use App\Models\AppraiserRepository;
-use App\Models\FuncionarioRepository;
-use App\Models\GeoMasterRepository;
-use App\Models\IgacTypologyRepository;
-use App\Models\IfrsStandardRepository;
-use App\Models\InternationalStandardRepository;
-use App\Models\LegalDocumentRepository;
-use App\Models\ValuationStandardRepository;
+use App\Models\{AppraisalRepository, AppraisalSectorMidasFileRepository, AppraisalSubjectRepository,
+    AppraiserRepository, FuncionarioRepository, GeoMasterRepository, IgacTypologyRepository,
+    IfrsStandardRepository, InternationalStandardRepository, LegalDocumentRepository, ValuationStandardRepository};
 use App\Services\AuthService;
 final class Kernel
 {
@@ -129,9 +122,10 @@ final class Kernel
                     new \App\Models\AppraisalSectorRepository($db),
                     new \App\Models\AppraisalSectorSectionRepository($db), new AppraisalSubjectRepository($db),
                     new \App\Models\NeighborhoodSectorRepository($db), new \App\Models\SectorBankRepository($db),
-                    new GeoMasterRepository($db), $user),
-                'sectorMidas' => new \App\Controllers\AppraisalSectorMidasController(new AppraisalRepository($db), new \App\Models\AppraisalSectorRepository($db),
-                    new \App\Models\AppraisalSectorSectionRepository($db), new AppraisalSubjectRepository($db), new \App\Models\SectorBankRepository($db), $user),
+                    new GeoMasterRepository($db), new AppraisalSectorMidasFileRepository($db), $user),
+                'sectorMidas' => new \App\Controllers\AppraisalSectorMidasController(new AppraisalRepository($db),
+                    new \App\Models\AppraisalSectorRepository($db), new \App\Models\AppraisalSectorSectionRepository($db),
+                    new AppraisalSubjectRepository($db), new \App\Models\SectorBankRepository($db), new AppraisalSectorMidasFileRepository($db), $user),
                 'valuations' => new ValuationController(),
                 default => new AppraisalController(new AppraisalRepository($db), $user,
                     new AppraiserRepository($db), new IgacTypologyRepository(),

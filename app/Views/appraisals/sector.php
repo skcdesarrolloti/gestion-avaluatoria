@@ -147,6 +147,7 @@ $sectorFormId = 'sector-form';
             </p>
         </div>
     </div>
+    <?php require BASE_PATH . '/app/Views/appraisals/sector-midas-support.php'; ?>
 </section>
 
 <?php require BASE_PATH . '/app/Views/appraisals/sector-midas-review.php'; ?>

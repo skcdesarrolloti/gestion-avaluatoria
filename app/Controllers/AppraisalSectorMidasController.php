@@ -3,8 +3,8 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, Session};
 use App\Models\{AppraisalRepository, AppraisalSectorRepository, AppraisalSectorSectionRepository,
-    AppraisalSubjectRepository, SectorBankRepository};
-use App\Services\{AppraisalMidasReview, AppraisalSectorAdvancedPrefill};
+    AppraisalSectorMidasFileRepository, AppraisalSubjectRepository, SectorBankRepository};
+use App\Services\{AppraisalMidasReview, AppraisalMidasSupportUploadService, AppraisalSectorAdvancedPrefill};
 use App\Support\AppraisalSectorAdvancedCatalog;
 
 final class AppraisalSectorMidasController
@@ -12,7 +12,7 @@ final class AppraisalSectorMidasController
     public function __construct(
         private AppraisalRepository $appraisals, private AppraisalSectorRepository $sectors,
         private AppraisalSectorSectionRepository $sections, private AppraisalSubjectRepository $subjects,
-        private SectorBankRepository $bank, private array $user
+        private SectorBankRepository $bank, private AppraisalSectorMidasFileRepository $midasFiles, private array $user
     ) {}
 
     public function consult(string $id): never
@@ -32,6 +32,42 @@ final class AppraisalSectorMidasController
             Session::flash('sector_error', $error->getMessage());
         }
         Http::redirect('avaluos/' . $id . '/sector#midas-review');
+    }
+
+    public function uploadSupport(string $id): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        try {
+            $subject = $this->subjects->find($id, $this->user['id']);
+            $record = (new AppraisalMidasSupportUploadService())->store($_FILES['midas_support'] ?? [],
+                $id, $this->user['id'], (string) ($subject['neighborhood_id'] ?? ''), $this->midasFiles,
+                trim((string) ($_POST['layer_group'] ?? 'Otro soporte MIDAS')), (string) ($_POST['notes'] ?? ''));
+            Session::flash('sector_midas_file_message', 'Soporte MIDAS cargado: ' . $record['source_filename'] . '.');
+        } catch (\Throwable $error) {
+            Session::flash('sector_midas_file_error', $error->getMessage());
+        }
+        Http::redirect('avaluos/' . $id . '/sector#midas-soportes');
+    }
+
+    public function supportFile(string $id, string $fileId): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        $file = $this->midasFiles->find($fileId, $id, $this->user['id']);
+        $path = AppraisalSectorMidasFileRepository::path((string) $file['storage_filename']);
+        $blob = $file['file_blob'] ?? null;
+        if (!is_file($path) && !is_string($blob)) throw new \App\Core\HttpException(404, 'No se encontró el soporte MIDAS.');
+        while (ob_get_level() > 0) ob_end_clean();
+        header('Content-Type: ' . ($file['mime_type'] ?: 'application/octet-stream'));
+        header('Content-Disposition: attachment; filename="' . basename((string) $file['source_filename']) . '"');
+        header('X-Content-Type-Options: nosniff');
+        if (is_file($path)) {
+            header('Content-Length: ' . filesize($path));
+            readfile($path);
+        } else {
+            header('Content-Length: ' . strlen($blob));
+            echo $blob;
+        }
+        exit;
     }
 
     public function apply(string $id): never

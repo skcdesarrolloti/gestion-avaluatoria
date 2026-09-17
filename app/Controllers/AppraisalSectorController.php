@@ -1,20 +1,19 @@
 <?php
 declare(strict_types=1);
 namespace App\Controllers;
-use App\Core\Http;
-use App\Core\Session;
+use App\Core\{Http, Session};
 use App\Models\{AppraisalRepository, AppraisalSectorRepository, AppraisalSectorSectionRepository,
-    AppraisalSubjectRepository, GeoMasterRepository, NeighborhoodSectorRepository, SectorBankRepository};
+    AppraisalSectorMidasFileRepository, AppraisalSubjectRepository, GeoMasterRepository, NeighborhoodSectorRepository, SectorBankRepository};
 use App\Services\{AppraisalPhotoUploadService, AppraisalSectorInput, AppraisalSectorPrefill, AppraisalSectorRedirect,
     AppraisalSectorSectionInput, GeoNeighborhoodResolver};
 use App\Support\{AppraisalSectorAdvancedCatalog, AppraisalSectorCatalog, SectorBankCatalog};
-
 final class AppraisalSectorController
 {
     public function __construct(
         private AppraisalRepository $appraisals, private AppraisalSectorRepository $sectors,
         private AppraisalSectorSectionRepository $sectorSections, private AppraisalSubjectRepository $subjects,
-        private NeighborhoodSectorRepository $neighborhoodSectors, private SectorBankRepository $sectorBank, private GeoMasterRepository $geo, private array $user
+        private NeighborhoodSectorRepository $neighborhoodSectors, private SectorBankRepository $sectorBank, private GeoMasterRepository $geo,
+        private AppraisalSectorMidasFileRepository $midasFiles, private array $user
     ) {}
 
     public function show(string $id): void
@@ -63,11 +62,14 @@ final class AppraisalSectorController
             'sectorBankSections' => $bankSections,
             'sectorBankSummary' => $bankSummary,
             'sectorAdvancedRows' => $advancedRows,
+            'sectorMidasFiles' => $this->midasFiles->forAppraisal($id, $this->user['id']),
             'sectorAdvancedCatalog' => AppraisalSectorAdvancedCatalog::sections(),
             'sectorBankSources' => SectorBankCatalog::sources(),
             'photos' => $this->appraisals->photos($id, $this->user['id']),
             'photoMessage' => Session::pullFlash('sector_photo_message'),
             'photoError' => Session::pullFlash('sector_photo_error'),
+            'midasFileMessage' => Session::pullFlash('sector_midas_file_message'),
+            'midasFileError' => Session::pullFlash('sector_midas_file_error'),
             'sectorSections' => AppraisalSectorCatalog::sections(),
             'sectorOptions' => AppraisalSectorCatalog::options(),
             'sectorHelps' => AppraisalSectorCatalog::helps(),

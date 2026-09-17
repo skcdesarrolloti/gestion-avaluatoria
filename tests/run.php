@@ -10,6 +10,7 @@ use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalSectorInput;
 use App\Services\AppraisalMidasReview;
+use App\Services\AppraisalMidasSupportUploadService;
 use App\Services\AppraisalSectorAdvancedPrefill;
 use App\Services\AppraisalSectorSectionInput;
 use App\Services\AppraisalSectorPrefill;
@@ -36,6 +37,7 @@ use App\Models\InternationalStandardRepository;
 use App\Models\LegalDocumentRepository;
 use App\Models\NeighborhoodSectorRepository;
 use App\Models\AppraisalSectorSectionRepository;
+use App\Models\AppraisalSectorMidasFileRepository;
 use App\Models\SectorBankRepository;
 use App\Models\ValuationStandardRepository;
 use App\Support\AppraisalSectorCatalog;
@@ -447,6 +449,10 @@ try {
         appraisal_id TEXT, owner_id INTEGER, neighborhood_id TEXT, section_code TEXT,
         section_title TEXT, status TEXT, version INTEGER DEFAULT 1, data_json TEXT,
         content_text TEXT, updated_at TEXT, UNIQUE(appraisal_id, section_code))");
+    $db->exec("CREATE TABLE appraisal_sector_midas_files (id TEXT PRIMARY KEY, appraisal_id TEXT,
+        owner_id INTEGER, neighborhood_id TEXT, layer_group TEXT, source_filename TEXT,
+        storage_filename TEXT, mime_type TEXT, file_size_bytes INTEGER, notes TEXT,
+        file_blob BLOB, created_at TEXT)");
     $neighborhoodSectors = new NeighborhoodSectorRepository($db);
     $sectorBank = new SectorBankRepository($db);
     $neighborhoodId = str_repeat('e', 32);
@@ -485,6 +491,20 @@ try {
     expect(count(SectorBankCatalog::sections()) === 16
         && (SectorBankCatalog::sections()['05'][0] ?? '') === 'Normatividad urbanística',
         'banco sectorial conserva secciones avanzadas');
+    $midasDir = sys_get_temp_dir() . '/ga_midas_' . bin2hex(random_bytes(4));
+    putenv('APPRAISAL_MIDAS_STORAGE_DIR=' . $midasDir);
+    $tmpMidasPdf = tempnam(sys_get_temp_dir(), 'ga_midas_pdf_');
+    file_put_contents($tmpMidasPdf, "%PDF-1.4\n%midas\n");
+    $midasFiles = new AppraisalSectorMidasFileRepository($db);
+    $uploadedMidas = (new AppraisalMidasSupportUploadService())->store(
+        uploadFixture('pdf_descargas_division_politica_barrios.pdf', $tmpMidasPdf),
+        str_repeat('f', 32), 1, $neighborhoodId, $midasFiles, 'Barrios / división política', 'Capa revisada');
+    $storedMidasFiles = $midasFiles->forAppraisal(str_repeat('f', 32), 1);
+    expect(count($storedMidasFiles) === 1 && $storedMidasFiles[0]['id'] === $uploadedMidas['id']
+        && $storedMidasFiles[0]['file_available'] === true, 'soporte MIDAS queda asociado al avaluo');
+    unlink(AppraisalSectorMidasFileRepository::path($storedMidasFiles[0]['storage_filename']));
+    rmdir($midasDir);
+    putenv('APPRAISAL_MIDAS_STORAGE_DIR');
     $photoRecordId = str_repeat('c', 32);
     $photoUnitId = str_repeat('d', 32);
     $photoController = (new ReflectionClass(AppraisalController::class))->newInstanceWithoutConstructor();
