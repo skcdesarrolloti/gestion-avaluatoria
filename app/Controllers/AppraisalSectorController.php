@@ -5,7 +5,8 @@ use App\Core\Http;
 use App\Core\Session;
 use App\Models\{AppraisalRepository, AppraisalSectorRepository, AppraisalSectorSectionRepository,
     AppraisalSubjectRepository, GeoMasterRepository, NeighborhoodSectorRepository, SectorBankRepository};
-use App\Services\{AppraisalPhotoUploadService, AppraisalSectorInput, AppraisalSectorPrefill, AppraisalSectorSectionInput, GeoNeighborhoodResolver};
+use App\Services\{AppraisalPhotoUploadService, AppraisalSectorInput, AppraisalSectorPrefill, AppraisalSectorRedirect,
+    AppraisalSectorSectionInput, GeoNeighborhoodResolver};
 use App\Support\{AppraisalSectorAdvancedCatalog, AppraisalSectorCatalog, SectorBankCatalog};
 
 final class AppraisalSectorController
@@ -92,11 +93,7 @@ final class AppraisalSectorController
         } catch (\Throwable $error) {
             Session::flash('sector_error', $error->getMessage());
         }
-        if ((string) ($_POST['after_sector_save'] ?? '') === 'bien-sujeto') Http::redirect('avaluos/' . $id . '/bien-sujeto');
-        $hash = preg_match('/^(?:[a-z_]+|banco-\d{2})$/', (string) ($_POST['active_sector'] ?? ''))
-            ? '#' . (string) $_POST['active_sector']
-            : '';
-        Http::redirect('avaluos/' . $id . '/sector' . $hash);
+        AppraisalSectorRedirect::afterSave($id, $_POST);
     }
     public function selectNeighborhood(string $id): never
     {

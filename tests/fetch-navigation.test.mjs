@@ -70,6 +70,16 @@ test('keeps active sector hash after post redirects', () => {
     );
 });
 
+test('prefers target sector over current sector after save', () => {
+    const body = new FormData();
+    body.set('active_sector', 'banco-01');
+    body.set('target_sector', 'banco-02');
+    assert.equal(
+        redirectedUrl('https://example.test/public/avaluos/abc/sector', current, body, current),
+        'https://example.test/public/avaluos/abc/sector#banco-02',
+    );
+});
+
 test('syncs hidden csrf field before form post', () => {
     const body = new FormData();
     body.set('_token', 'old');
