@@ -13,13 +13,19 @@ final class MidasWfsLayerAnalyzer
 
     public static function fromCollections(array $collections, string $name): array
     {
-        $neighborhood = MidasWfsSearch::neighborhoodFeature($collections['barrios'] ?? [], $name);
-        if ($neighborhood === []) return [];
-        $hits = [];
-        foreach (self::layerKeys() as $key) {
-            $hits[$key] = self::matching($collections[$key] ?? [], $neighborhood);
+        $hits = self::hits($collections, $name);
+        return $hits === [] ? [] : self::toSuggestions($hits);
+    }
+
+    public static function summary(array $collections, string $name): array
+    {
+        $hits = self::hits($collections, $name);
+        $summary = [];
+        foreach ($hits as $key => $features) {
+            $summary[$key] = ['title' => MidasWfsLayerCatalog::layers()[$key]['title'] ?? $key,
+                'hits' => count($features)];
         }
-        return self::toSuggestions($hits);
+        return $summary;
     }
 
     private static function toSuggestions(array $hits): array
@@ -114,6 +120,17 @@ final class MidasWfsLayerAnalyzer
         $features = is_array($collection['features'] ?? null) ? $collection['features'] : [];
         return array_values(array_filter($features,
             static fn ($feature): bool => is_array($feature) && MidasGeometry::intersectsFeature($feature, $neighborhood)));
+    }
+
+    private static function hits(array $collections, string $name): array
+    {
+        $neighborhood = MidasWfsSearch::neighborhoodFeature($collections['barrios'] ?? [], $name);
+        if ($neighborhood === []) return [];
+        $hits = [];
+        foreach (self::layerKeys() as $key) {
+            $hits[$key] = self::matching($collections[$key] ?? [], $neighborhood);
+        }
+        return $hits;
     }
 
     private static function countText(array $features, string $prefix, array $names = []): string

@@ -21,10 +21,13 @@ final class AppraisalSectorMidasController
         try {
             $subject = $this->subjects->find($id, $this->user['id']);
             if (empty($subject['neighborhood_id'])) throw new \InvalidArgumentException('Primero carga el barrio.');
-            $stats = AppraisalMidasReview::stats(AppraisalMidasReview::suggestions($subject));
+            $suggestions = AppraisalMidasReview::suggestions($subject);
+            $stats = AppraisalMidasReview::stats($suggestions);
+            $diagnostics = AppraisalMidasReview::diagnostics();
             Session::flash('sector_midas_review', '1');
             Session::flash('sector_message', 'Consulta MIDAS preparada: se encontraron '
-                . $stats['fields'] . ' datos sugeridos en ' . $stats['sections'] . ' pestañas. Revisa antes de aplicar.');
+                . $stats['fields'] . ' datos sugeridos en ' . $stats['sections'] . ' pestañas. '
+                . ($diagnostics ? $diagnostics[0] . ' ' : '') . 'Revisa antes de aplicar.');
         } catch (\Throwable $error) {
             Session::flash('sector_error', $error->getMessage());
         }

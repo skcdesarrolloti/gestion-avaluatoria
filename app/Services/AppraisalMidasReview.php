@@ -58,6 +58,11 @@ final class AppraisalMidasReview
             'pending' => array_sum(array_map('count', self::pending($suggestions)))];
     }
 
+    public static function diagnostics(): array
+    {
+        return MidasWfsSearch::diagnostics();
+    }
+
     public static function pending(array $suggestions): array
     {
         $pending = [];

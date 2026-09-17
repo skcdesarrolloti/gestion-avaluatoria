@@ -4,23 +4,50 @@ namespace App\Services;
 
 final class MidasWfsSearch
 {
+    private static array $diagnostics = [];
+
     public static function suggestions(array $subject): array
     {
-        if (PHP_SAPI === 'cli') return [];
+        self::$diagnostics = [];
+        if (PHP_SAPI === 'cli') {
+            self::$diagnostics[] = 'Consulta WFS omitida en pruebas CLI.';
+            return [];
+        }
         $name = trim((string) ($subject['neighborhood_name'] ?? ''));
-        if ($name === '') return [];
+        if ($name === '') {
+            self::$diagnostics[] = 'No hay barrio de trabajo para consultar.';
+            return [];
+        }
         $json = self::request(MidasWfsLayerCatalog::url('barrios'));
-        if (!is_array($json)) return [];
+        if (!is_array($json)) {
+            self::$diagnostics[] = 'No fue posible leer la capa Barrios de MIDAS/WFS; se conserva ficha base o manual.';
+            return [];
+        }
         $base = self::fromFeatureCollection($json, $name);
         $neighborhood = self::neighborhoodFeature($json, $name);
         $bbox = MidasGeometry::bbox(is_array($neighborhood['geometry'] ?? null) ? $neighborhood['geometry'] : []);
-        if ($neighborhood === [] || !$bbox) return $base;
+        if ($neighborhood === [] || !$bbox) {
+            self::$diagnostics[] = 'MIDAS no entregó polígono útil para cruzar capas del barrio.';
+            return $base;
+        }
         $collections = ['barrios' => $json];
+        $attempted = 0;
+        $loaded = 0;
         foreach (MidasWfsLayerAnalyzer::layerKeys() as $key) {
+            $attempted++;
             $layer = self::request(MidasWfsLayerCatalog::url($key, 'application/json', $bbox));
-            if (is_array($layer)) $collections[$key] = $layer;
+            if (is_array($layer)) {
+                $loaded++;
+                $collections[$key] = $layer;
+            }
         }
         $layers = MidasWfsLayerAnalyzer::fromCollections($collections, $name);
+        self::$diagnostics[] = 'Capas MIDAS consultadas con filtro del barrio: ' . $attempted
+            . '; respuestas utilizables: ' . $loaded . '.';
+        foreach (MidasWfsLayerAnalyzer::summary($collections, $name) as $row) {
+            if (($row['hits'] ?? 0) > 0) self::$diagnostics[] = $row['title'] . ': ' . $row['hits'] . ' coincidencia(s).';
+        }
+        if ($layers === []) self::$diagnostics[] = 'No se detectaron intersecciones automáticas en capas complementarias.';
         return $layers === [] ? $base : array_replace_recursive($base, $layers);
     }
 
@@ -56,6 +83,11 @@ final class MidasWfsSearch
     public static function neighborhoodFeature(array $json, string $name): array
     {
         return self::bestFeature($json, $name);
+    }
+
+    public static function diagnostics(): array
+    {
+        return self::$diagnostics;
     }
 
     private static function request(string $url): ?array

@@ -14,6 +14,7 @@ if ($showMidasReview):
         $midasCurrent[(string) $midasCode] = array_replace($midasCurrent[(string) $midasCode] ?? [], $decodeMidasRow($midasRow));
     }
     $midasSuggestions = AppraisalMidasReview::suggestions($subject ?? []);
+    $midasDiagnostics = AppraisalMidasReview::diagnostics();
     $midasRows = AppraisalMidasReview::rows($midasCurrent, $midasSuggestions);
     $midasStats = AppraisalMidasReview::stats($midasSuggestions);
     $midasLabels = [];
@@ -46,6 +47,18 @@ if ($showMidasReview):
         </p>
         <button class="btn-primary min-h-11" type="submit">Aplicar solo campos vacíos</button>
     </form>
+    <?php if ($midasDiagnostics): ?>
+        <details class="mt-4 rounded-xl border border-emerald-200 bg-white">
+            <summary class="min-h-11 cursor-pointer px-4 py-3 text-sm font-semibold text-emerald-900">
+                Ver diagnóstico de consulta por capas
+            </summary>
+            <ul class="space-y-2 border-t border-emerald-100 px-4 py-3 text-sm leading-6 text-slate-700">
+                <?php foreach ($midasDiagnostics as $diagnostic): ?>
+                    <li><?= e($diagnostic) ?></li>
+                <?php endforeach; ?>
+            </ul>
+        </details>
+    <?php endif; ?>
     <details class="mt-5 rounded-xl border border-emerald-200 bg-white">
         <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-emerald-900">
             <span>Ver detalle MIDAS encontrado</span>
