@@ -2,6 +2,11 @@
 $advancedCatalog = is_array($sectorAdvancedCatalog ?? null) ? $sectorAdvancedCatalog : [];
 $advancedRows = is_array($sectorAdvancedRows ?? null) ? $sectorAdvancedRows : [];
 $bankRows = array_column(is_array($sectorBankSections ?? null) ? $sectorBankSections : [], null, 'section_code');
+$sectorBankSourcesByKey = array_column(is_array($sectorBankSources ?? null) ? $sectorBankSources : [], null, 0);
+$summary = is_array($sectorBankSummary ?? null) ? $sectorBankSummary : [];
+$level = (string) ($summary['level'] ?? 'ROJO');
+$levelClass = $level === 'VERDE' ? 'bg-emerald-50 text-emerald-800 border-emerald-200'
+    : ($level === 'AMARILLO' ? 'bg-amber-50 text-amber-800 border-amber-200' : 'bg-red-50 text-red-800 border-red-200');
 $decodeData = static function (?array $row): array {
     if (!$row || empty($row['data_json'])) return [];
     $data = json_decode((string) $row['data_json'], true);
@@ -27,14 +32,14 @@ $fmtAdvancedDate = static function ($value): string {
                 del mismo barrio, y este expediente conserva su propia copia fechada.
             </p>
         </div>
-        <span class="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-800">
-            <?= e((string) count($advancedCatalog)) ?> secciones
+        <span class="rounded-full border px-3 py-1 text-sm font-semibold <?= e($levelClass) ?>">
+            <?= e($level) ?> · <?= e((string) ($summary['ready'] ?? 0)) ?>/<?= e((string) count($advancedCatalog)) ?>
         </span>
     </div>
     <nav class="mt-5 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Secciones avanzadas del barrio">
         <?php foreach ($advancedCatalog as $sectionCode => [$sectionTitle]): ?>
             <button type="button" class="min-h-12 shrink-0 rounded-lg px-4 py-2 text-left text-sm font-semibold"
-                @click="activeBankSection = '<?= e((string) $sectionCode) ?>'"
+                @click="activeBankSection = '<?= e((string) $sectionCode) ?>'; history.replaceState(null, '', '#banco-<?= e((string) $sectionCode) ?>')"
                 :class="activeBankSection === '<?= e((string) $sectionCode) ?>' ? 'bg-teal-700 text-white shadow-sm' : 'bg-white text-teal-800 hover:bg-white/70'">
                 <span class="block text-xs opacity-80"><?= e((string) $sectionCode) ?></span>
                 <?= e((string) $sectionTitle) ?>
@@ -69,6 +74,7 @@ $fmtAdvancedDate = static function ($value): string {
                     ?>
                 <?php endforeach; ?>
             </div>
+            <?php require BASE_PATH . '/app/Views/appraisals/sector-advanced-sources.php'; ?>
         </section>
     <?php endforeach; ?>
 </section>

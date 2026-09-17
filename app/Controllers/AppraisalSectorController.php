@@ -6,7 +6,7 @@ use App\Core\Session;
 use App\Models\{AppraisalRepository, AppraisalSectorRepository, AppraisalSectorSectionRepository,
     AppraisalSubjectRepository, GeoMasterRepository, NeighborhoodSectorRepository, SectorBankRepository};
 use App\Services\{AppraisalPhotoUploadService, AppraisalSectorInput, AppraisalSectorPrefill,
-    AppraisalSectorSectionInput};
+    AppraisalSectorSectionInput, GeoNeighborhoodResolver};
 use App\Support\{AppraisalSectorAdvancedCatalog, AppraisalSectorCatalog, SectorBankCatalog};
 
 final class AppraisalSectorController
@@ -98,7 +98,7 @@ final class AppraisalSectorController
         } catch (\Throwable $error) {
             Session::flash('sector_error', $error->getMessage());
         }
-        $hash = preg_match('/^[a-z_]+$/', (string) ($_POST['active_sector'] ?? ''))
+        $hash = preg_match('/^(?:[a-z_]+|banco-\d{2})$/', (string) ($_POST['active_sector'] ?? ''))
             ? '#' . (string) $_POST['active_sector']
             : '';
         Http::redirect('avaluos/' . $id . '/sector' . $hash);
@@ -108,7 +108,7 @@ final class AppraisalSectorController
     {
         $this->appraisals->find($id, $this->user['id']);
         try {
-            $neighborhoodId = $this->resolveNeighborhoodId();
+            $neighborhoodId = GeoNeighborhoodResolver::id($_POST, $this->geo->neighborhoods());
             if ($neighborhoodId === '') {
                 throw new \InvalidArgumentException('Selecciona un barrio válido.');
             }
@@ -137,6 +137,26 @@ final class AppraisalSectorController
         Http::redirect('avaluos/' . $id . '/sector');
     }
 
+    public function refreshSources(string $id): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        try {
+            $subject = $this->subjects->find($id, $this->user['id']);
+            $neighborhoodId = (string) ($subject['neighborhood_id'] ?? '');
+            if ($neighborhoodId === '') {
+                throw new \InvalidArgumentException('Primero selecciona el barrio del avalúo.');
+            }
+            $sector = $this->sectors->find($id, $this->user['id']);
+            $this->sectorBank->ensureSections($neighborhoodId, $subject, $sector);
+            $this->sectorBank->saveSnapshot($id, $this->user['id'], $neighborhoodId, $sector);
+            Session::flash('sector_message',
+                'Fuentes del barrio actualizadas sin sobrescribir la información manual guardada.');
+        } catch (\Throwable $error) {
+            Session::flash('sector_error', $error->getMessage());
+        }
+        Http::redirect('avaluos/' . $id . '/sector#banco-01');
+    }
+
     public function uploadPhotos(string $id): never
     {
         $record = $this->appraisals->find($id, $this->user['id']);
@@ -163,32 +183,6 @@ final class AppraisalSectorController
         return [array_replace($empty, AppraisalSectorPrefill::fromSubject($subject)), 'bien_sujeto', null];
     }
 
-    private function resolveNeighborhoodId(): string
-    {
-        $neighborhoodId = trim((string) ($_POST['neighborhood_id'] ?? ''));
-        if ($neighborhoodId !== '') return mb_substr($neighborhoodId, 0, 80);
-
-        $query = mb_strtolower(trim((string) ($_POST['neighborhood_query'] ?? '')));
-        if ($query === '') return '';
-
-        $matches = [];
-        foreach ($this->geo->neighborhoods() as $item) {
-            $label = mb_strtolower(trim(implode(' · ', array_filter([
-                $item['name'] ?? '',
-                $item['locality_name'] ?? '',
-                $item['commune_ucg'] ?? '',
-                $item['city_name'] ?? '',
-            ]))));
-            $name = mb_strtolower((string) ($item['name'] ?? ''));
-            if ($label === $query || $name === $query) return (string) $item['id'];
-            if (str_contains($label, $query) || str_contains($name, $query)) {
-                $matches[(string) $item['id']] = (string) $item['id'];
-            }
-        }
-
-        return count($matches) === 1 ? array_key_first($matches) : '';
-    }
-
     private function safeMasterSector(string $neighborhoodId, ?string &$sectorError): ?array
     {
         try {
@@ -202,7 +196,7 @@ final class AppraisalSectorController
     private function safeReturn(string $id): string
     {
         $target = (string) ($_POST['return_to'] ?? '');
-        return preg_match('#^avaluos/' . preg_quote($id, '#') . '/sector(?:\#[a-z_]+)?$#', $target)
+        return preg_match('#^avaluos/' . preg_quote($id, '#') . '/sector(?:\#[a-z0-9_-]+)?$#', $target)
             ? $target
             : 'avaluos/' . $id . '/sector#localizacion';
     }

@@ -180,17 +180,11 @@ try {
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
         ->execute([$seedStyleNeighborhoodId, $cityId, null, 'Crespo', 'UCG 1',
             'Residencial y servicios aeroportuarios', 'Si', '', date('c'), date('c')]);
-    $sectorController = (new ReflectionClass(\App\Controllers\AppraisalSectorController::class))->newInstanceWithoutConstructor();
-    $geoProperty = new ReflectionProperty(\App\Controllers\AppraisalSectorController::class, 'geo');
-    $geoProperty->setAccessible(true);
-    $geoProperty->setValue($sectorController, $geo);
-    $resolveNeighborhood = new ReflectionMethod(\App\Controllers\AppraisalSectorController::class, 'resolveNeighborhoodId');
-    $resolveNeighborhood->setAccessible(true);
-    $_POST = ['neighborhood_id' => $seedStyleNeighborhoodId];
-    expect($resolveNeighborhood->invoke($sectorController) === $seedStyleNeighborhoodId,
+    $resolveNeighborhood = static fn (array $input): string =>
+        \App\Services\GeoNeighborhoodResolver::id($input, $geo->neighborhoods());
+    expect($resolveNeighborhood(['neighborhood_id' => $seedStyleNeighborhoodId]) === $seedStyleNeighborhoodId,
         'sector acepta id barrial semilla no hexadecimal');
-    $_POST = ['neighborhood_query' => 'Crespo'];
-    expect($resolveNeighborhood->invoke($sectorController) === $seedStyleNeighborhoodId,
+    expect($resolveNeighborhood(['neighborhood_query' => 'Crespo']) === $seedStyleNeighborhoodId,
         'sector resuelve barrio por texto cuando la tarjeta no envia id');
     $seedB1 = require dirname(__DIR__) . '/database/migrations/202609150007_seed_b1_urban_legal_bibliography.php';
     $seedB1(new Schema($db));
