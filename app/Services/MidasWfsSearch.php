@@ -10,12 +10,23 @@ final class MidasWfsSearch
         $name = trim((string) ($subject['neighborhood_name'] ?? ''));
         if ($name === '') return [];
         $json = self::request(MidasWfsLayerCatalog::url('barrios'));
-        return is_array($json) ? self::fromFeatureCollection($json, $name) : [];
+        if (!is_array($json)) return [];
+        $base = self::fromFeatureCollection($json, $name);
+        $neighborhood = self::neighborhoodFeature($json, $name);
+        $bbox = MidasGeometry::bbox(is_array($neighborhood['geometry'] ?? null) ? $neighborhood['geometry'] : []);
+        if ($neighborhood === [] || !$bbox) return $base;
+        $collections = ['barrios' => $json];
+        foreach (MidasWfsLayerAnalyzer::layerKeys() as $key) {
+            $layer = self::request(MidasWfsLayerCatalog::url($key, 'application/json', $bbox));
+            if (is_array($layer)) $collections[$key] = $layer;
+        }
+        $layers = MidasWfsLayerAnalyzer::fromCollections($collections, $name);
+        return $layers === [] ? $base : array_replace_recursive($base, $layers);
     }
 
     public static function fromFeatureCollection(array $json, string $name): array
     {
-        $record = self::bestFeature($json, $name);
+        $record = self::neighborhoodFeature($json, $name);
         if ($record === []) return [];
         $flat = self::flatten($record);
         $section = [
@@ -40,6 +51,11 @@ final class MidasWfsSearch
             ];
         }
         return $suggestions;
+    }
+
+    public static function neighborhoodFeature(array $json, string $name): array
+    {
+        return self::bestFeature($json, $name);
     }
 
     private static function request(string $url): ?array

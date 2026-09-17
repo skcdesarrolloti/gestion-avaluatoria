@@ -20,6 +20,8 @@ use App\Services\InternationalStandardFileImportService;
 use App\Services\LegalDocumentFileImportService;
 use App\Services\LegalDocumentImportService;
 use App\Services\MidasLayerPlan;
+use App\Services\MidasGeometry;
+use App\Services\MidasWfsLayerAnalyzer;
 use App\Services\MidasWfsLayerCatalog;
 use App\Services\MidasWfsSearch;
 use App\Services\RateLimiter;
@@ -380,16 +382,48 @@ try {
     expect(str_contains($paraderosUrl, 'map=transcaribe')
         && str_contains($paraderosUrl, 'TYPENAME=Transcaribe_Paraderos'),
         'catalogo WFS construye URL de capa tecnica');
+    expect(str_contains(MidasWfsLayerCatalog::url('paraderos', 'application/json', [-75.6, 10.3, -75.5, 10.4]),
+        'BBOX=-75.6,10.3,-75.5,10.4,EPSG%3A4326') || str_contains(MidasWfsLayerCatalog::url('paraderos',
+        'application/json', [-75.6, 10.3, -75.5, 10.4]), 'BBOX=-75.6,10.3,-75.5,10.4,EPSG:4326'),
+        'catalogo WFS permite filtrar por caja del barrio');
     $wfsFixture = ['features' => [[
         'properties' => ['barrio' => 'Castillogrande', 'localidad' => 'Histórica y del Caribe Norte',
             'ucg' => 'UCG 1', 'fuente' => 'Decreto 0977 de 2001 (POT) - Acuerdo 006 de 2003',
             'area_ha' => '41.96', 'perimetro_m' => '4358.82'],
+        'geometry' => ['type' => 'Polygon', 'coordinates' => [[[-75.6, 10.3], [-75.5, 10.3],
+            [-75.5, 10.4], [-75.6, 10.4], [-75.6, 10.3]]]],
     ]]];
     $wfsParsed = MidasWfsSearch::fromFeatureCollection($wfsFixture, 'Castillogrande');
     expect(($wfsParsed['01']['area_hectareas'] ?? '') === '41,96'
         && ($wfsParsed['01']['perimetro_metros'] ?? '') === '4.358,82'
         && ($wfsParsed['05']['norma_base'] ?? '') !== '',
         'busqueda WFS interpreta ficha territorial de MIDAS');
+    $inside = ['geometry' => ['type' => 'Point', 'coordinates' => [-75.55, 10.35]]];
+    $outside = ['geometry' => ['type' => 'Point', 'coordinates' => [-75.7, 10.45]]];
+    expect(MidasGeometry::intersectsFeature($inside, $wfsFixture['features'][0]) === true
+        && MidasGeometry::intersectsFeature($outside, $wfsFixture['features'][0]) === false,
+        'geometria MIDAS distingue puntos dentro y fuera del barrio');
+    $layerParsed = MidasWfsLayerAnalyzer::fromCollections([
+        'barrios' => $wfsFixture,
+        'paraderos' => ['features' => [$inside + ['properties' => ['nombre' => 'Paradero Bahía']], $outside]],
+        'rutas' => ['features' => [[
+            'properties' => ['ruta' => 'Ruta C001'],
+            'geometry' => ['type' => 'LineString', 'coordinates' => [[-75.59, 10.31], [-75.51, 10.39]]],
+        ]]],
+        'aseo' => ['features' => [[
+            'properties' => ['empresa' => 'Pacaribe'],
+            'geometry' => ['type' => 'Polygon', 'coordinates' => [[[-75.58, 10.32], [-75.52, 10.32],
+                [-75.52, 10.38], [-75.58, 10.38], [-75.58, 10.32]]]],
+        ]]],
+        'educacion' => ['features' => [[
+            'properties' => ['nombre' => 'Colegio del Sector'],
+            'geometry' => ['type' => 'Point', 'coordinates' => [-75.54, 10.36]],
+        ]]],
+    ], 'Castillogrande');
+    expect(($layerParsed['03']['aseo_prestadores'][0] ?? '') === 'Pacaribe'
+        && str_contains((string) ($layerParsed['11']['detalle_paraderos_transporte'] ?? ''), '(1)')
+        && in_array('Educativo', $layerParsed['07']['equipamientos_seleccionados'] ?? [], true),
+        'analizador WFS cruza capas de servicios movilidad y equipamientos');
     expect(count(AppraisalSectorFieldGuidance::legend()) === 4
         && AppraisalSectorFieldGuidance::field('midas_lectura_manual')['mode'] === 'oficial'
         && AppraisalSectorFieldGuidance::field('observacion_localizacion')['mode'] === 'sugerido',

@@ -63,13 +63,18 @@ final class MidasWfsLayerCatalog
         ];
     }
 
-    public static function url(string $key, string $format = 'application/json'): string
+    public static function url(string $key, string $format = 'application/json', ?array $bbox = null): string
     {
         $layer = self::layers()[$key] ?? null;
         if (!$layer) return '';
-        return self::WFS_BASE . '?map=' . rawurlencode($layer['map'])
+        $url = self::WFS_BASE . '?map=' . rawurlencode($layer['map'])
             . '&VERSION=1.1.0&REQUEST=GETFEATURE&OUTPUTFORMAT=' . rawurlencode($format)
             . '&SRSNAME=EPSG:4326&SERVICE=WFS&TYPENAME=' . rawurlencode($layer['typename']);
+        if ($bbox && count($bbox) === 4) {
+            $url .= '&BBOX=' . implode(',', array_map(static fn (float|int $n): string => (string) $n, $bbox))
+                . ',EPSG:4326';
+        }
+        return $url;
     }
 
     public static function missingModuleFields(): array
