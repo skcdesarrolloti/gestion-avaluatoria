@@ -5,21 +5,15 @@ use App\Core\Http;
 use App\Core\Session;
 use App\Models\{AppraisalRepository, AppraisalSectorRepository, AppraisalSectorSectionRepository,
     AppraisalSubjectRepository, GeoMasterRepository, NeighborhoodSectorRepository, SectorBankRepository};
-use App\Services\{AppraisalPhotoUploadService, AppraisalSectorInput, AppraisalSectorPrefill,
-    AppraisalSectorSectionInput, GeoNeighborhoodResolver};
+use App\Services\{AppraisalPhotoUploadService, AppraisalSectorInput, AppraisalSectorPrefill, AppraisalSectorSectionInput, GeoNeighborhoodResolver};
 use App\Support\{AppraisalSectorAdvancedCatalog, AppraisalSectorCatalog, SectorBankCatalog};
 
 final class AppraisalSectorController
 {
     public function __construct(
-        private AppraisalRepository $appraisals,
-        private AppraisalSectorRepository $sectors,
-        private AppraisalSectorSectionRepository $sectorSections,
-        private AppraisalSubjectRepository $subjects,
-        private NeighborhoodSectorRepository $neighborhoodSectors,
-        private SectorBankRepository $sectorBank,
-        private GeoMasterRepository $geo,
-        private array $user
+        private AppraisalRepository $appraisals, private AppraisalSectorRepository $sectors,
+        private AppraisalSectorSectionRepository $sectorSections, private AppraisalSubjectRepository $subjects,
+        private NeighborhoodSectorRepository $neighborhoodSectors, private SectorBankRepository $sectorBank, private GeoMasterRepository $geo, private array $user
     ) {}
 
     public function show(string $id): void
@@ -167,11 +161,19 @@ final class AppraisalSectorController
         try {
             $caption = mb_substr(trim((string) ($_POST['photo_caption'] ?? 'sector')), 0, 190);
             $displayName = mb_substr(trim((string) ($_POST['photo_name'] ?? '')), 0, 190);
-            $count = (new AppraisalPhotoUploadService())->store($_FILES['photos'] ?? [], $record['id'],
-                $this->user['id'], $this->appraisals, null, $caption, $displayName);
-            Session::flash('sector_photo_message', $count === 1
-                ? 'Imagen sectorial cargada correctamente.'
-                : $count . ' imágenes sectoriales cargadas correctamente.');
+            $url = trim((string) ($_POST['photo_url'] ?? ''));
+            $service = new AppraisalPhotoUploadService();
+            if ($url !== '') {
+                $service->storeFromUrl($url, $record['id'], $this->user['id'], $this->appraisals,
+                    null, $caption, $displayName);
+                Session::flash('sector_photo_message', 'Imagen sectorial importada desde URL.');
+            } else {
+                $count = $service->store($_FILES['photos'] ?? [], $record['id'],
+                    $this->user['id'], $this->appraisals, null, $caption, $displayName);
+                Session::flash('sector_photo_message', $count === 1
+                    ? 'Imagen sectorial cargada correctamente.'
+                    : $count . ' imágenes sectoriales cargadas correctamente.');
+            }
         } catch (\Throwable $error) {
             Session::flash('sector_photo_error', $error->getMessage());
         }

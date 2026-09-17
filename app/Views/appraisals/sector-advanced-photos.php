@@ -33,7 +33,9 @@ $photoRows = $photoSections[(string) $sectionCode] ?? [];
             $photoUploadTitle = $title;
             $photoUploadDescription = $description;
             $photoUploadNamePlaceholder = $placeholder;
+            $photoUploadAllowUrl = true;
             require BASE_PATH . '/app/Views/appraisals/photo-upload.php';
+            unset($photoUploadAllowUrl);
             ?>
         <?php endforeach; ?>
     </div>

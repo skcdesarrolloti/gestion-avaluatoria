@@ -42,6 +42,18 @@ final class AppraisalPhotoUploadService
         return $stored;
     }
 
+    public function storeFromUrl(string $url, string $appraisalId, int $owner, AppraisalRepository $repo,
+        ?string $unitId = null, string $caption = '', string $displayName = ''): void
+    {
+        $remote = AppraisalRemoteImage::fetch($url);
+        try {
+            $this->storeLocalFile($remote['path'], $remote['name'], $appraisalId, $owner, $repo,
+                $unitId, $caption, $displayName);
+        } finally {
+            @unlink($remote['path']);
+        }
+    }
+
     private function flatNested(array $files, string $unitId, string $key): array
     {
         return array_map(static fn (array $values): array => (array) ($values[$unitId][$key] ?? []), $files);
@@ -56,6 +68,22 @@ final class AppraisalPhotoUploadService
         $storage = 'foto-' . $appraisalId . '-' . $photoId . '.' . $info['extension'];
         $bytes = AppraisalPhotoStorage::storeUploaded((string) $files['tmp_name'][$index],
             AppraisalPhotoStorage::path($storage));
+        $blob = file_get_contents(AppraisalPhotoStorage::path($storage));
+        if (!is_string($blob)) throw new \RuntimeException('La foto no pudo quedar respaldada.');
+        $repo->addPhoto($appraisalId, $owner, ['id' => $photoId, 'source_filename' => $source,
+            'storage_filename' => $storage, 'mime_type' => $info['mime'], 'file_size_bytes' => $bytes,
+            'caption' => $caption, 'display_name' => mb_substr(trim($displayName), 0, 190),
+            'file_blob' => $blob, 'unit_id' => $unitId]);
+    }
+
+    private function storeLocalFile(string $path, string $source, string $appraisalId, int $owner,
+        AppraisalRepository $repo, ?string $unitId, string $caption, string $displayName): void
+    {
+        $photoId = bin2hex(random_bytes(16));
+        $source = basename(str_replace('\\', '/', $source));
+        $info = AppraisalPhotoStorage::inspect($path, $source);
+        $storage = 'foto-' . $appraisalId . '-' . $photoId . '.' . $info['extension'];
+        $bytes = AppraisalPhotoStorage::storeFile($path, AppraisalPhotoStorage::path($storage));
         $blob = file_get_contents(AppraisalPhotoStorage::path($storage));
         if (!is_string($blob)) throw new \RuntimeException('La foto no pudo quedar respaldada.');
         $repo->addPhoto($appraisalId, $owner, ['id' => $photoId, 'source_filename' => $source,

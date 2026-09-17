@@ -2,6 +2,7 @@ export function photoUpload(initialEvidence = '') {
     return {
         busy: false,
         evidence: initialEvidence,
+        url: '',
         hasFiles: false,
         fileNames: '',
         fileCountLabel: '',

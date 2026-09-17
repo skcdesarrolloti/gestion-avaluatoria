@@ -12,6 +12,8 @@ $photoCaption = $photoUploadCaption ?? '';
 $photoNamePlaceholder = $photoUploadNamePlaceholder ?? 'Ej. Portada principal, cocina, vista lateral o detalle de cubierta';
 $photoFieldId = 'photo_upload_' . substr(hash('sha1', $photoUnitId . '|' . $photoCaption . '|' . $photoTitle), 0, 10);
 $compact = $photoUploadCompact ?? false;
+$allowUrl = $photoUploadAllowUrl ?? false;
+$submitDisabled = $allowUrl ? "busy || (!hasFiles && url.trim() === '')" : 'busy || !hasFiles';
 $visiblePhotos = $photoUnitId === '' ? $photos : array_values(array_filter($photos,
     static fn (array $photo): bool => (string) ($photo['unit_id'] ?? '') === $photoUnitId));
 $visiblePhotos = $photoCaption === '' ? $visiblePhotos : array_values(array_filter($visiblePhotos,
@@ -64,6 +66,15 @@ $visiblePhotos = $photoCaption === '' ? $visiblePhotos : array_values(array_filt
                     <p class="mt-2 text-xs leading-5 text-slate-500">
                         El botón abre archivos; el recuadro derecho recibe imágenes copiadas.
                     </p>
+                    <?php if ($allowUrl): ?>
+                        <label class="label sm:col-span-2">URL pública de imagen
+                            <input class="input" name="photo_url" x-model="url"
+                                placeholder="https://.../imagen.jpg, .png o .webp">
+                            <span class="mt-1 block text-xs leading-5 text-slate-500">
+                                Sirve para una imagen directa. Un enlace normal de Google Maps no entrega foto; en ese caso pega la captura o sube el archivo.
+                            </span>
+                        </label>
+                    <?php endif; ?>
                     <p class="mt-1 text-xs font-semibold text-teal-800" x-show="fileNames" x-text="fileNames"></p>
                     <div class="mt-2 flex flex-wrap gap-2 sm:col-span-2" x-show="previews.length">
                         <template x-for="preview in previews" :key="preview.url">
@@ -74,7 +85,7 @@ $visiblePhotos = $photoCaption === '' ? $visiblePhotos : array_values(array_filt
                 </div>
             </div>
             <div class="flex items-end">
-                <button class="btn-primary min-h-11 w-full lg:w-auto" type="submit" :disabled="busy || !hasFiles"
+                <button class="btn-primary min-h-11 w-full lg:w-auto" type="submit" :disabled="<?= e($submitDisabled) ?>"
                     x-text="busy ? 'Subiendo...' : 'Agregar fotos'">Agregar fotos</button>
             </div>
         </form>

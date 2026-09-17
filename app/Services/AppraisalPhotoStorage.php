@@ -51,4 +51,14 @@ final class AppraisalPhotoStorage
         }
         return (int) filesize($destination);
     }
+
+    public static function storeFile(string $source, string $destination): int
+    {
+        self::ensure();
+        if (!copy($source, $destination)) {
+            throw new \RuntimeException('La foto no quedó guardada.');
+        }
+        clearstatcache(true, $destination);
+        return (int) filesize($destination);
+    }
 }
