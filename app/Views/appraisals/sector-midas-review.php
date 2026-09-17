@@ -38,33 +38,6 @@ if ($showMidasReview):
             <?= e((string) $midasStats['fields']) ?> datos · <?= e((string) $midasStats['sections']) ?> pestañas
         </span>
     </div>
-    <div class="mt-5 overflow-x-auto rounded-xl border border-emerald-200 bg-white">
-        <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
-            <thead class="bg-slate-50 text-xs uppercase text-slate-500">
-                <tr>
-                    <th class="px-4 py-3">Pestaña</th>
-                    <th class="px-4 py-3">Campo</th>
-                    <th class="px-4 py-3">Dato MIDAS sugerido</th>
-                    <th class="px-4 py-3">Acción</th>
-                </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-100">
-                <?php foreach ($midasRows as $row): ?>
-                    <?php $modeClass = $row['mode'] === 'Aplicable' ? 'text-emerald-800' : 'text-amber-700'; ?>
-                    <tr>
-                        <td class="px-4 py-3 font-semibold text-slate-800">
-                            <?= e('2.' . (int) $row['code'] . ' ' . ($midasLabels[$row['code']]['_title'] ?? '')) ?>
-                        </td>
-                        <td class="px-4 py-3 text-slate-700"><?= e($midasLabels[$row['code']][$row['field']] ?? $row['field']) ?></td>
-                        <td class="px-4 py-3 text-slate-700">
-                            <?= e(is_array($row['value']) ? implode(', ', $row['value']) : (string) $row['value']) ?>
-                        </td>
-                        <td class="px-4 py-3 font-semibold <?= e($modeClass) ?>"><?= e($row['mode']) ?></td>
-                    </tr>
-                <?php endforeach; ?>
-            </tbody>
-        </table>
-    </div>
     <form class="mt-5 flex flex-wrap items-center justify-between gap-3" method="post"
         action="<?= e(url('avaluos/' . $record['id'] . '/sector/midas/aplicar')) ?>">
         <?= csrf_field() ?>
@@ -73,5 +46,40 @@ if ($showMidasReview):
         </p>
         <button class="btn-primary min-h-11" type="submit">Aplicar solo campos vacíos</button>
     </form>
+    <details class="mt-5 rounded-xl border border-emerald-200 bg-white">
+        <summary class="flex min-h-11 cursor-pointer list-none items-center justify-between gap-3 px-4 py-3 text-sm font-semibold text-emerald-900">
+            <span>Ver detalle MIDAS encontrado</span>
+            <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs">
+                <?= e((string) $midasStats['fields']) ?> datos sugeridos
+            </span>
+        </summary>
+        <div class="overflow-x-auto border-t border-emerald-100">
+            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
+                <thead class="bg-slate-50 text-xs uppercase text-slate-500">
+                    <tr>
+                        <th class="px-4 py-3">Pestaña</th>
+                        <th class="px-4 py-3">Campo</th>
+                        <th class="px-4 py-3">Dato MIDAS sugerido</th>
+                        <th class="px-4 py-3">Acción</th>
+                    </tr>
+                </thead>
+                <tbody class="divide-y divide-slate-100">
+                    <?php foreach ($midasRows as $row): ?>
+                        <?php $modeClass = $row['mode'] === 'Aplicable' ? 'text-emerald-800' : 'text-amber-700'; ?>
+                        <tr>
+                            <td class="px-4 py-3 font-semibold text-slate-800">
+                                <?= e('2.' . (int) $row['code'] . ' ' . ($midasLabels[$row['code']]['_title'] ?? '')) ?>
+                            </td>
+                            <td class="px-4 py-3 text-slate-700"><?= e($midasLabels[$row['code']][$row['field']] ?? $row['field']) ?></td>
+                            <td class="px-4 py-3 text-slate-700">
+                                <?= e(is_array($row['value']) ? implode(', ', $row['value']) : (string) $row['value']) ?>
+                            </td>
+                            <td class="px-4 py-3 font-semibold <?= e($modeClass) ?>"><?= e($row['mode']) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
+    </details>
 </section>
 <?php endif; ?>
