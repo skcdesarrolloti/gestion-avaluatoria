@@ -11,6 +11,9 @@ $help = AppraisalSectorAdvancedCatalog::helps()[$fieldName]
 $guidance = AppraisalSectorFieldGuidance::field($fieldName);
 $empty = is_array($value) ? $value === [] : trim((string) $value) === '';
 $emptyClass = AppraisalSectorFieldGuidance::emptyClass($guidance['mode']);
+$valueClass = AppraisalSectorFieldGuidance::valueClass($guidance['mode']);
+$reviewText = AppraisalSectorFieldGuidance::reviewText($guidance['mode']);
+$fieldClass = trim('input mt-2 ' . $valueClass);
 $badge = '<span class="ml-2 inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold '
     . e($guidance['class']) . '" title="' . e($guidance['hint']) . '">' . e($guidance['label']) . '</span>';
 $emptyBadge = $empty ? '<span class="ml-2 inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold '
@@ -20,15 +23,16 @@ $emptyBadge = $empty ? '<span class="ml-2 inline-flex rounded-full border px-2 p
     <label class="label md:col-span-2" for="<?= e($id) ?>"><?= e($fieldLabel) ?>
         <span class="help-dot" title="<?= e($help) ?>">?</span>
         <?= $badge ?><?= $emptyBadge ?>
-        <textarea class="input mt-2 min-h-28" id="<?= e($id) ?>" name="<?= e($name) ?>"<?= $formAttr ?>
+        <textarea class="<?= e($fieldClass) ?> min-h-28" id="<?= e($id) ?>" name="<?= e($name) ?>"<?= $formAttr ?>
             placeholder="Completa o ajusta este dato con fuente, fecha o validación de campo."><?= e((string) $value) ?></textarea>
         <span class="mt-2 block text-xs font-normal leading-5 text-slate-600"><?= e($help) ?></span>
+        <span class="mt-1 block text-xs font-semibold leading-5 <?= e($guidance['class']) ?>"><?= e($reviewText) ?></span>
     </label>
 <?php elseif ($fieldType === 'select'): ?>
     <label class="label" for="<?= e($id) ?>"><?= e($fieldLabel) ?>
         <span class="help-dot" title="<?= e($help) ?>">?</span>
         <?= $badge ?><?= $emptyBadge ?>
-        <select class="input mt-2" id="<?= e($id) ?>" name="<?= e($name) ?>"<?= $formAttr ?>>
+        <select class="<?= e($fieldClass) ?>" id="<?= e($id) ?>" name="<?= e($name) ?>"<?= $formAttr ?>>
             <option value="">Selecciona una opción</option>
             <?php foreach ($options as $optionValue => $optionLabel): ?>
                 <option value="<?= e((string) $optionValue) ?>" <?= (string) $value === (string) $optionValue ? 'selected' : '' ?>>
@@ -37,12 +41,14 @@ $emptyBadge = $empty ? '<span class="ml-2 inline-flex rounded-full border px-2 p
             <?php endforeach; ?>
         </select>
         <span class="mt-2 block text-xs font-normal leading-5 text-slate-600"><?= e($help) ?></span>
+        <span class="mt-1 block text-xs font-semibold leading-5 <?= e($guidance['class']) ?>"><?= e($reviewText) ?></span>
     </label>
 <?php elseif ($fieldType === 'multiselect'): ?>
     <?php $selected = is_array($value) ? array_map('strval', $value) : []; ?>
-    <fieldset class="md:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-4">
+    <fieldset class="md:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-4 <?= e($valueClass) ?>">
         <legend class="label"><?= e($fieldLabel) ?><span class="help-dot" title="<?= e($help) ?>">?</span><?= $badge ?><?= $emptyBadge ?></legend>
         <p class="mt-2 text-xs leading-5 text-slate-600"><?= e($help) ?></p>
+        <p class="mt-1 text-xs font-semibold leading-5 <?= e($guidance['class']) ?>"><?= e($reviewText) ?></p>
         <div class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             <?php foreach ($options as $optionValue => $optionLabel): ?>
                 <label class="flex min-h-11 items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm text-slate-700">
@@ -57,8 +63,9 @@ $emptyBadge = $empty ? '<span class="ml-2 inline-flex rounded-full border px-2 p
     <label class="label" for="<?= e($id) ?>"><?= e($fieldLabel) ?>
         <span class="help-dot" title="<?= e($help) ?>">?</span>
         <?= $badge ?><?= $emptyBadge ?>
-        <input class="input mt-2" id="<?= e($id) ?>" name="<?= e($name) ?>"<?= $formAttr ?> value="<?= e((string) $value) ?>"
+        <input class="<?= e($fieldClass) ?>" id="<?= e($id) ?>" name="<?= e($name) ?>"<?= $formAttr ?> value="<?= e((string) $value) ?>"
             placeholder="Dato, fuente o referencia verificable">
         <span class="mt-2 block text-xs font-normal leading-5 text-slate-600"><?= e($help) ?></span>
+        <span class="mt-1 block text-xs font-semibold leading-5 <?= e($guidance['class']) ?>"><?= e($reviewText) ?></span>
     </label>
 <?php endif; ?>

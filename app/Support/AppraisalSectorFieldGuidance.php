@@ -9,10 +9,10 @@ final class AppraisalSectorFieldGuidance
         return [
             'oficial' => ['Fuente oficial', 'bg-emerald-50 text-emerald-800 border-emerald-200',
                 'Dato que puede venir de MIDAS, POT, DANE, Geoportal u otra entidad.'],
-            'sugerido' => ['Sugerido', 'bg-blue-50 text-blue-800 border-blue-200',
-                'Texto que el sistema propone y el analista debe revisar.'],
-            'validar' => ['Validar', 'bg-amber-50 text-amber-800 border-amber-200',
-                'Dato precargado o consultable que requiere campo, mapa o soporte.'],
+            'sugerido' => ['Texto sugerido', 'bg-blue-50 text-blue-800 border-blue-200',
+                'Redacción propuesta por el sistema: léela y ajusta si no aplica.'],
+            'validar' => ['Confirmar dato', 'bg-amber-50 text-amber-800 border-amber-200',
+                'Si estás de acuerdo, déjalo así y guarda; si no, corrígelo con soporte.'],
             'manual' => ['Manual', 'bg-rose-50 text-rose-800 border-rose-200',
                 'Campo que depende del criterio técnico del analista.'],
         ];
@@ -30,6 +30,26 @@ final class AppraisalSectorFieldGuidance
         return in_array($mode, ['manual', 'validar'], true)
             ? 'border-rose-200 bg-rose-50 text-rose-800'
             : 'border-slate-200 bg-slate-50 text-slate-600';
+    }
+
+    public static function valueClass(string $mode): string
+    {
+        return match ($mode) {
+            'oficial' => 'bg-emerald-50/40 text-emerald-950',
+            'sugerido' => 'bg-blue-50/50 text-blue-950 italic',
+            'validar' => 'bg-amber-50/50 text-slate-950',
+            default => '',
+        };
+    }
+
+    public static function reviewText(string $mode): string
+    {
+        return match ($mode) {
+            'oficial' => 'Dato de fuente o entidad. Cámbialo solo si tienes una fuente más reciente o una verificación de campo.',
+            'sugerido' => 'Texto sugerido en cursiva: úsalo como borrador, ajusta la redacción y deja solo lo que aplique al inmueble.',
+            'validar' => 'Si estás de acuerdo con este dato, déjalo así y guarda. Si no corresponde, corrígelo con mapa, fuente o visita.',
+            default => 'Completa este campo con tu criterio técnico y deja fuente, fecha o pendiente de validación cuando aplique.',
+        };
     }
 
     private static function fieldModes(): array
