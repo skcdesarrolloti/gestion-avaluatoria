@@ -37,12 +37,18 @@ $fmtAdvancedDate = static function ($value): string {
             <?= e($level) ?> · <?= e((string) ($summary['ready'] ?? 0)) ?>/<?= e((string) count($advancedCatalog)) ?>
         </span>
     </div>
+    <?php if (!empty($sectorMessage)): ?>
+        <p class="mt-5 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm font-semibold leading-6 text-emerald-800">
+            <?= e($sectorMessage) ?>
+        </p>
+    <?php endif; ?>
     <nav class="mt-5 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Secciones avanzadas del barrio">
         <?php foreach ($advancedCatalog as $sectionCode => [$sectionTitle]): ?>
+            <?php $sectionNumber = '2.' . (int) $sectionCode; ?>
             <button type="button" class="min-h-12 shrink-0 rounded-lg px-4 py-2 text-left text-sm font-semibold"
                 @click="activeBankSection = '<?= e((string) $sectionCode) ?>'; history.replaceState(null, '', '#banco-<?= e((string) $sectionCode) ?>')"
                 :class="activeBankSection === '<?= e((string) $sectionCode) ?>' ? 'bg-teal-700 text-white shadow-sm' : 'bg-white text-teal-800 hover:bg-white/70'">
-                <span class="block text-xs opacity-80"><?= e((string) $sectionCode) ?></span>
+                <span class="block text-xs opacity-80"><?= e($sectionNumber) ?></span>
                 <?= e((string) $sectionTitle) ?>
             </button>
         <?php endforeach; ?>
@@ -56,12 +62,13 @@ $fmtAdvancedDate = static function ($value): string {
             $advancedDefaults[(string) $sectionCode] ?? [], $storedValues);
         $sectionStatus = (string) (($row['status'] ?? null) ?: ($bankRow['status'] ?? 'Pendiente'));
         $sectionDate = $fmtAdvancedDate(($row['updated_at'] ?? null) ?: ($bankRow['updated_at'] ?? null));
+        $sectionNumber = '2.' . (int) $sectionCode;
         ?>
         <section class="mt-5 rounded-xl border border-slate-200 p-5 scroll-mt-6"
             x-show="activeBankSection === '<?= e((string) $sectionCode) ?>'">
             <div class="flex flex-wrap items-start justify-between gap-3">
                 <div>
-                    <p class="eyebrow"><?= e((string) $sectionCode) ?></p>
+                    <p class="eyebrow"><?= e($sectionNumber) ?></p>
                     <h4 class="mt-2 text-lg font-semibold"><?= e((string) $sectionTitle) ?></h4>
                 </div>
                 <p class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">

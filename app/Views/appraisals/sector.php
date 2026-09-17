@@ -195,8 +195,8 @@ $sectorFormId = 'sector-form';
             </span>
         </div>
     <?php endif; ?>
+    <?php require BASE_PATH . '/app/Views/appraisals/sector-base-hidden-fields.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/sector-advanced-sections.php'; ?>
-    <?php require BASE_PATH . '/app/Views/appraisals/sector-legacy-sections.php'; ?>
 
     <div class="mt-6 flex flex-wrap justify-end gap-3">
         <a class="btn-secondary min-h-11" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto')) ?>">
