@@ -12,7 +12,6 @@ $guidance = AppraisalSectorFieldGuidance::field($fieldName);
 $empty = is_array($value) ? $value === [] : trim((string) $value) === '';
 $emptyClass = AppraisalSectorFieldGuidance::emptyClass($guidance['mode']);
 $valueClass = AppraisalSectorFieldGuidance::valueClass($guidance['mode']);
-$reviewText = AppraisalSectorFieldGuidance::reviewText($guidance['mode']);
 $fieldClass = trim('input mt-2 ' . $valueClass);
 $reviewSplit = is_array($value) ? ['', ''] : AppraisalSectorFieldGuidance::splitReview((string) $value);
 $badge = '<span class="ml-2 inline-flex rounded-full border px-2 py-0.5 text-[11px] font-semibold '
@@ -27,7 +26,6 @@ $emptyBadge = $empty ? '<span class="ml-2 inline-flex rounded-full border px-2 p
         <textarea class="<?= e($fieldClass) ?> min-h-28" id="<?= e($id) ?>" name="<?= e($name) ?>"<?= $formAttr ?>
             placeholder="Completa o ajusta este dato con fuente, fecha o validación de campo."><?= e((string) $value) ?></textarea>
         <span class="mt-2 block text-xs font-normal leading-5 text-slate-600"><?= e($help) ?></span>
-        <span class="mt-1 block text-xs font-semibold leading-5 <?= e($guidance['class']) ?>"><?= e($reviewText) ?></span>
         <?php if ($reviewSplit[1] !== ''): ?>
             <span class="mt-2 grid gap-2 text-xs font-normal leading-5 sm:grid-cols-2">
                 <span class="rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-emerald-900">
@@ -52,14 +50,12 @@ $emptyBadge = $empty ? '<span class="ml-2 inline-flex rounded-full border px-2 p
             <?php endforeach; ?>
         </select>
         <span class="mt-2 block text-xs font-normal leading-5 text-slate-600"><?= e($help) ?></span>
-        <span class="mt-1 block text-xs font-semibold leading-5 <?= e($guidance['class']) ?>"><?= e($reviewText) ?></span>
     </label>
 <?php elseif ($fieldType === 'multiselect'): ?>
     <?php $selected = is_array($value) ? array_map('strval', $value) : []; ?>
     <fieldset class="md:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-4 <?= e($valueClass) ?>">
         <legend class="label"><?= e($fieldLabel) ?><span class="help-dot" title="<?= e($help) ?>">?</span><?= $badge ?><?= $emptyBadge ?></legend>
         <p class="mt-2 text-xs leading-5 text-slate-600"><?= e($help) ?></p>
-        <p class="mt-1 text-xs font-semibold leading-5 <?= e($guidance['class']) ?>"><?= e($reviewText) ?></p>
         <div class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             <?php foreach ($options as $optionValue => $optionLabel): ?>
                 <label class="flex min-h-11 items-center gap-2 rounded-lg bg-white px-3 py-2 text-sm text-slate-700">
@@ -77,7 +73,6 @@ $emptyBadge = $empty ? '<span class="ml-2 inline-flex rounded-full border px-2 p
         <input class="<?= e($fieldClass) ?>" id="<?= e($id) ?>" name="<?= e($name) ?>"<?= $formAttr ?> value="<?= e((string) $value) ?>"
             placeholder="Dato, fuente o referencia verificable">
         <span class="mt-2 block text-xs font-normal leading-5 text-slate-600"><?= e($help) ?></span>
-        <span class="mt-1 block text-xs font-semibold leading-5 <?= e($guidance['class']) ?>"><?= e($reviewText) ?></span>
         <?php if ($reviewSplit[1] !== ''): ?>
             <span class="mt-2 grid gap-2 text-xs font-normal leading-5 sm:grid-cols-2">
                 <span class="rounded-lg border border-emerald-200 bg-emerald-50 p-2 text-emerald-900">

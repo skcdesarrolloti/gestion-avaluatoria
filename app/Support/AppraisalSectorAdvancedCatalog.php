@@ -104,22 +104,22 @@ final class AppraisalSectorAdvancedCatalog
     public static function sourceKeys(string $code): array
     {
         return [
-            '01' => ['barrios_cartagena', 'geoportal_catastro', 'campo_analista'],
-            '02' => ['geoportal_catastro', 'barrios_cartagena', 'imagenes_apoyo'],
-            '03' => ['planeacion_cartagena', 'campo_analista'],
-            '04' => ['campo_analista', 'investigacion_mercado'],
+            '01' => ['barrios_cartagena', 'geoportal_catastro', 'dane_cnpv', 'campo_analista'],
+            '02' => ['geoportal_catastro', 'barrios_cartagena', 'google_maps_earth', 'imagenes_apoyo'],
+            '03' => ['empresas_servicios', 'planeacion_cartagena', 'cartagena_como_vamos', 'campo_analista'],
+            '04' => ['midas_normatividad', 'cartagena_como_vamos', 'campo_analista', 'investigacion_mercado'],
             '05' => ['midas_normatividad', 'pot_usos', 'planeacion_cartagena', 'nts_aplicables'],
-            '06' => ['movilidad_infraestructura', 'transcaribe', 'campo_analista'],
-            '07' => ['planeacion_cartagena', 'campo_analista'],
-            '08' => ['planeacion_cartagena', 'campo_analista'],
+            '06' => ['movilidad_infraestructura', 'transcaribe', 'google_maps_earth', 'campo_analista'],
+            '07' => ['midas_normatividad', 'planeacion_cartagena', 'google_maps_earth', 'campo_analista'],
+            '08' => ['dane_cnpv', 'cartagena_como_vamos', 'planeacion_cartagena', 'campo_analista'],
             '09' => ['ipcc_pemp', 'planeacion_cartagena', 'campo_analista'],
             '10' => ['gestion_riesgo', 'epa_cartagena', 'cardique', 'dimar_cioh'],
-            '11' => ['transcaribe', 'movilidad_infraestructura', 'campo_analista'],
+            '11' => ['transcaribe', 'movilidad_infraestructura', 'google_maps_earth', 'campo_analista'],
             '12' => ['imagenes_apoyo', 'base_interna_skc', 'campo_analista'],
             '13' => ['epa_cartagena', 'gestion_riesgo', 'investigacion_mercado', 'campo_analista'],
             '14' => ['registro_fotografico', 'imagenes_apoyo', 'campo_analista'],
-            '15' => ['investigacion_mercado', 'campo_analista'],
-            '16' => ['campo_analista', 'base_interna_skc'],
+            '15' => ['investigacion_mercado', 'cartagena_como_vamos', 'base_interna_skc', 'campo_analista'],
+            '16' => ['campo_analista', 'base_interna_skc', 'dane_cnpv', 'cartagena_como_vamos'],
         ][$code] ?? ['campo_analista'];
     }
 

@@ -7,11 +7,11 @@ final class AppraisalSectorFieldGuidance
     public static function legend(): array
     {
         return [
-            'oficial' => ['Fuente oficial', 'bg-emerald-50 text-emerald-800 border-emerald-200',
+            'oficial' => ['Fuente', 'bg-emerald-50 text-emerald-800 border-emerald-200',
                 'Dato que puede venir de MIDAS, POT, DANE, Geoportal u otra entidad.'],
-            'sugerido' => ['Texto sugerido', 'bg-blue-50 text-blue-800 border-blue-200',
+            'sugerido' => ['Sugerido', 'bg-blue-50 text-blue-800 border-blue-200',
                 'Redacción propuesta por el sistema: léela y ajusta si no aplica.'],
-            'validar' => ['Confirmar dato', 'bg-amber-50 text-amber-800 border-amber-200',
+            'validar' => ['Validar', 'bg-amber-50 text-amber-800 border-amber-200',
                 'Si estás de acuerdo, déjalo así y guarda; si no, corrígelo con soporte.'],
             'manual' => ['Manual', 'bg-rose-50 text-rose-800 border-rose-200',
                 'Campo que depende del criterio técnico del analista.'],
