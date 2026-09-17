@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isFetchableUrl, redirectedUrl, shouldHandleLink } from '../resources/js/fetch-navigation.js';
+import { isFetchableUrl, redirectedUrl, shouldHandleLink, syncFormToken } from '../resources/js/fetch-navigation.js';
 
 const current = 'https://example.test/public/avaluos?page=1';
 
@@ -59,4 +59,11 @@ test('keeps app-route return_to hash after post redirects', () => {
         redirectedUrl('https://example.test/public/avaluos/abc/bien-sujeto', current, body, current),
         'https://example.test/public/avaluos/abc/bien-sujeto#fotos-general',
     );
+});
+
+test('syncs hidden csrf field before form post', () => {
+    const body = new FormData();
+    body.set('_token', 'old');
+    syncFormToken(body, 'fresh');
+    assert.equal(body.get('_token'), 'fresh');
 });

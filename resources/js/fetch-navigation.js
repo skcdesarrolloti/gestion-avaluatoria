@@ -1,5 +1,10 @@
 const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 
+export function syncFormToken(body, token = csrfToken()) {
+    if (body instanceof FormData && token) body.set('_token', token);
+    return body;
+}
+
 export function isFetchableUrl(href, currentHref = window.location.href) {
     let url;
     let current;
@@ -61,6 +66,17 @@ async function renderFetchedPage(response, fallbackUrl, focusMain) {
     return true;
 }
 
+async function refreshCsrf() {
+    const response = await fetch(window.location.href, {
+        headers: { Accept: 'text/html', 'X-Requested-With': 'fetch' },
+        credentials: 'same-origin',
+    });
+    const html = await response.text();
+    const nextDocument = new DOMParser().parseFromString(html, 'text/html');
+    updateHeadFrom(nextDocument);
+    return csrfToken() !== '';
+}
+
 export function redirectedUrl(responseUrl, fallbackUrl, body = null, currentHref = window.location.href) {
     const url = new URL(responseUrl || fallbackUrl, currentHref);
     if (url.hash || !(body instanceof FormData)) return url.toString();
@@ -87,12 +103,18 @@ function appRouteUrl(value, targetUrl, currentHref) {
     return new URL(route, currentHref);
 }
 
-async function visit(url, { method = 'GET', body = null, replace = false, text } = {}) {
+async function visit(url, { method = 'GET', body = null, replace = false, text, retryCsrf = true } = {}) {
     setBusy(true, text);
     try {
         const headers = { Accept: 'text/html', 'X-Requested-With': 'fetch' };
-        if (method !== 'GET') headers['X-CSRF-Token'] = csrfToken();
+        if (method !== 'GET') {
+            syncFormToken(body);
+            headers['X-CSRF-Token'] = csrfToken();
+        }
         const response = await fetch(url, { method, body, headers, credentials: 'same-origin' });
+        if (response.status === 419 && method !== 'GET' && retryCsrf && await refreshCsrf()) {
+            return visit(url, { method, body, replace, text, retryCsrf: false });
+        }
         const nextUrl = redirectedUrl(response.url, url, body);
         if (method !== 'GET') history.replaceState({}, '', nextUrl);
         const rendered = await renderFetchedPage(response, url, method === 'GET');
