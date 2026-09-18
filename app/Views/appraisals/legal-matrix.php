@@ -19,7 +19,13 @@ $matrixCompleteKey = $matrixReadonly ? 'cuadro_completo_impresion' : 'cuadro_com
         </label>
     </div>
     <div class="overflow-x-auto rounded-xl border border-blue-200 bg-white">
-        <table class="min-w-[1000px] w-full border-collapse text-sm">
+        <table class="min-w-[1320px] w-full table-fixed border-collapse text-sm">
+            <colgroup>
+                <col style="width: 4rem;">
+                <col style="width: 14rem;">
+                <col>
+                <col style="width: 28rem;">
+            </colgroup>
             <thead class="bg-blue-800 text-left text-white">
                 <tr><th class="px-4 py-3">Item</th><th class="px-4 py-3">Variable</th><th class="px-4 py-3">Descripción de la variable</th><th class="px-4 py-3">Valores</th></tr>
             </thead>
