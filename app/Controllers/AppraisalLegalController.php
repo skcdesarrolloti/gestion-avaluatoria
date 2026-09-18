@@ -36,7 +36,8 @@ final class AppraisalLegalController
         $this->appraisals->find($id, $this->user['id']);
         try {
             $result = (new AppraisalLegalCertificateUploadService())->store(
-                $_FILES['legal_certificate'] ?? [], $id, $this->user['id'], $this->legal);
+                $_FILES['legal_certificate'] ?? [], $id, $this->user['id'], $this->legal,
+                (string) ($_POST['client_extracted_text'] ?? ''));
             $chars = (int) ($result['record']['extracted_chars'] ?? 0);
             Session::flash('legal_message', $chars > 0
                 ? 'Certificado cargado y lectura preliminar preparada con ' . $chars . ' caracteres.'

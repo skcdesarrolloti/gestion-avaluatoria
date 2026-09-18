@@ -27,10 +27,7 @@ $legalTabNumbers = ['registral' => '4.1', 'catastro' => '4.2', 'ph' => '4.3', 't
     <div>
         <p class="eyebrow">Numeral 4 · Características jurídicas</p>
         <h1 class="mt-2 text-3xl font-semibold tracking-tight">Lectura registral asistida</h1>
-        <p class="mt-3 max-w-3xl text-slate-600">
-            Sube el Certificado de Tradición y Libertad. El sistema extrae datos y propone una lectura preliminar;
-            el analista conserva el control y valida antes de llevarlo al informe.
-        </p>
+        <p class="mt-3 max-w-3xl text-slate-600">Sube el Certificado de Tradición y Libertad. El sistema extrae datos y propone una lectura preliminar; el analista conserva el control y valida antes de llevarlo al informe.</p>
     </div>
     <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Numeral 4</span>
 </div>
@@ -48,10 +45,7 @@ $legalTabNumbers = ['registral' => '4.1', 'catastro' => '4.2', 'ph' => '4.3', 't
         <div>
             <p class="eyebrow">Certificado de tradición y libertad</p>
             <h2 class="mt-2 text-2xl font-semibold">Cargar y analizar documento</h2>
-            <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                La lectura se hace solamente sobre el archivo subido. Si el PDF o la imagen no trae texto legible,
-                el sistema lo dejará visible como pendiente para OCR o diligenciamiento manual.
-            </p>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">La lectura se hace solamente sobre el archivo subido. Si el PDF o la imagen no trae texto legible, el sistema lo dejará visible como pendiente para OCR o diligenciamiento manual.</p>
         </div>
         <?php if ($latest): ?>
             <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">
@@ -60,16 +54,17 @@ $legalTabNumbers = ['registral' => '4.1', 'catastro' => '4.2', 'ph' => '4.3', 't
         <?php endif; ?>
     </div>
     <form class="mt-6 grid gap-4 lg:grid-cols-[1fr_auto]" method="post" enctype="multipart/form-data"
+        data-legal-certificate-form
         action="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas/certificado')) ?>">
         <?= csrf_field() ?>
+        <textarea name="client_extracted_text" hidden data-client-extracted-text></textarea>
         <label class="label">Certificado registral
             <input class="input mt-2" type="file" name="legal_certificate"
                 accept=".pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.tif,.tiff,application/pdf,text/plain,image/jpeg,image/png,image/webp,image/tiff">
-            <span class="mt-2 block text-sm font-normal leading-6 text-slate-500">
-                Formatos permitidos: PDF, DOCX, TXT o imagen JPG, PNG, WEBP o TIFF. Máximo 25 MB.
-            </span>
+            <span class="mt-2 block text-sm font-normal leading-6 text-slate-500">Formatos permitidos: PDF, DOCX, TXT o imagen JPG, PNG, WEBP o TIFF. Máximo 25 MB.</span>
         </label>
         <button class="btn-primary self-start lg:mt-8" type="submit">Subir y analizar certificado</button>
+        <p class="text-sm font-semibold text-teal-800 lg:col-span-2" data-legal-reader-status aria-live="polite"></p>
     </form>
     <?php if ($latest): ?>
         <form class="mt-4 flex flex-wrap items-center gap-3" method="post"
@@ -217,3 +212,4 @@ $legalTabNumbers = ['registral' => '4.1', 'catastro' => '4.2', 'ph' => '4.3', 't
         <button class="btn-primary" type="submit" name="next" value="deliverable">Guardar y pasar a Entregable</button>
     </div>
 </form>
+<script type="module" src="<?= e(asset_url('assets/legal-certificate-reader.js')) ?>"></script>

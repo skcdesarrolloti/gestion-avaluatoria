@@ -623,6 +623,16 @@ try {
         && ($imageUpload['parsed']['status'] ?? '') === 'Requiere lectura manual'
         && count($imageCertificates) === 1,
         'certificado juridico en imagen se guarda y queda pendiente si no hay OCR');
+    $clientPdf = tempnam(sys_get_temp_dir(), 'ga_ctl_client_');
+    file_put_contents($clientPdf, "%PDF-1.4\n%%EOF\n");
+    $clientRepo = new AppraisalLegalRepository($db);
+    (new AppraisalLegalCertificateUploadService())->store(
+        uploadFixture('certificado-cliente.pdf', $clientPdf), str_repeat('d', 32), 1, $clientRepo, $ctlLongOcrText);
+    $clientProfile = $clientRepo->profile(str_repeat('d', 32), 1);
+    expect(($clientProfile['data']['matricula_inmobiliaria'] ?? '') === '060-187254'
+        && ($clientProfile['data']['direccion'] ?? '') !== ''
+        && count($clientProfile['annotations'] ?? []) === 3,
+        'certificado juridico usa texto extraido en navegador cuando supera lectura servidor');
     $sectorColumnsSql = implode(', ', array_map(static fn (string $key): string => $key . ' TEXT',
         AppraisalSectorCatalog::keys()));
     $db->exec("CREATE TABLE master_sector_profiles (neighborhood_id TEXT PRIMARY KEY,

@@ -5,7 +5,8 @@ use App\Models\AppraisalLegalRepository;
 
 final class AppraisalLegalCertificateUploadService
 {
-    public function store(array $files, string $appraisalId, int $owner, AppraisalLegalRepository $repo): array
+    public function store(array $files, string $appraisalId, int $owner, AppraisalLegalRepository $repo,
+        string $clientText = ''): array
     {
         $file = $this->singleFile($files);
         $name = mb_substr(basename(str_replace('\\', '/', (string) $file['name'])), 0, 220);
@@ -18,7 +19,9 @@ final class AppraisalLegalCertificateUploadService
         $bytes = AppraisalLegalCertificateStorage::storeUploaded((string) $file['tmp_name'],
             AppraisalLegalCertificateStorage::path($storageName));
         $path = AppraisalLegalCertificateStorage::path($storageName);
-        $text = (new LegalCertificateTextExtractor())->extract($path, $info['extension']);
+        $serverText = (new LegalCertificateTextExtractor())->extract($path, $info['extension']);
+        $clientText = $this->cleanClientText($clientText);
+        $text = mb_strlen($clientText) > mb_strlen($serverText) ? $clientText : $serverText;
         $parsed = (new LegalCertificateParser())->parse($text, $name);
         $blob = file_get_contents($path);
         if (!is_string($blob)) throw new \RuntimeException('El certificado se guardó, pero no quedó respaldado.');
@@ -40,5 +43,16 @@ final class AppraisalLegalCertificateUploadService
         }
         return ['name' => (string) ($files['name'] ?? ''), 'tmp_name' => (string) ($files['tmp_name'] ?? ''),
             'error' => (int) ($files['error'] ?? UPLOAD_ERR_NO_FILE)];
+    }
+
+    private function cleanClientText(string $text): string
+    {
+        $text = function_exists('mb_scrub') ? mb_scrub($text, 'UTF-8') : $text;
+        $text = preg_replace('/[ \t]+/', ' ', $text) ?? $text;
+        $text = preg_replace('/\R{3,}/', "\n\n", $text) ?? $text;
+        $text = trim($text);
+        if (mb_strlen($text) < 200) return '';
+        return preg_match('/matr|anotaci|folio|certificado|registro|supernotariado|departamento|municipio/iu', $text)
+            ? $text : '';
     }
 }
