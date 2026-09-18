@@ -12,6 +12,8 @@ use App\Services\AppraisalSectorInput;
 use App\Services\AppraisalMidasReview;
 use App\Services\AppraisalMidasSupportUploadService;
 use App\Services\AppraisalLegalInput;
+use App\Services\AppraisalLegalCertificateStorage;
+use App\Services\AppraisalLegalCertificateUploadService;
 use App\Services\AppraisalSectorAdvancedPrefill;
 use App\Services\AppraisalSectorSectionInput;
 use App\Services\AppraisalSectorPrefill;
@@ -541,6 +543,19 @@ try {
         && ($storedAfterReanalysis['data']['municipio'] ?? '') === 'Guardado municipio'
         && count($storedAfterReanalysis['annotations']) === 1,
         'reanálisis jurídico no borra campos manuales ya guardados');
+    $tmpCtlPng = tempnam(sys_get_temp_dir(), 'ga_ctl_png_');
+    file_put_contents($tmpCtlPng, hex2bin('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c6360000002000100ffff03000006000557bfabcf0000000049454e44ae426082'));
+    $imageInfo = AppraisalLegalCertificateStorage::inspect($tmpCtlPng, 'certificado-foto.png');
+    expect($imageInfo['extension'] === 'png' && $imageInfo['mime'] === 'image/png',
+        'almacenamiento juridico acepta imagen valida de certificado');
+    $imageRepo = new AppraisalLegalRepository($db);
+    $imageUpload = (new AppraisalLegalCertificateUploadService())->store(
+        uploadFixture('certificado-foto.png', $tmpCtlPng), str_repeat('c', 32), 1, $imageRepo);
+    $imageCertificates = $imageRepo->certificates(str_repeat('c', 32), 1);
+    expect(($imageUpload['record']['mime_type'] ?? '') === 'image/png'
+        && ($imageUpload['parsed']['status'] ?? '') === 'Requiere lectura manual'
+        && count($imageCertificates) === 1,
+        'certificado juridico en imagen se guarda y queda pendiente si no hay OCR');
     $sectorColumnsSql = implode(', ', array_map(static fn (string $key): string => $key . ' TEXT',
         AppraisalSectorCatalog::keys()));
     $db->exec("CREATE TABLE master_sector_profiles (neighborhood_id TEXT PRIMARY KEY,

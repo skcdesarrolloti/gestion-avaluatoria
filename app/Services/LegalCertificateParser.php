@@ -15,7 +15,7 @@ final class LegalCertificateParser
         return ['data' => $data, 'annotations' => $annotations, 'alerts' => $alerts,
             'status' => trim($text) === '' ? 'Requiere lectura manual' : 'Lectura preliminar',
             'message' => trim($text) === ''
-                ? 'No se obtuvo texto del certificado. Puede ser escaneado o protegido; carga OCR o transcribe los datos relevantes.'
+                ? 'No se obtuvo texto del certificado. Puede ser imagen sin OCR disponible, PDF escaneado o archivo protegido; transcribe los datos relevantes.'
                 : 'Lectura preliminar generada con ' . $found . ' campos sugeridos. Revisa cada campo antes del informe.'];
     }
 

@@ -81,6 +81,10 @@ Las Normas Internacionales de Valuación guardan sus PDFs en
 de la IVS correspondiente.
 Las Normas NIIF guardan sus PDFs en `storage/normas-niif/`; sirven como referencia
 contable y ayudan a distinguir campos normativos, metodológicos y operativos.
+El numeral 4 acepta certificados de tradición en PDF, DOCX, TXT e imágenes
+JPG/PNG/WEBP/TIFF. Las imágenes se intentan leer con Tesseract OCR si está instalado
+en el servidor; se puede fijar su ruta con `TESSERACT_BINARY`. Si no hay OCR disponible,
+el archivo queda guardado y visible para revisión o diligenciamiento manual.
 
 ```text
 app/Controllers/     Coordinación de solicitudes

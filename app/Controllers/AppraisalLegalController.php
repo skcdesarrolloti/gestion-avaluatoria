@@ -40,7 +40,7 @@ final class AppraisalLegalController
             $chars = (int) ($result['record']['extracted_chars'] ?? 0);
             Session::flash('legal_message', $chars > 0
                 ? 'Certificado cargado y lectura preliminar preparada con ' . $chars . ' caracteres.'
-                : 'Certificado cargado. No se leyó texto útil; revisa si requiere OCR o diligenciamiento manual.');
+                : 'Certificado cargado. No se leyó texto útil; si es una foto, verifica OCR/Tesseract o diligencia manualmente.');
         } catch (\Throwable $error) {
             Session::flash('legal_error', $error->getMessage());
         }

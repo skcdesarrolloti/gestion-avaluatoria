@@ -8,7 +8,17 @@ final class AppraisalLegalCertificateStorage
     private const ENV_KEY = 'APPRAISAL_LEGAL_CERTIFICATE_DIR';
     private const DEFAULT_DIR = '/storage/certificados-juridicos';
     private const MAX_BYTES = 26214400;
-    private const EXTENSIONS = ['pdf' => 'application/pdf', 'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 'txt' => 'text/plain'];
+    private const EXTENSIONS = [
+        'pdf' => 'application/pdf',
+        'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        'txt' => 'text/plain',
+        'jpg' => 'image/jpeg',
+        'jpeg' => 'image/jpeg',
+        'png' => 'image/png',
+        'webp' => 'image/webp',
+        'tif' => 'image/tiff',
+        'tiff' => 'image/tiff',
+    ];
 
     public static function dir(): string
     {
@@ -24,7 +34,7 @@ final class AppraisalLegalCertificateStorage
     {
         $ext = mb_strtolower(pathinfo($name, PATHINFO_EXTENSION));
         if (!is_file($path) || !isset(self::EXTENSIONS[$ext])) {
-            throw new \InvalidArgumentException('Sube el certificado en PDF, DOCX o TXT.');
+            throw new \InvalidArgumentException('Sube el certificado en PDF, DOCX, TXT o imagen JPG, PNG, WEBP o TIFF.');
         }
         $size = (int) filesize($path);
         if ($size <= 0 || $size > self::MAX_BYTES) {
@@ -32,7 +42,13 @@ final class AppraisalLegalCertificateStorage
         }
         if ($ext === 'pdf' && !self::startsWith($path, '%PDF')) throw new \InvalidArgumentException('El PDF no parece válido.');
         if ($ext === 'docx' && !self::startsWith($path, "PK\x03\x04")) throw new \InvalidArgumentException('El DOCX no parece válido.');
-        return ['extension' => $ext, 'mime' => self::EXTENSIONS[$ext], 'bytes' => $size];
+        if (str_starts_with(self::EXTENSIONS[$ext], 'image/')) {
+            $image = @getimagesize($path);
+            if (!is_array($image) || (string) ($image['mime'] ?? '') !== self::EXTENSIONS[$ext]) {
+                throw new \InvalidArgumentException('La imagen del certificado no parece válida.');
+            }
+        }
+        return ['extension' => $ext === 'jpeg' ? 'jpg' : $ext, 'mime' => self::EXTENSIONS[$ext], 'bytes' => $size];
     }
 
     public static function storeUploaded(string $tmpName, string $destination): int
