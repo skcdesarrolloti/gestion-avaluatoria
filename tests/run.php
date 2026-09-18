@@ -497,6 +497,16 @@ try {
         && ($radicadoParsed['annotations'][0]['cancelada_por'] ?? '') === '036'
         && !str_contains(mb_strtolower(implode(' ', $radicadoParsed['alerts'])), 'anotación 032'),
         'parser juridico cierra medidas cautelares por radicado compartido');
+    $servitudeText = "Nro Matrícula: 060-999999\nEstado del Folio: ACTIVO\n"
+        . "ANOTACION Nro 013 Fecha: 28/02/2002 Doc: ESCRITURA 882 "
+        . "Especificación: LIMITACION AL DOMINIO: 0334 SERVIDUMBRE DE ACUEDUCTO ACTIVA PREDIO SIRVIENTE.";
+    $servitudeParsed = (new LegalCertificateParser())->parse($servitudeText, 'certificado-servidumbre.txt');
+    $servitudeReport = (string) ($servitudeParsed['data']['reporte_afectaciones'] ?? '') . ' '
+        . (string) ($servitudeParsed['data']['reporte_profesional_entregable'] ?? '');
+    expect(($servitudeParsed['annotations'][0]['descripcion_acto'] ?? '') === 'Servidumbre de acueducto'
+        && str_contains($servitudeReport, 'franja afectada')
+        && str_contains($servitudeReport, 'restricciones constructivas'),
+        'parser juridico incorpora observacion de servidumbre de acueducto al informe');
     $trafficCounts = AppraisalLegalView::trafficCounts([
         ['estado_juridico' => 'vigente', 'requiere_revision' => 'Sí', 'categoria' => 'gravamen'],
         ['estado_juridico' => 'vigente', 'requiere_revision' => 'Sí', 'categoria' => 'propiedad_horizontal'],

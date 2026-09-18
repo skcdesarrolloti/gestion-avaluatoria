@@ -88,6 +88,7 @@ final class LegalCertificateOpinionBuilder
             $parts = ['Anotación ' . ($row['orden'] ?? '')];
             if (($row['descripcion_acto'] ?? '') !== '') $parts[] = (string) $row['descripcion_acto'];
             if (($row['documento'] ?? '') !== '') $parts[] = 'soporte ' . $row['documento'];
+            if (($row['impacto_resumen'] ?? '') !== '') $parts[] = (string) $row['impacto_resumen'];
             return trim(implode(' - ', array_filter($parts))) . '.';
         }, $items));
     }
