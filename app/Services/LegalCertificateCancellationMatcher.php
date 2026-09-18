@@ -13,6 +13,7 @@ final class LegalCertificateCancellationMatcher
         }
         foreach ($rows as $key => $row) {
             $refs = $this->references($row);
+            if (!$refs) $refs = $this->refsBySharedId($rows, $key, $row);
             if (!$refs) continue;
             $closed = [];
             foreach ($refs as $ref) {
@@ -60,6 +61,35 @@ final class LegalCertificateCancellationMatcher
             }
         }
         return array_values(array_unique($refs));
+    }
+
+    private function refsBySharedId(array $rows, int|string $key, array $row): array
+    {
+        $text = (string) ($row['texto'] ?? '');
+        if (!preg_match('/cancelaci|cancela|levantamiento|desembargo|liberaci(?:o|ó|\?|Ã³)n/iu', $text)) return [];
+        $ids = $this->identifiers($text);
+        if (!$ids) return [];
+        $refs = [];
+        foreach ($rows as $targetKey => $target) {
+            if ($targetKey === $key || (int) $targetKey >= (int) $key) continue;
+            if (($target['estado_juridico'] ?? '') === 'solucionada') continue;
+            if (!in_array(($target['categoria'] ?? ''), ['gravamen', 'limitacion_dominio', 'medida_cautelar'], true)) continue;
+            if (array_intersect($ids, $this->identifiers((string) ($target['texto'] ?? '')))) {
+                $refs[] = (string) ($target['orden'] ?? '');
+            }
+        }
+        return array_values(array_filter(array_unique($refs)));
+    }
+
+    private function identifiers(string $text): array
+    {
+        if (!preg_match_all('/\b\d[\d\s\-.]{10,}\d\b/', $text, $matches)) return [];
+        $ids = [];
+        foreach ($matches[0] as $raw) {
+            $digits = preg_replace('/\D+/', '', (string) $raw) ?? '';
+            if (strlen($digits) >= 12 && !preg_match('/^0+$/', $digits)) $ids[] = $digits;
+        }
+        return array_values(array_unique($ids));
     }
 
     private function norm(string $value): string

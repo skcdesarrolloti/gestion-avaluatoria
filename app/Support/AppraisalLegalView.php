@@ -65,10 +65,10 @@ final class AppraisalLegalView
         $category = $category !== '' ? $category : (string) ($row['categoria'] ?? '');
         $row['especificacion'] = self::value($row, 'especificacion') ?: self::match($text,
             '/especificaci(?:o|ó|\?)n\s*:\s*(.+?)(?=\s+personas\s+que\s+intervienen|\s+\bde\s*:|\s+\ba\s*:|$)/isu');
-        $row['personaDe'] = self::value($row, 'personaDe') ?: self::match($text,
-            '/\bde\s*:\s*(.+?)(?=\s+\ba\s*:|\s+\bI\b|\s+\bX\b|$)/isu');
-        $row['personaA'] = self::value($row, 'personaA') ?: self::match($text,
-            '/\ba\s*:\s*(.+?)(?=\s+\bI\b|\s+\bX\b|$)/isu');
+        $row['personaDe'] = self::compactParty(self::value($row, 'personaDe') ?: self::match($text,
+            '/\bde\s*:\s*(.+?)(?=\s+\ba\s*:|\s+\bI\b|\s+\bX\b|$)/isu'));
+        $row['personaA'] = self::compactParty(self::value($row, 'personaA') ?: self::match($text,
+            '/\ba\s*:\s*(.+?)(?=\s+\bI\b|\s+\bX\b|$)/isu'));
         $row['descripcion_acto'] = self::value($row, 'descripcion_acto') ?: self::describe($row, $category);
         return $row;
     }
@@ -121,6 +121,15 @@ final class AppraisalLegalView
     private static function value(array $row, string $key): string
     {
         return trim((string) ($row[$key] ?? ''));
+    }
+
+    private static function compactParty(string $value): string
+    {
+        $value = preg_replace('/OFICINA DE REGISTRO DE INSTRUMENTOS PUBLICOS DE [A-ZÁÉÍÓÚÑ\s]+ ORIP/iu', ' ', $value) ?? $value;
+        $value = preg_replace('/\b(?:I|X)\b\s*/u', ' ', $value) ?? $value;
+        $parts = array_values(array_unique(array_filter(array_map('trim', preg_split('/\s{2,}|;/', $value) ?: []))));
+        $clean = trim(preg_replace('/\s+/', ' ', implode('; ', $parts)) ?? $value);
+        return mb_strlen($clean) > 180 ? mb_substr($clean, 0, 177) . '...' : $clean;
     }
 
     private static function match(string $text, string $pattern): string

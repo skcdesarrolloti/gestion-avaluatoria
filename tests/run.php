@@ -487,6 +487,16 @@ try {
         && str_contains($pairedConclusion, 'se cancela con la anotación 002')
         && !str_contains($pairedConclusion, 'no saneada'),
         'parser juridico parea afectaciones canceladas y evita falsas alarmas');
+    $radicadoText = "Nro Matrícula: 060-999999\nEstado del Folio: ACTIVO\n"
+        . "ANOTACION Nro 032 Fecha: 01/10/2021 Doc: OFICIO 638 JUZGADO OCTAVO CIVIL "
+        . "Especificación: MEDIDA CAUTELAR: 0492 DEMANDA EN PROCESO VERBAL RADICADO 1300131030082021 0039 00.\n"
+        . "ANOTACION Nro 036 Fecha: 15/12/2023 Doc: OFICIO 900 JUZGADO OCTAVO CIVIL "
+        . "Especificación: CANCELACION: 0841 CANCELACION PROVIDENCIA JUDICIAL RADICADO 1300131030082021-0039-00.";
+    $radicadoParsed = (new LegalCertificateParser())->parse($radicadoText, 'certificado-radicado.txt');
+    expect(($radicadoParsed['annotations'][0]['estado_juridico'] ?? '') === 'solucionada'
+        && ($radicadoParsed['annotations'][0]['cancelada_por'] ?? '') === '036'
+        && !str_contains(mb_strtolower(implode(' ', $radicadoParsed['alerts'])), 'anotación 032'),
+        'parser juridico cierra medidas cautelares por radicado compartido');
     $trafficCounts = AppraisalLegalView::trafficCounts([
         ['estado_juridico' => 'vigente', 'requiere_revision' => 'Sí', 'categoria' => 'gravamen'],
         ['estado_juridico' => 'vigente', 'requiere_revision' => 'Sí', 'categoria' => 'propiedad_horizontal'],
@@ -494,6 +504,11 @@ try {
     ]);
     expect($trafficCounts['Rojo'] === 1 && $trafficCounts['Amarillo'] === 1 && $trafficCounts['Verde'] === 1,
         'vista juridica clasifica semaforo rojo amarillo y verde');
+    $cleanedParty = AppraisalLegalView::enrich(['personaDe' => 'DTO. ADMINISTRATIVO DE VALORIZACION DISTRITAL '
+        . 'OFICINA DE REGISTRO DE INSTRUMENTOS PUBLICOS DE CARTAGENA ORIP '
+        . 'OFICINA DE REGISTRO DE INSTRUMENTOS PUBLICOS DE CARTAGENA ORIP'])['personaDe'] ?? '';
+    expect($cleanedParty === 'DTO. ADMINISTRATIVO DE VALORIZACION DISTRITAL',
+        'vista juridica limpia intervinientes repetidos por OCR');
     $legalMerged = AppraisalLegalInput::mergeEmpty(['matricula_inmobiliaria' => 'manual'], $legalParsed['data']);
     expect($legalMerged['matricula_inmobiliaria'] === 'manual'
         && ($legalMerged['codigo_catastral_actual'] ?? '') !== '', 'juridico conserva dato manual y llena vacios');
