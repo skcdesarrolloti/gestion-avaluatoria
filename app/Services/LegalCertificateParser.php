@@ -26,20 +26,7 @@ final class LegalCertificateParser
 
     private function annotations(string $text): array
     {
-        $pattern = '/anotaci(?:o|ó|\?)n\s*:?\s*(?:nro|no|num(?:ero)?|n[uú]mero)?\.?\s*:?\s*\d+/iu';
-        if (!preg_match_all($pattern, $text, $matches, PREG_OFFSET_CAPTURE)) return [];
-        $rows = [];
-        foreach ($matches[0] as $index => $match) {
-            $start = (int) $match[1];
-            $end = isset($matches[0][$index + 1][1]) ? (int) $matches[0][$index + 1][1] : strlen($text);
-            $block = preg_replace('/\s+/', ' ', substr($text, $start, $end - $start)) ?? '';
-            $rows[] = ['orden' => $this->match($block, ['/anotaci(?:o|ó|\?)n\s*:?\s*(?:nro|no|num(?:ero)?|n[uú]mero)?\.?\s*:?\s*(\d+)/iu']) ?: (string) ($index + 1),
-                'fecha' => $this->match($block, ['/fecha\s*[:#]?\s*([0-9\/\-]{8,20})/iu']),
-                'documento' => $this->clean($this->match($block, ['/doc\s*\.?\s*:\s*(.+?)(?=\s+valor\s+acto|\s+especificaci|\s+personas\s+que\s+intervienen|$)/iu'])),
-                'valor' => $this->clean($this->match($block, ['/valor\s+acto\s*:\s*\$?\s*([0-9][0-9\.,\s]{1,60})/iu'])),
-                'texto' => mb_substr(trim($block), 0, 1600)];
-        }
-        return $rows;
+        return (new LegalCertificateAnnotationExtractor())->extract($text);
     }
 
     private function classifyAnnotations(array $rows): array

@@ -7,10 +7,10 @@ final class LegalCertificateFieldExtractor
     private const END_LABELS = ['departamento', 'municipio', 'vereda', 'circulo registral', 'círculo registral',
         'depto', 'matricula inmobiliaria', 'matrícula inmobiliaria', 'matr?cula inmobiliaria', 'estado del folio',
         'pagina', 'página', 'p?gina', 'descripcion', 'descripción', 'fecha apertura', 'fecha de apertura',
-        'radicacion', 'radicación', 'radicaci?n',
+        'radicacion', 'radicación', 'radicaci?n', 'impreso el',
         'fecha de expedicion', 'fecha de expedición', 'turno', 'pin', 'referencia catastral',
         'cedula catastral', 'cédula catastral', 'codigo catastral', 'código catastral', 'nupre',
-        'direccion', 'dirección', 'tipo de predio', 'cabida y linderos', 'anotacion', 'anotación'];
+        'direccion', 'dirección', 'tipo predio', 'tipo de predio', 'cabida y linderos', 'anotacion', 'anotación'];
 
     public static function extract(string $text, string $filename): array
     {
@@ -69,18 +69,22 @@ final class LegalCertificateFieldExtractor
                 'dirección actual del inmueble', 'direccion del inmueble', 'dirección del inmueble',
                 'direccion', 'dirección']) ?: $self->lineValue($lines, ['direccion actual del inmueble',
                 'dirección actual del inmueble', 'direccion del inmueble', 'dirección del inmueble',
-                'direccion', 'dirección']) ?: $self->match($text, ['/ubicaci(?:o|ó)n\s+del\s+predio\s*[:#]?\s*([^\n\r]{6,220})/iu'])),
-            'tipo_predio' => $self->clean($self->between($flat, ['tipo de predio', 'destinacion economica',
-                'destinación económica']) ?: $self->lineValue($lines, ['tipo de predio', 'destinacion economica',
+                'direccion', 'dirección']) ?: $self->addressFromText($text)
+                ?: $self->match($text, ['/ubicaci(?:o|ó)n\s+del\s+predio\s*[:#]?\s*([^\n\r]{6,220})/iu'])),
+            'tipo_predio' => $self->clean($self->match($text, ['/tipo\s+predio\s*[:#]?\s*([^\n\r]{3,80})/iu'])
+                ?: $self->between($flat, ['tipo predio', 'tipo de predio', 'destinacion economica',
+                'destinación económica']) ?: $self->lineValue($lines, ['tipo predio', 'tipo de predio', 'destinacion economica',
                 'destinación económica'])),
             'area' => $self->area($text, '/(?:[áa]rea|cabida)\s+(?:de\s+)?([0-9\.,]{1,30})\s*(?:m2|mts2|metros?\s*cuadrados?)/iu'),
             'area_privada' => $self->area($text, '/[áa]rea\s+privada\b[^0-9]{0,50}([0-9\.,]{1,30})/iu'),
             'area_construida' => $self->area($text, '/[áa]rea\s+construida\b[^0-9]{0,50}([0-9\.,]{1,30})/iu'),
-            'coeficiente' => $self->clean($self->between($flat, ['coeficiente']) ?: $self->lineValue($lines, ['coeficiente'])),
+            'coeficiente' => $self->clean($self->match($text, ['/coeficiente\s*(?:de\s+copropiedad)?\s*(?:[:#]|de)?\s*([0-9\.,]+%?)/iu'])
+                ?: $self->between($flat, ['coeficiente']) ?: $self->lineValue($lines, ['coeficiente'])),
             'cabida_linderos' => $self->block($text, ['descripcion cabida y linderos', 'descripción cabida y linderos',
                 'cabida y linderos', 'cabida/linderos', 'linderos'], 2200),
             'reglamento_ph' => $self->contains($text, ['propiedad horizontal', 'reglamento de propiedad horizontal', 'ley 675']) ? 'Sí' : '',
-            'matricula_matriz' => $self->code($self->match($text, ['/matr.{0,3}cula\s+matriz\s*[:#]?\s*([0-9]{2,4}\s*-\s*[0-9]{3,})/iu'])),
+            'matricula_matriz' => $self->code($self->match($text, ['/matr.{0,3}cula\s+matriz\s*[:#]?\s*([0-9]{2,4}\s*-\s*[0-9]{3,})/iu',
+                '/matr.{0,3}cula\s+abierta\s+con\s+base\s+en\s+la\s+([0-9]{2,4}\s*-\s*[0-9]{3,})/iu'])),
             'matriculas_derivadas' => implode('; ', array_slice($matriculas, 0, 12)),
             'unidad_privada' => $self->clean($self->match($text, ['/unidad\s+privada\s*[:#]?\s*([^\n\r]{3,160})/iu'])),
             'coeficiente_ph' => $self->clean($self->match($text, ['/coeficiente(?:\s+de\s+copropiedad)?\s*[:#]?\s*([0-9\.,%]{1,30})/iu'])),
@@ -155,14 +159,35 @@ final class LegalCertificateFieldExtractor
         return $this->clean($value);
     }
 
-    private function code(string $value): string { return preg_replace('/\s+/', '', $this->clean($value)) ?? ''; }
+    private function code(string $value): string
+    {
+        $value = preg_replace('/\s+/', '', $this->clean($value)) ?? '';
+        return preg_match('/^(sininformacion|sininformaci.n|noaplica|ninguno)$/iu', $value) ? '' : $value;
+    }
     private function flat(string $text): string { return preg_replace('/\s+/u', ' ', $text) ?? $text; }
     private function compact(string $text): string { return preg_replace('/\s+/u', '', $text) ?? $text; }
     private function lines(string $text): array { return array_values(array_filter(array_map('trim', preg_split('/\R/u', $text) ?: []))); }
     private function area(string $text, string $pattern): string { return preg_match($pattern, $text, $m) ? str_replace(',', '.', (string) $m[1]) : ''; }
     private function contains(string $text, array $needles): bool { foreach ($needles as $n) if (mb_stripos($text, $n) !== false) return true; return false; }
     private function matriculas(string $text): array { preg_match_all('/\b[0-9]{2,4}\s*-\s*[0-9]{3,}\b/u', $text, $m); return array_values(array_unique(array_map(fn ($v) => $this->code((string) $v), $m[0] ?? []))); }
-    private function block(string $text, array $labels, int $limit): string { foreach ($labels as $label) if (($pos = mb_stripos($text, $label)) !== false) return $this->clean(mb_substr($text, (int) $pos, $limit)); return ''; }
+    private function block(string $text, array $labels, int $limit): string
+    {
+        foreach ($labels as $label) if (($pos = mb_stripos($text, $label)) !== false) {
+            $chunk = mb_substr($text, (int) $pos, $limit);
+            $chunk = preg_split('/(?:anotaci(?:o|ó|\?)n(?:es)?|salvedades|complementaciones|titular(?:es)?|direcci(?:o|ó|\?)n|referencia catastral)/iu', $chunk)[0] ?? $chunk;
+            return $this->clean($chunk);
+        }
+        return '';
+    }
+
+    private function addressFromText(string $text): string
+    {
+        if (!preg_match('/direcci(?:o|ó|\?)n\s+(?:actual\s+)?del\s+inmueble\s*[:#]?\s*(.{6,360})/isu', $text, $m)) return '';
+        $value = preg_split('/(?:determinaci(?:o|ó|\?)n|matr.{0,3}cula\s+abierta|anotaci(?:o|ó|\?)n|oficina\s+de\s+registro)/iu', (string) $m[1])[0] ?? '';
+        $value = preg_replace('/tipo\s+predio\s*[:#]?\s*[^\n\r]+/iu', ' ', $value) ?? $value;
+        $value = preg_replace('/^\s*\d+\s+/u', '', $value) ?? $value;
+        return $this->address($value);
+    }
 
     private function lineValue(array $lines, array $labels): string
     {

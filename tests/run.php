@@ -524,6 +524,39 @@ try {
         && ($ctlOcrParsed['data']['check_gravamenes'] ?? '') === 'Sí'
         && ($ctlOcrParsed['data']['check_tradicion'] ?? '') === 'Sí',
         'parser juridico tolera etiquetas CTL con OCR parcial y caracteres danados');
+    $ctlLongOcrText = "Certificado generado con el Pin No: 230912151482354135\n"
+        . "Nro Matr?cula: 060-187254 Pagina 1 TURNO: 2023-060-1-132812\n"
+        . "CIRCULO REGISTRAL: 060 - CARTAGENA DEPTO: BOLIVAR MUNICIPIO: CARTAGENA DE INDIAS VEREDA: CARTAGENA\n"
+        . "FECHA APERTURA: 13-02-2002 RADICACI?N: 2002-800 CON: ESCRITURA DE: 16-01-2002\n"
+        . "CODIGO CATASTRAL:\nCOD CATASTRAL ANT: SIN INFORMACION\nNUPRE:\nESTADO DEL FOLIO:\nACTIVO\n"
+        . "DESCRIPCION: CABIDA Y LINDEROS\nContenidos en ESCRITURA Nro 2593 de fecha 30-11-1999 "
+        . "en NOTARIA 2 de CARTAGENA GARAJE 24 con area de 13.34M2 con coeficiente de 0.1010%\n"
+        . "Tipo Predio: URBANO\nDIRECCION DEL INMUEBLE\n"
+        . "1 KR 13 B # 26 - 78 GRAJE 24 EDIF 19 DEL PROYECTO INTEGRADO CHAMBACU R P H\n"
+        . "MATRICULA ABIERTA CON BASE EN LA 060 - 187193\nNRO TOTAL DE ANOTACIONES: *27*\n"
+        . "ANOTACION: Nro 001 Fecha: 07-04-1997 Radicaci?n: 1997-6570 Doc: ESCRITURA 3663 DEL 30-12-1996 "
+        . "VALOR ACTO: $ ESPECIFICACION: GRAVAMEN: 210 HIPOTECA PERSONAS QUE INTERVIENEN EN EL ACTO DE: FIDUCOLOMBIA "
+        . "A: GRANAHORRAR BANCO COMERCIAL\n"
+        . "ANOTACION: Nro 002 Fecha: 30-11-1999 Doc: ESCRITURA 3069 VALOR ACTO: $85500000 "
+        . "ESPECIFICACION: COMPRAVENTA PERSONAS QUE INTERVIENEN EN EL ACTO DE: PROMOTORA TERRANOVA S.A. "
+        . "A: CARMEN CAPELLA DE ESCOBAR\n"
+        . "ANOTACION: Nro 003 Fecha: 20-01-2001 Doc: ESCRITURA 120 VALOR ACTO: $0 "
+        . "ESPECIFICACION: LIMITACION AL DOMINIO: 360 REGLAMENTO PROPIEDAD HORIZONTAL COEFICIENTE 0.1010%\n";
+    $ctlLongParsed = (new LegalCertificateParser())->parse($ctlLongOcrText, 'certificado187254.pdf');
+    $ctlLongFound = count(array_filter($ctlLongParsed['data'], static fn ($value): bool => trim((string) $value) !== ''));
+    expect(($ctlLongParsed['data']['matricula_inmobiliaria'] ?? '') === '060-187254'
+        && ($ctlLongParsed['data']['turno'] ?? '') === '2023-060-1-132812'
+        && ($ctlLongParsed['data']['fecha_apertura'] ?? '') === '13-02-2002'
+        && ($ctlLongParsed['data']['tipo_predio'] ?? '') === 'URBANO'
+        && str_contains((string) ($ctlLongParsed['data']['direccion'] ?? ''), 'KR 13 B')
+        && ($ctlLongParsed['data']['area'] ?? '') === '13.34'
+        && ($ctlLongParsed['data']['coeficiente'] ?? '') === '0.1010%'
+        && ($ctlLongParsed['data']['matricula_matriz'] ?? '') === '060-187193'
+        && count($ctlLongParsed['annotations']) === 3
+        && ($ctlLongParsed['data']['check_gravamenes'] ?? '') === 'Sí'
+        && ($ctlLongParsed['data']['check_propiedad_horizontal'] ?? '') === 'Sí'
+        && $ctlLongFound >= 18,
+        'parser juridico lee CTL largo con direccion multilinea anotaciones y PH');
     $legalRepo = new AppraisalLegalRepository($db);
     $legalManual = [];
     foreach (AppraisalLegalCatalog::fieldKeys() as $fieldKey) $legalManual[$fieldKey] = 'Guardado ' . $fieldKey;
