@@ -496,6 +496,32 @@ try {
         && str_contains((string) ($ctlParsed['data']['reporte_profesional_entregable'] ?? ''), '060-179788')
         && $ctlFound >= 15,
         'parser juridico lee certificado CTL con campos registrales fisicos y titularidad');
+    $ctlOcrText = "Certificado generado con el Pin No: 230912151482354135\n"
+        . "Nro Matr?cula: 060-187254 Pagina 1 TURNO: 2023-060-1-132812\n"
+        . "CIRCULO REGISTRAL: 060 - CARTAGENA DEPTO: BOLIVAR MUNICIPIO: CARTAGENA DE INDIAS VEREDA: CARTAGENA\n"
+        . "FECHA APERTURA: 13-02-2002 RADICACI?N: 2002-800\n"
+        . "ESTADO DEL FOLIO:\nACTIVO\nDESCRIPCION: CABIDA Y LINDEROS\n"
+        . "CABIDA Y LINDEROS Contenidos en ESCRITURA Nro 3069 de fecha 30-11-1999 en NOTARIA 2 de CARTAGENA "
+        . "con area de 855.00 M2.\n"
+        . "ANOTACION: Nro 001 Fecha: 07-04-1997 Radicaci?n: 1997-6570 Doc: ESCRITURA 3663 DEL 30-12-1996 "
+        . "VALOR ACTO: $ ESPECIFICACION: GRAVAMEN: 210 HIPOTECA PERSONAS QUE INTERVIENEN EN EL ACTO DE: FIDUCOLOMBIA "
+        . "A: GRANAHORRAR BANCO COMERCIAL\n"
+        . "ANOTACI?N Nro: 002 Fecha: 30-11-1999 Doc: ESCRITURA 3069 VALOR ACTO: $85500000 "
+        . "ESPECIFICACION: COMPRAVENTA PERSONAS QUE INTERVIENEN EN EL ACTO DE: PROMOTORA TERRANOVA S.A. "
+        . "A: CARMEN CAPELLA DE ESCOBAR";
+    $ctlOcrParsed = (new LegalCertificateParser())->parse($ctlOcrText, 'certificado187254.pdf');
+    expect(($ctlOcrParsed['data']['matricula_inmobiliaria'] ?? '') === '060-187254'
+        && ($ctlOcrParsed['data']['circulo_registral'] ?? '') === '060 - CARTAGENA'
+        && ($ctlOcrParsed['data']['departamento'] ?? '') === 'BOLIVAR'
+        && ($ctlOcrParsed['data']['municipio'] ?? '') === 'CARTAGENA DE INDIAS'
+        && ($ctlOcrParsed['data']['vereda'] ?? '') === 'CARTAGENA'
+        && ($ctlOcrParsed['data']['estado_folio'] ?? '') === 'ACTIVO'
+        && count($ctlOcrParsed['annotations']) === 2
+        && ($ctlOcrParsed['annotations'][0]['categoria'] ?? '') === 'gravamen'
+        && ($ctlOcrParsed['annotations'][1]['categoria'] ?? '') === 'tradicion'
+        && ($ctlOcrParsed['data']['check_gravamenes'] ?? '') === 'Sí'
+        && ($ctlOcrParsed['data']['check_tradicion'] ?? '') === 'Sí',
+        'parser juridico tolera etiquetas CTL con OCR parcial y caracteres danados');
     $legalRepo = new AppraisalLegalRepository($db);
     $legalManual = [];
     foreach (AppraisalLegalCatalog::fieldKeys() as $fieldKey) $legalManual[$fieldKey] = 'Guardado ' . $fieldKey;

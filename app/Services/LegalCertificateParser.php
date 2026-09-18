@@ -26,14 +26,14 @@ final class LegalCertificateParser
 
     private function annotations(string $text): array
     {
-        $pattern = '/anotaci(?:o|ó)n\s*:?\s*(?:nro|no|num(?:ero)?|n[uú]mero)?\.?\s*\d+/iu';
+        $pattern = '/anotaci(?:o|ó|\?)n\s*:?\s*(?:nro|no|num(?:ero)?|n[uú]mero)?\.?\s*:?\s*\d+/iu';
         if (!preg_match_all($pattern, $text, $matches, PREG_OFFSET_CAPTURE)) return [];
         $rows = [];
         foreach ($matches[0] as $index => $match) {
             $start = (int) $match[1];
             $end = isset($matches[0][$index + 1][1]) ? (int) $matches[0][$index + 1][1] : strlen($text);
             $block = preg_replace('/\s+/', ' ', substr($text, $start, $end - $start)) ?? '';
-            $rows[] = ['orden' => $this->match($block, ['/anotaci(?:o|ó)n\s*:?\s*(?:nro|no|num(?:ero)?|n[uú]mero)?\.?\s*(\d+)/iu']) ?: (string) ($index + 1),
+            $rows[] = ['orden' => $this->match($block, ['/anotaci(?:o|ó|\?)n\s*:?\s*(?:nro|no|num(?:ero)?|n[uú]mero)?\.?\s*:?\s*(\d+)/iu']) ?: (string) ($index + 1),
                 'fecha' => $this->match($block, ['/fecha\s*[:#]?\s*([0-9\/\-]{8,20})/iu']),
                 'documento' => $this->clean($this->match($block, ['/doc\s*\.?\s*:\s*(.+?)(?=\s+valor\s+acto|\s+especificaci|\s+personas\s+que\s+intervienen|$)/iu'])),
                 'valor' => $this->clean($this->match($block, ['/valor\s+acto\s*:\s*\$?\s*([0-9][0-9\.,\s]{1,60})/iu'])),
@@ -50,7 +50,9 @@ final class LegalCertificateParser
             if ($this->contains($txt, ['cancelacion', 'cancela', 'levantamiento', 'liberacion', 'desembargo'])) {
                 $state = 'solucionada'; $impact = 'Anotación de cancelación, levantamiento o superación de una afectación previa.';
             }
-            if ($this->contains($txt, ['compraventa', 'adjudicacion', 'adjudicación', 'sucesion', 'sucesión', 'donacion', 'donación', 'permuta', 'remate', 'transferencia'])) {
+            if ($this->contains($txt, ['compraventa', 'adjudicacion', 'adjudicación', 'adjudicaci?n',
+                'sucesion', 'sucesión', 'sucesi?n', 'donacion', 'donación', 'donaci?n', 'permuta',
+                'remate', 'transferencia', 'dacion', 'daci?n'])) {
                 $category = 'tradicion'; $impact = 'Integra la cadena de tradición o el soporte de titularidad.';
             }
             if ($this->contains($txt, ['propiedad horizontal', 'reglamento', 'coeficiente', 'copropiedad'])) {
