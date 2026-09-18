@@ -22,10 +22,6 @@ $attributeScore = static function (array $unit, array $catalog): array {
     $label = $score < 2.5 ? 'Desfavorable' : ($score < 3.5 ? 'Normal' : ($score < 4.3 ? 'Favorable' : 'Muy favorable'));
     return ['score' => $score, 'label' => $label, 'count' => $count];
 };
-$photosForAttribute = static function (string $unitId, string $key) use ($photos): array {
-    return array_values(array_filter($photos, static fn (array $photo): bool =>
-        (string) ($photo['unit_id'] ?? '') === $unitId && (string) ($photo['caption'] ?? '') === 'attribute:' . $key));
-};
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{ activeAttributes: '<?= e($attributeUnits[0]['id'] ?? '') ?>', busyAttributes: false }">
@@ -68,28 +64,11 @@ $photosForAttribute = static function (string $unitId, string $key) use ($photos
         <?php if ($attributeUnits): ?>
             <div class="mt-5 flex justify-end">
                 <p class="mr-auto self-center text-xs font-semibold text-slate-500" data-autosave-status>
-                    Autoguardado activo para textos y atributos. Las fotos se suben con su botón.
+                    Autoguardado activo para textos y atributos. Las evidencias marcadas como Foto se cargan en 3.6.
                 </p>
                 <button class="btn-primary" type="submit" :disabled="busyAttributes"
                     x-text="busyAttributes ? 'Guardando...' : 'Guardar atributos'">Guardar atributos</button>
             </div>
         <?php endif; ?>
     </form>
-    <?php foreach ($attributeUnits as $unit): ?>
-        <div x-show="activeAttributes === '<?= e($unit['id']) ?>'">
-            <?php
-            $photoUploadEmbedded = true;
-            $photoUploadUnitId = (string) $unit['id'];
-            $photoUploadUnitLabel = $unit['label'] ?: $attributeUnitLabel($unit);
-            $photoUploadTypology = (string) $unit['igac_typology_hint'];
-            $photoUploadEyebrow = 'Evidencia de atributos';
-            $photoUploadTitle = 'Fotos de atributos y diferenciales';
-            $photoUploadDescription = 'Pega o sube imágenes que soporten vista, acabados, acceso, estado u otros atributos diferenciales de esta unidad.';
-            $photoUploadReturnTo = $subjectActionBase . '#atributos';
-            require BASE_PATH . '/app/Views/appraisals/photo-upload.php';
-            unset($photoUploadEmbedded, $photoUploadUnitId, $photoUploadUnitLabel, $photoUploadTypology,
-                $photoUploadEyebrow, $photoUploadTitle, $photoUploadDescription, $photoUploadReturnTo);
-            ?>
-        </div>
-    <?php endforeach; ?>
 </section>

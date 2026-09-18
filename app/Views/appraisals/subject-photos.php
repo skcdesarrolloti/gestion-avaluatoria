@@ -40,6 +40,8 @@ foreach (array_values(array_filter($units, static fn (array $unit): bool => $uni
         $caption = 'attribute:' . $key;
         $attributePhotoRequirements[] = [
             'unit_id' => $unitId,
+            'key' => (string) $key,
+            'caption' => $caption,
             'label' => $attributeLabels[$key] ?? ucfirst(str_replace('_', ' ', (string) $key)),
             'covered' => isset($storedAttributePhotos[$unitId . '|' . $caption]),
         ];
@@ -99,9 +101,32 @@ foreach (array_values(array_filter($units, static fn (array $unit): bool => $uni
                         <?php endforeach; ?>
                     </div>
                     <p class="mt-3 text-xs leading-5 text-amber-900">
-                        Para cerrar un pendiente, vuelve a 3.4, deja el atributo en evidencia Foto y carga o pega
-                        la imagen en la columna Foto soporte.
+                        Para cerrar un pendiente, carga o pega aquí la imagen correspondiente. Si dejas el nombre vacío,
+                        el sistema usará el nombre del atributo.
                     </p>
+                </div>
+            <?php endif; ?>
+            <?php if ($unitRequirements): ?>
+                <div class="mt-5 grid gap-5 xl:grid-cols-2">
+                    <?php foreach ($unitRequirements as $requirement): ?>
+                        <?php
+                        $photoUploadEmbedded = true;
+                        $photoUploadCompact = true;
+                        $photoUploadUnitId = $photoUnit['id'];
+                        $photoUploadUnitLabel = $photoUnit['label'];
+                        $photoUploadTypology = $photoUnit['typology'];
+                        $photoUploadEyebrow = 'Evidencia marcada en 3.4';
+                        $photoUploadTitle = $requirement['label'];
+                        $photoUploadDescription = 'Carga la imagen soporte de este atributo diferencial. Si el campo nombre queda vacío, se guardará como ' . $requirement['label'] . '.';
+                        $photoUploadCaption = $requirement['caption'];
+                        $photoUploadNamePlaceholder = $requirement['label'];
+                        $photoUploadReturnTo = $subjectActionBase . '#' . $tabAnchor;
+                        require BASE_PATH . '/app/Views/appraisals/photo-upload.php';
+                        unset($photoUploadEmbedded, $photoUploadCompact, $photoUploadUnitId, $photoUploadUnitLabel,
+                            $photoUploadTypology, $photoUploadEyebrow, $photoUploadTitle, $photoUploadDescription,
+                            $photoUploadCaption, $photoUploadNamePlaceholder, $photoUploadReturnTo);
+                        ?>
+                    <?php endforeach; ?>
                 </div>
             <?php endif; ?>
             <div class="mt-5 grid gap-5 xl:grid-cols-2">

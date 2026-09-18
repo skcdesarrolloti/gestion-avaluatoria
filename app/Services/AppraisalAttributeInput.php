@@ -36,7 +36,6 @@ final class AppraisalAttributeInput
     {
         return [
             'value' => self::short($item['value'] ?? '', 80),
-            'state' => self::short($item['state'] ?? '', 40),
             'impact' => self::short($item['impact'] ?? '', 40),
             'evidence' => self::short($item['evidence'] ?? '', 40),
             'rating' => self::allowed($item['rating'] ?? '', ['', '1', '2', '3', '4', '5']),

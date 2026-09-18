@@ -365,6 +365,11 @@ try {
     expect($storedCount === 1 && $storedPhoto['caption'] === 'attribute:vista_tipo'
         && $storedPhoto['display_name'] === 'Tipo de vista',
         'foto de atributo se guarda con nombre visible del atributo');
+    $attributeNameController = (new ReflectionClass(AppraisalSubjectController::class))->newInstanceWithoutConstructor();
+    $attributePhotoName = new ReflectionMethod(AppraisalSubjectController::class, 'attributePhotoName');
+    expect($attributePhotoName->invoke($attributeNameController, 'attribute:vista_tipo') === 'Tipo de vista'
+        && $attributePhotoName->invoke($attributeNameController, 'registro:general:portada') === '',
+        'foto cargada en 3.6 puede heredar nombre del atributo');
     $sectorData = AppraisalSectorInput::data(['sector_name' => ' Bruselas ampliado ',
         'services_status' => 'completa', 'connectivity' => 'invalida',
         'sector_report_text' => str_repeat('x', 2500)]);
