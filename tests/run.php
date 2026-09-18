@@ -524,6 +524,18 @@ try {
     expect(($tablePartyParsed['annotations'][0]['estado_juridico'] ?? '') === 'solucionada'
         && ($tablePartyParsed['annotations'][0]['cancelada_por'] ?? '') === '035',
         'parser juridico cierra cautelar con partes leidas desde texto tabular');
+    $partyIdCancelText = "Nro Matrícula: 060-999999\nEstado del Folio: ACTIVO\n"
+        . "ANOTACION Nro 032 Fecha: 01-10-2021 Doc: OFICIO 168 "
+        . "Especificación: MEDIDA CAUTELAR: 0492 DEMANDA EN PROCESO VERBAL PROCESO DECLARATIVO "
+        . "DE DEMANDANTE C.C 45.457.877 A DEMANDADO CC 73145456.\n"
+        . "ANOTACION Nro 035 Fecha: 13-09-2022 Doc: OFICIO 197 "
+        . "Especificación: CANCELACION: 0856 CANCELACION POR ORDEN JUDICIAL EMBARGO EJECUTIVO "
+        . "CON ACCION REAL A MERLANO MENDOZA SEBASTIAN CC# 73145456 "
+        . "A: VELEZ OSPINO MARIA ELENA CC# 45757877.";
+    $partyIdCancelParsed = (new LegalCertificateParser())->parse($partyIdCancelText, 'certificado-ids.txt');
+    expect(($partyIdCancelParsed['annotations'][0]['estado_juridico'] ?? '') === 'solucionada'
+        && ($partyIdCancelParsed['annotations'][0]['cancelada_por'] ?? '') === '035',
+        'parser juridico cierra cautelar por identificaciones compartidas de partes');
     $mixedCancelText = "Nro Matrícula: 060-999999\nEstado del Folio: ACTIVO\n"
         . "ANOTACION Nro 020 Fecha: 08-04-2011 Doc: OFICIO 574 Especificación: MEDIDA CAUTELAR: "
         . "0429 EMBARGO EJECUTIVO CON ACCION REAL RADICADO 13001310300420110012800 "

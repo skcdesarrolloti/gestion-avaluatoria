@@ -14,7 +14,8 @@ final class LegalCertificateCancellationMatcher
         foreach ($rows as $key => $row) {
             $refs = array_values(array_unique(array_merge($this->references($row),
                 $this->refsBySharedId($rows, $key, $row),
-                $this->refsBySharedParties($rows, $key, $row))));
+                $this->refsBySharedParties($rows, $key, $row),
+                $this->refsBySharedPartyIds($rows, $key, $row))));
             if (!$refs) continue;
             $closed = [];
             foreach ($refs as $ref) {
@@ -96,10 +97,27 @@ final class LegalCertificateCancellationMatcher
             $score = count(array_intersect($closingTokens, $this->partyTokens($target)));
             if ($score >= 3) $matches[] = ['score' => $score, 'order' => (string) ($target['orden'] ?? '')];
         }
-        if (!$matches) return [];
-        $best = max(array_column($matches, 'score'));
-        return array_values(array_filter(array_unique(array_column(array_filter($matches,
-            static fn (array $match): bool => $match['score'] === $best), 'order'))));
+        return array_values(array_filter(array_unique(array_column($matches, 'order'))));
+    }
+
+    private function refsBySharedPartyIds(array $rows, int|string $key, array $row): array
+    {
+        $text = (string) ($row['texto'] ?? '');
+        if (!preg_match('/cancelaci|cancela|levantamiento|desembargo|liberaci(?:o|ó|\?|Ã³)n/iu', $text)) return [];
+        $closingIds = $this->partyIds($row);
+        if (!$closingIds) return [];
+        $closingTokens = $this->partyTokens($row);
+        $refs = [];
+        foreach ($rows as $targetKey => $target) {
+            if ($targetKey === $key || (int) $targetKey >= (int) $key) continue;
+            if (($target['estado_juridico'] ?? '') === 'solucionada') continue;
+            if (($target['categoria'] ?? '') !== 'medida_cautelar') continue;
+            $sharedIds = count(array_intersect($closingIds, $this->partyIds($target)));
+            if ($sharedIds >= 2 || ($sharedIds >= 1 && count(array_intersect($closingTokens, $this->partyTokens($target))) >= 2)) {
+                $refs[] = (string) ($target['orden'] ?? '');
+            }
+        }
+        return array_values(array_filter(array_unique($refs)));
     }
 
     private function partyTokens(array $row): array
@@ -114,6 +132,21 @@ final class LegalCertificateCancellationMatcher
             'CIRCUITO', 'OCTAVO', 'CUARTO', 'ORALIDAD', 'EJECUTIVO', 'ACCION', 'REAL', 'ORDEN',
             'PROVIDENCIA'];
         return array_values(array_diff(array_unique($matches[0] ?? []), $stop));
+    }
+
+    private function partyIds(array $row): array
+    {
+        $text = implode(' ', [(string) ($row['personaDe'] ?? ''), (string) ($row['personaA'] ?? ''),
+            (string) ($row['texto'] ?? '')]);
+        if (!preg_match_all('/\b(?:c\.?\s*c\.?|cc|cedula|c[eé]dula|nit)\s*#?\s*([0-9][0-9.\-\s]{5,})/iu', $text, $matches)) {
+            return [];
+        }
+        $ids = [];
+        foreach ($matches[1] as $raw) {
+            $digits = preg_replace('/\D+/', '', (string) $raw) ?? '';
+            if (strlen($digits) >= 6 && !preg_match('/^0+$/', $digits)) $ids[] = ltrim($digits, '0');
+        }
+        return array_values(array_unique($ids));
     }
 
     private function identifiers(string $text): array
