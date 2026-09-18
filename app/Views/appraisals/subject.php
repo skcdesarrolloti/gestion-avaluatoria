@@ -15,18 +15,19 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
             descripciones técnicas para alimentar la caracterización del avalúo.
         </p>
     </div>
-    <div class="flex flex-wrap items-center gap-3">
-        <button class="btn-secondary" type="button" disabled>
-            Imprimir documento de Inspección Bien Sujeto
-        </button>
-        <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Sujeto del avalúo</span>
-    </div>
+    <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Sujeto del avalúo</span>
 </div>
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
 <div class="mt-7"
     x-data="{ activeSubject: 'basic', syncSubject() { this.activeSubject = location.hash === '#superficies' ? 'surface' : (location.hash === '#construccion' ? 'construction' : (location.hash === '#atributos' ? 'attributes' : (location.hash.startsWith('#fotos') ? 'photos' : 'basic'))) } }"
     x-init="syncSubject()" @hashchange.window="syncSubject()">
+    <div class="mb-3 flex flex-wrap justify-end">
+        <button class="btn-secondary" type="button" aria-disabled="true"
+            title="Pendiente de construir después de terminar 3.5 PH.">
+            Imprimir documento de Inspección Bien Sujeto
+        </button>
+    </div>
     <div class="rounded-2xl border border-slate-200 bg-white p-3 shadow-sm">
         <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
             <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
