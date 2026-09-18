@@ -8,6 +8,7 @@ use App\Core\Http;
 use App\Services\AppraisalValidator;
 use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterZeroInput;
+use App\Services\AppraisalPhInput;
 use App\Services\AppraisalSectorInput;
 use App\Services\AppraisalMidasReview;
 use App\Services\AppraisalMidasSupportUploadService;
@@ -34,6 +35,7 @@ use App\Services\RateLimiter;
 use App\Controllers\AppraisalController;
 use App\Controllers\AppraisalSubjectController;
 use App\Models\AppraisalLegalRepository;
+use App\Models\AppraisalPhRepository;
 use App\Models\AppraisalRepository;
 use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraiserRepository;
@@ -146,6 +148,14 @@ try {
         appraisal_id TEXT PRIMARY KEY, owner_id INTEGER, source_certificate_id TEXT,
         status TEXT, data_json TEXT, annotations_json TEXT, alerts_json TEXT,
         extracted_text TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE appraisal_ph_profiles (
+        appraisal_id TEXT PRIMARY KEY, owner_id INTEGER, ph_key TEXT, ph_name TEXT,
+        administration_name TEXT, administration_contact TEXT, administration_phone TEXT,
+        administration_email TEXT, matrix_registration TEXT, private_unit TEXT, coefficient TEXT,
+        regulation_document TEXT, reform_documents TEXT, monthly_fee TEXT, fee_status TEXT,
+        reserve_fund TEXT, insurance_status TEXT, restrictions_text TEXT, common_areas_json TEXT,
+        documents_json TEXT, risks_json TEXT, photos_json TEXT, diagnosis_text TEXT,
+        report_text TEXT, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE appraisal_legal_certificates (
         id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER, source_filename TEXT,
         storage_filename TEXT, mime_type TEXT, file_size_bytes INTEGER, extracted_chars INTEGER,
@@ -347,6 +357,20 @@ try {
         'atributos especiales dependen del tipo de inmueble y excluyen PH');
     expect(AppraisalSpecialAttributeCatalog::labels()['vista_vivienda'] === 'Vista',
         'atributos especiales exponen nombres para evidencia fotografica');
+    $_POST = ['ph' => ['ph_key' => 'NIT 900123456', 'ph_name' => 'Conjunto Prueba',
+        'common_areas' => ['porteria' => ['status' => 'ok', 'notes' => 'Acceso controlado'],
+            'inventado' => ['status' => 'risk', 'notes' => 'No debe pasar']],
+        'documents' => ['paquete_zip' => ['status' => 'warn', 'notes' => 'Pendiente de carga masiva']]]];
+    $phData = AppraisalPhInput::data();
+    expect($phData['ph_key'] === 'NIT 900123456'
+        && ($phData['common_areas']['porteria']['status'] ?? '') === 'ok'
+        && !isset($phData['common_areas']['inventado']), 'propiedad horizontal normaliza checklist');
+    $phRepo = new AppraisalPhRepository($db);
+    $phRepo->save(str_repeat('a', 32), 1, $phData);
+    $storedPh = $phRepo->profile(str_repeat('a', 32), 1);
+    expect($storedPh['ph_name'] === 'Conjunto Prueba'
+        && ($storedPh['documents']['paquete_zip']['status'] ?? '') === 'warn',
+        'propiedad horizontal guarda perfil por avaluo');
     $photoDb = new PDO('sqlite::memory:', null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
     $photoDb->exec('CREATE TABLE appraisal_photos (
         id TEXT, appraisal_id TEXT, owner_id INTEGER, unit_id TEXT, source_filename TEXT,

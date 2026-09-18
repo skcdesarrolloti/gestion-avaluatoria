@@ -71,6 +71,8 @@ return [
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/construcciones/autoguardar$#', 'subject', 'autosaveConstructions', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/atributos$#', 'subject', 'saveAttributes', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/atributos/autoguardar$#', 'subject', 'autosaveAttributes', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph$#', 'subject', 'savePh', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/autoguardar$#', 'subject', 'autosavePh', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/fotos$#', 'subject', 'uploadPhotos', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/fotos/([a-f0-9]{32})/eliminar$#', 'subject', 'deletePhoto', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/fotos/([a-f0-9]{32})$#', 'subject', 'photo', true],

@@ -14,6 +14,14 @@ $photoCategories = [
     'documento' => ['Documento / soporte', 'Capturas o fotos de documentos útiles para el entregable.'],
     'adicional' => ['Fotos adicionales', 'Agrega evidencias complementarias con nombre propio para el informe.'],
 ];
+if ((string) ($record['regimen_ph'] ?? '') === 'si') {
+    $photoCategories += [
+        'ph_acceso' => ['PH · fachada y acceso', 'Acceso, fachada o ingreso principal de la copropiedad.'],
+        'ph_porteria' => ['PH · portería y control', 'Portería, recepción, vigilancia o control de acceso.'],
+        'ph_comunes' => ['PH · zonas comunes', 'Zonas sociales, circulaciones, parqueaderos de visitantes o servicios comunes.'],
+        'ph_equipos' => ['PH · equipos y mantenimiento', 'Tanques, planta, red contra incendio, cuarto de basuras o estado de conservación común.'],
+    ];
+}
 $photoTabMap = [];
 foreach ($photoUnits as $photoUnit) {
     $photoTabMap['fotos-' . ($photoUnit['id'] ?: 'general')] = $photoUnit['kind'] . ':' . $photoUnit['id'];

@@ -2,15 +2,15 @@
 declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, HttpException, Session};
-use App\Models\{AppraisalRepository, AppraisalSubjectRepository, GeoMasterRepository, IgacTypologyRepository};
-use App\Services\{AppraisalAttributeInput, AppraisalChapterZeroInput, AppraisalPhotoUploadService};
-use App\Support\{AppraisalCatalog, AppraisalSpecialAttributeCatalog, AppraisalSubjectCatalog};
+use App\Models\{AppraisalPhRepository, AppraisalRepository, AppraisalSubjectRepository, GeoMasterRepository, IgacTypologyRepository};
+use App\Services\{AppraisalAttributeInput, AppraisalChapterZeroInput, AppraisalPhInput, AppraisalPhotoUploadService};
+use App\Support\{AppraisalCatalog, AppraisalPhCatalog, AppraisalSpecialAttributeCatalog, AppraisalSubjectCatalog};
 
 final class AppraisalSubjectController
 {
     public function __construct(
         private AppraisalRepository $appraisals, private array $user, private IgacTypologyRepository $typologies,
-        private AppraisalSubjectRepository $subjects, private GeoMasterRepository $geo
+        private AppraisalSubjectRepository $subjects, private GeoMasterRepository $geo, private AppraisalPhRepository $ph
     ) {}
 
     public function show(string $id): void
@@ -24,6 +24,11 @@ final class AppraisalSubjectController
                 'neighborhoods' => $this->geo->neighborhoods()],
             'photos' => $this->appraisals->photos($id, $this->user['id']),
             'units' => $this->appraisals->units($id, $this->user['id']),
+            'phProfile' => $this->ph->profile($id, $this->user['id']),
+            'phLegalPrefill' => $this->ph->legalPrefill($id, $this->user['id']),
+            'phCatalog' => ['status' => AppraisalPhCatalog::statusOptions(),
+                'commonAreas' => AppraisalPhCatalog::commonAreas(), 'documents' => AppraisalPhCatalog::documents(),
+                'risks' => AppraisalPhCatalog::risks(), 'photos' => AppraisalPhCatalog::photos()],
             'igacCategories' => $this->typologies->categories(),
             'igacTypologiesByCategory' => $this->typologies->optionsByCategory(),
             'specialAttributeCatalog' => AppraisalSpecialAttributeCatalog::groups((string) ($record['tipo_inmueble'] ?? '')),
@@ -73,6 +78,12 @@ final class AppraisalSubjectController
 
     public function autosaveAttributes(string $id): never
     { $this->appraisals->find($id, $this->user['id']); $this->appraisals->saveUnitAttributes($id, $this->user['id'], AppraisalAttributeInput::unitAttributeData()); $this->savedJson(); }
+
+    public function savePh(string $id): never
+    { $this->saveSubjectData($id, fn () => $this->ph->save($id, $this->user['id'], AppraisalPhInput::data()), 'Propiedad horizontal guardada correctamente.', '#ph'); }
+
+    public function autosavePh(string $id): never
+    { $this->appraisals->find($id, $this->user['id']); $this->ph->save($id, $this->user['id'], AppraisalPhInput::data()); $this->savedJson(); }
 
     public function savePreclassification(string $id): never
     { $this->savePreclassificationAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }
