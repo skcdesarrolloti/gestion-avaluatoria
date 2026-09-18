@@ -39,6 +39,9 @@ final class AppraisalAttributeInput
             'state' => self::short($item['state'] ?? '', 40),
             'impact' => self::short($item['impact'] ?? '', 40),
             'evidence' => self::short($item['evidence'] ?? '', 40),
+            'rating' => self::allowed($item['rating'] ?? '', ['', '1', '2', '3', '4', '5']),
+            'weight' => self::allowed($item['weight'] ?? '', ['', '1', '2', '3']),
+            'use_in_comparables' => self::allowed($item['use_in_comparables'] ?? '', ['', 'si', 'no']),
             'notes' => self::short($item['notes'] ?? '', 220),
         ];
     }
@@ -46,5 +49,11 @@ final class AppraisalAttributeInput
     private static function short(mixed $value, int $limit): string
     {
         return mb_substr(trim((string) $value), 0, $limit);
+    }
+
+    private static function allowed(mixed $value, array $allowed): string
+    {
+        $value = trim((string) $value);
+        return in_array($value, $allowed, true) ? $value : '';
     }
 }

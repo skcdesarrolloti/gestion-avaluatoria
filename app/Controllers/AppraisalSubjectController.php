@@ -26,7 +26,7 @@ final class AppraisalSubjectController
             'units' => $this->appraisals->units($id, $this->user['id']),
             'igacCategories' => $this->typologies->categories(),
             'igacTypologiesByCategory' => $this->typologies->optionsByCategory(),
-            'specialAttributeCatalog' => AppraisalSpecialAttributeCatalog::groups(),
+            'specialAttributeCatalog' => AppraisalSpecialAttributeCatalog::groups((string) ($record['tipo_inmueble'] ?? '')),
             'specialAttributeOptions' => AppraisalSpecialAttributeCatalog::selectOptions(),
             'subjectCatalog' => AppraisalSubjectCatalog::selects(),
             'subjectHelp' => AppraisalSubjectCatalog::helps(),

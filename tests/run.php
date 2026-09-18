@@ -50,6 +50,7 @@ use App\Support\AppraisalSectorCatalog;
 use App\Support\AppraisalSectorFieldGuidance;
 use App\Support\AppraisalLegalCatalog;
 use App\Support\AppraisalLegalView;
+use App\Support\AppraisalSpecialAttributeCatalog;
 use App\Support\SectorBankCatalog;
 
 // All fixtures are in memory; never connect to the configured production database.
@@ -326,11 +327,19 @@ try {
         && str_contains($constructionRows[0]['construction_conservation_json'], 'estructura'), 'construccion por unidad normalizada');
     $_POST = ['unit_attributes' => [$unitId => ['items' => ['esquina' => ['value' => 'esquinero',
         'state' => 'bueno', 'impact' => 'positivo_medio', 'evidence' => 'visita',
+        'rating' => '4', 'weight' => '3', 'use_in_comparables' => 'si',
         'notes' => 'Frente comercial observado'], 'desconocido' => ['value' => 'x']],
         'report_text' => 'Unidad con condición esquinera verificable.']]];
     $attributeRows = AppraisalAttributeInput::unitAttributeData();
     expect(str_contains($attributeRows[0]['special_attributes_json'], 'esquinero')
+        && str_contains($attributeRows[0]['special_attributes_json'], '"rating":"4"')
+        && str_contains($attributeRows[0]['special_attributes_json'], '"weight":"3"')
         && !str_contains($attributeRows[0]['special_attributes_json'], 'desconocido'), 'atributos especiales normalizados');
+    $localAttributeGroups = AppraisalSpecialAttributeCatalog::groups('local');
+    $warehouseAttributeGroups = AppraisalSpecialAttributeCatalog::groups('bodega');
+    expect(isset($localAttributeGroups['comercial'], $warehouseAttributeGroups['industrial'])
+        && !isset($localAttributeGroups['ph'], $warehouseAttributeGroups['ph']),
+        'atributos especiales dependen del tipo de inmueble y excluyen PH');
     $sectorData = AppraisalSectorInput::data(['sector_name' => ' Bruselas ampliado ',
         'services_status' => 'completa', 'connectivity' => 'invalida',
         'sector_report_text' => str_repeat('x', 2500)]);
