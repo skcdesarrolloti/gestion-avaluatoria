@@ -17,22 +17,17 @@ final class ValuationStandardRepository
     {
         $rows = $this->db->query("SELECT c.code category_code, c.name category_name, c.group_type,
             c.sort_order category_sort, s.slug, s.standard_code, s.title, s.kind, s.sector_code,
-            s.source_filename, s.storage_filename, s.file_size_bytes, s.imported_at, s.sort_order standard_sort
+            s.source_filename, s.storage_filename, s.file_size_bytes, s.imported_at, s.pdf_blob IS NOT NULL AS has_blob,
+            s.sort_order standard_sort
             FROM valuation_standard_categories c
             LEFT JOIN valuation_standards s ON s.category_code = c.code
             ORDER BY c.sort_order ASC, s.sort_order ASC")->fetchAll();
         $categories = [];
         foreach ($rows as $row) {
             $code = (string) $row['category_code'];
-            $categories[$code] ??= [
-                'code' => $code,
-                'name' => $row['category_name'],
-                'group_type' => $row['group_type'],
-                'standards' => [],
-            ];
-            if ($row['slug'] !== null) {
-                $categories[$code]['standards'][] = $this->hydrateStandard($row);
-            }
+            $categories[$code] ??= ['code' => $code, 'name' => $row['category_name'],
+                'group_type' => $row['group_type'], 'standards' => []];
+            if ($row['slug'] !== null) $categories[$code]['standards'][] = $this->hydrateStandard($row);
         }
         return array_values($categories);
     }
@@ -59,24 +54,19 @@ final class ValuationStandardRepository
         $summary = ['copied' => [], 'skipped' => [], 'missing' => []];
         foreach ($this->allStandards() as $standard) {
             $source = $sourceRoot . DIRECTORY_SEPARATOR . $standard['source_filename'];
-            if (!is_file($source)) {
-                $summary['missing'][] = $standard['source_filename'];
-                continue;
-            }
+            if (!is_file($source)) { $summary['missing'][] = $standard['source_filename']; continue; }
             $destination = self::storagePath($standard['storage_filename']);
             if ($this->storedMatchesSource($destination, $source)) {
-                $this->markImported($standard['slug'], (int) filesize($destination));
+                $this->markImported($standard['slug'], (int) filesize($destination), $this->pdfBlob($destination));
                 $summary['skipped'][] = $standard['source_filename'];
                 continue;
             }
-            if (!copy($source, $destination)) {
-                throw new \RuntimeException('No se pudo copiar ' . $standard['source_filename']);
-            }
+            if (!copy($source, $destination)) throw new \RuntimeException('No se pudo copiar ' . $standard['source_filename']);
             clearstatcache(true, $destination);
             if (!StandardFileStorage::isPdf($destination, $standard['source_filename'])) {
                 throw new \RuntimeException('El PDF copiado no quedó verificado: ' . $standard['source_filename']);
             }
-            $this->markImported($standard['slug'], (int) filesize($destination));
+            $this->markImported($standard['slug'], (int) filesize($destination), $this->pdfBlob($destination));
             $summary['copied'][] = $standard['source_filename'];
         }
         return $summary;
@@ -93,25 +83,16 @@ final class ValuationStandardRepository
         $result = ['ok' => true, 'copied' => [], 'skipped' => [], 'unknown' => [], 'errors' => [], 'missing' => []];
         foreach ($this->uploadedFiles($files) as $file) {
             $name = $this->cleanUploadName($file['name']);
-            if ($file['error'] !== UPLOAD_ERR_OK) {
-                $result['errors'][] = "$name " . StandardFileStorage::uploadErrorMessage($file['error']);
-                continue;
-            }
-            if (!StandardFileStorage::isPdf($file['tmp_name'], $name)) {
-                $result['errors'][] = "$name no es un PDF válido.";
-                continue;
-            }
+            if ($file['error'] !== UPLOAD_ERR_OK) { $result['errors'][] = "$name " . StandardFileStorage::uploadErrorMessage($file['error']); continue; }
+            if (!StandardFileStorage::isPdf($file['tmp_name'], $name)) { $result['errors'][] = "$name no es un PDF válido."; continue; }
             $standard = $byName[$this->filenameKey($name)] ?? null;
-            if (!$standard) {
-                $result['unknown'][] = $name;
-                continue;
-            }
+            if (!$standard) { $result['unknown'][] = $name; continue; }
             $destination = self::storagePath($standard['storage_filename']);
             $bytes = (int) filesize($file['tmp_name']);
             $sameFile = is_file($destination) && filesize($destination) === $bytes
                 && hash_file('sha256', $destination) === hash_file('sha256', $file['tmp_name']);
             if ($sameFile) {
-                $this->markImported($standard['slug'], $bytes);
+                $this->markImported($standard['slug'], $bytes, $this->pdfBlob($destination));
                 $result['skipped'][] = $standard['source_filename'];
                 continue;
             }
@@ -121,11 +102,11 @@ final class ValuationStandardRepository
                 $result['errors'][] = "$name no se pudo guardar: " . $error->getMessage();
                 continue;
             }
-            $this->markImported($standard['slug'], $storedBytes);
+            $this->markImported($standard['slug'], $storedBytes, $this->pdfBlob($destination));
             $result['copied'][] = $standard['source_filename'];
         }
         foreach ($standards as $standard) {
-            if (!is_file(self::storagePath($standard['storage_filename']))) {
+            if (!is_file(self::storagePath($standard['storage_filename'])) && empty($standard['has_blob'])) {
                 $result['missing'][] = $standard['source_filename'];
             }
         }
@@ -138,8 +119,9 @@ final class ValuationStandardRepository
         $present = $markedMissing = 0;
         foreach ($standards as $standard) {
             $exists = is_file(self::storagePath($standard['storage_filename']));
-            $present += $exists ? 1 : 0;
-            $markedMissing += (!$exists && $standard['file_size_bytes'] !== null) ? 1 : 0;
+            $backed = !$exists && !empty($standard['has_blob']);
+            $present += ($exists || $backed) ? 1 : 0;
+            $markedMissing += (!$exists && !$backed && $standard['file_size_bytes'] !== null) ? 1 : 0;
         }
         return ['dir' => self::storageDir(), 'configured' => StandardFileStorage::configured(),
             'writable' => StandardFileStorage::writable(), 'present' => $present,
@@ -149,7 +131,8 @@ final class ValuationStandardRepository
 
     private function allStandards(): array
     {
-        return $this->db->query('SELECT slug, source_filename, storage_filename, file_size_bytes
+        return $this->db->query('SELECT slug, source_filename, storage_filename, file_size_bytes,
+            pdf_blob IS NOT NULL AS has_blob
             FROM valuation_standards ORDER BY sort_order')
             ->fetchAll();
     }
@@ -162,8 +145,7 @@ final class ValuationStandardRepository
         }
         $uploads = [];
         foreach (array_keys($names) as $index) {
-            $uploads[] = ['name' => (string) ($files['name'][$index] ?? ''),
-                'tmp_name' => (string) ($files['tmp_name'][$index] ?? ''),
+            $uploads[] = ['name' => (string) ($files['name'][$index] ?? ''), 'tmp_name' => (string) ($files['tmp_name'][$index] ?? ''),
                 'error' => (int) ($files['error'][$index] ?? UPLOAD_ERR_NO_FILE)];
         }
         return $uploads;
@@ -182,33 +164,39 @@ final class ValuationStandardRepository
             && StandardFileStorage::isPdf($destination, $destination);
     }
 
-    private function markImported(string $slug, int $bytes): void
+    private function markImported(string $slug, int $bytes, string $blob): void
     {
         $query = $this->db->prepare('UPDATE valuation_standards
-            SET file_size_bytes = ?, imported_at = ?, updated_at = ? WHERE slug = ?');
+            SET file_size_bytes = ?, pdf_blob = ?, imported_at = ?, updated_at = ? WHERE slug = ?');
         $now = gmdate('Y-m-d H:i:s');
-        $query->execute([$bytes, $now, $now, $slug]);
+        $query->execute([$bytes, $blob, $now, $now, $slug]);
     }
 
     private function hydrateStandard(array $row): array
     {
         $filename = (string) $row['storage_filename'];
         $path = self::storagePath($filename);
-        return [
-            'slug' => $row['slug'],
-            'category_code' => $row['category_code'],
-            'category_name' => $row['category_name'],
-            'standard_code' => $row['standard_code'],
-            'title' => $row['title'],
-            'kind' => $row['kind'],
-            'sector_code' => $row['sector_code'],
-            'source_filename' => $row['source_filename'],
-            'storage_filename' => $filename,
+        $hasBlob = !empty($row['has_blob']) || (is_string($row['pdf_blob'] ?? null) && $row['pdf_blob'] !== '');
+        return ['slug' => $row['slug'], 'category_code' => $row['category_code'],
+            'category_name' => $row['category_name'], 'standard_code' => $row['standard_code'],
+            'title' => $row['title'], 'kind' => $row['kind'], 'sector_code' => $row['sector_code'],
+            'source_filename' => $row['source_filename'], 'storage_filename' => $filename,
             'summary' => $row['summary'] ?? '',
             'file_size_bytes' => $row['file_size_bytes'] !== null ? (int) $row['file_size_bytes'] : null,
             'imported_at' => $row['imported_at'] ?? null,
-            'has_file' => is_file($path),
+            'has_blob' => $hasBlob,
+            'pdf_blob' => $row['pdf_blob'] ?? null,
+            'has_file' => is_file($path) || $hasBlob,
             'file_path' => $path,
         ];
+    }
+
+    private function pdfBlob(string $path): string
+    {
+        $blob = file_get_contents($path);
+        if (!is_string($blob)) {
+            throw new \RuntimeException('El PDF se guardó en disco, pero no se pudo crear el respaldo interno.');
+        }
+        return $blob;
     }
 }

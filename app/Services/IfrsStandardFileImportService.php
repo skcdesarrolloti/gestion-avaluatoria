@@ -24,7 +24,7 @@ final class IfrsStandardFileImportService
         if (!$this->sameFile($destination, (string) $file['tmp_name'], $bytes)) {
             $bytes = IfrsFileStorage::storeUploaded((string) $file['tmp_name'], $destination);
         }
-        $this->standards->saveImportedFile((string) $standard['slug'], $name, $storageName, $bytes);
+        $this->standards->saveImportedFile((string) $standard['slug'], $name, $storageName, $bytes, $this->pdfBlob($destination));
         return ['ok' => true, 'copied' => [$name], 'skipped' => []];
     }
 
@@ -43,4 +43,13 @@ final class IfrsStandardFileImportService
     }
 
     private function cleanUploadName(string $name): string { return basename(str_replace('\\', '/', $name)); }
+
+    private function pdfBlob(string $path): string
+    {
+        $blob = file_get_contents($path);
+        if (!is_string($blob)) {
+            throw new \RuntimeException('El PDF se guardó en disco, pero no se pudo crear el respaldo interno.');
+        }
+        return $blob;
+    }
 }

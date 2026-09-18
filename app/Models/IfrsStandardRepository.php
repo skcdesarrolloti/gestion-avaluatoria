@@ -18,7 +18,8 @@ final class IfrsStandardRepository
         $rows = $this->db->query("SELECT g.code group_code, g.name group_name, s.slug,
             s.standard_code, s.title, s.applicable_categories, s.measurement_focus,
             s.summary, s.field_relevance, s.source_reference, s.status, s.source_filename,
-            s.storage_filename, s.file_size_bytes, s.imported_at, s.sort_order standard_sort
+            s.storage_filename, s.file_size_bytes, s.imported_at, s.pdf_blob IS NOT NULL AS has_blob,
+            s.sort_order standard_sort
             FROM valuation_ifrs_groups g LEFT JOIN valuation_ifrs_standards s ON s.group_code = g.code
             ORDER BY g.sort_order ASC, s.sort_order ASC")->fetchAll();
         $groups = [];
@@ -54,8 +55,9 @@ final class IfrsStandardRepository
         foreach ($standards as $standard) {
             $exists = $standard['storage_filename'] !== ''
                 && is_file(self::storagePath((string) $standard['storage_filename']));
-            $present += $exists ? 1 : 0;
-            $markedMissing += (!$exists && $standard['file_size_bytes'] !== null) ? 1 : 0;
+            $backed = !$exists && !empty($standard['has_blob']);
+            $present += ($exists || $backed) ? 1 : 0;
+            $markedMissing += (!$exists && !$backed && $standard['file_size_bytes'] !== null) ? 1 : 0;
         }
         return ['dir' => self::storageDir(), 'configured' => IfrsFileStorage::configured(),
             'writable' => IfrsFileStorage::writable(), 'present' => $present,
@@ -76,17 +78,17 @@ final class IfrsStandardRepository
         return $stats;
     }
 
-    public function saveImportedFile(string $slug, string $sourceName, string $storageName, int $bytes): void
+    public function saveImportedFile(string $slug, string $sourceName, string $storageName, int $bytes, string $blob): void
     {
         $now = gmdate('Y-m-d H:i:s');
         $query = $this->db->prepare("UPDATE valuation_ifrs_standards SET source_filename = ?,
-            storage_filename = ?, file_size_bytes = ?, imported_at = ?, updated_at = ? WHERE slug = ?");
-        $query->execute([$sourceName, $storageName, $bytes, $now, $now, $slug]);
+            storage_filename = ?, file_size_bytes = ?, pdf_blob = ?, imported_at = ?, updated_at = ? WHERE slug = ?");
+        $query->execute([$sourceName, $storageName, $bytes, $blob, $now, $now, $slug]);
     }
 
     private function standardsWithStorage(): array
     {
-        return $this->db->query("SELECT slug, storage_filename, file_size_bytes
+        return $this->db->query("SELECT slug, storage_filename, file_size_bytes, pdf_blob IS NOT NULL AS has_blob
             FROM valuation_ifrs_standards WHERE storage_filename <> '' ORDER BY sort_order")->fetchAll();
     }
 
@@ -94,6 +96,7 @@ final class IfrsStandardRepository
     {
         $filename = (string) ($row['storage_filename'] ?? '');
         $path = $filename !== '' ? self::storagePath($filename) : '';
+        $hasBlob = !empty($row['has_blob']) || (is_string($row['pdf_blob'] ?? null) && $row['pdf_blob'] !== '');
         return ['slug' => $row['slug'], 'group_code' => $row['group_code'], 'group_name' => $row['group_name'],
             'standard_code' => $row['standard_code'], 'title' => $row['title'],
             'applicable_categories' => $row['applicable_categories'] ?? '',
@@ -101,6 +104,8 @@ final class IfrsStandardRepository
             'field_relevance' => $row['field_relevance'] ?? '', 'source_reference' => $row['source_reference'] ?? '',
             'status' => $row['status'], 'source_filename' => $row['source_filename'] ?? '',
             'storage_filename' => $filename, 'file_size_bytes' => $row['file_size_bytes'] !== null ? (int) $row['file_size_bytes'] : null,
-            'imported_at' => $row['imported_at'] ?? null, 'has_file' => $path !== '' && is_file($path), 'file_path' => $path];
+            'imported_at' => $row['imported_at'] ?? null, 'has_blob' => $hasBlob,
+            'pdf_blob' => $row['pdf_blob'] ?? null, 'has_file' => ($path !== '' && is_file($path)) || $hasBlob,
+            'file_path' => $path];
     }
 }

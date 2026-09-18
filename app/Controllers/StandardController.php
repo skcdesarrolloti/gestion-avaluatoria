@@ -67,10 +67,16 @@ final class StandardController
             throw new HttpException(404, 'El PDF de esta norma todavía no fue importado.');
         }
         $name = str_replace(['"', '\\'], '', (string) $standard['source_filename']);
+        $blob = is_string($standard['pdf_blob'] ?? null) ? $standard['pdf_blob'] : null;
+        $fromDisk = is_string($standard['file_path']) && is_file($standard['file_path']);
+        if (!$fromDisk && $blob === null) {
+            throw new HttpException(404, 'El PDF de esta norma todavía no fue importado.');
+        }
+        while (ob_get_level() > 0) ob_end_clean();
         header('Content-Type: application/pdf');
-        header('Content-Length: ' . filesize($standard['file_path']));
+        header('Content-Length: ' . ($fromDisk ? filesize($standard['file_path']) : strlen($blob)));
         header('Content-Disposition: inline; filename="' . $name . '"');
-        readfile($standard['file_path']);
+        if ($fromDisk) readfile($standard['file_path']); else echo $blob;
         exit;
     }
 }

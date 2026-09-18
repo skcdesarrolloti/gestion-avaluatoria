@@ -18,7 +18,7 @@ final class InternationalStandardRepository
         $rows = $this->db->query("SELECT g.code group_code, g.name group_name, s.slug,
             s.standard_code, s.title, s.applicable_categories, s.summary, s.effective_from, s.status,
             s.source_reference, s.source_filename, s.storage_filename, s.file_size_bytes, s.imported_at,
-            s.sort_order standard_sort
+            s.pdf_blob IS NOT NULL AS has_blob, s.sort_order standard_sort
             FROM valuation_international_groups g
             LEFT JOIN valuation_international_standards s ON s.group_code = g.code
             ORDER BY g.sort_order ASC, s.sort_order ASC")->fetchAll();
@@ -50,8 +50,9 @@ final class InternationalStandardRepository
         foreach ($standards as $standard) {
             $exists = $standard['storage_filename'] !== ''
                 && is_file(self::storagePath((string) $standard['storage_filename']));
-            $present += $exists ? 1 : 0;
-            $markedMissing += (!$exists && $standard['file_size_bytes'] !== null) ? 1 : 0;
+            $backed = !$exists && !empty($standard['has_blob']);
+            $present += ($exists || $backed) ? 1 : 0;
+            $markedMissing += (!$exists && !$backed && $standard['file_size_bytes'] !== null) ? 1 : 0;
         }
         return ['dir' => self::storageDir(), 'configured' => InternationalFileStorage::configured(),
             'writable' => InternationalFileStorage::writable(), 'present' => $present,
@@ -73,18 +74,18 @@ final class InternationalStandardRepository
         return $stats;
     }
 
-    public function saveImportedFile(string $slug, string $sourceName, string $storageName, int $bytes): void
+    public function saveImportedFile(string $slug, string $sourceName, string $storageName, int $bytes, string $blob): void
     {
         $now = gmdate('Y-m-d H:i:s');
         $query = $this->db->prepare("UPDATE valuation_international_standards
             SET source_filename = ?, storage_filename = ?, file_size_bytes = ?,
-            imported_at = ?, updated_at = ? WHERE slug = ?");
-        $query->execute([$sourceName, $storageName, $bytes, $now, $now, $slug]);
+            pdf_blob = ?, imported_at = ?, updated_at = ? WHERE slug = ?");
+        $query->execute([$sourceName, $storageName, $bytes, $blob, $now, $now, $slug]);
     }
 
     private function standardsWithStorage(): array
     {
-        return $this->db->query("SELECT slug, storage_filename, file_size_bytes
+        return $this->db->query("SELECT slug, storage_filename, file_size_bytes, pdf_blob IS NOT NULL AS has_blob
             FROM valuation_international_standards WHERE storage_filename <> '' ORDER BY sort_order")->fetchAll();
     }
 
@@ -92,6 +93,7 @@ final class InternationalStandardRepository
     {
         $filename = (string) ($row['storage_filename'] ?? '');
         $path = $filename !== '' ? self::storagePath($filename) : '';
+        $hasBlob = !empty($row['has_blob']) || (is_string($row['pdf_blob'] ?? null) && $row['pdf_blob'] !== '');
         return [
             'slug' => $row['slug'],
             'group_code' => $row['group_code'],
@@ -107,7 +109,9 @@ final class InternationalStandardRepository
             'storage_filename' => $filename,
             'file_size_bytes' => $row['file_size_bytes'] !== null ? (int) $row['file_size_bytes'] : null,
             'imported_at' => $row['imported_at'] ?? null,
-            'has_file' => $path !== '' && is_file($path),
+            'has_blob' => $hasBlob,
+            'pdf_blob' => $row['pdf_blob'] ?? null,
+            'has_file' => ($path !== '' && is_file($path)) || $hasBlob,
             'file_path' => $path,
         ];
     }
