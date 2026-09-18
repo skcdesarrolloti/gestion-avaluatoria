@@ -14,6 +14,7 @@ final class LegalCertificateCancellationMatcher
         foreach ($rows as $key => $row) {
             $refs = $this->references($row);
             if (!$refs) $refs = $this->refsBySharedId($rows, $key, $row);
+            if (!$refs) $refs = $this->refsBySharedParties($rows, $key, $row);
             if (!$refs) continue;
             $closed = [];
             foreach ($refs as $ref) {
@@ -79,6 +80,34 @@ final class LegalCertificateCancellationMatcher
             }
         }
         return array_values(array_filter(array_unique($refs)));
+    }
+
+    private function refsBySharedParties(array $rows, int|string $key, array $row): array
+    {
+        $text = (string) ($row['texto'] ?? '');
+        if (!preg_match('/cancelaci|cancela|levantamiento|desembargo|liberaci(?:o|ó|\?|Ã³)n/iu', $text)) return [];
+        $closingTokens = $this->partyTokens($row);
+        if (count($closingTokens) < 2) return [];
+        $refs = [];
+        foreach ($rows as $targetKey => $target) {
+            if ($targetKey === $key || (int) $targetKey >= (int) $key) continue;
+            if (($target['estado_juridico'] ?? '') === 'solucionada') continue;
+            if (($target['categoria'] ?? '') !== 'medida_cautelar') continue;
+            if (count(array_intersect($closingTokens, $this->partyTokens($target))) >= 2) {
+                $refs[] = (string) ($target['orden'] ?? '');
+            }
+        }
+        return array_values(array_filter(array_unique($refs)));
+    }
+
+    private function partyTokens(array $row): array
+    {
+        $text = implode(' ', [(string) ($row['personaDe'] ?? ''), (string) ($row['personaA'] ?? '')]);
+        $text = preg_replace('/\b(?:cc|nit|n\.?i\.?t|cedula|c[eé]dula)\b[^A-ZÁÉÍÓÚÑ]*/iu', ' ', $text) ?? $text;
+        preg_match_all('/[A-ZÁÉÍÓÚÑ]{4,}/iu', mb_strtoupper($text), $matches);
+        $stop = ['BANCO', 'BANCOLOMBIA', 'CONDOMINIO', 'DISTRITAL', 'JUZGADO', 'OFICIO', 'CARTAGENA',
+            'INDIAS', 'NIT', 'SAS', 'SA', 'MARIA', 'ELENA'];
+        return array_values(array_diff(array_unique($matches[0] ?? []), $stop));
     }
 
     private function identifiers(string $text): array

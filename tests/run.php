@@ -497,6 +497,20 @@ try {
         && ($radicadoParsed['annotations'][0]['cancelada_por'] ?? '') === '036'
         && !str_contains(mb_strtolower(implode(' ', $radicadoParsed['alerts'])), 'anotación 032'),
         'parser juridico cierra medidas cautelares por radicado compartido');
+    $partyCancelText = "Nro Matrícula: 060-999999\nEstado del Folio: ACTIVO\n"
+        . "ANOTACION Nro 032 Fecha: 01-10-2021 Doc: OFICIO 168 JUZGADO OCTAVO CIVIL "
+        . "Especificación: MEDIDA CAUTELAR: 0492 DEMANDA EN PROCESO VERBAL PROCESO DECLARATIVO "
+        . "RADICADO 1300131030082021-0039-00 PERSONAS QUE INTERVIENEN EN EL ACTO DE: "
+        . "VELEZ OSPINO MARIA ELENA A: MERLANO MENDOZA SEBASTIAN.\n"
+        . "ANOTACION Nro 035 Fecha: 13-09-2022 Doc: OFICIO 197 JUZGADO CUARTO CIVIL "
+        . "Especificación: CANCELACION: 0856 CANCELACION POR ORDEN JUDICIAL EMBARGO EJECUTIVO "
+        . "CON ACCION REAL RADICADO N? 13001310300420110012800 PERSONAS QUE INTERVIENEN EN EL ACTO DE: "
+        . "BANCOLOMBIA S.A. A: MERLANO MENDOZA SEBASTIAN A: VELEZ OSPINO MARIA ELENA.";
+    $partyCancelParsed = (new LegalCertificateParser())->parse($partyCancelText, 'certificado-partes.txt');
+    expect(($partyCancelParsed['annotations'][0]['estado_juridico'] ?? '') === 'solucionada'
+        && ($partyCancelParsed['annotations'][0]['cancelada_por'] ?? '') === '035'
+        && !str_contains(mb_strtolower(implode(' ', $partyCancelParsed['alerts'])), 'anotación 032'),
+        'parser juridico cierra cautelar por cancelacion judicial con mismas partes');
     $servitudeText = "Nro Matrícula: 060-999999\nEstado del Folio: ACTIVO\n"
         . "ANOTACION Nro 013 Fecha: 28/02/2002 Doc: ESCRITURA 882 "
         . "Especificación: LIMITACION AL DOMINIO: 0334 SERVIDUMBRE DE ACUEDUCTO ACTIVA PREDIO SIRVIENTE.";
