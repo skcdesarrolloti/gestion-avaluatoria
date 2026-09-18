@@ -507,6 +507,18 @@ try {
         && str_contains($servitudeReport, 'franja afectada')
         && str_contains($servitudeReport, 'restricciones constructivas'),
         'parser juridico incorpora observacion de servidumbre de acueducto al informe');
+    $impactText = "Nro Matrícula: 060-999999\nEstado del Folio: ACTIVO\n"
+        . "ANOTACION Nro 010 Fecha: 01/01/2020 Doc: ESCRITURA 1 Especificación: GRAVAMEN: 210 HIPOTECA.\n"
+        . "ANOTACION Nro 011 Fecha: 02/01/2020 Doc: OFICIO 2 Especificación: EMBARGO.\n"
+        . "ANOTACION Nro 012 Fecha: 03/01/2020 Doc: ESCRITURA 3 Especificación: LIMITACION AL DOMINIO: USUFRUCTO.\n"
+        . "ANOTACION Nro 013 Fecha: 04/01/2020 Doc: ESCRITURA 4 Especificación: AFECTACION A VIVIENDA FAMILIAR.";
+    $impactParsed = (new LegalCertificateParser())->parse($impactText, 'certificado-impactos.txt');
+    $impactReport = (string) ($impactParsed['data']['reporte_profesional_entregable'] ?? '');
+    expect(str_contains($impactReport, 'Gravamen o garantía real activa')
+        && str_contains($impactReport, 'Medida cautelar o actuación judicial activa')
+        && str_contains($impactReport, 'Usufructo activo')
+        && str_contains($impactReport, 'Afectación familiar activa'),
+        'parser juridico reporta implicaciones para afectaciones activas generales');
     $trafficCounts = AppraisalLegalView::trafficCounts([
         ['estado_juridico' => 'vigente', 'requiere_revision' => 'Sí', 'categoria' => 'gravamen'],
         ['estado_juridico' => 'vigente', 'requiere_revision' => 'Sí', 'categoria' => 'propiedad_horizontal'],

@@ -35,6 +35,7 @@ final class LegalCertificateParser
 
     private function classifyAnnotations(array $rows): array
     {
+        $narrator = new LegalCertificateImpactNarrator();
         foreach ($rows as &$row) {
             $txt = mb_strtolower((string) $row['texto']);
             $category = 'informativa'; $state = 'informativa'; $review = false; $impact = 'No se aprecia afectación material inmediata.';
@@ -60,11 +61,8 @@ final class LegalCertificateParser
             }
             if ($this->contains($txt, ['usufructo', 'patrimonio de familia', 'afectacion a vivienda familiar', 'afectación a vivienda familiar', 'servidumbre'])) {
                 $category = 'limitacion_dominio'; $state = $state === 'solucionada' ? $state : 'vigente'; $review = $state !== 'solucionada';
-                $impact = 'Impone limitación o carga al ejercicio del dominio.';
-                if ($this->contains($txt, ['servidumbre de acueducto', 'acueducto activa predio sirviente'])) {
-                    $impact = 'Servidumbre de acueducto activa: el predio actúa como sirviente y soporta una carga real para paso, instalación, mantenimiento o protección de red de acueducto. No impide por sí sola la transferencia, pero limita el uso de la franja afectada y exige validar trazado, área, beneficiario y restricciones constructivas antes de definir aprovechamiento y valor.';
-                }
             }
+            $impact = $narrator->narrate((string) ($row['texto'] ?? ''), $category, $state);
             $row += ['categoria' => $category, 'categoria_final' => $category,
                 'estado_juridico' => $state, 'descripcion_acto' => $this->describeAct($row, $category),
                 'requiere_revision' => $review ? 'Sí' : 'No', 'impacto_resumen' => $impact];
