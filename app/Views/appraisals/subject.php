@@ -51,7 +51,7 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
             <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
                 @click="activeSubject = 'photos'; history.replaceState(null, '', '#fotos')"
                 :class="activeSubject === 'photos' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:border-blue-700'">
-                <span class="block text-base">3.5 Registro fotográfico</span>
+                <span class="block text-base">3.6 Registro fotográfico</span>
                 <span class="block text-xs font-medium opacity-80">Fotos para el entregable</span>
             </button>
         </div>

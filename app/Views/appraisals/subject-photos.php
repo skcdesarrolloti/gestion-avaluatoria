@@ -18,17 +18,45 @@ $photoTabMap = [];
 foreach ($photoUnits as $photoUnit) {
     $photoTabMap['fotos-' . ($photoUnit['id'] ?: 'general')] = $photoUnit['kind'] . ':' . $photoUnit['id'];
 }
+$attributeLabels = [];
+foreach (($specialAttributeCatalog ?? []) as $group) {
+    foreach (($group[1] ?? []) as $key => $attribute) {
+        $attributeLabels[$key] = (string) ($attribute[0] ?? $key);
+    }
+}
+$storedAttributePhotos = [];
+foreach ($photos as $photo) {
+    $caption = (string) ($photo['caption'] ?? '');
+    if (!str_starts_with($caption, 'attribute:')) continue;
+    $storedAttributePhotos[(string) ($photo['unit_id'] ?? '') . '|' . $caption] = true;
+}
+$attributePhotoRequirements = [];
+foreach (array_values(array_filter($units, static fn (array $unit): bool => $unit['unit_kind'] !== 'common')) as $unit) {
+    $unitId = (string) $unit['id'];
+    $unitData = json_decode((string) ($unit['special_attributes_json'] ?? '{}'), true);
+    if (!is_array($unitData)) continue;
+    foreach ($unitData as $key => $item) {
+        if (!is_array($item) || (string) ($item['evidence'] ?? '') !== 'foto') continue;
+        $caption = 'attribute:' . $key;
+        $attributePhotoRequirements[] = [
+            'unit_id' => $unitId,
+            'label' => $attributeLabels[$key] ?? ucfirst(str_replace('_', ' ', (string) $key)),
+            'covered' => isset($storedAttributePhotos[$unitId . '|' . $caption]),
+        ];
+    }
+}
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{ activePhotoUnit: '', photoMap: <?= e(json_encode($photoTabMap, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>, syncPhotoUnit() { this.activePhotoUnit = this.photoMap[location.hash.slice(1)] || '<?= e($photoUnits[0]['kind'] . ':' . $photoUnits[0]['id']) ?>' }, activeAnchor() { return Object.keys(this.photoMap).find(key => this.photoMap[key] === this.activePhotoUnit) || 'fotos-general' }, focusAdditional() { const card = document.getElementById(this.activeAnchor() + '-adicional'); card?.scrollIntoView({ behavior: 'smooth', block: 'start' }); card?.querySelector('input[name=photo_name]')?.focus({ preventScroll: true }) } }"
     x-init="syncPhotoUnit()" @hashchange.window="syncPhotoUnit()">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">3.5 Registro fotográfico del sujeto</p>
+            <p class="eyebrow">3.6 Registro fotográfico del sujeto</p>
             <h2 class="mt-2 text-2xl font-semibold">Fotos organizadas para el entregable</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Carga o pega las imágenes que irán al informe. Todas se muestran con el mismo formato visual;
-                la portada puede tomarse horizontal cuando sea necesario para cubrir toda la propiedad.
+                la portada puede tomarse horizontal cuando sea necesario para cubrir toda la propiedad. Si en 3.4
+                un atributo exige foto, aquí queda visible como pendiente hasta que cargues su evidencia.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
@@ -57,6 +85,25 @@ foreach ($photoUnits as $photoUnit) {
                 Las fotos de este grupo se usarán como soporte visual del entregable. Mantén una portada clara;
                 si el frente es amplio, usa foto horizontal y conserva el encuadre completo.
             </div>
+            <?php $unitRequirements = array_values(array_filter($attributePhotoRequirements,
+                static fn (array $row): bool => (string) $row['unit_id'] === (string) $photoUnit['id'])); ?>
+            <?php if ($unitRequirements): ?>
+                <div class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                    <h3 class="text-sm font-semibold text-amber-950">Evidencias marcadas en 3.4</h3>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        <?php foreach ($unitRequirements as $requirement): ?>
+                            <span class="rounded-full px-3 py-1 text-xs font-semibold <?= $requirement['covered']
+                                ? 'bg-emerald-100 text-emerald-800' : 'bg-red-100 text-red-800' ?>">
+                                <?= e($requirement['label']) ?> · <?= $requirement['covered'] ? 'foto cargada' : 'foto faltante' ?>
+                            </span>
+                        <?php endforeach; ?>
+                    </div>
+                    <p class="mt-3 text-xs leading-5 text-amber-900">
+                        Para cerrar un pendiente, vuelve a 3.4, deja el atributo en evidencia Foto y carga o pega
+                        la imagen en la columna Foto soporte.
+                    </p>
+                </div>
+            <?php endif; ?>
             <div class="mt-5 grid gap-5 xl:grid-cols-2">
                 <?php foreach ($photoCategories as $categoryKey => [$title, $description]): ?>
                     <div id="<?= e($tabAnchor . '-' . $categoryKey) ?>" class="scroll-mt-6">

@@ -41,7 +41,6 @@ final class AppraisalAttributeInput
             'evidence' => self::short($item['evidence'] ?? '', 40),
             'rating' => self::allowed($item['rating'] ?? '', ['', '1', '2', '3', '4', '5']),
             'weight' => self::allowed($item['weight'] ?? '', ['', '1', '2', '3']),
-            'use_in_comparables' => self::allowed($item['use_in_comparables'] ?? '', ['', 'si', 'no']),
             'notes' => self::short($item['notes'] ?? '', 220),
         ];
     }

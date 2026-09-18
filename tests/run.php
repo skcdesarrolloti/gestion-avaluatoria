@@ -327,7 +327,7 @@ try {
         && str_contains($constructionRows[0]['construction_conservation_json'], 'estructura'), 'construccion por unidad normalizada');
     $_POST = ['unit_attributes' => [$unitId => ['items' => ['esquina' => ['value' => 'esquinero',
         'state' => 'bueno', 'impact' => 'positivo_medio', 'evidence' => 'visita',
-        'rating' => '4', 'weight' => '3', 'use_in_comparables' => 'si',
+        'rating' => '4', 'weight' => '3',
         'notes' => 'Frente comercial observado'], 'desconocido' => ['value' => 'x']],
         'report_text' => 'Unidad con condición esquinera verificable.']]];
     $attributeRows = AppraisalAttributeInput::unitAttributeData();

@@ -40,7 +40,7 @@ $score = $attributeScore($unit, $specialAttributeCatalog);
             <div class="overflow-x-auto rounded-xl border border-slate-200"
                 x-show="activeAttributeGroup === '<?= e($groupKey) ?>'">
                 <div class="bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800"><?= e($groupLabel) ?></div>
-                <table class="table-fixed text-left text-sm" style="min-width: 136rem;">
+                <table class="table-fixed text-left text-sm" style="min-width: 127rem;">
                     <colgroup>
                         <col style="width: 17rem;">
                         <col style="width: 13rem;">
@@ -48,7 +48,6 @@ $score = $attributeScore($unit, $specialAttributeCatalog);
                         <col style="width: 12rem;">
                         <col style="width: 12rem;">
                         <col style="width: 13rem;">
-                        <col style="width: 10rem;">
                         <col style="width: 10rem;">
                         <col style="width: 22rem;">
                         <col style="width: 16rem;">
@@ -62,7 +61,6 @@ $score = $attributeScore($unit, $specialAttributeCatalog);
                             <th class="px-3 py-3">Evidencia</th>
                             <th class="px-3 py-3">Calificación</th>
                             <th class="px-3 py-3">Peso</th>
-                            <th class="px-3 py-3">Comparables</th>
                             <th class="px-3 py-3">Observación</th>
                             <th class="px-3 py-3">Foto soporte</th>
                         </tr>
@@ -100,13 +98,6 @@ $score = $attributeScore($unit, $specialAttributeCatalog);
                                         </select>
                                     </td>
                                 <?php endforeach; ?>
-                                <td class="px-3 py-3 align-top">
-                                    <select class="input min-w-32" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][use_in_comparables]">
-                                        <?php foreach (['' => 'Por definir', 'si' => 'Sí', 'no' => 'No'] as $value => $text): ?>
-                                            <option value="<?= e($value) ?>" <?= $attrValue($unit, $key, 'use_in_comparables') === $value ? 'selected' : '' ?>><?= e($text) ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </td>
                                 <td class="px-3 py-3 align-top">
                                     <textarea class="input" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][notes]"
                                         rows="3" maxlength="220" placeholder="Criterio escrito del perito."><?= e($attrValue($unit, $key, 'notes')) ?></textarea>
