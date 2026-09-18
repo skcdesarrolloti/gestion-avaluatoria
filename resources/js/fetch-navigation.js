@@ -99,6 +99,24 @@ export function redirectedUrl(responseUrl, fallbackUrl, body = null, currentHref
     return url.toString();
 }
 
+export function isLoginRedirect(responseUrl, currentHref = window.location.href) {
+    try {
+        const url = new URL(responseUrl, currentHref);
+        const current = new URL(currentHref);
+        return url.origin === current.origin && /\/login\/?$/i.test(url.pathname);
+    } catch {
+        return false;
+    }
+}
+
+function showSessionExpiredNotice() {
+    const main = document.getElementById('contenido') || document.body;
+    if (!main || main.querySelector('[data-session-expired-notice]')) return; const notice = document.createElement('p');
+    notice.dataset.sessionExpiredNotice = 'true';
+    Object.assign(notice, { className: 'mt-6 rounded-xl bg-amber-50 p-4 text-sm font-semibold text-amber-900', textContent: 'Tu sesión venció antes de completar la acción. Ingresa de nuevo y vuelve a ejecutar el guardado o reanálisis.' });
+    main.prepend(notice);
+}
+
 function sectorAnchor(value) {
     if (typeof value !== 'string') return '';
     const match = value.match(/^banco-(\d{1,2})$/);
@@ -131,10 +149,12 @@ async function visit(url, { method = 'GET', body = null, replace = false, text, 
         if (response.status === 419 && method !== 'GET' && retryCsrf && await refreshCsrf()) {
             return visit(url, { method, body, replace, text, retryCsrf: false });
         }
+        const loginRedirect = method !== 'GET' && isLoginRedirect(response.url, url);
         const nextUrl = redirectedUrl(response.url, url, body);
         if (method !== 'GET') history.replaceState({}, '', nextUrl);
         const rendered = await renderFetchedPage(response, url, method === 'GET');
         if (!rendered) return;
+        if (loginRedirect) showSessionExpiredNotice();
         if (method === 'GET') {
             history[replace ? 'replaceState' : 'pushState']({}, '', nextUrl);
             scrollToTarget(new URL(nextUrl).hash);

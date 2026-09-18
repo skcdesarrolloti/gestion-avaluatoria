@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isFetchableUrl, redirectedUrl, shouldHandleLink, syncFormToken } from '../resources/js/fetch-navigation.js';
+import { isFetchableUrl, isLoginRedirect, redirectedUrl, shouldHandleLink, syncFormToken } from '../resources/js/fetch-navigation.js';
 
 const current = 'https://example.test/public/avaluos?page=1';
 
@@ -94,4 +94,10 @@ test('syncs hidden csrf field before form post', () => {
     body.set('_token', 'old');
     syncFormToken(body, 'fresh');
     assert.equal(body.get('_token'), 'fresh');
+});
+
+test('detects protected action redirected to login', () => {
+    assert.equal(isLoginRedirect('https://example.test/public/login', current), true);
+    assert.equal(isLoginRedirect('https://other.test/public/login', current), false);
+    assert.equal(isLoginRedirect('https://example.test/public/avaluos', current), false);
 });
