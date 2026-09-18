@@ -7,7 +7,14 @@ final class LegalCertificateAnnotationExtractor
     public function extract(string $text): array
     {
         $safe = function_exists('iconv') ? (@iconv('UTF-8', 'UTF-8//IGNORE', $text) ?: $text) : $text;
-        if (!preg_match_all('/anotaci(?:o|ó|\?|Ã³)n\s*:?\s*(?:nro|no|num(?:ero)?|n[uú]mero)?\.?\s*:?\s*\d+/iu',
+        $first = preg_match('/^\s*anotaci(?:o|ó|\?|Ã³)n\s*:/imu', $safe, $m, PREG_OFFSET_CAPTURE)
+            ? (int) $m[0][1] : false;
+        foreach (['/\bNRO\s+TOTAL\s+DE\s+ANOTACIONES\b/iu', '/\bSALVEDADES\b/iu'] as $limit) {
+            if (preg_match($limit, $safe, $m, PREG_OFFSET_CAPTURE) && ($first === false || (int) $m[0][1] > $first)) {
+                $safe = substr($safe, 0, (int) $m[0][1]);
+            }
+        }
+        if (!preg_match_all('/^\s*anotaci(?:o|ó|\?|Ã³)n\s*:?\s*(?:nro|no|num(?:ero)?|n[uú]mero)?\.?\s*:?\s*\d+/imu',
             $safe, $matches, PREG_OFFSET_CAPTURE)) return [];
         $rows = [];
         foreach ($matches[0] as $index => $match) {

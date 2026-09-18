@@ -22,8 +22,11 @@ final class LegalCertificateParser
     private function fields(string $text, string $filename): array
     {
         $data = LegalCertificateFieldExtractor::extract($text, $filename);
+        $trusted = ['matricula_inmobiliaria', 'circulo_registral', 'orip', 'municipio', 'departamento',
+            'vereda', 'estado_folio', 'fecha_apertura', 'fecha_expedicion', 'turno', 'pin', 'tipo_predio',
+            'direccion', 'area', 'coeficiente', 'matricula_matriz'];
         foreach ((new LegalCertificateSnrHeaderExtractor())->extract($text) as $key => $value) {
-            if (trim((string) ($data[$key] ?? '')) === '') $data[$key] = $value;
+            if (in_array($key, $trusted, true) || trim((string) ($data[$key] ?? '')) === '') $data[$key] = $value;
         }
         return $data;
     }

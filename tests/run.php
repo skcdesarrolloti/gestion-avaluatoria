@@ -578,6 +578,19 @@ try {
         ['matricula_inmobiliaria' => '060-187254']);
     expect(($pendingMerged['matricula_inmobiliaria'] ?? '') === '060-187254',
         'reanálisis juridico reemplaza marcador pendiente guardado');
+    $badCtlPath = tempnam(sys_get_temp_dir(), 'ga_ctl_bad_');
+    file_put_contents($badCtlPath, "Nro Matr\xe9cula: 060-187254\nCIRCULO REGISTRAL: 060 - CARTAGENA DEPTO: BOLIVAR MUNICIPIO: CARTAGENA DE INDIAS VEREDA: CARTAGENA\n"
+        . "FECHA APERTURA: 13-02-2002\nESTADO DEL FOLIO:\nACTIVO\nDIRECCION DEL INMUEBLE\nTipo Predio: URBANO\n1 KR 13 B # 26 - 78 GARAJE 24\n"
+        . "ANOTACION: Nro 001 Fecha: 01-01-2020 Doc: ESCRITURA 1 VALOR ACTO: $0 ESPECIFICACION: HIPOTECA\n"
+        . "Se cancela anotacion No: 001\nNRO TOTAL DE ANOTACIONES: *1*\nSALVEDADES: Informacion Anterior o Corregida\nAnotacion Nro: 1\n");
+    $badText = (new \App\Services\LegalCertificateTextExtractor())->extract($badCtlPath, 'txt');
+    $badParsed = (new LegalCertificateParser())->parse($badText, 'certificado-danado.txt');
+    expect(($badParsed['data']['matricula_inmobiliaria'] ?? '') === '060-187254'
+        && ($badParsed['data']['vereda'] ?? '') === 'CARTAGENA'
+        && ($badParsed['data']['pin'] ?? '') === ''
+        && count($badParsed['annotations']) === 1,
+        'parser juridico tolera bytes danados y no cuenta salvedades como anotaciones');
+    unlink($badCtlPath);
     $legalRepo = new AppraisalLegalRepository($db);
     $legalManual = [];
     foreach (AppraisalLegalCatalog::fieldKeys() as $fieldKey) $legalManual[$fieldKey] = 'Guardado ' . $fieldKey;

@@ -14,9 +14,18 @@ final class LegalCertificateTextExtractor
             'jpg', 'jpeg', 'png', 'webp', 'tif', 'tiff' => $this->image($path),
             default => '',
         };
+        $text = $this->scrub($text);
         $text = preg_replace('/[ \t]+/', ' ', $text) ?? $text;
         $text = preg_replace('/\R{3,}/', "\n\n", $text) ?? $text;
         return trim($text);
+    }
+
+    private function scrub(string $text): string
+    {
+        if ($text === '') return '';
+        if (function_exists('mb_scrub')) return mb_scrub($text, 'UTF-8');
+        $converted = @mb_convert_encoding($text, 'UTF-8', 'UTF-8');
+        return is_string($converted) ? $converted : $text;
     }
 
     private function docx(string $path): string

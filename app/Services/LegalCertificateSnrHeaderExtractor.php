@@ -9,7 +9,7 @@ final class LegalCertificateSnrHeaderExtractor
         $flat = preg_replace('/\s+/u', ' ', $text) ?? $text;
         $data = [
             'matricula_inmobiliaria' => $this->code($this->match($text, [
-                '/Nro\s+Matr(?:i|í|\?)cula\s*:\s*([0-9]{2,4}\s*-\s*[0-9]{3,})/iu',
+                '/Nro\s+Matr.{0,6}cula\s*:\s*([0-9]{2,4}\s*-\s*[0-9]{3,})/iu',
                 '/MATRICULA\s+INMOBILIARIA.*?([0-9]{2,4}\s*-\s*[0-9]{3,})/isu',
             ])),
             'turno' => $this->clean($this->match($text, ['/TURNO\s*:\s*([A-Za-z0-9\-\/\.]{3,50})/iu'])),
@@ -24,7 +24,7 @@ final class LegalCertificateSnrHeaderExtractor
             'cabida_linderos' => $this->block($text, 'DESCRIPCION: CABIDA Y LINDEROS', ['COMPLEMENTACION:', 'DIRECCION DEL INMUEBLE']),
             'direccion' => $this->address($text),
         ];
-        if (preg_match('/CIRCULO\s+REGISTRAL\s*:\s*(.*?)\s+DEPTO\s*:\s*(.*?)\s+MUNICIPIO\s*:\s*(.*?)\s+VEREDA\s*:\s*([^\n\r]+)/iu', $flat, $m)) {
+        if (preg_match('/CIRCULO\s+REGISTRAL\s*:\s*(.*?)\s+DEPTO\s*:\s*(.*?)\s+MUNICIPIO\s*:\s*(.*?)\s+VEREDA\s*:\s*(.*?)(?=\s+FECHA\s+APERTURA\b|\s+CODIGO\s+CATASTRAL\b|$)/iu', $flat, $m)) {
             $data['circulo_registral'] = $this->clean((string) $m[1]);
             $data['orip'] = $data['circulo_registral'];
             $data['departamento'] = $this->clean((string) $m[2]);
