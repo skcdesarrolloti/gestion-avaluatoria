@@ -53,7 +53,7 @@ foreach (array_values(array_filter($units, static fn (array $unit): bool => $uni
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Carga o pega las imágenes que irán al informe. Todas se muestran con el mismo formato visual;
                 la portada puede tomarse horizontal cuando sea necesario para cubrir toda la propiedad. Si en 3.4
-                un atributo exige foto, aquí queda visible como pendiente hasta que cargues su evidencia.
+                un atributo o demérito exige foto, aquí queda visible como pendiente hasta que cargues su evidencia.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
@@ -112,7 +112,7 @@ foreach (array_values(array_filter($units, static fn (array $unit): bool => $uni
                         $photoUploadTypology = $photoUnit['typology'];
                         $photoUploadEyebrow = 'Evidencia marcada en 3.4';
                         $photoUploadTitle = $requirement['label'];
-                        $photoUploadDescription = 'Carga la imagen soporte de este atributo diferencial. Si el campo nombre queda vacío, se guardará como ' . $requirement['label'] . '.';
+                        $photoUploadDescription = 'Carga la imagen soporte de este diferencial. Si el campo nombre queda vacío, se guardará como ' . $requirement['label'] . '.';
                         $photoUploadCaption = $requirement['caption'];
                         $photoUploadNamePlaceholder = $requirement['label'];
                         $photoUploadReturnTo = $subjectActionBase . '#' . $tabAnchor;

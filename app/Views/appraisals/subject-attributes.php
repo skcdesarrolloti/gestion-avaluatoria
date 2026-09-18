@@ -38,12 +38,12 @@ $formatAttributeAdjustment = static function (?float $value): string {
     x-data="{ activeAttributes: '<?= e($attributeUnits[0]['id'] ?? '') ?>', busyAttributes: false }">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">3.4 Atributos especiales del sujeto</p>
+            <p class="eyebrow">3.4 Atributos y deméritos del sujeto</p>
             <h2 class="mt-2 text-2xl font-semibold">Lectura diferencial por unidad</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                Aquí solo se registra qué atributos especiales tiene cada unidad, su evidencia e impacto técnico.
-                La calificación ponderada ayuda a ubicar el bien dentro del rango de mercado sin reemplazar
-                el criterio del perito.
+                Aquí se registra qué condiciones diferenciales tiene cada unidad, su evidencia e impacto técnico.
+                Pueden sumar como atributos o restar como deméritos. La calificación ponderada ayuda a ubicar
+                el bien dentro del rango de mercado sin reemplazar el criterio del perito.
             </p>
         </div>
         <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
@@ -57,7 +57,7 @@ $formatAttributeAdjustment = static function (?float $value): string {
         </div>
         <div>
             <strong class="block">Cómo se calcula el índice</strong>
-            <span>Comunes y específicos entran juntos. Fórmula: suma(calificación × peso) / suma(pesos). Ese índice solo mide calidad relativa.</span>
+            <span>Índice = suma(calificación × peso) / suma(pesos). Mide calidad relativa sobre 5; no es el porcentaje de valorización.</span>
         </div>
         <div>
             <strong class="block">Cómo escoger el peso</strong>
@@ -65,7 +65,11 @@ $formatAttributeAdjustment = static function (?float $value): string {
         </div>
         <div>
             <strong class="block">Ejemplo valuatorio</strong>
-            <span>35 puntos / 9 pesos = 3,89 sobre 5. No sube 78%; con banda máxima del 10%, equivale a +4,5%. Sobre $1.000 millones serían $45 millones orientativos.</span>
+            <span>Ajuste = ((índice - 3) / 2) × 10. Si da 3,89: ((3,89 - 3) / 2) × 10 = +4,5%. El 78% solo es índice de calidad.</span>
+        </div>
+        <div>
+            <strong class="block">Cuándo resta valor</strong>
+            <span>Si el índice baja de 3 hay demérito. Ejemplo: 2,40 genera -3,0%. Aplica por ruido, humedad, mal acceso, deterioro, vista obstruida o restricciones.</span>
         </div>
     </div>
     <form class="mt-6" method="post" enctype="multipart/form-data" action="<?= e(url($subjectActionBase . '/atributos')) ?>"
@@ -98,10 +102,10 @@ $formatAttributeAdjustment = static function (?float $value): string {
         <?php if ($attributeUnits): ?>
             <div class="mt-5 flex justify-end">
                 <p class="mr-auto self-center text-xs font-semibold text-slate-500" data-autosave-status>
-                    Autoguardado activo para textos y atributos. Las evidencias marcadas como Foto se cargan en 3.6.
+                    Autoguardado activo para textos, atributos y deméritos. Las evidencias marcadas como Foto se cargan en 3.6.
                 </p>
                 <button class="btn-primary" type="submit" :disabled="busyAttributes"
-                    x-text="busyAttributes ? 'Guardando...' : 'Guardar atributos'">Guardar atributos</button>
+                    x-text="busyAttributes ? 'Guardando...' : 'Guardar atributos y deméritos'">Guardar atributos y deméritos</button>
             </div>
         <?php endif; ?>
     </form>

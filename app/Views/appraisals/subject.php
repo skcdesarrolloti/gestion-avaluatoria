@@ -45,7 +45,7 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
             <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
                 @click="activeSubject = 'attributes'; history.replaceState(null, '', '#atributos')"
                 :class="activeSubject === 'attributes' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:border-blue-700'">
-                <span class="block text-base">3.4 Atributos especiales</span>
+                <span class="block text-base">3.4 Atributos y deméritos</span>
                 <span class="block text-xs font-medium opacity-80">Diferenciales del sujeto por unidad</span>
             </button>
             <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"

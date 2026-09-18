@@ -24,8 +24,9 @@ $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'
         </div>
     </div>
     <div class="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
-        Selecciona solo atributos que realmente diferencian al sujeto. Si un atributo no aplica, déjalo sin diligenciar.
-        Califica de 1 a 5 y asigna peso bajo, medio o alto solo cuando el atributo pueda incidir en el valor.
+        Selecciona solo condiciones que realmente diferencian al sujeto. Si no aplica, déjalo sin diligenciar.
+        Califica de 1 a 5: por debajo de 3 resta como demérito; por encima de 3 suma como atributo.
+        Asigna peso bajo, medio o alto solo cuando pueda incidir en el valor.
     </div>
     <div class="mt-5 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
         <?php $attributeGroupNumber = 1; ?>
@@ -59,7 +60,7 @@ $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'
                     </colgroup>
                     <thead class="bg-blue-900 text-xs uppercase tracking-wide text-white">
                         <tr>
-                            <th class="px-3 py-3">Atributo</th>
+                            <th class="px-3 py-3">Atributo / demérito</th>
                             <th class="px-3 py-3">Valor observado</th>
                             <th class="px-3 py-3">Impacto</th>
                             <th class="px-3 py-3">Evidencia</th>
