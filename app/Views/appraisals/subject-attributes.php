@@ -23,8 +23,9 @@ $attributeScore = static function (array $unit, array $catalog): array {
     }
     if ($weightSum === 0) return ['score' => null, 'label' => 'Sin calificación', 'count' => 0];
     $score = round($sum / $weightSum, 2);
+    $percent = round(($score / 5) * 100);
     $label = $score < 2.5 ? 'Desfavorable' : ($score < 3.5 ? 'Normal' : ($score < 4.3 ? 'Favorable' : 'Muy favorable'));
-    return ['score' => $score, 'label' => $label, 'count' => $count];
+    return ['score' => $score, 'percent' => $percent, 'label' => $label, 'count' => $count];
 };
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
@@ -43,18 +44,22 @@ $attributeScore = static function (array $unit, array $catalog): array {
             <?= count($attributeUnits) ?> unidad(es)
         </span>
     </div>
-    <div class="mt-5 grid gap-4 rounded-xl border border-teal-100 bg-teal-50 p-4 text-sm leading-6 text-teal-950 lg:grid-cols-3">
+    <div class="mt-5 grid gap-4 rounded-xl border border-teal-100 bg-teal-50 p-4 text-sm leading-6 text-teal-950 lg:grid-cols-4">
         <div>
             <strong class="block">Dónde nace cada unidad</strong>
             <span>En el numeral 1 defines cuántas unidades principales y anexos existen. En 3.1 nombras cada una y eliges su tipo de inmueble.</span>
         </div>
         <div>
             <strong class="block">Cómo se calcula el índice</strong>
-            <span>Solo cuentan atributos con calificación de 1 a 5 y peso bajo, medio o alto. Fórmula: suma(calificación × peso) / suma(pesos).</span>
+            <span>Comunes y específicos entran juntos. Fórmula: suma(calificación × peso) / suma(pesos). Luego se pasa a % dividiendo entre 5.</span>
         </div>
         <div>
             <strong class="block">Cómo escoger el peso</strong>
             <span>Bajo si apenas ayuda, medio si mueve la comparación, alto si cambia claramente la percepción de valor de esa unidad.</span>
+        </div>
+        <div>
+            <strong class="block">Ejemplo numérico</strong>
+            <span>4×3 ubicación, 3×2 acceso, 5×3 vista y 2×1 ruido = 35 puntos / 9 pesos = 3,89 sobre 5 = 78%.</span>
         </div>
     </div>
     <form class="mt-6" method="post" enctype="multipart/form-data" action="<?= e(url($subjectActionBase . '/atributos')) ?>"
