@@ -88,8 +88,9 @@ final class AppraisalLegalController
             $this->legal->updateCertificateAnalysis((string) $file['id'], $id, $this->user['id'],
                 mb_strlen($text), (string) $parsed['status'], (string) $parsed['message']);
             $this->legal->mergeAnalysis($id, $this->user['id'], (string) $file['id'],
-                $parsed['data'], $parsed['annotations'], $parsed['alerts'], $text);
-            Session::flash('legal_message', 'Último certificado reanalizado: ' . mb_strlen($text) . ' caracteres leídos.');
+                $parsed['data'], $parsed['annotations'], $parsed['alerts'], $text, true);
+            Session::flash('legal_message', 'Último certificado reanalizado y ficha reconstruida: '
+                . mb_strlen($text) . ' caracteres leídos.');
             if (!is_file(AppraisalLegalRepository::path((string) $file['storage_filename']))) @unlink($path);
         } catch (\Throwable $error) {
             Session::flash('legal_error', $error->getMessage());

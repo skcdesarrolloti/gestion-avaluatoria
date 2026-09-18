@@ -76,7 +76,7 @@ $trafficCounts = \App\Support\AppraisalLegalView::trafficCounts($annotations);
             <?= csrf_field() ?>
             <button class="btn-secondary" type="submit">Reanalizar último certificado cargado</button>
             <span class="text-sm leading-6 text-slate-500">
-                Usa esta opción si el archivo ya aparece en la tabla y quieres volver a llenar campos vacíos.
+                Usa esta opción si el archivo ya aparece en la tabla y quieres reconstruir la ficha con esa lectura.
             </span>
         </form>
     <?php endif; ?>
