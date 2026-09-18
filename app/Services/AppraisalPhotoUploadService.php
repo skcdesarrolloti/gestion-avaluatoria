@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace App\Services;
 use App\Models\AppraisalRepository;
+use App\Support\AppraisalSpecialAttributeCatalog;
 
 final class AppraisalPhotoUploadService
 {
@@ -26,15 +27,18 @@ final class AppraisalPhotoUploadService
     public function storeAttributeEvidence(array $files, string $appraisalId, int $owner, AppraisalRepository $repo): int
     {
         $stored = 0;
+        $attributeLabels = AppraisalSpecialAttributeCatalog::labels();
         foreach (($files['name'] ?? []) as $unitId => $attributes) {
             if (!preg_match('/^[a-f0-9]{32}$/', (string) $unitId) || !is_array($attributes)) continue;
             foreach ($attributes as $key => $names) {
+                $displayName = $attributeLabels[(string) $key] ?? ucfirst(str_replace('_', ' ', (string) $key));
                 foreach (array_keys((array) $names) as $index) {
                     $flat = $this->flatNested($files, (string) $unitId, (string) $key);
                     $error = (int) ($flat['error'][$index] ?? UPLOAD_ERR_NO_FILE);
                     if ($error === UPLOAD_ERR_NO_FILE) continue;
                     if ($error !== UPLOAD_ERR_OK) throw new \RuntimeException('No se pudo recibir una evidencia.');
-                    $this->storeOne($flat, $index, $appraisalId, $owner, $repo, (string) $unitId, 'attribute:' . $key, '');
+                    $this->storeOne($flat, $index, $appraisalId, $owner, $repo,
+                        (string) $unitId, 'attribute:' . $key, $displayName);
                     $stored++;
                 }
             }

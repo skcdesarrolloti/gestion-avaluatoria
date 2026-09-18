@@ -340,6 +340,8 @@ try {
     expect(isset($localAttributeGroups['comercial'], $warehouseAttributeGroups['industrial'])
         && !isset($localAttributeGroups['ph'], $warehouseAttributeGroups['ph']),
         'atributos especiales dependen del tipo de inmueble y excluyen PH');
+    expect(AppraisalSpecialAttributeCatalog::labels()['vista_tipo'] === 'Tipo de vista',
+        'atributos especiales exponen nombres para evidencia fotografica');
     $sectorData = AppraisalSectorInput::data(['sector_name' => ' Bruselas ampliado ',
         'services_status' => 'completa', 'connectivity' => 'invalida',
         'sector_report_text' => str_repeat('x', 2500)]);

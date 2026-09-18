@@ -132,6 +132,15 @@ final class AppraisalSpecialAttributeCatalog
         return $keys;
     }
 
+    public static function labels(): array
+    {
+        $labels = [];
+        foreach (self::allGroups() as $group) {
+            foreach ($group[1] as $key => $attribute) $labels[$key] = (string) $attribute[0];
+        }
+        return $labels;
+    }
+
     public static function selectOptions(): array
     {
         return [
