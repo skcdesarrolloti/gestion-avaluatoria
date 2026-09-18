@@ -43,6 +43,20 @@ $attributeScore = static function (array $unit, array $catalog): array {
             <?= count($attributeUnits) ?> unidad(es)
         </span>
     </div>
+    <div class="mt-5 grid gap-4 rounded-xl border border-teal-100 bg-teal-50 p-4 text-sm leading-6 text-teal-950 lg:grid-cols-3">
+        <div>
+            <strong class="block">Dónde nace cada unidad</strong>
+            <span>En el numeral 1 defines cuántas unidades principales y anexos existen. En 3.1 nombras cada una y eliges su tipo de inmueble.</span>
+        </div>
+        <div>
+            <strong class="block">Cómo se calcula el índice</strong>
+            <span>Solo cuentan atributos con calificación de 1 a 5 y peso bajo, medio o alto. Fórmula: suma(calificación × peso) / suma(pesos).</span>
+        </div>
+        <div>
+            <strong class="block">Cómo escoger el peso</strong>
+            <span>Bajo si apenas ayuda, medio si mueve la comparación, alto si cambia claramente la percepción de valor de esa unidad.</span>
+        </div>
+    </div>
     <form class="mt-6" method="post" enctype="multipart/form-data" action="<?= e(url($subjectActionBase . '/atributos')) ?>"
         data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/atributos/autoguardar')) ?>"
         @submit="busyAttributes = true">

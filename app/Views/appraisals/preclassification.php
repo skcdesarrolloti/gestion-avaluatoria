@@ -40,7 +40,9 @@
             <label class="label">Inmuebles o construcciones
                 <input class="input" type="number" name="igac_property_units_count" min="0" max="50"
                     x-model.number="propertyUnits" placeholder="Ej. 1">
-                <span class="mt-1 block text-xs leading-5 text-slate-500">Casas, edificios, bodegas u otras unidades principales.</span>
+                <span class="mt-1 block text-xs leading-5 text-slate-500">
+                    Coloca aquí cuántas unidades inmobiliarias principales hay dentro del predio: casa + 2 aptos = 3.
+                </span>
             </label>
             <label class="label">Anexos existentes
                 <input class="input" type="number" name="igac_annex_units_count" min="0" max="50"
@@ -53,7 +55,8 @@
             </label>
             <div class="rounded-xl bg-slate-50 p-4 text-sm leading-6 text-slate-600 md:col-span-2 xl:col-span-3">
                 Se prepararán <strong x-text="propertyUnits || 0"></strong> unidad(es) principal(es)
-                y <strong x-text="annexUnits || 0"></strong> anexo(s) para tipología individual.
+                y <strong x-text="annexUnits || 0"></strong> anexo(s) para tipología individual. Después,
+                en 3.1 nombras cada unidad y eliges su tipo de inmueble: casa, apartamento, local, consultorio, bodega o lote.
             </div>
             <div class="flex items-end">
                 <button class="btn-primary min-h-11 w-full" type="submit" :disabled="busy"
