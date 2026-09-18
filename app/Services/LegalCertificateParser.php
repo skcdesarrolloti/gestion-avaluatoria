@@ -26,21 +26,55 @@ final class LegalCertificateParser
         $matriculas = $this->matriculas($text);
         return [
             'archivo_origen' => $filename,
-            'matricula_inmobiliaria' => $this->code($this->match($text, ['/matr(?:i|í)cula\s+inmobiliaria\s*[:#]?\s*([0-9]{2,4}\s*-\s*[0-9]{3,})/iu', '/\b([0-9]{2,4}\s*-\s*[0-9]{3,})\b/u'])),
-            'circulo_registral' => $this->clean($this->match($text, ['/c[ií]rculo\s+registral\s*[:#]?\s*([^\n\r]{3,120})/iu', '/oficina\s+de\s+registro\s+de\s+instrumentos\s+p[uú]blicos\s+de\s*([^\n\r]{3,120})/iu'])),
+            'matricula_inmobiliaria' => $this->code($this->match($text, [
+                '/(?:nro|no|n[uú]mero|numero)\s+matr(?:i|í)cula\s*[:#]?\s*([0-9]{2,4}\s*-\s*[0-9]{3,})/iu',
+                '/matr(?:i|í)cula\s+inmobiliaria\s*[:#]?\s*([0-9]{2,4}\s*-\s*[0-9]{3,})/iu',
+                '/\b([0-9]{2,4}\s*-\s*[0-9]{3,})\b/u',
+            ])),
+            'circulo_registral' => $this->clean($this->match($text, [
+                '/c[ií]rculo\s+registral\s*[:#]?\s*([^\n\r]{3,120})/iu',
+                '/oficina\s+de\s+registro\s+de\s+instrumentos\s+p[uú]blicos\s+de\s*([^\n\r]{3,120})/iu',
+            ])),
             'orip' => $this->clean($this->match($text, ['/oficina\s+de\s+registro\s+de\s+instrumentos\s+p[uú]blicos\s+de\s*([^\n\r]{3,120})/iu'])),
-            'municipio' => $this->clean($this->match($text, ['/municipio\s*[:#]?\s*([^\n\r]{3,80})/iu'])),
-            'departamento' => $this->clean($this->match($text, ['/departamento\s*[:#]?\s*([^\n\r]{3,80})/iu'])),
-            'vereda' => $this->clean($this->match($text, ['/vereda\s*[:#]?\s*([^\n\r]{3,120})/iu'])),
+            'municipio' => $this->clean($this->match($text, [
+                '/municipio\s*[:#]?\s*([A-ZÁÉÍÓÚÜÑa-záéíóúüñ ]{3,100})(?=\s+(?:vereda|departamento|direcci[oó]n|referencia|nro|estado|fecha)|[\n\r]|$)/iu',
+                '/municipio\s*[:#]?\s*([^\n\r]{3,80})/iu',
+            ])),
+            'departamento' => $this->clean($this->match($text, [
+                '/departamento\s*[:#]?\s*([A-ZÁÉÍÓÚÜÑa-záéíóúüñ ]{3,80})(?=\s+(?:municipio|vereda|direcci[oó]n|referencia|nro|estado|fecha)|[\n\r]|$)/iu',
+                '/departamento\s*[:#]?\s*([^\n\r]{3,80})/iu',
+            ])),
+            'vereda' => $this->clean($this->match($text, [
+                '/vereda\s*[:#]?\s*([^\n\r]{3,120})(?=\s+(?:direcci[oó]n|referencia|nro|estado|fecha)|[\n\r]|$)/iu',
+            ])),
             'estado_folio' => $this->clean($this->match($text, ['/estado\s+del\s+folio\s*[:#]?\s*([^\n\r]{3,80})/iu', '/folio\s+(abierto|cerrado|cancelado)\b/iu'])),
             'fecha_apertura' => $this->clean($this->match($text, ['/fecha\s+de\s+apertura\s*[:#]?\s*([0-9\/\-]{8,20})/iu'])),
-            'fecha_expedicion' => $this->clean($this->match($text, ['/fecha\s+de\s+expedici(?:o|ó)n\s*[:#]?\s*([0-9\/\-\s:amp\.]{8,40})/iu', '/impreso\s+el\s+([0-9\/\-\s:amp\.]{8,40})/iu'])),
+            'fecha_expedicion' => $this->clean($this->match($text, [
+                '/fecha\s+de\s+expedici(?:o|ó)n\s*[:#]?\s*([0-9\/\-\s:amp\.]{8,40})/iu',
+                '/fecha\s+de\s+impresi(?:o|ó)n\s*[:#]?\s*([0-9\/\-\s:amp\.]{8,40})/iu',
+                '/impreso\s+el\s+([0-9\/\-\s:amp\.]{8,40})/iu',
+            ])),
             'turno' => $this->clean($this->match($text, ['/turno\s*[:#]?\s*([A-Za-z0-9\-\/\.]{3,50})/iu'])),
-            'pin' => $this->clean($this->match($text, ['/pin\s*[:#]?\s*([A-Za-z0-9\-]{4,40})/iu'])),
-            'codigo_catastral_actual' => $this->code($this->match($text, ['/c[oó]digo\s+catastral(?:\s+actual)?\s*[:#]?\s*([0-9A-Za-z\.\- ]{8,60})/iu'])),
-            'codigo_catastral_anterior' => $this->code($this->match($text, ['/c[oó]digo\s+catastral\s+anterior\s*[:#]?\s*([0-9A-Za-z\.\- ]{8,60})/iu'])),
+            'pin' => $this->clean($this->match($text, [
+                '/pin\s*(?:no\.?|n[uú]mero|numero)?\s*[:#]?\s*([A-Za-z0-9\-]{4,40})/iu',
+                '/certificado\s+generado\s+con\s+el\s+pin\s+(?:no\.?)?\s*([A-Za-z0-9\-]{4,40})/iu',
+            ])),
+            'codigo_catastral_actual' => $this->code($this->match($text, [
+                '/referencia\s+catastral(?:\s+actual)?\s*[:#]?\s*([0-9A-Za-z\.\- ]{8,80})/iu',
+                '/c[eé]dula\s+catastral(?:\s+actual)?\s*[:#]?\s*([0-9A-Za-z\.\- ]{8,80})/iu',
+                '/c[oó]digo\s+catastral(?:\s+actual)?\s*[:#]?\s*([0-9A-Za-z\.\- ]{8,80})/iu',
+            ])),
+            'codigo_catastral_anterior' => $this->code($this->match($text, [
+                '/referencia\s+catastral\s+anterior\s*[:#]?\s*([0-9A-Za-z\.\- ]{8,80})/iu',
+                '/c[oó]digo\s+catastral\s+anterior\s*[:#]?\s*([0-9A-Za-z\.\- ]{8,80})/iu',
+            ])),
             'nupre' => $this->code($this->match($text, ['/nupre\s*[:#]?\s*([0-9A-Za-z\-]{6,40})/iu'])),
-            'direccion' => $this->clean($this->match($text, ['/direcci(?:o|ó)n(?:\s+actual)?\s*[:#]?\s*([^\n\r]{6,220})/iu', '/ubicaci(?:o|ó)n\s+del\s+predio\s*[:#]?\s*([^\n\r]{6,220})/iu'])),
+            'direccion' => $this->clean($this->match($text, [
+                '/direcci(?:o|ó)n\s+actual\s+del\s+inmueble\s*[:#]?\s*([^\n\r]{6,220})/iu',
+                '/direcci(?:o|ó)n\s+del\s+inmueble\s*[:#]?\s*([^\n\r]{6,220})/iu',
+                '/direcci(?:o|ó)n(?:\s+actual)?\s*[:#]?\s*([^\n\r]{6,220})/iu',
+                '/ubicaci(?:o|ó)n\s+del\s+predio\s*[:#]?\s*([^\n\r]{6,220})/iu',
+            ])),
             'tipo_predio' => $this->clean($this->match($text, ['/tipo\s+de\s+predio\s*[:#]?\s*([^\n\r]{3,80})/iu', '/destinaci(?:o|ó)n\s+econ[oó]mica\s*[:#]?\s*([^\n\r]{3,120})/iu'])),
             'area' => $area, 'area_privada' => $areaPrivada, 'area_construida' => $areaConstruida,
             'coeficiente' => $this->clean($this->match($text, ['/coeficiente\s*[:#]?\s*([0-9\.,%]{1,30})/iu'])),
@@ -56,14 +90,14 @@ final class LegalCertificateParser
 
     private function annotations(string $text): array
     {
-        $pattern = '/anotaci(?:o|ó)n\s*:\s*(?:nro|no|num(?:ero)?|n[uú]mero)?\.?\s*\d+/iu';
+        $pattern = '/anotaci(?:o|ó)n\s*:?\s*(?:nro|no|num(?:ero)?|n[uú]mero)?\.?\s*\d+/iu';
         if (!preg_match_all($pattern, $text, $matches, PREG_OFFSET_CAPTURE)) return [];
         $rows = [];
         foreach ($matches[0] as $index => $match) {
             $start = (int) $match[1];
             $end = isset($matches[0][$index + 1][1]) ? (int) $matches[0][$index + 1][1] : strlen($text);
             $block = preg_replace('/\s+/', ' ', substr($text, $start, $end - $start)) ?? '';
-            $rows[] = ['orden' => $this->match($block, ['/anotaci(?:o|ó)n\s*:\s*(?:nro|no|num(?:ero)?|n[uú]mero)?\.?\s*(\d+)/iu']) ?: (string) ($index + 1),
+            $rows[] = ['orden' => $this->match($block, ['/anotaci(?:o|ó)n\s*:?\s*(?:nro|no|num(?:ero)?|n[uú]mero)?\.?\s*(\d+)/iu']) ?: (string) ($index + 1),
                 'fecha' => $this->match($block, ['/fecha\s*[:#]?\s*([0-9\/\-]{8,20})/iu']),
                 'documento' => $this->clean($this->match($block, ['/doc\s*\.?\s*:\s*(.+?)(?=\s+valor\s+acto|\s+especificaci|\s+personas\s+que\s+intervienen|$)/iu'])),
                 'valor' => $this->clean($this->match($block, ['/valor\s+acto\s*:\s*\$?\s*([0-9][0-9\.,\s]{1,60})/iu'])),

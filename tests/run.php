@@ -435,15 +435,17 @@ try {
     $splitReview = AppraisalSectorFieldGuidance::splitReview('Dato real. Para el informe, confirma en visita.');
     expect($splitReview[0] === 'Dato real.' && str_starts_with($splitReview[1], 'Para el informe'),
         'guia visual separa dato base de alerta');
-    $legalText = "Matrícula inmobiliaria: 060-123456\nMunicipio: Cartagena\nDepartamento: Bolívar\n"
-        . "Dirección: Calle 1 No 2-3\nCódigo catastral actual: 130010101000000000001000000000\n"
-        . "ANOTACION: Nro 1 Fecha: 01/01/2020 Doc: ESCRITURA 123 Valor Acto: \$1000000 "
-        . "Especificación: COMPRAVENTA.\nANOTACION: Nro 2 Fecha: 02/02/2021 Doc: ESCRITURA 456 "
+    $legalText = "Nro Matrícula: 060-123456\nDepartamento: Bolívar Municipio: Cartagena de Indias\n"
+        . "Dirección Actual del Inmueble: Calle 1 No 2-3\nReferencia Catastral: 130010101000000000001000000000\n"
+        . "Estado del Folio: ACTIVO\nCertificado generado con el Pin No: ABCD1234\n"
+        . "ANOTACION Nro 1 Fecha: 01/01/2020 Doc: ESCRITURA 123 Valor Acto: \$1000000 "
+        . "Especificación: COMPRAVENTA.\nANOTACIÓN: Nro 2 Fecha: 02/02/2021 Doc: ESCRITURA 456 "
         . "Valor Acto: \$500000 Especificación: HIPOTECA a favor de Banco.\nANOTACION: Nro 3 "
         . "Fecha: 03/03/2022 Doc: OFICIO 789 Especificación: EMBARGO.";
     $legalParsed = (new LegalCertificateParser())->parse($legalText, 'certificado.txt');
     expect(($legalParsed['data']['matricula_inmobiliaria'] ?? '') === '060-123456'
-        && ($legalParsed['data']['municipio'] ?? '') === 'Cartagena'
+        && ($legalParsed['data']['municipio'] ?? '') === 'Cartagena de Indias'
+        && ($legalParsed['data']['pin'] ?? '') === 'ABCD1234'
         && count($legalParsed['annotations']) === 3
         && ($legalParsed['annotations'][1]['categoria'] ?? '') === 'gravamen'
         && ($legalParsed['annotations'][2]['categoria'] ?? '') === 'medida_cautelar'

@@ -8,6 +8,7 @@ $field = static fn (string $key): string => (string) ($data[$key] ?? '');
 $label = static fn (string $key): string => (string) ($legalLabels[$key] ?? $key);
 $isTextarea = static fn (string $key): bool => str_starts_with($key, 'reporte_')
     || in_array($key, ['cabida_linderos', 'reformas_ph', 'matriculas_derivadas'], true);
+$legalTabNumbers = ['registral' => '4.1', 'catastro' => '4.2', 'ph' => '4.3', 'informe' => '4.4'];
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
@@ -115,10 +116,26 @@ $isTextarea = static fn (string $key): bool => str_starts_with($key, 'reporte_')
                 <?= e($profile['status'] ?? 'Pendiente de revisión') ?>
             </span>
         </div>
-        <div class="mt-6 space-y-4">
+        <div class="mt-6" x-data="{ activeLegalTab: 'registral' }">
+            <div class="rounded-2xl bg-slate-100 p-2">
+                <div class="flex gap-2 overflow-x-auto pb-2" role="tablist" aria-label="Submenús jurídicos">
+                    <?php foreach ($legalGroups as $groupKey => [$groupTitle, $keys]): ?>
+                        <button class="min-h-14 shrink-0 rounded-xl px-5 py-3 text-left text-sm font-semibold transition"
+                            type="button" role="tab" @click="activeLegalTab = '<?= e($groupKey) ?>'"
+                            :aria-selected="activeLegalTab === '<?= e($groupKey) ?>'"
+                            :class="activeLegalTab === '<?= e($groupKey) ?>' ? 'bg-teal-700 text-white shadow-sm' : 'bg-white text-teal-800 hover:bg-teal-50'">
+                            <span class="block text-xs opacity-80"><?= e($legalTabNumbers[$groupKey] ?? '4') ?></span>
+                            <?= e($groupTitle) ?>
+                        </button>
+                    <?php endforeach; ?>
+                </div>
+            </div>
             <?php foreach ($legalGroups as $groupKey => [$groupTitle, $keys]): ?>
-                <details class="rounded-xl border border-slate-200 bg-slate-50 p-4" <?= $groupKey === 'registral' ? 'open' : '' ?>>
-                    <summary class="cursor-pointer text-lg font-semibold text-slate-900"><?= e($groupTitle) ?></summary>
+                <section class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4"
+                    x-show="activeLegalTab === '<?= e($groupKey) ?>'">
+                    <h3 class="text-lg font-semibold text-slate-900">
+                        <?= e(($legalTabNumbers[$groupKey] ?? '4') . ' ' . $groupTitle) ?>
+                    </h3>
                     <div class="mt-5 grid gap-5 md:grid-cols-2">
                         <?php foreach ($keys as $key): ?>
                             <label class="label <?= $isTextarea($key) ? 'md:col-span-2' : '' ?>"><?= e($label($key)) ?>
@@ -131,7 +148,7 @@ $isTextarea = static fn (string $key): bool => str_starts_with($key, 'reporte_')
                             </label>
                         <?php endforeach; ?>
                     </div>
-                </details>
+                </section>
             <?php endforeach; ?>
         </div>
     </section>
