@@ -1,5 +1,5 @@
 function formatAdjustment(value) {
-    if (value === null) return 'pendiente';
+    if (value === null || !Number.isFinite(value)) return 'pendiente';
     if (Math.abs(value) < 0.05) return '0%';
     return `${value > 0 ? '+' : ''}${String(value).replace('.', ',')}%`;
 }
@@ -13,6 +13,7 @@ function scoreFromUnit(unit) {
         const weight = row?.querySelector('[data-attribute-weight]');
         const ratingValue = Number.parseInt(rating.value, 10);
         const weightValue = Number.parseInt(weight?.value || '', 10);
+        if (!Number.isInteger(ratingValue) || !Number.isInteger(weightValue)) return;
         if (ratingValue < 1 || ratingValue > 5 || weightValue < 1 || weightValue > 3) return;
         sum += ratingValue * weightValue;
         weightSum += weightValue;
@@ -56,7 +57,7 @@ export function subjectAttributes(initialUnit = '') {
         },
         unitScoreText(unitId) {
             const score = this.scores[unitId];
-            if (!score || score.adjustment === null) return 'Ajuste pendiente';
+            if (!score || score.adjustment === null || !Number.isFinite(score.adjustment)) return 'Ajuste pendiente';
             return `Ajuste ${formatAdjustment(score.adjustment)} · índice ${score.percent}%`;
         },
     };
