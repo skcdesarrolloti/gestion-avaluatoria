@@ -30,7 +30,7 @@ final class AppraisalLegalCertificateUploadService
             'extracted_chars' => mb_strlen($text), 'analysis_status' => $parsed['status'],
             'analysis_message' => $parsed['message'], 'file_blob' => $blob];
         $repo->addCertificate($appraisalId, $owner, $record);
-        $repo->mergeAnalysis($appraisalId, $owner, $id, $parsed['data'], $parsed['annotations'], $parsed['alerts'], $text);
+        $repo->mergeAnalysis($appraisalId, $owner, $id, $parsed['data'], $parsed['annotations'], $parsed['alerts'], $text, true);
         return ['record' => $record, 'parsed' => $parsed];
     }
 

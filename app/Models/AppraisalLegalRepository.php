@@ -91,10 +91,12 @@ final class AppraisalLegalRepository
     }
 
     public function mergeAnalysis(string $appraisalId, int $owner, string $certificateId, array $data,
-        array $annotations, array $alerts, string $text): void
+        array $annotations, array $alerts, string $text, bool $replaceData = false): void
     {
         $current = $this->profile($appraisalId, $owner);
-        $merged = AppraisalLegalInput::mergeEmpty($current['data'] ?? [], $data);
+        $merged = $replaceData
+            ? array_replace(AppraisalLegalCatalog::defaults(), $data)
+            : AppraisalLegalInput::mergeEmpty($current['data'] ?? [], $data);
         if ((new LegalCertificateTitleSanitizer())->isBad((string) ($merged['titular_actual'] ?? ''))
             && trim((string) ($data['titular_actual'] ?? '')) !== '') {
             $merged['titular_actual'] = (string) $data['titular_actual'];
@@ -150,10 +152,25 @@ final class AppraisalLegalRepository
     private function clearSourceIfMatches(string $appraisalId, int $owner, string $certificateId): void
     {
         $now = gmdate('Y-m-d H:i:s');
+        if ($this->certificateCount($appraisalId, $owner) === 0) {
+            $query = $this->db->prepare('UPDATE appraisal_legal_profiles SET source_certificate_id = NULL,
+                status = ?, data_json = ?, annotations_json = ?, alerts_json = ?, extracted_text = ?,
+                updated_at = ? WHERE appraisal_id = ? AND owner_id = ?');
+            $query->execute(['Sin certificado cargado', json_encode(AppraisalLegalCatalog::defaults(), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
+                '[]', '[]', '', $now, $appraisalId, $owner]);
+            return;
+        }
         $query = $this->db->prepare('UPDATE appraisal_legal_profiles
             SET source_certificate_id = NULL, status = ?, updated_at = ?
             WHERE appraisal_id = ? AND owner_id = ? AND source_certificate_id = ?');
         $query->execute(['Soporte retirado; revisar datos conservados', $now, $appraisalId, $owner, $certificateId]);
+    }
+
+    private function certificateCount(string $appraisalId, int $owner): int
+    {
+        $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_legal_certificates WHERE appraisal_id = ? AND owner_id = ?');
+        $query->execute([$appraisalId, $owner]);
+        return (int) $query->fetchColumn();
     }
 
     private function json(string $json, array $default): array

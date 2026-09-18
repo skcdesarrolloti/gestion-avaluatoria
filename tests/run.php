@@ -767,6 +767,33 @@ try {
         && ($storedAfterReanalysis['data']['reporte_conclusion_entregable'] ?? '') === 'Diagnóstico renovado'
         && count($storedAfterReanalysis['annotations']) === 1,
         'reanálisis jurídico conserva datos manuales y refresca cierre automático');
+    $replaceId = str_repeat('1', 32);
+    $legalRepo->mergeAnalysis($replaceId, 1, str_repeat('2', 32),
+        ['matricula_inmobiliaria' => '060-111111', 'municipio' => 'CARTAGENA'],
+        [['orden' => '001']], [], 'texto certificado 1', true);
+    $legalRepo->mergeAnalysis($replaceId, 1, str_repeat('3', 32),
+        ['matricula_inmobiliaria' => '060-222222', 'departamento' => 'BOLIVAR'],
+        [['orden' => '002']], [], 'texto certificado 2', true);
+    $replacedProfile = $legalRepo->profile($replaceId, 1);
+    expect(($replacedProfile['data']['matricula_inmobiliaria'] ?? '') === '060-222222'
+        && ($replacedProfile['data']['municipio'] ?? '') === ''
+        && ($replacedProfile['data']['departamento'] ?? '') === 'BOLIVAR'
+        && count($replacedProfile['annotations']) === 1,
+        'certificado jurídico nuevo limpia datos de lectura anterior');
+    $deleteId = str_repeat('4', 32);
+    $certId = str_repeat('5', 32);
+    $legalRepo->addCertificate($deleteId, 1, ['id' => $certId, 'source_filename' => 'ctl.pdf',
+        'storage_filename' => 'ctl-inexistente.pdf', 'mime_type' => 'application/pdf',
+        'file_size_bytes' => 10, 'extracted_chars' => 10, 'analysis_status' => 'Lectura preliminar',
+        'analysis_message' => 'ok', 'file_blob' => 'pdf']);
+    $legalRepo->mergeAnalysis($deleteId, 1, $certId, ['matricula_inmobiliaria' => '060-333333'], [], [], 'texto', true);
+    $legalRepo->deleteCertificate($certId, $deleteId, 1);
+    $deletedProfile = $legalRepo->profile($deleteId, 1);
+    expect(($deletedProfile['data']['matricula_inmobiliaria'] ?? '') === ''
+        && $deletedProfile['source_certificate_id'] === null
+        && ($deletedProfile['extracted_text'] ?? '') === ''
+        && ($deletedProfile['status'] ?? '') === 'Sin certificado cargado',
+        'eliminar último certificado limpia ficha jurídica');
     $tmpCtlPng = tempnam(sys_get_temp_dir(), 'ga_ctl_png_');
     file_put_contents($tmpCtlPng, hex2bin('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c6360000002000100ffff03000006000557bfabcf0000000049454e44ae426082'));
     $imageInfo = AppraisalLegalCertificateStorage::inspect($tmpCtlPng, 'certificado-foto.png');
