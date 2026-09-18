@@ -471,6 +471,21 @@ try {
     expect(str_contains((string) ($legalParsed['data']['reporte_conclusion_entregable'] ?? ''), 'no saneada')
         && str_contains((string) ($legalParsed['data']['reporte_profesional_entregable'] ?? ''), 'No se recomienda'),
         'parser juridico emite diagnostico preliminar para cargas criticas');
+    $pairedLegalText = "Nro Matrícula: 060-999999\nDepartamento: BOLIVAR Municipio: CARTAGENA DE INDIAS\n"
+        . "Estado del Folio: ACTIVO\nANOTACION Nro 001 Fecha: 01/01/2020 Doc: ESCRITURA 111 "
+        . "Especificación: GRAVAMEN: 210 HIPOTECA A FAVOR DE BANCO.\n"
+        . "ANOTACION Nro 002 Fecha: 01/01/2022 Doc: ESCRITURA 222 "
+        . "Especificación: CANCELACION: 650 CANCELACION HIPOTECA Se cancela anotacion No: 001.";
+    $pairedParsed = (new LegalCertificateParser())->parse($pairedLegalText, 'certificado-pareado.txt');
+    $pairedConclusion = mb_strtolower((string) ($pairedParsed['data']['reporte_conclusion_entregable'] ?? ''));
+    $pairedAlerts = mb_strtolower(implode(' ', $pairedParsed['alerts']));
+    expect(($pairedParsed['annotations'][0]['estado_juridico'] ?? '') === 'solucionada'
+        && ($pairedParsed['annotations'][0]['cancelada_por'] ?? '') === '002'
+        && ($pairedParsed['annotations'][1]['cancelacion_de'] ?? '') === '001'
+        && !str_contains($pairedAlerts, 'anotación 001')
+        && str_contains($pairedConclusion, 'se cancela con la anotación 002')
+        && !str_contains($pairedConclusion, 'no saneada'),
+        'parser juridico parea afectaciones canceladas y evita falsas alarmas');
     $legalMerged = AppraisalLegalInput::mergeEmpty(['matricula_inmobiliaria' => 'manual'], $legalParsed['data']);
     expect($legalMerged['matricula_inmobiliaria'] === 'manual'
         && ($legalMerged['codigo_catastral_actual'] ?? '') !== '', 'juridico conserva dato manual y llena vacios');

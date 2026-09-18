@@ -66,7 +66,8 @@ final class LegalCertificateParser
                 'estado_juridico' => $state, 'descripcion_acto' => $this->describeAct($row, $category),
                 'requiere_revision' => $review ? 'Sí' : 'No', 'impacto_resumen' => $impact];
         }
-        return $rows;
+        unset($row);
+        return (new LegalCertificateCancellationMatcher())->apply($rows);
     }
 
     private function alerts(array $data, array $annotations, string $text): array
@@ -125,6 +126,8 @@ final class LegalCertificateParser
         if (!$rows) return $empty;
         return implode("\n", array_map(static fn (array $row): string => 'Anotación ' . ($row['orden'] ?? '')
             . ': ' . ($row['impacto_resumen'] ?? 'Revisión preliminar pendiente.')
+            . (($row['cancelada_por'] ?? '') !== '' ? ' Relación registral: se cancela con la anotación ' . $row['cancelada_por'] . '.' : '')
+            . (($row['cancelacion_de'] ?? '') !== '' ? ' Relación registral: cancela la anotación ' . $row['cancelacion_de'] . '.' : '')
             . (($row['documento'] ?? '') !== '' ? ' Soporte: ' . $row['documento'] . '.' : ''), $rows));
     }
 
