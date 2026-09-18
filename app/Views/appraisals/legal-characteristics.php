@@ -3,6 +3,8 @@ $currentStep = 'juridicas';
 $data = is_array($profile['data'] ?? null) ? $profile['data'] : [];
 $annotations = is_array($profile['annotations'] ?? null) ? $profile['annotations'] : [];
 $alerts = is_array($profile['alerts'] ?? null) ? $profile['alerts'] : [];
+$annotations = \App\Support\AppraisalLegalView::resolvedAnnotations($annotations);
+$alerts = \App\Support\AppraisalLegalView::activeAlerts($alerts, $annotations);
 $latest = $certificates[0] ?? null;
 $field = static fn (string $key): string => (string) ($data[$key] ?? '');
 $label = static fn (string $key): string => (string) ($legalLabels[$key] ?? $key);

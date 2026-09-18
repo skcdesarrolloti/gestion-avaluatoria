@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace App\Support;
+use App\Services\LegalCertificateCancellationMatcher;
 
 final class AppraisalLegalView
 {
@@ -49,14 +50,29 @@ final class AppraisalLegalView
     {
         $groups = ['ph' => [], 'tradicion' => [], 'gravamen' => [], 'limitacion_dominio' => [],
             'medida_cautelar' => [], 'otras' => []];
-        foreach ($annotations as $row) {
+        foreach (self::resolvedAnnotations($annotations) as $row) {
             $category = (string) ($row['categoria_final'] ?? $row['categoria'] ?? 'otras');
             $key = in_array($category, ['tradicion', 'gravamen', 'limitacion_dominio', 'medida_cautelar'], true)
                 ? $category : 'otras';
-            if ($category === 'propiedad_horizontal') $groups['ph'][] = self::enrich($row, $category);
-            else $groups[$key][] = self::enrich($row, $category);
+            if ($category === 'propiedad_horizontal') $groups['ph'][] = $row;
+            else $groups[$key][] = $row;
         }
         return $groups;
+    }
+
+    public static function resolvedAnnotations(array $annotations): array
+    {
+        $enriched = array_map(static fn (array $row): array => self::enrich($row), $annotations);
+        return (new LegalCertificateCancellationMatcher())->apply($enriched);
+    }
+
+    public static function activeAlerts(array $alerts, array $annotations): array
+    {
+        $closed = array_values(array_filter(array_map(static fn (array $row): string => ($row['estado_juridico'] ?? '') === 'solucionada'
+            ? (string) ($row['orden'] ?? '') : '', $annotations)));
+        if (!$closed) return $alerts;
+        return array_values(array_filter($alerts, static fn ($alert): bool => !preg_match('/anotaci(?:o|ó)n\s+('
+            . implode('|', array_map('preg_quote', $closed)) . ')\b/iu', (string) $alert)));
     }
 
     public static function enrich(array $row, string $category = ''): array
@@ -93,7 +109,7 @@ final class AppraisalLegalView
     public static function trafficCounts(array $annotations): array
     {
         $counts = ['Rojo' => 0, 'Amarillo' => 0, 'Verde' => 0];
-        foreach ($annotations as $row) $counts[self::trafficLight($row)[0]]++;
+        foreach (self::resolvedAnnotations($annotations) as $row) $counts[self::trafficLight($row)[0]]++;
         return $counts;
     }
 

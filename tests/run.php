@@ -536,6 +536,19 @@ try {
     expect(($partyIdCancelParsed['annotations'][0]['estado_juridico'] ?? '') === 'solucionada'
         && ($partyIdCancelParsed['annotations'][0]['cancelada_por'] ?? '') === '035',
         'parser juridico cierra cautelar por identificaciones compartidas de partes');
+    $storedRows = [
+        ['orden' => '032', 'categoria' => 'medida_cautelar', 'estado_juridico' => 'vigente',
+            'requiere_revision' => 'Sí', 'personaDe' => 'VELEZ OSPINO MARIA ELENA C.C 45.457.877',
+            'personaA' => 'MERLANO MENDOZA SEBASTIAN - CC 73145456', 'texto' => ''],
+        ['orden' => '035', 'categoria' => 'medida_cautelar', 'estado_juridico' => 'solucionada',
+            'requiere_revision' => 'No', 'personaDe' => 'BANCOLOMBIA S.A. NIT# 8909039388',
+            'personaA' => 'MERLANO MENDOZA SEBASTIAN CC# 73145456 A: VELEZ OSPINO MARIA ELENA CC# 45757877',
+            'texto' => 'CANCELACION: 0856 CANCELACION POR ORDEN JUDICIAL EMBARGO EJECUTIVO CON ACCION REAL'],
+    ];
+    $storedResolved = AppraisalLegalView::resolvedAnnotations($storedRows);
+    expect(($storedResolved[0]['estado_juridico'] ?? '') === 'solucionada'
+        && ($storedResolved[0]['cancelada_por'] ?? '') === '035',
+        'vista juridica refresca cierres sobre anotaciones guardadas');
     $mixedCancelText = "Nro Matrícula: 060-999999\nEstado del Folio: ACTIVO\n"
         . "ANOTACION Nro 020 Fecha: 08-04-2011 Doc: OFICIO 574 Especificación: MEDIDA CAUTELAR: "
         . "0429 EMBARGO EJECUTIVO CON ACCION REAL RADICADO 13001310300420110012800 "
