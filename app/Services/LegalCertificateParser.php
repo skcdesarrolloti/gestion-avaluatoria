@@ -9,6 +9,7 @@ final class LegalCertificateParser
     {
         $data = $this->fields($text, $filename);
         $annotations = $this->classifyAnnotations($this->annotations($text));
+        $data = $this->improveTitle($data, $annotations);
         $alerts = $this->alerts($data, $annotations, $text);
         $found = count(array_filter($data, static fn ($value): bool => trim((string) $value) !== ''));
         $data = array_replace(AppraisalLegalCatalog::defaults(), $data, $this->reportFields($data, $annotations, $alerts));
@@ -32,6 +33,16 @@ final class LegalCertificateParser
     }
 
     private function annotations(string $text): array { return (new LegalCertificateAnnotationExtractor())->extract($text); }
+
+    private function improveTitle(array $data, array $annotations): array
+    {
+        $tradition = array_values(array_filter($annotations, fn (array $a): bool => ($a['categoria'] ?? '') === 'tradicion'));
+        $last = $tradition ? end($tradition) : [];
+        $titles = new LegalCertificateTitleSanitizer();
+        $owner = $titles->valid((string) ($last['personaA'] ?? ''));
+        if ($owner !== '' && $titles->isBad((string) ($data['titular_actual'] ?? ''))) $data['titular_actual'] = $owner;
+        return $data;
+    }
 
     private function classifyAnnotations(array $rows): array
     {
@@ -200,6 +211,5 @@ final class LegalCertificateParser
         foreach ($patterns as $pattern) if (preg_match($pattern, $text, $m)) return trim((string) ($m[1] ?? ''));
         return '';
     }
-    private function clean(string $value): string { return mb_substr(trim(preg_replace('/\s+/', ' ', $value) ?? $value), 0, 500); }
     private function contains(string $text, array $needles): bool { foreach ($needles as $n) if (mb_stripos($text, $n) !== false) return true; return false; }
 }

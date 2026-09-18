@@ -4,6 +4,7 @@ namespace App\Models;
 use App\Core\HttpException;
 use App\Services\AppraisalLegalCertificateStorage;
 use App\Services\AppraisalLegalInput;
+use App\Services\LegalCertificateTitleSanitizer;
 use App\Support\AppraisalLegalCatalog;
 use PDO;
 
@@ -94,6 +95,13 @@ final class AppraisalLegalRepository
     {
         $current = $this->profile($appraisalId, $owner);
         $merged = AppraisalLegalInput::mergeEmpty($current['data'] ?? [], $data);
+        if ((new LegalCertificateTitleSanitizer())->isBad((string) ($merged['titular_actual'] ?? ''))
+            && trim((string) ($data['titular_actual'] ?? '')) !== '') {
+            $merged['titular_actual'] = (string) $data['titular_actual'];
+            if (trim((string) ($data['reporte_titular_actual'] ?? '')) !== '') {
+                $merged['reporte_titular_actual'] = (string) $data['reporte_titular_actual'];
+            }
+        }
         foreach (['semaforo_manual', 'clasificacion_manual', 'revision_analista',
             'salvedad_final', 'reporte_conclusion_entregable',
             'reporte_profesional_entregable'] as $key) {

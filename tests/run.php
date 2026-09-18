@@ -562,6 +562,15 @@ try {
         && str_contains((string) ($ctlParsed['data']['reporte_conclusion_entregable'] ?? ''), 'comercializable con condiciones')
         && $ctlFound >= 15,
         'parser juridico lee certificado CTL con campos registrales fisicos y titularidad');
+    $badTitleText = "Nro Matrícula: 060-777777\nEstado del Folio: ACTIVO\n"
+        . "Titular del derecho real de dominio: Y A LOS LINDEROS Y\n"
+        . "Descripción Cabida y Linderos: AREA Y COEFICIENTE AREA - HECTAREAS: METROS: CENTIMETROS Y A LOS LINDEROS Y\n"
+        . "ANOTACION Nro 001 Fecha: 01-01-2020 Doc: ESCRITURA 10 Valor Acto: $100000 "
+        . "Especificacion: COMPRAVENTA PERSONAS QUE INTERVIENEN EN EL ACTO DE: VENDEDOR S.A. A: COMPRADOR REAL SAS";
+    $badTitleParsed = (new LegalCertificateParser())->parse($badTitleText, 'titular-linderos.txt');
+    expect(($badTitleParsed['data']['titular_actual'] ?? '') === 'COMPRADOR REAL SAS'
+        && str_contains((string) ($badTitleParsed['data']['reporte_titular_actual'] ?? ''), 'COMPRADOR REAL SAS'),
+        'parser juridico descarta linderos como titular y usa ultima tradicion');
     $ctlOcrText = "Certificado generado con el Pin No: 230912151482354135\n"
         . "Nro Matr?cula: 060-187254 Pagina 1 TURNO: 2023-060-1-132812\n"
         . "CIRCULO REGISTRAL: 060 - CARTAGENA DEPTO: BOLIVAR MUNICIPIO: CARTAGENA DE INDIAS VEREDA: CARTAGENA\n"
@@ -656,6 +665,19 @@ try {
         'parser juridico tolera bytes danados y no cuenta salvedades como anotaciones');
     unlink($badCtlPath);
     $legalRepo = new AppraisalLegalRepository($db);
+    $badTitleId = str_repeat('7', 32);
+    $legalRepo->saveManual($badTitleId, 1, array_replace(AppraisalLegalCatalog::defaults(), [
+        'titular_actual' => 'Y A LOS LINDEROS Y',
+        'reporte_titular_actual' => 'Titular inscrito: Y A LOS LINDEROS Y.',
+    ]));
+    $legalRepo->mergeAnalysis($badTitleId, 1, str_repeat('8', 32), [
+        'titular_actual' => 'COMPRADOR REAL SAS',
+        'reporte_titular_actual' => 'Titular inscrito: COMPRADOR REAL SAS.',
+    ], [], [], 'texto extraido');
+    $fixedTitleProfile = $legalRepo->profile($badTitleId, 1);
+    expect(($fixedTitleProfile['data']['titular_actual'] ?? '') === 'COMPRADOR REAL SAS'
+        && str_contains((string) ($fixedTitleProfile['data']['reporte_titular_actual'] ?? ''), 'COMPRADOR REAL SAS'),
+        'reanálisis jurídico reemplaza titularidad contaminada por linderos');
     $legalManual = [];
     foreach (AppraisalLegalCatalog::fieldKeys() as $fieldKey) $legalManual[$fieldKey] = 'Guardado ' . $fieldKey;
     $legalRepo->saveManual(str_repeat('b', 32), 1, $legalManual);

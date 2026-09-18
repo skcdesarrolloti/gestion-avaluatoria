@@ -118,13 +118,14 @@ final class LegalCertificateFieldExtractor
     private function titular(string $text, string $lastTradition = ''): string
     {
         $source = $lastTradition !== '' ? $lastTradition : $text;
-        return $this->match($text, [
+        $candidate = $this->match($text, [
             '/titular(?:es)?\s+del\s+derecho\s+real\s+de\s+dominio\s*[:#]?\s*([^\n\r]{4,220})/iu',
             '/propietario(?:\(s\))?\s*[:#]?\s*([^\n\r]{4,220})/iu',
         ]) ?: $this->match($source, [
             '/personas\s+que\s+intervienen\s+en\s+el\s+acto.*?\ba\s*:\s*([^\n\r]{4,220})/isu',
             '/\ba\s*:\s*([^\n\r]{4,220})/iu',
         ]) ?: $this->match($source, ['/comprador(?:\(es\))?\s*[:#]?\s*([^\n\r]{4,220})/iu']);
+        return (new LegalCertificateTitleSanitizer())->valid($candidate);
     }
 
     private function documento(string $text): string
