@@ -94,6 +94,11 @@ final class AppraisalLegalRepository
     {
         $current = $this->profile($appraisalId, $owner);
         $merged = AppraisalLegalInput::mergeEmpty($current['data'] ?? [], $data);
+        foreach (['semaforo_manual', 'clasificacion_manual', 'revision_analista',
+            'salvedad_final', 'reporte_conclusion_entregable',
+            'reporte_profesional_entregable'] as $key) {
+            if (trim((string) ($data[$key] ?? '')) !== '') $merged[$key] = (string) $data[$key];
+        }
         $this->upsert($appraisalId, $owner, $certificateId, 'Lectura preliminar', $merged, $annotations, $alerts, $text);
     }
 

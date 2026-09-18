@@ -607,13 +607,15 @@ try {
     expect($allLegalFieldsSaved && $storedLegalProfile['status'] === 'Revisado por analista',
         'numeral 4 guarda y recarga todos los campos manuales');
     $legalRepo->mergeAnalysis(str_repeat('b', 32), 1, str_repeat('9', 32),
-        ['matricula_inmobiliaria' => 'lectura reemplazo', 'municipio' => 'lectura reemplazo'],
+        ['matricula_inmobiliaria' => 'lectura reemplazo', 'municipio' => 'lectura reemplazo',
+            'reporte_conclusion_entregable' => 'Diagnóstico renovado'],
         [['orden' => '1']], ['alerta'], 'texto extraido');
     $storedAfterReanalysis = $legalRepo->profile(str_repeat('b', 32), 1);
     expect(($storedAfterReanalysis['data']['matricula_inmobiliaria'] ?? '') === 'Guardado matricula_inmobiliaria'
         && ($storedAfterReanalysis['data']['municipio'] ?? '') === 'Guardado municipio'
+        && ($storedAfterReanalysis['data']['reporte_conclusion_entregable'] ?? '') === 'Diagnóstico renovado'
         && count($storedAfterReanalysis['annotations']) === 1,
-        'reanálisis jurídico no borra campos manuales ya guardados');
+        'reanálisis jurídico conserva datos manuales y refresca cierre automático');
     $tmpCtlPng = tempnam(sys_get_temp_dir(), 'ga_ctl_png_');
     file_put_contents($tmpCtlPng, hex2bin('89504e470d0a1a0a0000000d49484452000000010000000108060000001f15c4890000000a49444154789c6360000002000100ffff03000006000557bfabcf0000000049454e44ae426082'));
     $imageInfo = AppraisalLegalCertificateStorage::inspect($tmpCtlPng, 'certificado-foto.png');
