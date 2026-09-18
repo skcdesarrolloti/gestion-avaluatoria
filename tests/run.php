@@ -557,6 +557,27 @@ try {
         && ($ctlLongParsed['data']['check_propiedad_horizontal'] ?? '') === 'Sí'
         && $ctlLongFound >= 18,
         'parser juridico lee CTL largo con direccion multilinea anotaciones y PH');
+    $snrHeaderText = "La validez de este documento podr? verificarse en la p?gina certificados.supernotariado.gov.co\n"
+        . "Certificado generado con el Pin No: 230912151482354135\nNro Matr?cula: 060-187254\n"
+        . "Pagina 1 TURNO: 2023-060-1-132812\nImpreso el 12 de Septiembre de 2023 a las 11:03:36 AM\n"
+        . "CIRCULO REGISTRAL: 060 - CARTAGENA DEPTO: BOLIVAR MUNICIPIO: CARTAGENA DE INDIAS VEREDA: CARTAGENA\n"
+        . "FECHA APERTURA: 13-02-2002 RADICACI?N: 2002-800 CON: ESCRITURA DE: 16-01-2002\n"
+        . "ESTADO DEL FOLIO:\nACTIVO\nDESCRIPCION: CABIDA Y LINDEROS\n"
+        . "Contenidos en ESCRITURA Nro 2593 de fecha 29-12-2001 en NOTARIA 61 de BOGOTA GARAJE 24 con area de 13.34M2 con coeficiente de 0.1010%\n"
+        . "DIRECCION DEL INMUEBLE\nTipo Predio: URBANO\n1 KR 13 B # 26 - 78 GRAJE 24 EDIF 19 DEL PROYECTO INTEGRADO CHAMBACU R P H\n"
+        . "MATRICULA ABIERTA CON BASE EN LA s SIGUIENTE s En caso de integraci?n y otros\n060 - 187193\n";
+    $snrHeaderParsed = (new LegalCertificateParser())->parse($snrHeaderText, 'certificado187254.pdf');
+    expect(($snrHeaderParsed['data']['matricula_inmobiliaria'] ?? '') === '060-187254'
+        && ($snrHeaderParsed['data']['circulo_registral'] ?? '') === '060 - CARTAGENA'
+        && ($snrHeaderParsed['data']['estado_folio'] ?? '') === 'ACTIVO'
+        && ($snrHeaderParsed['data']['matricula_matriz'] ?? '') === '060-187193'
+        && str_contains((string) ($snrHeaderParsed['data']['direccion'] ?? ''), 'KR 13 B'),
+        'parser juridico lee cabecera SNR real con acentos danados');
+    $pendingMerged = AppraisalLegalInput::mergeEmpty(
+        ['matricula_inmobiliaria' => 'Pendiente de lectura o revisión manual'],
+        ['matricula_inmobiliaria' => '060-187254']);
+    expect(($pendingMerged['matricula_inmobiliaria'] ?? '') === '060-187254',
+        'reanálisis juridico reemplaza marcador pendiente guardado');
     $legalRepo = new AppraisalLegalRepository($db);
     $legalManual = [];
     foreach (AppraisalLegalCatalog::fieldKeys() as $fieldKey) $legalManual[$fieldKey] = 'Guardado ' . $fieldKey;

@@ -21,7 +21,11 @@ final class LegalCertificateParser
 
     private function fields(string $text, string $filename): array
     {
-        return LegalCertificateFieldExtractor::extract($text, $filename);
+        $data = LegalCertificateFieldExtractor::extract($text, $filename);
+        foreach ((new LegalCertificateSnrHeaderExtractor())->extract($text) as $key => $value) {
+            if (trim((string) ($data[$key] ?? '')) === '') $data[$key] = $value;
+        }
+        return $data;
     }
 
     private function annotations(string $text): array

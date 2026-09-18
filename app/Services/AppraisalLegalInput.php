@@ -23,7 +23,8 @@ final class AppraisalLegalInput
     {
         foreach (AppraisalLegalCatalog::defaults() as $key => $empty) {
             $manual = trim((string) ($current[$key] ?? ''));
-            if ($manual === '' && trim((string) ($suggested[$key] ?? '')) !== '') {
+            $isPending = preg_match('/^pendiente\s+de\s+lectura(?:\s+o\s+revisi[oó]n\s+manual)?$/iu', $manual) === 1;
+            if (($manual === '' || $isPending) && trim((string) ($suggested[$key] ?? '')) !== '') {
                 $current[$key] = (string) $suggested[$key];
             } elseif (!array_key_exists($key, $current)) {
                 $current[$key] = $empty;
