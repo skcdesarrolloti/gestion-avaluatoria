@@ -5,7 +5,7 @@ $firstAttributeGroup = (string) array_key_first($catalog);
 $score = $attributeScore($unit, $catalog);
 $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'] ?? ''));
 ?>
-<div class="mt-5 rounded-xl border border-slate-200 p-5"
+<div class="mt-5 rounded-xl border border-slate-200 p-5" data-attribute-unit data-unit-id="<?= e($unitId) ?>"
     x-data="{ activeAttributeGroup: '<?= e($firstAttributeGroup) ?>' }"
     x-show="activeAttributes === '<?= e($unitId) ?>'">
     <div class="flex flex-wrap items-center justify-between gap-3">
@@ -18,15 +18,17 @@ $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'
                 <?= e($unit['igac_typology_hint'] ?: 'Tipología IGAC pendiente') ?>
             </span>
             <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800">
+                <span x-text="unitScoreText('<?= e($unitId) ?>')">
                 Ajuste <?= e($formatAttributeAdjustment($score['score'] === null ? null : (float) $score['adjustment'])) ?>
                 <?= $score['score'] === null ? '' : ' · índice ' . e((string) $score['percent']) . '%' ?>
+                </span>
             </span>
         </div>
     </div>
     <div class="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
         Selecciona solo condiciones que realmente diferencian al sujeto. Si no aplica, déjalo sin diligenciar.
         Califica de 1 a 5: por debajo de 3 resta como demérito; por encima de 3 suma como atributo.
-        Asigna peso bajo, medio o alto solo cuando pueda incidir en el valor.
+        El peso se coloca en medio automáticamente; cámbialo a bajo o alto solo cuando el efecto real lo justifique.
     </div>
     <div class="mt-5 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
         <?php $attributeGroupNumber = 1; ?>
@@ -71,7 +73,7 @@ $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'
                     </thead>
                     <tbody class="divide-y divide-slate-200">
                         <?php foreach ($attributes as $key => [$label, $help, $options]): ?>
-                            <tr x-data="photoUpload('<?= e($attrValue($unit, $key, 'evidence')) ?>')">
+                            <tr data-attribute-row x-data="photoUpload('<?= e($attrValue($unit, $key, 'evidence')) ?>')">
                                 <td class="px-3 py-3 align-top">
                                     <strong class="block text-slate-950"><?= e($label) ?></strong>
                                     <span class="mt-1 block max-w-xs text-xs leading-5 text-slate-500"><?= e($help) ?></span>
@@ -95,7 +97,8 @@ $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'
                                 <?php endforeach; ?>
                                 <?php foreach (['rating' => 'rating', 'weight' => 'weight'] as $field => $optionKey): ?>
                                     <td class="px-3 py-3 align-top">
-                                        <select class="input min-w-40" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][<?= e($field) ?>]">
+                                        <select class="input min-w-40" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][<?= e($field) ?>]"
+                                            <?= $field === 'rating' ? 'data-attribute-rating' : 'data-attribute-weight' ?>>
                                             <?php foreach ($specialAttributeOptions[$optionKey] as $value => $text): ?>
                                                 <option value="<?= e($value) ?>" <?= $attrValue($unit, $key, $field) === $value ? 'selected' : '' ?>><?= e($text) ?></option>
                                             <?php endforeach; ?>

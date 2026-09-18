@@ -35,7 +35,7 @@ $formatAttributeAdjustment = static function (?float $value): string {
 };
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
-    x-data="{ activeAttributes: '<?= e($attributeUnits[0]['id'] ?? '') ?>', busyAttributes: false }">
+    x-data="subjectAttributes('<?= e($attributeUnits[0]['id'] ?? '') ?>')">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">3.4 Diferenciales valuatorios del sujeto</p>
@@ -82,7 +82,7 @@ $formatAttributeAdjustment = static function (?float $value): string {
     </div>
     <form class="mt-6" method="post" enctype="multipart/form-data" action="<?= e(url($subjectActionBase . '/atributos')) ?>"
         data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/atributos/autoguardar')) ?>"
-        @submit="busyAttributes = true">
+        @change="handleAttributeChange($event)" @submit="busyAttributes = true">
         <?= csrf_field() ?>
         <?php if (!$attributeUnits): ?>
             <p class="rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-600">
@@ -97,7 +97,9 @@ $formatAttributeAdjustment = static function (?float $value): string {
                         :class="activeAttributes === '<?= e($unit['id']) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'">
                         <?= e($unit['label'] ?: $attributeUnitLabel($unit)) ?>
                         <span class="ml-2 rounded-full bg-blue-50 px-2 py-0.5 text-xs text-blue-800">
+                            <span x-text="unitAdjustment('<?= e($unit['id']) ?>')">
                             <?= e($formatAttributeAdjustment($tabScore['score'] === null ? null : (float) $tabScore['adjustment'])) ?>
+                            </span>
                         </span>
                     </button>
                 <?php endforeach; ?>
