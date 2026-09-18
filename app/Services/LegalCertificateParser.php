@@ -31,10 +31,7 @@ final class LegalCertificateParser
         return $data;
     }
 
-    private function annotations(string $text): array
-    {
-        return (new LegalCertificateAnnotationExtractor())->extract($text);
-    }
+    private function annotations(string $text): array { return (new LegalCertificateAnnotationExtractor())->extract($text); }
 
     private function classifyAnnotations(array $rows): array
     {
@@ -65,7 +62,8 @@ final class LegalCertificateParser
                 $category = 'limitacion_dominio'; $state = $state === 'solucionada' ? $state : 'vigente'; $review = $state !== 'solucionada';
                 $impact = 'Impone limitación o carga al ejercicio del dominio.';
             }
-            $row += ['categoria' => $category, 'estado_juridico' => $state,
+            $row += ['categoria' => $category, 'categoria_final' => $category,
+                'estado_juridico' => $state, 'descripcion_acto' => $this->describeAct($row, $category),
                 'requiere_revision' => $review ? 'Sí' : 'No', 'impacto_resumen' => $impact];
         }
         return $rows;
@@ -108,15 +106,15 @@ final class LegalCertificateParser
             'revision_medidas_cautelares' => $this->annotationSummary($measures, 'No se identificaron medidas cautelares en la lectura automática.'),
             'revision_propiedad_horizontal' => $this->annotationSummary($ph, 'No se identificó anotación específica de propiedad horizontal.'),
             'revision_otras_cargas' => $this->annotationSummary($others, 'Sin otras notas clasificadas automáticamente.'),
-            'reporte_matricula' => trim('Matrícula inmobiliaria ' . ($data['matricula_inmobiliaria'] ?? '') . ', ORIP ' . (($data['orip'] ?? '') ?: ($data['circulo_registral'] ?? '')) . '.'),
-            'reporte_escritura_propiedad' => $tradition ? 'Se identifican actos de tradición que deben confrontarse con las anotaciones del certificado.' : '',
+            'reporte_matricula' => trim((string) ($data['matricula_inmobiliaria'] ?? '')),
+            'reporte_escritura_propiedad' => $this->lastActSummary($tradition),
             'reporte_cedula_catastral' => trim((string) ($data['codigo_catastral_actual'] ?? '')),
-            'reporte_licencia_construccion' => trim((string) ($data['observacion_catastral'] ?? '')),
-            'reporte_constitucion_ph' => ($data['reglamento_ph'] ?? '') !== '' ? 'El certificado reporta referencia a régimen de propiedad horizontal; validar reglamento, coeficiente y unidad privada.' : '',
+            'reporte_licencia_construccion' => 'No se identifica licencia de construcción dentro del certificado de tradición y libertad. Su verificación debe realizarse con expediente urbanístico o soporte documental aportado.',
+            'reporte_constitucion_ph' => $this->phSummary($data, $ph),
             'reporte_coeficiente_propiedad' => trim((string) (($data['coeficiente_ph'] ?? '') ?: ($data['coeficiente'] ?? ''))),
-            'reporte_titular_actual' => (string) ($data['titular_actual'] ?? ''),
-            'reporte_afectaciones' => $affects ? 'Existen anotaciones que pueden constituir limitaciones o medidas cautelares. Validar vigencia y cancelaciones.' : '',
-            'reporte_gravamenes' => $debts ? 'Se identifican gravámenes o hipotecas en la lectura preliminar; confirmar si están vigentes o cancelados.' : '',
+            'reporte_titular_actual' => $this->titleSummary($data, $tradition),
+            'reporte_afectaciones' => $this->annotationSummary($affects, 'No se identifican afectaciones o medidas vigentes concluyentes en la lectura automática.'),
+            'reporte_gravamenes' => $this->annotationSummary($debts, 'No se identifican gravámenes vigentes concluyentes en la lectura automática.'),
             'semaforo_manual' => $level, 'clasificacion_manual' => $classification,
             'revision_analista' => $alerts ? implode("\n", $alerts) : 'Sin alertas automáticas; conservar revisión humana del certificado.',
             'salvedad_final' => $salvedad,
@@ -131,6 +129,68 @@ final class LegalCertificateParser
         return implode("\n", array_map(static fn (array $row): string => 'Anotación ' . ($row['orden'] ?? '')
             . ': ' . ($row['impacto_resumen'] ?? 'Revisión preliminar pendiente.')
             . (($row['documento'] ?? '') !== '' ? ' Soporte: ' . $row['documento'] . '.' : ''), $rows));
+    }
+
+    private function describeAct(array $row, string $category): string
+    {
+        $base = mb_strtolower((string) (($row['especificacion'] ?? '') . ' ' . ($row['texto'] ?? '')));
+        if ($category === 'propiedad_horizontal') {
+            if ($this->contains($base, ['reglamento propiedad horizontal', 'constitucion de propiedad horizontal'])) return 'Acto constitutivo de propiedad horizontal';
+            if ($this->contains($base, ['coeficiente', 'aclaratoria'])) return 'Acto aclaratorio o modificatorio de coeficientes';
+            if ($this->contains($base, ['reforma', 'modificacion', 'modifica'])) return 'Acto reformatorio o aclaratorio del régimen PH';
+            return 'Acto relacionado con propiedad horizontal';
+        }
+        if ($category === 'tradicion') {
+            foreach (['compraventa', 'adjudicación', 'adjudicacion', 'dación en pago', 'dacion en pago',
+                'donación', 'donacion', 'sucesión', 'sucesion', 'permuta', 'remate'] as $mode) {
+                if (mb_stripos($base, $mode) !== false) return ucfirst(str_replace('cion', 'ción', $mode));
+            }
+            return 'Acto de tradición';
+        }
+        if ($category === 'gravamen') return $this->contains($base, ['cancelacion', 'cancela'])
+            ? 'Cancelación de hipoteca' : 'Constitución de hipoteca';
+        if ($category === 'limitacion_dominio') return 'Limitación al dominio';
+        if ($category === 'medida_cautelar') {
+            if ($this->contains($base, ['embargo'])) return 'Embargo';
+            if ($this->contains($base, ['demanda'])) return 'Demanda registrada';
+            return 'Medida cautelar o judicial';
+        }
+        return 'Otra anotación registral';
+    }
+
+    private function lastActSummary(array $tradition): string
+    {
+        if (!$tradition) return '';
+        $row = end($tradition);
+        $parts = [];
+        if (($row['orden'] ?? '') !== '') $parts[] = 'Anotación ' . $row['orden'];
+        if (($row['documento'] ?? '') !== '') $parts[] = $row['documento'];
+        if (($row['fecha'] ?? '') !== '') $parts[] = 'Fecha: ' . $row['fecha'];
+        if (($row['descripcion_acto'] ?? '') !== '') $parts[] = 'Acto: ' . $row['descripcion_acto'];
+        return implode(' | ', $parts);
+    }
+
+    private function phSummary(array $data, array $ph): string
+    {
+        if (($data['reglamento_ph'] ?? '') === '' && !$ph) return '';
+        $row = $ph[0] ?? [];
+        $parts = ['Sí, el inmueble presenta régimen de propiedad horizontal.'];
+        if (($row['documento'] ?? '') !== '') $parts[] = 'Soporte: ' . $row['documento'] . '.';
+        if (($row['fecha'] ?? '') !== '') $parts[] = 'Fecha: ' . $row['fecha'] . '.';
+        if (($data['matricula_matriz'] ?? '') !== '') $parts[] = 'Matrícula matriz: ' . $data['matricula_matriz'] . '.';
+        return implode(' ', $parts);
+    }
+
+    private function titleSummary(array $data, array $tradition): string
+    {
+        $row = $tradition ? end($tradition) : [];
+        $parts = [];
+        if (($data['titular_actual'] ?? '') !== '') $parts[] = 'Titular inscrito: ' . $data['titular_actual'] . '.';
+        if (($row['descripcion_acto'] ?? '') !== '') $parts[] = 'Modo de adquisición: ' . $row['descripcion_acto'] . '.';
+        if (($row['documento'] ?? '') !== '') $parts[] = 'Soporte: ' . $row['documento'] . '.';
+        if (($row['fecha'] ?? '') !== '') $parts[] = 'Fecha del acto: ' . $row['fecha'] . '.';
+        if (($row['valor'] ?? '') !== '') $parts[] = 'Valor del acto: ' . $row['valor'] . '.';
+        return implode(' ', $parts);
     }
 
     private function integratedReport(array $data, array $tradition, array $debts, array $affects, array $ph, array $alerts): string

@@ -19,8 +19,9 @@ $selectOptions = [
         'Con alertas para revisión jurídica' => 'Con alertas para revisión jurídica',
         'Requiere estudio jurídico especializado' => 'Requiere estudio jurídico especializado'],
 ];
-$legalTabNumbers = ['registral' => '4.1', 'catastro' => '4.2', 'ph' => '4.3', 'tradicion' => '4.4',
-    'informe' => '4.5', 'impresion' => '4.6'];
+$legalSections = \App\Support\AppraisalLegalView::sections();
+$matrixRows = \App\Support\AppraisalLegalView::matrixRows();
+$legalAnnotationGroups = \App\Support\AppraisalLegalView::groupedAnnotations($annotations);
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
@@ -131,28 +132,52 @@ $legalTabNumbers = ['registral' => '4.1', 'catastro' => '4.2', 'ph' => '4.3', 't
         <div class="mt-6" x-data="{ activeLegalTab: 'registral' }">
             <div class="rounded-2xl bg-slate-100 p-2">
                 <div class="flex gap-2 overflow-x-auto pb-2" role="tablist" aria-label="Submenús jurídicos">
-                    <?php foreach ($legalGroups as $groupKey => [$groupTitle, $keys]): ?>
+                    <?php foreach ($legalSections as $sectionKey => [$sectionTitle]): ?>
                         <button class="min-h-14 shrink-0 rounded-xl px-5 py-3 text-left text-sm font-semibold transition"
-                            type="button" role="tab" @click="activeLegalTab = '<?= e($groupKey) ?>'"
-                            :aria-selected="activeLegalTab === '<?= e($groupKey) ?>'"
-                            :class="activeLegalTab === '<?= e($groupKey) ?>' ? 'bg-teal-700 text-white shadow-sm' : 'bg-white text-teal-800 hover:bg-teal-50'">
-                            <span class="block text-xs opacity-80"><?= e($legalTabNumbers[$groupKey] ?? '4') ?></span>
-                            <?= e($groupTitle) ?>
+                            type="button" role="tab" @click="activeLegalTab = '<?= e($sectionKey) ?>'"
+                            :aria-selected="activeLegalTab === '<?= e($sectionKey) ?>'"
+                            :class="activeLegalTab === '<?= e($sectionKey) ?>' ? 'bg-blue-800 text-white shadow-sm' : 'bg-white text-blue-900 hover:bg-blue-50'">
+                            <?= e($sectionTitle) ?>
                         </button>
                     <?php endforeach; ?>
                 </div>
             </div>
-            <?php foreach ($legalGroups as $groupKey => [$groupTitle, $keys]): ?>
-                <section class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4"
-                    x-show="activeLegalTab === '<?= e($groupKey) ?>'">
-                    <h3 class="text-lg font-semibold text-slate-900">
-                        <?= e(($legalTabNumbers[$groupKey] ?? '4') . ' ' . $groupTitle) ?>
-                    </h3>
-                    <div class="mt-5 grid gap-5 md:grid-cols-2">
-                        <?php foreach ($keys as $key): ?>
-                            <?php require BASE_PATH . '/app/Views/appraisals/legal-field.php'; ?>
+            <?php foreach ($legalSections as $sectionKey => [$sectionTitle, $sectionHelp, $blocks]): ?>
+                <section class="mt-5 space-y-5 rounded-xl border border-slate-200 bg-slate-50 p-4"
+                    x-show="activeLegalTab === '<?= e($sectionKey) ?>'">
+                    <p class="text-sm leading-6 text-slate-600"><?= e($sectionHelp) ?></p>
+                    <?php if ($sectionKey === 'tradicion'): ?>
+                        <?php foreach ([
+                            'Cadena de tradición' => 'tradicion',
+                            'Gravámenes' => 'gravamen',
+                            'Limitaciones al dominio' => 'limitacion_dominio',
+                            'Medidas cautelares / judiciales' => 'medida_cautelar',
+                            'Otras anotaciones relevantes' => 'otras',
+                        ] as $tableTitle => $tableKey): ?>
+                            <?php $tableRows = $legalAnnotationGroups[$tableKey] ?? []; ?>
+                            <?php require BASE_PATH . '/app/Views/appraisals/legal-annotation-table.php'; ?>
                         <?php endforeach; ?>
-                    </div>
+                    <?php elseif ($sectionKey === 'informe'): ?>
+                        <?php $matrixReadonly = false; require BASE_PATH . '/app/Views/appraisals/legal-matrix.php'; unset($matrixReadonly); ?>
+                        <?php $blockTitle = 'Validación y criterio del analista';
+                        $blockFields = ['semaforo_manual', 'clasificacion_manual', 'revision_analista',
+                            'salvedad_final', 'reporte_conclusion_entregable']; ?>
+                        <?php $blockScope = $sectionKey; require BASE_PATH . '/app/Views/appraisals/legal-block.php'; unset($blockScope); ?>
+                    <?php elseif ($sectionKey === 'impresion'): ?>
+                        <?php $matrixReadonly = true; require BASE_PATH . '/app/Views/appraisals/legal-matrix.php'; unset($matrixReadonly); ?>
+                        <?php $blockTitle = 'Texto profesional para el entregable';
+                        $blockFields = ['reporte_profesional_entregable']; ?>
+                        <?php $blockScope = $sectionKey; require BASE_PATH . '/app/Views/appraisals/legal-block.php'; unset($blockScope); ?>
+                    <?php else: ?>
+                        <?php foreach ($blocks as [$blockTitle, $blockFields]): ?>
+                            <?php $blockScope = $sectionKey; require BASE_PATH . '/app/Views/appraisals/legal-block.php'; unset($blockScope); ?>
+                        <?php endforeach; ?>
+                        <?php if ($sectionKey === 'ph'): ?>
+                            <?php $tableTitle = 'Actos de propiedad horizontal identificados';
+                            $tableRows = $legalAnnotationGroups['ph'] ?? []; ?>
+                            <?php require BASE_PATH . '/app/Views/appraisals/legal-annotation-table.php'; ?>
+                        <?php endif; ?>
+                    <?php endif; ?>
                 </section>
             <?php endforeach; ?>
         </div>
@@ -178,29 +203,6 @@ $legalTabNumbers = ['registral' => '4.1', 'catastro' => '4.2', 'ph' => '4.3', 't
             </p>
         </div>
     </section>
-
-    <?php if ($annotations): ?>
-        <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-            <h2 class="text-xl font-semibold">Anotaciones clasificadas</h2>
-            <div class="mt-5 overflow-x-auto rounded-xl border border-slate-200">
-                <table class="min-w-full text-sm">
-                    <thead class="bg-slate-50 text-left text-xs uppercase text-slate-500">
-                        <tr><th class="px-4 py-3">No.</th><th class="px-4 py-3">Categoría</th><th class="px-4 py-3">Estado</th><th class="px-4 py-3">Lectura</th></tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-100">
-                        <?php foreach ($annotations as $annotation): ?>
-                            <tr>
-                                <td class="px-4 py-3 font-semibold"><?= e($annotation['orden'] ?? '') ?></td>
-                                <td class="px-4 py-3"><?= e($annotation['categoria'] ?? '') ?></td>
-                                <td class="px-4 py-3"><?= e($annotation['estado_juridico'] ?? '') ?></td>
-                                <td class="px-4 py-3 text-slate-700"><?= e($annotation['impacto_resumen'] ?? '') ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        </section>
-    <?php endif; ?>
 
     <details class="rounded-2xl border border-slate-200 bg-white p-6">
         <summary class="cursor-pointer text-lg font-semibold">Texto extraído del certificado</summary>

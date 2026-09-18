@@ -28,6 +28,10 @@ final class LegalCertificateAnnotationExtractor
                 'fecha' => $this->match($block, ['/fecha\s*[:#]?\s*([0-9\/\-]{8,20})/iu']),
                 'documento' => $this->clean($this->document($block)),
                 'valor' => $this->value($block),
+                'especificacion' => $this->specification($block),
+                'personas' => $this->parties($block),
+                'personaDe' => $this->party($block, 'de'),
+                'personaA' => $this->party($block, 'a'),
                 'texto' => mb_substr($block, 0, 1800),
             ];
         }
@@ -62,6 +66,32 @@ final class LegalCertificateAnnotationExtractor
             return trim((string) ($m[0] ?? ''));
         }
         return '';
+    }
+
+    private function specification(string $block): string
+    {
+        return $this->clean($this->match($block, [
+            '/especificaci(?:o|ó|\?|Ã³)n\s*:\s*(.+?)(?=\s+personas\s+que\s+intervienen|\s+\bde\s*:|\s+\ba\s*:|\s+anotaci(?:o|ó|\?|Ã³)n\s*:|$)/isu',
+        ]));
+    }
+
+    private function parties(string $block): string
+    {
+        if (preg_match('/personas\s+que\s+intervienen\s+en\s+el\s+acto.*?(?=anotaci(?:o|ó|\?|Ã³)n\s*:|$)/isu', $block, $m)) {
+            $value = preg_replace('/^personas\s+que\s+intervienen\s+en\s+el\s+acto[^:]*:?/iu', '', (string) $m[0]) ?? '';
+            return $this->clean($value);
+        }
+        return $this->clean(trim(($this->party($block, 'de') ? 'DE: ' . $this->party($block, 'de') : '')
+            . ($this->party($block, 'a') ? ' A: ' . $this->party($block, 'a') : '')));
+    }
+
+    private function party(string $block, string $side): string
+    {
+        $label = $side === 'de' ? 'de' : 'a';
+        $end = $side === 'de'
+            ? '(?=\s+\ba\s*:|\s+\bI\b|\s+\bX\b|\s+anotaci(?:o|ó|\?|Ã³)n\s*:|$)'
+            : '(?=\s+\bI\b|\s+\bX\b|\s+anotaci(?:o|ó|\?|Ã³)n\s*:|$)';
+        return $this->clean($this->match($block, ['/\b' . $label . '\s*:\s*(.+?)' . $end . '/isu']));
     }
 
     private function value(string $block): string

@@ -78,11 +78,42 @@ final class AppraisalLegalCatalog
         foreach (self::groups() as $group) {
             $keys = array_merge($keys, $group[1]);
         }
-        return array_values(array_unique($keys));
+        return array_values(array_unique(array_merge($keys, self::validationKeys($keys))));
+    }
+
+    public static function fieldApprovalKey(string $field): string
+    {
+        return 'aprobado_' . $field;
+    }
+
+    public static function blockApprovalKey(string $scope, string $title): string
+    {
+        return 'bloque_validado_' . $scope . '_' . self::slug($title);
     }
 
     public static function defaults(): array
     {
         return array_fill_keys(self::fieldKeys(), '');
+    }
+
+    private static function validationKeys(array $baseKeys): array
+    {
+        $keys = ['cuadro_completo_informe', 'cuadro_completo_impresion'];
+        foreach ($baseKeys as $key) $keys[] = self::fieldApprovalKey($key);
+        foreach ([
+            ['registral', 'Identificación registral'], ['catastro', 'Identificación catastral'],
+            ['catastro', 'Identificación física'], ['ph', 'Propiedad horizontal'],
+            ['ph', 'Titularidad actual'], ['informe', 'Validación y criterio del analista'],
+            ['impresion', 'Texto profesional para el entregable'],
+        ] as [$scope, $title]) {
+            $keys[] = self::blockApprovalKey($scope, $title);
+        }
+        return $keys;
+    }
+
+    private static function slug(string $value): string
+    {
+        $value = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $value) ?: $value;
+        return trim((string) preg_replace('/[^a-z0-9]+/i', '_', strtolower($value)), '_');
     }
 }
