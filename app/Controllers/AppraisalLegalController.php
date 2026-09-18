@@ -7,6 +7,7 @@ use App\Models\AppraisalLegalRepository;
 use App\Models\AppraisalRepository;
 use App\Services\AppraisalLegalCertificateUploadService;
 use App\Services\AppraisalLegalInput;
+use App\Services\LegalCertificateCancellationMatcher;
 use App\Services\LegalCertificateParser;
 use App\Services\LegalCertificateTextExtractor;
 use App\Support\AppraisalLegalCatalog;
@@ -22,7 +23,7 @@ final class AppraisalLegalController
         view('appraisals/legal-characteristics', [
             'title' => 'Características jurídicas',
             'record' => $record,
-            'profile' => $this->legal->profile($id, $this->user['id']),
+            'profile' => $this->refreshedProfile($this->legal->profile($id, $this->user['id'])),
             'certificates' => $this->legal->certificates($id, $this->user['id']),
             'legalGroups' => AppraisalLegalCatalog::groups(),
             'legalLabels' => AppraisalLegalCatalog::labels(),
@@ -144,5 +145,23 @@ final class AppraisalLegalController
             throw new \RuntimeException('No se pudo preparar el certificado temporal.');
         }
         return $tmp;
+    }
+
+    private function refreshedProfile(array $profile): array
+    {
+        $annotations = is_array($profile['annotations'] ?? null) ? $profile['annotations'] : [];
+        if (!$annotations) return $profile;
+        $profile['annotations'] = (new LegalCertificateCancellationMatcher())->apply($annotations);
+        $closed = [];
+        foreach ($profile['annotations'] as $row) {
+            if (($row['estado_juridico'] ?? '') === 'solucionada' && ($row['orden'] ?? '') !== '') {
+                $closed[] = (string) $row['orden'];
+            }
+        }
+        if (!$closed) return $profile;
+        $profile['alerts'] = array_values(array_filter((array) ($profile['alerts'] ?? []),
+            static fn ($alert): bool => !preg_match('/anotaci(?:o|ó)n\s+(' . implode('|', array_map('preg_quote', $closed)) . ')\b/iu',
+                (string) $alert)));
+        return $profile;
     }
 }
