@@ -468,6 +468,9 @@ try {
         && ($legalParsed['annotations'][2]['categoria'] ?? '') === 'medida_cautelar'
         && count($legalParsed['alerts']) >= 2,
         'parser juridico extrae y clasifica certificado');
+    expect(str_contains((string) ($legalParsed['data']['reporte_conclusion_entregable'] ?? ''), 'no saneada')
+        && str_contains((string) ($legalParsed['data']['reporte_profesional_entregable'] ?? ''), 'No se recomienda'),
+        'parser juridico emite diagnostico preliminar para cargas criticas');
     $legalMerged = AppraisalLegalInput::mergeEmpty(['matricula_inmobiliaria' => 'manual'], $legalParsed['data']);
     expect($legalMerged['matricula_inmobiliaria'] === 'manual'
         && ($legalMerged['codigo_catastral_actual'] ?? '') !== '', 'juridico conserva dato manual y llena vacios');
@@ -496,6 +499,7 @@ try {
         && ($ctlParsed['data']['check_propiedad_horizontal'] ?? '') === 'Sí'
         && ($ctlParsed['data']['semaforo_manual'] ?? '') === 'Atención'
         && str_contains((string) ($ctlParsed['data']['reporte_profesional_entregable'] ?? ''), '060-179788')
+        && str_contains((string) ($ctlParsed['data']['reporte_conclusion_entregable'] ?? ''), 'comercializable con condiciones')
         && $ctlFound >= 15,
         'parser juridico lee certificado CTL con campos registrales fisicos y titularidad');
     $ctlOcrText = "Certificado generado con el Pin No: 230912151482354135\n"

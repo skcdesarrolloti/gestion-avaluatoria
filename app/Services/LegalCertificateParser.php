@@ -91,11 +91,8 @@ final class LegalCertificateParser
         $ph = array_values(array_filter($annotations, fn (array $a): bool => ($a['categoria'] ?? '') === 'propiedad_horizontal'));
         $others = array_values(array_filter($annotations, fn (array $a): bool => ($a['categoria'] ?? '') === 'informativa'));
         $affects = array_merge($limits, $measures);
-        $level = ($measures || $limits) ? 'Crítico' : ($debts || $alerts ? 'Atención' : 'Normal');
-        $classification = $level === 'Crítico' ? 'Requiere estudio jurídico especializado'
-            : ($level === 'Atención' ? 'Con alertas para revisión jurídica' : 'Sin alertas automáticas relevantes');
+        $opinion = (new LegalCertificateOpinionBuilder())->build($data, $tradition, $debts, $limits, $measures, $ph, $alerts);
         $salvedad = 'Lectura automática preliminar basada en el certificado cargado; debe validarse contra el folio completo y los soportes del encargo.';
-        $integrated = $this->integratedReport($data, $tradition, $debts, $affects, $ph, $alerts);
         return [
             'check_tradicion' => $tradition ? 'Sí' : '', 'check_gravamenes' => $debts ? 'Sí' : '',
             'check_limitaciones_dominio' => $limits ? 'Sí' : '', 'check_medidas_cautelares' => $measures ? 'Sí' : '',
@@ -115,11 +112,11 @@ final class LegalCertificateParser
             'reporte_titular_actual' => $this->titleSummary($data, $tradition),
             'reporte_afectaciones' => $this->annotationSummary($affects, 'No se identifican afectaciones o medidas vigentes concluyentes en la lectura automática.'),
             'reporte_gravamenes' => $this->annotationSummary($debts, 'No se identifican gravámenes vigentes concluyentes en la lectura automática.'),
-            'semaforo_manual' => $level, 'clasificacion_manual' => $classification,
+            'semaforo_manual' => $opinion['level'], 'clasificacion_manual' => $opinion['classification'],
             'revision_analista' => $alerts ? implode("\n", $alerts) : 'Sin alertas automáticas; conservar revisión humana del certificado.',
             'salvedad_final' => $salvedad,
-            'reporte_conclusion_entregable' => $alerts ? 'Lectura jurídica preliminar con alertas pendientes de revisión por el analista.' : 'Lectura jurídica preliminar sin alertas automáticas relevantes; validar contra el certificado completo.',
-            'reporte_profesional_entregable' => $integrated . "\n\n" . $salvedad,
+            'reporte_conclusion_entregable' => $opinion['conclusion'],
+            'reporte_profesional_entregable' => $opinion['integrated'] . "\n\n" . $salvedad,
         ];
     }
 
@@ -191,20 +188,6 @@ final class LegalCertificateParser
         if (($row['fecha'] ?? '') !== '') $parts[] = 'Fecha del acto: ' . $row['fecha'] . '.';
         if (($row['valor'] ?? '') !== '') $parts[] = 'Valor del acto: ' . $row['valor'] . '.';
         return implode(' ', $parts);
-    }
-
-    private function integratedReport(array $data, array $tradition, array $debts, array $affects, array $ph, array $alerts): string
-    {
-        $parts = [];
-        if (($data['matricula_inmobiliaria'] ?? '') !== '') $parts[] = 'El inmueble se revisó con matrícula inmobiliaria '
-            . $data['matricula_inmobiliaria'] . ', asociada a la ORIP ' . (($data['orip'] ?? '') ?: ($data['circulo_registral'] ?? 'pendiente')) . '.';
-        if (($data['titular_actual'] ?? '') !== '') $parts[] = 'La titularidad preliminar leída corresponde a ' . $data['titular_actual'] . '.';
-        if ($tradition) $parts[] = 'La cadena de tradición presenta actos que deben cotejarse con el certificado completo.';
-        if ($debts) $parts[] = 'Se detectaron gravámenes o hipotecas para confirmar vigencia y cancelaciones.';
-        if ($affects) $parts[] = 'Se detectaron posibles limitaciones o medidas cautelares que requieren revisión jurídica.';
-        if ($ph) $parts[] = 'Hay referencias a propiedad horizontal o copropiedad que deben validarse con reglamento y coeficientes.';
-        if ($alerts) $parts[] = 'Alertas: ' . implode(' ', $alerts);
-        return $parts ? implode(' ', $parts) : 'Lectura registral preliminar sin hallazgos automáticos concluyentes.';
     }
 
     private function match(string $text, array $patterns): string
