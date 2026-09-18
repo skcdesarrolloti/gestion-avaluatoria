@@ -22,6 +22,7 @@ $selectOptions = [
 $legalSections = \App\Support\AppraisalLegalView::sections();
 $matrixRows = \App\Support\AppraisalLegalView::matrixRows();
 $legalAnnotationGroups = \App\Support\AppraisalLegalView::groupedAnnotations($annotations);
+$trafficCounts = \App\Support\AppraisalLegalView::trafficCounts($annotations);
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
@@ -196,11 +197,7 @@ $legalAnnotationGroups = \App\Support\AppraisalLegalView::groupedAnnotations($an
         </div>
         <div class="rounded-2xl border border-slate-200 bg-white p-6">
             <h2 class="text-lg font-semibold">Control de anotaciones</h2>
-            <p class="mt-3 text-sm leading-6 text-slate-600">
-                Detectadas: <strong><?= e((string) count($annotations)) ?></strong>.
-                Vigentes con revisión:
-                <strong><?= e((string) count(array_filter($annotations, static fn ($a): bool => ($a['requiere_revision'] ?? '') === 'Sí'))) ?></strong>.
-            </p>
+            <?php require BASE_PATH . '/app/Views/appraisals/legal-traffic-summary.php'; ?>
         </div>
     </section>
 

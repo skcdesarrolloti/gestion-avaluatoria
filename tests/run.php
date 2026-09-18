@@ -49,6 +49,7 @@ use App\Models\ValuationStandardRepository;
 use App\Support\AppraisalSectorCatalog;
 use App\Support\AppraisalSectorFieldGuidance;
 use App\Support\AppraisalLegalCatalog;
+use App\Support\AppraisalLegalView;
 use App\Support\SectorBankCatalog;
 
 // All fixtures are in memory; never connect to the configured production database.
@@ -486,6 +487,13 @@ try {
         && str_contains($pairedConclusion, 'se cancela con la anotación 002')
         && !str_contains($pairedConclusion, 'no saneada'),
         'parser juridico parea afectaciones canceladas y evita falsas alarmas');
+    $trafficCounts = AppraisalLegalView::trafficCounts([
+        ['estado_juridico' => 'vigente', 'requiere_revision' => 'Sí', 'categoria' => 'gravamen'],
+        ['estado_juridico' => 'vigente', 'requiere_revision' => 'Sí', 'categoria' => 'propiedad_horizontal'],
+        ['estado_juridico' => 'solucionada', 'requiere_revision' => 'No', 'categoria' => 'gravamen', 'cancelada_por' => '002'],
+    ]);
+    expect($trafficCounts['Rojo'] === 1 && $trafficCounts['Amarillo'] === 1 && $trafficCounts['Verde'] === 1,
+        'vista juridica clasifica semaforo rojo amarillo y verde');
     $legalMerged = AppraisalLegalInput::mergeEmpty(['matricula_inmobiliaria' => 'manual'], $legalParsed['data']);
     expect($legalMerged['matricula_inmobiliaria'] === 'manual'
         && ($legalMerged['codigo_catastral_actual'] ?? '') !== '', 'juridico conserva dato manual y llena vacios');

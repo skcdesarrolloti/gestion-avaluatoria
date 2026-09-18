@@ -73,6 +73,30 @@ final class AppraisalLegalView
         return $row;
     }
 
+    public static function trafficLight(array $row): array
+    {
+        $state = (string) ($row['estado_juridico'] ?? '');
+        $review = (string) ($row['requiere_revision'] ?? '');
+        $category = (string) ($row['categoria_final'] ?? $row['categoria'] ?? '');
+        if ($state === 'solucionada' || ($row['cancelada_por'] ?? '') !== '' || ($row['cancelacion_de'] ?? '') !== '') {
+            return ['Verde', 'Cerrada / saneada', 'bg-emerald-50', 'bg-emerald-100 text-emerald-800 border-emerald-200'];
+        }
+        if ($review === 'Sí' && in_array($category, ['gravamen', 'limitacion_dominio', 'medida_cautelar'], true)) {
+            return ['Rojo', 'Afectación sin cierre', 'bg-red-50', 'bg-red-100 text-red-800 border-red-200'];
+        }
+        if ($review === 'Sí' || $state === 'vigente') {
+            return ['Amarillo', 'Por validar', 'bg-amber-50', 'bg-amber-100 text-amber-900 border-amber-200'];
+        }
+        return ['Verde', 'Sin alerta activa', 'bg-emerald-50', 'bg-emerald-100 text-emerald-800 border-emerald-200'];
+    }
+
+    public static function trafficCounts(array $annotations): array
+    {
+        $counts = ['Rojo' => 0, 'Amarillo' => 0, 'Verde' => 0];
+        foreach ($annotations as $row) $counts[self::trafficLight($row)[0]]++;
+        return $counts;
+    }
+
     private static function describe(array $row, string $category): string
     {
         $base = mb_strtolower((string) (($row['especificacion'] ?? '') . ' ' . ($row['texto'] ?? '')));

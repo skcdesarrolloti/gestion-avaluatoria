@@ -16,6 +16,7 @@
                 <thead class="bg-blue-50 text-left text-blue-950">
                     <tr>
                         <th class="border border-slate-200 px-3 py-2"># Anot.</th>
+                        <th class="border border-slate-200 px-3 py-2">Estado</th>
                         <th class="border border-slate-200 px-3 py-2">Documento soporte</th>
                         <th class="border border-slate-200 px-3 py-2">Descripción del acto</th>
                         <th class="border border-slate-200 px-3 py-2">Especificación</th>
@@ -26,8 +27,14 @@
                 </thead>
                 <tbody>
                     <?php foreach ($tableRows as $row): ?>
-                        <tr class="align-top">
+                        <?php [, $trafficLabel, $trafficRowClass, $trafficBadgeClass] = \App\Support\AppraisalLegalView::trafficLight($row); ?>
+                        <tr class="align-top <?= e($trafficRowClass) ?>">
                             <td class="border border-slate-200 px-3 py-2 font-semibold"><?= e($row['orden'] ?? '') ?></td>
+                            <td class="border border-slate-200 px-3 py-2">
+                                <span class="inline-flex min-h-7 items-center rounded-full border px-2 py-1 text-[11px] font-bold <?= e($trafficBadgeClass) ?>">
+                                    <?= e($trafficLabel) ?>
+                                </span>
+                            </td>
                             <td class="border border-slate-200 px-3 py-2"><?= e($row['documento'] ?? '') ?></td>
                             <td class="border border-slate-200 px-3 py-2"><?= e($row['descripcion_acto'] ?? '') ?></td>
                             <td class="border border-slate-200 px-3 py-2"><?= e($row['especificacion'] ?? '') ?></td>
