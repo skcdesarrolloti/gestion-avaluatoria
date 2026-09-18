@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, HttpException, Session};
 use App\Models\{AppraisalPhRepository, AppraisalRepository, AppraisalSubjectRepository, GeoMasterRepository, IgacTypologyRepository};
-use App\Services\{AppraisalAttributeInput, AppraisalChapterZeroInput, AppraisalPhInput, AppraisalPhotoUploadService};
+use App\Services\{AppraisalAttributeInput, AppraisalChapterZeroInput, AppraisalPhotoUploadService};
 use App\Support\{AppraisalCatalog, AppraisalPhCatalog, AppraisalSpecialAttributeCatalog, AppraisalSubjectCatalog};
 
 final class AppraisalSubjectController
@@ -25,8 +25,10 @@ final class AppraisalSubjectController
             'photos' => $this->appraisals->photos($id, $this->user['id']),
             'units' => $this->appraisals->units($id, $this->user['id']),
             'phProfile' => $this->ph->profile($id, $this->user['id']),
+            'phDocuments' => $this->ph->documents($id, $this->user['id']),
             'phLegalPrefill' => $this->ph->legalPrefill($id, $this->user['id']),
             'phCatalog' => ['status' => AppraisalPhCatalog::statusOptions(),
+                'typologies' => AppraisalPhCatalog::typologies(), 'technical' => AppraisalPhCatalog::technicalGroups(),
                 'commonAreas' => AppraisalPhCatalog::commonAreas(), 'documents' => AppraisalPhCatalog::documents(),
                 'risks' => AppraisalPhCatalog::risks(), 'photos' => AppraisalPhCatalog::photos()],
             'igacCategories' => $this->typologies->categories(),
@@ -78,12 +80,6 @@ final class AppraisalSubjectController
 
     public function autosaveAttributes(string $id): never
     { $this->appraisals->find($id, $this->user['id']); $this->appraisals->saveUnitAttributes($id, $this->user['id'], AppraisalAttributeInput::unitAttributeData()); $this->savedJson(); }
-
-    public function savePh(string $id): never
-    { $this->saveSubjectData($id, fn () => $this->ph->save($id, $this->user['id'], AppraisalPhInput::data()), 'Propiedad horizontal guardada correctamente.', '#ph'); }
-
-    public function autosavePh(string $id): never
-    { $this->appraisals->find($id, $this->user['id']); $this->ph->save($id, $this->user['id'], AppraisalPhInput::data()); $this->savedJson(); }
 
     public function savePreclassification(string $id): never
     { $this->savePreclassificationAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }

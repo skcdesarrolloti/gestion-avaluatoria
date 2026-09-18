@@ -5,6 +5,10 @@ $legalPh = is_array($phLegalPrefill ?? null) ? $phLegalPrefill : [];
 $phText = static fn (string $key): string => (string) (($ph[$key] ?? '') ?: ($legalPh[$key] ?? ''));
 $phMap = static fn (string $group, string $key, string $field): string =>
     (string) (($ph[$group][$key][$field] ?? ''));
+$technical = is_array($ph['technical'] ?? null) ? $ph['technical'] : [];
+$linkage = is_array($ph['linkage'] ?? null) ? $ph['linkage'] : [];
+$phSourceSummary = (string) ($ph['source_summary'] ?? '');
+$phFindings = is_array($ph['findings'] ?? null) ? $ph['findings'] : [];
 $statusClass = static function (string $status): string {
     return match ($status) {
         'ok' => 'border-emerald-200 bg-emerald-50',
@@ -51,13 +55,60 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
             de la copropiedad. Sirve para reconocerla en otros avalúos; por ahora guarda este expediente y
             deja preparada la migración a banco compartido. Este apartado no reemplaza estudio de títulos.
         </div>
+        <section class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <div class="grid gap-4 lg:grid-cols-[1fr_auto]">
+                <div>
+                    <h3 class="text-lg font-semibold">Preparar y cargar reglamento / soportes PH</h3>
+                    <p class="mt-2 text-sm leading-6 text-slate-600">
+                        Sube ZIP, PDF, DOCX, TXT o imágenes. ZIP se abre en servidor y se analizan los archivos internos.
+                        RAR queda rechazado porque este servidor no tiene extensión RAR instalada.
+                    </p>
+                </div>
+                <form class="grid gap-3 lg:min-w-80" method="post" enctype="multipart/form-data"
+                    action="<?= e(url($subjectActionBase . '/ph/soportes')) ?>">
+                    <?= csrf_field() ?>
+                    <select class="input" name="ph_typology">
+                        <option value="">Tipología PH para orientar lectura</option>
+                        <?php foreach ($phCatalog['typologies'] as $value => $label): ?>
+                            <option value="<?= e($value) ?>" <?= (string) ($ph['ph_typology'] ?? '') === (string) $value ? 'selected' : '' ?>><?= e($label) ?></option>
+                        <?php endforeach; ?>
+                    </select>
+                    <input class="input" type="file" name="ph_document"
+                        accept=".zip,.rar,.pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.tif,.tiff">
+                    <button class="btn-primary" type="submit">Leer soporte PH</button>
+                </form>
+            </div>
+            <div class="mt-4 grid gap-4 lg:grid-cols-2">
+                <div class="rounded-xl bg-white p-4">
+                    <h4 class="font-semibold">Resumen detectado</h4>
+                    <p class="mt-2 text-sm leading-6 text-slate-600"><?= e($phSourceSummary ?: 'Aún no se ha procesado ningún soporte PH.') ?></p>
+                    <?php if ($phFindings): ?>
+                        <ul class="mt-3 space-y-1 text-sm text-slate-700">
+                            <?php foreach ($phFindings as $finding): ?><li>• <?= e((string) $finding) ?></li><?php endforeach; ?>
+                        </ul>
+                    <?php endif; ?>
+                </div>
+                <div class="rounded-xl bg-white p-4">
+                    <h4 class="font-semibold">Soportes cargados</h4>
+                    <?php if (!empty($phDocuments)): ?>
+                        <ul class="mt-2 space-y-1 text-sm text-slate-700">
+                            <?php foreach (array_slice($phDocuments, 0, 5) as $doc): ?>
+                                <li><?= e($doc['source_filename']) ?> · <?= e((string) $doc['extracted_chars']) ?> caracteres</li>
+                            <?php endforeach; ?>
+                        </ul>
+                    <?php else: ?>
+                        <p class="mt-2 text-sm text-slate-600">Sin soportes cargados.</p>
+                    <?php endif; ?>
+                </div>
+            </div>
+        </section>
         <form class="mt-6 space-y-6" method="post" action="<?= e(url($subjectActionBase . '/ph')) ?>"
             data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/ph/autoguardar')) ?>">
             <?= csrf_field() ?>
             <div x-data="{ tab: 'identidad' }">
                 <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
                     <?php foreach ([
-                        'identidad' => 'Identificación', 'juridico' => 'Jurídica PH',
+                        'identidad' => 'Identificación', 'juridico' => 'Jurídica PH', 'tecnica' => 'Descripción técnica',
                         'administracion' => 'Administración', 'comunes' => 'Zonas comunes',
                         'riesgos' => 'Riesgos y soportes', 'informe' => 'Informe',
                     ] as $key => $label): ?>
@@ -70,8 +121,28 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                 </div>
 
                 <section class="mt-5 grid gap-4 lg:grid-cols-2" x-show="tab === 'identidad'">
+                    <label class="label">Tipología PH de referencia
+                        <select class="input mt-2" name="ph[ph_typology]">
+                            <option value="">Selecciona tipología PH</option>
+                            <?php foreach ($phCatalog['typologies'] as $value => $label): ?>
+                                <option value="<?= e($value) ?>" <?= (string) ($ph['ph_typology'] ?? '') === (string) $value ? 'selected' : '' ?>><?= e($label) ?></option>
+                            <?php endforeach; ?>
+                        </select>
+                    </label>
                     <?php $renderPhInput('ph_name', 'Nombre de la copropiedad / agrupación', $phText('ph_name'), 'Ej. Edificio, conjunto, centro comercial o zona franca.'); ?>
                     <?php $renderPhInput('ph_key', 'Llave técnica PH', $phText('ph_key'), 'NIT, matrícula matriz o nombre normalizado para reutilizarla luego.'); ?>
+                    <label class="label">Vínculo con sector por barrio
+                        <input class="input mt-2" name="ph[linkage][sector_neighborhood]"
+                            value="<?= e((string) (($linkage['sector_neighborhood'] ?? '') ?: ($subject['neighborhood_name'] ?? ''))) ?>">
+                    </label>
+                    <label class="label">Vínculo jurídico por matrícula inmobiliaria
+                        <input class="input mt-2" name="ph[linkage][legal_registration]"
+                            value="<?= e((string) (($linkage['legal_registration'] ?? '') ?: ($subject['property_registry'] ?? ''))) ?>">
+                    </label>
+                    <label class="label">Vínculo de copropiedad por nombre
+                        <input class="input mt-2" name="ph[linkage][coproperty_name]"
+                            value="<?= e((string) (($linkage['coproperty_name'] ?? '') ?: $phText('ph_name'))) ?>">
+                    </label>
                     <?php $renderPhInput('private_unit', 'Unidad privada analizada', $phText('private_unit')); ?>
                     <?php $renderPhInput('coefficient', 'Coeficiente de copropiedad', $phText('coefficient')); ?>
                 </section>
@@ -92,6 +163,10 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                     <?php $renderPhInput('fee_status', 'Estado de expensas', $phText('fee_status'), 'Paz y salvo, pendiente o por confirmar.'); ?>
                     <?php $renderPhInput('reserve_fund', 'Fondo / imprevistos', $phText('reserve_fund')); ?>
                     <?php $renderPhInput('insurance_status', 'Seguros comunes', $phText('insurance_status')); ?>
+                </section>
+
+                <section class="mt-5" x-show="tab === 'tecnica'">
+                    <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-technical.php'; ?>
                 </section>
 
                 <?php foreach ([

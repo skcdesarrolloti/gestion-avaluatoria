@@ -15,25 +15,30 @@ final class AppraisalPhRepository
         $row = $query->fetch();
         if (!$row) return AppraisalPhCatalog::defaults();
         return array_replace(AppraisalPhCatalog::defaults(), $row, [
+            'linkage' => $this->json((string) ($row['linkage_json'] ?? '')),
             'common_areas' => $this->json((string) ($row['common_areas_json'] ?? '')),
             'documents' => $this->json((string) ($row['documents_json'] ?? '')),
             'risks' => $this->json((string) ($row['risks_json'] ?? '')),
             'photos' => $this->json((string) ($row['photos_json'] ?? '')),
+            'technical' => $this->json((string) ($row['technical_json'] ?? '')),
+            'findings' => $this->json((string) ($row['findings_json'] ?? '')),
         ]);
     }
 
     public function save(string $appraisalId, int $owner, array $data): void
     {
         $now = gmdate('Y-m-d H:i:s');
-        $fields = ['ph_key', 'ph_name', 'administration_name', 'administration_contact',
+        $fields = ['ph_key', 'ph_name', 'ph_typology', 'administration_name', 'administration_contact',
             'administration_phone', 'administration_email', 'matrix_registration', 'private_unit',
             'coefficient', 'regulation_document', 'reform_documents', 'monthly_fee', 'fee_status',
             'reserve_fund', 'insurance_status', 'restrictions_text', 'diagnosis_text', 'report_text'];
         $json = [
+            'linkage_json' => $data['linkage'] ?? [],
             'common_areas_json' => $data['common_areas'] ?? [],
             'documents_json' => $data['documents'] ?? [],
             'risks_json' => $data['risks'] ?? [],
             'photos_json' => $data['photos'] ?? [],
+            'technical_json' => $data['technical'] ?? [],
         ];
         if ($this->exists($appraisalId, $owner)) {
             $assignments = implode(', ', array_map(static fn (string $field): string => $field . ' = ?',
@@ -66,6 +71,44 @@ final class AppraisalPhRepository
         ];
     }
 
+    public function documents(string $appraisalId, int $owner): array
+    {
+        $query = $this->db->prepare('SELECT id, source_filename, mime_type, file_size_bytes,
+            extracted_chars, analysis_status, analysis_message, created_at
+            FROM appraisal_ph_documents WHERE appraisal_id = ? AND owner_id = ?
+            ORDER BY created_at DESC, id DESC');
+        $query->execute([$appraisalId, $owner]);
+        return $query->fetchAll();
+    }
+
+    public function addDocument(string $appraisalId, int $owner, array $file): void
+    {
+        $now = gmdate('Y-m-d H:i:s');
+        $query = $this->db->prepare('INSERT INTO appraisal_ph_documents
+            (id, appraisal_id, owner_id, source_filename, storage_filename, mime_type, file_size_bytes,
+            extracted_chars, analysis_status, analysis_message, file_blob, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+        $query->execute([$file['id'], $appraisalId, $owner, $file['source_filename'], $file['storage_filename'],
+            $file['mime_type'], $file['file_size_bytes'], $file['extracted_chars'], $file['analysis_status'],
+            $file['analysis_message'], $file['file_blob'], $now]);
+    }
+
+    public function mergeAnalysis(string $appraisalId, int $owner, array $analysis): void
+    {
+        $current = $this->profile($appraisalId, $owner);
+        $data = array_replace($current, $this->mergeEmpty($current, $analysis['core'] ?? []));
+        foreach (['linkage', 'technical'] as $key) {
+            $data[$key] = array_replace($current[$key] ?? [], $this->mergeEmpty($current[$key] ?? [], $analysis[$key] ?? []));
+        }
+        $data['source_summary'] = (string) ($analysis['summary'] ?? $current['source_summary'] ?? '');
+        $data['findings'] = $analysis['findings'] ?? $current['findings'] ?? [];
+        $this->save($appraisalId, $owner, $data);
+        $query = $this->db->prepare('UPDATE appraisal_ph_profiles SET source_summary = ?, findings_json = ?
+            WHERE appraisal_id = ? AND owner_id = ?');
+        $query->execute([$data['source_summary'],
+            json_encode($data['findings'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), $appraisalId, $owner]);
+    }
+
     private function exists(string $appraisalId, int $owner): bool
     {
         $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_ph_profiles WHERE appraisal_id = ? AND owner_id = ?');
@@ -76,6 +119,15 @@ final class AppraisalPhRepository
     private function values(array $fields, array $data): array
     {
         return array_map(static fn (string $field): mixed => $data[$field] ?? '', $fields);
+    }
+
+    private function mergeEmpty(array $current, array $incoming): array
+    {
+        $merged = [];
+        foreach ($incoming as $key => $value) {
+            if (trim((string) ($current[$key] ?? '')) === '' && trim((string) $value) !== '') $merged[$key] = $value;
+        }
+        return $merged;
     }
 
     private function jsonValues(array $data): array

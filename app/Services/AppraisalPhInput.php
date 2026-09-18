@@ -11,6 +11,8 @@ final class AppraisalPhInput
         return [
             'ph_key' => self::short($posted['ph_key'] ?? '', 190),
             'ph_name' => self::short($posted['ph_name'] ?? '', 190),
+            'ph_typology' => self::choice($posted['ph_typology'] ?? '', array_keys(AppraisalPhCatalog::typologies())),
+            'linkage' => self::linkage($posted['linkage'] ?? []),
             'administration_name' => self::short($posted['administration_name'] ?? '', 190),
             'administration_contact' => self::short($posted['administration_contact'] ?? '', 190),
             'administration_phone' => self::short($posted['administration_phone'] ?? '', 80),
@@ -29,9 +31,33 @@ final class AppraisalPhInput
             'documents' => self::statusMap($posted['documents'] ?? [], AppraisalPhCatalog::documents()),
             'risks' => self::statusMap($posted['risks'] ?? [], AppraisalPhCatalog::risks()),
             'photos' => self::statusMap($posted['photos'] ?? [], AppraisalPhCatalog::photos()),
+            'technical' => self::technical($posted['technical'] ?? []),
             'diagnosis_text' => self::text($posted['diagnosis_text'] ?? '', 2500),
             'report_text' => self::text($posted['report_text'] ?? '', 3000),
         ];
+    }
+
+    private static function linkage(mixed $values): array
+    {
+        if (!is_array($values)) return [];
+        return [
+            'sector_neighborhood' => self::short($values['sector_neighborhood'] ?? '', 190),
+            'legal_registration' => self::short($values['legal_registration'] ?? '', 120),
+            'coproperty_name' => self::short($values['coproperty_name'] ?? '', 190),
+        ];
+    }
+
+    private static function technical(mixed $values): array
+    {
+        if (!is_array($values)) return [];
+        $allowed = [];
+        foreach (AppraisalPhCatalog::technicalGroups() as $group) $allowed += $group[1];
+        $clean = [];
+        foreach ($allowed as $key => $label) {
+            $value = self::text($values[$key] ?? '', 1200);
+            if ($value !== '') $clean[$key] = $value;
+        }
+        return $clean;
     }
 
     private static function statusMap(mixed $values, array $allowed): array
@@ -57,5 +83,11 @@ final class AppraisalPhInput
     private static function text(mixed $value, int $limit): string
     {
         return mb_substr(trim((string) $value), 0, $limit);
+    }
+
+    private static function choice(mixed $value, array $allowed): string
+    {
+        $value = self::short($value, 60);
+        return in_array($value, $allowed, true) ? $value : '';
     }
 }

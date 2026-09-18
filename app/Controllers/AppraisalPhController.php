@@ -1,0 +1,42 @@
+<?php
+declare(strict_types=1);
+namespace App\Controllers;
+use App\Core\{Http, Session};
+use App\Models\{AppraisalPhRepository, AppraisalRepository};
+use App\Services\{AppraisalPhDocumentUploadService, AppraisalPhInput};
+
+final class AppraisalPhController
+{
+    public function __construct(private AppraisalRepository $appraisals, private AppraisalPhRepository $ph,
+        private array $user) {}
+
+    public function save(string $id): never
+    {
+        $this->saveAndRedirect($id, fn () => $this->ph->save($id, $this->user['id'], AppraisalPhInput::data()),
+            'Propiedad horizontal guardada correctamente.');
+    }
+
+    public function autosave(string $id): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        $this->ph->save($id, $this->user['id'], AppraisalPhInput::data());
+        Http::json(['ok' => true, 'saved_at' => gmdate('Y-m-d\TH:i:s\Z')]);
+    }
+
+    public function upload(string $id): never
+    {
+        $this->saveAndRedirect($id, function () use ($id): void {
+            $typology = (string) ($_POST['ph_typology'] ?? '');
+            (new AppraisalPhDocumentUploadService())->store($_FILES['ph_document'] ?? [], $id,
+                $this->user['id'], $typology, $this->ph);
+        }, 'Soporte PH analizado. Se llenaron los campos vacíos sugeridos por la lectura preliminar.');
+    }
+
+    private function saveAndRedirect(string $id, callable $save, string $message): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        try { $save(); Session::flash('subject_message', $message); }
+        catch (\Throwable $error) { Session::flash('subject_error', $error->getMessage()); }
+        Http::redirect('avaluos/' . $id . '/bien-sujeto#ph');
+    }
+}

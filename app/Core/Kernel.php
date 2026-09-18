@@ -131,6 +131,8 @@ final class Kernel
                 'subject' => new AppraisalSubjectController(new AppraisalRepository($db), $user,
                     new IgacTypologyRepository(), new AppraisalSubjectRepository($db), new GeoMasterRepository($db),
                     new \App\Models\AppraisalPhRepository($db)),
+                'subjectPh' => new \App\Controllers\AppraisalPhController(new AppraisalRepository($db),
+                    new \App\Models\AppraisalPhRepository($db), $user),
                 'valuations' => new ValuationController(),
                 default => new AppraisalController(new AppraisalRepository($db), $user,
                     new AppraiserRepository($db), new IgacTypologyRepository()),

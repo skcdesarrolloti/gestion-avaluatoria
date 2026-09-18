@@ -9,6 +9,7 @@ use App\Services\AppraisalValidator;
 use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalPhInput;
+use App\Services\AppraisalPhDocumentUploadService;
 use App\Services\AppraisalSectorInput;
 use App\Services\AppraisalMidasReview;
 use App\Services\AppraisalMidasSupportUploadService;
@@ -149,13 +150,19 @@ try {
         status TEXT, data_json TEXT, annotations_json TEXT, alerts_json TEXT,
         extracted_text TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE appraisal_ph_profiles (
-        appraisal_id TEXT PRIMARY KEY, owner_id INTEGER, ph_key TEXT, ph_name TEXT,
+        appraisal_id TEXT PRIMARY KEY, owner_id INTEGER, ph_key TEXT, ph_name TEXT, ph_typology TEXT,
+        linkage_json TEXT,
         administration_name TEXT, administration_contact TEXT, administration_phone TEXT,
         administration_email TEXT, matrix_registration TEXT, private_unit TEXT, coefficient TEXT,
         regulation_document TEXT, reform_documents TEXT, monthly_fee TEXT, fee_status TEXT,
         reserve_fund TEXT, insurance_status TEXT, restrictions_text TEXT, common_areas_json TEXT,
-        documents_json TEXT, risks_json TEXT, photos_json TEXT, diagnosis_text TEXT,
-        report_text TEXT, created_at TEXT, updated_at TEXT)");
+        documents_json TEXT, risks_json TEXT, photos_json TEXT, technical_json TEXT,
+        source_summary TEXT, findings_json TEXT, diagnosis_text TEXT, report_text TEXT,
+        created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE appraisal_ph_documents (
+        id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER, source_filename TEXT,
+        storage_filename TEXT, mime_type TEXT, file_size_bytes INTEGER, extracted_chars INTEGER,
+        analysis_status TEXT, analysis_message TEXT, file_blob BLOB, created_at TEXT)");
     $db->exec("CREATE TABLE appraisal_legal_certificates (
         id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER, source_filename TEXT,
         storage_filename TEXT, mime_type TEXT, file_size_bytes INTEGER, extracted_chars INTEGER,
@@ -371,6 +378,24 @@ try {
     expect($storedPh['ph_name'] === 'Conjunto Prueba'
         && ($storedPh['documents']['paquete_zip']['status'] ?? '') === 'warn',
         'propiedad horizontal guarda perfil por avaluo');
+    if (class_exists(ZipArchive::class)) {
+        $phDir = sys_get_temp_dir() . '/ga-ph-test-' . bin2hex(random_bytes(4));
+        putenv('APPRAISAL_PH_DOCUMENT_DIR=' . $phDir);
+        $zipPath = tempnam(sys_get_temp_dir(), 'ga_ph_zip_');
+        $zip = new ZipArchive();
+        $zip->open($zipPath, ZipArchive::OVERWRITE);
+        $zip->addFromString('reglamento.txt', 'Reglamento de propiedad horizontal Copropiedad ZONA FRANCA LA CANDELARIA. Matricula matriz 060-239752. Vias internas, red contra incendios, patios de maniobra y expensas comunes.');
+        $zip->close();
+        (new AppraisalPhDocumentUploadService())->store(uploadFixture('soportes-ph.zip', $zipPath),
+            str_repeat('a', 32), 1, 'bodegas', $phRepo);
+        $analyzedPh = $phRepo->profile(str_repeat('a', 32), 1);
+        expect(($analyzedPh['technical']['vias_internas'] ?? '') !== ''
+            && count($phRepo->documents(str_repeat('a', 32), 1)) === 1,
+            'propiedad horizontal analiza ZIP y conserva soporte');
+        foreach (glob($phDir . '/*') ?: [] as $file) unlink($file);
+        rmdir($phDir);
+        putenv('APPRAISAL_PH_DOCUMENT_DIR');
+    }
     $photoDb = new PDO('sqlite::memory:', null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
     $photoDb->exec('CREATE TABLE appraisal_photos (
         id TEXT, appraisal_id TEXT, owner_id INTEGER, unit_id TEXT, source_filename TEXT,
