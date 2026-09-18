@@ -38,6 +38,7 @@ foreach ($visibleUnits as $unit) $labelMap[$unit['id']] = $labelInput($unit);
         <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"><?= count($visibleUnits) ?> pestaña(s)</span>
     </div>
     <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/unidades')) ?>"
+        data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/unidades/autoguardar')) ?>"
         x-data="{ busy: false }" @submit="busy = true">
         <?= csrf_field() ?>
         <?php if (!$visibleUnits): ?>
@@ -163,6 +164,9 @@ foreach ($visibleUnits as $unit) $labelMap[$unit['id']] = $labelInput($unit);
             </div>
         <?php endforeach; ?>
         <div class="mt-5 flex justify-end">
+            <p class="mr-auto self-center text-xs font-semibold text-slate-500" data-autosave-status>
+                Autoguardado activo
+            </p>
             <button class="btn-primary" type="submit" :disabled="busy"
                 x-text="busy ? 'Guardando...' : 'Guardar unidades'">Guardar unidades</button>
         </div>

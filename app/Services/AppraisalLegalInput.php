@@ -11,7 +11,9 @@ final class AppraisalLegalInput
         foreach (AppraisalLegalCatalog::fieldKeys() as $key) {
             $value = $input[$key] ?? '';
             if (is_array($value)) $value = '';
-            $limit = str_starts_with($key, 'reporte_') || in_array($key, ['cabida_linderos', 'reformas_ph'], true) ? 3000 : 500;
+            $long = str_starts_with($key, 'reporte_') || str_starts_with($key, 'revision_')
+                || in_array($key, ['cabida_linderos', 'reformas_ph', 'salvedad_final'], true);
+            $limit = $long ? 3000 : 500;
             $data[$key] = mb_substr(trim((string) $value), 0, $limit);
         }
         return $data;

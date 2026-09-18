@@ -111,7 +111,9 @@ $typologyUsefulLife = static function (array $unit) use ($typologyLookup): strin
         </div>
         <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"><?= count($constructionUnits) ?> unidad(es)</span>
     </div>
-    <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/construcciones')) ?>" @submit="busyConstruction = true">
+    <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/construcciones')) ?>"
+        data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/construcciones/autoguardar')) ?>"
+        @submit="busyConstruction = true">
         <?= csrf_field() ?>
         <?php if (!$constructionUnits): ?>
             <p class="rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-600">
@@ -133,6 +135,9 @@ $typologyUsefulLife = static function (array $unit) use ($typologyLookup): strin
         <?php endforeach; ?>
         <?php if ($constructionUnits): ?>
             <div class="mt-5 flex justify-end">
+                <p class="mr-auto self-center text-xs font-semibold text-slate-500" data-autosave-status>
+                    Autoguardado activo
+                </p>
                 <button class="btn-primary" type="submit" :disabled="busyConstruction"
                     x-text="busyConstruction ? 'Guardando...' : 'Guardar construcción'">Guardar construcción</button>
             </div>

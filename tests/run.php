@@ -29,6 +29,7 @@ use App\Services\MidasWfsSearch;
 use App\Services\LegalCertificateParser;
 use App\Services\RateLimiter;
 use App\Controllers\AppraisalController;
+use App\Controllers\AppraisalSubjectController;
 use App\Models\AppraisalLegalRepository;
 use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraiserRepository;
@@ -468,6 +469,33 @@ try {
     $legalMerged = AppraisalLegalInput::mergeEmpty(['matricula_inmobiliaria' => 'manual'], $legalParsed['data']);
     expect($legalMerged['matricula_inmobiliaria'] === 'manual'
         && ($legalMerged['codigo_catastral_actual'] ?? '') !== '', 'juridico conserva dato manual y llena vacios');
+    $ctlText = "OFICINA DE REGISTRO DE INSTRUMENTOS PUBLICOS DE CARTAGENA\n"
+        . "Nro Matrícula: 060-179788\nCírculo Registral: CARTAGENA\nDepartamento: BOLIVAR\n"
+        . "Municipio: CARTAGENA DE INDIAS\nFecha de Apertura: 30-11-1999\nEstado del Folio: ACTIVO\n"
+        . "Turno: 2026-123456 PIN: 7A8B9C\nReferencia Catastral: 130010109001000\n"
+        . "Dirección Actual del Inmueble: MANZANA 10 LOTE 10-098 CASTILLOGRANDE\n"
+        . "Descripción Cabida y Linderos: Contenidos en ESCRITURA Nro 3069 de fecha 30-11-1999 "
+        . "en NOTARIA 2 de CARTAGENA con area de 855.00 M2. AREA Y COEFICIENTE AREA - HECTAREAS: "
+        . "METROS: CENTIMETROS: AREA PRIVADA - METROS: CENTIMETROS: AREA CONSTRUIDA - METROS: CENTIMETROS.\n"
+        . "ANOTACION Nro 1 Fecha: 30-11-1999 Doc: ESCRITURA 3069 NOTARIA 2 DE CARTAGENA "
+        . "Valor Acto: $85.500.000 Especificacion: COMPRAVENTA "
+        . "PERSONAS QUE INTERVIENEN EN EL ACTO DE: PROMOTORA TERRANOVA S.A. A: CARMEN CAPELLA DE ESCOBAR\n"
+        . "ANOTACION Nro 2 Fecha: 20-01-2001 Doc: ESCRITURA 120 Valor Acto: $0 "
+        . "Especificacion: REGLAMENTO DE PROPIEDAD HORIZONTAL COEFICIENTE 1.25%";
+    $ctlParsed = (new LegalCertificateParser())->parse($ctlText, 'CTL179788.pdf');
+    $ctlFound = count(array_filter($ctlParsed['data'], static fn ($value): bool => trim((string) $value) !== ''));
+    expect(($ctlParsed['data']['matricula_inmobiliaria'] ?? '') === '060-179788'
+        && ($ctlParsed['data']['circulo_registral'] ?? '') === 'CARTAGENA'
+        && ($ctlParsed['data']['codigo_catastral_actual'] ?? '') === '130010109001000'
+        && str_contains((string) ($ctlParsed['data']['cabida_linderos'] ?? ''), '855.00 M2')
+        && ($ctlParsed['data']['titular_actual'] ?? '') === 'CARMEN CAPELLA DE ESCOBAR'
+        && ($ctlParsed['data']['reglamento_ph'] ?? '') === 'Sí'
+        && ($ctlParsed['data']['check_tradicion'] ?? '') === 'Sí'
+        && ($ctlParsed['data']['check_propiedad_horizontal'] ?? '') === 'Sí'
+        && ($ctlParsed['data']['semaforo_manual'] ?? '') === 'Atención'
+        && str_contains((string) ($ctlParsed['data']['reporte_profesional_entregable'] ?? ''), '060-179788')
+        && $ctlFound >= 15,
+        'parser juridico lee certificado CTL con campos registrales fisicos y titularidad');
     $legalRepo = new AppraisalLegalRepository($db);
     $legalManual = [];
     foreach (AppraisalLegalCatalog::fieldKeys() as $fieldKey) $legalManual[$fieldKey] = 'Guardado ' . $fieldKey;
@@ -561,8 +589,8 @@ try {
     putenv('APPRAISAL_MIDAS_STORAGE_DIR');
     $photoRecordId = str_repeat('c', 32);
     $photoUnitId = str_repeat('d', 32);
-    $photoController = (new ReflectionClass(AppraisalController::class))->newInstanceWithoutConstructor();
-    $safePhotoReturn = new ReflectionMethod(AppraisalController::class, 'safePhotoReturn');
+    $photoController = (new ReflectionClass(AppraisalSubjectController::class))->newInstanceWithoutConstructor();
+    $safePhotoReturn = new ReflectionMethod(AppraisalSubjectController::class, 'safePhotoReturn');
     $safePhotoReturn->setAccessible(true);
     $_POST = ['return_to' => 'avaluos/' . $photoRecordId . '/bien-sujeto#fotos-general'];
     expect($safePhotoReturn->invoke($photoController, $photoRecordId) === $_POST['return_to'], 'retorno a fotos generales conservado');

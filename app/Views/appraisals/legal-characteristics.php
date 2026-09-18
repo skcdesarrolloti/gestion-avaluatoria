@@ -7,8 +7,20 @@ $latest = $certificates[0] ?? null;
 $field = static fn (string $key): string => (string) ($data[$key] ?? '');
 $label = static fn (string $key): string => (string) ($legalLabels[$key] ?? $key);
 $isTextarea = static fn (string $key): bool => str_starts_with($key, 'reporte_')
-    || in_array($key, ['cabida_linderos', 'reformas_ph', 'matriculas_derivadas'], true);
-$legalTabNumbers = ['registral' => '4.1', 'catastro' => '4.2', 'ph' => '4.3', 'informe' => '4.4'];
+    || str_starts_with($key, 'revision_') || in_array($key, ['cabida_linderos', 'reformas_ph',
+        'matriculas_derivadas', 'salvedad_final'], true);
+$checkboxFields = ['check_tradicion', 'check_gravamenes', 'check_limitaciones_dominio',
+    'check_medidas_cautelares', 'check_propiedad_horizontal', 'check_otras'];
+$selectOptions = [
+    'semaforo_manual' => ['' => 'Pendiente de lectura o revisión manual', 'Normal' => 'Normal',
+        'Atención' => 'Atención', 'Crítico' => 'Crítico'],
+    'clasificacion_manual' => ['' => 'Pendiente de lectura o revisión manual',
+        'Sin alertas automáticas relevantes' => 'Sin alertas automáticas relevantes',
+        'Con alertas para revisión jurídica' => 'Con alertas para revisión jurídica',
+        'Requiere estudio jurídico especializado' => 'Requiere estudio jurídico especializado'],
+];
+$legalTabNumbers = ['registral' => '4.1', 'catastro' => '4.2', 'ph' => '4.3', 'tradicion' => '4.4',
+    'informe' => '4.5', 'impresion' => '4.6'];
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
@@ -102,8 +114,8 @@ $legalTabNumbers = ['registral' => '4.1', 'catastro' => '4.2', 'ph' => '4.3', 'i
 </section>
 
 <form class="mt-7 space-y-6" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas')) ?>"
-    x-data="legalAutosave" data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas/autoguardar')) ?>"
-    @input="changed()" @change="changed()" @submit="cancel()">
+    data-module-autosave
+    data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas/autoguardar')) ?>">
     <?= csrf_field() ?>
     <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div class="flex flex-wrap items-start justify-between gap-5">
@@ -114,7 +126,7 @@ $legalTabNumbers = ['registral' => '4.1', 'catastro' => '4.2', 'ph' => '4.3', 'i
                     Los campos vacíos quedan pendientes. Lo que corrijas manualmente se guarda como criterio del analista.
                 </p>
                 <p class="mt-2 text-xs font-semibold text-teal-800" role="status" aria-live="polite"
-                    x-text="savedAt || message">Autoguardado activo</p>
+                    data-autosave-status>Autoguardado activo</p>
             </div>
             <span class="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-800">
                 <?= e($profile['status'] ?? 'Pendiente de revisión') ?>
@@ -142,14 +154,7 @@ $legalTabNumbers = ['registral' => '4.1', 'catastro' => '4.2', 'ph' => '4.3', 'i
                     </h3>
                     <div class="mt-5 grid gap-5 md:grid-cols-2">
                         <?php foreach ($keys as $key): ?>
-                            <label class="label <?= $isTextarea($key) ? 'md:col-span-2' : '' ?>"><?= e($label($key)) ?>
-                                <?php if ($isTextarea($key)): ?>
-                                    <textarea class="input mt-2 min-h-28" name="<?= e($key) ?>" placeholder="Pendiente de lectura o revisión manual"><?= e($field($key)) ?></textarea>
-                                <?php else: ?>
-                                    <input class="input mt-2 <?= $field($key) === '' ? 'bg-slate-50' : '' ?>" name="<?= e($key) ?>"
-                                        value="<?= e($field($key)) ?>" placeholder="Pendiente de lectura o revisión manual">
-                                <?php endif; ?>
-                            </label>
+                            <?php require BASE_PATH . '/app/Views/appraisals/legal-field.php'; ?>
                         <?php endforeach; ?>
                     </div>
                 </section>

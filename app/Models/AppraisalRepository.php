@@ -103,8 +103,7 @@ final class AppraisalRepository
         return ['version' => $version + 1, 'saved_at' => str_replace(' ', 'T', $now) . 'Z'];
     }
 
-    public function savePreclassification(string $id, int $owner, int $version, array $data): void
-    {
+    public function savePreclassification(string $id, int $owner, int $version, array $data): array {
         $now = gmdate('Y-m-d H:i:s');
         $query = $this->db->prepare('UPDATE appraisals SET igac_category = ?, igac_typology_hint = ?,
             igac_property_units_count = ?, igac_annex_units_count = ?, version = version + 1, updated_at = ?
@@ -116,6 +115,7 @@ final class AppraisalRepository
             throw new HttpException(409, 'Esta lectura inicial cambió en otra pestaña. Revisa antes de guardar.');
         }
         $this->ensureUnits($id, $owner, (int) $data['igac_property_units_count'], (int) $data['igac_annex_units_count']);
+        return ['version' => $version + 1, 'saved_at' => str_replace(' ', 'T', $now) . 'Z'];
     }
 
     public function saveUnits(string $id, int $owner, array $units): void

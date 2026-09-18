@@ -19,6 +19,8 @@
         <?php $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/expediente'; ?>
         <form class="mt-6 grid gap-5 md:grid-cols-2 xl:grid-cols-4" method="post"
             action="<?= e(url($subjectActionBase . '/preclasificacion')) ?>"
+            data-module-autosave
+            data-autosave-endpoint="<?= e(url($subjectActionBase . '/preclasificacion/autoguardar')) ?>"
             x-data="{ busy: false }" @submit="busy = true">
             <?= csrf_field() ?>
             <input type="hidden" name="version" value="<?= e($record['version']) ?>">
@@ -57,6 +59,9 @@
                 <button class="btn-primary min-h-11 w-full" type="submit" :disabled="busy"
                     x-text="busy ? 'Guardando...' : 'Guardar lectura inicial'">Guardar lectura inicial</button>
             </div>
+            <p class="text-xs font-semibold text-slate-500 md:col-span-2 xl:col-span-4" data-autosave-status>
+                Autoguardado activo
+            </p>
         </form>
     </section>
 

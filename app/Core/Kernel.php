@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace App\Core;
-use App\Controllers\{AppraisalController, AppraisalLegalController, AuthController, DiagnosticController, IgacTypologyController, IfrsStandardController,
+use App\Controllers\{AppraisalController, AppraisalLegalController, AppraisalSubjectController, AuthController, DiagnosticController, IgacTypologyController, IfrsStandardController,
     InternationalStandardController, LegalFrameworkController, MaintenanceController, MasterDataController, StandardController, ValuationController};
 use App\Database\Migrator;
 use App\Models\{AppraisalLegalRepository, AppraisalRepository, AppraisalSectorMidasFileRepository, AppraisalSubjectRepository,
@@ -128,10 +128,11 @@ final class Kernel
                     new AppraisalSubjectRepository($db), new \App\Models\SectorBankRepository($db), new AppraisalSectorMidasFileRepository($db), $user),
                 'legalCharacteristics' => new AppraisalLegalController(new AppraisalRepository($db),
                     new AppraisalLegalRepository($db), $user),
+                'subject' => new AppraisalSubjectController(new AppraisalRepository($db), $user,
+                    new IgacTypologyRepository(), new AppraisalSubjectRepository($db), new GeoMasterRepository($db)),
                 'valuations' => new ValuationController(),
                 default => new AppraisalController(new AppraisalRepository($db), $user,
-                    new AppraiserRepository($db), new IgacTypologyRepository(),
-                    new AppraisalSubjectRepository($db), new GeoMasterRepository($db)),
+                    new AppraiserRepository($db), new IgacTypologyRepository()),
             };
             $instance->$action(...array_slice($matches, 1));
             return;

@@ -78,7 +78,9 @@ $tabs = [
     </div>
     <?php if ($subjectMessage): ?><p class="mt-5 rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($subjectMessage) ?></p><?php endif; ?>
     <?php if ($subjectError): ?><p class="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($subjectError) ?></p><?php endif; ?>
-    <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/ficha-basica')) ?>" @submit="busy = true">
+    <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/ficha-basica')) ?>"
+        data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/ficha-basica/autoguardar')) ?>"
+        @submit="busy = true">
         <?= csrf_field() ?>
         <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
             <?php foreach ($tabs as $key => [$title]): ?>
@@ -120,6 +122,9 @@ $tabs = [
             </div>
         <?php endforeach; ?>
         <div class="mt-5 flex justify-end">
+            <p class="mr-auto self-center text-xs font-semibold text-slate-500" data-autosave-status>
+                Autoguardado activo
+            </p>
             <button class="btn-primary" type="submit" :disabled="busy"
                 x-show="activeTab !== 'tipologias'"
                 x-text="busy ? 'Guardando...' : 'Guardar ficha básica'">Guardar ficha básica</button>

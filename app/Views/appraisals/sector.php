@@ -152,7 +152,8 @@ $sectorFormId = 'sector-form';
 
 <?php require BASE_PATH . '/app/Views/appraisals/sector-midas-review.php'; ?>
 
-<form id="<?= e($sectorFormId) ?>" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/sector')) ?>">
+<form id="<?= e($sectorFormId) ?>" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/sector')) ?>"
+    data-module-autosave data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/sector/autoguardar')) ?>">
     <?= csrf_field() ?>
 </form>
 <section class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
@@ -173,6 +174,9 @@ $sectorFormId = 'sector-form';
         <button form="<?= e($sectorFormId) ?>" class="btn-primary min-h-11" type="submit"
             @click="prepareSectorSave()" x-text="advanceLabel()">Guardar y pasar</button>
     </div>
+    <p class="mt-3 text-xs font-semibold text-slate-500" data-autosave-status-for="<?= e($sectorFormId) ?>">
+        Autoguardado activo
+    </p>
 
     <?php if ($locationLine || ($sectorPrefillSource ?? '') !== 'expediente'): ?>
         <div class="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">

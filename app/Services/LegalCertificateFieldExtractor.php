@@ -16,6 +16,8 @@ final class LegalCertificateFieldExtractor
         $flat = $self->flat($text);
         $compact = $self->compact($text);
         $matriculas = $self->matriculas($text);
+        $lines = $self->lines($text);
+        $lastTradition = $self->lastTraditionBlock($text);
         $actualCadastral = $self->cadastral($flat, false) ?: $self->match($compact, [
             '/(?:referenciacatastral|c[eé]dulacatastral|c[oó]digocatastral)(?:actual)?[:#]?([0-9A-Za-z\.\-]{8,80}?)(?=(?:referenciacatastralanterior|c[oó]digocatastralanterior|nupre|direcci|estado|fecha|$))/iu',
         ]);
@@ -25,47 +27,61 @@ final class LegalCertificateFieldExtractor
         $data = [
             'archivo_origen' => $filename,
             'matricula_inmobiliaria' => $self->code($self->between($flat, ['nro matricula', 'nro matrícula',
-                'matricula inmobiliaria', 'matrícula inmobiliaria']) ?: $self->match($text, [
+                'matricula inmobiliaria', 'matrícula inmobiliaria', 'numero de matricula',
+                'número de matrícula']) ?: $self->lineValue($lines, ['nro matricula', 'nro matrícula',
+                'matricula inmobiliaria', 'matrícula inmobiliaria', 'numero de matricula', 'número de matrícula'])
+                ?: $self->match($text, [
                 '/(?:nro|no|n[uú]mero|numero)\s+matr(?:i|í)cula\s*[:#]?\s*([0-9]{2,4}\s*-\s*[0-9]{3,})/iu',
                 '/matr(?:i|í)cula\s+inmobiliaria(?:\s*(?:no\.?|nro\.?))?\s*[:#]?\s*([0-9]{2,4}\s*-\s*[0-9]{3,})/iu',
                 '/\b([0-9]{2,4}\s*-\s*[0-9]{3,})\b/u',
             ])),
             'circulo_registral' => $self->clean($self->between($flat, ['circulo registral', 'círculo registral'])
+                ?: $self->lineValue($lines, ['circulo registral', 'círculo registral'])
                 ?: $self->match($text, ['/oficina\s+de\s+registro\s+de\s+instrumentos\s+p[uú]blicos\s+de\s*([^\n\r]{3,120})/iu'])),
             'orip' => $self->clean($self->match($text, ['/oficina\s+de\s+registro\s+de\s+instrumentos\s+p[uú]blicos\s+de\s*([^\n\r]{3,120})/iu'])),
-            'municipio' => $self->clean($self->between($flat, ['municipio'])),
-            'departamento' => $self->clean($self->between($flat, ['departamento'])),
-            'vereda' => $self->clean($self->between($flat, ['vereda'])),
+            'municipio' => $self->clean($self->between($flat, ['municipio']) ?: $self->lineValue($lines, ['municipio'])),
+            'departamento' => $self->clean($self->between($flat, ['departamento']) ?: $self->lineValue($lines, ['departamento'])),
+            'vereda' => $self->clean($self->between($flat, ['vereda']) ?: $self->lineValue($lines, ['vereda'])),
             'estado_folio' => $self->clean($self->between($flat, ['estado del folio'])
+                ?: $self->lineValue($lines, ['estado del folio'])
                 ?: $self->match($text, ['/folio\s+(abierto|cerrado|cancelado|activo)\b/iu'])),
-            'fecha_apertura' => $self->clean($self->between($flat, ['fecha de apertura'])),
+            'fecha_apertura' => $self->clean($self->between($flat, ['fecha de apertura'])
+                ?: $self->lineValue($lines, ['fecha de apertura'])),
             'fecha_expedicion' => $self->clean($self->between($flat, ['fecha de expedicion', 'fecha de expedición',
-                'fecha de impresion', 'fecha de impresión']) ?: $self->match($text, ['/impreso\s+el\s+([0-9\/\-\s:amp\.]{8,40})/iu'])),
-            'turno' => $self->clean($self->between($flat, ['turno'])),
-            'pin' => $self->clean($self->between($flat, ['pin']) ?: $self->match($text, [
+                'fecha de impresion', 'fecha de impresión']) ?: $self->lineValue($lines, ['fecha de expedicion',
+                'fecha de expedición', 'fecha de impresion', 'fecha de impresión'])
+                ?: $self->match($text, ['/impreso\s+el\s+([0-9\/\-\s:amp\.]{8,40})/iu'])),
+            'turno' => $self->clean($self->between($flat, ['turno']) ?: $self->lineValue($lines, ['turno'])),
+            'pin' => $self->clean($self->between($flat, ['pin']) ?: $self->lineValue($lines, ['pin']) ?: $self->match($text, [
                 '/certificado\s+generado\s+con\s+el\s+pin\s+(?:no\.?)?\s*([A-Za-z0-9\-]{4,40})/iu',
             ])),
             'codigo_catastral_actual' => $self->code($actualCadastral),
             'codigo_catastral_anterior' => $self->code($previousCadastral),
-            'nupre' => $self->code($self->between($flat, ['nupre'])),
+            'nupre' => $self->code($self->between($flat, ['nupre']) ?: $self->lineValue($lines, ['nupre'])),
             'observacion_catastral' => $self->clean($self->between($flat, ['observacion catastral',
                 'observación catastral', 'observaciones catastrales'])),
             'direccion' => $self->address($self->between($flat, ['direccion actual del inmueble',
                 'dirección actual del inmueble', 'direccion del inmueble', 'dirección del inmueble',
+                'direccion', 'dirección']) ?: $self->lineValue($lines, ['direccion actual del inmueble',
+                'dirección actual del inmueble', 'direccion del inmueble', 'dirección del inmueble',
                 'direccion', 'dirección']) ?: $self->match($text, ['/ubicaci(?:o|ó)n\s+del\s+predio\s*[:#]?\s*([^\n\r]{6,220})/iu'])),
             'tipo_predio' => $self->clean($self->between($flat, ['tipo de predio', 'destinacion economica',
+                'destinación económica']) ?: $self->lineValue($lines, ['tipo de predio', 'destinacion economica',
                 'destinación económica'])),
-            'area' => $self->area($text, '/[áa]rea\s+(?:de\s+)?([0-9\.,]{1,30})\s*(?:m2|mts2|metros?\s*cuadrados?)/iu'),
+            'area' => $self->area($text, '/(?:[áa]rea|cabida)\s+(?:de\s+)?([0-9\.,]{1,30})\s*(?:m2|mts2|metros?\s*cuadrados?)/iu'),
             'area_privada' => $self->area($text, '/[áa]rea\s+privada\b[^0-9]{0,50}([0-9\.,]{1,30})/iu'),
             'area_construida' => $self->area($text, '/[áa]rea\s+construida\b[^0-9]{0,50}([0-9\.,]{1,30})/iu'),
-            'coeficiente' => $self->clean($self->between($flat, ['coeficiente'])),
-            'cabida_linderos' => $self->block($text, ['cabida y linderos', 'cabida/linderos', 'linderos'], 1600),
+            'coeficiente' => $self->clean($self->between($flat, ['coeficiente']) ?: $self->lineValue($lines, ['coeficiente'])),
+            'cabida_linderos' => $self->block($text, ['descripcion cabida y linderos', 'descripción cabida y linderos',
+                'cabida y linderos', 'cabida/linderos', 'linderos'], 2200),
             'reglamento_ph' => $self->contains($text, ['propiedad horizontal', 'reglamento de propiedad horizontal', 'ley 675']) ? 'Sí' : '',
             'matricula_matriz' => $self->code($self->match($text, ['/matr(?:i|í)cula\s+matriz\s*[:#]?\s*([0-9]{2,4}\s*-\s*[0-9]{3,})/iu'])),
             'matriculas_derivadas' => implode('; ', array_slice($matriculas, 0, 12)),
-            'titular_actual' => $self->clean($self->titular($text)),
-            'documento_soporte_actual' => $self->clean($self->match($text, ['/escritura\s+p[uú]blica\s*(?:no\.?|n[oº])?\s*([A-Za-z0-9\-\/\.]{2,80})/iu'])),
-            'valor_ultimo_acto' => $self->clean($self->match($text, ['/valor\s+(?:acto|negocio|compraventa)\s*[:#]?\s*\$?\s*([0-9\.\,]{4,40})/iu'])),
+            'unidad_privada' => $self->clean($self->match($text, ['/unidad\s+privada\s*[:#]?\s*([^\n\r]{3,160})/iu'])),
+            'coeficiente_ph' => $self->clean($self->match($text, ['/coeficiente(?:\s+de\s+copropiedad)?\s*[:#]?\s*([0-9\.,%]{1,30})/iu'])),
+            'titular_actual' => $self->clean($self->titular($text, $lastTradition)),
+            'documento_soporte_actual' => $self->clean($self->documento($lastTradition ?: $text)),
+            'valor_ultimo_acto' => $self->clean($self->valor($lastTradition ?: $text)),
         ];
         if ($data['orip'] === '') $data['orip'] = $data['circulo_registral'];
         return $data;
@@ -90,13 +106,29 @@ final class LegalCertificateFieldExtractor
         return $this->match($this->between($flat, $labels), ['/([0-9A-Za-z\.\- ]{8,80})/u']);
     }
 
-    private function titular(string $text): string
+    private function titular(string $text, string $lastTradition = ''): string
     {
+        $source = $lastTradition !== '' ? $lastTradition : $text;
         return $this->match($text, [
             '/titular(?:es)?\s+del\s+derecho\s+real\s+de\s+dominio\s*[:#]?\s*([^\n\r]{4,220})/iu',
-            '/personas\s+que\s+intervienen\s+en\s+el\s+acto.*?de:\s*([^\n\r]{4,220})/isu',
             '/propietario(?:\(s\))?\s*[:#]?\s*([^\n\r]{4,220})/iu',
+        ]) ?: $this->match($source, [
+            '/personas\s+que\s+intervienen\s+en\s+el\s+acto.*?\ba\s*:\s*([^\n\r]{4,220})/isu',
+            '/\ba\s*:\s*([^\n\r]{4,220})/iu',
+        ]) ?: $this->match($source, ['/comprador(?:\(es\))?\s*[:#]?\s*([^\n\r]{4,220})/iu']);
+    }
+
+    private function documento(string $text): string
+    {
+        return $this->match($text, [
+            '/doc\s*\.?\s*:\s*(.+?)(?=\s+valor\s+acto|\s+especificaci|\s+personas\s+que\s+intervienen|$)/isu',
+            '/escritura\s+p[uú]blica\s*(?:no\.?|n[oº])?\s*([A-Za-z0-9\-\/\.]{2,80})/iu',
         ]);
+    }
+
+    private function valor(string $text): string
+    {
+        return $this->match($text, ['/valor\s+(?:acto|negocio|compraventa)\s*[:#]?\s*\$?\s*([0-9\.\,\s]{4,60})/iu']);
     }
 
     private function match(string $text, array $patterns): string
@@ -121,8 +153,32 @@ final class LegalCertificateFieldExtractor
     private function code(string $value): string { return preg_replace('/\s+/', '', $this->clean($value)) ?? ''; }
     private function flat(string $text): string { return preg_replace('/\s+/u', ' ', $text) ?? $text; }
     private function compact(string $text): string { return preg_replace('/\s+/u', '', $text) ?? $text; }
+    private function lines(string $text): array { return array_values(array_filter(array_map('trim', preg_split('/\R/u', $text) ?: []))); }
     private function area(string $text, string $pattern): string { return preg_match($pattern, $text, $m) ? str_replace(',', '.', (string) $m[1]) : ''; }
     private function contains(string $text, array $needles): bool { foreach ($needles as $n) if (mb_stripos($text, $n) !== false) return true; return false; }
     private function matriculas(string $text): array { preg_match_all('/\b[0-9]{2,4}\s*-\s*[0-9]{3,}\b/u', $text, $m); return array_values(array_unique(array_map(fn ($v) => $this->code((string) $v), $m[0] ?? []))); }
     private function block(string $text, array $labels, int $limit): string { foreach ($labels as $label) if (($pos = mb_stripos($text, $label)) !== false) return $this->clean(mb_substr($text, (int) $pos, $limit)); return ''; }
+
+    private function lineValue(array $lines, array $labels): string
+    {
+        $labelPattern = implode('|', array_map(static fn (string $label): string => preg_quote($label, '/'), $labels));
+        foreach ($lines as $line) {
+            if (preg_match('/\b(?:' . $labelPattern . ')\b\s*[:#-]?\s*(.+)$/iu', $line, $m)) return $this->clean((string) $m[1]);
+        }
+        return '';
+    }
+
+    private function lastTraditionBlock(string $text): string
+    {
+        preg_match_all('/anotaci(?:o|ó)n\s*:?\s*(?:nro|no|num(?:ero)?|n[uú]mero)?\.?\s*\d+/iu', $text, $m, PREG_OFFSET_CAPTURE);
+        $blocks = [];
+        foreach ($m[0] ?? [] as $index => $match) {
+            $start = (int) $match[1];
+            $end = isset($m[0][$index + 1][1]) ? (int) $m[0][$index + 1][1] : strlen($text);
+            $block = substr($text, $start, $end - $start);
+            if ($this->contains($block, ['compraventa', 'adjudicacion', 'adjudicación', 'sucesion', 'sucesión',
+                'donacion', 'donación', 'permuta', 'remate', 'transferencia'])) $blocks[] = $block;
+        }
+        return $blocks ? (string) end($blocks) : '';
+    }
 }

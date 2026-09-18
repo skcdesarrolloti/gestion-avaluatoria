@@ -34,6 +34,8 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
 <div class="mt-8 space-y-7">
     <form id="expediente-form" class="grid gap-7 lg:grid-cols-[1fr_18rem]" method="post"
         action="<?= e(url('avaluos/' . $record['id'] . '/expediente')) ?>"
+        data-module-autosave
+        data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/expediente/autoguardar')) ?>"
         x-data="{
             busy: false, active: 'configuracion',
             notes: <?= e(json_encode($initial['notes'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
@@ -161,6 +163,9 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
                 </p>
                 <button class="btn-primary mt-5 w-full" type="submit" :disabled="busy"
                     x-text="busy ? 'Guardando...' : 'Guardar expediente'">Guardar expediente</button>
+                <p class="mt-3 text-xs font-semibold text-slate-500" data-autosave-status>
+                    Autoguardado activo
+                </p>
             </div>
             <p class="px-2 text-xs leading-5 text-slate-500">
                 El consecutivo técnico se asignará cuando el expediente quede formalmente configurado.

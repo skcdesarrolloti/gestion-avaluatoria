@@ -31,6 +31,7 @@ $photosForAttribute = static function (string $unitId, string $key) use ($photos
         </span>
     </div>
     <form class="mt-6" method="post" enctype="multipart/form-data" action="<?= e(url($subjectActionBase . '/atributos')) ?>"
+        data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/atributos/autoguardar')) ?>"
         @submit="busyAttributes = true">
         <?= csrf_field() ?>
         <?php if (!$attributeUnits): ?>
@@ -53,6 +54,9 @@ $photosForAttribute = static function (string $unitId, string $key) use ($photos
         <?php endforeach; ?>
         <?php if ($attributeUnits): ?>
             <div class="mt-5 flex justify-end">
+                <p class="mr-auto self-center text-xs font-semibold text-slate-500" data-autosave-status>
+                    Autoguardado activo para textos y atributos. Las fotos se suben con su botón.
+                </p>
                 <button class="btn-primary" type="submit" :disabled="busyAttributes"
                     x-text="busyAttributes ? 'Guardando...' : 'Guardar atributos'">Guardar atributos</button>
             </div>

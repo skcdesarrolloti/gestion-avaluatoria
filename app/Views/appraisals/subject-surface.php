@@ -55,6 +55,7 @@ $dynamicOptions = [
         </span>
     </div>
     <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/superficies')) ?>"
+        data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/superficies/autoguardar')) ?>"
         @submit="busySurface = true">
         <?= csrf_field() ?>
         <?php if (!$surfaceUnits): ?>
@@ -77,6 +78,9 @@ $dynamicOptions = [
         <?php endforeach; ?>
         <?php if ($surfaceUnits): ?>
             <div class="mt-5 flex justify-end">
+                <p class="mr-auto self-center text-xs font-semibold text-slate-500" data-autosave-status>
+                    Autoguardado activo
+                </p>
                 <button class="btn-primary" type="submit" :disabled="busySurface"
                     x-text="busySurface ? 'Guardando...' : 'Guardar superficies'">Guardar superficies</button>
             </div>

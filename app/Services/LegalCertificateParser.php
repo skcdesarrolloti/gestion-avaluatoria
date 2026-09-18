@@ -92,8 +92,26 @@ final class LegalCertificateParser
     {
         $tradition = array_values(array_filter($annotations, fn (array $a): bool => ($a['categoria'] ?? '') === 'tradicion'));
         $debts = array_values(array_filter($annotations, fn (array $a): bool => ($a['categoria'] ?? '') === 'gravamen'));
-        $affects = array_values(array_filter($annotations, fn (array $a): bool => in_array(($a['categoria'] ?? ''), ['limitacion_dominio', 'medida_cautelar'], true)));
+        $limits = array_values(array_filter($annotations, fn (array $a): bool => ($a['categoria'] ?? '') === 'limitacion_dominio'));
+        $measures = array_values(array_filter($annotations, fn (array $a): bool => ($a['categoria'] ?? '') === 'medida_cautelar'));
+        $ph = array_values(array_filter($annotations, fn (array $a): bool => ($a['categoria'] ?? '') === 'propiedad_horizontal'));
+        $others = array_values(array_filter($annotations, fn (array $a): bool => ($a['categoria'] ?? '') === 'informativa'));
+        $affects = array_merge($limits, $measures);
+        $level = ($measures || $limits) ? 'Crítico' : ($debts || $alerts ? 'Atención' : 'Normal');
+        $classification = $level === 'Crítico' ? 'Requiere estudio jurídico especializado'
+            : ($level === 'Atención' ? 'Con alertas para revisión jurídica' : 'Sin alertas automáticas relevantes');
+        $salvedad = 'Lectura automática preliminar basada en el certificado cargado; debe validarse contra el folio completo y los soportes del encargo.';
+        $integrated = $this->integratedReport($data, $tradition, $debts, $affects, $ph, $alerts);
         return [
+            'check_tradicion' => $tradition ? 'Sí' : '', 'check_gravamenes' => $debts ? 'Sí' : '',
+            'check_limitaciones_dominio' => $limits ? 'Sí' : '', 'check_medidas_cautelares' => $measures ? 'Sí' : '',
+            'check_propiedad_horizontal' => $ph ? 'Sí' : '', 'check_otras' => $others ? 'Sí' : '',
+            'revision_tradicion' => $this->annotationSummary($tradition, 'No se identificaron actos de tradición en la lectura automática.'),
+            'revision_gravamenes' => $this->annotationSummary($debts, 'No se identificaron gravámenes en la lectura automática.'),
+            'revision_limitaciones_dominio' => $this->annotationSummary($limits, 'No se identificaron limitaciones al dominio en la lectura automática.'),
+            'revision_medidas_cautelares' => $this->annotationSummary($measures, 'No se identificaron medidas cautelares en la lectura automática.'),
+            'revision_propiedad_horizontal' => $this->annotationSummary($ph, 'No se identificó anotación específica de propiedad horizontal.'),
+            'revision_otras_cargas' => $this->annotationSummary($others, 'Sin otras notas clasificadas automáticamente.'),
             'reporte_matricula' => trim('Matrícula inmobiliaria ' . ($data['matricula_inmobiliaria'] ?? '') . ', ORIP ' . (($data['orip'] ?? '') ?: ($data['circulo_registral'] ?? '')) . '.'),
             'reporte_escritura_propiedad' => $tradition ? 'Se identifican actos de tradición que deben confrontarse con las anotaciones del certificado.' : '',
             'reporte_cedula_catastral' => trim((string) ($data['codigo_catastral_actual'] ?? '')),
@@ -103,8 +121,34 @@ final class LegalCertificateParser
             'reporte_titular_actual' => (string) ($data['titular_actual'] ?? ''),
             'reporte_afectaciones' => $affects ? 'Existen anotaciones que pueden constituir limitaciones o medidas cautelares. Validar vigencia y cancelaciones.' : '',
             'reporte_gravamenes' => $debts ? 'Se identifican gravámenes o hipotecas en la lectura preliminar; confirmar si están vigentes o cancelados.' : '',
+            'semaforo_manual' => $level, 'clasificacion_manual' => $classification,
+            'revision_analista' => $alerts ? implode("\n", $alerts) : 'Sin alertas automáticas; conservar revisión humana del certificado.',
+            'salvedad_final' => $salvedad,
             'reporte_conclusion_entregable' => $alerts ? 'Lectura jurídica preliminar con alertas pendientes de revisión por el analista.' : 'Lectura jurídica preliminar sin alertas automáticas relevantes; validar contra el certificado completo.',
+            'reporte_profesional_entregable' => $integrated . "\n\n" . $salvedad,
         ];
+    }
+
+    private function annotationSummary(array $rows, string $empty): string
+    {
+        if (!$rows) return $empty;
+        return implode("\n", array_map(static fn (array $row): string => 'Anotación ' . ($row['orden'] ?? '')
+            . ': ' . ($row['impacto_resumen'] ?? 'Revisión preliminar pendiente.')
+            . (($row['documento'] ?? '') !== '' ? ' Soporte: ' . $row['documento'] . '.' : ''), $rows));
+    }
+
+    private function integratedReport(array $data, array $tradition, array $debts, array $affects, array $ph, array $alerts): string
+    {
+        $parts = [];
+        if (($data['matricula_inmobiliaria'] ?? '') !== '') $parts[] = 'El inmueble se revisó con matrícula inmobiliaria '
+            . $data['matricula_inmobiliaria'] . ', asociada a la ORIP ' . (($data['orip'] ?? '') ?: ($data['circulo_registral'] ?? 'pendiente')) . '.';
+        if (($data['titular_actual'] ?? '') !== '') $parts[] = 'La titularidad preliminar leída corresponde a ' . $data['titular_actual'] . '.';
+        if ($tradition) $parts[] = 'La cadena de tradición presenta actos que deben cotejarse con el certificado completo.';
+        if ($debts) $parts[] = 'Se detectaron gravámenes o hipotecas para confirmar vigencia y cancelaciones.';
+        if ($affects) $parts[] = 'Se detectaron posibles limitaciones o medidas cautelares que requieren revisión jurídica.';
+        if ($ph) $parts[] = 'Hay referencias a propiedad horizontal o copropiedad que deben validarse con reglamento y coeficientes.';
+        if ($alerts) $parts[] = 'Alertas: ' . implode(' ', $alerts);
+        return $parts ? implode(' ', $parts) : 'Lectura registral preliminar sin hallazgos automáticos concluyentes.';
     }
 
     private function match(string $text, array $patterns): string

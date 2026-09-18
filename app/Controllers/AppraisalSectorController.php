@@ -80,22 +80,22 @@ final class AppraisalSectorController
 
     public function save(string $id): never
     {
-        $this->appraisals->find($id, $this->user['id']);
-        try {
-            $data = AppraisalSectorInput::data($_POST);
-            $advanced = AppraisalSectorSectionInput::data($_POST);
-            $subject = $this->subjects->find($id, $this->user['id']);
-            $this->sectors->save($id, $this->user['id'], $data);
-            $this->neighborhoodSectors->save((string) ($subject['neighborhood_id'] ?? ''), $this->user['id'], $id, $data);
-            $this->sectorSections->saveAll($id, $this->user['id'], (string) ($subject['neighborhood_id'] ?? ''), $advanced);
-            $this->sectorBank->ensureSections((string) ($subject['neighborhood_id'] ?? ''), $subject, $data, true);
-            $this->sectorBank->saveAdvancedSections((string) ($subject['neighborhood_id'] ?? ''), $advanced);
-            $this->sectorBank->saveSnapshot($id, $this->user['id'], (string) ($subject['neighborhood_id'] ?? ''), $data);
-            Session::flash('sector_message', 'Numeral 2 guardado y banco barrial actualizado.');
-        } catch (\Throwable $error) {
-            Session::flash('sector_error', $error->getMessage());
-        }
+        try { $this->persistSector($id); Session::flash('sector_message', 'Numeral 2 guardado y banco barrial actualizado.'); }
+        catch (\Throwable $error) { Session::flash('sector_error', $error->getMessage()); }
         AppraisalSectorRedirect::afterSave($id, $_POST);
+    }
+
+    public function autosave(string $id): never
+    { $this->persistSector($id); Http::json(['ok' => true, 'saved_at' => gmdate('Y-m-d\TH:i:s\Z')]); }
+
+    private function persistSector(string $id): void
+    {
+        $this->appraisals->find($id, $this->user['id']); $data = AppraisalSectorInput::data($_POST);
+        $advanced = AppraisalSectorSectionInput::data($_POST); $subject = $this->subjects->find($id, $this->user['id']);
+        $neighborhoodId = (string) ($subject['neighborhood_id'] ?? '');
+        $this->sectors->save($id, $this->user['id'], $data); $this->neighborhoodSectors->save($neighborhoodId, $this->user['id'], $id, $data);
+        $this->sectorSections->saveAll($id, $this->user['id'], $neighborhoodId, $advanced); $this->sectorBank->ensureSections($neighborhoodId, $subject, $data, true);
+        $this->sectorBank->saveAdvancedSections($neighborhoodId, $advanced); $this->sectorBank->saveSnapshot($id, $this->user['id'], $neighborhoodId, $data);
     }
     public function selectNeighborhood(string $id): never
     {
