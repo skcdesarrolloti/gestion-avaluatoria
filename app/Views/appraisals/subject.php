@@ -15,7 +15,12 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
             descripciones técnicas para alimentar la caracterización del avalúo.
         </p>
     </div>
-    <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Sujeto del avalúo</span>
+    <div class="flex flex-wrap items-center gap-3">
+        <button class="btn-secondary" type="button" disabled>
+            Imprimir documento de Inspección Bien Sujeto
+        </button>
+        <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Sujeto del avalúo</span>
+    </div>
 </div>
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
