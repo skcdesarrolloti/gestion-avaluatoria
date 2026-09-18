@@ -131,11 +131,11 @@ $legalAnnotationGroups = \App\Support\AppraisalLegalView::groupedAnnotations($an
         </div>
         <div class="mt-6" x-data="{ activeLegalTab: 'registral' }">
             <div class="rounded-2xl bg-slate-100 p-2">
-                <div class="flex gap-2 overflow-x-auto pb-2" role="tablist" aria-label="Submenús jurídicos">
+                <div class="flex gap-2 overflow-x-auto pb-2" role="group" aria-label="Submenús jurídicos">
                     <?php foreach ($legalSections as $sectionKey => [$sectionTitle]): ?>
                         <button class="min-h-14 shrink-0 rounded-xl px-5 py-3 text-left text-sm font-semibold transition"
-                            type="button" role="tab" @click="activeLegalTab = '<?= e($sectionKey) ?>'"
-                            :aria-selected="activeLegalTab === '<?= e($sectionKey) ?>'"
+                            type="button" @click="activeLegalTab = '<?= e($sectionKey) ?>'"
+                            :aria-pressed="activeLegalTab === '<?= e($sectionKey) ?>'"
                             :class="activeLegalTab === '<?= e($sectionKey) ?>' ? 'bg-blue-800 text-white shadow-sm' : 'bg-white text-blue-900 hover:bg-blue-50'">
                             <?= e($sectionTitle) ?>
                         </button>
