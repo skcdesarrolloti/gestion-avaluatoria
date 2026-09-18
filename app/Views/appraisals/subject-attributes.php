@@ -38,11 +38,11 @@ $formatAttributeAdjustment = static function (?float $value): string {
     x-data="{ activeAttributes: '<?= e($attributeUnits[0]['id'] ?? '') ?>', busyAttributes: false }">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">3.4 Atributos y deméritos del sujeto</p>
-            <h2 class="mt-2 text-2xl font-semibold">Lectura diferencial por unidad</h2>
+            <p class="eyebrow">3.4 Diferenciales valuatorios del sujeto</p>
+            <h2 class="mt-2 text-2xl font-semibold">Atributos y deméritos por unidad</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                Aquí se registra qué condiciones diferenciales tiene cada unidad, su evidencia e impacto técnico.
-                Pueden sumar como atributos o restar como deméritos. La calificación ponderada ayuda a ubicar
+                Aquí se registran las condiciones diferenciales de cada unidad, su evidencia e impacto técnico.
+                Pueden sumar como atributo o restar como demérito. La calificación ponderada ayuda a ubicar
                 el bien dentro del rango de mercado sin reemplazar el criterio del perito.
             </p>
         </div>
@@ -50,26 +50,34 @@ $formatAttributeAdjustment = static function (?float $value): string {
             <?= count($attributeUnits) ?> unidad(es)
         </span>
     </div>
-    <div class="mt-5 grid gap-4 rounded-xl border border-teal-100 bg-teal-50 p-4 text-sm leading-6 text-teal-950 lg:grid-cols-4">
-        <div>
-            <strong class="block">Dónde nace cada unidad</strong>
-            <span>En el numeral 1 defines cuántas unidades principales y anexos existen. En 3.1 nombras cada una y eliges su tipo de inmueble.</span>
+    <div class="mt-5 rounded-xl border border-teal-100 bg-teal-50 p-4 text-sm leading-6 text-teal-950">
+        <div class="flex flex-wrap items-center justify-between gap-3">
+            <strong class="text-base">Academia del campo</strong>
+            <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-teal-800">
+                Banda orientativa: -10% a +10%
+            </span>
         </div>
-        <div>
-            <strong class="block">Cómo se calcula el índice</strong>
-            <span>Índice = suma(calificación × peso) / suma(pesos). Mide calidad relativa sobre 5; no es el porcentaje de valorización.</span>
-        </div>
-        <div>
-            <strong class="block">Cómo escoger el peso</strong>
-            <span>Bajo si apenas ayuda, medio si mueve la comparación, alto si cambia claramente la percepción de valor de esa unidad.</span>
-        </div>
-        <div>
-            <strong class="block">Ejemplo valuatorio</strong>
-            <span>Ajuste = ((índice - 3) / 2) × 10. Si da 3,89: ((3,89 - 3) / 2) × 10 = +4,5%. El 78% solo es índice de calidad.</span>
-        </div>
-        <div>
-            <strong class="block">Cuándo resta valor</strong>
-            <span>Si el índice baja de 3 hay demérito. Ejemplo: 2,40 genera -3,0%. Aplica por ruido, humedad, mal acceso, deterioro, vista obstruida o restricciones.</span>
+        <div class="mt-3 grid gap-4 lg:grid-cols-3 xl:grid-cols-5">
+            <div>
+                <strong class="block">Dónde nace cada unidad</strong>
+                <span>En el numeral 1 defines cuántas unidades principales y anexos existen. En 3.1 nombras cada una y eliges su tipo de inmueble.</span>
+            </div>
+            <div>
+                <strong class="block">Índice técnico</strong>
+                <span>Índice = suma(calificación × peso) / suma(pesos). Mide calidad relativa sobre 5; no es porcentaje de valorización.</span>
+            </div>
+            <div>
+                <strong class="block">Ajuste valuatorio</strong>
+                <span>Ajuste = ((índice - 3) / 2) × 10. El 3 es neutro, 5 llega a +10% y 1 llega a -10%.</span>
+            </div>
+            <div>
+                <strong class="block">Ejemplo positivo</strong>
+                <span>Si el índice da 3,89: ((3,89 - 3) / 2) × 10 = +4,5%. El 78% solo es índice de calidad.</span>
+            </div>
+            <div>
+                <strong class="block">Ejemplo negativo</strong>
+                <span>Si el índice da 2,40: ((2,40 - 3) / 2) × 10 = -3,0%. Aplica por ruido, humedad, mal acceso o restricciones.</span>
+            </div>
         </div>
     </div>
     <form class="mt-6" method="post" enctype="multipart/form-data" action="<?= e(url($subjectActionBase . '/atributos')) ?>"
@@ -102,10 +110,10 @@ $formatAttributeAdjustment = static function (?float $value): string {
         <?php if ($attributeUnits): ?>
             <div class="mt-5 flex justify-end">
                 <p class="mr-auto self-center text-xs font-semibold text-slate-500" data-autosave-status>
-                    Autoguardado activo para textos, atributos y deméritos. Las evidencias marcadas como Foto se cargan en 3.6.
+                    Autoguardado activo para textos y diferenciales. Las evidencias marcadas como Foto se cargan en 3.6.
                 </p>
                 <button class="btn-primary" type="submit" :disabled="busyAttributes"
-                    x-text="busyAttributes ? 'Guardando...' : 'Guardar atributos y deméritos'">Guardar atributos y deméritos</button>
+                    x-text="busyAttributes ? 'Guardando...' : 'Guardar diferenciales'">Guardar diferenciales</button>
             </div>
         <?php endif; ?>
     </form>

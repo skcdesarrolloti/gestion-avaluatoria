@@ -36,7 +36,7 @@ final class AppraisalSpecialAttributeCatalog
                 'riesgos_afectaciones_fisicas' => ['Riesgos o afectaciones físicas', 'Humedad, inundación, remoción, deterioros o restricciones físicas observables.', self::risk()],
                 'evidencia_fotografica' => ['Evidencia fotográfica', 'Define si el diferencial requiere soporte fotográfico en 3.6.', self::evidenceNeed()],
                 'impacto_valuatorio' => ['Impacto valuatorio', 'Lectura técnica del efecto esperado en valor.', self::marketImpact()],
-                'otro_atributo_especial' => ['Otro atributo o demérito', 'Campo de apoyo para un diferencial no previsto en el catálogo.', self::other()],
+                'otro_atributo_especial' => ['Otro diferencial', 'Campo de apoyo para un atributo o demérito no previsto en el catálogo.', self::other()],
             ]],
             'vivienda' => ['Vivienda, apartamento o casa', [
                 'vista_vivienda' => ['Vista', 'Interior, calle, paisajística, mar, parque u obstruida.', self::view()],
