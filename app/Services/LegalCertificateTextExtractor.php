@@ -32,6 +32,8 @@ final class LegalCertificateTextExtractor
 
     private function pdf(string $path): string
     {
+        $external = $this->externalPdfText($path);
+        if ($external !== '') return $external;
         $raw = @file_get_contents($path, false, null, 0, 8 * 1024 * 1024);
         if (!is_string($raw) || $raw === '') return '';
         $parts = [];
@@ -83,6 +85,7 @@ final class LegalCertificateTextExtractor
 
     private function decodePdfString(string $text): string
     {
+        $text = preg_replace_callback('/\\\\([0-7]{1,3})/', static fn (array $m): string => chr(octdec($m[1])), $text) ?? $text;
         $text = preg_replace('/\\\\([nrtbf()\\\\])/', ' ', $text) ?? $text;
         return trim(str_replace(['\(', '\)'], ['(', ')'], $text));
     }
@@ -93,5 +96,20 @@ final class LegalCertificateTextExtractor
         if (!is_string($bin)) return '';
         $utf16 = @mb_convert_encoding($bin, 'UTF-8', 'UTF-16BE');
         return trim(is_string($utf16) && preg_match('/[A-Za-zÁÉÍÓÚáéíóúÑñ]/u', $utf16) ? $utf16 : $bin);
+    }
+
+    private function externalPdfText(string $path): string
+    {
+        if (!function_exists('shell_exec') || !is_file($path)) return '';
+        $locator = PHP_OS_FAMILY === 'Windows' ? 'where pdftotext 2>NUL' : 'command -v pdftotext 2>/dev/null';
+        $binary = trim((string) @shell_exec($locator));
+        if ($binary === '') return '';
+        $binary = preg_split('/\R/', $binary)[0] ?? '';
+        if ($binary === '') return '';
+        $command = escapeshellarg($binary) . ' -layout -enc UTF-8 ' . escapeshellarg($path) . ' - 2>&1';
+        $text = (string) @shell_exec($command);
+        $text = trim(preg_replace('/[ \t]+/', ' ', $text) ?? $text);
+        if (mb_strlen($text) < 30) return '';
+        return preg_match('/matr|anotaci|folio|certificado|referencia|departamento|municipio/iu', $text) ? $text : '';
     }
 }

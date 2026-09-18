@@ -10,16 +10,18 @@ final class LegalCertificateParser
         $data = $this->fields($text, $filename);
         $annotations = $this->classifyAnnotations($this->annotations($text));
         $alerts = $this->alerts($data, $annotations, $text);
+        $found = count(array_filter($data, static fn ($value): bool => trim((string) $value) !== ''));
         $data = array_replace(AppraisalLegalCatalog::defaults(), $data, $this->reportFields($data, $annotations, $alerts));
         return ['data' => $data, 'annotations' => $annotations, 'alerts' => $alerts,
             'status' => trim($text) === '' ? 'Requiere lectura manual' : 'Lectura preliminar',
             'message' => trim($text) === ''
                 ? 'No se obtuvo texto del certificado. Puede ser escaneado o protegido; carga OCR o transcribe los datos relevantes.'
-                : 'Lectura preliminar generada. Revisa cada campo antes del informe.'];
+                : 'Lectura preliminar generada con ' . $found . ' campos sugeridos. Revisa cada campo antes del informe.'];
     }
 
     private function fields(string $text, string $filename): array
     {
+        $compact = $this->compact($text);
         $area = $this->area($text, '/[áa]rea\s+(?:de\s+)?([0-9\.,]{1,30})\s*(?:m2|mts2|metros?\s*cuadrados?)/iu');
         $areaPrivada = $this->area($text, '/[áa]rea\s+privada\b[^0-9]{0,50}([0-9\.,]{1,30})/iu');
         $areaConstruida = $this->area($text, '/[áa]rea\s+construida\b[^0-9]{0,50}([0-9\.,]{1,30})/iu');
@@ -28,8 +30,12 @@ final class LegalCertificateParser
             'archivo_origen' => $filename,
             'matricula_inmobiliaria' => $this->code($this->match($text, [
                 '/(?:nro|no|n[uú]mero|numero)\s+matr(?:i|í)cula\s*[:#]?\s*([0-9]{2,4}\s*-\s*[0-9]{3,})/iu',
+                '/matr(?:i|í)cula\s+inmobiliaria\s*(?:no\.?|nro\.?|n[uú]mero|numero)?\s*[:#]?\s*([0-9]{2,4}\s*-\s*[0-9]{3,})/iu',
                 '/matr(?:i|í)cula\s+inmobiliaria\s*[:#]?\s*([0-9]{2,4}\s*-\s*[0-9]{3,})/iu',
                 '/\b([0-9]{2,4}\s*-\s*[0-9]{3,})\b/u',
+            ]) ?: $this->match($compact, [
+                '/(?:nromatr(?:i|í)cula|matr(?:i|í)culainmobiliaria(?:no\.?|nro\.?|n[uú]mero|numero)?)([0-9]{2,4}-?[0-9]{3,})/iu',
+                '/\b([0-9]{2,4}-[0-9]{3,})\b/u',
             ])),
             'circulo_registral' => $this->clean($this->match($text, [
                 '/c[ií]rculo\s+registral\s*[:#]?\s*([^\n\r]{3,120})/iu',
@@ -47,28 +53,39 @@ final class LegalCertificateParser
             'vereda' => $this->clean($this->match($text, [
                 '/vereda\s*[:#]?\s*([^\n\r]{3,120})(?=\s+(?:direcci[oó]n|referencia|nro|estado|fecha)|[\n\r]|$)/iu',
             ])),
-            'estado_folio' => $this->clean($this->match($text, ['/estado\s+del\s+folio\s*[:#]?\s*([^\n\r]{3,80})/iu', '/folio\s+(abierto|cerrado|cancelado)\b/iu'])),
-            'fecha_apertura' => $this->clean($this->match($text, ['/fecha\s+de\s+apertura\s*[:#]?\s*([0-9\/\-]{8,20})/iu'])),
+            'estado_folio' => $this->clean($this->match($text, ['/estado\s+del\s+folio\s*[:#]?\s*([^\n\r]{3,80})/iu', '/folio\s+(abierto|cerrado|cancelado)\b/iu'])
+                ?: $this->match($compact, ['/estadodelfolio[:#]?([A-ZÁÉÍÓÚÜÑa-záéíóúüñ]{3,30})/iu'])),
+            'fecha_apertura' => $this->clean($this->match($text, ['/fecha\s+de\s+apertura\s*[:#]?\s*([0-9\/\-]{8,20})/iu'])
+                ?: $this->match($compact, ['/fechadeapertura[:#]?([0-9\/\-]{8,20})/iu'])),
             'fecha_expedicion' => $this->clean($this->match($text, [
                 '/fecha\s+de\s+expedici(?:o|ó)n\s*[:#]?\s*([0-9\/\-\s:amp\.]{8,40})/iu',
                 '/fecha\s+de\s+impresi(?:o|ó)n\s*[:#]?\s*([0-9\/\-\s:amp\.]{8,40})/iu',
                 '/impreso\s+el\s+([0-9\/\-\s:amp\.]{8,40})/iu',
-            ])),
-            'turno' => $this->clean($this->match($text, ['/turno\s*[:#]?\s*([A-Za-z0-9\-\/\.]{3,50})/iu'])),
+            ]) ?: $this->match($compact, ['/fechade(?:expedici(?:o|ó)n|impresi(?:o|ó)n)[:#]?([0-9\/\-\.:amp]{8,40})/iu'])),
+            'turno' => $this->clean($this->match($text, ['/turno\s*[:#]?\s*([A-Za-z0-9\-\/\.]{3,50})/iu'])
+                ?: $this->match($compact, ['/turno[:#]?([A-Za-z0-9\-\/\.]{3,50})/iu'])),
             'pin' => $this->clean($this->match($text, [
                 '/pin\s*(?:no\.?|n[uú]mero|numero)?\s*[:#]?\s*([A-Za-z0-9\-]{4,40})/iu',
                 '/certificado\s+generado\s+con\s+el\s+pin\s+(?:no\.?)?\s*([A-Za-z0-9\-]{4,40})/iu',
+            ]) ?: $this->match($compact, [
+                '/pin(?:no\.?|n[uú]mero|numero)?[:#]?([A-Za-z0-9\-]{4,40})/iu',
+                '/certificadogeneradoconelpin(?:no\.?)?([A-Za-z0-9\-]{4,40})/iu',
             ])),
             'codigo_catastral_actual' => $this->code($this->match($text, [
                 '/referencia\s+catastral(?:\s+actual)?\s*[:#]?\s*([0-9A-Za-z\.\- ]{8,80})/iu',
                 '/c[eé]dula\s+catastral(?:\s+actual)?\s*[:#]?\s*([0-9A-Za-z\.\- ]{8,80})/iu',
                 '/c[oó]digo\s+catastral(?:\s+actual)?\s*[:#]?\s*([0-9A-Za-z\.\- ]{8,80})/iu',
+            ]) ?: $this->match($compact, [
+                '/(?:referenciacatastral|c[eé]dulacatastral|c[oó]digocatastral)(?:actual)?[:#]?([0-9A-Za-z\.\-]{8,80}?)(?=(?:referenciacatastralanterior|c[oó]digocatastralanterior|nupre|direcci|estado|fecha|$))/iu',
             ])),
             'codigo_catastral_anterior' => $this->code($this->match($text, [
                 '/referencia\s+catastral\s+anterior\s*[:#]?\s*([0-9A-Za-z\.\- ]{8,80})/iu',
                 '/c[oó]digo\s+catastral\s+anterior\s*[:#]?\s*([0-9A-Za-z\.\- ]{8,80})/iu',
+            ]) ?: $this->match($compact, [
+                '/(?:referenciacatastralanterior|c[oó]digocatastralanterior)[:#]?([0-9A-Za-z\.\-]{8,80}?)(?=(?:nupre|direcci|estado|fecha|$))/iu',
             ])),
-            'nupre' => $this->code($this->match($text, ['/nupre\s*[:#]?\s*([0-9A-Za-z\-]{6,40})/iu'])),
+            'nupre' => $this->code($this->match($text, ['/nupre\s*[:#]?\s*([0-9A-Za-z\-]{6,40})/iu'])
+                ?: $this->match($compact, ['/nupre[:#]?([0-9A-Za-z\-]{6,40})/iu'])),
             'direccion' => $this->clean($this->match($text, [
                 '/direcci(?:o|ó)n\s+actual\s+del\s+inmueble\s*[:#]?\s*([^\n\r]{6,220})/iu',
                 '/direcci(?:o|ó)n\s+del\s+inmueble\s*[:#]?\s*([^\n\r]{6,220})/iu',
@@ -179,5 +196,6 @@ final class LegalCertificateParser
     private function contains(string $text, array $needles): bool { foreach ($needles as $n) if (mb_stripos($text, $n) !== false) return true; return false; }
     private function area(string $text, string $pattern): string { return preg_match($pattern, $text, $m) ? str_replace(',', '.', (string) $m[1]) : ''; }
     private function matriculas(string $text): array { preg_match_all('/\b[0-9]{2,4}\s*-\s*[0-9]{3,}\b/u', $text, $m); return array_values(array_unique(array_map(fn ($v) => $this->code((string) $v), $m[0] ?? []))); }
+    private function compact(string $text): string { return preg_replace('/\s+/u', '', $text) ?? $text; }
     private function block(string $text, array $labels, int $limit): string { foreach ($labels as $label) if (($pos = mb_stripos($text, $label)) !== false) return $this->clean(mb_substr($text, (int) $pos, $limit)); return ''; }
 }
