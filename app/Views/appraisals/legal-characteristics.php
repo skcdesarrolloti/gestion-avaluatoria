@@ -101,7 +101,9 @@ $legalTabNumbers = ['registral' => '4.1', 'catastro' => '4.2', 'ph' => '4.3', 'i
     <?php endif; ?>
 </section>
 
-<form class="mt-7 space-y-6" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas')) ?>">
+<form class="mt-7 space-y-6" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas')) ?>"
+    x-data="legalAutosave" data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas/autoguardar')) ?>"
+    @input="changed()" @change="changed()" @submit="cancel()">
     <?= csrf_field() ?>
     <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div class="flex flex-wrap items-start justify-between gap-5">
@@ -111,6 +113,8 @@ $legalTabNumbers = ['registral' => '4.1', 'catastro' => '4.2', 'ph' => '4.3', 'i
                 <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                     Los campos vacíos quedan pendientes. Lo que corrijas manualmente se guarda como criterio del analista.
                 </p>
+                <p class="mt-2 text-xs font-semibold text-teal-800" role="status" aria-live="polite"
+                    x-text="savedAt || message">Autoguardado activo</p>
             </div>
             <span class="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-800">
                 <?= e($profile['status'] ?? 'Pendiente de revisión') ?>

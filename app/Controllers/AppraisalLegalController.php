@@ -62,6 +62,15 @@ final class AppraisalLegalController
         Http::redirect($target);
     }
 
+    public function autosave(string $id): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        $this->legal->saveManual($id, $this->user['id'], AppraisalLegalInput::data($_POST));
+        header('Content-Type: application/json; charset=utf-8');
+        echo json_encode(['ok' => true, 'saved_at' => gmdate('c')], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+        exit;
+    }
+
     public function reanalyze(string $id): never
     {
         $this->appraisals->find($id, $this->user['id']);

@@ -50,6 +50,7 @@ return [
     ['GET', '#^/avaluos/([a-f0-9]{32})/bien-sujeto$#', 'appraisals', 'subject', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/caracteristicas-juridicas$#', 'legalCharacteristics', 'show', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/caracteristicas-juridicas$#', 'legalCharacteristics', 'save', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/caracteristicas-juridicas/autoguardar$#', 'legalCharacteristics', 'autosave', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/caracteristicas-juridicas/certificado$#', 'legalCharacteristics', 'upload', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/caracteristicas-juridicas/reanalizar$#', 'legalCharacteristics', 'reanalyze', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/caracteristicas-juridicas/certificados/([a-f0-9]{32})$#', 'legalCharacteristics', 'certificate', true],

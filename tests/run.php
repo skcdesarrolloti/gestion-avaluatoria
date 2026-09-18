@@ -29,6 +29,7 @@ use App\Services\MidasWfsSearch;
 use App\Services\LegalCertificateParser;
 use App\Services\RateLimiter;
 use App\Controllers\AppraisalController;
+use App\Models\AppraisalLegalRepository;
 use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraiserRepository;
 use App\Models\FuncionarioRepository;
@@ -44,6 +45,7 @@ use App\Models\SectorBankRepository;
 use App\Models\ValuationStandardRepository;
 use App\Support\AppraisalSectorCatalog;
 use App\Support\AppraisalSectorFieldGuidance;
+use App\Support\AppraisalLegalCatalog;
 use App\Support\SectorBankCatalog;
 
 // All fixtures are in memory; never connect to the configured production database.
@@ -133,6 +135,14 @@ try {
         energy_service TEXT, gas_service TEXT, sewer_service TEXT, internet_service TEXT,
         service_continuity TEXT, subject_reference_date TEXT, latitude TEXT, longitude TEXT,
         notes TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE appraisal_legal_profiles (
+        appraisal_id TEXT PRIMARY KEY, owner_id INTEGER, source_certificate_id TEXT,
+        status TEXT, data_json TEXT, annotations_json TEXT, alerts_json TEXT,
+        extracted_text TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE appraisal_legal_certificates (
+        id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER, source_filename TEXT,
+        storage_filename TEXT, mime_type TEXT, file_size_bytes INTEGER, extracted_chars INTEGER,
+        analysis_status TEXT, analysis_message TEXT, file_blob BLOB, created_at TEXT)");
     $db->exec("INSERT INTO valuation_legal_categories VALUES
         ('A', 'Marco jurídico general', 'general', 0, '2026-09-15 00:00:00', '2026-09-15 00:00:00'),
         ('1', 'Inmuebles urbanos', 'category', 11, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
@@ -458,6 +468,25 @@ try {
     $legalMerged = AppraisalLegalInput::mergeEmpty(['matricula_inmobiliaria' => 'manual'], $legalParsed['data']);
     expect($legalMerged['matricula_inmobiliaria'] === 'manual'
         && ($legalMerged['codigo_catastral_actual'] ?? '') !== '', 'juridico conserva dato manual y llena vacios');
+    $legalRepo = new AppraisalLegalRepository($db);
+    $legalManual = [];
+    foreach (AppraisalLegalCatalog::fieldKeys() as $fieldKey) $legalManual[$fieldKey] = 'Guardado ' . $fieldKey;
+    $legalRepo->saveManual(str_repeat('b', 32), 1, $legalManual);
+    $storedLegalProfile = $legalRepo->profile(str_repeat('b', 32), 1);
+    $allLegalFieldsSaved = true;
+    foreach (AppraisalLegalCatalog::fieldKeys() as $fieldKey) {
+        $allLegalFieldsSaved = $allLegalFieldsSaved && (($storedLegalProfile['data'][$fieldKey] ?? '') === 'Guardado ' . $fieldKey);
+    }
+    expect($allLegalFieldsSaved && $storedLegalProfile['status'] === 'Revisado por analista',
+        'numeral 4 guarda y recarga todos los campos manuales');
+    $legalRepo->mergeAnalysis(str_repeat('b', 32), 1, str_repeat('9', 32),
+        ['matricula_inmobiliaria' => 'lectura reemplazo', 'municipio' => 'lectura reemplazo'],
+        [['orden' => '1']], ['alerta'], 'texto extraido');
+    $storedAfterReanalysis = $legalRepo->profile(str_repeat('b', 32), 1);
+    expect(($storedAfterReanalysis['data']['matricula_inmobiliaria'] ?? '') === 'Guardado matricula_inmobiliaria'
+        && ($storedAfterReanalysis['data']['municipio'] ?? '') === 'Guardado municipio'
+        && count($storedAfterReanalysis['annotations']) === 1,
+        'reanálisis jurídico no borra campos manuales ya guardados');
     $sectorColumnsSql = implode(', ', array_map(static fn (string $key): string => $key . ' TEXT',
         AppraisalSectorCatalog::keys()));
     $db->exec("CREATE TABLE master_sector_profiles (neighborhood_id TEXT PRIMARY KEY,
