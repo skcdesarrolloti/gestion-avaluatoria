@@ -53,12 +53,12 @@ final class AppraisalChapterZeroInput
             self::assertIgacTypology($category, $hint, $typologiesByCategory);
             $label = mb_substr(trim((string) ($unit['label'] ?? '')), 0, 120);
             $defaultLabel = trim((string) ($unit['default_label'] ?? ''));
-            if ($label === '' || ($defaultLabel !== '' && $label === $defaultLabel)) {
-                throw new HttpException(422, 'Asigna un nombre propio a cada unidad o anexo.');
-            }
+            if ($label === '' || ($defaultLabel !== '' && $label === $defaultLabel)) throw new HttpException(422, 'Asigna un nombre propio a cada unidad o anexo.');
+            $propertyType = trim((string) ($unit['property_type'] ?? ''));
+            if (!in_array($propertyType, AppraisalCatalog::allowedValues('tipo_inmueble'), true)) $propertyType = '';
             $rows[] = [
-                'id' => $id,
-                'label' => $label,
+                'id' => $id, 'label' => $label,
+                'property_type' => $propertyType,
                 'igac_category' => $category,
                 'igac_typology_hint' => $hint,
                 'notes' => mb_substr(trim((string) ($unit['notes'] ?? '')), 0, 2000),

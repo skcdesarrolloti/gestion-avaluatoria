@@ -18,12 +18,7 @@ $photoTabMap = [];
 foreach ($photoUnits as $photoUnit) {
     $photoTabMap['fotos-' . ($photoUnit['id'] ?: 'general')] = $photoUnit['kind'] . ':' . $photoUnit['id'];
 }
-$attributeLabels = [];
-foreach (($specialAttributeCatalog ?? []) as $group) {
-    foreach (($group[1] ?? []) as $key => $attribute) {
-        $attributeLabels[$key] = (string) ($attribute[0] ?? $key);
-    }
-}
+$attributeLabels = \App\Support\AppraisalSpecialAttributeCatalog::labels();
 $storedAttributePhotos = [];
 foreach ($photos as $photo) {
     $caption = (string) ($photo['caption'] ?? '');

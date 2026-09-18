@@ -1,7 +1,9 @@
 <?php
 $unitId = (string) $unit['id'];
-$firstAttributeGroup = (string) array_key_first($specialAttributeCatalog);
-$score = $attributeScore($unit, $specialAttributeCatalog);
+$catalog = $unitSpecialAttributeCatalog ?? $specialAttributeCatalog;
+$firstAttributeGroup = (string) array_key_first($catalog);
+$score = $attributeScore($unit, $catalog);
+$unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'] ?? ''));
 ?>
 <div class="mt-5 rounded-xl border border-slate-200 p-5"
     x-data="{ activeAttributeGroup: '<?= e($firstAttributeGroup) ?>' }"
@@ -10,7 +12,10 @@ $score = $attributeScore($unit, $specialAttributeCatalog);
         <h3 class="text-base font-semibold"><?= e($unit['label'] ?: $attributeUnitLabel($unit)) ?></h3>
         <div class="flex flex-wrap gap-2">
             <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
-                <?= e($unit['igac_typology_hint'] ?: 'Tipología pendiente') ?>
+                <?= e($unitType !== '' ? ucfirst($unitType) : 'Tipo pendiente') ?>
+            </span>
+            <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                <?= e($unit['igac_typology_hint'] ?: 'Tipología IGAC pendiente') ?>
             </span>
             <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800">
                 Índice <?= $score['score'] === null ? 'pendiente' : e((string) $score['score']) . ' / 5 · ' . e($score['label']) ?>
@@ -23,7 +28,7 @@ $score = $attributeScore($unit, $specialAttributeCatalog);
     </div>
     <div class="mt-5 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
         <?php $attributeGroupNumber = 1; ?>
-        <?php foreach ($specialAttributeCatalog as $groupKey => [$groupLabel, $attributes]): ?>
+        <?php foreach ($catalog as $groupKey => [$groupLabel, $attributes]): ?>
             <button class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold" type="button"
                 @click="activeAttributeGroup = '<?= e($groupKey) ?>'"
                 :class="activeAttributeGroup === '<?= e($groupKey) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'">
@@ -36,7 +41,7 @@ $score = $attributeScore($unit, $specialAttributeCatalog);
         <?php endforeach; ?>
     </div>
     <div class="mt-5">
-        <?php foreach ($specialAttributeCatalog as $groupKey => [$groupLabel, $attributes]): ?>
+        <?php foreach ($catalog as $groupKey => [$groupLabel, $attributes]): ?>
             <div class="overflow-x-auto rounded-xl border border-slate-200"
                 x-show="activeAttributeGroup === '<?= e($groupKey) ?>'">
                 <div class="bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800"><?= e($groupLabel) ?></div>

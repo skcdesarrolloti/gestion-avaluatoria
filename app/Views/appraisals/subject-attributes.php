@@ -1,6 +1,10 @@
 <?php
 $attributeUnitLabel = static fn (array $unit): string => ($unit['unit_kind'] === 'annex' ? 'Anexo ' : 'Unidad ') . (int) $unit['unit_index'];
 $attributeUnits = array_values(array_filter($units, static fn (array $unit): bool => $unit['unit_kind'] !== 'common'));
+$attributeCatalogForUnit = static function (array $unit) use ($record): array {
+    $type = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'] ?? ''));
+    return \App\Support\AppraisalSpecialAttributeCatalog::groups($type);
+};
 $attrValue = static function (array $unit, string $key, string $field): string {
     $data = json_decode((string) ($unit['special_attributes_json'] ?? '{}'), true);
     return is_array($data) ? (string) ($data[$key][$field] ?? '') : '';
@@ -59,6 +63,7 @@ $attributeScore = static function (array $unit, array $catalog): array {
             </div>
         <?php endif; ?>
         <?php foreach ($attributeUnits as $unit): ?>
+            <?php $unitSpecialAttributeCatalog = $attributeCatalogForUnit($unit); ?>
             <?php require BASE_PATH . '/app/Views/appraisals/subject-attributes-unit.php'; ?>
         <?php endforeach; ?>
         <?php if ($attributeUnits): ?>

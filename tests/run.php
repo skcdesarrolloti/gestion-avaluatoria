@@ -309,8 +309,11 @@ try {
     $unitId = str_repeat('b', 32);
     $_POST = ['units' => [$unitId => ['label' => 'Unidad 1', 'default_label' => 'Unidad 1']]];
     expectStatus(422, fn () => AppraisalChapterZeroInput::unitData([], []), 'nombre generico de unidad rechazado');
-    $_POST = ['units' => [$unitId => ['label' => 'Casa principal', 'default_label' => 'Unidad 1']]];
-    expect(AppraisalChapterZeroInput::unitData([], [])[0]['label'] === 'Casa principal', 'nombre propio de unidad aceptado');
+    $_POST = ['units' => [$unitId => ['label' => 'Casa principal', 'default_label' => 'Unidad 1',
+        'property_type' => 'casa']]];
+    $unitRows = AppraisalChapterZeroInput::unitData([], []);
+    expect($unitRows[0]['label'] === 'Casa principal' && $unitRows[0]['property_type'] === 'casa',
+        'nombre propio y tipo de inmueble por unidad aceptados');
     $_POST = ['unit_surfaces' => [$unitId => ['area_land_m2' => '123,45',
         'area_built_m2' => '85', 'area_adopted_m2' => '120,50', 'boundary_front' => 'Calle principal']]];
     $surfaceRows = AppraisalChapterZeroInput::unitSurfaceData();
@@ -327,7 +330,7 @@ try {
     $constructionRows = AppraisalChapterZeroInput::unitConstructionData();
     expect($constructionRows[0]['built_area_adopted_m2'] === '85.25'
         && str_contains($constructionRows[0]['construction_conservation_json'], 'estructura'), 'construccion por unidad normalizada');
-    $_POST = ['unit_attributes' => [$unitId => ['items' => ['esquina' => ['value' => 'esquinero',
+    $_POST = ['unit_attributes' => [$unitId => ['items' => ['esquinero_medianero' => ['value' => 'esquinero',
         'state' => 'bueno', 'impact' => 'positivo_medio', 'evidence' => 'visita',
         'rating' => '4', 'weight' => '3',
         'notes' => 'Frente comercial observado'], 'desconocido' => ['value' => 'x']],
@@ -339,10 +342,10 @@ try {
         && !str_contains($attributeRows[0]['special_attributes_json'], 'desconocido'), 'atributos especiales normalizados');
     $localAttributeGroups = AppraisalSpecialAttributeCatalog::groups('local');
     $warehouseAttributeGroups = AppraisalSpecialAttributeCatalog::groups('bodega');
-    expect(isset($localAttributeGroups['comercial'], $warehouseAttributeGroups['industrial'])
+    expect(isset($localAttributeGroups['local_comercial'], $warehouseAttributeGroups['bodega_industrial'])
         && !isset($localAttributeGroups['ph'], $warehouseAttributeGroups['ph']),
         'atributos especiales dependen del tipo de inmueble y excluyen PH');
-    expect(AppraisalSpecialAttributeCatalog::labels()['vista_tipo'] === 'Tipo de vista',
+    expect(AppraisalSpecialAttributeCatalog::labels()['vista_vivienda'] === 'Vista',
         'atributos especiales exponen nombres para evidencia fotografica');
     $photoDb = new PDO('sqlite::memory:', null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
     $photoDb->exec('CREATE TABLE appraisal_photos (
@@ -355,19 +358,19 @@ try {
     $tmpPhoto = tempnam(sys_get_temp_dir(), 'ga-attr-photo-') . '.png';
     file_put_contents($tmpPhoto, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAFgwJ/lNWK3wAAAABJRU5ErkJggg=='));
     $storedCount = (new AppraisalPhotoUploadService())->storeAttributeEvidence([
-        'name' => [$unitId => ['vista_tipo' => ['vista.png']]],
-        'type' => [$unitId => ['vista_tipo' => ['image/png']]],
-        'tmp_name' => [$unitId => ['vista_tipo' => [$tmpPhoto]]],
-        'error' => [$unitId => ['vista_tipo' => [UPLOAD_ERR_OK]]],
-        'size' => [$unitId => ['vista_tipo' => [filesize($tmpPhoto)]]],
+        'name' => [$unitId => ['vista_vivienda' => ['vista.png']]],
+        'type' => [$unitId => ['vista_vivienda' => ['image/png']]],
+        'tmp_name' => [$unitId => ['vista_vivienda' => [$tmpPhoto]]],
+        'error' => [$unitId => ['vista_vivienda' => [UPLOAD_ERR_OK]]],
+        'size' => [$unitId => ['vista_vivienda' => [filesize($tmpPhoto)]]],
     ], str_repeat('a', 32), 7, new AppraisalRepository($photoDb));
     $storedPhoto = $photoDb->query('SELECT caption, display_name FROM appraisal_photos')->fetch();
-    expect($storedCount === 1 && $storedPhoto['caption'] === 'attribute:vista_tipo'
-        && $storedPhoto['display_name'] === 'Tipo de vista',
+    expect($storedCount === 1 && $storedPhoto['caption'] === 'attribute:vista_vivienda'
+        && $storedPhoto['display_name'] === 'Vista',
         'foto de atributo se guarda con nombre visible del atributo');
     $attributeNameController = (new ReflectionClass(AppraisalSubjectController::class))->newInstanceWithoutConstructor();
     $attributePhotoName = new ReflectionMethod(AppraisalSubjectController::class, 'attributePhotoName');
-    expect($attributePhotoName->invoke($attributeNameController, 'attribute:vista_tipo') === 'Tipo de vista'
+    expect($attributePhotoName->invoke($attributeNameController, 'attribute:vista_vivienda') === 'Vista'
         && $attributePhotoName->invoke($attributeNameController, 'registro:general:portada') === '',
         'foto cargada en 3.6 puede heredar nombre del atributo');
     $sectorData = AppraisalSectorInput::data(['sector_name' => ' Bruselas ampliado ',

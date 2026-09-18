@@ -4,123 +4,114 @@ namespace App\Support;
 
 final class AppraisalSpecialAttributeCatalog
 {
+    public static function __callStatic(string $name, array $arguments): array
+    {
+        return AppraisalSpecialAttributeOptions::$name(...$arguments);
+    }
+
     public static function groups(string $propertyType = ''): array
     {
         $groups = self::allGroups();
-        $selected = ['vista', 'confort', 'urbanistica', 'suelo', 'constructivos', 'diferenciales'];
-        $typeGroups = match ($propertyType) {
-            'casa', 'apartamento', 'hotel' => ['residencial'],
-            'local' => ['comercial'],
-            'oficina', 'consultorio' => ['corporativo'],
-            'bodega' => ['industrial'],
+        $specific = match ($propertyType) {
+            'casa', 'apartamento', 'hotel' => ['vivienda'],
+            'local' => ['local_comercial'],
+            'oficina', 'consultorio' => ['oficina_consultorio'],
+            'bodega' => ['bodega_industrial'],
             'lote', 'finca' => ['lote'],
-            'edificio' => ['residencial', 'comercial', 'corporativo'],
+            'edificio' => ['vivienda', 'local_comercial', 'oficina_consultorio'],
             'parqueadero' => ['parqueadero'],
             default => [],
         };
-        return array_intersect_key($groups, array_flip(array_merge($selected, $typeGroups)));
+        return array_intersect_key($groups, array_flip(array_merge(['comun'], $specific)));
     }
 
     public static function allGroups(): array
     {
         return [
-            'vista' => ['Vista y relación visual', [
-                'vista_tipo' => ['Tipo de vista', 'Diferencia visual que el mercado puede reconocer positiva o negativamente.',
-                    ['' => 'No verificado', 'interior' => 'Interior', 'calle' => 'Exterior a calle', 'paisajistica' => 'Exterior paisajística', 'parque' => 'Zona verde / parque', 'agua' => 'Mar, río, bahía o lago', 'obstruida' => 'Obstruida', 'negativa' => 'Negativa']],
-                'privacidad_visual' => ['Privacidad visual', 'Nivel de exposición frente a vecinos, vías o zonas comunes.',
-                    ['' => 'No verificado', 'baja' => 'Baja', 'media' => 'Media', 'alta' => 'Alta']],
+            'comun' => ['Base común', [
+                'ubicacion_especial' => ['Ubicación especial', 'Localización o exposición que diferencia la unidad frente al mercado.', self::location()],
+                'acceso' => ['Acceso', 'Facilidad real de ingreso peatonal, vehicular u operativo.', self::level()],
+                'estado_conservacion' => ['Estado de conservación', 'Condición física observable y mantenimiento general.', self::condition()],
+                'mejoras_relevantes' => ['Mejoras relevantes', 'Adecuaciones u obras que agregan funcionalidad o valor.', self::relevance()],
+                'riesgos_afectaciones_fisicas' => ['Riesgos o afectaciones físicas', 'Humedad, inundación, remoción, deterioros o restricciones físicas observables.', self::risk()],
+                'evidencia_fotografica' => ['Evidencia fotográfica', 'Define si el atributo diferencial requiere soporte fotográfico en 3.6.', self::evidenceNeed()],
+                'impacto_valuatorio' => ['Impacto valuatorio', 'Lectura técnica del efecto esperado en valor.', self::marketImpact()],
+                'otro_atributo_especial' => ['Otro atributo especial', 'Campo de apoyo para un diferencial no previsto en el catálogo.', self::other()],
             ]],
-            'confort' => ['Iluminación, ventilación y confort', [
-                'iluminacion_natural' => ['Iluminación natural', 'Entrada de luz natural observable en espacios principales.',
-                    ['' => 'No verificado', 'deficiente' => 'Deficiente', 'normal' => 'Normal', 'buena' => 'Buena', 'superior' => 'Superior']],
-                'ventilacion' => ['Ventilación', 'Circulación de aire natural o mecánica suficiente para el uso.',
-                    ['' => 'No verificado', 'deficiente' => 'Deficiente', 'normal' => 'Normal', 'cruzada' => 'Cruzada / superior']],
-                'ruido_olores' => ['Ruido u olores', 'Afectaciones sensoriales que pueden reducir deseabilidad.',
-                    ['' => 'No verificado', 'ninguno' => 'No relevantes', 'moderados' => 'Moderados', 'altos' => 'Altos']],
+            'vivienda' => ['Vivienda, apartamento o casa', [
+                'vista_vivienda' => ['Vista', 'Interior, calle, paisajística, mar, parque u obstruida.', self::view()],
+                'iluminacion_ventilacion' => ['Iluminación y ventilación', 'Entrada de luz y circulación de aire en espacios principales.', self::quality()],
+                'privacidad' => ['Privacidad', 'Nivel de exposición frente a vecinos, vías o zonas comunes.', self::privacy()],
+                'balcon_terraza_patio_jardin' => ['Balcón, terraza, patio o jardín', 'Área exterior privada que pueda incidir en deseabilidad.', self::amenity()],
+                'acabados_interiores' => ['Acabados interiores', 'Calidad observable de pisos, carpintería, pintura y detalles.', self::finish()],
+                'cocina_banos_closets' => ['Cocina, baños y closets', 'Dotación y estado de elementos interiores principales.', self::finish()],
+                'parqueadero_deposito' => ['Parqueadero o depósito', 'Disponibilidad y funcionalidad de anexos asociados.', self::annex()],
+                'ruido_humedad_asoleamiento' => ['Ruido, humedad o asoleamiento', 'Condiciones de confort que pueden castigar o premiar el valor.', self::comfortRisk()],
             ]],
-            'urbanistica' => ['Condición urbanística', [
-                'esquina' => ['Esquinero o medianero', 'Lee exposición comercial, accesibilidad y frente útil.',
-                    ['' => 'No verificado', 'doble_frente' => 'Doble frente', 'esquinero' => 'Esquinero', 'medianero' => 'Medianero']],
-                'servicios' => ['Disponibilidad de servicios', 'Verifica disponibilidad real, no solo promesa del sector.',
-                    ['' => 'No verificado', 'completa' => 'Completa', 'parcial' => 'Parcial', 'limitada' => 'Limitada']],
-                'licencia' => ['Licencia o factibilidad', 'Soporte urbanístico que puede cambiar la lectura de mercado.',
-                    ['' => 'No verificado', 'no_tiene' => 'No tiene', 'factibilidad' => 'Factibilidad', 'tramite' => 'En trámite', 'aprobada' => 'Aprobada']],
-                'via' => ['Frente sobre vía', 'Jerarquía vial que afecta visibilidad, acceso y comparabilidad.',
-                    ['' => 'No verificado', 'arterial' => 'Vía arterial', 'colectora' => 'Vía colectora', 'local' => 'Vía local', 'restringida' => 'Acceso restringido']],
+            'local_comercial' => ['Local comercial', [
+                'frente_comercial' => ['Frente comercial', 'Longitud y calidad del frente útil para exhibición o acceso.', self::front()],
+                'vitrina' => ['Vitrina', 'Capacidad de exhibición hacia zona de clientes.', self::level()],
+                'visibilidad_peatonal' => ['Visibilidad peatonal', 'Exposición frente al flujo de peatones.', self::level()],
+                'visibilidad_vehicular' => ['Visibilidad vehicular', 'Exposición desde vía o circulación vehicular.', self::level()],
+                'flujo_personas' => ['Flujo de personas', 'Intensidad observable de potenciales clientes.', self::level()],
+                'esquinero_medianero' => ['Esquinero o medianero', 'Ubicación dentro de la manzana o corredor comercial.', self::corner()],
+                'altura_libre_comercial' => ['Altura libre', 'Altura funcional para operación, exhibición o adecuaciones.', self::height()],
+                'facilidad_parqueo' => ['Facilidad de parqueo', 'Disponibilidad cercana para clientes o usuarios.', self::level()],
+                'bahia_cargue_descargue' => ['Bahía de cargue/descargue', 'Facilidad operativa para abastecimiento.', self::yesPartial()],
+                'compatibilidad_uso' => ['Compatibilidad de uso', 'Coherencia entre uso actual, norma y dinámica comercial.', self::compatibility()],
+                'restricciones_aviso_horario_actividad' => ['Restricciones de aviso, horario o actividad', 'Limitaciones que puedan afectar explotación comercial.', self::restriction()],
+                'anclas_comerciales' => ['Cercanía a anclas comerciales', 'Proximidad a marcas, equipamientos o flujos que atraen demanda.', self::level()],
             ]],
-            'suelo' => ['Condición física del suelo', [
-                'cerramiento' => ['Cerramiento', 'Elemento de control físico y seguridad del predio.',
-                    ['' => 'No verificado', 'si' => 'Sí', 'parcial' => 'Parcial', 'no' => 'No']],
-                'inundacion' => ['Riesgo de inundación', 'Riesgo físico observable o documentado que afecta uso y deseabilidad.',
-                    ['' => 'No verificado', 'bajo' => 'Bajo', 'medio' => 'Medio', 'alto' => 'Alto']],
-                'mejoras' => ['Mejoras o adecuaciones', 'Rellenos, nivelación, placa, muros u obras útiles existentes.',
-                    ['' => 'No verificado', 'ninguna' => 'Ninguna', 'menores' => 'Menores', 'relevantes' => 'Relevantes']],
-                'remocion' => ['Amenaza por remoción en masa', 'Condición de amenaza que exige soporte técnico o cartográfico.',
-                    ['' => 'No verificado', 'nula' => 'Nula', 'baja' => 'Baja', 'media' => 'Media', 'alta' => 'Alta']],
+            'oficina_consultorio' => ['Oficina o consultorio', [
+                'imagen_corporativa' => ['Imagen corporativa del edificio', 'Presentación y percepción profesional del inmueble.', self::quality()],
+                'piso_altura' => ['Piso o altura', 'Nivel dentro del edificio y efecto funcional o comercial.', self::floor()],
+                'vista_oficina' => ['Vista', 'Calidad visual desde áreas de trabajo o atención.', self::view()],
+                'iluminacion_natural_oficina' => ['Iluminación natural', 'Entrada de luz natural en áreas laborales.', self::quality()],
+                'modularidad' => ['Modularidad', 'Facilidad para adaptar puestos, salas o consultorios.', self::flexibility()],
+                'divisiones_internas' => ['Divisiones internas', 'Distribución construida y posibilidad de ajuste.', self::division()],
+                'cableado_redes' => ['Cableado / redes', 'Soporte para datos, energía regulada o comunicaciones.', self::quality()],
+                'aire_acondicionado' => ['Aire acondicionado', 'Disponibilidad y condición de climatización.', self::yesPartial()],
+                'ascensores' => ['Ascensores', 'Disponibilidad y suficiencia de transporte vertical.', self::level()],
+                'recepcion' => ['Recepción', 'Control o atención de ingreso al edificio o unidad.', self::yesPartial()],
+                'parqueaderos_oficina' => ['Parqueaderos', 'Disponibilidad para usuarios, visitantes o propietarios.', self::level()],
+                'seguridad_control_acceso' => ['Seguridad y control de acceso', 'Vigilancia, portería, tarjetas o filtros de ingreso.', self::level()],
+                'servicios_empresariales' => ['Cercanía a servicios empresariales', 'Entorno de bancos, notarías, comercio, transporte o apoyo profesional.', self::level()],
             ]],
-            'diferenciales' => ['Diferenciales de mercado', [
-                'ubicacion_especial' => ['Ubicación especial', 'Rasgo de localización que el mercado podría reconocer.',
-                    ['' => 'No verificado', 'parque' => 'Frente a parque', 'mar' => 'Frente al mar', 'principal' => 'Sobre vía principal', 'turistica' => 'Zona turística', 'comercial' => 'Zona comercial']],
-                'amenidades_privadas' => ['Amenidades privadas', 'Elementos privativos de disfrute o servicio que diferencian la unidad.',
-                    ['' => 'No verificado', 'balcon' => 'Balcón', 'terraza' => 'Terraza', 'patio' => 'Patio / jardín privado', 'varias' => 'Varias', 'premium' => 'Premium']],
-                'seguridad' => ['Seguridad especial', 'Control de acceso, vigilancia, cerramiento o seguridad complementaria.',
-                    ['' => 'No verificado', 'basica' => 'Básica', 'controlada' => 'Controlada', 'alta' => 'Alta']],
-                'exclusividad' => ['Exclusividad / prestigio', 'Reconocimiento o posicionamiento diferencial del sector o activo.',
-                    ['' => 'No verificado', 'baja' => 'Baja', 'media' => 'Media', 'alta' => 'Alta', 'muy_alta' => 'Muy alta']],
+            'bodega_industrial' => ['Bodega o industrial', [
+                'altura_libre_industrial' => ['Altura libre', 'Altura útil para almacenamiento, estantería u operación.', self::height()],
+                'resistencia_piso' => ['Resistencia de piso', 'Capacidad aparente del piso para carga o uso industrial.', self::floorStrength()],
+                'muelles' => ['Muelles', 'Disponibilidad de muelles para cargue o descargue.', self::level()],
+                'bahias' => ['Bahías', 'Áreas de cargue, espera o operación vehicular.', self::level()],
+                'patio_maniobra' => ['Patio de maniobra', 'Espacio funcional para circulación interna.', self::level()],
+                'acceso_tractomulas' => ['Acceso tractomulas', 'Capacidad de ingreso de vehículos pesados.', self::yesPartial()],
+                'ancho_via' => ['Ancho de vía', 'Condición vial para logística y maniobra.', self::level()],
+                'puertas_cargue' => ['Puertas de cargue', 'Cantidad y funcionalidad de accesos operativos.', self::level()],
+                'energia_subestacion' => ['Energía eléctrica / subestación', 'Capacidad eléctrica disponible o instalada.', self::level()],
+                'red_contra_incendio' => ['Red contra incendio', 'Sistema de protección contra incendio observable/documentado.', self::yesPartial()],
+                'ventilacion_industrial' => ['Ventilación', 'Ventilación natural o mecánica para operación.', self::quality()],
+                'cubierta' => ['Cubierta', 'Estado y funcionalidad de la cubierta.', self::condition()],
+                'mezanine_oficinas' => ['Mezanine u oficinas internas', 'Áreas complementarias para administración u operación.', self::yesPartial()],
+                'cerramiento_industrial' => ['Cerramiento', 'Control perimetral y seguridad física.', self::condition()],
+                'seguridad_industrial' => ['Seguridad', 'Controles de acceso, vigilancia o sistemas de seguridad.', self::level()],
+                'compatibilidad_logistica' => ['Compatibilidad logística', 'Ajuste entre inmueble, vías, operación y uso previsto.', self::compatibility()],
             ]],
-            'constructivos' => ['Rasgos constructivos diferenciales', [
-                'uso_especifico' => ['Uso específico', 'Uso observado de la unidad cuando no basta la categoría general.',
-                    ['' => 'No verificado', 'residencial' => 'Residencial', 'comercial' => 'Comercial', 'industrial' => 'Industrial', 'servicios' => 'Servicios', 'mixto' => 'Mixto']],
-                'altura_libre' => ['Altura libre', 'Altura funcional relevante para bodegas, locales o usos especiales.',
-                    ['' => 'No verificado', 'convencional' => 'Convencional', 'alta' => 'Alta', 'doble_altura' => 'Doble altura']],
-                'cubierta' => ['Tipo de cubierta', 'Cubierta visible o relevante para reposición y funcionalidad.',
-                    ['' => 'No verificado', 'placa' => 'Placa', 'fibrocemento' => 'Fibrocemento', 'metalica' => 'Metálica', 'barro' => 'Barro', 'otra' => 'Otra']],
-                'estructura' => ['Material estructura', 'Sistema estructural principal observado o documentado.',
-                    ['' => 'No verificado', 'concreto' => 'Concreto', 'acero' => 'Acero', 'mamposteria' => 'Mampostería', 'madera' => 'Madera', 'mixta' => 'Mixta']],
+            'lote' => ['Lote', [
+                'frente_lote' => ['Frente', 'Longitud y exposición del frente.', self::front()],
+                'fondo_lote' => ['Fondo', 'Profundidad y relación frente-fondo.', self::front()],
+                'forma_lote' => ['Forma', 'Regularidad y aprovechamiento geométrico.', self::shape()],
+                'topografia' => ['Topografía', 'Pendiente y condición física del terreno.', self::topography()],
+                'acceso_lote' => ['Acceso', 'Ingreso físico y conectividad inmediata.', self::level()],
+                'cerramiento_lote' => ['Cerramiento', 'Cierre físico del predio.', self::yesPartial()],
+                'servicios_lote' => ['Servicios', 'Disponibilidad de servicios públicos o acometidas.', self::services()],
+                'urbanismo_disponible' => ['Urbanismo disponible', 'Vías, andenes, redes o urbanismo construido.', self::level()],
+                'riesgos_fisicos_lote' => ['Riesgos físicos', 'Inundación, remoción, erosión u otras condiciones físicas.', self::risk()],
+                'afectaciones_lote' => ['Afectaciones', 'Retiros, servidumbres, rondas, reservas o limitaciones observables.', self::restriction()],
+                'potencial_normativo' => ['Potencial normativo', 'Capacidad de desarrollo según uso, edificabilidad o norma aplicable.', self::potential()],
+                'visibilidad_comercial_lote' => ['Visibilidad o exposición comercial', 'Exposición comercial cuando el uso o corredor lo haga relevante.', self::level()],
             ]],
-            'residencial' => ['Vivienda: atributos interiores', [
-                'acabados_residenciales' => ['Acabados interiores', 'Calidad de cocina, baños, pisos, carpintería y detalles interiores.',
-                    ['' => 'No verificado', 'basicos' => 'Básicos', 'buenos' => 'Buenos', 'superiores' => 'Superiores', 'lujo' => 'De lujo']],
-                'distribucion_residencial' => ['Distribución funcional', 'Eficiencia, independencia y aprovechamiento de espacios.',
-                    ['' => 'No verificado', 'deficiente' => 'Deficiente', 'normal' => 'Normal', 'eficiente' => 'Eficiente', 'superior' => 'Superior']],
-            ]],
-            'comercial' => ['Local: exposición comercial', [
-                'vitrina_comercial' => ['Vitrina comercial', 'Visibilidad y frente útil para comercio.',
-                    ['' => 'No verificado', 'baja' => 'Baja', 'media' => 'Media', 'alta' => 'Alta', 'superior' => 'Superior']],
-                'flujo_comercial' => ['Flujo peatonal / vehicular', 'Exposición a clientes potenciales.',
-                    ['' => 'No verificado', 'bajo' => 'Bajo', 'medio' => 'Medio', 'alto' => 'Alto']],
-                'cargue_local' => ['Cargue, descargue o parqueo', 'Facilidad de operación para abastecimiento o clientes.',
-                    ['' => 'No verificado', 'no_tiene' => 'No tiene', 'limitado' => 'Limitado', 'adecuado' => 'Adecuado']],
-            ]],
-            'corporativo' => ['Oficina/consultorio: funcionalidad', [
-                'imagen_corporativa' => ['Imagen corporativa', 'Presentación del inmueble para uso empresarial o profesional.',
-                    ['' => 'No verificado', 'basica' => 'Básica', 'buena' => 'Buena', 'superior' => 'Superior']],
-                'modularidad' => ['Modularidad', 'Capacidad de adaptar espacios a puestos, consultorios o salas.',
-                    ['' => 'No verificado', 'rigida' => 'Rígida', 'media' => 'Media', 'flexible' => 'Flexible']],
-                'redes_tecnicas' => ['Redes y soporte técnico', 'Cableado, climatización, conectividad o instalaciones especiales.',
-                    ['' => 'No verificado', 'basicas' => 'Básicas', 'adecuadas' => 'Adecuadas', 'superiores' => 'Superiores']],
-            ]],
-            'industrial' => ['Bodega/industrial: operación', [
-                'altura_libre_operativa' => ['Altura libre operativa', 'Altura útil para almacenamiento, estantería o procesos.',
-                    ['' => 'No verificado', 'baja' => 'Baja', 'normal' => 'Normal', 'alta' => 'Alta', 'doble_altura' => 'Doble altura']],
-                'piso_resistencia' => ['Piso y resistencia', 'Capacidad aparente del piso para carga o uso industrial.',
-                    ['' => 'No verificado', 'basico' => 'Básico', 'adecuado' => 'Adecuado', 'industrial' => 'Industrial reforzado']],
-                'maniobra_cargue' => ['Maniobra y cargue privado', 'Puertas, muelles, bahías, patio o acceso de vehículos de carga.',
-                    ['' => 'No verificado', 'limitado' => 'Limitado', 'adecuado' => 'Adecuado', 'superior' => 'Superior']],
-            ]],
-            'lote' => ['Lote: potencial físico', [
-                'forma_lote' => ['Forma del lote', 'Regularidad y aprovechamiento del terreno.',
-                    ['' => 'No verificado', 'irregular' => 'Irregular', 'regular' => 'Regular', 'optima' => 'Óptima']],
-                'frente_lote' => ['Frente y exposición', 'Relación de frente, fondo y visibilidad.',
-                    ['' => 'No verificado', 'reducido' => 'Reducido', 'normal' => 'Normal', 'amplio' => 'Amplio']],
-                'potencial_normativo' => ['Potencial normativo', 'Capacidad normativa o de desarrollo observable/documentada.',
-                    ['' => 'No verificado', 'bajo' => 'Bajo', 'medio' => 'Medio', 'alto' => 'Alto']],
-            ]],
-            'parqueadero' => ['Parqueadero: funcionalidad', [
-                'facilidad_maniobra' => ['Facilidad de maniobra', 'Acceso, giro y uso cómodo del cupo.',
-                    ['' => 'No verificado', 'limitada' => 'Limitada', 'normal' => 'Normal', 'amplia' => 'Amplia']],
-                'cobertura_parqueadero' => ['Cobertura', 'Condición cubierta o descubierta del parqueadero.',
-                    ['' => 'No verificado', 'descubierto' => 'Descubierto', 'cubierto' => 'Cubierto']],
+            'parqueadero' => ['Parqueadero', [
+                'facilidad_maniobra' => ['Facilidad de maniobra', 'Acceso, giro y uso cómodo del cupo.', self::level()],
+                'cobertura_parqueadero' => ['Cobertura', 'Condición cubierta o descubierta.', ['' => 'No verificado', 'descubierto' => 'Descubierto', 'cubierto' => 'Cubierto']],
             ]],
         ];
     }
@@ -135,9 +126,7 @@ final class AppraisalSpecialAttributeCatalog
     public static function labels(): array
     {
         $labels = [];
-        foreach (self::allGroups() as $group) {
-            foreach ($group[1] as $key => $attribute) $labels[$key] = (string) $attribute[0];
-        }
+        foreach (self::allGroups() as $group) foreach ($group[1] as $key => $attribute) $labels[$key] = (string) $attribute[0];
         return $labels;
     }
 
@@ -154,4 +143,5 @@ final class AppraisalSpecialAttributeCatalog
             'weight' => ['' => 'Sin peso', '1' => 'Bajo', '2' => 'Medio', '3' => 'Alto'],
         ];
     }
+
 }

@@ -70,6 +70,19 @@ foreach ($visibleUnits as $unit) $labelMap[$unit['id']] = $labelInput($unit);
                             x-model="labels['<?= e($unit['id']) ?>']" placeholder="Ej. Casa principal, Local 1, Piscina">
                         <input type="hidden" name="units[<?= e($unit['id']) ?>][default_label]" value="<?= e($unitLabel($unit)) ?>">
                     </label>
+                    <label class="label">Tipo de inmueble de esta unidad
+                        <select class="input" name="units[<?= e($unit['id']) ?>][property_type]">
+                            <option value="">Usar tipo general del avalúo</option>
+                            <?php foreach (($catalog['selects']['tipo_inmueble'][4] ?? []) as $value => $text): ?>
+                                <option value="<?= e($value) ?>" <?= (string) ($unit['property_type'] ?? '') === (string) $value ? 'selected' : '' ?>>
+                                    <?= e($text) ?>
+                                </option>
+                            <?php endforeach; ?>
+                        </select>
+                        <span class="mt-1 block text-xs leading-5 text-slate-500">
+                            Activa los atributos especiales propios de esta unidad en 3.4.
+                        </span>
+                    </label>
                     <label class="label">Categoría IGAC de esta unidad
                         <select class="input" name="units[<?= e($unit['id']) ?>][igac_category]" x-model="category"
                             @change="if (!(typologies[category] || []).some(item => item.value === hint)) hint = ''">

@@ -121,10 +121,10 @@ final class AppraisalRepository
     public function saveUnits(string $id, int $owner, array $units): void
     {
         $now = gmdate('Y-m-d H:i:s');
-        $query = $this->db->prepare('UPDATE appraisal_units SET label = ?, igac_category = ?,
+        $query = $this->db->prepare('UPDATE appraisal_units SET label = ?, property_type = ?, igac_category = ?,
             igac_typology_hint = ?, notes = ?, updated_at = ? WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
         foreach ($units as $unit) {
-            $query->execute([$unit['label'], $unit['igac_category'], $unit['igac_typology_hint'],
+            $query->execute([$unit['label'], $unit['property_type'], $unit['igac_category'], $unit['igac_typology_hint'],
                 $unit['notes'], $now, $unit['id'], $id, $owner]);
         }
     }
