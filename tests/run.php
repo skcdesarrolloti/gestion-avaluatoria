@@ -524,6 +524,23 @@ try {
     expect(($tablePartyParsed['annotations'][0]['estado_juridico'] ?? '') === 'solucionada'
         && ($tablePartyParsed['annotations'][0]['cancelada_por'] ?? '') === '035',
         'parser juridico cierra cautelar con partes leidas desde texto tabular');
+    $mixedCancelText = "Nro Matrícula: 060-999999\nEstado del Folio: ACTIVO\n"
+        . "ANOTACION Nro 020 Fecha: 08-04-2011 Doc: OFICIO 574 Especificación: MEDIDA CAUTELAR: "
+        . "0429 EMBARGO EJECUTIVO CON ACCION REAL RADICADO 13001310300420110012800 "
+        . "DE BANCOLOMBIA S.A. A: MERLANO MENDOZA SEBASTIAN A: VELEZ OSPINO MARIA ELENA.\n"
+        . "ANOTACION Nro 032 Fecha: 01-10-2021 Doc: OFICIO 168 Especificación: MEDIDA CAUTELAR: "
+        . "0492 DEMANDA EN PROCESO VERBAL PROCESO DECLARATIVO. RADICADO 1300131030082021-0039-00 "
+        . "DE VELEZ OSPINO MARIA ELENA C.C 45.457.877 A MERLANO MENDOZA SEBASTIAN - CC 73145456.\n"
+        . "ANOTACION Nro 035 Fecha: 13-09-2022 Doc: OFICIO 197 Especificación: CANCELACION: "
+        . "0856 CANCELACION POR ORDEN JUDICIAL EMBARGO EJECUTIVO CON ACCION REAL RADICADO N? "
+        . "13001310300420110012800 DE BANCOLOMBIA S.A. NIT# 8909039388 A MERLANO MENDOZA "
+        . "SEBASTIAN CC# 73145456 A: VELEZ OSPINO MARIA ELENA CC# 45757877.";
+    $mixedCancelParsed = (new LegalCertificateParser())->parse($mixedCancelText, 'certificado-mixto.txt');
+    expect(($mixedCancelParsed['annotations'][0]['cancelada_por'] ?? '') === '035'
+        && ($mixedCancelParsed['annotations'][1]['cancelada_por'] ?? '') === '035'
+        && str_contains((string) ($mixedCancelParsed['annotations'][2]['cancelacion_de'] ?? ''), '020')
+        && str_contains((string) ($mixedCancelParsed['annotations'][2]['cancelacion_de'] ?? ''), '032'),
+        'parser juridico acumula cierres por radicado y por partes compartidas');
     $servitudeText = "Nro Matrícula: 060-999999\nEstado del Folio: ACTIVO\n"
         . "ANOTACION Nro 013 Fecha: 28/02/2002 Doc: ESCRITURA 882 "
         . "Especificación: LIMITACION AL DOMINIO: 0334 SERVIDUMBRE DE ACUEDUCTO ACTIVA PREDIO SIRVIENTE.";

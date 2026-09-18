@@ -12,9 +12,9 @@ final class LegalCertificateCancellationMatcher
             if ($order !== '') $index[$order] = $key;
         }
         foreach ($rows as $key => $row) {
-            $refs = $this->references($row);
-            if (!$refs) $refs = $this->refsBySharedId($rows, $key, $row);
-            if (!$refs) $refs = $this->refsBySharedParties($rows, $key, $row);
+            $refs = array_values(array_unique(array_merge($this->references($row),
+                $this->refsBySharedId($rows, $key, $row),
+                $this->refsBySharedParties($rows, $key, $row))));
             if (!$refs) continue;
             $closed = [];
             foreach ($refs as $ref) {
