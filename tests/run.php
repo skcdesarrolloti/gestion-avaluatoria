@@ -12,6 +12,7 @@ use App\Services\AppraisalSectorInput;
 use App\Services\AppraisalMidasReview;
 use App\Services\AppraisalMidasSupportUploadService;
 use App\Services\AppraisalLegalInput;
+use App\Services\AppraisalPhotoUploadService;
 use App\Services\AppraisalLegalCertificateStorage;
 use App\Services\AppraisalLegalCertificateUploadService;
 use App\Services\AppraisalSectorAdvancedPrefill;
@@ -33,6 +34,7 @@ use App\Services\RateLimiter;
 use App\Controllers\AppraisalController;
 use App\Controllers\AppraisalSubjectController;
 use App\Models\AppraisalLegalRepository;
+use App\Models\AppraisalRepository;
 use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraiserRepository;
 use App\Models\FuncionarioRepository;
@@ -342,6 +344,27 @@ try {
         'atributos especiales dependen del tipo de inmueble y excluyen PH');
     expect(AppraisalSpecialAttributeCatalog::labels()['vista_tipo'] === 'Tipo de vista',
         'atributos especiales exponen nombres para evidencia fotografica');
+    $photoDb = new PDO('sqlite::memory:', null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+    $photoDb->exec('CREATE TABLE appraisal_photos (
+        id TEXT, appraisal_id TEXT, owner_id INTEGER, unit_id TEXT, source_filename TEXT,
+        storage_filename TEXT, mime_type TEXT, file_size_bytes INTEGER, caption TEXT,
+        display_name TEXT, created_at TEXT, file_blob BLOB
+    )');
+    $photoDir = sys_get_temp_dir() . '/ga-photo-test-' . bin2hex(random_bytes(4));
+    putenv('APPRAISAL_PHOTO_STORAGE_DIR=' . $photoDir);
+    $tmpPhoto = tempnam(sys_get_temp_dir(), 'ga-attr-photo-') . '.png';
+    file_put_contents($tmpPhoto, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAFgwJ/lNWK3wAAAABJRU5ErkJggg=='));
+    $storedCount = (new AppraisalPhotoUploadService())->storeAttributeEvidence([
+        'name' => [$unitId => ['vista_tipo' => ['vista.png']]],
+        'type' => [$unitId => ['vista_tipo' => ['image/png']]],
+        'tmp_name' => [$unitId => ['vista_tipo' => [$tmpPhoto]]],
+        'error' => [$unitId => ['vista_tipo' => [UPLOAD_ERR_OK]]],
+        'size' => [$unitId => ['vista_tipo' => [filesize($tmpPhoto)]]],
+    ], str_repeat('a', 32), 7, new AppraisalRepository($photoDb));
+    $storedPhoto = $photoDb->query('SELECT caption, display_name FROM appraisal_photos')->fetch();
+    expect($storedCount === 1 && $storedPhoto['caption'] === 'attribute:vista_tipo'
+        && $storedPhoto['display_name'] === 'Tipo de vista',
+        'foto de atributo se guarda con nombre visible del atributo');
     $sectorData = AppraisalSectorInput::data(['sector_name' => ' Bruselas ampliado ',
         'services_status' => 'completa', 'connectivity' => 'invalida',
         'sector_report_text' => str_repeat('x', 2500)]);
