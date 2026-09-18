@@ -18,7 +18,8 @@ $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'
                 <?= e($unit['igac_typology_hint'] ?: 'Tipología IGAC pendiente') ?>
             </span>
             <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800">
-                Índice <?= $score['score'] === null ? 'pendiente' : e((string) $score['percent']) . '% · ' . e($score['label']) ?>
+                Ajuste <?= e($formatAttributeAdjustment($score['score'] === null ? null : (float) $score['adjustment'])) ?>
+                <?= $score['score'] === null ? '' : ' · índice ' . e((string) $score['percent']) . '%' ?>
             </span>
         </div>
     </div>
