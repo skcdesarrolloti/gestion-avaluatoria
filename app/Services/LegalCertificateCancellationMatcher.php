@@ -88,25 +88,31 @@ final class LegalCertificateCancellationMatcher
         if (!preg_match('/cancelaci|cancela|levantamiento|desembargo|liberaci(?:o|ó|\?|Ã³)n/iu', $text)) return [];
         $closingTokens = $this->partyTokens($row);
         if (count($closingTokens) < 2) return [];
-        $refs = [];
+        $matches = [];
         foreach ($rows as $targetKey => $target) {
             if ($targetKey === $key || (int) $targetKey >= (int) $key) continue;
             if (($target['estado_juridico'] ?? '') === 'solucionada') continue;
             if (($target['categoria'] ?? '') !== 'medida_cautelar') continue;
-            if (count(array_intersect($closingTokens, $this->partyTokens($target))) >= 2) {
-                $refs[] = (string) ($target['orden'] ?? '');
-            }
+            $score = count(array_intersect($closingTokens, $this->partyTokens($target)));
+            if ($score >= 3) $matches[] = ['score' => $score, 'order' => (string) ($target['orden'] ?? '')];
         }
-        return array_values(array_filter(array_unique($refs)));
+        if (!$matches) return [];
+        $best = max(array_column($matches, 'score'));
+        return array_values(array_filter(array_unique(array_column(array_filter($matches,
+            static fn (array $match): bool => $match['score'] === $best), 'order'))));
     }
 
     private function partyTokens(array $row): array
     {
-        $text = implode(' ', [(string) ($row['personaDe'] ?? ''), (string) ($row['personaA'] ?? '')]);
+        $text = implode(' ', [(string) ($row['personaDe'] ?? ''), (string) ($row['personaA'] ?? ''),
+            (string) ($row['texto'] ?? '')]);
         $text = preg_replace('/\b(?:cc|nit|n\.?i\.?t|cedula|c[eé]dula)\b[^A-ZÁÉÍÓÚÑ]*/iu', ' ', $text) ?? $text;
         preg_match_all('/[A-ZÁÉÍÓÚÑ]{4,}/iu', mb_strtoupper($text), $matches);
         $stop = ['BANCO', 'BANCOLOMBIA', 'CONDOMINIO', 'DISTRITAL', 'JUZGADO', 'OFICIO', 'CARTAGENA',
-            'INDIAS', 'NIT', 'SAS', 'SA', 'MARIA', 'ELENA'];
+            'INDIAS', 'NIT', 'SAS', 'SA', 'MARIA', 'ELENA', 'MEDIDA', 'CAUTELAR', 'CANCELACION',
+            'PROCESO', 'RADICADO', 'EMBARGO', 'DEMANDA', 'OFICINA', 'APOYO', 'JUDICIAL', 'CIVIL',
+            'CIRCUITO', 'OCTAVO', 'CUARTO', 'ORALIDAD', 'EJECUTIVO', 'ACCION', 'REAL', 'ORDEN',
+            'PROVIDENCIA'];
         return array_values(array_diff(array_unique($matches[0] ?? []), $stop));
     }
 

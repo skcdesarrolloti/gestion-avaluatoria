@@ -77,9 +77,12 @@ final class AppraisalLegalController
         $this->appraisals->find($id, $this->user['id']);
         try {
             $file = $this->legal->latestCertificate($id, $this->user['id']);
+            $profile = $this->legal->profile($id, $this->user['id']);
             $path = $this->certificatePath($file);
             $extension = mb_strtolower(pathinfo((string) $file['source_filename'], PATHINFO_EXTENSION));
-            $text = (new LegalCertificateTextExtractor())->extract($path, $extension);
+            $serverText = (new LegalCertificateTextExtractor())->extract($path, $extension);
+            $storedText = (string) ($profile['extracted_text'] ?? '');
+            $text = mb_strlen($storedText) > mb_strlen($serverText) ? $storedText : $serverText;
             $parsed = (new LegalCertificateParser())->parse($text, (string) $file['source_filename']);
             $this->legal->updateCertificateAnalysis((string) $file['id'], $id, $this->user['id'],
                 mb_strlen($text), (string) $parsed['status'], (string) $parsed['message']);
