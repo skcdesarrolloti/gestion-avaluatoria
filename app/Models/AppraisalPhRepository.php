@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace App\Models;
 use App\Core\HttpException;
+use App\Services\AppraisalPhDocumentStorage;
 use App\Support\AppraisalPhCatalog;
 use PDO;
 final class AppraisalPhRepository
@@ -86,12 +87,15 @@ final class AppraisalPhRepository
     }
     public function documents(string $appraisalId, int $owner): array
     {
-        $query = $this->db->prepare('SELECT id, source_filename, mime_type, file_size_bytes,
-            extracted_chars, analysis_status, analysis_message, created_at
+        $query = $this->db->prepare("SELECT id, source_filename, storage_filename, mime_type, file_size_bytes,
+            extracted_chars, extracted_text IS NOT NULL AND extracted_text <> '' AS has_extracted_text,
+            analysis_status, analysis_message, file_blob IS NOT NULL AS has_blob, created_at
             FROM appraisal_ph_documents WHERE appraisal_id = ? AND owner_id = ?
-            ORDER BY created_at DESC, id DESC');
+            ORDER BY created_at DESC, id DESC");
         $query->execute([$appraisalId, $owner]);
-        return $query->fetchAll();
+        return array_map(static fn (array $row): array => $row + [
+            'file_available' => is_file(AppraisalPhDocumentStorage::path((string) $row['storage_filename'])),
+        ], $query->fetchAll());
     }
     public function addDocument(string $appraisalId, int $owner, array $file): void
     {

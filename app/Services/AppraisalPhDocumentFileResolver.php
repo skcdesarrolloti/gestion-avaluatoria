@@ -11,7 +11,7 @@ final class AppraisalPhDocumentFileResolver
         if ($path !== '' && is_file($path)) return $path;
         $blob = $document['file_blob'] ?? null;
         if (!is_string($blob) || $blob === '') {
-            throw new \RuntimeException('El soporte PH no tiene archivo físico ni respaldo interno disponible.');
+            throw new \RuntimeException('El soporte PH no tiene archivo físico ni respaldo interno disponible. Elimínalo y vuelve a subirlo.');
         }
         $tmp = tempnam(sys_get_temp_dir(), 'ga_ph_reload_');
         file_put_contents($tmp, $blob);
