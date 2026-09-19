@@ -18,17 +18,15 @@
                     <?php elseif ($hasFile): ?>
                         <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="button" disabled
                             title="No hay texto extraído para cargar en la ficha.">Cargar</button>
-                        <?php if (!empty($phExternalOcr)): ?>
-                            <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/ocr-externo')) ?>">
-                                <?= csrf_field() ?>
-                                <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
-                                <input type="hidden" name="ph_typology" value="<?= e((string) ($ph['ph_typology'] ?? '')) ?>">
-                                <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="submit">Leer con IA/OCR</button>
-                            </form>
-                        <?php else: ?>
-                            <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="button" disabled
-                                title="Falta configurar PH_EXTERNAL_OCR_ENDPOINT en el servidor.">IA no configurada</button>
-                        <?php endif; ?>
+                        <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/ocr-externo')) ?>">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
+                            <input type="hidden" name="ph_typology" value="<?= e((string) ($ph['ph_typology'] ?? '')) ?>">
+                            <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="submit"
+                                title="<?= empty($phExternalOcr) ? 'Falta configurar PH_EXTERNAL_OCR_ENDPOINT en el servidor.' : 'Enviar este soporte al OCR/IA configurado.' ?>">
+                                Leer con IA/OCR
+                            </button>
+                        </form>
                     <?php else: ?>
                         <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="button" disabled
                             title="El archivo físico ya no está disponible. Elimina este soporte y vuelve a subirlo.">Archivo no disponible</button>
