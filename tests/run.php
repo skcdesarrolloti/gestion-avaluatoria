@@ -10,6 +10,7 @@ use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalPhInput;
 use App\Services\AppraisalPhChunkUploadService;
+use App\Services\AppraisalPhDocumentReanalysisService;
 use App\Services\AppraisalPhDocumentUploadService;
 use App\Services\AppraisalSectorInput;
 use App\Services\AppraisalMidasReview;
@@ -459,6 +460,11 @@ try {
         expect(($analyzedPh['technical']['vias_internas'] ?? '') !== ''
             && count($phDocs) === 1,
             'propiedad horizontal analiza ZIP y conserva soporte');
+        $reloadedPh = (new AppraisalPhDocumentReanalysisService())->reanalyze((string) $phDocs[0]['id'],
+            str_repeat('a', 32), 1, 'bodegas', $phRepo);
+        expect(($reloadedPh['has_text'] ?? false) === true
+            && ($phRepo->profile(str_repeat('a', 32), 1)['matrix_registration'] ?? '') === '060-239752',
+            'propiedad horizontal carga soporte existente a la ficha');
         $deletedPhStorage = $phRepo->deleteDocument((string) $phDocs[0]['id'], str_repeat('a', 32), 1);
         $cleanedPh = $phRepo->profile(str_repeat('a', 32), 1);
         expect(($deletedPhStorage['filename'] ?? '') !== '' && ($deletedPhStorage['cleared'] ?? false)

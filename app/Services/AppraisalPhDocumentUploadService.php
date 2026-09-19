@@ -25,6 +25,12 @@ final class AppraisalPhDocumentUploadService
         return $this->storeFiles([$file], $appraisalId, $owner, $typology, $repo, true);
     }
 
+    public function readStoredText(string $path, string $name, string $extension): array
+    {
+        return in_array($extension, ['zip', 'rar'], true)
+            ? $this->archiveText($path, $name, $extension) : $this->singleText($path, $name, $extension);
+    }
+
     private function storeFiles(array $uploads, string $appraisalId, int $owner, string $typology, AppraisalPhRepository $repo, bool $prepared): array
     {
         if (function_exists('set_time_limit')) @set_time_limit(300);
@@ -49,9 +55,7 @@ final class AppraisalPhDocumentUploadService
                 : AppraisalPhDocumentStorage::storeUploaded((string) $file['tmp_name'], AppraisalPhDocumentStorage::path($storageName));
             if ($prepared) @unlink((string) $file['tmp_name']);
             $path = AppraisalPhDocumentStorage::path($storageName);
-            [$text, $readNames] = in_array($info['extension'], ['zip', 'rar'], true)
-                ? $this->archiveText($path, $name, $info['extension'])
-                : $this->singleText($path, $name, $info['extension']);
+            [$text, $readNames] = $this->readStoredText($path, $name, $info['extension']);
             $texts[] = $text; $names = array_merge($names, $readNames);
             $blob = $bytes <= self::BLOB_BACKUP_BYTES ? file_get_contents($path) : null;
             if ($bytes <= self::BLOB_BACKUP_BYTES && !is_string($blob)) {

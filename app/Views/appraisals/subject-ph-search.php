@@ -10,15 +10,15 @@ $phReadableDocuments = array_filter($phLoadedDocuments, static fn (array $doc): 
         <div>
             <h3 class="font-semibold text-blue-950">Banco de copropiedades</h3>
             <p class="mt-2 text-sm leading-6 text-blue-950">
-                Busca copropiedades ya guardadas en otros avalúos por nombre, llave PH o matrícula matriz.
-                Los soportes cargados en este avalúo se ven abajo y no aparecen como resultado del banco.
+                Busca copropiedades ya guardadas en otros avalúos por nombre de copropiedad, llave PH o matrícula matriz.
+                No busca por número de escritura; los soportes cargados en este avalúo se ven abajo.
             </p>
         </div>
         <form class="grid gap-2 sm:grid-cols-[minmax(220px,1fr)_auto]" method="get"
             action="<?= e(url($subjectActionBase)) ?>#ph">
             <label class="sr-only" for="ph-coproperty-search">Buscar copropiedad guardada</label>
             <input id="ph-coproperty-search" class="input bg-white" name="copropiedad"
-                value="<?= e($phSearch ?: $phSuggestion) ?>" placeholder="Ej. Edificio, conjunto o NIT">
+                value="<?= e($phSearch ?: $phSuggestion) ?>" placeholder="Ej. Edificio, conjunto, llave PH o matrícula">
             <button class="btn-secondary bg-white" type="submit">Buscar</button>
         </form>
     </div>

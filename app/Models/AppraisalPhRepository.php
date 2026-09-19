@@ -4,11 +4,9 @@ namespace App\Models;
 use App\Core\HttpException;
 use App\Support\AppraisalPhCatalog;
 use PDO;
-
 final class AppraisalPhRepository
 {
     public function __construct(private PDO $db) {}
-
     public function profile(string $appraisalId, int $owner): array
     {
         $query = $this->db->prepare('SELECT * FROM appraisal_ph_profiles WHERE appraisal_id = ? AND owner_id = ?');
@@ -25,7 +23,6 @@ final class AppraisalPhRepository
             'findings' => $this->json((string) ($row['findings_json'] ?? '')),
         ]);
     }
-
     public function save(string $appraisalId, int $owner, array $data): void
     {
         $now = gmdate('Y-m-d H:i:s');
@@ -57,7 +54,6 @@ final class AppraisalPhRepository
         $query->execute([$appraisalId, $owner, ...$this->values($fields, $data),
             ...$this->jsonValues($json), $now, $now]);
     }
-
     public function searchByCoproperty(string $term, int $owner, string $excludeId = '', int $limit = 8): array
     {
         $needle = '%' . trim($term) . '%';
@@ -75,7 +71,6 @@ final class AppraisalPhRepository
         $query->execute([$owner, $excludeId, $needle, $needle, $needle]);
         return $query->fetchAll();
     }
-
     public function legalPrefill(string $appraisalId, int $owner): array
     {
         $query = $this->db->prepare('SELECT data_json FROM appraisal_legal_profiles WHERE appraisal_id = ? AND owner_id = ?');
@@ -89,7 +84,6 @@ final class AppraisalPhRepository
             'reform_documents' => (string) ($data['reformas_ph'] ?? ''),
         ];
     }
-
     public function documents(string $appraisalId, int $owner): array
     {
         $query = $this->db->prepare('SELECT id, source_filename, mime_type, file_size_bytes,
@@ -99,7 +93,6 @@ final class AppraisalPhRepository
         $query->execute([$appraisalId, $owner]);
         return $query->fetchAll();
     }
-
     public function addDocument(string $appraisalId, int $owner, array $file): void
     {
         $now = gmdate('Y-m-d H:i:s');
@@ -111,7 +104,6 @@ final class AppraisalPhRepository
             $file['mime_type'], $file['file_size_bytes'], $file['extracted_chars'], $file['analysis_status'],
             $file['analysis_message'], $file['file_blob'], $now]);
     }
-
     public function hasDocumentFile(string $appraisalId, int $owner, string $sourceFilename, int $bytes): bool
     {
         $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_ph_documents
@@ -119,7 +111,22 @@ final class AppraisalPhRepository
         $query->execute([$appraisalId, $owner, $sourceFilename, $bytes]);
         return (int) $query->fetchColumn() > 0;
     }
-
+    public function documentForAnalysis(string $id, string $appraisalId, int $owner): array
+    {
+        $query = $this->db->prepare('SELECT id, source_filename, storage_filename, mime_type,
+            file_size_bytes, file_blob FROM appraisal_ph_documents
+            WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
+        $query->execute([$id, $appraisalId, $owner]);
+        $row = $query->fetch();
+        if (!$row) throw new HttpException(404, 'No se encontró el soporte PH.');
+        return $row;
+    }
+    public function updateDocumentAnalysis(string $id, string $appraisalId, int $owner, int $chars, string $message): void
+    {
+        $query = $this->db->prepare('UPDATE appraisal_ph_documents SET extracted_chars = ?,
+            analysis_status = ?, analysis_message = ? WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
+        $query->execute([$chars, 'Lectura preliminar', $message, $id, $appraisalId, $owner]);
+    }
     public function deleteDocument(string $id, string $appraisalId, int $owner): array
     {
         $query = $this->db->prepare('SELECT storage_filename FROM appraisal_ph_documents
@@ -134,7 +141,6 @@ final class AppraisalPhRepository
         if ($cleared) $this->clearDocumentAnalysis($appraisalId, $owner);
         return ['filename' => $filename, 'cleared' => $cleared];
     }
-
     public function mergeAnalysis(string $appraisalId, int $owner, array $analysis): void
     {
         if (array_key_exists('has_text', $analysis) && $analysis['has_text'] === false) {
@@ -153,21 +159,18 @@ final class AppraisalPhRepository
         $query->execute([$data['source_summary'],
             json_encode($data['findings'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), $appraisalId, $owner]);
     }
-
     private function exists(string $appraisalId, int $owner): bool
     {
         $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_ph_profiles WHERE appraisal_id = ? AND owner_id = ?');
         $query->execute([$appraisalId, $owner]);
         return (int) $query->fetchColumn() > 0;
     }
-
     private function hasDocuments(string $appraisalId, int $owner): bool
     {
         $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_ph_documents WHERE appraisal_id = ? AND owner_id = ?');
         $query->execute([$appraisalId, $owner]);
         return (int) $query->fetchColumn() > 0;
     }
-
     private function clearDocumentAnalysis(string $appraisalId, int $owner): void
     {
         $query = $this->db->prepare("UPDATE appraisal_ph_profiles SET ph_key = '', ph_name = '',
@@ -178,12 +181,10 @@ final class AppraisalPhRepository
             updated_at = ? WHERE appraisal_id = ? AND owner_id = ?");
         $query->execute([gmdate('Y-m-d H:i:s'), $appraisalId, $owner]);
     }
-
     private function values(array $fields, array $data): array
     {
         return array_map(static fn (string $field): mixed => $data[$field] ?? '', $fields);
     }
-
     private function mergeEmpty(array $current, array $incoming): array
     {
         $merged = [];
@@ -192,7 +193,6 @@ final class AppraisalPhRepository
         }
         return $merged;
     }
-
     private function emptyValue(mixed $value): bool
     {
         if (is_array($value)) {
@@ -201,13 +201,11 @@ final class AppraisalPhRepository
         }
         return trim((string) $value) === '';
     }
-
     private function jsonValues(array $data): array
     {
         return array_values(array_map(static fn (array $value): string =>
             json_encode($value, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), $data));
     }
-
     private function json(string $json): array
     {
         $decoded = json_decode($json, true);

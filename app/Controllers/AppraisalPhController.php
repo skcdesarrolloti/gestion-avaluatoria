@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, Session};
 use App\Models\{AppraisalPhRepository, AppraisalRepository};
-use App\Services\{AppraisalPhChunkUploadService, AppraisalPhDocumentStorage, AppraisalPhDocumentUploadService, AppraisalPhInput};
+use App\Services\{AppraisalPhChunkUploadService, AppraisalPhDocumentReanalysisService, AppraisalPhDocumentStorage, AppraisalPhDocumentUploadService, AppraisalPhInput};
 
 final class AppraisalPhController
 {
@@ -66,6 +66,20 @@ final class AppraisalPhController
             Session::flash('ph_message', $result['cleared']
                 ? 'Soporte PH eliminado. Se limpió la lectura automática porque no quedan soportes cargados.'
                 : 'Soporte PH eliminado.');
+        } catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
+        Http::redirect('avaluos/' . $id . '/bien-sujeto#ph');
+    }
+
+    public function loadDocument(string $id, string $documentId): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        try {
+            $typology = (string) ($_POST['ph_typology'] ?? ($this->ph->profile($id, $this->user['id'])['ph_typology'] ?? ''));
+            $analysis = (new AppraisalPhDocumentReanalysisService())->reanalyze($documentId, $id,
+                $this->user['id'], $typology, $this->ph);
+            Session::flash('ph_message', ($analysis['has_text'] ?? true) === false
+                ? 'Soporte PH cargado, pero no se extrajo texto útil para diligenciar campos.'
+                : 'Soporte PH cargado en la ficha. Se llenaron los campos vacíos sugeridos.');
         } catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
         Http::redirect('avaluos/' . $id . '/bien-sujeto#ph');
     }
