@@ -77,9 +77,11 @@ final class AppraisalPhController
             $typology = (string) ($_POST['ph_typology'] ?? ($this->ph->profile($id, $this->user['id'])['ph_typology'] ?? ''));
             $analysis = (new AppraisalPhDocumentReanalysisService())->reanalyze($documentId, $id,
                 $this->user['id'], $typology, $this->ph);
-            Session::flash('ph_message', ($analysis['has_text'] ?? true) === false
+            $message = ($analysis['has_text'] ?? true) === false
                 ? 'Soporte PH cargado, pero no se extrajo texto útil para diligenciar campos.'
-                : 'Soporte PH cargado en la ficha. Se llenaron los campos vacíos sugeridos.');
+                : 'Soporte PH cargado en la ficha. Se llenaron los campos vacíos sugeridos.';
+            Session::flash('ph_message', $message);
+            $this->flashDocumentAction($documentId, 'ok', $message);
         } catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
         Http::redirect($this->safeReturn($id));
     }
@@ -91,11 +93,24 @@ final class AppraisalPhController
             $typology = (string) ($_POST['ph_typology'] ?? ($this->ph->profile($id, $this->user['id'])['ph_typology'] ?? ''));
             $analysis = (new AppraisalPhExternalOcrService())->reanalyze($documentId, $id,
                 $this->user['id'], $typology, $this->ph);
-            Session::flash('ph_message', ($analysis['has_text'] ?? false)
+            $message = ($analysis['has_text'] ?? false)
                 ? 'OCR externo aplicado. Se llenaron los campos vacíos sugeridos.'
-                : 'El OCR externo no devolvió texto útil para diligenciar campos.');
-        } catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
+                : 'El OCR externo no devolvió texto útil para diligenciar campos.';
+            Session::flash('ph_message', $message);
+            $this->flashDocumentAction($documentId, 'ok', $message);
+        } catch (\Throwable $error) {
+            $message = 'No se ejecutó la lectura IA/OCR: ' . $error->getMessage();
+            Session::flash('ph_error', $message);
+            $this->flashDocumentAction($documentId, 'error', $message);
+        }
         Http::redirect($this->safeReturn($id));
+    }
+
+    private function flashDocumentAction(string $documentId, string $tone, string $message): void
+    {
+        Session::flash('ph_action_document_id', $documentId);
+        Session::flash('ph_action_tone', $tone);
+        Session::flash('ph_action_message', $message);
     }
 
     private function saveAndRedirect(string $id, callable $save, string $message): never

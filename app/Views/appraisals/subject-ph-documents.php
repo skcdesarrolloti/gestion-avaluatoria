@@ -5,9 +5,10 @@
             $hasFile = !empty($doc['file_available']) || !empty($doc['has_blob']);
             $canLoad = (int) ($doc['extracted_chars'] ?? 0) > 0 && (!empty($doc['has_extracted_text']) || $hasFile);
             ?>
-            <li class="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
-                <span><?= e($doc['source_filename']) ?> · <?= e((string) $doc['extracted_chars']) ?> caracteres</span>
-                <div class="flex flex-wrap gap-2">
+            <li class="rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
+                <div class="flex flex-wrap items-center justify-between gap-2">
+                    <span><?= e($doc['source_filename']) ?> · <?= e((string) $doc['extracted_chars']) ?> caracteres</span>
+                    <div class="flex flex-wrap gap-2">
                     <?php if ($canLoad): ?>
                         <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/cargar')) ?>">
                             <?= csrf_field() ?>
@@ -18,7 +19,8 @@
                     <?php elseif ($hasFile): ?>
                         <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="button" disabled
                             title="No hay texto extraído para cargar en la ficha.">Cargar</button>
-                        <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/ocr-externo')) ?>">
+                        <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/ocr-externo')) ?>"
+                            onsubmit="this.querySelector('button[type=submit]').textContent='Leyendo IA/OCR...';">
                             <?= csrf_field() ?>
                             <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
                             <input type="hidden" name="ph_typology" value="<?= e((string) ($ph['ph_typology'] ?? '')) ?>">
@@ -37,7 +39,13 @@
                         <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
                         <button class="btn-secondary min-h-9 px-3 py-1 text-xs text-red-700" type="submit">Eliminar</button>
                     </form>
+                    </div>
                 </div>
+                <?php if (($phActionDocumentId ?? '') === (string) $doc['id'] && !empty($phActionMessage)): ?>
+                    <p class="mt-2 rounded-lg px-3 py-2 text-xs font-semibold <?= ($phActionTone ?? '') === 'error' ? 'bg-red-50 text-red-800' : 'bg-emerald-50 text-emerald-800' ?>">
+                        <?= e($phActionMessage) ?>
+                    </p>
+                <?php endif; ?>
             </li>
         <?php endforeach; ?>
     </ul>

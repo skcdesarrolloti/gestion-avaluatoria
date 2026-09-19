@@ -82,6 +82,11 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                         · ejecución PHP <?= (!empty($ocr['shell_exec']) && !empty($ocr['exec'])) ? 'sí' : 'no' ?>
                         · IA externa <?= !empty($ocr['external']) ? 'sí' : 'no' ?>
                     </p>
+                    <?php if (empty($ocr['external'])): ?>
+                        <p class="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900">
+                            Leer con IA/OCR requiere configurar PH_EXTERNAL_OCR_ENDPOINT en el servidor. Mientras aparezca IA externa no, los soportes escaneados quedarán cargados pero sin texto automático.
+                        </p>
+                    <?php endif; ?>
                 </div>
                 <form class="grid gap-3 lg:min-w-80" method="post" enctype="multipart/form-data"
                     action="<?= e(url($subjectActionBase . '/ph/soportes')) ?>" data-upload-progress data-upload-chunk-url="<?= e(url($subjectActionBase . '/ph/soportes/chunk')) ?>" data-upload-finish-url="<?= e(url($subjectActionBase . '/ph/soportes/finalizar')) ?>">
