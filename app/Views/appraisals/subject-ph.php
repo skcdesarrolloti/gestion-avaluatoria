@@ -72,7 +72,7 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                     </p>
                 </div>
                 <form class="grid gap-3 lg:min-w-80" method="post" enctype="multipart/form-data"
-                    action="<?= e(url($subjectActionBase . '/ph/soportes')) ?>">
+                    action="<?= e(url($subjectActionBase . '/ph/soportes')) ?>" data-upload-progress>
                     <?= csrf_field() ?>
                     <select class="input" name="ph_typology">
                         <option value="">Tipología PH para orientar lectura</option>
@@ -83,6 +83,7 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                     <input class="input" type="file" name="ph_document[]" multiple
                         accept=".zip,.rar,.pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.tif,.tiff">
                     <button class="btn-primary" type="submit">Leer soporte PH</button>
+                    <?php require BASE_PATH . '/app/Views/appraisals/upload-progress.php'; ?>
                 </form>
             </div>
             <div class="mt-4 grid gap-4 lg:grid-cols-2">
