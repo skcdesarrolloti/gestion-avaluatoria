@@ -404,6 +404,17 @@ try {
         'propiedad horizontal guarda perfil por avaluo');
     expect($phRepo->searchByCoproperty('Conjunto Prueba', 1, str_repeat('a', 32))[0]['client_name'] === 'Cliente PH',
         'busqueda PH muestra contexto del avaluo relacionado');
+    $phAnalysis = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
+        'Reglamento de propiedad horizontal Copropiedad ZONA FRANCA LA CANDELARIA. Matricula matriz 060-239752. '
+        . 'Cuenta con vias internas, porteria, red contra incendios, patios de maniobra, cuota de administracion, '
+        . 'coeficiente de copropiedad 1.25%, usos restringidos y usuario operador de zona franca.',
+        ['reglamento.txt'], 'bodegas');
+    expect(($phAnalysis['core']['matrix_registration'] ?? '') === '060-239752'
+        && ($phAnalysis['technical']['patios_maniobra'] ?? '') !== ''
+        && ($phAnalysis['documents']['reglamento']['status'] ?? '') === 'warn'
+        && ($phAnalysis['risks']['restricciones_uso']['status'] ?? '') === 'warn'
+        && str_contains((string) ($phAnalysis['core']['report_text'] ?? ''), 'no reemplaza estudio de títulos'),
+        'analizador PH migra lectura avanzada y texto preliminar');
     if (class_exists(ZipArchive::class)) {
         $phDir = sys_get_temp_dir() . '/ga-ph-test-' . bin2hex(random_bytes(4));
         putenv('APPRAISAL_PH_DOCUMENT_DIR=' . $phDir);

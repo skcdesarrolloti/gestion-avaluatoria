@@ -115,7 +115,7 @@ final class AppraisalPhRepository
     {
         $current = $this->profile($appraisalId, $owner);
         $data = array_replace($current, $this->mergeEmpty($current, $analysis['core'] ?? []));
-        foreach (['linkage', 'technical'] as $key) {
+        foreach (['linkage', 'technical', 'common_areas', 'documents', 'risks', 'photos'] as $key) {
             $data[$key] = array_replace($current[$key] ?? [], $this->mergeEmpty($current[$key] ?? [], $analysis[$key] ?? []));
         }
         $data['source_summary'] = (string) ($analysis['summary'] ?? $current['source_summary'] ?? '');
@@ -143,9 +143,18 @@ final class AppraisalPhRepository
     {
         $merged = [];
         foreach ($incoming as $key => $value) {
-            if (trim((string) ($current[$key] ?? '')) === '' && trim((string) $value) !== '') $merged[$key] = $value;
+            if ($this->emptyValue($current[$key] ?? '') && !$this->emptyValue($value)) $merged[$key] = $value;
         }
         return $merged;
+    }
+
+    private function emptyValue(mixed $value): bool
+    {
+        if (is_array($value)) {
+            foreach ($value as $item) if (!$this->emptyValue($item)) return false;
+            return true;
+        }
+        return trim((string) $value) === '';
     }
 
     private function jsonValues(array $data): array
