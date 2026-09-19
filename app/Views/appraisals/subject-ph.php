@@ -80,7 +80,7 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                             <option value="<?= e($value) ?>" <?= (string) ($ph['ph_typology'] ?? '') === (string) $value ? 'selected' : '' ?>><?= e($label) ?></option>
                         <?php endforeach; ?>
                     </select>
-                    <input class="input" type="file" name="ph_document"
+                    <input class="input" type="file" name="ph_document[]" multiple
                         accept=".zip,.rar,.pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.tif,.tiff">
                     <button class="btn-primary" type="submit">Leer soporte PH</button>
                 </form>

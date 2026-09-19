@@ -8,25 +8,39 @@ final class AppraisalPhDocumentUploadService
     public function store(array $files, string $appraisalId, int $owner, string $typology,
         AppraisalPhRepository $repo): array
     {
-        $file = $this->singleFile($files);
-        $name = mb_substr(basename(str_replace('\\', '/', (string) $file['name'])), 0, 220);
-        if ((int) $file['error'] !== UPLOAD_ERR_OK) {
-            throw new \RuntimeException("$name " . AppraisalPhDocumentStorage::uploadErrorMessage((int) $file['error']));
+        $uploads = $this->files($files);
+        if (!$uploads) throw new \RuntimeException('Selecciona al menos un soporte PH para analizar.');
+        $texts = []; $names = []; $stored = [];
+        foreach ($uploads as $file) {
+            $name = mb_substr(basename(str_replace('\\', '/', (string) $file['name'])), 0, 220);
+            if ((int) $file['error'] !== UPLOAD_ERR_OK) {
+                throw new \RuntimeException(($name ?: 'El soporte PH') . ' '
+                    . AppraisalPhDocumentStorage::uploadErrorMessage((int) $file['error']));
+            }
+            $info = AppraisalPhDocumentStorage::inspect((string) $file['tmp_name'], $name);
+            $id = bin2hex(random_bytes(16));
+            $storageName = 'ph-' . $appraisalId . '-' . $id . '.' . $info['extension'];
+            $bytes = AppraisalPhDocumentStorage::storeUploaded((string) $file['tmp_name'],
+                AppraisalPhDocumentStorage::path($storageName));
+            $path = AppraisalPhDocumentStorage::path($storageName);
+            [$text, $readNames] = $info['extension'] === 'zip'
+                ? $this->zipText($path, $name)
+                : $this->singleText($path, $name, $info['extension']);
+            $texts[] = $text; $names = array_merge($names, $readNames);
+            $blob = file_get_contents($path);
+            if (!is_string($blob)) throw new \RuntimeException('El soporte PH se guardó, pero no quedó respaldado.');
+            $stored[] = ['id' => $id, 'source_filename' => $name, 'storage_filename' => $storageName,
+                'mime_type' => $info['mime'], 'file_size_bytes' => $bytes, 'extracted_chars' => mb_strlen($text),
+                'file_blob' => $blob];
         }
-        $info = AppraisalPhDocumentStorage::inspect((string) $file['tmp_name'], $name);
-        $id = bin2hex(random_bytes(16));
-        $storageName = 'ph-' . $appraisalId . '-' . $id . '.' . $info['extension'];
-        $bytes = AppraisalPhDocumentStorage::storeUploaded((string) $file['tmp_name'],
-            AppraisalPhDocumentStorage::path($storageName));
-        $path = AppraisalPhDocumentStorage::path($storageName);
-        [$text, $fileNames] = $info['extension'] === 'zip' ? $this->zipText($path, $name) : $this->singleText($path, $name, $info['extension']);
-        $analysis = (new AppraisalPhDocumentAnalyzer())->analyze($text, $fileNames, $typology);
-        $blob = file_get_contents($path);
-        if (!is_string($blob)) throw new \RuntimeException('El soporte PH se guardó, pero no quedó respaldado.');
-        $repo->addDocument($appraisalId, $owner, ['id' => $id, 'source_filename' => $name,
-            'storage_filename' => $storageName, 'mime_type' => $info['mime'], 'file_size_bytes' => $bytes,
-            'extracted_chars' => mb_strlen($text), 'analysis_status' => 'Lectura preliminar',
-            'analysis_message' => $analysis['summary'], 'file_blob' => $blob]);
+        $analysis = (new AppraisalPhDocumentAnalyzer())->analyze(trim(implode("\n\n", array_filter($texts))),
+            $names, $typology);
+        foreach ($stored as $file) {
+            $repo->addDocument($appraisalId, $owner, $file + [
+                'analysis_status' => 'Lectura preliminar',
+                'analysis_message' => $analysis['summary'],
+            ]);
+        }
         $repo->mergeAnalysis($appraisalId, $owner, $analysis);
         return $analysis;
     }
@@ -60,12 +74,22 @@ final class AppraisalPhDocumentUploadService
         return [(new LegalCertificateTextExtractor())->extract($path, $extension), [$name]];
     }
 
-    private function singleFile(array $files): array
+    private function files(array $files): array
     {
         $name = $files['name'] ?? null;
-        if (is_array($name)) return ['name' => (string) ($files['name'][0] ?? ''),
-            'tmp_name' => (string) ($files['tmp_name'][0] ?? ''), 'error' => (int) ($files['error'][0] ?? UPLOAD_ERR_NO_FILE)];
-        return ['name' => (string) ($files['name'] ?? ''), 'tmp_name' => (string) ($files['tmp_name'] ?? ''),
-            'error' => (int) ($files['error'] ?? UPLOAD_ERR_NO_FILE)];
+        if (!is_array($name)) {
+            return trim((string) $name) === '' ? [] : [[
+                'name' => (string) ($files['name'] ?? ''),
+                'tmp_name' => (string) ($files['tmp_name'] ?? ''),
+                'error' => (int) ($files['error'] ?? UPLOAD_ERR_NO_FILE),
+            ]];
+        }
+        $items = [];
+        foreach ($name as $index => $value) {
+            if (trim((string) $value) === '' && (int) ($files['error'][$index] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) continue;
+            $items[] = ['name' => (string) $value, 'tmp_name' => (string) ($files['tmp_name'][$index] ?? ''),
+                'error' => (int) ($files['error'][$index] ?? UPLOAD_ERR_NO_FILE)];
+        }
+        return array_slice($items, 0, 80);
     }
 }

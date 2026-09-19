@@ -429,6 +429,20 @@ try {
         expect(($analyzedPh['technical']['vias_internas'] ?? '') !== ''
             && count($phRepo->documents(str_repeat('a', 32), 1)) === 1,
             'propiedad horizontal analiza ZIP y conserva soporte');
+        $multiA = tempnam(sys_get_temp_dir(), 'ga_ph_txt_a_');
+        $multiB = tempnam(sys_get_temp_dir(), 'ga_ph_txt_b_');
+        file_put_contents($multiA, 'Reglamento de propiedad horizontal Copropiedad MULTI PH. Matricula matriz 060-111222.');
+        file_put_contents($multiB, 'La copropiedad cuenta con patios de maniobra y red contra incendios.');
+        (new AppraisalPhDocumentUploadService())->store([
+            'name' => ['reglamento.txt', 'anexo-operativo.txt'],
+            'tmp_name' => [$multiA, $multiB],
+            'error' => [UPLOAD_ERR_OK, UPLOAD_ERR_OK],
+        ], str_repeat('e', 32), 1, 'bodegas', $phRepo);
+        $multiPh = $phRepo->profile(str_repeat('e', 32), 1);
+        expect(($multiPh['matrix_registration'] ?? '') === '060-111222'
+            && ($multiPh['technical']['patios_maniobra'] ?? '') !== ''
+            && count($phRepo->documents(str_repeat('e', 32), 1)) === 2,
+            'propiedad horizontal analiza varios soportes en un solo cargue');
         foreach (glob($phDir . '/*') ?: [] as $file) unlink($file);
         rmdir($phDir);
         putenv('APPRAISAL_PH_DOCUMENT_DIR');

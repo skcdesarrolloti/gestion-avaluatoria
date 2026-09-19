@@ -31,7 +31,10 @@ final class AppraisalPhDocumentStorage
             throw new \InvalidArgumentException('Sube ZIP, PDF, DOCX, TXT o imagen JPG, PNG, WEBP o TIFF.');
         }
         $size = (int) filesize($path);
-        if ($size <= 0 || $size > self::MAX_BYTES) throw new \InvalidArgumentException('El soporte PH debe pesar entre 1 byte y 50 MB.');
+        if ($size <= 0) {
+            throw new \InvalidArgumentException('El soporte PH llegó vacío. Selecciona nuevamente el archivo o súbelo dentro de un ZIP válido.');
+        }
+        if ($size > self::MAX_BYTES) throw new \InvalidArgumentException('Cada soporte PH debe pesar máximo 50 MB.');
         if ($ext === 'zip' && !self::startsWith($path, "PK\x03\x04")) throw new \InvalidArgumentException('El ZIP no parece válido.');
         return ['extension' => $ext === 'jpeg' ? 'jpg' : $ext, 'mime' => self::EXTENSIONS[$ext], 'bytes' => $size];
     }

@@ -56,6 +56,7 @@ final class Kernel
                     ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
                     Http::redirect($route);
                 }
+                if ($controller === 'subjectPh' && $action === 'upload' && $this->uploadLikelyExceededPostLimit()) { Session::flash('ph_error', 'La carga superó el límite post_max_size de PHP. Sube menos soportes por lote o comprímelos en un ZIP menor.'); Http::redirect('avaluos/' . (string) ($matches[1] ?? '') . '/bien-sujeto#ph'); }
                 try {
                     Session::csrf();
                 } catch (HttpException $error) {
@@ -105,9 +106,7 @@ final class Kernel
             if ($protected) {
                 Database::assertSeparate();
                 $db = Database::connection();
-                if (Env::bool('AUTO_MIGRATE', true)) {
-                    (new Migrator($db, BASE_PATH . '/database/migrations'))->run();
-                }
+                if (Env::bool('AUTO_MIGRATE', true)) (new Migrator($db, BASE_PATH . '/database/migrations'))->run();
             }
             $instance = match ($controller) {
                 'auth' => new AuthController($auth),
