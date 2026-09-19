@@ -45,6 +45,8 @@ final class AppraisalSubjectController
             'subjectHelp' => AppraisalSubjectCatalog::helps(),
             'subjectMessage' => Session::pullFlash('subject_message'),
             'subjectError' => Session::pullFlash('subject_error'),
+            'phMessage' => Session::pullFlash('ph_message'),
+            'phError' => Session::pullFlash('ph_error'),
             'photoMessage' => Session::pullFlash('chapter_zero_photo_message'),
             'photoError' => Session::pullFlash('chapter_zero_photo_error'),
             'preclassMessage' => Session::pullFlash('chapter_zero_preclass_message'),

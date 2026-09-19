@@ -35,8 +35,8 @@ final class AppraisalPhController
     private function saveAndRedirect(string $id, callable $save, string $message): never
     {
         $this->appraisals->find($id, $this->user['id']);
-        try { $save(); Session::flash('subject_message', $message); }
-        catch (\Throwable $error) { Session::flash('subject_error', $error->getMessage()); }
+        try { $save(); Session::flash('ph_message', $message); }
+        catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
         Http::redirect('avaluos/' . $id . '/bien-sujeto#ph');
     }
 }

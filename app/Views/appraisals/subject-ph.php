@@ -50,6 +50,12 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
             en el numeral 1. Así evitamos mezclar copropiedad en inmuebles independientes.
         </div>
     <?php else: ?>
+        <?php if (!empty($phMessage)): ?>
+            <p class="mt-5 rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($phMessage) ?></p>
+        <?php endif; ?>
+        <?php if (!empty($phError)): ?>
+            <p class="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($phError) ?></p>
+        <?php endif; ?>
         <div class="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
             <strong>Academia del campo.</strong> La llave PH puede ser NIT, matrícula matriz o nombre normalizado
             de la copropiedad. Sirve para reconocerla en otros avalúos; por ahora guarda este expediente y
