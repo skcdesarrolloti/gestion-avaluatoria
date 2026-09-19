@@ -16,10 +16,12 @@ final class AppraisalSubjectController
     public function show(string $id): void
     {
         $record = $this->appraisals->find($id, $this->user['id']);
+        $subject = $this->subjects->find($id, $this->user['id']);
+        $phSearch = mb_substr(trim((string) ($_GET['copropiedad'] ?? '')), 0, 190);
         $this->appraisals->ensureUnits($id, $this->user['id'],
             (int) ($record['igac_property_units_count'] ?? 0), (int) ($record['igac_annex_units_count'] ?? 0));
         view('appraisals/subject', ['title' => 'Bien sujeto', 'record' => $record,
-            'subject' => $this->subjects->find($id, $this->user['id']),
+            'subject' => $subject,
             'geo' => ['departments' => $this->geo->departments(), 'cities' => $this->geo->cities(),
                 'neighborhoods' => $this->geo->neighborhoods()],
             'photos' => $this->appraisals->photos($id, $this->user['id']),
@@ -27,6 +29,10 @@ final class AppraisalSubjectController
             'phProfile' => $this->ph->profile($id, $this->user['id']),
             'phDocuments' => $this->ph->documents($id, $this->user['id']),
             'phLegalPrefill' => $this->ph->legalPrefill($id, $this->user['id']),
+            'phSearchQuery' => $phSearch,
+            'phSearchResults' => $phSearch !== ''
+                ? $this->ph->searchByCoproperty($phSearch, $this->user['id'], $id)
+                : [],
             'phCatalog' => ['status' => AppraisalPhCatalog::statusOptions(),
                 'typologies' => AppraisalPhCatalog::typologies(), 'technical' => AppraisalPhCatalog::technicalGroups(),
                 'commonAreas' => AppraisalPhCatalog::commonAreas(), 'documents' => AppraisalPhCatalog::documents(),

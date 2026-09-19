@@ -5,6 +5,7 @@ use App\Core\Http;
 use App\Core\Session;
 use App\Models\AppraisalLegalRepository;
 use App\Models\AppraisalRepository;
+use App\Models\AppraisalSubjectRepository;
 use App\Services\AppraisalLegalCertificateUploadService;
 use App\Services\AppraisalLegalInput;
 use App\Services\LegalCertificateCancellationMatcher;
@@ -15,14 +16,21 @@ use App\Support\AppraisalLegalCatalog;
 final class AppraisalLegalController
 {
     public function __construct(private AppraisalRepository $appraisals,
-        private AppraisalLegalRepository $legal, private array $user) {}
+        private AppraisalLegalRepository $legal, private AppraisalSubjectRepository $subjects, private array $user) {}
 
     public function show(string $id): void
     {
         $record = $this->appraisals->find($id, $this->user['id']);
+        $subject = $this->subjects->find($id, $this->user['id']);
+        $search = mb_substr(trim((string) ($_GET['matricula'] ?? '')), 0, 80);
         view('appraisals/legal-characteristics', [
             'title' => 'Características jurídicas',
             'record' => $record,
+            'subject' => $subject,
+            'legalSearchQuery' => $search,
+            'legalSearchResults' => $search !== ''
+                ? $this->subjects->searchByRegistry($search, $this->user['id'], $id)
+                : [],
             'profile' => $this->refreshedProfile($this->legal->profile($id, $this->user['id'])),
             'certificates' => $this->legal->certificates($id, $this->user['id']),
             'legalGroups' => AppraisalLegalCatalog::groups(),

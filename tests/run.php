@@ -101,6 +101,9 @@ try {
     expect($diagnostics[array_key_last($diagnostics)]['ok'] === false, 'diagnostico auth falla sin base configurada');
     $db = new PDO('sqlite::memory:', null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
     fixture($db);
+    $db->exec("CREATE TABLE appraisals (id TEXT PRIMARY KEY, owner_id INTEGER, titulo TEXT DEFAULT '',
+        tipo TEXT DEFAULT '', direccion TEXT DEFAULT '', municipio TEXT DEFAULT '', client_name TEXT DEFAULT '',
+        property_owner_name TEXT DEFAULT '', version INTEGER DEFAULT 1, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_standard_categories (code TEXT PRIMARY KEY, name TEXT, group_type TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_standards (slug TEXT PRIMARY KEY, category_code TEXT, standard_code TEXT, title TEXT, kind TEXT, sector_code TEXT, source_filename TEXT, storage_filename TEXT, summary TEXT, file_size_bytes INTEGER, pdf_blob BLOB, imported_at TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("INSERT INTO valuation_standard_categories VALUES
@@ -214,10 +217,24 @@ try {
     expect($neighborhood['locality_name'] === 'Zona urbana'
         && $neighborhood['commune_ucg'] === 'Comuna 14', 'maestro barrio trae localidad y comuna');
     $subjectRepo = new AppraisalSubjectRepository($db);
+    $insertAppraisal = $db->prepare("INSERT INTO appraisals
+        (id, owner_id, titulo, direccion, municipio, client_name, property_owner_name, created_at, updated_at)
+        VALUES (?, 1, ?, ?, ?, ?, ?, '2026-09-18 00:00:00', ?)");
+    $insertAppraisal->execute([str_repeat('a', 32), 'Avalúo actual', 'Calle 1', 'Medellín',
+        'Cliente actual', 'Propietario actual', '2026-09-18 10:00:00']);
+    $insertAppraisal->execute([str_repeat('b', 32), 'Antecedente registral', 'Calle 2', 'Medellín',
+        'Cliente histórico', 'Propietario histórico', '2026-09-18 11:00:00']);
     $subjectRepo->save(str_repeat('a', 32), 1, ['neighborhood_id' => $neighborhood['id'],
         'point_reference' => 'Zona residencial consolidada', 'horizontal_property' => 'no',
         'centrality' => 'alta', 'current_use' => 'Residencial']);
+    $subjectRepo->save(str_repeat('b', 32), 1, ['neighborhood_id' => $neighborhood['id'],
+        'property_registry' => '060-179699', 'cadastral_reference' => '130010001',
+        'address' => 'Calle 2', 'registry_office' => '060 - CARTAGENA']);
     $subject = $subjectRepo->find(str_repeat('a', 32), 1);
+    expect($subjectRepo->searchByRegistry('060-179699', 1, str_repeat('a', 32))[0]['client_name'] === 'Cliente histórico',
+        'busqueda juridica muestra contexto del avaluo previo');
+    expect($subjectRepo->searchByNeighborhood((string) $neighborhood['id'], 1, str_repeat('a', 32))[0]['titulo'] === 'Antecedente registral',
+        'busqueda por barrio encuentra avaluos relacionados');
     expect($subject['neighborhood_name'] === 'El Poblado' && $subject['locality_name'] === 'Zona urbana'
         && $subject['commune_ucg'] === 'Comuna 14', 'ficha sujeto deriva ubicacion desde barrio');
     $seedStyleNeighborhoodId = 'geo-neigh-crespo-test-00000000';
@@ -374,10 +391,19 @@ try {
         && !isset($phData['common_areas']['inventado']), 'propiedad horizontal normaliza checklist');
     $phRepo = new AppraisalPhRepository($db);
     $phRepo->save(str_repeat('a', 32), 1, $phData);
+    $insertAppraisal->execute([str_repeat('c', 32), 'PH antecedente', 'Carrera 3', 'Medellín',
+        'Cliente PH', 'Propietario PH', '2026-09-18 12:00:00']);
+    $subjectRepo->save(str_repeat('c', 32), 1, ['neighborhood_id' => $neighborhood['id'],
+        'property_registry' => '060-888999', 'address' => 'Carrera 3']);
+    $phRepo->save(str_repeat('c', 32), 1, array_replace($phData, [
+        'ph_name' => 'Conjunto Prueba Torre 2', 'ph_key' => 'NIT 900123456-2',
+    ]));
     $storedPh = $phRepo->profile(str_repeat('a', 32), 1);
     expect($storedPh['ph_name'] === 'Conjunto Prueba'
         && ($storedPh['documents']['paquete_zip']['status'] ?? '') === 'warn',
         'propiedad horizontal guarda perfil por avaluo');
+    expect($phRepo->searchByCoproperty('Conjunto Prueba', 1, str_repeat('a', 32))[0]['client_name'] === 'Cliente PH',
+        'busqueda PH muestra contexto del avaluo relacionado');
     if (class_exists(ZipArchive::class)) {
         $phDir = sys_get_temp_dir() . '/ga-ph-test-' . bin2hex(random_bytes(4));
         putenv('APPRAISAL_PH_DOCUMENT_DIR=' . $phDir);

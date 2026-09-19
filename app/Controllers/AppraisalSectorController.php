@@ -59,6 +59,7 @@ final class AppraisalSectorController
             'sectorHasNeighborhoodBank' => (bool) $master,
             'sectorNeighborhoodUpdatedAt' => $master['updated_at'] ?? null,
             'sectorBankProfileVersion' => $master['version'] ?? null,
+            'sectorNeighborhoodMatches' => $this->subjects->searchByNeighborhood($neighborhoodId, $this->user['id'], $id),
             'sectorBankSections' => $bankSections,
             'sectorBankSummary' => $bankSummary,
             'sectorAdvancedRows' => $advancedRows,

@@ -29,6 +29,34 @@ final class AppraisalSubjectRepository
         $this->insert($appraisalId, $owner, $data, $now);
     }
 
+    public function searchByRegistry(string $term, int $owner, string $excludeId = '', int $limit = 8): array
+    {
+        $needle = '%' . trim($term) . '%';
+        if ($needle === '%%') return [];
+        $query = $this->db->prepare('SELECT a.id, a.titulo, a.direccion, a.municipio, a.client_name,
+                a.property_owner_name, a.updated_at, s.subject_title, s.address, s.city_name,
+                s.neighborhood_name, s.property_registry, s.cadastral_reference, s.registry_office
+            FROM appraisal_subjects s JOIN appraisals a ON a.id = s.appraisal_id AND a.owner_id = s.owner_id
+            WHERE s.owner_id = ? AND s.appraisal_id <> ?
+                AND (s.property_registry LIKE ? OR s.cadastral_reference LIKE ?)
+            ORDER BY a.updated_at DESC, a.id DESC LIMIT ' . max(1, min(12, $limit)));
+        $query->execute([$owner, $excludeId, $needle, $needle]);
+        return $query->fetchAll();
+    }
+
+    public function searchByNeighborhood(string $neighborhoodId, int $owner, string $excludeId = '', int $limit = 8): array
+    {
+        if (trim($neighborhoodId) === '') return [];
+        $query = $this->db->prepare('SELECT a.id, a.titulo, a.direccion, a.municipio, a.client_name,
+                a.property_owner_name, a.updated_at, s.subject_title, s.address, s.city_name,
+                s.neighborhood_name, s.property_registry, s.cadastral_reference, s.registry_office
+            FROM appraisal_subjects s JOIN appraisals a ON a.id = s.appraisal_id AND a.owner_id = s.owner_id
+            WHERE s.owner_id = ? AND s.appraisal_id <> ? AND s.neighborhood_id = ?
+            ORDER BY a.updated_at DESC, a.id DESC LIMIT ' . max(1, min(12, $limit)));
+        $query->execute([$owner, $excludeId, $neighborhoodId]);
+        return $query->fetchAll();
+    }
+
     private function exists(string $appraisalId, int $owner): bool
     {
         $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_subjects WHERE appraisal_id = ? AND owner_id = ?');

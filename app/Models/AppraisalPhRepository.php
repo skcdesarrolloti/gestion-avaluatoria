@@ -57,6 +57,24 @@ final class AppraisalPhRepository
             ...$this->jsonValues($json), $now, $now]);
     }
 
+    public function searchByCoproperty(string $term, int $owner, string $excludeId = '', int $limit = 8): array
+    {
+        $needle = '%' . trim($term) . '%';
+        if ($needle === '%%') return [];
+        $query = $this->db->prepare('SELECT p.appraisal_id AS id, p.ph_name, p.ph_key, p.ph_typology,
+                p.matrix_registration, p.updated_at, a.titulo, a.direccion, a.municipio,
+                a.client_name, a.property_owner_name, s.subject_title, s.address,
+                s.neighborhood_name, s.property_registry, s.cadastral_reference
+            FROM appraisal_ph_profiles p
+            JOIN appraisals a ON a.id = p.appraisal_id AND a.owner_id = p.owner_id
+            LEFT JOIN appraisal_subjects s ON s.appraisal_id = p.appraisal_id AND s.owner_id = p.owner_id
+            WHERE p.owner_id = ? AND p.appraisal_id <> ?
+                AND (p.ph_name LIKE ? OR p.ph_key LIKE ? OR p.matrix_registration LIKE ?)
+            ORDER BY p.updated_at DESC, p.appraisal_id DESC LIMIT ' . max(1, min(12, $limit)));
+        $query->execute([$owner, $excludeId, $needle, $needle, $needle]);
+        return $query->fetchAll();
+    }
+
     public function legalPrefill(string $appraisalId, int $owner): array
     {
         $query = $this->db->prepare('SELECT data_json FROM appraisal_legal_profiles WHERE appraisal_id = ? AND owner_id = ?');

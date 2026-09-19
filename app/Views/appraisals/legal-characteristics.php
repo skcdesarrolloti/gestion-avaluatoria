@@ -57,6 +57,7 @@ $trafficCounts = \App\Support\AppraisalLegalView::trafficCounts($annotations);
             </span>
         <?php endif; ?>
     </div>
+    <?php require BASE_PATH . '/app/Views/appraisals/legal-linkage-search.php'; ?>
     <form class="mt-6 grid gap-4 lg:grid-cols-[1fr_auto]" method="post" enctype="multipart/form-data"
         data-legal-certificate-form
         action="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas/certificado')) ?>">

@@ -55,6 +55,7 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
             de la copropiedad. Sirve para reconocerla en otros avalúos; por ahora guarda este expediente y
             deja preparada la migración a banco compartido. Este apartado no reemplaza estudio de títulos.
         </div>
+        <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-search.php'; ?>
         <section class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
             <div class="grid gap-4 lg:grid-cols-[1fr_auto]">
                 <div>
