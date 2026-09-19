@@ -112,6 +112,14 @@ final class AppraisalPhRepository
             $file['analysis_message'], $file['file_blob'], $now]);
     }
 
+    public function hasDocumentFile(string $appraisalId, int $owner, string $sourceFilename, int $bytes): bool
+    {
+        $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_ph_documents
+            WHERE appraisal_id = ? AND owner_id = ? AND source_filename = ? AND file_size_bytes = ?');
+        $query->execute([$appraisalId, $owner, $sourceFilename, $bytes]);
+        return (int) $query->fetchColumn() > 0;
+    }
+
     public function deleteDocument(string $id, string $appraisalId, int $owner): array
     {
         $query = $this->db->prepare('SELECT storage_filename FROM appraisal_ph_documents

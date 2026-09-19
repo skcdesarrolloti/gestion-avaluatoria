@@ -489,6 +489,13 @@ try {
             && ($multiPh['technical']['patios_maniobra'] ?? '') !== ''
             && count($phRepo->documents(str_repeat('e', 32), 1)) === 2,
             'propiedad horizontal analiza varios soportes en un solo cargue');
+        $dup = tempnam(sys_get_temp_dir(), 'ga_ph_txt_dup_');
+        file_put_contents($dup, 'Reglamento de propiedad horizontal Copropiedad MULTI PH. Matricula matriz 060-111222.');
+        $duplicateResult = (new AppraisalPhDocumentUploadService())->store(uploadFixture('reglamento.txt', $dup),
+            str_repeat('e', 32), 1, 'bodegas', $phRepo);
+        expect(count($phRepo->documents(str_repeat('e', 32), 1)) === 2
+            && str_contains((string) ($duplicateResult['message'] ?? ''), 'ya estaba cargado'),
+            'propiedad horizontal omite soportes duplicados');
         $chunkContent = 'Reglamento de propiedad horizontal Copropiedad CHUNKS PH. Matricula matriz 060-333444.';
         $chunkId = 'test_' . bin2hex(random_bytes(4)); $chunkService = new AppraisalPhChunkUploadService();
         $chunkParts = str_split($chunkContent, 42);

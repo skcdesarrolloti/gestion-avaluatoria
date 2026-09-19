@@ -29,6 +29,7 @@ final class AppraisalPhController
             $typology = (string) ($_POST['ph_typology'] ?? '');
             $analysis = (new AppraisalPhDocumentUploadService())->store($_FILES['ph_document'] ?? [], $id,
                 $this->user['id'], $typology, $this->ph);
+            if (($analysis['message'] ?? '') !== '') return (string) $analysis['message'];
             return ($analysis['has_text'] ?? true) === false
                 ? 'Soporte PH cargado, pero no se extrajo texto útil para diligenciar campos.'
                 : '';
@@ -48,6 +49,7 @@ final class AppraisalPhController
             $file = (new AppraisalPhChunkUploadService())->finish($id, $this->user['id']);
             $typology = (string) ($_POST['ph_typology'] ?? '');
             $analysis = (new AppraisalPhDocumentUploadService())->storePrepared($file, $id, $this->user['id'], $typology, $this->ph);
+            if (($analysis['message'] ?? '') !== '') return (string) $analysis['message'];
             return ($analysis['has_text'] ?? true) === false
                 ? 'Soporte PH cargado, pero no se extrajo texto útil para diligenciar campos.'
                 : '';

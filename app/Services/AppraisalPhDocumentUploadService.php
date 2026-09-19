@@ -12,27 +12,23 @@ final class AppraisalPhDocumentUploadService
     private const LARGE_ARCHIVE_ENTRY_READ_BYTES = 25165824;
     private const LARGE_ARCHIVE_TOTAL_READ_BYTES = 50331648;
     private const ARCHIVE_TIME_SECONDS = 35;
-
-    public function store(array $files, string $appraisalId, int $owner, string $typology,
-        AppraisalPhRepository $repo): array
+    public function store(array $files, string $appraisalId, int $owner, string $typology, AppraisalPhRepository $repo): array
     {
         $uploads = $this->files($files);
         if (!$uploads) throw new \RuntimeException('Selecciona al menos un soporte PH para analizar.');
         return $this->storeFiles($uploads, $appraisalId, $owner, $typology, $repo, false);
     }
 
-    public function storePrepared(array $file, string $appraisalId, int $owner, string $typology,
-        AppraisalPhRepository $repo): array
+    public function storePrepared(array $file, string $appraisalId, int $owner, string $typology, AppraisalPhRepository $repo): array
     {
         if (!$file) throw new \RuntimeException('Selecciona al menos un soporte PH para analizar.');
         return $this->storeFiles([$file], $appraisalId, $owner, $typology, $repo, true);
     }
 
-    private function storeFiles(array $uploads, string $appraisalId, int $owner, string $typology,
-        AppraisalPhRepository $repo, bool $prepared): array
+    private function storeFiles(array $uploads, string $appraisalId, int $owner, string $typology, AppraisalPhRepository $repo, bool $prepared): array
     {
         if (function_exists('set_time_limit')) @set_time_limit(300);
-        $texts = []; $names = []; $stored = [];
+        $texts = []; $names = []; $stored = []; $duplicates = [];
         foreach ($uploads as $file) {
             $name = mb_substr(basename(str_replace('\\', '/', (string) $file['name'])), 0, 220);
             if ((int) $file['error'] !== UPLOAD_ERR_OK) {
@@ -40,6 +36,12 @@ final class AppraisalPhDocumentUploadService
                     . AppraisalPhDocumentStorage::uploadErrorMessage((int) $file['error']));
             }
             $info = AppraisalPhDocumentStorage::inspect((string) $file['tmp_name'], $name);
+            $size = (int) @filesize((string) $file['tmp_name']);
+            if ($repo->hasDocumentFile($appraisalId, $owner, $name, $size)) {
+                $duplicates[] = $name;
+                if ($prepared) @unlink((string) $file['tmp_name']);
+                continue;
+            }
             $id = bin2hex(random_bytes(16));
             $storageName = 'ph-' . $appraisalId . '-' . $id . '.' . $info['extension'];
             $bytes = $prepared
@@ -59,6 +61,11 @@ final class AppraisalPhDocumentUploadService
                 'mime_type' => $info['mime'], 'file_size_bytes' => $bytes, 'extracted_chars' => mb_strlen($text),
                 'file_blob' => $blob];
         }
+        if (!$stored && $duplicates) {
+            return ['has_text' => true, 'message' => 'Soporte PH ya estaba cargado; no se duplicó.',
+                'summary' => 'Archivo omitido por duplicado: ' . implode(', ', array_slice($duplicates, 0, 5)),
+                'findings' => []];
+        }
         $analysis = (new AppraisalPhDocumentAnalyzer())->analyze(trim(implode("\n\n", array_filter($texts))),
             $names, $typology);
         foreach ($stored as $file) {
@@ -70,12 +77,10 @@ final class AppraisalPhDocumentUploadService
         $repo->mergeAnalysis($appraisalId, $owner, $analysis);
         return $analysis;
     }
-
     private function archiveText(string $path, string $name, string $extension): array
     {
         return $extension === 'zip' ? $this->zipText($path, $name) : $this->rarText($path, $name);
     }
-
     private function zipText(string $path, string $name): array
     {
         $zip = new \ZipArchive();
@@ -108,7 +113,6 @@ final class AppraisalPhDocumentUploadService
         $zip->close();
         return [trim(implode("\n\n", array_filter($texts))), $names ?: [$name]];
     }
-
     private function rarText(string $path, string $name): array
     {
         $dir = sys_get_temp_dir() . '/ga_ph_rar_' . bin2hex(random_bytes(4));
@@ -139,7 +143,6 @@ final class AppraisalPhDocumentUploadService
             @rmdir($dir);
         }
     }
-
     private function extractRar(string $path, string $dir, string $name): void
     {
         if (class_exists('\\RarArchive')) {
@@ -158,7 +161,6 @@ final class AppraisalPhDocumentUploadService
         }
         throw new \RuntimeException("$name es RAR, pero este servidor no tiene motor RAR disponible. Sube ZIP o instala 7z/unrar/unar/bsdtar.");
     }
-
     private function rarCommands(string $path, string $dir): array
     {
         $p = escapeshellarg($path); $d = escapeshellarg($dir);
@@ -172,7 +174,6 @@ final class AppraisalPhDocumentUploadService
             $tar ? "$tar -xf $p -C $d" : '',
         ]));
     }
-
     private function cmd(string $name): string
     {
         if (!function_exists('shell_exec')) return '';
@@ -181,7 +182,6 @@ final class AppraisalPhDocumentUploadService
         $path = trim(strtok((string) $found, "\r\n") ?: '');
         return $path !== '' ? escapeshellarg($path) : '';
     }
-
     private function extractedFiles(string $dir, bool $withDirs = false): array
     {
         $iterator = is_dir($dir) ? new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir,
@@ -190,12 +190,10 @@ final class AppraisalPhDocumentUploadService
         foreach ($iterator as $file) if ($withDirs || $file->isFile()) $files[] = $file->getPathname();
         return $files;
     }
-
     private function singleText(string $path, string $name, string $extension): array
     {
         return [(new LegalCertificateTextExtractor(true))->extract($path, $extension), [$name]];
     }
-
     private function files(array $files): array
     {
         $name = $files['name'] ?? null;
