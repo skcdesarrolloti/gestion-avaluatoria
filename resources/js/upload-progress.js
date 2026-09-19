@@ -59,6 +59,7 @@ export function submitUpload(form, submitter = null) {
     setDisabled(parts, true);
     setProgress(parts, 1, 'Preparando subida...');
     xhr.open((form.method || 'POST').toUpperCase(), form.action, true);
+    xhr.timeout = Number.parseInt(form.dataset?.uploadTimeout || '300000', 10);
     xhr.setRequestHeader('Accept', 'text/html');
     xhr.setRequestHeader('X-Requested-With', 'upload-progress');
     const token = csrfToken();
@@ -83,6 +84,10 @@ export function submitUpload(form, submitter = null) {
     xhr.onerror = () => {
         setDisabled(parts, false);
         setProgress(parts, 100, 'La conexión se interrumpió durante la subida. Intenta nuevamente.');
+    };
+    xhr.ontimeout = () => {
+        setDisabled(parts, false);
+        setProgress(parts, 100, 'La subida o análisis tardó demasiado. Intenta con menos archivos por lote o un ZIP más liviano.');
     };
     xhr.send(body);
     return xhr;

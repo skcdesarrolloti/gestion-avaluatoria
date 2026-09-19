@@ -5,6 +5,9 @@ use App\Core\Env;
 
 final class LegalCertificateTextExtractor
 {
+    private const EXTERNAL_PDF_MAX_BYTES = 12582912;
+    private const OCR_IMAGE_MAX_BYTES = 8388608;
+
     public function extract(string $path, string $extension): string
     {
         $text = match ($extension) {
@@ -117,6 +120,7 @@ final class LegalCertificateTextExtractor
     private function externalPdfText(string $path): string
     {
         if (!function_exists('shell_exec') || !is_file($path)) return '';
+        if ((int) filesize($path) > self::EXTERNAL_PDF_MAX_BYTES) return '';
         $locator = PHP_OS_FAMILY === 'Windows' ? 'where pdftotext 2>NUL' : 'command -v pdftotext 2>/dev/null';
         $binary = trim((string) @shell_exec($locator));
         if ($binary === '') return '';
@@ -132,6 +136,7 @@ final class LegalCertificateTextExtractor
     private function externalOcrText(string $path): string
     {
         if (!function_exists('shell_exec') || !is_file($path)) return '';
+        if ((int) filesize($path) > self::OCR_IMAGE_MAX_BYTES) return '';
         $binary = $this->tesseractBinary();
         if ($binary === '') return '';
         foreach (['spa+eng', 'spa', 'eng', ''] as $language) {

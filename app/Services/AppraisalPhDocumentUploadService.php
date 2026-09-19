@@ -6,6 +6,7 @@ use App\Models\AppraisalPhRepository;
 final class AppraisalPhDocumentUploadService
 {
     private const BLOB_BACKUP_BYTES = 52428800;
+    private const ARCHIVE_ENTRY_READ_BYTES = 12582912;
 
     public function store(array $files, string $appraisalId, int $owner, string $typology,
         AppraisalPhRepository $repo): array
@@ -69,7 +70,9 @@ final class AppraisalPhDocumentUploadService
             $tmp = tempnam(sys_get_temp_dir(), 'ga_ph_zip_');
             $out = fopen($tmp, 'wb');
             if (!$out) { fclose($stream); continue; }
-            stream_copy_to_stream($stream, $out); fclose($out); fclose($stream);
+            $limit = $ext === 'pdf' ? self::ARCHIVE_ENTRY_READ_BYTES : null;
+            $limit ? stream_copy_to_stream($stream, $out, $limit) : stream_copy_to_stream($stream, $out);
+            fclose($out); fclose($stream);
             $names[] = basename(str_replace('\\', '/', $entry));
             $texts[] = (new LegalCertificateTextExtractor())->extract($tmp, $ext);
             @unlink($tmp);
