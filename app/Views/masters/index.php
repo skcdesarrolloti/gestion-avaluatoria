@@ -4,11 +4,10 @@
             <p class="eyebrow">Administración base</p>
             <h1 class="mt-2 text-3xl font-semibold tracking-tight">Creación de Maestros</h1>
             <p class="mt-3 text-base leading-6 text-slate-600">
-                Administra los catálogos que alimentan Valuaciones: peritos y ubicación nacional
-                por departamento, ciudad o municipio, y barrio, vereda o sector.
+                Administra el maestro de peritos que alimenta Valuaciones y conserva su soporte RAA.
             </p>
         </div>
-        <a class="btn-primary" href="<?= e(url('#maestros-geograficos')) ?>">Crear maestro</a>
+        <a class="btn-primary" href="<?= e(url('#crear-perito')) ?>">Crear perito</a>
     </div>
 
     <?php if ($message): ?>
@@ -17,8 +16,6 @@
     <?php if ($error): ?>
         <div class="rounded-xl border border-red-50 bg-red-50 p-4 text-sm font-medium text-red-700"><?= e($error) ?></div>
     <?php endif; ?>
-
-    <?php require BASE_PATH . '/app/Views/masters/locations.php'; ?>
 
     <section id="crear-perito" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div class="flex flex-wrap items-start justify-between gap-4">

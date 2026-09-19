@@ -115,7 +115,7 @@ final class Kernel
                 'international' => new InternationalStandardController(new InternationalStandardRepository($db)),
                 'legal' => new LegalFrameworkController(new LegalDocumentRepository($db)),
                 'maintenance' => new MaintenanceController($db, $user),
-                'masters' => new MasterDataController(new AppraiserRepository($db), new GeoMasterRepository($db)),
+                'masters' => new MasterDataController(new AppraiserRepository($db)),
                 'standards' => new StandardController(new ValuationStandardRepository($db)),
                 'sector' => new \App\Controllers\AppraisalSectorController(new AppraisalRepository($db),
                     new \App\Models\AppraisalSectorRepository($db),

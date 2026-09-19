@@ -7,24 +7,19 @@ use App\Core\Http;
 use App\Core\HttpException;
 use App\Core\Session;
 use App\Models\AppraiserRepository;
-use App\Models\GeoMasterRepository;
 use App\Services\AppraiserRaaStorage;
 use App\Support\RaaCategoryCatalog;
 use PDOException;
 
 final class MasterDataController
 {
-    public function __construct(private AppraiserRepository $appraisers, private GeoMasterRepository $geo) {}
+    public function __construct(private AppraiserRepository $appraisers) {}
 
     public function index(): void
     {
         view('masters/index', [
             'title' => 'Creación de Maestros',
             'appraisers' => $this->appraisers->all(),
-            'departments' => $this->geo->departments(),
-            'cities' => $this->geo->cities(),
-            'localities' => $this->geo->localities(),
-            'neighborhoods' => $this->geo->neighborhoods(),
             'categories' => RaaCategoryCatalog::all(),
             'message' => Session::pullFlash('masters_message'),
             'error' => Session::pullFlash('masters_error'),
@@ -54,22 +49,6 @@ final class MasterDataController
             Session::flash('masters_error', $error->getMessage());
         }
         Http::redirect('maestros');
-    }
-
-    public function createDepartment(): never
-    {
-        $this->createGeo('Departamento', fn () => $this->geo->createDepartment($this->geoData(['code', 'name'])));
-    }
-
-    public function createCity(): never
-    {
-        $this->createGeo('Ciudad / municipio', fn () => $this->geo->createCity($this->geoData(['department_id', 'code', 'name'])));
-    }
-
-    public function createNeighborhood(): never
-    {
-        $fields = ['city_id', 'name', 'locality_name', 'commune_ucg', 'zone_sector', 'notes'];
-        $this->createGeo('Barrio / microsector', fn () => $this->geo->createNeighborhood($this->geoData($fields)));
     }
 
     public function raaFile(string $id): never
@@ -132,32 +111,6 @@ final class MasterDataController
         $data['raa_source_filename'] = $source;
         $data['raa_storage_filename'] = 'raa-' . $data['id'] . '.pdf';
         $data['raa_file_size_bytes'] = 0;
-        return $data;
-    }
-
-    private function createGeo(string $label, callable $create): never
-    {
-        try {
-            $create();
-            Session::flash('masters_message', $label . ' creado correctamente.');
-        } catch (PDOException $error) {
-            Session::flash('masters_error', str_contains($error->getMessage(), 'Duplicate')
-                ? $label . ' ya existe en ese nivel.' : 'No se pudo guardar el maestro geográfico.');
-        } catch (\Throwable $error) {
-            Session::flash('masters_error', $error->getMessage());
-        }
-        Http::redirect('maestros#maestros-geograficos');
-    }
-
-    private function geoData(array $fields): array
-    {
-        $data = ['active' => ($_POST['active'] ?? 'Si') === 'No' ? 'No' : 'Si'];
-        foreach ($fields as $field) $data[$field] = trim((string) ($_POST[$field] ?? ''));
-        foreach (['name' => 160, 'code' => 20, 'locality_name' => 160,
-            'commune_ucg' => 80, 'zone_sector' => 120, 'notes' => 240] as $field => $limit) {
-            if (isset($data[$field])) $data[$field] = mb_substr($data[$field], 0, $limit);
-        }
-        if (($data['name'] ?? '') === '') throw new \InvalidArgumentException('El nombre es obligatorio.');
         return $data;
     }
 
