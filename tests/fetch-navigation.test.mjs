@@ -131,3 +131,23 @@ test('waits for pending module autosave before link navigation', async () => {
     assert.deepEqual(events.slice(0, 2), ['flush', 'fetch']);
     Object.assign(globalThis, originals);
 });
+
+test('leaves multipart uploads to native browser submit', () => {
+    const originals = { document: globalThis.document, window: globalThis.window, HTMLFormElement: globalThis.HTMLFormElement };
+    const listeners = {};
+    globalThis.HTMLFormElement = class {};
+    const form = new globalThis.HTMLFormElement();
+    form.enctype = 'multipart/form-data';
+    form.closest = () => null;
+    globalThis.document = { addEventListener: (type, handler) => { listeners[type] = handler; } };
+    globalThis.window = { location: { href: current }, addEventListener() {} };
+    installFetchNavigation();
+    let prevented = false;
+    listeners.submit({
+        defaultPrevented: false,
+        preventDefault: () => { prevented = true; },
+        target: form,
+    });
+    assert.equal(prevented, false);
+    Object.assign(globalThis, originals);
+});

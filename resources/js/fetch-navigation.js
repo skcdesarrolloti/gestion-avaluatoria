@@ -45,8 +45,7 @@ function updateHeadFrom(nextDocument) {
 
 function activateNewBody(body, focusMain = true) {
     document.body.replaceWith(body);
-    window.Alpine?.initTree(document.body);
-    setBusy(false);
+    try { window.Alpine?.initTree(document.body); } finally { setBusy(false); }
     if (!focusMain) return;
     const main = document.getElementById('contenido');
     main?.setAttribute('tabindex', '-1');
@@ -196,7 +195,7 @@ export function installFetchNavigation() {
     document.addEventListener('submit', event => {
         if (event.defaultPrevented) return;
         const form = event.target;
-        if (!(form instanceof HTMLFormElement) || form.closest('[data-no-fetch]')) return;
+        if (!(form instanceof HTMLFormElement) || form.closest('[data-no-fetch]') || form.enctype === 'multipart/form-data') return;
         if ((form.target || '').trim() !== '') return;
         const method = (form.method || 'GET').toUpperCase();
         if (!['GET', 'POST'].includes(method)) return;
