@@ -23,8 +23,8 @@ final class AppraisalPhDocumentUploadService
             $bytes = AppraisalPhDocumentStorage::storeUploaded((string) $file['tmp_name'],
                 AppraisalPhDocumentStorage::path($storageName));
             $path = AppraisalPhDocumentStorage::path($storageName);
-            [$text, $readNames] = $info['extension'] === 'zip'
-                ? $this->zipText($path, $name)
+            [$text, $readNames] = in_array($info['extension'], ['zip', 'rar'], true)
+                ? $this->archiveText($path, $name, $info['extension'])
                 : $this->singleText($path, $name, $info['extension']);
             $texts[] = $text; $names = array_merge($names, $readNames);
             $blob = file_get_contents($path);
@@ -43,6 +43,11 @@ final class AppraisalPhDocumentUploadService
         }
         $repo->mergeAnalysis($appraisalId, $owner, $analysis);
         return $analysis;
+    }
+
+    private function archiveText(string $path, string $name, string $extension): array
+    {
+        return $extension === 'zip' ? $this->zipText($path, $name) : $this->rarText($path, $name);
     }
 
     private function zipText(string $path, string $name): array
@@ -67,6 +72,77 @@ final class AppraisalPhDocumentUploadService
         }
         $zip->close();
         return [trim(implode("\n\n", array_filter($texts))), $names ?: [$name]];
+    }
+
+    private function rarText(string $path, string $name): array
+    {
+        $dir = sys_get_temp_dir() . '/ga_ph_rar_' . bin2hex(random_bytes(4));
+        if (!mkdir($dir, 0775, true) && !is_dir($dir)) throw new \RuntimeException('No se pudo preparar extracción RAR.');
+        try {
+            $this->extractRar($path, $dir, $name);
+            $texts = []; $names = [];
+            foreach ($this->extractedFiles($dir) as $file) {
+                $ext = mb_strtolower(pathinfo($file, PATHINFO_EXTENSION));
+                if (!in_array($ext, ['pdf', 'docx', 'txt', 'jpg', 'jpeg', 'png', 'webp', 'tif', 'tiff'], true)) continue;
+                $names[] = basename($file); $texts[] = (new LegalCertificateTextExtractor())->extract($file, $ext);
+                if (count($names) >= 80) break;
+            }
+            return [trim(implode("\n\n", array_filter($texts))), $names ?: [$name]];
+        } finally {
+            foreach (array_reverse($this->extractedFiles($dir, true)) as $file) is_dir($file) ? @rmdir($file) : @unlink($file);
+            @rmdir($dir);
+        }
+    }
+
+    private function extractRar(string $path, string $dir, string $name): void
+    {
+        if (class_exists('\\RarArchive')) {
+            $rar = \RarArchive::open($path);
+            if ($rar) {
+                foreach ($rar->getEntries() ?: [] as $entry) $entry->extract($dir);
+                $rar->close(); return;
+            }
+        }
+        if (!function_exists('exec')) {
+            throw new \RuntimeException("$name es RAR, pero PHP no permite ejecutar extractores en este servidor. Sube ZIP o habilita 7z/unrar/unar/bsdtar.");
+        }
+        foreach ($this->rarCommands($path, $dir) as $command) {
+            $output = []; $code = 1; exec($command . ' 2>&1', $output, $code);
+            if ($code === 0 && $this->extractedFiles($dir) !== []) return;
+        }
+        throw new \RuntimeException("$name es RAR, pero este servidor no tiene motor RAR disponible. Sube ZIP o instala 7z/unrar/unar/bsdtar.");
+    }
+
+    private function rarCommands(string $path, string $dir): array
+    {
+        $p = escapeshellarg($path); $d = escapeshellarg($dir);
+        $sevenZip = $this->cmd('7z'); $unrar = $this->cmd('unrar'); $unar = $this->cmd('unar');
+        $bsdtar = $this->cmd('bsdtar'); $tar = $this->cmd('tar');
+        return array_values(array_filter([
+            $sevenZip ? "$sevenZip x -y -o$d $p" : '',
+            $unrar ? "$unrar x -o+ $p $d" : '',
+            $unar ? "$unar -o $d $p" : '',
+            $bsdtar ? "$bsdtar -xf $p -C $d" : '',
+            $tar ? "$tar -xf $p -C $d" : '',
+        ]));
+    }
+
+    private function cmd(string $name): string
+    {
+        if (!function_exists('shell_exec')) return '';
+        $probe = stripos(PHP_OS_FAMILY, 'Windows') === 0 ? 'where ' : 'command -v ';
+        $found = shell_exec($probe . escapeshellarg($name) . ' 2>' . (stripos(PHP_OS_FAMILY, 'Windows') === 0 ? 'NUL' : '/dev/null'));
+        $path = trim(strtok((string) $found, "\r\n") ?: '');
+        return $path !== '' ? escapeshellarg($path) : '';
+    }
+
+    private function extractedFiles(string $dir, bool $withDirs = false): array
+    {
+        $iterator = is_dir($dir) ? new \RecursiveIteratorIterator(new \RecursiveDirectoryIterator($dir,
+            \FilesystemIterator::SKIP_DOTS), \RecursiveIteratorIterator::SELF_FIRST) : new \ArrayIterator([]);
+        $files = [];
+        foreach ($iterator as $file) if ($withDirs || $file->isFile()) $files[] = $file->getPathname();
+        return $files;
     }
 
     private function singleText(string $path, string $name, string $extension): array

@@ -8,7 +8,7 @@ final class AppraisalPhDocumentStorage
     private const ENV_KEY = 'APPRAISAL_PH_DOCUMENT_DIR';
     private const DEFAULT_DIR = '/storage/propiedad-horizontal';
     private const MAX_BYTES = 52428800;
-    private const EXTENSIONS = ['zip' => 'application/zip', 'pdf' => 'application/pdf',
+    private const EXTENSIONS = ['zip' => 'application/zip', 'rar' => 'application/vnd.rar', 'pdf' => 'application/pdf',
         'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'txt' => 'text/plain', 'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg',
         'png' => 'image/png', 'webp' => 'image/webp', 'tif' => 'image/tiff', 'tiff' => 'image/tiff'];
@@ -26,9 +26,8 @@ final class AppraisalPhDocumentStorage
     public static function inspect(string $path, string $name): array
     {
         $ext = mb_strtolower(pathinfo($name, PATHINFO_EXTENSION));
-        if ($ext === 'rar') throw new \InvalidArgumentException('RAR no está soportado por este servidor. Convierte el paquete a ZIP.');
         if (!is_file($path) || !isset(self::EXTENSIONS[$ext])) {
-            throw new \InvalidArgumentException('Sube ZIP, PDF, DOCX, TXT o imagen JPG, PNG, WEBP o TIFF.');
+            throw new \InvalidArgumentException('Sube ZIP, RAR, PDF, DOCX, TXT o imagen JPG, PNG, WEBP o TIFF.');
         }
         $size = (int) filesize($path);
         if ($size <= 0) {
@@ -36,6 +35,7 @@ final class AppraisalPhDocumentStorage
         }
         if ($size > self::MAX_BYTES) throw new \InvalidArgumentException('Cada soporte PH debe pesar máximo 50 MB.');
         if ($ext === 'zip' && !self::startsWith($path, "PK\x03\x04")) throw new \InvalidArgumentException('El ZIP no parece válido.');
+        if ($ext === 'rar' && !self::isRar($path)) throw new \InvalidArgumentException('El RAR no parece válido.');
         return ['extension' => $ext === 'jpeg' ? 'jpg' : $ext, 'mime' => self::EXTENSIONS[$ext], 'bytes' => $size];
     }
 
@@ -73,5 +73,10 @@ final class AppraisalPhDocumentStorage
         if (!$handle) return false;
         try { return fread($handle, strlen($signature)) === $signature; }
         finally { fclose($handle); }
+    }
+
+    private static function isRar(string $path): bool
+    {
+        return self::startsWith($path, "Rar!\x1A\x07\x00") || self::startsWith($path, "Rar!\x1A\x07\x01\x00");
     }
 }
