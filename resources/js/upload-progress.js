@@ -67,7 +67,7 @@ export function uploadErrorMessage(xhr) {
     if (xhr?.status === 413) return 'El servidor rechazó el archivo por tamaño. Lo intentaré por partes si el formulario ya está actualizado; si persiste, el hosting bloquea cargas grandes antes de PHP.';
     if (xhr?.status === 419) return 'La sesión de seguridad venció. Recarga la página e intenta de nuevo.';
     if (xhr?.status === 422 && text) return text.slice(0, 220);
-    if (xhr?.status >= 500) return 'El servidor falló durante la lectura PH. Intenta de nuevo; si se repite, revisa el log del hosting.';
+    if (xhr?.status >= 500) return text ? text.slice(0, 220) : 'El servidor falló durante la lectura PH. Intenta de nuevo; si se repite, revisa el log del hosting.';
     return 'No se pudo completar la subida. Revisa el archivo e intenta nuevamente.';
 }
 

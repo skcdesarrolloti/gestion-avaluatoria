@@ -435,6 +435,16 @@ try {
         expect(($analyzedPh['technical']['vias_internas'] ?? '') !== ''
             && count($phRepo->documents(str_repeat('a', 32), 1)) === 1,
             'propiedad horizontal analiza ZIP y conserva soporte');
+        $mixedZipPath = tempnam(sys_get_temp_dir(), 'ga_ph_mixed_zip_');
+        $zip = new ZipArchive();
+        $zip->open($mixedZipPath, ZipArchive::OVERWRITE);
+        $zip->addFromString('reglamento.txt', 'Reglamento de propiedad horizontal Copropiedad ZIP MIXTO. Matricula matriz 060-555666.');
+        $zip->addFromString('anexo-pesado.pdf', str_repeat('x', 1024 * 1024));
+        $zip->close();
+        (new AppraisalPhDocumentUploadService())->store(uploadFixture('soportes-ph-mixto.zip', $mixedZipPath),
+            str_repeat('b', 32), 1, 'oficinas', $phRepo);
+        expect(($phRepo->profile(str_repeat('b', 32), 1)['matrix_registration'] ?? '') === '060-555666',
+            'propiedad horizontal continua lectura ZIP con entradas internas no utiles');
         $multiA = tempnam(sys_get_temp_dir(), 'ga_ph_txt_a_');
         $multiB = tempnam(sys_get_temp_dir(), 'ga_ph_txt_b_');
         file_put_contents($multiA, 'Reglamento de propiedad horizontal Copropiedad MULTI PH. Matricula matriz 060-111222.');

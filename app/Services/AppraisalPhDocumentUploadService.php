@@ -7,6 +7,7 @@ final class AppraisalPhDocumentUploadService
 {
     private const BLOB_BACKUP_BYTES = 52428800;
     private const ARCHIVE_ENTRY_READ_BYTES = 12582912;
+    private const ARCHIVE_TOTAL_READ_BYTES = 25165824;
 
     public function store(array $files, string $appraisalId, int $owner, string $typology,
         AppraisalPhRepository $repo): array
@@ -26,6 +27,7 @@ final class AppraisalPhDocumentUploadService
     private function storeFiles(array $uploads, string $appraisalId, int $owner, string $typology,
         AppraisalPhRepository $repo, bool $prepared): array
     {
+        if (function_exists('set_time_limit')) @set_time_limit(300);
         $texts = []; $names = []; $stored = [];
         foreach ($uploads as $file) {
             $name = mb_substr(basename(str_replace('\\', '/', (string) $file['name'])), 0, 220);
@@ -74,8 +76,8 @@ final class AppraisalPhDocumentUploadService
     {
         $zip = new \ZipArchive();
         if ($zip->open($path) !== true) throw new \RuntimeException("$name no es un ZIP válido.");
-        $texts = []; $names = [];
-        for ($i = 0; $i < $zip->numFiles && count($names) < 80; $i++) {
+        $texts = []; $names = []; $readBytes = 0; $extractor = new LegalCertificateTextExtractor();
+        for ($i = 0; $i < $zip->numFiles && count($names) < 80 && $readBytes < self::ARCHIVE_TOTAL_READ_BYTES; $i++) {
             $entry = $zip->getNameIndex($i);
             if (!is_string($entry) || str_ends_with($entry, '/')) continue;
             $ext = mb_strtolower(pathinfo($entry, PATHINFO_EXTENSION));
@@ -85,11 +87,14 @@ final class AppraisalPhDocumentUploadService
             $tmp = tempnam(sys_get_temp_dir(), 'ga_ph_zip_');
             $out = fopen($tmp, 'wb');
             if (!$out) { fclose($stream); continue; }
-            $limit = $ext === 'pdf' ? self::ARCHIVE_ENTRY_READ_BYTES : null;
-            $limit ? stream_copy_to_stream($stream, $out, $limit) : stream_copy_to_stream($stream, $out);
+            $limit = min($ext === 'pdf' ? self::ARCHIVE_ENTRY_READ_BYTES : self::ARCHIVE_TOTAL_READ_BYTES,
+                self::ARCHIVE_TOTAL_READ_BYTES - $readBytes);
+            $copied = $limit > 0 ? stream_copy_to_stream($stream, $out, $limit) : 0;
             fclose($out); fclose($stream);
+            $readBytes += max(0, (int) $copied);
             $names[] = basename(str_replace('\\', '/', $entry));
-            $texts[] = (new LegalCertificateTextExtractor())->extract($tmp, $ext);
+            try { $texts[] = $extractor->extract($tmp, $ext); }
+            catch (\Throwable $error) { error_log('Gestion avaluatoria PH ZIP entry ' . $names[array_key_last($names)] . ' ' . $error->getMessage()); }
             @unlink($tmp);
         }
         $zip->close();
@@ -103,10 +108,15 @@ final class AppraisalPhDocumentUploadService
         try {
             $this->extractRar($path, $dir, $name);
             $texts = []; $names = [];
+            $readBytes = 0; $extractor = new LegalCertificateTextExtractor();
             foreach ($this->extractedFiles($dir) as $file) {
                 $ext = mb_strtolower(pathinfo($file, PATHINFO_EXTENSION));
                 if (!in_array($ext, ['pdf', 'docx', 'txt', 'jpg', 'jpeg', 'png', 'webp', 'tif', 'tiff'], true)) continue;
-                $names[] = basename($file); $texts[] = (new LegalCertificateTextExtractor())->extract($file, $ext);
+                $size = (int) filesize($file);
+                if ($readBytes >= self::ARCHIVE_TOTAL_READ_BYTES || ($ext !== 'pdf' && $size > self::ARCHIVE_TOTAL_READ_BYTES)) continue;
+                $names[] = basename($file); $readBytes += min($size, self::ARCHIVE_ENTRY_READ_BYTES);
+                try { $texts[] = $extractor->extract($file, $ext); }
+                catch (\Throwable $error) { error_log('Gestion avaluatoria PH RAR entry ' . basename($file) . ' ' . $error->getMessage()); }
                 if (count($names) >= 80) break;
             }
             return [trim(implode("\n\n", array_filter($texts))), $names ?: [$name]];
