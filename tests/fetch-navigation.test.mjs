@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { isFetchableUrl, isLoginRedirect, redirectedUrl, shouldHandleLink, syncFormToken } from '../resources/js/fetch-navigation.js';
+import { installFetchNavigation, isFetchableUrl, isLoginRedirect, redirectedUrl, shouldHandleLink, syncFormToken } from '../resources/js/fetch-navigation.js';
 
 const current = 'https://example.test/public/avaluos?page=1';
 
@@ -100,4 +100,34 @@ test('detects protected action redirected to login', () => {
     assert.equal(isLoginRedirect('https://example.test/public/login', current), true);
     assert.equal(isLoginRedirect('https://other.test/public/login', current), false);
     assert.equal(isLoginRedirect('https://example.test/public/avaluos', current), false);
+});
+
+test('waits for pending module autosave before link navigation', async () => {
+    const originals = { document: globalThis.document, window: globalThis.window, fetch: globalThis.fetch };
+    const events = [];
+    const listeners = {};
+    globalThis.document = {
+        addEventListener: (type, handler) => { listeners[type] = handler; },
+        body: { setAttribute() {} },
+        documentElement: { dataset: {} },
+        getElementById: () => null,
+        querySelector: () => ({ content: 'csrf-token' }),
+    };
+    globalThis.window = {
+        location: { href: current, assign: () => events.push('assign') },
+        addEventListener() {},
+        gaFlushAutosaves: async () => { events.push('flush'); return true; },
+    };
+    globalThis.fetch = async () => {
+        events.push('fetch');
+        return { headers: { get: () => 'application/octet-stream' }, url: '' };
+    };
+    installFetchNavigation();
+    await listeners.click({
+        altKey: false, button: 0, ctrlKey: false, defaultPrevented: false, metaKey: false, shiftKey: false,
+        preventDefault() {},
+        target: { closest: () => link({ href: 'https://example.test/public/avaluos/abc/bien-sujeto' }) },
+    });
+    assert.deepEqual(events.slice(0, 2), ['flush', 'fetch']);
+    Object.assign(globalThis, originals);
 });

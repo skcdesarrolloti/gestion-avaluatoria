@@ -4,7 +4,7 @@ const activeStates = new Set();
 
 function stateFor(form) {
     if (!states.has(form)) {
-        const state = { dirty: false, saving: false, timer: null, controller: null };
+        const state = { form, dirty: false, saving: false, timer: null, controller: null, promise: null };
         states.set(form, state);
         activeStates.add(state);
     }
@@ -45,11 +45,12 @@ function updateVersion(form, result) {
 
 async function save(form) {
     const state = stateFor(form);
-    if (state.saving || !state.dirty) return;
+    if (state.saving) return state.promise;
+    if (!state.dirty) return;
     state.saving = true;
     state.controller = new AbortController();
     setStatus(form, 'Guardando cambios...', 'saving');
-    try {
+    state.promise = (async () => { try {
         const response = await fetch(form.dataset.autosaveEndpoint, {
             method: 'POST',
             body: formBody(form),
@@ -69,7 +70,9 @@ async function save(form) {
     } finally {
         state.saving = false;
         state.controller = null;
-    }
+        state.promise = null;
+    } })();
+    return state.promise;
 }
 
 function markDirty(form, target) {
@@ -90,7 +93,16 @@ function cancel(form) {
     state.dirty = false;
 }
 
+export async function flushModuleAutosaves() {
+    await Promise.all([...activeStates].map(state => {
+        clearTimeout(state.timer);
+        return save(state.form);
+    }));
+    return ![...activeStates].some(state => state.dirty || state.saving);
+}
+
 export function installModuleAutosave() {
+    window.gaFlushAutosaves = flushModuleAutosaves;
     document.addEventListener('input', event => markDirty(formFor(event.target), event.target));
     document.addEventListener('change', event => markDirty(formFor(event.target), event.target));
     document.addEventListener('submit', event => cancel(event.target), true);

@@ -1,4 +1,5 @@
 const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+const flushAutosaves = () => typeof window.gaFlushAutosaves === 'function' ? window.gaFlushAutosaves() : Promise.resolve(true);
 
 export function syncFormToken(body, token = csrfToken()) {
     if (body instanceof FormData && token) body.set('_token', token);
@@ -184,10 +185,11 @@ function formBody(form, submitter) {
 }
 
 export function installFetchNavigation() {
-    document.addEventListener('click', event => {
+    document.addEventListener('click', async event => {
         const link = event.target.closest?.('a[href]');
         if (!link || !shouldHandleLink(link, event)) return;
         event.preventDefault();
+        if (!await flushAutosaves()) return;
         visit(link.href, { text: 'Cargando página...' });
     });
 
@@ -208,9 +210,7 @@ export function installFetchNavigation() {
         visit(form.action, { method, body: formBody(form, event.submitter), text: 'Procesando...' });
     });
 
-    document.addEventListener('ga:loader', event => {
-        setBusy(Boolean(event.detail?.active), event.detail?.text || 'Procesando...');
-    });
+    document.addEventListener('ga:loader', event => setBusy(Boolean(event.detail?.active), event.detail?.text || 'Procesando...'));
 
     window.addEventListener('popstate', () => visit(window.location.href, {
         replace: true,
