@@ -9,6 +9,16 @@ final class OcrTextExtractor
     private const PDF_MAX_BYTES = 52428800;
     private const PDF_MAX_PAGES = 6;
 
+    public function diagnostics(): array
+    {
+        $shell = function_exists('shell_exec');
+        $exec = function_exists('exec');
+        $tesseract = $this->command('TESSERACT_BINARY', 'tesseract') !== '';
+        $pdftoppm = $this->command('PDFTOPPM_BINARY', 'pdftoppm') !== '';
+        return ['shell_exec' => $shell, 'exec' => $exec, 'tesseract' => $tesseract,
+            'pdftoppm' => $pdftoppm, 'pdf_ocr' => $shell && $exec && $tesseract && $pdftoppm];
+    }
+
     public function image(string $path): string
     {
         if ((int) @filesize($path) > self::IMAGE_MAX_BYTES) return '';

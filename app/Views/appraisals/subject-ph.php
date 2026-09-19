@@ -73,6 +73,13 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                         Sube ZIP/RAR hasta 300 MB o documentos sueltos hasta 50 MB. ZIP se abre siempre; RAR se procesa
                         si el servidor tiene extractor disponible y, si no, el sistema pedirá convertirlo a ZIP.
                     </p>
+                    <?php $ocr = is_array($phOcrDiagnostics ?? null) ? $phOcrDiagnostics : []; ?>
+                    <p class="mt-2 text-xs font-semibold <?= !empty($ocr['pdf_ocr']) ? 'text-emerald-700' : 'text-amber-800' ?>">
+                        OCR PDF escaneado: <?= !empty($ocr['pdf_ocr']) ? 'disponible' : 'incompleto' ?>
+                        · Tesseract <?= !empty($ocr['tesseract']) ? 'sí' : 'no' ?>
+                        · pdftoppm <?= !empty($ocr['pdftoppm']) ? 'sí' : 'no' ?>
+                        · ejecución PHP <?= (!empty($ocr['shell_exec']) && !empty($ocr['exec'])) ? 'sí' : 'no' ?>
+                    </p>
                 </div>
                 <form class="grid gap-3 lg:min-w-80" method="post" enctype="multipart/form-data"
                     action="<?= e(url($subjectActionBase . '/ph/soportes')) ?>" data-upload-progress data-upload-chunk-url="<?= e(url($subjectActionBase . '/ph/soportes/chunk')) ?>" data-upload-finish-url="<?= e(url($subjectActionBase . '/ph/soportes/finalizar')) ?>">
