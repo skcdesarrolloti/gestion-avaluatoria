@@ -26,6 +26,7 @@ $textLabels = [
 ];
 $tabs = [
     'identificacion' => ['Identificación', ['subject_title', 'address']],
+    'tipologias' => ['Unidades y tipologías', []],
     'fuentes' => ['Fuentes de dirección', ['address_certificate', 'address_midas', 'address_tax',
         'address_deed', 'address_other', 'adopted_source', 'adopted_address']],
     'ubicacion' => ['Ubicación territorial', []],
@@ -40,7 +41,6 @@ $tabs = [
     'servicios' => ['Servicios', ['water_service', 'energy_service', 'gas_service',
         'sewer_service', 'internet_service', 'service_continuity']],
     'cierre' => ['Fecha, coordenadas y notas', ['subject_reference_date', 'latitude', 'longitude']],
-    'tipologias' => ['Tipologías IGAC', []],
 ];
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"

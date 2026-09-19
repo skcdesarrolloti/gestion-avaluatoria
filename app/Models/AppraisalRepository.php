@@ -96,10 +96,8 @@ final class AppraisalRepository
             version = version + 1, updated_at = ? WHERE id = ? AND owner_id = ? AND version = ?');
         $query->execute([...array_map(static fn (string $field): mixed => $data[$field], $fields),
             $now, $id, $owner, $version]);
-        if ($query->rowCount() !== 1) {
-            $this->find($id, $owner);
-            throw new HttpException(409, 'Esta configuración cambió en otra pestaña. Revisa antes de guardar.');
-        }
+        if ($query->rowCount() !== 1) { $this->find($id, $owner); throw new HttpException(409, 'Esta configuración cambió en otra pestaña. Revisa antes de guardar.'); }
+        $this->ensureUnits($id, $owner, (int) $data['igac_property_units_count'], (int) $data['igac_annex_units_count']);
         return ['version' => $version + 1, 'saved_at' => str_replace(' ', 'T', $now) . 'Z'];
     }
 
