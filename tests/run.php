@@ -9,6 +9,7 @@ use App\Services\AppraisalValidator;
 use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalPhInput;
+use App\Services\AppraisalPhChunkUploadService;
 use App\Services\AppraisalPhDocumentUploadService;
 use App\Services\AppraisalSectorInput;
 use App\Services\AppraisalMidasReview;
@@ -443,6 +444,24 @@ try {
             && ($multiPh['technical']['patios_maniobra'] ?? '') !== ''
             && count($phRepo->documents(str_repeat('e', 32), 1)) === 2,
             'propiedad horizontal analiza varios soportes en un solo cargue');
+        $chunkContent = 'Reglamento de propiedad horizontal Copropiedad CHUNKS PH. Matricula matriz 060-333444.';
+        $chunkId = 'test_' . bin2hex(random_bytes(4)); $chunkService = new AppraisalPhChunkUploadService();
+        $chunkParts = str_split($chunkContent, 42);
+        foreach ($chunkParts as $index => $part) {
+            $tmp = tempnam(sys_get_temp_dir(), 'ga_ph_chunk_'); file_put_contents($tmp, $part);
+            $_POST = ['upload_id' => $chunkId, 'index' => (string) $index, 'total' => (string) count($chunkParts),
+                'filename' => 'reglamento-chunks.txt', 'size' => (string) strlen($chunkContent)];
+            $_FILES = ['chunk' => ['tmp_name' => $tmp, 'error' => UPLOAD_ERR_OK]];
+            $chunkService->store(str_repeat('f', 32), 1);
+        }
+        $_POST = ['upload_id' => $chunkId, 'total' => (string) count($chunkParts), 'filename' => 'reglamento-chunks.txt',
+            'size' => (string) strlen($chunkContent), 'ph_typology' => 'residencial'];
+        $_FILES = [];
+        $preparedPh = $chunkService->finish(str_repeat('f', 32), 1);
+        (new AppraisalPhDocumentUploadService())->storePrepared($preparedPh, str_repeat('f', 32), 1, 'residencial', $phRepo);
+        @rmdir(dirname($preparedPh['tmp_name'])); $_POST = []; $_FILES = [];
+        expect(($phRepo->profile(str_repeat('f', 32), 1)['matrix_registration'] ?? '') === '060-333444',
+            'propiedad horizontal ensambla carga por partes y analiza soporte');
         $largeZip = tempnam(sys_get_temp_dir(), 'ga_ph_large_zip_');
         $handle = fopen($largeZip, 'wb');
         fwrite($handle, "PK\x03\x04"); ftruncate($handle, 60 * 1024 * 1024); fclose($handle);

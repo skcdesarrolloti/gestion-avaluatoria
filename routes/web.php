@@ -73,6 +73,8 @@ return [
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/atributos/autoguardar$#', 'subject', 'autosaveAttributes', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph$#', 'subjectPh', 'save', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/autoguardar$#', 'subjectPh', 'autosave', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/soportes/chunk$#', 'subjectPh', 'uploadChunk', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/soportes/finalizar$#', 'subjectPh', 'finishChunkUpload', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/soportes$#', 'subjectPh', 'upload', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/fotos$#', 'subject', 'uploadPhotos', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/fotos/([a-f0-9]{32})/eliminar$#', 'subject', 'deletePhoto', true],

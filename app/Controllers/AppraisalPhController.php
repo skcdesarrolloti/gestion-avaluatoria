@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, Session};
 use App\Models\{AppraisalPhRepository, AppraisalRepository};
-use App\Services\{AppraisalPhDocumentUploadService, AppraisalPhInput};
+use App\Services\{AppraisalPhChunkUploadService, AppraisalPhDocumentUploadService, AppraisalPhInput};
 
 final class AppraisalPhController
 {
@@ -29,6 +29,22 @@ final class AppraisalPhController
             $typology = (string) ($_POST['ph_typology'] ?? '');
             (new AppraisalPhDocumentUploadService())->store($_FILES['ph_document'] ?? [], $id,
                 $this->user['id'], $typology, $this->ph);
+        }, 'Soporte PH analizado. Se llenaron los campos vacíos sugeridos por la lectura preliminar.');
+    }
+
+    public function uploadChunk(string $id): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        try { Http::json((new AppraisalPhChunkUploadService())->store($id, $this->user['id'])); }
+        catch (\Throwable $error) { Http::json(['ok' => false, 'message' => $error->getMessage()], 422); }
+    }
+
+    public function finishChunkUpload(string $id): never
+    {
+        $this->saveAndRedirect($id, function () use ($id): void {
+            $file = (new AppraisalPhChunkUploadService())->finish($id, $this->user['id']);
+            $typology = (string) ($_POST['ph_typology'] ?? '');
+            (new AppraisalPhDocumentUploadService())->storePrepared($file, $id, $this->user['id'], $typology, $this->ph);
         }, 'Soporte PH analizado. Se llenaron los campos vacíos sugeridos por la lectura preliminar.');
     }
 

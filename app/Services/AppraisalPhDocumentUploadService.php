@@ -13,6 +13,19 @@ final class AppraisalPhDocumentUploadService
     {
         $uploads = $this->files($files);
         if (!$uploads) throw new \RuntimeException('Selecciona al menos un soporte PH para analizar.');
+        return $this->storeFiles($uploads, $appraisalId, $owner, $typology, $repo, false);
+    }
+
+    public function storePrepared(array $file, string $appraisalId, int $owner, string $typology,
+        AppraisalPhRepository $repo): array
+    {
+        if (!$file) throw new \RuntimeException('Selecciona al menos un soporte PH para analizar.');
+        return $this->storeFiles([$file], $appraisalId, $owner, $typology, $repo, true);
+    }
+
+    private function storeFiles(array $uploads, string $appraisalId, int $owner, string $typology,
+        AppraisalPhRepository $repo, bool $prepared): array
+    {
         $texts = []; $names = []; $stored = [];
         foreach ($uploads as $file) {
             $name = mb_substr(basename(str_replace('\\', '/', (string) $file['name'])), 0, 220);
@@ -23,8 +36,10 @@ final class AppraisalPhDocumentUploadService
             $info = AppraisalPhDocumentStorage::inspect((string) $file['tmp_name'], $name);
             $id = bin2hex(random_bytes(16));
             $storageName = 'ph-' . $appraisalId . '-' . $id . '.' . $info['extension'];
-            $bytes = AppraisalPhDocumentStorage::storeUploaded((string) $file['tmp_name'],
-                AppraisalPhDocumentStorage::path($storageName));
+            $bytes = $prepared
+                ? AppraisalPhDocumentStorage::storeFile((string) $file['tmp_name'], AppraisalPhDocumentStorage::path($storageName))
+                : AppraisalPhDocumentStorage::storeUploaded((string) $file['tmp_name'], AppraisalPhDocumentStorage::path($storageName));
+            if ($prepared) @unlink((string) $file['tmp_name']);
             $path = AppraisalPhDocumentStorage::path($storageName);
             [$text, $readNames] = in_array($info['extension'], ['zip', 'rar'], true)
                 ? $this->archiveText($path, $name, $info['extension'])

@@ -75,7 +75,7 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                     </p>
                 </div>
                 <form class="grid gap-3 lg:min-w-80" method="post" enctype="multipart/form-data"
-                    action="<?= e(url($subjectActionBase . '/ph/soportes')) ?>" data-upload-progress>
+                    action="<?= e(url($subjectActionBase . '/ph/soportes')) ?>" data-upload-progress data-upload-chunk-url="<?= e(url($subjectActionBase . '/ph/soportes/chunk')) ?>" data-upload-finish-url="<?= e(url($subjectActionBase . '/ph/soportes/finalizar')) ?>">
                     <?= csrf_field() ?>
                     <select class="input" name="ph_typology" x-model="phTypology">
                         <option value="">Selecciona tipología PH de referencia</option>

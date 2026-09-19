@@ -55,6 +55,14 @@ final class AppraisalPhDocumentStorage
         return (int) filesize($destination);
     }
 
+    public static function storeFile(string $source, string $destination): int
+    {
+        self::ensure();
+        if (!copy($source, $destination)) throw new \RuntimeException('El soporte PH no quedó guardado.');
+        clearstatcache(true, $destination);
+        return (int) filesize($destination);
+    }
+
     public static function uploadErrorMessage(int $code): string
     {
         return match ($code) {

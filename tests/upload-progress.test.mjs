@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { installUploadProgress, uploadRedirectUrl } from '../resources/js/upload-progress.js';
+import { installUploadProgress, uploadErrorMessage, uploadRedirectUrl } from '../resources/js/upload-progress.js';
 
 const current = 'https://example.test/public/avaluos/abc/bien-sujeto#ph';
 const action = 'https://example.test/public/avaluos/abc/bien-sujeto/ph/soportes';
@@ -8,6 +8,11 @@ const action = 'https://example.test/public/avaluos/abc/bien-sujeto/ph/soportes'
 test('adds ph anchor after upload redirects without fragment', () => {
     assert.equal(uploadRedirectUrl('https://example.test/public/avaluos/abc/bien-sujeto', action, current),
         'https://example.test/public/avaluos/abc/bien-sujeto#ph');
+});
+
+test('shows specific message for rejected large uploads', () => {
+    assert.match(uploadErrorMessage({ status: 413, responseText: '' }), /tamaño/);
+    assert.equal(uploadErrorMessage({ status: 422, responseText: '{"message":"RAR no disponible"}' }), 'RAR no disponible');
 });
 
 test('submits marked upload form through xhr progress', () => {
