@@ -105,6 +105,12 @@ $tabs = [
             <div class="mt-5 grid gap-5 md:grid-cols-3">
                 <?php require BASE_PATH . '/app/Views/appraisals/subject-location-fields.php'; ?>
             </div>
+            <div class="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
+                <strong>Barrio / microsector es la llave sectorial.</strong>
+                Al guardar esta ficha, el numeral 2 usará este barrio para consultar el banco barrial:
+                si ya existe información sectorial guardada, la carga como base; si no existe, prepara
+                una ficha inicial para completar y guardar.
+            </div>
         </div>
         <?php foreach ($tabs as $tabKey => [$title, $keys]): ?>
             <?php if (in_array($tabKey, ['identificacion', 'ubicacion', 'tipologias'], true)) continue; ?>
