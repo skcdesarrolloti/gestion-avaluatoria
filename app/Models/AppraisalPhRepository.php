@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace App\Models;
+use App\Core\HttpException;
 use App\Support\AppraisalPhCatalog;
 use PDO;
 
@@ -109,6 +110,19 @@ final class AppraisalPhRepository
         $query->execute([$file['id'], $appraisalId, $owner, $file['source_filename'], $file['storage_filename'],
             $file['mime_type'], $file['file_size_bytes'], $file['extracted_chars'], $file['analysis_status'],
             $file['analysis_message'], $file['file_blob'], $now]);
+    }
+
+    public function deleteDocument(string $id, string $appraisalId, int $owner): string
+    {
+        $query = $this->db->prepare('SELECT storage_filename FROM appraisal_ph_documents
+            WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
+        $query->execute([$id, $appraisalId, $owner]);
+        $filename = (string) ($query->fetchColumn() ?: '');
+        if ($filename === '') throw new HttpException(404, 'No se encontró el soporte PH.');
+        $delete = $this->db->prepare('DELETE FROM appraisal_ph_documents
+            WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
+        $delete->execute([$id, $appraisalId, $owner]);
+        return $filename;
     }
 
     public function mergeAnalysis(string $appraisalId, int $owner, array $analysis): void

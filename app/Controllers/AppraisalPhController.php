@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, Session};
 use App\Models\{AppraisalPhRepository, AppraisalRepository};
-use App\Services\{AppraisalPhChunkUploadService, AppraisalPhDocumentUploadService, AppraisalPhInput};
+use App\Services\{AppraisalPhChunkUploadService, AppraisalPhDocumentStorage, AppraisalPhDocumentUploadService, AppraisalPhInput};
 
 final class AppraisalPhController
 {
@@ -46,6 +46,15 @@ final class AppraisalPhController
             $typology = (string) ($_POST['ph_typology'] ?? '');
             (new AppraisalPhDocumentUploadService())->storePrepared($file, $id, $this->user['id'], $typology, $this->ph);
         }, 'Soporte PH analizado. Se llenaron los campos vacíos sugeridos por la lectura preliminar.');
+    }
+
+    public function deleteDocument(string $id, string $documentId): never
+    {
+        $this->saveAndRedirect($id, function () use ($id, $documentId): void {
+            $filename = $this->ph->deleteDocument($documentId, $id, $this->user['id']);
+            $path = $filename !== '' ? AppraisalPhDocumentStorage::path($filename) : '';
+            if ($path !== '' && is_file($path)) @unlink($path);
+        }, 'Soporte PH eliminado. Los campos ya diligenciados se conservaron.');
     }
 
     private function saveAndRedirect(string $id, callable $save, string $message): never

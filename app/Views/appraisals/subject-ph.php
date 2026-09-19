@@ -101,15 +101,7 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                 </div>
                 <div class="rounded-xl bg-white p-4">
                     <h4 class="font-semibold">Soportes cargados</h4>
-                    <?php if (!empty($phDocuments)): ?>
-                        <ul class="mt-2 space-y-1 text-sm text-slate-700">
-                            <?php foreach (array_slice($phDocuments, 0, 5) as $doc): ?>
-                                <li><?= e($doc['source_filename']) ?> · <?= e((string) $doc['extracted_chars']) ?> caracteres</li>
-                            <?php endforeach; ?>
-                        </ul>
-                    <?php else: ?>
-                        <p class="mt-2 text-sm text-slate-600">Sin soportes cargados.</p>
-                    <?php endif; ?>
+                    <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-documents.php'; ?>
                 </div>
             </div>
         </section>

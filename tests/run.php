@@ -438,9 +438,13 @@ try {
         (new AppraisalPhDocumentUploadService())->store(uploadFixture('soportes-ph.zip', $zipPath),
             str_repeat('a', 32), 1, 'bodegas', $phRepo);
         $analyzedPh = $phRepo->profile(str_repeat('a', 32), 1);
+        $phDocs = $phRepo->documents(str_repeat('a', 32), 1);
         expect(($analyzedPh['technical']['vias_internas'] ?? '') !== ''
-            && count($phRepo->documents(str_repeat('a', 32), 1)) === 1,
+            && count($phDocs) === 1,
             'propiedad horizontal analiza ZIP y conserva soporte');
+        $deletedPhStorage = $phRepo->deleteDocument((string) $phDocs[0]['id'], str_repeat('a', 32), 1);
+        expect($deletedPhStorage !== '' && count($phRepo->documents(str_repeat('a', 32), 1)) === 0,
+            'propiedad horizontal permite eliminar soporte cargado');
         $mixedZipPath = tempnam(sys_get_temp_dir(), 'ga_ph_mixed_zip_');
         $zip = new ZipArchive();
         $zip->open($mixedZipPath, ZipArchive::OVERWRITE);
