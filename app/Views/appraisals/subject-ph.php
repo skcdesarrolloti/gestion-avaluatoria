@@ -67,8 +67,8 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                 <div>
                     <h3 class="text-lg font-semibold">Preparar y cargar reglamento / soportes PH</h3>
                     <p class="mt-2 text-sm leading-6 text-slate-600">
-                        Sube ZIP, RAR, PDF, DOCX, TXT o imágenes. ZIP se abre siempre; RAR se procesa si el servidor
-                        tiene extractor disponible y, si no, el sistema pedirá convertirlo a ZIP.
+                        Sube ZIP/RAR hasta 300 MB o documentos sueltos hasta 50 MB. ZIP se abre siempre; RAR se procesa
+                        si el servidor tiene extractor disponible y, si no, el sistema pedirá convertirlo a ZIP.
                     </p>
                 </div>
                 <form class="grid gap-3 lg:min-w-80" method="post" enctype="multipart/form-data"

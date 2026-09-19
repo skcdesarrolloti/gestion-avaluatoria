@@ -443,6 +443,19 @@ try {
             && ($multiPh['technical']['patios_maniobra'] ?? '') !== ''
             && count($phRepo->documents(str_repeat('e', 32), 1)) === 2,
             'propiedad horizontal analiza varios soportes en un solo cargue');
+        $largeZip = tempnam(sys_get_temp_dir(), 'ga_ph_large_zip_');
+        $handle = fopen($largeZip, 'wb');
+        fwrite($handle, "PK\x03\x04"); ftruncate($handle, 60 * 1024 * 1024); fclose($handle);
+        $zipInfo = \App\Services\AppraisalPhDocumentStorage::inspect($largeZip, 'reglamento-grande.zip');
+        expect($zipInfo['extension'] === 'zip', 'propiedad horizontal acepta paquete ZIP mayor a 50MB');
+        $largePdf = tempnam(sys_get_temp_dir(), 'ga_ph_large_pdf_');
+        $handle = fopen($largePdf, 'wb');
+        fwrite($handle, '%PDF'); ftruncate($handle, 60 * 1024 * 1024); fclose($handle);
+        $rejectedLargePdf = false;
+        try { \App\Services\AppraisalPhDocumentStorage::inspect($largePdf, 'reglamento-grande.pdf'); }
+        catch (\InvalidArgumentException) { $rejectedLargePdf = true; }
+        expect($rejectedLargePdf, 'propiedad horizontal limita soporte suelto mayor a 50MB');
+        unlink($largeZip); unlink($largePdf);
         foreach (glob($phDir . '/*') ?: [] as $file) unlink($file);
         rmdir($phDir);
         putenv('APPRAISAL_PH_DOCUMENT_DIR');

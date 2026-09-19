@@ -5,6 +5,8 @@ use App\Models\AppraisalPhRepository;
 
 final class AppraisalPhDocumentUploadService
 {
+    private const BLOB_BACKUP_BYTES = 52428800;
+
     public function store(array $files, string $appraisalId, int $owner, string $typology,
         AppraisalPhRepository $repo): array
     {
@@ -27,8 +29,10 @@ final class AppraisalPhDocumentUploadService
                 ? $this->archiveText($path, $name, $info['extension'])
                 : $this->singleText($path, $name, $info['extension']);
             $texts[] = $text; $names = array_merge($names, $readNames);
-            $blob = file_get_contents($path);
-            if (!is_string($blob)) throw new \RuntimeException('El soporte PH se guardó, pero no quedó respaldado.');
+            $blob = $bytes <= self::BLOB_BACKUP_BYTES ? file_get_contents($path) : null;
+            if ($bytes <= self::BLOB_BACKUP_BYTES && !is_string($blob)) {
+                throw new \RuntimeException('El soporte PH se guardó, pero no quedó respaldado.');
+            }
             $stored[] = ['id' => $id, 'source_filename' => $name, 'storage_filename' => $storageName,
                 'mime_type' => $info['mime'], 'file_size_bytes' => $bytes, 'extracted_chars' => mb_strlen($text),
                 'file_blob' => $blob];

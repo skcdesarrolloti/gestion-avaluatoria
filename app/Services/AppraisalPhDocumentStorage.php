@@ -7,7 +7,8 @@ final class AppraisalPhDocumentStorage
 {
     private const ENV_KEY = 'APPRAISAL_PH_DOCUMENT_DIR';
     private const DEFAULT_DIR = '/storage/propiedad-horizontal';
-    private const MAX_BYTES = 52428800;
+    private const MAX_FILE_BYTES = 52428800;
+    private const MAX_ARCHIVE_BYTES = 314572800;
     private const EXTENSIONS = ['zip' => 'application/zip', 'rar' => 'application/vnd.rar', 'pdf' => 'application/pdf',
         'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
         'txt' => 'text/plain', 'jpg' => 'image/jpeg', 'jpeg' => 'image/jpeg',
@@ -31,9 +32,15 @@ final class AppraisalPhDocumentStorage
         }
         $size = (int) filesize($path);
         if ($size <= 0) {
-            throw new \InvalidArgumentException('El soporte PH llegó vacío. Selecciona nuevamente el archivo o súbelo dentro de un ZIP válido.');
+            throw new \InvalidArgumentException('El soporte PH llegó vacío. Selecciona nuevamente el archivo o súbelo dentro de un ZIP/RAR válido.');
         }
-        if ($size > self::MAX_BYTES) throw new \InvalidArgumentException('Cada soporte PH debe pesar máximo 50 MB.');
+        $archive = in_array($ext, ['zip', 'rar'], true);
+        $limit = $archive ? self::MAX_ARCHIVE_BYTES : self::MAX_FILE_BYTES;
+        if ($size > $limit) {
+            throw new \InvalidArgumentException($archive
+                ? 'Cada ZIP/RAR PH debe pesar máximo 300 MB.'
+                : 'Cada soporte PH suelto debe pesar máximo 50 MB.');
+        }
         if ($ext === 'zip' && !self::startsWith($path, "PK\x03\x04")) throw new \InvalidArgumentException('El ZIP no parece válido.');
         if ($ext === 'rar' && !self::isRar($path)) throw new \InvalidArgumentException('El RAR no parece válido.');
         return ['extension' => $ext === 'jpeg' ? 'jpg' : $ext, 'mime' => self::EXTENSIONS[$ext], 'bytes' => $size];
