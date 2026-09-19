@@ -1,8 +1,7 @@
 <?php
 $phApplies = (string) ($record['regimen_ph'] ?? '') === 'si';
 $ph = is_array($phProfile ?? null) ? $phProfile : [];
-$legalPh = is_array($phLegalPrefill ?? null) ? $phLegalPrefill : [];
-$phText = static fn (string $key): string => (string) (($ph[$key] ?? '') ?: ($legalPh[$key] ?? ''));
+$phText = static fn (string $key): string => (string) ($ph[$key] ?? '');
 $phMap = static fn (string $group, string $key, string $field): string =>
     (string) (($ph[$group][$key][$field] ?? ''));
 $technical = is_array($ph['technical'] ?? null) ? $ph['technical'] : [];
@@ -30,7 +29,11 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
     </label>
 <?php };
 ?>
-<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
+    x-data="{
+        phTypology: <?= e(json_encode((string) ($ph['ph_typology'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+        phTypologyLabels: <?= e(json_encode($phCatalog['typologies'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>, phTypologyLabel() { return this.phTypologyLabels[this.phTypology] || 'Pendiente de selección' }
+    }">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">3.5 Propiedad horizontal</p>
@@ -74,8 +77,8 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                 <form class="grid gap-3 lg:min-w-80" method="post" enctype="multipart/form-data"
                     action="<?= e(url($subjectActionBase . '/ph/soportes')) ?>" data-upload-progress>
                     <?= csrf_field() ?>
-                    <select class="input" name="ph_typology">
-                        <option value="">Tipología PH para orientar lectura</option>
+                    <select class="input" name="ph_typology" x-model="phTypology">
+                        <option value="">Selecciona tipología PH de referencia</option>
                         <?php foreach ($phCatalog['typologies'] as $value => $label): ?>
                             <option value="<?= e($value) ?>" <?= (string) ($ph['ph_typology'] ?? '') === (string) $value ? 'selected' : '' ?>><?= e($label) ?></option>
                         <?php endforeach; ?>
@@ -113,6 +116,7 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
         <form class="mt-6 space-y-6" method="post" action="<?= e(url($subjectActionBase . '/ph')) ?>"
             data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/ph/autoguardar')) ?>">
             <?= csrf_field() ?>
+            <input type="hidden" name="ph[ph_typology]" :value="phTypology">
             <div x-data="{ tab: 'identidad' }">
                 <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
                     <?php foreach ([
@@ -129,14 +133,10 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                 </div>
 
                 <section class="mt-5 grid gap-4 lg:grid-cols-2" x-show="tab === 'identidad'">
-                    <label class="label">Tipología PH de referencia
-                        <select class="input mt-2" name="ph[ph_typology]">
-                            <option value="">Selecciona tipología PH</option>
-                            <?php foreach ($phCatalog['typologies'] as $value => $label): ?>
-                                <option value="<?= e($value) ?>" <?= (string) ($ph['ph_typology'] ?? '') === (string) $value ? 'selected' : '' ?>><?= e($label) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </label>
+                    <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950 lg:col-span-2">
+                        <strong>Tipología PH de referencia:</strong>
+                        <span x-text="phTypologyLabel()"></span>
+                    </div>
                     <?php $renderPhInput('ph_name', 'Nombre de la copropiedad / agrupación', $phText('ph_name'), 'Ej. Edificio, conjunto, centro comercial o zona franca.'); ?>
                     <?php $renderPhInput('ph_key', 'Llave técnica PH', $phText('ph_key'), 'NIT, matrícula matriz o nombre normalizado para reutilizarla luego.'); ?>
                     <label class="label">Vínculo con sector por barrio
