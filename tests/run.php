@@ -421,6 +421,12 @@ try {
         && ($phAnalysis['risks']['restricciones_uso']['status'] ?? '') === 'warn'
         && str_contains((string) ($phAnalysis['core']['report_text'] ?? ''), 'no reemplaza estudio de títulos'),
         'analizador PH migra lectura avanzada y texto preliminar');
+    $emptyPhAnalysis = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
+        '', ['ESCRITURA PUBLICA 2593 EDIFICIO CHAMBACU.pdf'], 'oficinas');
+    expect(!isset($emptyPhAnalysis['core']['ph_name'])
+        && !isset($emptyPhAnalysis['linkage']['coproperty_name'])
+        && str_contains((string) $emptyPhAnalysis['summary'], 'No se extrajo texto útil'),
+        'analizador PH no infiere copropiedad desde nombre de archivo');
     if (class_exists(ZipArchive::class)) {
         $phDir = sys_get_temp_dir() . '/ga-ph-test-' . bin2hex(random_bytes(4));
         putenv('APPRAISAL_PH_DOCUMENT_DIR=' . $phDir);

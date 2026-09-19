@@ -141,7 +141,7 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                     <?php $renderPhInput('ph_key', 'Llave técnica PH', $phText('ph_key'), 'NIT, matrícula matriz o nombre normalizado para reutilizarla luego.'); ?>
                     <label class="label">Vínculo con sector por barrio
                         <input class="input mt-2" name="ph[linkage][sector_neighborhood]"
-                            value="<?= e((string) (($linkage['sector_neighborhood'] ?? '') ?: ($subject['neighborhood_name'] ?? ''))) ?>">
+                            value="<?= e((string) ($linkage['sector_neighborhood'] ?? '')) ?>" placeholder="Barrio validado de la copropiedad">
                     </label>
                     <label class="label">Vínculo jurídico por matrícula inmobiliaria
                         <input class="input mt-2" name="ph[linkage][legal_registration]"

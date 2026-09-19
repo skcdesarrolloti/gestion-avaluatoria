@@ -130,7 +130,7 @@ final class LegalCertificateTextExtractor
         $text = (string) @shell_exec($command);
         $text = trim(preg_replace('/[ \t]+/', ' ', $text) ?? $text);
         if (mb_strlen($text) < 30) return '';
-        return preg_match('/matr|anotaci|folio|certificado|referencia|departamento|municipio/iu', $text) ? $text : '';
+        return preg_match('/matr|anotaci|folio|certificado|referencia|departamento|municipio|propiedad horizontal|copropiedad|reglamento|coeficiente|unidades privadas/iu', $text) ? $text : '';
     }
 
     private function externalOcrText(string $path): string
@@ -148,7 +148,7 @@ final class LegalCertificateTextExtractor
             if (mb_strlen($text) < 30 || preg_match('/error opening data file|failed loading language|could not initialize/iu', $text)) {
                 continue;
             }
-            if (preg_match('/matr|anotaci|folio|certificado|registro|supernotariado|departamento|municipio/iu', $text)) {
+            if (preg_match('/matr|anotaci|folio|certificado|registro|supernotariado|departamento|municipio|propiedad horizontal|copropiedad|reglamento|coeficiente|unidades privadas/iu', $text)) {
                 return $text;
             }
         }

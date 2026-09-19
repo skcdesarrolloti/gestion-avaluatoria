@@ -7,6 +7,7 @@ final class AppraisalPhDocumentAnalyzer
 {
     public function analyze(string $text, array $fileNames, string $typology): array
     {
+        $hasText = trim($text) !== '';
         $technical = [];
         foreach ($this->rules() as $key => $needles) {
             $snippet = $this->snippet($text, $needles);
@@ -55,9 +56,11 @@ final class AppraisalPhDocumentAnalyzer
         $total = count($this->fieldKeys());
         return ['core' => array_filter($core), 'linkage' => array_filter($linkage),
             'technical' => $technical, 'common_areas' => $common, 'documents' => $documents, 'risks' => $risks,
-            'summary' => "$filled de $total campos técnicos sugeridos desde "
-                . count($fileNames) . ' archivo(s). Revisa contra el documento original antes del entregable.',
+            'summary' => $hasText
+                ? "$filled de $total campos técnicos sugeridos desde " . count($fileNames) . ' archivo(s). Revisa contra el documento original antes del entregable.'
+                : 'No se extrajo texto útil del soporte PH. El archivo quedó registrado, pero debes diligenciar manualmente o subir un PDF con texto/OCR, DOCX o TXT.',
             'findings' => array_values(array_filter([
+                !$hasText ? 'Sin texto extraíble: el PDF puede estar escaneado, protegido o no tener OCR.' : '',
                 $core['ph_name'] ? 'Copropiedad probable: ' . $core['ph_name'] : '',
                 $core['matrix_registration'] ? 'Matrícula matriz probable: ' . $core['matrix_registration'] : '',
                 $core['coefficient'] ? 'Coeficiente probable: ' . $core['coefficient'] : '',
@@ -135,8 +138,7 @@ final class AppraisalPhDocumentAnalyzer
             $value = $this->match($pattern, $text);
             if ($value !== '') return mb_substr(trim($value, " .,\n\r\t"), 0, 190);
         }
-        $base = pathinfo($fileNames[0] ?? '', PATHINFO_FILENAME);
-        return mb_substr(trim((string) preg_replace('/[_-]+/', ' ', $base)), 0, 190);
+        return '';
     }
 
     private function snippet(string $text, array $needles): string
