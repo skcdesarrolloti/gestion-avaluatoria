@@ -74,6 +74,7 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                         si el servidor tiene extractor disponible y, si no, el sistema pedirá convertirlo a ZIP.
                     </p>
                     <?php $ocr = is_array($phOcrDiagnostics ?? null) ? $phOcrDiagnostics : []; ?>
+                    <?php $phExternalOcr = !empty($ocr['external']); ?>
                     <p class="mt-2 text-xs font-semibold <?= !empty($ocr['pdf_ocr']) ? 'text-emerald-700' : 'text-amber-800' ?>">
                         OCR PDF escaneado: <?= !empty($ocr['pdf_ocr']) ? 'disponible' : 'incompleto' ?>
                         · Tesseract <?= !empty($ocr['tesseract']) ? 'sí' : 'no' ?>

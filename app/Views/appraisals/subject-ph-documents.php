@@ -1,21 +1,32 @@
 <?php if (!empty($phDocuments)): ?>
     <ul class="mt-2 space-y-2 text-sm text-slate-700">
         <?php foreach (array_slice($phDocuments, 0, 8) as $doc): ?>
+            <?php $canLoad = (int) ($doc['extracted_chars'] ?? 0) > 0; ?>
             <li class="flex flex-wrap items-center justify-between gap-2 rounded-lg border border-slate-100 bg-slate-50 px-3 py-2">
                 <span><?= e($doc['source_filename']) ?> · <?= e((string) $doc['extracted_chars']) ?> caracteres</span>
                 <div class="flex flex-wrap gap-2">
-                    <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/cargar')) ?>">
-                        <?= csrf_field() ?>
-                        <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
-                        <input type="hidden" name="ph_typology" value="<?= e((string) ($ph['ph_typology'] ?? '')) ?>">
-                        <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="submit">Cargar</button>
-                    </form>
-                    <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/ocr-externo')) ?>">
-                        <?= csrf_field() ?>
-                        <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
-                        <input type="hidden" name="ph_typology" value="<?= e((string) ($ph['ph_typology'] ?? '')) ?>">
-                        <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="submit">Leer con IA/OCR</button>
-                    </form>
+                    <?php if ($canLoad): ?>
+                        <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/cargar')) ?>">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
+                            <input type="hidden" name="ph_typology" value="<?= e((string) ($ph['ph_typology'] ?? '')) ?>">
+                            <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="submit">Cargar</button>
+                        </form>
+                    <?php else: ?>
+                        <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="button" disabled
+                            title="No hay texto extraído para cargar en la ficha.">Cargar</button>
+                        <?php if (!empty($phExternalOcr)): ?>
+                            <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/ocr-externo')) ?>">
+                                <?= csrf_field() ?>
+                                <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
+                                <input type="hidden" name="ph_typology" value="<?= e((string) ($ph['ph_typology'] ?? '')) ?>">
+                                <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="submit">Leer con IA/OCR</button>
+                            </form>
+                        <?php else: ?>
+                            <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="button" disabled
+                                title="Falta configurar PH_EXTERNAL_OCR_ENDPOINT en el servidor.">IA no configurada</button>
+                        <?php endif; ?>
+                    <?php endif; ?>
                     <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/eliminar')) ?>"
                         onsubmit="return confirm('¿Eliminar este soporte PH del avalúo? Los campos ya diligenciados se conservarán.');">
                         <?= csrf_field() ?>
