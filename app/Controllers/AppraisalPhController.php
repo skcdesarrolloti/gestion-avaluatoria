@@ -50,11 +50,16 @@ final class AppraisalPhController
 
     public function deleteDocument(string $id, string $documentId): never
     {
-        $this->saveAndRedirect($id, function () use ($id, $documentId): void {
-            $filename = $this->ph->deleteDocument($documentId, $id, $this->user['id']);
-            $path = $filename !== '' ? AppraisalPhDocumentStorage::path($filename) : '';
+        $this->appraisals->find($id, $this->user['id']);
+        try {
+            $result = $this->ph->deleteDocument($documentId, $id, $this->user['id']);
+            $path = $result['filename'] !== '' ? AppraisalPhDocumentStorage::path($result['filename']) : '';
             if ($path !== '' && is_file($path)) @unlink($path);
-        }, 'Soporte PH eliminado. Los campos ya diligenciados se conservaron.');
+            Session::flash('ph_message', $result['cleared']
+                ? 'Soporte PH eliminado. Se limpió la lectura automática porque no quedan soportes cargados.'
+                : 'Soporte PH eliminado.');
+        } catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
+        Http::redirect('avaluos/' . $id . '/bien-sujeto#ph');
     }
 
     private function saveAndRedirect(string $id, callable $save, string $message): never

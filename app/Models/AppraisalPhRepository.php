@@ -112,7 +112,7 @@ final class AppraisalPhRepository
             $file['analysis_message'], $file['file_blob'], $now]);
     }
 
-    public function deleteDocument(string $id, string $appraisalId, int $owner): string
+    public function deleteDocument(string $id, string $appraisalId, int $owner): array
     {
         $query = $this->db->prepare('SELECT storage_filename FROM appraisal_ph_documents
             WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
@@ -122,7 +122,9 @@ final class AppraisalPhRepository
         $delete = $this->db->prepare('DELETE FROM appraisal_ph_documents
             WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
         $delete->execute([$id, $appraisalId, $owner]);
-        return $filename;
+        $cleared = !$this->hasDocuments($appraisalId, $owner);
+        if ($cleared) $this->clearDocumentAnalysis($appraisalId, $owner);
+        return ['filename' => $filename, 'cleared' => $cleared];
     }
 
     public function mergeAnalysis(string $appraisalId, int $owner, array $analysis): void
@@ -146,6 +148,24 @@ final class AppraisalPhRepository
         $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_ph_profiles WHERE appraisal_id = ? AND owner_id = ?');
         $query->execute([$appraisalId, $owner]);
         return (int) $query->fetchColumn() > 0;
+    }
+
+    private function hasDocuments(string $appraisalId, int $owner): bool
+    {
+        $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_ph_documents WHERE appraisal_id = ? AND owner_id = ?');
+        $query->execute([$appraisalId, $owner]);
+        return (int) $query->fetchColumn() > 0;
+    }
+
+    private function clearDocumentAnalysis(string $appraisalId, int $owner): void
+    {
+        $query = $this->db->prepare("UPDATE appraisal_ph_profiles SET ph_key = '', ph_name = '',
+            matrix_registration = '', private_unit = '', coefficient = '', regulation_document = '',
+            reform_documents = '', monthly_fee = '', restrictions_text = '', diagnosis_text = '',
+            report_text = '', linkage_json = '[]', common_areas_json = '[]', documents_json = '[]',
+            risks_json = '[]', technical_json = '[]', source_summary = '', findings_json = '[]',
+            updated_at = ? WHERE appraisal_id = ? AND owner_id = ?");
+        $query->execute([gmdate('Y-m-d H:i:s'), $appraisalId, $owner]);
     }
 
     private function values(array $fields, array $data): array
