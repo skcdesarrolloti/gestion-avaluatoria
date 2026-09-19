@@ -1,13 +1,11 @@
 <?php
 declare(strict_types=1);
 namespace App\Services;
-use App\Core\Env;
 
 final class LegalCertificateTextExtractor
 {
     private const EXTERNAL_PDF_MAX_BYTES = 25165824;
     private const PDF_RAW_READ_BYTES = 25165824;
-    private const OCR_IMAGE_MAX_BYTES = 8388608;
 
     public function extract(string $path, string $extension): string
     {
@@ -67,13 +65,15 @@ final class LegalCertificateTextExtractor
         }
         $text = trim(implode("\n", array_filter($parts, static fn (string $v): bool => trim($v) !== '')));
         if ($text !== '') return $text;
+        $ocr = (new OcrTextExtractor())->pdf($path);
+        if ($ocr !== '') return $ocr;
         $fallback = preg_replace('/[^\PC\s]/u', ' ', $raw);
         return is_string($fallback) ? trim($fallback) : '';
     }
 
     private function image(string $path): string
     {
-        return $this->externalOcrText($path);
+        return (new OcrTextExtractor())->image($path);
     }
 
     private function pdfStreams(string $raw): array
@@ -134,34 +134,4 @@ final class LegalCertificateTextExtractor
         return preg_match('/matr|anotaci|folio|certificado|referencia|departamento|municipio|propiedad horizontal|copropiedad|reglamento|coeficiente|unidades privadas/iu', $text) ? $text : '';
     }
 
-    private function externalOcrText(string $path): string
-    {
-        if (!function_exists('shell_exec') || !is_file($path)) return '';
-        if ((int) filesize($path) > self::OCR_IMAGE_MAX_BYTES) return '';
-        $binary = $this->tesseractBinary();
-        if ($binary === '') return '';
-        foreach (['spa+eng', 'spa', 'eng', ''] as $language) {
-            $command = escapeshellarg($binary) . ' ' . escapeshellarg($path) . ' stdout'
-                . ($language !== '' ? ' -l ' . escapeshellarg($language) : '')
-                . ' --psm 6 2>&1';
-            $text = (string) @shell_exec($command);
-            $text = trim(preg_replace('/[ \t]+/', ' ', $text) ?? $text);
-            if (mb_strlen($text) < 30 || preg_match('/error opening data file|failed loading language|could not initialize/iu', $text)) {
-                continue;
-            }
-            if (preg_match('/matr|anotaci|folio|certificado|registro|supernotariado|departamento|municipio|propiedad horizontal|copropiedad|reglamento|coeficiente|unidades privadas/iu', $text)) {
-                return $text;
-            }
-        }
-        return '';
-    }
-
-    private function tesseractBinary(): string
-    {
-        $configured = trim(Env::get('TESSERACT_BINARY'));
-        if ($configured !== '') return $configured;
-        $locator = PHP_OS_FAMILY === 'Windows' ? 'where tesseract 2>NUL' : 'command -v tesseract 2>/dev/null';
-        $binary = trim((string) @shell_exec($locator));
-        return preg_split('/\R/', $binary)[0] ?? '';
-    }
 }
