@@ -8,6 +8,10 @@ final class AppraisalPhDocumentUploadService
     private const BLOB_BACKUP_BYTES = 52428800;
     private const ARCHIVE_ENTRY_READ_BYTES = 12582912;
     private const ARCHIVE_TOTAL_READ_BYTES = 25165824;
+    private const LARGE_ARCHIVE_BYTES = 104857600;
+    private const LARGE_ARCHIVE_ENTRY_READ_BYTES = 1048576;
+    private const LARGE_ARCHIVE_TOTAL_READ_BYTES = 4194304;
+    private const ARCHIVE_TIME_SECONDS = 18;
 
     public function store(array $files, string $appraisalId, int $owner, string $typology,
         AppraisalPhRepository $repo): array
@@ -76,19 +80,23 @@ final class AppraisalPhDocumentUploadService
     {
         $zip = new \ZipArchive();
         if ($zip->open($path) !== true) throw new \RuntimeException("$name no es un ZIP válido.");
+        $large = (int) filesize($path) > self::LARGE_ARCHIVE_BYTES;
+        $entryBytes = $large ? self::LARGE_ARCHIVE_ENTRY_READ_BYTES : self::ARCHIVE_ENTRY_READ_BYTES;
+        $totalBytes = $large ? self::LARGE_ARCHIVE_TOTAL_READ_BYTES : self::ARCHIVE_TOTAL_READ_BYTES;
+        $allowed = $large ? ['pdf', 'docx', 'txt'] : ['pdf', 'docx', 'txt', 'jpg', 'jpeg', 'png', 'webp', 'tif', 'tiff'];
+        $deadline = microtime(true) + self::ARCHIVE_TIME_SECONDS;
         $texts = []; $names = []; $readBytes = 0; $extractor = new LegalCertificateTextExtractor();
-        for ($i = 0; $i < $zip->numFiles && count($names) < 80 && $readBytes < self::ARCHIVE_TOTAL_READ_BYTES; $i++) {
+        for ($i = 0; $i < $zip->numFiles && count($names) < 80 && $readBytes < $totalBytes && microtime(true) < $deadline; $i++) {
             $entry = $zip->getNameIndex($i);
             if (!is_string($entry) || str_ends_with($entry, '/')) continue;
             $ext = mb_strtolower(pathinfo($entry, PATHINFO_EXTENSION));
-            if (!in_array($ext, ['pdf', 'docx', 'txt', 'jpg', 'jpeg', 'png', 'webp', 'tif', 'tiff'], true)) continue;
+            if (!in_array($ext, $allowed, true)) continue;
             $stream = $zip->getStream($entry);
             if (!$stream) continue;
             $tmp = tempnam(sys_get_temp_dir(), 'ga_ph_zip_');
             $out = fopen($tmp, 'wb');
             if (!$out) { fclose($stream); continue; }
-            $limit = min($ext === 'pdf' ? self::ARCHIVE_ENTRY_READ_BYTES : self::ARCHIVE_TOTAL_READ_BYTES,
-                self::ARCHIVE_TOTAL_READ_BYTES - $readBytes);
+            $limit = min($ext === 'pdf' ? $entryBytes : $totalBytes, $totalBytes - $readBytes);
             $copied = $limit > 0 ? stream_copy_to_stream($stream, $out, $limit) : 0;
             fclose($out); fclose($stream);
             $readBytes += max(0, (int) $copied);
@@ -108,13 +116,19 @@ final class AppraisalPhDocumentUploadService
         try {
             $this->extractRar($path, $dir, $name);
             $texts = []; $names = [];
+            $large = (int) filesize($path) > self::LARGE_ARCHIVE_BYTES;
+            $entryBytes = $large ? self::LARGE_ARCHIVE_ENTRY_READ_BYTES : self::ARCHIVE_ENTRY_READ_BYTES;
+            $totalBytes = $large ? self::LARGE_ARCHIVE_TOTAL_READ_BYTES : self::ARCHIVE_TOTAL_READ_BYTES;
+            $deadline = microtime(true) + self::ARCHIVE_TIME_SECONDS;
             $readBytes = 0; $extractor = new LegalCertificateTextExtractor();
             foreach ($this->extractedFiles($dir) as $file) {
+                if ($readBytes >= $totalBytes || microtime(true) >= $deadline) break;
                 $ext = mb_strtolower(pathinfo($file, PATHINFO_EXTENSION));
                 if (!in_array($ext, ['pdf', 'docx', 'txt', 'jpg', 'jpeg', 'png', 'webp', 'tif', 'tiff'], true)) continue;
                 $size = (int) filesize($file);
-                if ($readBytes >= self::ARCHIVE_TOTAL_READ_BYTES || ($ext !== 'pdf' && $size > self::ARCHIVE_TOTAL_READ_BYTES)) continue;
-                $names[] = basename($file); $readBytes += min($size, self::ARCHIVE_ENTRY_READ_BYTES);
+                if ($large && !in_array($ext, ['pdf', 'docx', 'txt'], true)) continue;
+                if ($ext !== 'pdf' && $size > $totalBytes) continue;
+                $names[] = basename($file); $readBytes += min($size, $entryBytes);
                 try { $texts[] = $extractor->extract($file, $ext); }
                 catch (\Throwable $error) { error_log('Gestion avaluatoria PH RAR entry ' . basename($file) . ' ' . $error->getMessage()); }
                 if (count($names) >= 80) break;
