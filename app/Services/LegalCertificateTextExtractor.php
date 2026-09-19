@@ -6,6 +6,9 @@ final class LegalCertificateTextExtractor
 {
     private const EXTERNAL_PDF_MAX_BYTES = 25165824;
     private const PDF_RAW_READ_BYTES = 25165824;
+    private const QUICK_PDF_RAW_MAX_BYTES = 8388608;
+
+    public function __construct(private bool $quickPdfFallback = false) {}
 
     public function extract(string $path, string $extension): string
     {
@@ -47,6 +50,8 @@ final class LegalCertificateTextExtractor
     {
         $external = $this->externalPdfText($path);
         if ($external !== '') return $external;
+        if ($this->quickPdfFallback && (int) @filesize($path) > self::QUICK_PDF_RAW_MAX_BYTES
+            && !$this->canRunPdfEngines()) return '';
         $raw = @file_get_contents($path, false, null, 0, self::PDF_RAW_READ_BYTES);
         if (!is_string($raw) || $raw === '') return '';
         $parts = [];
@@ -132,6 +137,14 @@ final class LegalCertificateTextExtractor
         $text = trim(preg_replace('/[ \t]+/', ' ', $text) ?? $text);
         if (mb_strlen($text) < 30) return '';
         return preg_match('/matr|anotaci|folio|certificado|referencia|departamento|municipio|propiedad horizontal|copropiedad|reglamento|coeficiente|unidades privadas/iu', $text) ? $text : '';
+    }
+
+    private function canRunPdfEngines(): bool
+    {
+        if (!function_exists('shell_exec')) return false;
+        $pdftotext = PHP_OS_FAMILY === 'Windows' ? 'where pdftotext 2>NUL' : 'command -v pdftotext 2>/dev/null';
+        if (trim((string) @shell_exec($pdftotext)) !== '') return true;
+        return !empty((new OcrTextExtractor())->diagnostics()['pdf_ocr']);
     }
 
 }

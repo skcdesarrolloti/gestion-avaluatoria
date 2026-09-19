@@ -85,7 +85,7 @@ final class AppraisalPhDocumentUploadService
         $totalBytes = $large ? self::LARGE_ARCHIVE_TOTAL_READ_BYTES : self::ARCHIVE_TOTAL_READ_BYTES;
         $allowed = $large ? ['pdf', 'docx', 'txt'] : ['pdf', 'docx', 'txt', 'jpg', 'jpeg', 'png', 'webp', 'tif', 'tiff'];
         $deadline = microtime(true) + self::ARCHIVE_TIME_SECONDS;
-        $texts = []; $names = []; $readBytes = 0; $extractor = new LegalCertificateTextExtractor();
+        $texts = []; $names = []; $readBytes = 0; $extractor = new LegalCertificateTextExtractor(true);
         for ($i = 0; $i < $zip->numFiles && count($names) < 80 && $readBytes < $totalBytes && microtime(true) < $deadline; $i++) {
             $entry = $zip->getNameIndex($i);
             if (!is_string($entry) || str_ends_with($entry, '/')) continue;
@@ -120,7 +120,7 @@ final class AppraisalPhDocumentUploadService
             $entryBytes = $large ? self::LARGE_ARCHIVE_ENTRY_READ_BYTES : self::ARCHIVE_ENTRY_READ_BYTES;
             $totalBytes = $large ? self::LARGE_ARCHIVE_TOTAL_READ_BYTES : self::ARCHIVE_TOTAL_READ_BYTES;
             $deadline = microtime(true) + self::ARCHIVE_TIME_SECONDS;
-            $readBytes = 0; $extractor = new LegalCertificateTextExtractor();
+            $readBytes = 0; $extractor = new LegalCertificateTextExtractor(true);
             foreach ($this->extractedFiles($dir) as $file) {
                 if ($readBytes >= $totalBytes || microtime(true) >= $deadline) break;
                 $ext = mb_strtolower(pathinfo($file, PATHINFO_EXTENSION));
@@ -193,7 +193,7 @@ final class AppraisalPhDocumentUploadService
 
     private function singleText(string $path, string $name, string $extension): array
     {
-        return [(new LegalCertificateTextExtractor())->extract($path, $extension), [$name]];
+        return [(new LegalCertificateTextExtractor(true))->extract($path, $extension), [$name]];
     }
 
     private function files(array $files): array
