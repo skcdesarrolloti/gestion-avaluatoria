@@ -98,10 +98,10 @@ final class AppraisalPhRepository
         $now = gmdate('Y-m-d H:i:s');
         $query = $this->db->prepare('INSERT INTO appraisal_ph_documents
             (id, appraisal_id, owner_id, source_filename, storage_filename, mime_type, file_size_bytes,
-            extracted_chars, analysis_status, analysis_message, file_blob, created_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+            extracted_chars, extracted_text, analysis_status, analysis_message, file_blob, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
         $query->execute([$file['id'], $appraisalId, $owner, $file['source_filename'], $file['storage_filename'],
-            $file['mime_type'], $file['file_size_bytes'], $file['extracted_chars'], $file['analysis_status'],
+            $file['mime_type'], $file['file_size_bytes'], $file['extracted_chars'], $file['extracted_text'] ?? '', $file['analysis_status'],
             $file['analysis_message'], $file['file_blob'], $now]);
     }
     public function hasDocumentFile(string $appraisalId, int $owner, string $sourceFilename, int $bytes): bool
@@ -114,18 +114,18 @@ final class AppraisalPhRepository
     public function documentForAnalysis(string $id, string $appraisalId, int $owner): array
     {
         $query = $this->db->prepare('SELECT id, source_filename, storage_filename, mime_type,
-            file_size_bytes, file_blob FROM appraisal_ph_documents
+            file_size_bytes, extracted_text, file_blob FROM appraisal_ph_documents
             WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
         $query->execute([$id, $appraisalId, $owner]);
         $row = $query->fetch();
         if (!$row) throw new HttpException(404, 'No se encontró el soporte PH.');
         return $row;
     }
-    public function updateDocumentAnalysis(string $id, string $appraisalId, int $owner, int $chars, string $message): void
+    public function updateDocumentAnalysis(string $id, string $appraisalId, int $owner, int $chars, string $message, string $text = ''): void
     {
         $query = $this->db->prepare('UPDATE appraisal_ph_documents SET extracted_chars = ?,
-            analysis_status = ?, analysis_message = ? WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
-        $query->execute([$chars, 'Lectura preliminar', $message, $id, $appraisalId, $owner]);
+            extracted_text = ?, analysis_status = ?, analysis_message = ? WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
+        $query->execute([$chars, $text, 'Lectura preliminar', $message, $id, $appraisalId, $owner]);
     }
     public function deleteDocument(string $id, string $appraisalId, int $owner): array
     {

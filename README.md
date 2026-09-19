@@ -86,6 +86,12 @@ Las imágenes se intentan leer con Tesseract OCR si está instalado en el servid
 puede fijar su ruta con `TESSERACT_BINARY`. Para PDFs escaneados se requiere además
 `pdftoppm` y se puede fijar con `PDFTOPPM_BINARY`. Si no hay OCR disponible, el archivo
 queda guardado y visible para revisión o diligenciamiento manual.
+Para PH también existe una ruta opcional de OCR/IA externo: configura
+`PH_EXTERNAL_OCR_ENDPOINT` para un endpoint que reciba `multipart/form-data` con el
+archivo en el campo `file` y responda JSON `{"text":"..."}`. El campo, la ruta del
+texto y el tiempo de espera se pueden ajustar con `PH_EXTERNAL_OCR_FILE_FIELD`,
+`PH_EXTERNAL_OCR_TEXT_KEY` y `PH_EXTERNAL_OCR_TIMEOUT_SECONDS`; si requiere token, usa
+`PH_EXTERNAL_OCR_TOKEN` y se enviará como `Authorization: Bearer`.
 En hosting compartido estos binarios normalmente no se instalan desde el módulo PHP:
 deben existir en el servidor o ser habilitados por el proveedor. El numeral 3.5 muestra
 un diagnóstico de disponibilidad OCR para confirmarlo.

@@ -12,6 +12,8 @@ use App\Services\AppraisalPhInput;
 use App\Services\AppraisalPhChunkUploadService;
 use App\Services\AppraisalPhDocumentReanalysisService;
 use App\Services\AppraisalPhDocumentUploadService;
+use App\Services\AppraisalExternalOcrClient;
+use App\Services\AppraisalPhExternalOcrService;
 use App\Services\AppraisalSectorInput;
 use App\Services\AppraisalMidasReview;
 use App\Services\AppraisalMidasSupportUploadService;
@@ -168,7 +170,7 @@ try {
     $db->exec("CREATE TABLE appraisal_ph_documents (
         id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER, source_filename TEXT,
         storage_filename TEXT, mime_type TEXT, file_size_bytes INTEGER, extracted_chars INTEGER,
-        analysis_status TEXT, analysis_message TEXT, file_blob BLOB, created_at TEXT)");
+        extracted_text TEXT, analysis_status TEXT, analysis_message TEXT, file_blob BLOB, created_at TEXT)");
     $db->exec("CREATE TABLE appraisal_legal_certificates (
         id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER, source_filename TEXT,
         storage_filename TEXT, mime_type TEXT, file_size_bytes INTEGER, extracted_chars INTEGER,
@@ -488,6 +490,24 @@ try {
             str_repeat('b', 32), 1, 'oficinas', $phRepo);
         expect(($phRepo->profile(str_repeat('b', 32), 1)['matrix_registration'] ?? '') === '060-555666',
             'propiedad horizontal continua lectura ZIP con entradas internas no utiles');
+        $scanPath = tempnam(sys_get_temp_dir(), 'ga_ph_scan_') . '.png';
+        file_put_contents($scanPath, base64_decode('iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8BQDwAFgwJ/lNWK3wAAAABJRU5ErkJggg=='));
+        (new AppraisalPhDocumentUploadService())->store(uploadFixture('reglamento-escaneado.png', $scanPath),
+            str_repeat('g', 32), 1, 'oficinas', $phRepo);
+        $scanDoc = $phRepo->documents(str_repeat('g', 32), 1)[0];
+        $externalText = 'Reglamento de propiedad horizontal Copropiedad OCR EXTERNO. '
+            . 'Matricula matriz 060-999888. Coeficiente de copropiedad 2.5%.';
+        (new AppraisalPhExternalOcrService(new AppraisalExternalOcrClient(fn () => $externalText)))
+            ->reanalyze((string) $scanDoc['id'], str_repeat('g', 32), 1, 'oficinas', $phRepo);
+        $externalPh = $phRepo->profile(str_repeat('g', 32), 1);
+        expect(($externalPh['matrix_registration'] ?? '') === '060-999888'
+            && ($externalPh['coefficient'] ?? '') === '2.5%',
+            'propiedad horizontal usa OCR externo para soporte escaneado');
+        $phRepo->save(str_repeat('g', 32), 1, array_replace($externalPh, ['matrix_registration' => '']));
+        (new AppraisalPhDocumentReanalysisService())->reanalyze((string) $scanDoc['id'],
+            str_repeat('g', 32), 1, 'oficinas', $phRepo);
+        expect(($phRepo->profile(str_repeat('g', 32), 1)['matrix_registration'] ?? '') === '060-999888',
+            'propiedad horizontal recarga texto OCR externo guardado');
         $multiA = tempnam(sys_get_temp_dir(), 'ga_ph_txt_a_');
         $multiB = tempnam(sys_get_temp_dir(), 'ga_ph_txt_b_');
         file_put_contents($multiA, 'Reglamento de propiedad horizontal Copropiedad MULTI PH. Matricula matriz 060-111222.');

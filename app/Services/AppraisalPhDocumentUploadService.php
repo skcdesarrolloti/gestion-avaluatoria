@@ -63,7 +63,7 @@ final class AppraisalPhDocumentUploadService
             }
             $stored[] = ['id' => $id, 'source_filename' => $name, 'storage_filename' => $storageName,
                 'mime_type' => $info['mime'], 'file_size_bytes' => $bytes, 'extracted_chars' => mb_strlen($text),
-                'file_blob' => $blob];
+                'extracted_text' => $text, 'file_blob' => $blob];
         }
         if (!$stored && $duplicates) {
             return ['has_text' => true, 'message' => 'Soporte PH ya estaba cargado; no se duplicó.',

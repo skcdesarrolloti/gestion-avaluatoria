@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, HttpException, Session};
 use App\Models\{AppraisalPhRepository, AppraisalRepository, AppraisalSubjectRepository, GeoMasterRepository, IgacTypologyRepository};
-use App\Services\{AppraisalAttributeInput, AppraisalChapterZeroInput, AppraisalPhotoUploadService, OcrTextExtractor};
+use App\Services\{AppraisalAttributeInput, AppraisalChapterZeroInput, AppraisalExternalOcrClient, AppraisalPhotoUploadService, OcrTextExtractor};
 use App\Support\{AppraisalCatalog, AppraisalPhCatalog, AppraisalSpecialAttributeCatalog, AppraisalSubjectCatalog};
 
 final class AppraisalSubjectController
@@ -28,7 +28,7 @@ final class AppraisalSubjectController
             'units' => $this->appraisals->units($id, $this->user['id']),
             'phProfile' => $this->ph->profile($id, $this->user['id']),
             'phDocuments' => $this->ph->documents($id, $this->user['id']),
-            'phOcrDiagnostics' => (new OcrTextExtractor())->diagnostics(),
+            'phOcrDiagnostics' => (new OcrTextExtractor())->diagnostics() + ['external' => (new AppraisalExternalOcrClient())->diagnostics()['configured']],
             'phLegalPrefill' => $this->ph->legalPrefill($id, $this->user['id']),
             'phSearchQuery' => $phSearch,
             'phSearchResults' => $phSearch !== ''

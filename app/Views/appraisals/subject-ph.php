@@ -79,6 +79,7 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                         · Tesseract <?= !empty($ocr['tesseract']) ? 'sí' : 'no' ?>
                         · pdftoppm <?= !empty($ocr['pdftoppm']) ? 'sí' : 'no' ?>
                         · ejecución PHP <?= (!empty($ocr['shell_exec']) && !empty($ocr['exec'])) ? 'sí' : 'no' ?>
+                        · IA externa <?= !empty($ocr['external']) ? 'sí' : 'no' ?>
                     </p>
                 </div>
                 <form class="grid gap-3 lg:min-w-80" method="post" enctype="multipart/form-data"
