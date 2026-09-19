@@ -2,14 +2,16 @@
 $phSearch = trim((string) ($phSearchQuery ?? ''));
 $phResults = is_array($phSearchResults ?? null) ? $phSearchResults : [];
 $phSuggestion = trim((string) (($ph['ph_name'] ?? '') ?: ($linkage['coproperty_name'] ?? '')));
+$phLoadedDocuments = is_array($phDocuments ?? null) ? $phDocuments : [];
+$phReadableDocuments = array_filter($phLoadedDocuments, static fn (array $doc): bool => (int) ($doc['extracted_chars'] ?? 0) > 0);
 ?>
 <section class="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4">
     <div class="grid gap-4 lg:grid-cols-[1fr_auto]">
         <div>
             <h3 class="font-semibold text-blue-950">Banco de copropiedades</h3>
             <p class="mt-2 text-sm leading-6 text-blue-950">
-                Busca por nombre, llave PH o matrícula matriz. Cada coincidencia trae el avalúo,
-                cliente, propietario y ubicación para validar que sea la copropiedad correcta.
+                Busca copropiedades ya guardadas en otros avalúos por nombre, llave PH o matrícula matriz.
+                Los soportes cargados en este avalúo se ven abajo y no aparecen como resultado del banco.
             </p>
         </div>
         <form class="grid gap-2 sm:grid-cols-[minmax(220px,1fr)_auto]" method="get"
@@ -36,7 +38,10 @@ $phSuggestion = trim((string) (($ph['ph_name'] ?? '') ?: ($linkage['coproperty_n
             </div>
         <?php else: ?>
             <p class="mt-4 rounded-lg bg-white p-3 text-sm font-semibold text-amber-800">
-                No hay copropiedades guardadas con ese criterio.
+                No hay copropiedades guardadas en otros avalúos con ese criterio.
+                <?php if ($phLoadedDocuments && !$phReadableDocuments): ?>
+                    El soporte cargado en este avalúo existe, pero quedó con 0 caracteres extraídos; por eso aún no puede alimentar una copropiedad reutilizable.
+                <?php endif; ?>
             </p>
         <?php endif; ?>
     <?php endif; ?>
