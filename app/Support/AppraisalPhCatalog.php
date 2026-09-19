@@ -86,6 +86,37 @@ final class AppraisalPhCatalog
         ];
     }
 
+    public static function technicalApplicability(): array
+    {
+        $base = ['fuente_documental', 'escritura_reforma', 'ciudad_municipio', 'direccion_referencia',
+            'tipo_propiedad_horizontal', 'naturaleza_conjunto', 'uso_dominante', 'numero_edificios',
+            'numero_unidades', 'resumen_areas_conjunto', 'ubicacion_unidad',
+            'porteria_administracion_vigilancia', 'cctv_control_acceso', 'usos_permitidos',
+            'usos_restringidos', 'reglas_constructivas', 'coeficientes_copropiedad',
+            'expensas_cuotas', 'responsabilidades_bienes_comunes', 'lectura_valuatoria',
+            'salvedades_reglamento', 'salvedades_visita', 'salvedades_validacion',
+            'observaciones_extraccion'];
+        return [
+            'residencial' => array_merge($base, ['etapas_copropiedad', 'numero_edificios',
+                'condiciones_normativas_operativas', 'incidencia_valor_soporte_comun']),
+            'oficinas' => array_merge($base, ['relacion_funcional_usos', 'regimen_especial',
+                'equipamiento_tecnico', 'red_contra_incendios', 'condiciones_normativas_operativas',
+                'cargas_comercializacion', 'incidencia_valor_soporte_comun']),
+            'comercio' => array_merge($base, ['relacion_funcional_usos', 'usos_complementarios',
+                'zonas_espera', 'reglas_cargue_descargue', 'cargue_descargue',
+                'condiciones_normativas_operativas', 'cargas_comercializacion',
+                'incidencia_comercializacion_interna']),
+            'bodegas' => array_merge($base, ['regimen_especial', 'etapas_copropiedad', 'lotes_por_etapa',
+                'organizacion_interna', 'subdivisiones_futuras', 'vias_internas', 'red_contra_incendios',
+                'equipamiento_tecnico', 'apoyo_logistico_aduanero', 'muelles', 'patios_maniobra',
+                'circulacion_pesada', 'zonas_espera', 'reglas_cargue_descargue', 'cargue_descargue',
+                'condiciones_usuario_operador', 'cargas_comercializacion', 'incidencia_operacion_bodegas',
+                'incidencia_restricciones_regimen', 'incidencia_comercializacion_interna']),
+            'mixto' => array_keys(array_merge(...array_values(array_map(static fn (array $group): array => $group[1],
+                self::technicalGroups())))),
+        ];
+    }
+
     public static function commonAreas(): array
     {
         return [

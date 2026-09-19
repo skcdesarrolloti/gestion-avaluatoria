@@ -390,6 +390,11 @@ try {
     expect($phData['ph_key'] === 'NIT 900123456'
         && ($phData['common_areas']['porteria']['status'] ?? '') === 'ok'
         && !isset($phData['common_areas']['inventado']), 'propiedad horizontal normaliza checklist');
+    $phApplicability = \App\Support\AppraisalPhCatalog::technicalApplicability();
+    expect(in_array('muelles', $phApplicability['bodegas'], true)
+        && !in_array('muelles', $phApplicability['residencial'], true)
+        && in_array('vias_internas', $phApplicability['bodegas'], true),
+        'propiedad horizontal filtra campos tecnicos por tipologia');
     $phRepo = new AppraisalPhRepository($db);
     $phRepo->save(str_repeat('a', 32), 1, $phData);
     $insertAppraisal->execute([str_repeat('c', 32), 'PH antecedente', 'Carrera 3', 'Medellín',
