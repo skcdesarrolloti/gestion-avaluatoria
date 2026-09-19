@@ -42,6 +42,8 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
             subtypeByProperty: <?= e(json_encode(AppraisalCatalog::subtypesByPropertyType(), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             selectedPropertyType: <?= e(json_encode($field('tipo_inmueble'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             selectedSubtype: <?= e(json_encode($field('subtipo_funcional'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+            propertyUnits: <?= e((string) $count('igac_property_units_count')) ?>,
+            annexUnits: <?= e((string) $count('igac_annex_units_count')) ?>,
             subtypeOptions() { return this.subtypeByProperty[this.selectedPropertyType] || {} },
             syncSubtype() { if (this.selectedSubtype && !this.subtypeOptions()[this.selectedSubtype]) this.selectedSubtype = '' },
             academy(field, value) { return value && this.notes[field] ? this.notes[field][value] : null }
@@ -50,8 +52,6 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
         <input type="hidden" name="version" value="<?= e($record['version']) ?>">
         <input type="hidden" name="igac_category" value="<?= e($field('igac_category')) ?>">
         <input type="hidden" name="igac_typology_hint" value="<?= e($field('igac_typology_hint')) ?>">
-        <input type="hidden" name="igac_property_units_count" value="<?= e((string) $count('igac_property_units_count')) ?>">
-        <input type="hidden" name="igac_annex_units_count" value="<?= e((string) $count('igac_annex_units_count')) ?>">
         <input type="hidden" name="direccion" value="<?= e($field('direccion')) ?>">
         <input type="hidden" name="municipio" value="<?= e($field('municipio')) ?>">
 
@@ -91,6 +91,28 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
                 </label>
                 <?php foreach ($configurationSelects as $name) {
                     require BASE_PATH . '/app/Views/appraisals/chapter-zero-select-field.php';
+                    if ($name === 'subtipo_funcional'): ?>
+                        <label class="label">Unidades inmobiliarias principales
+                            <input class="input" type="number" name="igac_property_units_count" min="0" max="50"
+                                x-model.number="propertyUnits" placeholder="Ej. 3">
+                            <span class="mt-1 block text-xs leading-5 text-slate-500">
+                                Casa + 2 apartamentos = 3. Cada unidad se nombrará y clasificará en 3.1.
+                            </span>
+                        </label>
+                        <label class="label">Anexos existentes
+                            <input class="input" type="number" name="igac_annex_units_count" min="0" max="50"
+                                x-model.number="annexUnits" placeholder="Ej. 1">
+                            <span class="mt-1 block text-xs leading-5 text-slate-500">
+                                Parqueaderos, depósitos, kioscos, piscinas, ramadas u otros anexos.
+                            </span>
+                        </label>
+                        <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950 md:col-span-2">
+                            Se prepararán <strong x-text="propertyUnits || 0"></strong> unidad(es) principal(es)
+                            y <strong x-text="annexUnits || 0"></strong> anexo(s). En 3.1 nombras cada una,
+                            eliges su tipo de inmueble y desde ahí se alimentan superficies, construcción,
+                            diferenciales, fotos y PH cuando aplique.
+                        </div>
+                    <?php endif;
                 } ?>
                 <label class="label md:col-span-2">Notas de inspección y configuración
                     <textarea class="input" name="inspection_notes" rows="4" maxlength="2000"

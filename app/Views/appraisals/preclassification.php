@@ -2,9 +2,9 @@
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
                 <p class="eyebrow">Antes de las fotos</p>
-                <h2 class="mt-2 text-2xl font-semibold">Lectura inicial del predio</h2>
+                <h2 class="mt-2 text-2xl font-semibold">Lectura inicial y ajuste de unidades</h2>
                 <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                    Define qué familias IGAC vas a revisar y cuántas unidades o anexos existen.
+                    Ajusta si hace falta las unidades definidas en el numeral 1 y la familia IGAC probable.
                     Cada unidad podrá tener su propia tipología constructiva.
                 </p>
             </div>
