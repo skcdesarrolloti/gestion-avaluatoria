@@ -9,9 +9,9 @@ final class AppraisalPhDocumentUploadService
     private const ARCHIVE_ENTRY_READ_BYTES = 12582912;
     private const ARCHIVE_TOTAL_READ_BYTES = 25165824;
     private const LARGE_ARCHIVE_BYTES = 104857600;
-    private const LARGE_ARCHIVE_ENTRY_READ_BYTES = 1048576;
-    private const LARGE_ARCHIVE_TOTAL_READ_BYTES = 4194304;
-    private const ARCHIVE_TIME_SECONDS = 18;
+    private const LARGE_ARCHIVE_ENTRY_READ_BYTES = 25165824;
+    private const LARGE_ARCHIVE_TOTAL_READ_BYTES = 50331648;
+    private const ARCHIVE_TIME_SECONDS = 35;
 
     public function store(array $files, string $appraisalId, int $owner, string $typology,
         AppraisalPhRepository $repo): array

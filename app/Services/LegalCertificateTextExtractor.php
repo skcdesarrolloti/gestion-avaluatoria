@@ -5,7 +5,8 @@ use App\Core\Env;
 
 final class LegalCertificateTextExtractor
 {
-    private const EXTERNAL_PDF_MAX_BYTES = 12582912;
+    private const EXTERNAL_PDF_MAX_BYTES = 25165824;
+    private const PDF_RAW_READ_BYTES = 25165824;
     private const OCR_IMAGE_MAX_BYTES = 8388608;
 
     public function extract(string $path, string $extension): string
@@ -48,7 +49,7 @@ final class LegalCertificateTextExtractor
     {
         $external = $this->externalPdfText($path);
         if ($external !== '') return $external;
-        $raw = @file_get_contents($path, false, null, 0, 8 * 1024 * 1024);
+        $raw = @file_get_contents($path, false, null, 0, self::PDF_RAW_READ_BYTES);
         if (!is_string($raw) || $raw === '') return '';
         $parts = [];
         foreach ($this->pdfStreams($raw) as $chunk) {

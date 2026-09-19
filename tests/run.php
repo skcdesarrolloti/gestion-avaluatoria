@@ -437,6 +437,13 @@ try {
         && ($cleanedEmptyPh['source_summary'] ?? '') !== ''
         && ($cleanedEmptyPh['linkage']['coproperty_name'] ?? '') === '',
         'lectura PH sin texto limpia datos automaticos anteriores');
+    $latePdf = tempnam(sys_get_temp_dir(), 'ga_late_pdf_');
+    file_put_contents($latePdf, '%PDF' . str_repeat('0', 10 * 1024 * 1024)
+        . "stream\nBT (Reglamento de propiedad horizontal Copropiedad TEXTO TARDIO) Tj ET\nendstream");
+    $lateText = (new \App\Services\LegalCertificateTextExtractor())->extract($latePdf, 'pdf');
+    expect(str_contains($lateText, 'Copropiedad TEXTO TARDIO'),
+        'extractor PDF lee texto tardio en archivos pesados');
+    @unlink($latePdf);
     if (class_exists(ZipArchive::class)) {
         $phDir = sys_get_temp_dir() . '/ga-ph-test-' . bin2hex(random_bytes(4));
         putenv('APPRAISAL_PH_DOCUMENT_DIR=' . $phDir);
