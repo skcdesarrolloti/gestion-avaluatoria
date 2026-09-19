@@ -129,6 +129,9 @@ final class AppraisalPhRepository
 
     public function mergeAnalysis(string $appraisalId, int $owner, array $analysis): void
     {
+        if (array_key_exists('has_text', $analysis) && $analysis['has_text'] === false) {
+            $this->clearDocumentAnalysis($appraisalId, $owner);
+        }
         $current = $this->profile($appraisalId, $owner);
         $data = array_replace($current, $this->mergeEmpty($current, $analysis['core'] ?? []));
         foreach (['linkage', 'technical', 'common_areas', 'documents', 'risks', 'photos'] as $key) {

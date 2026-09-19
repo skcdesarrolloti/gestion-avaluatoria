@@ -54,7 +54,7 @@ final class AppraisalPhDocumentAnalyzer
         $core['report_text'] = $this->reportText($core, $technical, $typology);
         $filled = count(array_filter($technical, static fn (string $v): bool => trim($v) !== ''));
         $total = count($this->fieldKeys());
-        return ['core' => array_filter($core), 'linkage' => array_filter($linkage),
+        return ['has_text' => $hasText, 'core' => array_filter($core), 'linkage' => array_filter($linkage),
             'technical' => $technical, 'common_areas' => $common, 'documents' => $documents, 'risks' => $risks,
             'summary' => $hasText
                 ? "$filled de $total campos técnicos sugeridos desde " . count($fileNames) . ' archivo(s). Revisa contra el documento original antes del entregable.'

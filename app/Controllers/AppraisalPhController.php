@@ -25,10 +25,13 @@ final class AppraisalPhController
 
     public function upload(string $id): never
     {
-        $this->saveAndRedirect($id, function () use ($id): void {
+        $this->saveAndRedirect($id, function () use ($id): string {
             $typology = (string) ($_POST['ph_typology'] ?? '');
-            (new AppraisalPhDocumentUploadService())->store($_FILES['ph_document'] ?? [], $id,
+            $analysis = (new AppraisalPhDocumentUploadService())->store($_FILES['ph_document'] ?? [], $id,
                 $this->user['id'], $typology, $this->ph);
+            return ($analysis['has_text'] ?? true) === false
+                ? 'Soporte PH cargado, pero no se extrajo texto útil para diligenciar campos.'
+                : '';
         }, 'Soporte PH analizado. Se llenaron los campos vacíos sugeridos por la lectura preliminar.');
     }
 
@@ -41,10 +44,13 @@ final class AppraisalPhController
 
     public function finishChunkUpload(string $id): never
     {
-        $this->saveAndRedirect($id, function () use ($id): void {
+        $this->saveAndRedirect($id, function () use ($id): string {
             $file = (new AppraisalPhChunkUploadService())->finish($id, $this->user['id']);
             $typology = (string) ($_POST['ph_typology'] ?? '');
-            (new AppraisalPhDocumentUploadService())->storePrepared($file, $id, $this->user['id'], $typology, $this->ph);
+            $analysis = (new AppraisalPhDocumentUploadService())->storePrepared($file, $id, $this->user['id'], $typology, $this->ph);
+            return ($analysis['has_text'] ?? true) === false
+                ? 'Soporte PH cargado, pero no se extrajo texto útil para diligenciar campos.'
+                : '';
         }, 'Soporte PH analizado. Se llenaron los campos vacíos sugeridos por la lectura preliminar.');
     }
 
@@ -65,7 +71,10 @@ final class AppraisalPhController
     private function saveAndRedirect(string $id, callable $save, string $message): never
     {
         $this->appraisals->find($id, $this->user['id']);
-        try { $save(); Session::flash('ph_message', $message); }
+        try {
+            $customMessage = $save();
+            Session::flash('ph_message', is_string($customMessage) && $customMessage !== '' ? $customMessage : $message);
+        }
         catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
         Http::redirect('avaluos/' . $id . '/bien-sujeto#ph');
     }

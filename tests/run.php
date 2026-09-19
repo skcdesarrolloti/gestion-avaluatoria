@@ -425,8 +425,18 @@ try {
         '', ['ESCRITURA PUBLICA 2593 EDIFICIO CHAMBACU.pdf'], 'oficinas');
     expect(!isset($emptyPhAnalysis['core']['ph_name'])
         && !isset($emptyPhAnalysis['linkage']['coproperty_name'])
+        && ($emptyPhAnalysis['has_text'] ?? true) === false
         && str_contains((string) $emptyPhAnalysis['summary'], 'No se extrajo texto útil'),
         'analizador PH no infiere copropiedad desde nombre de archivo');
+    $phRepo->save(str_repeat('d', 32), 1, array_replace($phData, [
+        'ph_name' => 'LECTURA VIEJA', 'ph_key' => 'LECTURA VIEJA',
+    ]));
+    $phRepo->mergeAnalysis(str_repeat('d', 32), 1, $emptyPhAnalysis);
+    $cleanedEmptyPh = $phRepo->profile(str_repeat('d', 32), 1);
+    expect(($cleanedEmptyPh['ph_name'] ?? '') === ''
+        && ($cleanedEmptyPh['source_summary'] ?? '') !== ''
+        && ($cleanedEmptyPh['linkage']['coproperty_name'] ?? '') === '',
+        'lectura PH sin texto limpia datos automaticos anteriores');
     if (class_exists(ZipArchive::class)) {
         $phDir = sys_get_temp_dir() . '/ga-ph-test-' . bin2hex(random_bytes(4));
         putenv('APPRAISAL_PH_DOCUMENT_DIR=' . $phDir);
