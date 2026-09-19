@@ -67,7 +67,7 @@ final class AppraisalPhController
                 ? 'Soporte PH eliminado. Se limpió la lectura automática porque no quedan soportes cargados.'
                 : 'Soporte PH eliminado.');
         } catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
-        Http::redirect('avaluos/' . $id . '/bien-sujeto#ph');
+        Http::redirect($this->safeReturn($id));
     }
 
     public function loadDocument(string $id, string $documentId): never
@@ -81,7 +81,7 @@ final class AppraisalPhController
                 ? 'Soporte PH cargado, pero no se extrajo texto útil para diligenciar campos.'
                 : 'Soporte PH cargado en la ficha. Se llenaron los campos vacíos sugeridos.');
         } catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
-        Http::redirect('avaluos/' . $id . '/bien-sujeto#ph');
+        Http::redirect($this->safeReturn($id));
     }
 
     private function saveAndRedirect(string $id, callable $save, string $message): never
@@ -92,6 +92,12 @@ final class AppraisalPhController
             Session::flash('ph_message', is_string($customMessage) && $customMessage !== '' ? $customMessage : $message);
         }
         catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
-        Http::redirect('avaluos/' . $id . '/bien-sujeto#ph');
+        Http::redirect($this->safeReturn($id));
+    }
+
+    private function safeReturn(string $id): string
+    {
+        $target = (string) ($_POST['return_to'] ?? '');
+        return $target === 'avaluos/' . $id . '/bien-sujeto#ph' ? $target : 'avaluos/' . $id . '/bien-sujeto#ph';
     }
 }

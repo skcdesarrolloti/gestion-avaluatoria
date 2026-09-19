@@ -36,6 +36,7 @@ use App\Services\MidasWfsSearch;
 use App\Services\LegalCertificateParser;
 use App\Services\RateLimiter;
 use App\Controllers\AppraisalController;
+use App\Controllers\AppraisalPhController;
 use App\Controllers\AppraisalSubjectController;
 use App\Models\AppraisalLegalRepository;
 use App\Models\AppraisalPhRepository;
@@ -409,6 +410,12 @@ try {
     expect($storedPh['ph_name'] === 'Conjunto Prueba'
         && ($storedPh['documents']['paquete_zip']['status'] ?? '') === 'warn',
         'propiedad horizontal guarda perfil por avaluo');
+    $phController = (new ReflectionClass(AppraisalPhController::class))->newInstanceWithoutConstructor();
+    $phSafeReturn = new ReflectionMethod(AppraisalPhController::class, 'safeReturn');
+    $phSafeReturn->setAccessible(true);
+    $_POST = ['return_to' => 'avaluos/' . str_repeat('a', 32) . '/bien-sujeto#ph'];
+    expect($phSafeReturn->invoke($phController, str_repeat('a', 32)) === $_POST['return_to'],
+        'propiedad horizontal conserva retorno a pestana PH');
     expect($phRepo->searchByCoproperty('Conjunto Prueba', 1, str_repeat('a', 32))[0]['client_name'] === 'Cliente PH',
         'busqueda PH muestra contexto del avaluo relacionado');
     $phAnalysis = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
