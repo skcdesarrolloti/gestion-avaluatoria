@@ -25,8 +25,10 @@ final class AppraisalPhReportBuilder
         $tab = [
             'resumen_base_ph' => "Lectura comparativa: {$name} se analiza como {$label}. La dotación común se clasifica como {$level}. "
                 . "Para el inmueble, la copropiedad aporta {$advantages}; esto favorece operación, seguridad, acceso de usuarios y percepción comercial frente a inmuebles aislados o PH menos dotadas.",
-            'resumen_trazabilidad_ph' => 'Trazabilidad: ' . ($sourceSummary ?: 'sin soporte procesado.')
-                . " El OCR ubica evidencias, pero el texto de informe debe usar solo hechos depurados. {$limits}",
+            'resumen_trazabilidad_ph' => 'Para el análisis de propiedad horizontal se tuvo como soporte '
+                . $this->source($technical) . ". La lectura documental permitió ubicar referencias al reglamento, "
+                . 'antecedentes, reformas o aclaraciones, bienes comunes, reglas de uso y administración. '
+                . "Los extractos OCR se conservan como evidencia de revisión; el cuerpo del avalúo debe usar solo hechos depurados. {$limits}",
             'resumen_identificacion_ph' => "Identificación: el soporte reconoce {$name}. {$assets}"
                 . ($missing ? " Falta confirmar {$missing} para amarrar plenamente la unidad al bien sujeto." : ' La identificación básica queda trazable.'),
             'resumen_tipologia_ph' => "Tipología y régimen: {$name} corresponde preliminarmente a {$label}. {$use} "
@@ -68,6 +70,12 @@ final class AppraisalPhReportBuilder
         $support = $this->labels($common);
         $advantage = $found ? implode(', ', $found) : 'soporte común por confirmar';
         return [$advantage, $support ?: 'los bienes comunes específicos deben confirmarse con visita y soportes actuales.'];
+    }
+
+    private function source(array $technical): string
+    {
+        $source = $this->cleanName($technical['fuente_documental'] ?? '');
+        return $source !== '' ? 'el documento fuente ' . $source : 'el reglamento o soporte documental cargado';
     }
 
     private function labels(array $common): string

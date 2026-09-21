@@ -9,6 +9,16 @@ foreach ($phCatalog['commonAreaGroups'] as $groupKey => [$groupTitle, $items]) {
     $commonStats[$groupKey] = [$groupTitle, $found, count($items)];
 }
 $hasPhReading = trim($phSourceSummary) !== '' || trim((string) ($technical['dotacion_tipologia'] ?? '')) !== '';
+$phDocumentCount = is_array($phDocuments ?? null) ? count($phDocuments) : 0;
+$phExtractedChars = 0;
+foreach (($phDocuments ?? []) as $doc) $phExtractedChars += (int) ($doc['extracted_chars'] ?? 0);
+$phCoverage = 'Pendiente';
+$phLowPages = 'No reportadas';
+foreach ($phFindings as $finding) {
+    $line = (string) $finding;
+    if (str_contains($line, '[Cobertura:')) $phCoverage = trim($line, '[]');
+    if (str_starts_with($line, 'Páginas con lectura baja')) $phLowPages = $line;
+}
 $technicalValue = static fn (string $key): string => (string) ($technical[$key] ?? '');
 $renderTechTextarea = static function (string $key, string $label, string $value): void { ?>
     <label class="label"><?= e($label) ?>
@@ -50,10 +60,26 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
             <h3 class="text-lg font-semibold">Documento y trazabilidad</h3>
             <p class="mt-2 text-sm leading-6 text-slate-600"><?= e($phSourceSummary ?: 'Aún no hay lectura documental cargada.') ?></p>
             <div class="mt-4"><?php $renderPhTabSummary('resumen_trazabilidad_ph', 'Resumen depurado para Entregable'); ?></div>
+            <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
+                <?php foreach ([
+                    ['Documento fuente', $phDocumentCount > 0 ? $phDocumentCount . ' soporte(s) cargado(s)' : 'Sin soporte cargado'],
+                    ['Cobertura de lectura', $phCoverage],
+                    ['Texto extraído', number_format($phExtractedChars, 0, ',', '.') . ' caracteres'],
+                    ['Uso en informe', 'Solo texto depurado; OCR como evidencia'],
+                ] as [$title, $value]): ?>
+                    <div class="rounded-xl border border-slate-200 bg-white p-3">
+                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500"><?= e($title) ?></p>
+                        <p class="mt-2 text-sm font-semibold leading-5 text-slate-800"><?= e($value) ?></p>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+            <div class="mt-3 rounded-xl border border-amber-100 bg-amber-50 p-3 text-sm leading-6 text-amber-950">
+                <strong>Control de calidad:</strong> <?= e($phLowPages) ?>. Revisa esas páginas contra el PDF original antes de cerrar conclusiones.
+            </div>
             <div class="mt-4 rounded-xl bg-white p-4"><?php require BASE_PATH . '/app/Views/appraisals/subject-ph-documents.php'; ?></div>
             <div class="mt-4 grid gap-4 lg:grid-cols-2">
-                <?php $renderPhTextarea('regulation_document', 'PDF, escritura o reglamento leído', $phText('regulation_document'), 'Documento base del régimen PH.', 4); ?>
-                <?php $renderPhTextarea('reform_documents', 'Reformas, anexos y salvedades', $phText('reform_documents'), 'Reformas o aclaraciones que deban tenerse presentes.', 4); ?>
+                <?php $renderPhTextarea('regulation_document', 'Extractos del documento constitutivo / reglamento PH', $phText('regulation_document'), 'Evidencia OCR para revisión; no se copia literal al informe.', 4); ?>
+                <?php $renderPhTextarea('reform_documents', 'Extractos de reformas, aclaraciones y antecedentes', $phText('reform_documents'), 'Evidencia OCR para ubicar antecedentes y salvedades documentales.', 4); ?>
             </div>
         </section>
 
