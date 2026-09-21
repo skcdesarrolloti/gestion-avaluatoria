@@ -18,7 +18,7 @@ final class AppraisalPhQuantityExtractor
             'numero_parqueaderos' => ['parqueaderos?|garajes|estacionamientos', 'parqueaderos'],
             'numero_depositos' => ['depositos|cuartos utiles', 'depósitos'],
             'numero_pisos' => ['pisos?|niveles', 'pisos'],
-            'numero_sotanos' => ['sotanos?', 'sótanos'],
+            'numero_sotanos' => ['sotanos?|semisotanos?', 'sótanos'],
             'numero_ascensores' => ['ascensores?', 'ascensores'],
         ] as $key => [$terms, $label]) {
             $value = $this->near($plain, $terms, $label);
@@ -30,14 +30,25 @@ final class AppraisalPhQuantityExtractor
     private function near(string $text, string $terms, string $label): string
     {
         $number = '(\d{1,4}|un|uno|una|dos|tres|cuatro|cinco|seis|siete|ocho|nueve|diez|once|doce|trece|catorce|quince|dieciseis|diecisiete|dieciocho|diecinueve|veinte|treinta|cuarenta|cincuenta|sesenta|setenta|ochenta|noventa|cien|ciento)';
-        if (preg_match('/\b' . $number . '\s+(?:unidades\s+)?(?:' . $terms . ')\b/u', $text, $m)) return $this->format($m[1], $label);
-        if (preg_match('/\b(?:' . $terms . ')\s*[:\-]\s*' . $number . '\b/u', $text, $m)) return $this->format($m[1], $label);
-        return '';
+        $found = [];
+        foreach (['/\((\d{1,4})\)\s+(?:' . $terms . ')\b/u', '/\b(?:' . $terms . ')\s*[:\-]\s*(\d{1,4})\b/u'] as $pattern) {
+            if (preg_match_all($pattern, $text, $matches)) foreach ($matches[1] as $raw) $found[(string) (int) $raw] = $this->format($raw, $label);
+        }
+        if (!$found && preg_match_all('/\b' . $number . '(?![\.,]\d)\s+(?:unidades\s+)?(?:' . $terms . ')\b/u', $text, $matches)) {
+            foreach ($matches[1] as $raw) $found[(string) $this->numeric($raw)] = $this->format($raw, $label);
+        }
+        if (!$found) return '';
+        $values = array_values($found);
+        return count($values) === 1 ? $values[0] : implode('; ', $values) . ' (verificar vigencia)';
+    }
+    private function numeric(string $raw): int|string
+    {
+        $raw = trim($raw);
+        return ctype_digit($raw) ? (int) $raw : (self::WORDS[$raw] ?? $raw);
     }
     private function format(string $raw, string $label): string
     {
-        $raw = trim($raw);
-        $num = ctype_digit($raw) ? (int) $raw : (self::WORDS[$raw] ?? null);
-        return $num !== null ? $num . ' ' . $label : $raw . ' ' . $label;
+        $num = $this->numeric($raw);
+        return is_int($num) ? $num . ' ' . $label : trim($raw) . ' ' . $label;
     }
 }

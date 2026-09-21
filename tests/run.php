@@ -469,6 +469,14 @@ try {
         && str_contains((string) ($phQuantityAnalysis['technical']['resumen_configuracion_ph'] ?? ''), '40 oficinas')
         && str_contains((string) ($phQuantityAnalysis['technical']['resumen_configuracion_ph'] ?? ''), '120 parqueaderos'),
         'configuracion PH extrae cantidades especificas de unidades y niveles');
+    $chambacuQuantity = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
+        'area de construccion de 15.394,86 metros cuadrados. area de oficinas para un total de ciento cinco (105) oficinas. piso adicional intermedio que comprende veintiseis (26) oficinas. semisotano para ciento ochenta y cinco (185) parqueaderos.',
+        ['reglamento.txt'], 'oficinas');
+    expect(str_contains((string) ($chambacuQuantity['technical']['numero_oficinas'] ?? ''), '105 oficinas')
+        && str_contains((string) ($chambacuQuantity['technical']['numero_oficinas'] ?? ''), '26 oficinas')
+        && !str_contains((string) ($chambacuQuantity['technical']['numero_oficinas'] ?? ''), '15 oficinas')
+        && ($chambacuQuantity['technical']['numero_parqueaderos'] ?? '') === '185 parqueaderos',
+        'configuracion PH no confunde area con cantidad de oficinas');
     $emptyPhAnalysis = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
         '', ['ESCRITURA PUBLICA 2593 EDIFICIO CHAMBACU.pdf'], 'oficinas');
     expect(!isset($emptyPhAnalysis['core']['ph_name'])
