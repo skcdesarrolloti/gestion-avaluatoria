@@ -9,12 +9,46 @@ $compareIdentity = static function (string $label, string $ctl, string $phValue)
     elseif ($ctl !== '' || $phValue !== '') $identityPending[] = $label . ' solo aparece en ' . ($ctl !== '' ? 'CTL: ' . $ctl : 'reglamento/ficha PH: ' . $phValue) . '.';
     else $identityPending[] = $label . ' no está ubicado en los soportes cargados.';
 };
-$compareIdentity('Matrícula del bien sujeto', (string) (($phLegal['property_registration'] ?? '') ?: ($subject['property_registry'] ?? '')), (string) (($linkage['legal_registration'] ?? '') ?: ($subject['property_registry'] ?? '')));
+$ctlRegistration = (string) (($phLegal['property_registration'] ?? '') ?: ($subject['property_registry'] ?? ''));
+$phRegistration = (string) (($linkage['legal_registration'] ?? '') ?: ($subject['property_registry'] ?? ''));
+$compareIdentity('Matrícula del bien sujeto', $ctlRegistration, $phRegistration);
 $compareIdentity('Matrícula matriz', (string) ($phLegal['matrix_registration'] ?? ''), $phText('matrix_registration'));
 $compareIdentity('Unidad privada', (string) ($phLegal['private_unit'] ?? ''), $phText('private_unit'));
 $compareIdentity('Coeficiente de copropiedad', (string) ($phLegal['coefficient'] ?? ''), $phText('coefficient'));
 if ($phText('ph_name') !== '') $identityMatches[] = 'Nombre de copropiedad registrado para el banco PH: ' . $phText('ph_name') . '.';
+$identityStatusPill = static function (string $state): string {
+    return match ($state) {
+        'ok' => '<button type="button" disabled class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">Completo</button>',
+        'warn' => '<button type="button" disabled class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">Revisar</button>',
+        default => '<button type="button" disabled class="rounded-full bg-red-100 px-3 py-1 text-xs font-bold text-red-800">Falta</button>',
+    };
+};
+$identityRows = [];
+$identityTextState = $technicalValue('resumen_identificacion_ph') === '' ? 'missing' : (($identityDiffs || $identityPending) ? 'warn' : 'ok');
+$identityRows[] = ['Texto editable para Entregable', $technicalValue('resumen_identificacion_ph') !== '' ? 'Texto construido' : 'Sin texto construido', $identityTextState, 'Resolver campos en rojo o amarillo antes de pasar al Entregable.'];
+$identityRows[] = ['Nombre de la copropiedad', $phText('ph_name') ?: 'Sin nombre', $phText('ph_name') !== '' ? 'ok' : 'missing', 'Nombre oficial según reglamento o escritura.'];
+$identityRows[] = ['Llave técnica PH', $phText('ph_key') ?: 'Sin llave', $phText('ph_key') !== '' ? 'ok' : 'missing', 'Nombre normalizado, NIT o matrícula matriz para reutilizar la ficha.'];
+$identityRows[] = ['Vínculo con sector/barrio', (string) ($linkage['sector_neighborhood'] ?? '') ?: 'Sin vínculo', trim((string) ($linkage['sector_neighborhood'] ?? '')) !== '' ? 'ok' : 'warn', 'Asignar barrio o sector validado.'];
+$identityRows[] = ['Matrícula del bien sujeto', trim($phRegistration) !== '' ? $phRegistration : 'Sin matrícula', trim($phRegistration) !== '' ? 'ok' : 'missing', 'Tomar del CTL o del módulo jurídico.'];
+$matrixValue = $phText('matrix_registration') ?: (string) ($phLegal['matrix_registration'] ?? '');
+$identityRows[] = ['Matrícula matriz', trim($matrixValue) !== '' ? $matrixValue : 'Sin matrícula matriz', trim($matrixValue) !== '' ? 'ok' : 'warn', 'Ubicar en CTL, reglamento o escritura.'];
+$identityRows[] = ['Unidad privada analizada', $phText('private_unit') ?: 'Sin unidad privada', $phText('private_unit') !== '' ? 'ok' : 'missing', 'Identificar oficina, local, bodega, parqueadero o depósito objeto del avalúo.'];
+$identityRows[] = ['Coeficiente de copropiedad', $phText('coefficient') ?: 'Sin coeficiente', $phText('coefficient') !== '' ? 'ok' : 'warn', 'Cruzar coeficiente de reglamento y certificado si aplica.'];
+$identityRows[] = ['Cruce CTL / reglamento', $identityDiffs ? count($identityDiffs) . ' diferencia(s)' : ($identityPending ? count($identityPending) . ' dato(s) por completar' : 'Sin diferencias automáticas'), $identityDiffs ? 'warn' : ($identityPending ? 'warn' : 'ok'), 'Revisar diferencias o datos no ubicados.'];
 ?>
+<div class="rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 lg:col-span-2">
+    <h4 class="font-semibold text-slate-900">Campos de identificación PH para construir el Entregable</h4>
+    <div class="mt-3 overflow-x-auto">
+        <table class="w-full min-w-[46rem] text-left text-sm">
+            <thead class="text-xs uppercase text-slate-500"><tr><th class="py-2 pr-3">Campo</th><th class="py-2 pr-3">Valor detectado</th><th class="py-2 pr-3">Estado</th><th class="py-2">Qué falta</th></tr></thead>
+            <tbody class="divide-y divide-slate-100">
+                <?php foreach ($identityRows as [$field, $value, $state, $missing]): ?>
+                    <tr><td class="py-2 pr-3 font-semibold text-slate-800"><?= e($field) ?></td><td class="py-2 pr-3 text-slate-700"><?= e($value) ?></td><td class="py-2 pr-3"><?= $identityStatusPill($state) ?></td><td class="py-2 text-slate-600"><?= e($state === 'ok' ? 'Listo para texto.' : $missing) ?></td></tr>
+                <?php endforeach; ?>
+            </tbody>
+        </table>
+    </div>
+</div>
 <div class="rounded-xl border <?= $identityDiffs ? 'border-amber-200 bg-amber-50 text-amber-950' : 'border-slate-200 bg-white text-slate-700' ?> p-4 text-sm leading-6 lg:col-span-2">
     <strong>Cruce documental CTL / reglamento:</strong>
     <?php if ($identityDiffs): ?>

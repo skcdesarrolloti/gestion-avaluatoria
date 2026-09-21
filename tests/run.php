@@ -441,6 +441,9 @@ try {
     expect(str_starts_with((string) ($phAnalysis['technical']['resumen_base_ph'] ?? ''), 'El inmueble se integra a')
         && !str_contains((string) ($phAnalysis['technical']['resumen_base_ph'] ?? ''), 'Lectura comparativa'),
         'resumen base PH queda redactado para entregable');
+    expect(str_starts_with((string) ($phAnalysis['technical']['resumen_identificacion_ph'] ?? ''), 'El inmueble objeto de análisis forma parte de')
+        && !str_contains((string) ($phAnalysis['technical']['resumen_identificacion_ph'] ?? ''), 'Identificación:'),
+        'resumen identificacion PH queda redactado para entregable');
     $emptyPhAnalysis = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
         '', ['ESCRITURA PUBLICA 2593 EDIFICIO CHAMBACU.pdf'], 'oficinas');
     expect(!isset($emptyPhAnalysis['core']['ph_name'])

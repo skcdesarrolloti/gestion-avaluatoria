@@ -24,7 +24,7 @@ final class AppraisalPhReportBuilder
         $tab = [
             'resumen_base_ph' => $this->baseSummary($name, $label, $advantages, $level),
             'resumen_trazabilidad_ph' => $trace,
-            'resumen_identificacion_ph' => trim("Identificación: el soporte reconoce {$name} como copropiedad o agrupación bajo régimen de propiedad horizontal. {$assets}"),
+            'resumen_identificacion_ph' => $this->identitySummary($name, $assets),
             'resumen_tipologia_ph' => $this->typologySummary($name, $label, $technical, $typology),
             'resumen_configuracion_ph' => "Configuración predial: {$config} Esta información ayuda a entender escala, organización interna y soporte de funcionamiento del edificio.",
             'resumen_comunes_ph' => "Bienes comunes y soporte: {$support} En términos valuatorios, estos elementos aportan funcionalidad, control, comodidad para usuarios y respaldo operativo.",
@@ -38,6 +38,12 @@ final class AppraisalPhReportBuilder
             'report_text' => $this->report($name, $label, $assets, $use, $support, $level, $limits), 'technical' => $tab];
     }
 
+    private function identitySummary(string $name, string $assets): string
+    {
+        $summary = "El inmueble objeto de análisis forma parte de {$name}, copropiedad sometida al régimen de propiedad horizontal.";
+        if ($assets !== '') $summary .= ' ' . $assets;
+        return $summary . ' Esta identificación permite vincular la unidad con el reglamento, el certificado de tradición, la matrícula inmobiliaria y los coeficientes aplicables dentro del análisis valuatorio.';
+    }
     private function baseSummary(string $name, string $label, string $advantages, string $level): string
     {
         $benefits = $advantages === 'soporte común por confirmar'
@@ -150,7 +156,6 @@ final class AppraisalPhReportBuilder
             'desenglobes o antecedentes prediales' => $technical['desarrollos_relevantes'] ?? '']);
         return $parts ? 'hay soporte para revisar ' . $parts . '.' : 'la escala predial y la organización interna requieren depuración manual.';
     }
-
     private function rules(array $technical, array $core): string
     {
         $parts = $this->present(['usos permitidos' => $technical['usos_permitidos'] ?? '',
@@ -160,7 +165,6 @@ final class AppraisalPhReportBuilder
             'texto de restricciones' => $core['restrictions_text'] ?? '']);
         return $parts ? 'se encontraron referencias a ' . $parts . '.' : 'no hay reglas depuradas suficientes; revisar reglamento y visita.';
     }
-
     private function administration(array $core, array $technical): string
     {
         $parts = $this->present(['coeficientes' => $technical['coeficientes_copropiedad'] ?? '',
@@ -168,7 +172,6 @@ final class AppraisalPhReportBuilder
             'administración vigente' => $core['administration_name'] ?? '']);
         return $parts ? 'el reglamento aporta referencias a ' . $parts . '.' : 'no hay soporte vigente suficiente de administración, cuota o estado de expensas.';
     }
-
     private function assets(array $core): string
     {
         $unit = $this->cleanName($core['private_unit'] ?? '');
