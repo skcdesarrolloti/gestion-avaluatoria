@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace App\Models;
 use App\Core\HttpException;
-use App\Services\{AppraisalPhDocumentStorage, AppraisalPhLegalTrace, AppraisalPhReportBuilder};
+use App\Services\{AppraisalPhDocumentStorage, AppraisalPhLegalTrace, AppraisalPhReportBuilder, AppraisalPhSubjectPrefill};
 use App\Support\AppraisalPhCatalog;
 use PDO;
 final class AppraisalPhRepository
@@ -54,7 +54,7 @@ final class AppraisalPhRepository
             'property_registration' => (string) ($data['matricula_inmobiliaria'] ?? ''),
             'matrix_registration' => (string) ($data['matricula_matriz'] ?? ''),
             'private_unit' => (string) ($data['unidad_privada'] ?? ''),
-            'coefficient' => (string) ($data['coeficiente_ph'] ?? ''),
+            'coefficient' => (string) (($data['coeficiente_ph'] ?? '') ?: ($data['coeficiente'] ?? '')),
             'regulation_document' => (string) ($data['reporte_constitucion_ph'] ?? ($data['reglamento_ph'] ?? '')),
             'reform_documents' => (string) ($data['reformas_ph'] ?? ''),
         ];
@@ -164,6 +164,15 @@ final class AppraisalPhRepository
     private function withGeneratedReport(array $profile): array
     {
         $profile['technical'] = is_array($profile['technical'] ?? null) ? $profile['technical'] : [];
+        $profile['linkage'] = is_array($profile['linkage'] ?? null) ? $profile['linkage'] : [];
+        $legal = $this->legalPrefill((string) ($profile['appraisal_id'] ?? ''), (int) ($profile['owner_id'] ?? 0));
+        $subject = (new AppraisalPhSubjectPrefill($this->db))->data((string) ($profile['appraisal_id'] ?? ''), (int) ($profile['owner_id'] ?? 0));
+        if (trim((string) ($profile['linkage']['legal_registration'] ?? '')) === '') {
+            $profile['linkage']['legal_registration'] = $subject['property_registration'] ?: ($legal['property_registration'] ?? '');
+        }
+        foreach (['matrix_registration', 'private_unit', 'coefficient'] as $key) {
+            if (trim((string) ($profile[$key] ?? '')) === '') $profile[$key] = (string) (($legal[$key] ?? '') ?: ($subject[$key] ?? ''));
+        }
         $legalTrace = (new AppraisalPhLegalTrace($this->db))->build((string) ($profile['appraisal_id'] ?? ''), (int) ($profile['owner_id'] ?? 0));
         if (trim((string) ($profile['ph_name'] ?? '')) === ''
             && empty($profile['common_areas']) && empty($profile['technical']) && $legalTrace === '') return $profile;
@@ -192,7 +201,8 @@ final class AppraisalPhRepository
             'Administración y cargas:', 'Incidencia valuatoria:', 'Notas y salvedades:',
             'La copropiedad corresponde preliminarmente', 'Se revisa preliminarmente como',
             'Lectura preliminar PH sin hallazgos suficientes', 'Para el análisis de propiedad horizontal se tuvo como soporte',
-            'Condición especial PH:', 'Trazabilidad documental:', 'Lectura comparativa:'] as $prefix) {
+            'Condición especial PH:', 'Trazabilidad documental:', 'Lectura comparativa:',
+            'El inmueble objeto de análisis forma parte de'] as $prefix) {
             if (str_starts_with($text, $prefix)) return true;
         }
         return false;

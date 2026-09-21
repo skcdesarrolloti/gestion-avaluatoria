@@ -27,11 +27,11 @@ $identityRows = [];
 $identityTextState = $technicalValue('resumen_identificacion_ph') === '' ? 'missing' : (($identityDiffs || $identityPending) ? 'warn' : 'ok');
 $identityRows[] = ['Texto editable para Entregable', $technicalValue('resumen_identificacion_ph') !== '' ? 'Texto construido' : 'Sin texto construido', $identityTextState, 'Resolver campos en rojo o amarillo antes de pasar al Entregable.'];
 $identityRows[] = ['Nombre / llave técnica PH', $phText('ph_name') ?: 'Sin nombre', $phText('ph_name') !== '' ? 'ok' : 'missing', 'Nombre oficial de la copropiedad según reglamento o escritura.'];
-$identityRows[] = ['Matrícula del bien sujeto', trim($phRegistration) !== '' ? $phRegistration : 'Sin matrícula', trim($phRegistration) !== '' ? 'ok' : 'missing', 'Tomar del CTL o del módulo jurídico.'];
+$identityRows[] = ['Matrícula del bien sujeto', trim($phRegistration) !== '' ? $phRegistration : 'Sin matrícula', trim($phRegistration) !== '' ? 'ok' : 'missing', 'Tomar de 3.1 Registro y catastro o del módulo jurídico.'];
 $matrixValue = $phText('matrix_registration') ?: (string) ($phLegal['matrix_registration'] ?? '');
 $identityRows[] = ['Matrícula matriz', trim($matrixValue) !== '' ? $matrixValue : 'Sin matrícula matriz', trim($matrixValue) !== '' ? 'ok' : 'warn', 'Ubicar en CTL, reglamento o escritura.'];
-$identityRows[] = ['Unidad privada analizada', $phText('private_unit') ?: 'Sin unidad privada', $phText('private_unit') !== '' ? 'ok' : 'missing', 'Identificar oficina, local, bodega, parqueadero o depósito objeto del avalúo.'];
-$identityRows[] = ['Coeficiente de copropiedad', $phText('coefficient') ?: 'Sin coeficiente', $phText('coefficient') !== '' ? 'ok' : 'warn', 'Cruzar coeficiente de reglamento y certificado si aplica.'];
+$identityRows[] = ['Unidad privada analizada', $phText('private_unit') ?: 'Sin unidad privada', $phText('private_unit') !== '' ? 'ok' : 'missing', 'Tomar de 3.1 Unidades y tipologías, jurídica o reglamento.'];
+$identityRows[] = ['Coeficiente de copropiedad', $phText('coefficient') ?: 'Sin coeficiente', $phText('coefficient') !== '' ? 'ok' : 'warn', 'Tomar de jurídica o cruzar contra reglamento si aplica.'];
 $identityRows[] = ['Cruce CTL / reglamento', $identityDiffs ? count($identityDiffs) . ' diferencia(s)' : ($identityPending ? count($identityPending) . ' dato(s) por completar' : 'Sin diferencias automáticas'), $identityDiffs ? 'warn' : ($identityPending ? 'warn' : 'ok'), 'Revisar diferencias o datos no ubicados.'];
 ?>
 <div class="rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 lg:col-span-2">

@@ -409,6 +409,8 @@ try {
         'propiedad horizontal separa bienes comunes y prioridades por tipologia');
     $phRepo = new AppraisalPhRepository($db);
     $phRepo->save(str_repeat('a', 32), 1, $phData);
+    $db->prepare('UPDATE appraisal_subjects SET property_registry = ? WHERE appraisal_id = ? AND owner_id = ?')
+        ->execute(['060-PH31', str_repeat('a', 32), 1]);
     $insertAppraisal->execute([str_repeat('c', 32), 'PH antecedente', 'Carrera 3', 'Medellín',
         'Cliente PH', 'Propietario PH', '2026-09-18 12:00:00']);
     $subjectRepo->save(str_repeat('c', 32), 1, ['neighborhood_id' => $neighborhood['id'],
@@ -420,6 +422,9 @@ try {
     expect($storedPh['ph_name'] === 'Conjunto Prueba'
         && ($storedPh['documents']['paquete_zip']['status'] ?? '') === 'warn',
         'propiedad horizontal guarda perfil por avaluo');
+    expect(($storedPh['linkage']['legal_registration'] ?? '') === '060-PH31'
+        && str_contains((string) ($storedPh['technical']['resumen_identificacion_ph'] ?? ''), '060-PH31'),
+        'propiedad horizontal trae matricula del bien sujeto desde 3.1');
     $phController = (new ReflectionClass(AppraisalPhController::class))->newInstanceWithoutConstructor();
     $phSafeReturn = new ReflectionMethod(AppraisalPhController::class, 'safeReturn');
     $phSafeReturn->setAccessible(true);

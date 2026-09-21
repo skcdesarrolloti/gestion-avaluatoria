@@ -63,7 +63,6 @@ final class AppraisalPhReportBuilder
         }
         return $summary . ' Para efectos valuatorios, la comparación se realiza con copropiedades de igual vocación, escala, localización y nivel de soporte común.';
     }
-
     private function useProfile(array $technical, string $typology): string
     {
         $text = mb_strtolower($this->cleanName(($technical['uso_dominante'] ?? '') . ' ' . ($technical['naturaleza_conjunto'] ?? '')));
@@ -81,7 +80,6 @@ final class AppraisalPhReportBuilder
             default => 'La vocación se determina a partir del reglamento, la visita y los soportes del encargo.',
         };
     }
-
     private function traceSummary(array $technical, string $limits): string
     {
         $legal = $this->cleanName($technical['trazabilidad_juridica_ph'] ?? '');
@@ -90,7 +88,6 @@ final class AppraisalPhReportBuilder
             . $this->source($technical) . '. La revisión permite ubicar referencias al reglamento, antecedentes, reformas o aclaraciones, bienes comunes, reglas de uso y administración. '
             . 'El texto del avalúo incorpora únicamente hechos verificados y redactados por el analista. ' . $limits;
     }
-
     private function report(string $name, string $label, string $assets, string $use,
         string $support, string $level, string $limits): string
     {
@@ -101,7 +98,6 @@ final class AppraisalPhReportBuilder
             . 'la funcionalidad, la deseabilidad comercial y la comparación con unidades ubicadas en copropiedades de menor dotación. '
             . "{$limits}";
     }
-
     private function advantages(array $common, string $typology): array
     {
         $sets = [
@@ -117,13 +113,11 @@ final class AppraisalPhReportBuilder
         $advantage = $found ? implode(', ', $found) : 'soporte común por confirmar';
         return [$advantage, $support ?: 'los bienes comunes específicos deben confirmarse con visita y soportes actuales.'];
     }
-
     private function source(array $technical): string
     {
         $source = $this->cleanName($technical['fuente_documental'] ?? '');
         return $source !== '' ? 'el documento fuente ' . $source : 'el reglamento o soporte documental cargado';
     }
-
     private function labels(array $common): string
     {
         $labels = AppraisalPhCatalog::commonAreas();
@@ -174,11 +168,16 @@ final class AppraisalPhReportBuilder
     }
     private function assets(array $core): string
     {
+        $linkage = is_array($core['linkage'] ?? null) ? $core['linkage'] : [];
+        $registration = $this->cleanName($linkage['legal_registration'] ?? '');
         $unit = $this->cleanName($core['private_unit'] ?? '');
         $coef = $this->cleanName($core['coefficient'] ?? '');
-        if ($unit !== '' && $coef !== '') return "La unidad analizada corresponde a {$unit}, con coeficiente {$coef}.";
-        if ($unit !== '') return "La unidad analizada corresponde a {$unit}.";
-        return '';
+        $parts = [];
+        if ($registration !== '') $parts[] = "se identifica registralmente con matrícula inmobiliaria {$registration}";
+        if ($unit !== '' && $coef !== '') $parts[] = "la unidad privada analizada corresponde a {$unit}, con coeficiente de copropiedad {$coef}";
+        elseif ($unit !== '') $parts[] = "la unidad privada analizada corresponde a {$unit}";
+        elseif ($coef !== '') $parts[] = "se registra coeficiente de copropiedad {$coef}";
+        return $parts ? ucfirst(implode('; ', $parts)) . '.' : '';
     }
 
     private function dotationLevel(array $technical): string
