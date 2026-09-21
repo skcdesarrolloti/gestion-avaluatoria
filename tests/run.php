@@ -459,6 +459,15 @@ try {
     expect(str_starts_with((string) ($phAnalysis['technical']['resumen_configuracion_ph'] ?? ''), 'La copropiedad ')
         && !str_contains((string) ($phAnalysis['technical']['resumen_configuracion_ph'] ?? ''), 'Configuración predial:'),
         'resumen configuracion PH queda redactado para entregable');
+    $phQuantityAnalysis = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
+        'El edificio cuenta con seis pisos, un sotano, seis ascensores, Oficinas: 40, Locales: 8, Parqueaderos: 120, Depositos: 20.',
+        ['reglamento.txt'], 'oficinas');
+    expect(($phQuantityAnalysis['technical']['numero_oficinas'] ?? '') === '40 oficinas'
+        && ($phQuantityAnalysis['technical']['numero_parqueaderos'] ?? '') === '120 parqueaderos'
+        && ($phQuantityAnalysis['technical']['numero_pisos'] ?? '') === '6 pisos'
+        && ($phQuantityAnalysis['technical']['numero_ascensores'] ?? '') === '6 ascensores'
+        && str_contains((string) ($phQuantityAnalysis['technical']['resumen_configuracion_ph'] ?? ''), 'oficinas'),
+        'configuracion PH extrae cantidades especificas de unidades y niveles');
     $emptyPhAnalysis = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
         '', ['ESCRITURA PUBLICA 2593 EDIFICIO CHAMBACU.pdf'], 'oficinas');
     expect(!isset($emptyPhAnalysis['core']['ph_name'])

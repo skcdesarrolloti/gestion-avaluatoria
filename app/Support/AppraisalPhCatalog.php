@@ -37,9 +37,11 @@ final class AppraisalPhCatalog
             ]],
             'configuracion' => ['Configuración general', [
                 'etapas_copropiedad' => 'Etapas, sectores o manzanas',
-                'numero_edificios' => 'Número de bloques / torres / naves',
-                'numero_unidades' => 'Número de unidades privadas',
-                'resumen_areas_conjunto' => 'Cuadro general de áreas',
+                'numero_edificios' => 'Número de bloques / torres / naves', 'numero_pisos' => 'Número de pisos / niveles',
+                'numero_sotanos' => 'Número de sótanos', 'numero_ascensores' => 'Número de ascensores',
+                'numero_unidades' => 'Número de unidades privadas', 'numero_oficinas' => 'Número de oficinas',
+                'numero_locales' => 'Número de locales', 'numero_parqueaderos' => 'Número de parqueaderos',
+                'numero_depositos' => 'Número de depósitos', 'resumen_areas_conjunto' => 'Cuadro general de áreas',
                 'area_lote_matriz' => 'Área del lote matriz', 'area_construida_total' => 'Área construida o área total del conjunto',
                 'desarrollos_relevantes' => 'Desenglobes, subdivisiones o ampliaciones',
                 'lotes_por_etapa' => 'Lote matriz y lotes resultantes',
@@ -106,8 +108,9 @@ final class AppraisalPhCatalog
     public static function technicalApplicability(): array
     {
         $base = ['fuente_documental', 'escritura_reforma', 'ciudad_municipio', 'direccion_referencia',
-            'tipo_propiedad_horizontal', 'naturaleza_conjunto', 'uso_dominante', 'numero_edificios',
-            'numero_unidades', 'resumen_areas_conjunto', 'area_lote_matriz', 'area_construida_total', 'ubicacion_unidad',
+            'tipo_propiedad_horizontal', 'naturaleza_conjunto', 'uso_dominante', 'numero_edificios', 'numero_pisos',
+            'numero_sotanos', 'numero_ascensores', 'numero_unidades', 'numero_oficinas', 'numero_locales',
+            'numero_parqueaderos', 'numero_depositos', 'resumen_areas_conjunto', 'area_lote_matriz', 'area_construida_total', 'ubicacion_unidad',
             'bienes_comunes_esenciales', 'bienes_comunes_no_esenciales', 'areas_uso_exclusivo',
             'porteria_administracion_vigilancia', 'cctv_control_acceso', 'usos_permitidos',
             'usos_restringidos', 'reglas_constructivas', 'coeficientes_copropiedad',

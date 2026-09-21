@@ -16,7 +16,14 @@ $lot = $technicalValue('lotes_por_etapa');
 $lotArea = $technicalValue('area_lote_matriz');
 $totalArea = $technicalValue('area_construida_total');
 $units = $technicalValue('numero_unidades');
+$offices = $technicalValue('numero_oficinas');
+$premises = $technicalValue('numero_locales');
+$parking = $technicalValue('numero_parqueaderos');
+$deposits = $technicalValue('numero_depositos');
 $buildings = $technicalValue('numero_edificios');
+$floors = $technicalValue('numero_pisos');
+$basements = $technicalValue('numero_sotanos');
+$elevators = $technicalValue('numero_ascensores');
 $stages = $technicalValue('etapas_copropiedad');
 $areas = $technicalValue('resumen_areas_conjunto');
 $organization = $technicalValue('organizacion_interna');
@@ -28,9 +35,16 @@ $configRows = [
     ['Lote matriz o predio de origen', $configShort($lot) ?: 'Sin lote matriz descrito', $lot !== '' ? 'ok' : 'warn', 'Precisar el predio sobre el que se desarrolló la PH.'],
     ['Área del lote matriz', $configShort($lotArea) ?: 'Sin área de lote', $lotArea !== '' ? 'ok' : 'warn', 'Ubicar área de lote o cabida en escritura, CTL o cuadro de áreas.'],
     ['Área construida o total del conjunto', $configShort($totalArea) ?: ($configShort($areas) ?: 'Sin área total'), ($totalArea !== '' || $areas !== '') ? 'ok' : 'warn', 'Tomar del cuadro de áreas, planos o reglamento.'],
-    ['Número de unidades privadas', $configShort($units) ?: 'Sin número de unidades', $units !== '' ? 'ok' : 'missing', 'Precisar oficinas, locales, parqueaderos, depósitos, bodegas o viviendas según aplique.'],
+    ['Número total de unidades privadas', $configShort($units) ?: 'Sin número total de unidades', $units !== '' ? 'ok' : 'missing', 'Precisar el total de unidades privadas de la PH.'],
+    ['Número de oficinas', $configShort($offices) ?: 'Sin número de oficinas', $offices !== '' ? 'ok' : 'warn', 'Completar si la PH tiene componente corporativo o de consultorios.'],
+    ['Número de locales', $configShort($premises) ?: 'Sin número de locales', $premises !== '' ? 'ok' : 'warn', 'Completar si existen locales comerciales o atención al público.'],
+    ['Número de parqueaderos', $configShort($parking) ?: 'Sin número de parqueaderos', $parking !== '' ? 'ok' : 'warn', 'Precisar privados, visitantes o comunales si el soporte lo permite.'],
+    ['Número de depósitos', $configShort($deposits) ?: 'Sin número de depósitos', $deposits !== '' ? 'ok' : 'warn', 'Completar si existen depósitos, cuartos útiles o bodegajes menores.'],
     ['Bloques, torres, edificios o naves', $configShort($buildings) ?: 'Sin bloques o edificios', $buildings !== '' ? 'ok' : 'warn', 'Describir la organización física de la copropiedad.'],
-    ['Número de pisos, sótanos o niveles', $configShort($organization) ?: 'Sin distribución funcional', $organization !== '' ? 'ok' : 'warn', 'Registrar sótanos, pisos, niveles y destinación por nivel si se conoce.'],
+    ['Número de pisos o niveles', $configShort($floors) ?: 'Sin número de pisos', $floors !== '' ? 'ok' : 'warn', 'Registrar pisos, niveles o plantas principales.'],
+    ['Número de sótanos', $configShort($basements) ?: 'Sin número de sótanos', $basements !== '' ? 'ok' : 'warn', 'Precisar sótanos o semisótanos si existen.'],
+    ['Número de ascensores', $configShort($elevators) ?: 'Sin número de ascensores', $elevators !== '' ? 'ok' : 'warn', 'Completar transporte vertical si aplica a la tipología.'],
+    ['Distribución funcional por pisos', $configShort($organization) ?: 'Sin distribución funcional', $organization !== '' ? 'ok' : 'warn', 'Registrar destinación por nivel: sótano, lobby, locales, oficinas, parqueaderos, etc.'],
     ['Etapas, sectores o manzanas', $configShort($stages) ?: 'Sin etapas o sectores', $stages !== '' ? 'ok' : 'warn', 'Indicar fases, sectores o manzanas cuando existan.'],
     ['Unidad objeto dentro de la configuración', $configShort($unitLocation) ?: 'Sin ubicación de la unidad objeto', $unitLocation !== '' ? 'ok' : 'missing', 'Ubicar oficina, local, parqueadero, depósito, piso, torre o nave del avalúo.'],
     ['Desenglobes o antecedentes prediales', $configShort($developments) ?: 'Sin antecedentes descritos', $developments !== '' ? 'ok' : 'warn', 'Revisar si hay desenglobes, integraciones, reformas o lotes resultantes.'],

@@ -33,6 +33,7 @@ final class AppraisalPhDocumentAnalyzer
         $reserve = $evidence->excerpts(['fondo de imprevistos', 'fondo de reserva'], 120);
         if ($reserve !== '') $core['reserve_fund'] = $reserve;
         if (empty($technical['ciudad_municipio'])) $technical['ciudad_municipio'] = $this->city($content);
+        $technical = array_replace($technical, (new AppraisalPhQuantityExtractor())->extract($content));
         $common = $this->map($evidence, AppraisalPhCatalog::commonAreas(),
             AppraisalPhComparativeCatalog::commonAreaRules());
         $technical = array_replace($technical, $this->comparativeTechnical($common, $typology));
