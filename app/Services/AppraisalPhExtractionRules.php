@@ -20,6 +20,8 @@ final class AppraisalPhExtractionRules
             'numero_edificios' => ['bloques', 'torres', 'naves', 'edificios'],
             'numero_unidades' => ['unidades privadas', 'unidades inmobiliarias'],
             'resumen_areas_conjunto' => ['area privada', 'area comun', 'area construida', 'cuadro de areas'],
+            'area_lote_matriz' => ['area del lote', 'lote de terreno', 'lote matriz', 'cabida y linderos'],
+            'area_construida_total' => ['area construida', 'area total construida', 'area total del conjunto'],
             'desarrollos_relevantes' => ['desenglobe', 'subdivision', 'ampliacion'],
             'lotes_por_etapa' => ['lote matriz', 'lotes resultantes', 'lotes por etapa'],
             'organizacion_interna' => ['organizacion interna', 'sectores internos', 'distribucion por pisos'],

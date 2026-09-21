@@ -20,7 +20,6 @@ final class AppraisalPhCatalog
             'mixto' => 'Mixto · PH de usos combinados',
         ];
     }
-
     public static function technicalGroups(): array
     {
         return [
@@ -41,6 +40,7 @@ final class AppraisalPhCatalog
                 'numero_edificios' => 'Número de bloques / torres / naves',
                 'numero_unidades' => 'Número de unidades privadas',
                 'resumen_areas_conjunto' => 'Cuadro general de áreas',
+                'area_lote_matriz' => 'Área del lote matriz', 'area_construida_total' => 'Área construida o área total del conjunto',
                 'desarrollos_relevantes' => 'Desenglobes, subdivisiones o ampliaciones',
                 'lotes_por_etapa' => 'Lote matriz y lotes resultantes',
                 'organizacion_interna' => 'Organización por manzanas, lotes o sectores',
@@ -103,12 +103,11 @@ final class AppraisalPhCatalog
             ]],
         ];
     }
-
     public static function technicalApplicability(): array
     {
         $base = ['fuente_documental', 'escritura_reforma', 'ciudad_municipio', 'direccion_referencia',
             'tipo_propiedad_horizontal', 'naturaleza_conjunto', 'uso_dominante', 'numero_edificios',
-            'numero_unidades', 'resumen_areas_conjunto', 'ubicacion_unidad',
+            'numero_unidades', 'resumen_areas_conjunto', 'area_lote_matriz', 'area_construida_total', 'ubicacion_unidad',
             'bienes_comunes_esenciales', 'bienes_comunes_no_esenciales', 'areas_uso_exclusivo',
             'porteria_administracion_vigilancia', 'cctv_control_acceso', 'usos_permitidos',
             'usos_restringidos', 'reglas_constructivas', 'coeficientes_copropiedad',

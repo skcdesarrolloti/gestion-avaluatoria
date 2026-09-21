@@ -102,9 +102,10 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
         </section>
 
         <section class="mt-5 grid gap-4 lg:grid-cols-2" x-show="tab === 'configuracion'">
-            <div class="lg:col-span-2"><?php $renderPhTabSummary('resumen_configuracion_ph', 'Resumen depurado para Entregable'); ?></div>
-            <?php $renderPhInput('matrix_registration', 'Matrícula matriz', $phText('matrix_registration'), 'Puede venir del certificado de tradición.'); ?>
-            <?php foreach (['etapas_copropiedad'=>'Etapas, sectores o manzanas','numero_edificios'=>'Bloques, torres, naves o edificios','numero_unidades'=>'Unidades privadas','resumen_areas_conjunto'=>'Cuadro general de áreas','lotes_por_etapa'=>'Lote matriz y lotes resultantes','organizacion_interna'=>'Organización interna','desarrollos_relevantes'=>'Desenglobes o ampliaciones','ubicacion_unidad'=>'Ubicación de la unidad objeto'] as $key=>$label) $renderTechTextarea($key, $label, $technicalValue($key)); ?>
+            <div class="lg:col-span-2"><?php $renderPhTabSummary('resumen_configuracion_ph', 'Configuración predial para Entregable'); ?></div>
+            <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-configuration-support.php'; ?>
+            <?php $renderPhInput('matrix_registration', 'Matrícula matriz', $phText('matrix_registration'), 'Folio base de la copropiedad, tomado de jurídica o reglamento.'); ?>
+            <?php foreach (['lotes_por_etapa'=>'Lote matriz o predio de origen','area_lote_matriz'=>'Área del lote matriz','area_construida_total'=>'Área construida o área total del conjunto','numero_unidades'=>'Número de unidades privadas','numero_edificios'=>'Bloques, torres, naves o edificios','etapas_copropiedad'=>'Etapas, sectores o manzanas','resumen_areas_conjunto'=>'Cuadro general de áreas','organizacion_interna'=>'Distribución funcional interna','desarrollos_relevantes'=>'Desenglobes, integraciones o ampliaciones','ubicacion_unidad'=>'Unidad objeto dentro de la configuración'] as $key=>$label) $renderTechTextarea($key, $label, $technicalValue($key)); ?>
         </section>
 
         <section class="mt-5 grid gap-4 lg:grid-cols-2" x-show="tab === 'reglas'">

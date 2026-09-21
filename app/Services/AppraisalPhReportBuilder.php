@@ -15,7 +15,6 @@ final class AppraisalPhReportBuilder
         $use = $this->dominantUse($technical, $typology);
         [$advantages, $support] = $this->advantages($common, $typology);
         $level = $this->dotationLevel($technical);
-        $config = $this->configuration($technical);
         $rules = $this->rules($technical, $core);
         $admin = $this->administration($core, $technical);
         $limits = 'La conclusión corresponde al alcance técnico del avalúo y se complementa con el análisis jurídico registrado en el expediente.';
@@ -26,7 +25,7 @@ final class AppraisalPhReportBuilder
             'resumen_trazabilidad_ph' => $trace,
             'resumen_identificacion_ph' => $this->identitySummary($name, $assets),
             'resumen_tipologia_ph' => $this->typologySummary($name, $label, $technical, $typology),
-            'resumen_configuracion_ph' => "Configuración predial: {$config} Esta información ayuda a entender escala, organización interna y soporte de funcionamiento del edificio.",
+            'resumen_configuracion_ph' => $this->configuration($technical, $core),
             'resumen_comunes_ph' => "Bienes comunes y soporte: {$support} En términos valuatorios, estos elementos aportan funcionalidad, control, comodidad para usuarios y respaldo operativo.",
             'resumen_reglas_ph' => "Reglas de uso y operación: {$rules} Estas reglas inciden en imagen, convivencia, uso permitido, adecuaciones y comercialización de la unidad.",
             'resumen_administracion_ph' => "Administración y cargas: {$admin} Para valor, liquidez y negociación se requiere confirmar expensas, paz y salvo, pólizas y estado administrativo actual.",
@@ -128,7 +127,6 @@ final class AppraisalPhReportBuilder
         }
         return $names ? 'se identifican menciones de ' . implode(', ', $names) . '.' : '';
     }
-
     private function dominantUse(array $technical, string $typology): string
     {
         if ($this->hasText($technical['uso_dominante'] ?? '')) {
@@ -142,13 +140,23 @@ final class AppraisalPhReportBuilder
             default => 'La lectura aporta elementos para precisar el uso dominante y los usos complementarios.',
         };
     }
-
-    private function configuration(array $technical): string
+    private function configuration(array $technical, array $core): string
     {
-        $parts = $this->present(['etapas o sectores' => $technical['etapas_copropiedad'] ?? '',
-            'unidades privadas' => $technical['numero_unidades'] ?? '', 'áreas' => $technical['resumen_areas_conjunto'] ?? '',
+        $name = $this->cleanName($core['ph_name'] ?? '') ?: 'la copropiedad analizada';
+        $parts = $this->present(['lote matriz' => $technical['lotes_por_etapa'] ?? '',
+            'área del lote matriz' => $technical['area_lote_matriz'] ?? '',
+            'área construida o total' => ($technical['area_construida_total'] ?? '') ?: ($technical['resumen_areas_conjunto'] ?? ''),
+            'unidades privadas' => $technical['numero_unidades'] ?? '',
+            'bloques, torres, edificios o naves' => $technical['numero_edificios'] ?? '',
+            'etapas, sectores o manzanas' => $technical['etapas_copropiedad'] ?? '',
+            'organización interna' => $technical['organizacion_interna'] ?? '',
             'desenglobes o antecedentes prediales' => $technical['desarrollos_relevantes'] ?? '']);
-        return $parts ? 'hay soporte para revisar ' . $parts . '.' : 'la escala predial y la organización interna requieren depuración manual.';
+        $summary = "La copropiedad {$name} presenta una configuración predial que permite relacionar el bien sujeto con la estructura física y jurídica de la propiedad horizontal.";
+        if ($parts !== '') $summary .= " El soporte disponible identifica {$parts}, información útil para entender escala, organización interna y relación entre áreas privadas y bienes comunes.";
+        else $summary .= ' La escala, organización interna y cuadro de áreas deben completarse antes de trasladar la descripción al informe.';
+        if ($this->hasText($technical['ubicacion_unidad'] ?? '')) $summary .= ' La unidad objeto cuenta con referencia de ubicación dentro de la copropiedad.';
+        else $summary .= ' Falta precisar la ubicación de la unidad objeto dentro de la copropiedad.';
+        return $summary;
     }
     private function rules(array $technical, array $core): string
     {
@@ -179,31 +187,26 @@ final class AppraisalPhReportBuilder
         elseif ($coef !== '') $parts[] = "se registra coeficiente de copropiedad {$coef}";
         return $parts ? ucfirst(implode('; ', $parts)) . '.' : '';
     }
-
     private function dotationLevel(array $technical): string
     {
         $text = $this->cleanName($technical['nivel_dotacion_comparativa'] ?? '');
         return $text !== '' ? mb_strtolower(strtok($text, '.') ?: $text) : 'por confirmar';
     }
-
     private function present(array $values): string
     {
         $names = [];
         foreach ($values as $label => $value) if ($this->hasText($value)) $names[] = $label;
         return implode(', ', $names);
     }
-
     private function hasAny(array $rows, array $keys): bool
     {
         foreach ($keys as $key) if (($rows[$key]['status'] ?? '') !== '') return true;
         return false;
     }
-
     private function hasText(mixed $value): bool
     {
         return trim((string) $value) !== '';
     }
-
     private function containsAny(string $text, array $needles): bool
     {
         foreach ($needles as $needle) if (str_contains($text, $needle)) return true;
