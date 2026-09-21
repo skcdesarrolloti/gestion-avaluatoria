@@ -10,8 +10,8 @@ $phReadableDocuments = array_filter($phLoadedDocuments, static fn (array $doc): 
         <div>
             <h3 class="font-semibold text-blue-950">Banco de copropiedades</h3>
             <p class="mt-2 text-sm leading-6 text-blue-950">
-                Busca copropiedades ya guardadas en otros avalúos por nombre de copropiedad, llave PH o matrícula matriz.
-                No busca por número de escritura; los soportes cargados en este avalúo se ven abajo.
+                Busca copropiedades guardadas por nombre, llave PH o matrícula matriz. Usa la tipología y la ciudad
+                para distinguir homónimos; los soportes ya procesados pueden recargarse sin repetir OCR.
             </p>
         </div>
         <form class="grid gap-2 sm:grid-cols-[minmax(220px,1fr)_auto]" method="get"

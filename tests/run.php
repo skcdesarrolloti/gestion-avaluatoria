@@ -397,8 +397,13 @@ try {
     $phApplicability = \App\Support\AppraisalPhCatalog::technicalApplicability();
     expect(in_array('muelles', $phApplicability['bodegas'], true)
         && !in_array('muelles', $phApplicability['residencial'], true)
+        && in_array('amenidades_relevantes', $phApplicability['residencial'], true)
         && in_array('vias_internas', $phApplicability['bodegas'], true),
         'propiedad horizontal filtra campos tecnicos por tipologia');
+    expect(isset(\App\Support\AppraisalPhCatalog::commonAreaGroups()['esenciales'])
+        && in_array('patios_maniobra', \App\Support\AppraisalPhCatalog::typologyPriorities()['bodegas'], true)
+        && in_array('piscina', \App\Support\AppraisalPhCatalog::typologyPriorities()['residencial'], true),
+        'propiedad horizontal separa bienes comunes y prioridades por tipologia');
     $phRepo = new AppraisalPhRepository($db);
     $phRepo->save(str_repeat('a', 32), 1, $phData);
     $insertAppraisal->execute([str_repeat('c', 32), 'PH antecedente', 'Carrera 3', 'Medellín',
@@ -427,6 +432,8 @@ try {
         ['reglamento.txt'], 'bodegas');
     expect(($phAnalysis['core']['matrix_registration'] ?? '') === '060-239752'
         && ($phAnalysis['technical']['patios_maniobra'] ?? '') !== ''
+        && ($phAnalysis['technical']['bienes_comunes_esenciales'] ?? '') !== ''
+        && str_contains((string) ($phAnalysis['technical']['dotacion_tipologia'] ?? ''), 'factores prioritarios')
         && ($phAnalysis['documents']['reglamento']['status'] ?? '') === 'warn'
         && ($phAnalysis['risks']['restricciones_uso']['status'] ?? '') === 'warn'
         && str_contains((string) ($phAnalysis['core']['report_text'] ?? ''), 'no reemplaza estudio de títulos'),

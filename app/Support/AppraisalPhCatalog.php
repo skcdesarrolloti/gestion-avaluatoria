@@ -48,6 +48,10 @@ final class AppraisalPhCatalog
                 'subdivisiones_futuras' => 'Futuras subdivisiones o integraciones',
             ]],
             'soporte' => ['Bienes comunes y soporte operativo', [
+                'bienes_comunes_esenciales' => 'Bienes comunes esenciales',
+                'bienes_comunes_no_esenciales' => 'Bienes comunes no esenciales',
+                'areas_uso_exclusivo' => 'Áreas comunes de uso exclusivo',
+                'amenidades_relevantes' => 'Amenidades relevantes según tipología',
                 'porteria_administracion_vigilancia' => 'Portería, administración y vigilancia',
                 'cctv_control_acceso' => 'CCTV y control de acceso',
                 'vias_internas' => 'Vías internas',
@@ -77,11 +81,15 @@ final class AppraisalPhCatalog
                 'incidencia_valor_soporte_comun' => 'Aporte de valor del soporte común',
                 'incidencia_restricciones_regimen' => 'Incidencia del régimen especial y sus restricciones',
                 'incidencia_comercializacion_interna' => 'Incidencia de la organización interna en la comercialización',
+                'dotacion_tipologia' => 'Perfil de dotación frente a la tipología',
+                'nivel_dotacion_comparativa' => 'Lectura comparativa de dotación',
+                'comparacion_mercado_ph' => 'Comparación con copropiedades similares',
                 'lectura_valuatoria' => 'Incidencia funcional y valuatoria de la copropiedad',
                 'salvedades_reglamento' => 'Aspectos extraídos directamente del reglamento',
                 'salvedades_visita' => 'Aspectos que requieren visita',
                 'salvedades_validacion' => 'Aspectos que requieren plano, certificado o validación',
                 'observaciones_extraccion' => 'Salvedades de lectura y validación documental',
+                'notas_normativas_ph' => 'Notas normativas sugeridas',
             ]],
         ];
     }
@@ -91,19 +99,23 @@ final class AppraisalPhCatalog
         $base = ['fuente_documental', 'escritura_reforma', 'ciudad_municipio', 'direccion_referencia',
             'tipo_propiedad_horizontal', 'naturaleza_conjunto', 'uso_dominante', 'numero_edificios',
             'numero_unidades', 'resumen_areas_conjunto', 'ubicacion_unidad',
+            'bienes_comunes_esenciales', 'bienes_comunes_no_esenciales', 'areas_uso_exclusivo',
             'porteria_administracion_vigilancia', 'cctv_control_acceso', 'usos_permitidos',
             'usos_restringidos', 'reglas_constructivas', 'coeficientes_copropiedad',
             'expensas_cuotas', 'responsabilidades_bienes_comunes', 'lectura_valuatoria',
             'salvedades_reglamento', 'salvedades_visita', 'salvedades_validacion',
-            'observaciones_extraccion'];
+            'observaciones_extraccion', 'dotacion_tipologia', 'nivel_dotacion_comparativa',
+            'comparacion_mercado_ph', 'notas_normativas_ph'];
         return [
             'residencial' => array_merge($base, ['etapas_copropiedad', 'numero_edificios',
-                'condiciones_normativas_operativas', 'incidencia_valor_soporte_comun']),
+                'amenidades_relevantes', 'condiciones_normativas_operativas',
+                'incidencia_valor_soporte_comun']),
             'oficinas' => array_merge($base, ['relacion_funcional_usos', 'regimen_especial',
-                'equipamiento_tecnico', 'red_contra_incendios', 'condiciones_normativas_operativas',
-                'cargas_comercializacion', 'incidencia_valor_soporte_comun']),
+                'amenidades_relevantes', 'equipamiento_tecnico', 'red_contra_incendios',
+                'condiciones_normativas_operativas', 'cargas_comercializacion',
+                'incidencia_valor_soporte_comun']),
             'comercio' => array_merge($base, ['relacion_funcional_usos', 'usos_complementarios',
-                'zonas_espera', 'reglas_cargue_descargue', 'cargue_descargue',
+                'amenidades_relevantes', 'zonas_espera', 'reglas_cargue_descargue', 'cargue_descargue',
                 'condiciones_normativas_operativas', 'cargas_comercializacion',
                 'incidencia_comercializacion_interna']),
             'bodegas' => array_merge($base, ['regimen_especial', 'etapas_copropiedad', 'lotes_por_etapa',
@@ -119,16 +131,27 @@ final class AppraisalPhCatalog
 
     public static function commonAreas(): array
     {
-        return [
-            'porteria' => 'Portería / acceso controlado', 'lobby' => 'Lobby o recepción',
-            'ascensores' => 'Ascensores', 'circulaciones' => 'Circulaciones y escaleras',
-            'parqueaderos_visitantes' => 'Parqueaderos de visitantes', 'zonas_verdes' => 'Zonas verdes',
-            'salon_social' => 'Salón social', 'piscina' => 'Piscina', 'gimnasio' => 'Gimnasio',
-            'juegos' => 'Juegos / recreación', 'vias_internas' => 'Vías internas',
-            'planta_electrica' => 'Planta eléctrica', 'tanques' => 'Tanques / bombeo',
-            'red_incendio' => 'Red contra incendio', 'basuras' => 'Cuarto de basuras',
-            'cerramiento' => 'Cerramiento y seguridad perimetral',
-        ];
+        return AppraisalPhComparativeCatalog::commonAreas();
+    }
+
+    public static function commonAreaGroups(): array
+    {
+        return AppraisalPhComparativeCatalog::commonAreaGroups();
+    }
+
+    public static function typologyPriorities(): array
+    {
+        return AppraisalPhComparativeCatalog::typologyPriorities();
+    }
+
+    public static function dotationLevels(): array
+    {
+        return AppraisalPhComparativeCatalog::dotationLevels();
+    }
+
+    public static function normNotes(): array
+    {
+        return AppraisalPhComparativeCatalog::normNotes();
     }
 
     public static function documents(): array

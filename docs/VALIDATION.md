@@ -130,3 +130,16 @@ sin versión en un servidor local de fixtures; el formulario real y los bundles
 compilados cargaron la URL versionada, hicieron OCR de una página escaneada y
 completaron el envío multipart del PDF junto al JSON de texto. No hubo cambios
 nuevos en esquema o persistencia que requirieran repetir las pruebas MySQL.
+
+## Matriz comparativa PH — 21/09/2026
+
+Se agregó el catálogo comparativo de bienes comunes esenciales, bienes comunes no
+esenciales, áreas de uso exclusivo, amenidades y soporte operativo. La UI de 3.5
+muestra prioridades por tipología para evitar mezclar amenidades residenciales con
+soporte logístico, y el analizador documental propone un perfil de dotación revisable
+por el analista.
+
+Validación ejecutada: lint PHP de 251 archivos, `php tests/run.php` con 166
+verificaciones correctas, `npm test` con 38 pruebas correctas, `npm run build` y
+`npm run check:size` con CSS + JS en 34,5 KB gzip. No hubo cambios de esquema ni se
+tocaron bases reales.

@@ -22,6 +22,13 @@ el texto, conserva referencias al archivo y página y limita los extractos por c
 La asociación usa reglas textuales, no un modelo de razonamiento jurídico: no interpreta
 automáticamente excepciones, derogaciones internas ni la vigencia de cada cláusula.
 
+La ficha separa bienes comunes esenciales, bienes comunes no esenciales, áreas de uso
+exclusivo, amenidades y soporte operativo. La matriz de dotación cambia por tipología:
+residencial prioriza amenidades, seguridad, ascensores y parqueaderos; bodegas/logística
+prioriza vías internas, patios de maniobra, muelles, red contra incendio, subestación
+y control operativo. El perfil comparativo es orientativo y revisable; no es una
+calificación automática de valor ni sustituye comparables, visita o criterio pericial.
+
 Los campos vacíos reciben sugerencias; los ya diligenciados se conservan. Lo que no
 se identifica queda pendiente, con ayuda visible. Una mención de piscina, póliza, acta,
 mora o mantenimiento no acredita existencia actual, entrega del soporte ni incumplimiento.
@@ -29,6 +36,9 @@ No se marcan como verificados estos hallazgos. Fotos, visita, pagos vigentes, im
 en valor y conclusiones finales requieren al analista y sus soportes correspondientes.
 El coeficiente solo se propone si la unidad previamente diligenciada tiene una mención
 expresa, única y reconocible junto a su coeficiente; tablas complejas quedan por revisar.
+Las notas normativas sugeridas citan Ley 675 de 2001, Decreto 1420 de 1998, Resolución
+IGAC 941 de 2026 e IVS 2025 como pies de página de apoyo, no como reemplazo de una
+revisión jurídica particular del reglamento.
 
 ## Persistencia y conflictos
 

@@ -25,6 +25,10 @@ final class AppraisalPhExtractionRules
             'organizacion_interna' => ['organizacion interna', 'sectores internos', 'distribucion por pisos'],
             'ubicacion_unidad' => ['ubicacion de la unidad analizada'],
             'subdivisiones_futuras' => ['futura subdivision', 'integracion futura'],
+            'bienes_comunes_esenciales' => ['bienes comunes esenciales', 'terreno', 'estructura', 'fachadas', 'cubiertas', 'redes generales'],
+            'bienes_comunes_no_esenciales' => ['bienes comunes no esenciales', 'amenidades', 'zonas sociales', 'salon social', 'piscina'],
+            'areas_uso_exclusivo' => ['uso exclusivo', 'areas de uso exclusivo', 'parqueadero privado', 'terraza', 'deposito'],
+            'amenidades_relevantes' => ['amenidades', 'piscina', 'gimnasio', 'salon social', 'coworking', 'juegos infantiles'],
             'vias_internas' => ['vias internas', 'circulacion vehicular'],
             'red_contra_incendios' => ['red contra incendios', 'hidrante', 'gabinetes contra incendio'],
             'equipamiento_tecnico' => ['subestacion', 'planta electrica', 'bascula', 'cuarto tecnico', 'ascensores', 'bombas'],
@@ -50,11 +54,15 @@ final class AppraisalPhExtractionRules
             'incidencia_valor_soporte_comun' => ['soporte comun', 'aporte de valor'],
             'incidencia_restricciones_regimen' => ['regimen especial', 'restricciones del regimen'],
             'incidencia_comercializacion_interna' => ['comercializacion interna', 'organizacion interna'],
+            'dotacion_tipologia' => ['dotacion', 'amenidades', 'soporte comun'],
+            'nivel_dotacion_comparativa' => ['dotacion comparativa', 'infraestructura especializada'],
+            'comparacion_mercado_ph' => ['copropiedades similares', 'comparacion'],
             'lectura_valuatoria' => ['valor', 'valuacion', 'avaluo'],
             'salvedades_reglamento' => ['salvedades al reglamento', 'aclaraciones al reglamento'],
             'salvedades_visita' => ['visita', 'inspeccion'],
             'salvedades_validacion' => ['validacion documental', 'certificado', 'plano'],
             'observaciones_extraccion' => ['observacion', 'nota'],
+            'notas_normativas_ph' => ['ley 675', 'ivs', 'decreto 1420', 'resolucion 941'],
         ];
     }
 
