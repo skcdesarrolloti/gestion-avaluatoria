@@ -7,6 +7,8 @@ await build({ entryPoints: ['resources/js/app.js'], bundle: true, minify: true,
     format: 'esm', target: ['es2020'], outfile: 'public/assets/app.js', legalComments: 'eof' });
 await build({ entryPoints: ['resources/js/legal-certificate-reader.js'], bundle: true, minify: true,
     format: 'esm', target: ['es2020'], outfile: 'public/assets/legal-certificate-reader.js', legalComments: 'eof' });
+await build({ entryPoints: ['resources/js/ph-pdf-reader.js'], bundle: true, minify: true,
+    format: 'esm', target: ['es2020'], outfile: 'public/assets/ph-pdf-reader.js', legalComments: 'eof' });
 copyFileSync('node_modules/pdfjs-dist/build/pdf.worker.mjs', 'public/assets/pdf.worker.mjs');
 mkdirSync('public/assets/tesseract/core', { recursive: true });
 mkdirSync('public/assets/tesseract/lang', { recursive: true });

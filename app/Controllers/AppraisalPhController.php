@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, Session};
 use App\Models\{AppraisalPhRepository, AppraisalRepository};
-use App\Services\{AppraisalPhChunkUploadService, AppraisalPhDocumentReanalysisService, AppraisalPhDocumentStorage, AppraisalPhDocumentUploadService, AppraisalPhExternalOcrService, AppraisalPhInput};
+use App\Services\{AppraisalPhChunkUploadService, AppraisalPhClientPdfOcrService, AppraisalPhDocumentReanalysisService, AppraisalPhDocumentStorage, AppraisalPhDocumentUploadService, AppraisalPhExternalOcrService, AppraisalPhInput};
 
 final class AppraisalPhController
 {
@@ -27,8 +27,9 @@ final class AppraisalPhController
     {
         $this->saveAndRedirect($id, function () use ($id): string {
             $typology = (string) ($_POST['ph_typology'] ?? '');
+            $clientText = (new AppraisalPhClientPdfOcrService())->extract($_FILES['ph_client_pdf_image'] ?? []);
             $analysis = (new AppraisalPhDocumentUploadService())->store($_FILES['ph_document'] ?? [], $id,
-                $this->user['id'], $typology, $this->ph);
+                $this->user['id'], $typology, $this->ph, $clientText);
             if (($analysis['message'] ?? '') !== '') return (string) $analysis['message'];
             return ($analysis['has_text'] ?? true) === false
                 ? 'Soporte PH cargado, pero no se extrajo texto útil para diligenciar campos.'
@@ -48,7 +49,8 @@ final class AppraisalPhController
         $this->saveAndRedirect($id, function () use ($id): string {
             $file = (new AppraisalPhChunkUploadService())->finish($id, $this->user['id']);
             $typology = (string) ($_POST['ph_typology'] ?? '');
-            $analysis = (new AppraisalPhDocumentUploadService())->storePrepared($file, $id, $this->user['id'], $typology, $this->ph);
+            $clientText = (new AppraisalPhClientPdfOcrService())->extract($_FILES['ph_client_pdf_image'] ?? []);
+            $analysis = (new AppraisalPhDocumentUploadService())->storePrepared($file, $id, $this->user['id'], $typology, $this->ph, $clientText);
             if (($analysis['message'] ?? '') !== '') return (string) $analysis['message'];
             return ($analysis['has_text'] ?? true) === false
                 ? 'Soporte PH cargado, pero no se extrajo texto útil para diligenciar campos.'

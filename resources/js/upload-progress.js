@@ -6,6 +6,13 @@ function formBody(form, submitter) {
     try { return new FormData(form, submitter); } catch { return new FormData(form); }
 }
 
+function augmentFormData(form, body, submitter) {
+    if (typeof form.dispatchEvent === 'function') {
+        form.dispatchEvent(new CustomEvent('ga:upload-formdata', { bubbles: true, detail: { body, submitter } }));
+    }
+    return body;
+}
+
 function syncToken(body) {
     const token = csrfToken();
     if (token && body instanceof FormData) body.set('_token', token);
@@ -110,7 +117,7 @@ async function submitChunkedUpload(form, submitter, file) {
                 },
             });
         }
-        const finish = syncToken(new FormData());
+        const finish = syncToken(augmentFormData(form, new FormData(), submitter));
         finish.set('upload_id', uploadId); finish.set('total', String(total));
         finish.set('filename', file.name); finish.set('size', String(file.size));
         finish.set('ph_typology', form.querySelector('[name="ph_typology"]')?.value ?? '');
@@ -133,7 +140,7 @@ export function submitUpload(form, submitter = null) {
         return null;
     }
     const xhr = new XMLHttpRequest();
-    const body = syncToken(formBody(form, submitter));
+    const body = syncToken(augmentFormData(form, formBody(form, submitter), submitter));
     setDisabled(parts, true);
     setProgress(parts, 1, 'Preparando subida...');
     xhr.open((form.method || 'POST').toUpperCase(), form.action, true);

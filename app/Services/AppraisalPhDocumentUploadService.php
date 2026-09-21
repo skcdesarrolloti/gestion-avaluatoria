@@ -2,7 +2,6 @@
 declare(strict_types=1);
 namespace App\Services;
 use App\Models\AppraisalPhRepository;
-
 final class AppraisalPhDocumentUploadService
 {
     private const BLOB_BACKUP_BYTES = 52428800;
@@ -12,26 +11,23 @@ final class AppraisalPhDocumentUploadService
     private const LARGE_ARCHIVE_ENTRY_READ_BYTES = 25165824;
     private const LARGE_ARCHIVE_TOTAL_READ_BYTES = 50331648;
     private const ARCHIVE_TIME_SECONDS = 35;
-    public function store(array $files, string $appraisalId, int $owner, string $typology, AppraisalPhRepository $repo): array
+    public function store(array $files, string $appraisalId, int $owner, string $typology, AppraisalPhRepository $repo, string $clientText = ''): array
     {
         $uploads = $this->files($files);
         if (!$uploads) throw new \RuntimeException('Selecciona al menos un soporte PH para analizar.');
-        return $this->storeFiles($uploads, $appraisalId, $owner, $typology, $repo, false);
+        return $this->storeFiles($uploads, $appraisalId, $owner, $typology, $repo, false, $clientText);
     }
-
-    public function storePrepared(array $file, string $appraisalId, int $owner, string $typology, AppraisalPhRepository $repo): array
+    public function storePrepared(array $file, string $appraisalId, int $owner, string $typology, AppraisalPhRepository $repo, string $clientText = ''): array
     {
         if (!$file) throw new \RuntimeException('Selecciona al menos un soporte PH para analizar.');
-        return $this->storeFiles([$file], $appraisalId, $owner, $typology, $repo, true);
+        return $this->storeFiles([$file], $appraisalId, $owner, $typology, $repo, true, $clientText);
     }
-
     public function readStoredText(string $path, string $name, string $extension): array
     {
         return in_array($extension, ['zip', 'rar'], true)
             ? $this->archiveText($path, $name, $extension) : $this->singleText($path, $name, $extension);
     }
-
-    private function storeFiles(array $uploads, string $appraisalId, int $owner, string $typology, AppraisalPhRepository $repo, bool $prepared): array
+    private function storeFiles(array $uploads, string $appraisalId, int $owner, string $typology, AppraisalPhRepository $repo, bool $prepared, string $clientText): array
     {
         if (function_exists('set_time_limit')) @set_time_limit(300);
         $texts = []; $names = []; $stored = []; $duplicates = [];
@@ -56,6 +52,10 @@ final class AppraisalPhDocumentUploadService
             if ($prepared) @unlink((string) $file['tmp_name']);
             $path = AppraisalPhDocumentStorage::path($storageName);
             [$text, $readNames] = $this->readStoredText($path, $name, $info['extension']);
+            if ($text === '' && trim($clientText) !== '' && $info['extension'] === 'pdf') {
+                $text = trim($clientText);
+                $readNames[] = 'páginas PDF renderizadas en navegador';
+            }
             $texts[] = $text; $names = array_merge($names, $readNames);
             $blob = $bytes <= self::BLOB_BACKUP_BYTES ? file_get_contents($path) : null;
             if ($bytes <= self::BLOB_BACKUP_BYTES && !is_string($blob)) {
