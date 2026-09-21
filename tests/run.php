@@ -466,7 +466,8 @@ try {
         && ($phQuantityAnalysis['technical']['numero_parqueaderos'] ?? '') === '120 parqueaderos'
         && ($phQuantityAnalysis['technical']['numero_pisos'] ?? '') === '6 pisos'
         && ($phQuantityAnalysis['technical']['numero_ascensores'] ?? '') === '6 ascensores'
-        && str_contains((string) ($phQuantityAnalysis['technical']['resumen_configuracion_ph'] ?? ''), 'oficinas'),
+        && str_contains((string) ($phQuantityAnalysis['technical']['resumen_configuracion_ph'] ?? ''), '40 oficinas')
+        && str_contains((string) ($phQuantityAnalysis['technical']['resumen_configuracion_ph'] ?? ''), '120 parqueaderos'),
         'configuracion PH extrae cantidades especificas de unidades y niveles');
     $emptyPhAnalysis = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
         '', ['ESCRITURA PUBLICA 2593 EDIFICIO CHAMBACU.pdf'], 'oficinas');
