@@ -7,18 +7,17 @@ $phStatusPill = static function (string $state): string {
     };
 };
 $baseRows = [];
-$cityValue = trim((string) ($technical['ciudad_municipio'] ?? ''));
-$keyParts = array_filter([$phText('ph_name'), $currentTypology ? ($phCatalog['typologies'][$currentTypology] ?? $currentTypology) : '', $cityValue]);
+$phName = $phText('ph_name');
 $commonRows = [];
 foreach ($commonStats as [$groupTitle, $found, $total]) {
     $state = $found >= max(1, ceil($total * 0.6)) ? 'ok' : ($found > 0 ? 'warn' : 'missing');
     $commonRows[] = [$groupTitle, (int) $found . ' de ' . (int) $total . ' menciones', $state, 'Completar desde reglamento, visita o soporte manual.'];
 }
-$needsReview = count($keyParts) < 3 || trim((string) ($technical['nivel_dotacion_comparativa'] ?? '')) === ''
+$needsReview = trim($phName) === '' || trim((string) ($technical['nivel_dotacion_comparativa'] ?? '')) === ''
     || array_filter($commonRows, static fn (array $row): bool => $row[2] !== 'ok') !== [];
 $baseRows[] = ['Texto editable para Entregable', $technicalValue('resumen_base_ph') !== '' ? 'Texto construido' : 'Sin texto construido', $technicalValue('resumen_base_ph') === '' ? 'missing' : ($needsReview ? 'warn' : 'ok'), 'Completar los campos en rojo o amarillo antes de pasar al Entregable.'];
 $baseRows[] = ['Tipología PH de referencia', $currentTypology ? ($phCatalog['typologies'][$currentTypology] ?? $currentTypology) : 'No seleccionada', $currentTypology ? 'ok' : 'missing', 'Seleccionar la tipología comparable.'];
-$baseRows[] = ['Llave principal', $keyParts ? implode(' · ', $keyParts) : 'Sin llave completa', count($keyParts) >= 3 ? 'ok' : ($keyParts ? 'warn' : 'missing'), 'Nombre + tipología + ciudad.'];
+$baseRows[] = ['Nombre / llave PH', $phName ?: 'Sin nombre', $phName !== '' ? 'ok' : 'missing', 'Nombre oficial de la copropiedad.'];
 $baseRows[] = ['Clasificación de dotación', trim((string) ($technical['nivel_dotacion_comparativa'] ?? '')) ?: 'Sin clasificación', trim((string) ($technical['nivel_dotacion_comparativa'] ?? '')) !== '' ? 'ok' : 'missing', 'Nivel comparable de dotación.'];
 $baseRows = array_merge($baseRows, $commonRows);
 ?>

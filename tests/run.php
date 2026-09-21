@@ -394,6 +394,9 @@ try {
     expect($phData['ph_key'] === 'NIT 900123456'
         && ($phData['common_areas']['porteria']['status'] ?? '') === 'ok'
         && !isset($phData['common_areas']['inventado']), 'propiedad horizontal normaliza checklist');
+    $_POST = ['ph' => ['ph_name' => 'Edificio Llave Nombre']];
+    expect(AppraisalPhInput::data()['ph_key'] === 'Edificio Llave Nombre',
+        'propiedad horizontal usa nombre como llave tecnica');
     $phApplicability = \App\Support\AppraisalPhCatalog::technicalApplicability();
     expect(in_array('muelles', $phApplicability['bodegas'], true)
         && !in_array('muelles', $phApplicability['residencial'], true)

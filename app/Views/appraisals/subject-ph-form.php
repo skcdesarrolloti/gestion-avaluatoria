@@ -77,18 +77,9 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
             <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-identity-cross.php'; ?>
 
             <?php $renderPhInput('ph_name', 'Nombre de la copropiedad / agrupación', $phText('ph_name'), 'Ej. Edificio, conjunto, centro comercial o zona franca.'); ?>
-            <?php $renderPhInput('ph_key', 'Llave técnica PH', $phText('ph_key'), 'NIT, matrícula matriz o nombre normalizado para reutilizarla luego.'); ?>
-            <label class="label">Vínculo con sector por barrio
-                <input class="input mt-2" name="ph[linkage][sector_neighborhood]"
-                    value="<?= e((string) ($linkage['sector_neighborhood'] ?? '')) ?>" placeholder="Barrio validado de la copropiedad">
-            </label>
             <label class="label">Vínculo jurídico por matrícula inmobiliaria
                 <input class="input mt-2" name="ph[linkage][legal_registration]"
                     value="<?= e((string) (($linkage['legal_registration'] ?? '') ?: ($subject['property_registry'] ?? ''))) ?>" placeholder="Matrícula del bien sujeto, confirmada en jurídica">
-            </label>
-            <label class="label">Vínculo de copropiedad por nombre
-                <input class="input mt-2" name="ph[linkage][coproperty_name]"
-                    value="<?= e((string) (($linkage['coproperty_name'] ?? '') ?: $phText('ph_name'))) ?>" placeholder="Nombre según el reglamento">
             </label>
             <?php $renderPhInput('private_unit', 'Unidad privada analizada', $phText('private_unit')); ?>
             <?php $renderPhInput('coefficient', 'Coeficiente de copropiedad', $phText('coefficient')); ?>

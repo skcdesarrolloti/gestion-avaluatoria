@@ -60,8 +60,8 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
             <p class="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($phError) ?></p>
         <?php endif; ?>
         <div class="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
-            <strong>Banco técnico PH.</strong> La llave funcional es nombre de copropiedad + tipología + ciudad.
-            La matrícula matriz y la escritura validan la identidad, pero no deben llenar de llaves la primera lectura.
+            <strong>Banco técnico PH.</strong> La llave funcional es el nombre de la copropiedad.
+            La tipología orienta la comparación; la matrícula matriz y la escritura validan la identidad.
             Si el documento ya tiene texto OCR guardado, puedes recargarlo desde soportes sin repetir la lectura pesada.
         </div>
         <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-search.php'; ?>

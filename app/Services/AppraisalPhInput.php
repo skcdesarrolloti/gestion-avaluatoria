@@ -8,9 +8,10 @@ final class AppraisalPhInput
     public static function data(): array
     {
         $posted = is_array($_POST['ph'] ?? null) ? $_POST['ph'] : [];
+        $phName = self::short($posted['ph_name'] ?? '', 190);
         return [
-            'ph_key' => self::short($posted['ph_key'] ?? '', 190),
-            'ph_name' => self::short($posted['ph_name'] ?? '', 190),
+            'ph_key' => self::short(($posted['ph_key'] ?? '') ?: $phName, 190),
+            'ph_name' => $phName,
             'ph_typology' => self::choice($posted['ph_typology'] ?? '', array_keys(AppraisalPhCatalog::typologies())),
             'linkage' => self::linkage($posted['linkage'] ?? []),
             'administration_name' => self::short($posted['administration_name'] ?? '', 190),

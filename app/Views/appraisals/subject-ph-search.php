@@ -10,15 +10,15 @@ $phReadableDocuments = array_filter($phLoadedDocuments, static fn (array $doc): 
         <div>
             <h3 class="font-semibold text-blue-950">Banco de copropiedades</h3>
             <p class="mt-2 text-sm leading-6 text-blue-950">
-                Busca copropiedades guardadas por nombre, llave PH o matrícula matriz. Usa la tipología y la ciudad
-                para distinguir homónimos; los soportes ya procesados pueden recargarse sin repetir OCR.
+                Busca copropiedades guardadas por nombre o matrícula matriz. Usa la tipología como referencia
+                comparativa; los soportes ya procesados pueden recargarse sin repetir OCR.
             </p>
         </div>
         <form class="grid gap-2 sm:grid-cols-[minmax(220px,1fr)_auto]" method="get"
             action="<?= e(url($subjectActionBase)) ?>#ph">
             <label class="sr-only" for="ph-coproperty-search">Buscar copropiedad guardada</label>
             <input id="ph-coproperty-search" class="input bg-white" name="copropiedad"
-                value="<?= e($phSearch ?: $phSuggestion) ?>" placeholder="Ej. Edificio, conjunto, llave PH o matrícula">
+                value="<?= e($phSearch ?: $phSuggestion) ?>" placeholder="Ej. Edificio, conjunto o matrícula matriz">
             <button class="btn-secondary bg-white" type="submit">Buscar</button>
         </form>
     </div>

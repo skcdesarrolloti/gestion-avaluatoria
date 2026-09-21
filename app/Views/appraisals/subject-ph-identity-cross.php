@@ -26,9 +26,7 @@ $identityStatusPill = static function (string $state): string {
 $identityRows = [];
 $identityTextState = $technicalValue('resumen_identificacion_ph') === '' ? 'missing' : (($identityDiffs || $identityPending) ? 'warn' : 'ok');
 $identityRows[] = ['Texto editable para Entregable', $technicalValue('resumen_identificacion_ph') !== '' ? 'Texto construido' : 'Sin texto construido', $identityTextState, 'Resolver campos en rojo o amarillo antes de pasar al Entregable.'];
-$identityRows[] = ['Nombre de la copropiedad', $phText('ph_name') ?: 'Sin nombre', $phText('ph_name') !== '' ? 'ok' : 'missing', 'Nombre oficial según reglamento o escritura.'];
-$identityRows[] = ['Llave técnica PH', $phText('ph_key') ?: 'Sin llave', $phText('ph_key') !== '' ? 'ok' : 'missing', 'Nombre normalizado, NIT o matrícula matriz para reutilizar la ficha.'];
-$identityRows[] = ['Vínculo con sector/barrio', (string) ($linkage['sector_neighborhood'] ?? '') ?: 'Sin vínculo', trim((string) ($linkage['sector_neighborhood'] ?? '')) !== '' ? 'ok' : 'warn', 'Asignar barrio o sector validado.'];
+$identityRows[] = ['Nombre / llave técnica PH', $phText('ph_name') ?: 'Sin nombre', $phText('ph_name') !== '' ? 'ok' : 'missing', 'Nombre oficial de la copropiedad según reglamento o escritura.'];
 $identityRows[] = ['Matrícula del bien sujeto', trim($phRegistration) !== '' ? $phRegistration : 'Sin matrícula', trim($phRegistration) !== '' ? 'ok' : 'missing', 'Tomar del CTL o del módulo jurídico.'];
 $matrixValue = $phText('matrix_registration') ?: (string) ($phLegal['matrix_registration'] ?? '');
 $identityRows[] = ['Matrícula matriz', trim($matrixValue) !== '' ? $matrixValue : 'Sin matrícula matriz', trim($matrixValue) !== '' ? 'ok' : 'warn', 'Ubicar en CTL, reglamento o escritura.'];
