@@ -94,9 +94,6 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
                 </select>
             </label>
             <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-typology-support.php'; ?>
-            <div class="rounded-xl border border-slate-200 bg-white p-3 text-sm leading-6 text-slate-700 lg:col-span-2">
-                <strong>Campos de tipología y régimen:</strong> tipología seleccionada, régimen especial, naturaleza del conjunto, uso dominante, usos complementarios y relación funcional entre usos.
-            </div>
             <?php $renderTechTextarea('regimen_especial', 'Régimen especial', $technicalValue('regimen_especial')); ?>
             <?php $renderTechTextarea('naturaleza_conjunto', 'Naturaleza del conjunto', $technicalValue('naturaleza_conjunto')); ?>
             <?php $renderTechTextarea('uso_dominante', 'Uso dominante', $technicalValue('uso_dominante')); ?>

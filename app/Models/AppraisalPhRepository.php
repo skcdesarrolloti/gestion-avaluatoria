@@ -202,7 +202,7 @@ final class AppraisalPhRepository
             'La copropiedad corresponde preliminarmente', 'Se revisa preliminarmente como',
             'Lectura preliminar PH sin hallazgos suficientes', 'Para el análisis de propiedad horizontal se tuvo como soporte',
             'Condición especial PH:', 'Trazabilidad documental:', 'Lectura comparativa:',
-            'El inmueble objeto de análisis forma parte de'] as $prefix) {
+            'El inmueble objeto de análisis forma parte de', 'La copropiedad '] as $prefix) {
             if (str_starts_with($text, $prefix)) return true;
         }
         return false;

@@ -54,31 +54,31 @@ final class AppraisalPhReportBuilder
     }
     private function typologySummary(string $name, string $label, array $technical, string $typology): string
     {
-        $summary = "Tipología y régimen: {$name} se analiza como {$label}. " . $this->useProfile($technical, $typology);
+        $summary = "La copropiedad {$name} se clasifica para este avalúo como {$label}. " . $this->useProfile($technical, $typology);
         if ($this->hasText($technical['regimen_especial'] ?? '')) {
-            $summary .= ' El reglamento contiene referencias a régimen especial, administración u operación específica, aspecto relevante para segmentar comparables y condiciones de ocupación.';
+            $summary .= ' El régimen especial registrado debe considerarse al definir usos admisibles, condiciones de ocupación y comparables.';
         }
         if ($this->hasText($technical['usos_complementarios'] ?? '') || $this->hasText($technical['relacion_funcional_usos'] ?? '')) {
-            $summary .= ' La presencia de usos complementarios exige valorar la unidad dentro de una copropiedad con interacción funcional entre actividades, usuarios y servicios comunes.';
+            $summary .= ' Los usos complementarios y su relación funcional deben depurarse para precisar cómo interactúan actividades, usuarios y servicios comunes.';
         }
-        return $summary . ' Para efectos valuatorios, la comparación se realiza con copropiedades de igual vocación, escala, localización y nivel de soporte común.';
+        return $summary . ' La comparación valuatoria debe hacerse con copropiedades de vocación, escala, localización y soporte común semejantes.';
     }
     private function useProfile(array $technical, string $typology): string
     {
-        $text = mb_strtolower($this->cleanName(($technical['uso_dominante'] ?? '') . ' ' . ($technical['naturaleza_conjunto'] ?? '')));
-        if ($text !== '') {
-            if ($this->containsAny($text, ['oficina', 'consultorio', 'corporativ', 'servicios'])) return 'El uso dominante se orienta a actividades corporativas, profesionales o de servicios, con incidencia positiva en representatividad, atención de usuarios y comparabilidad frente a edificios empresariales.';
-            if ($this->containsAny($text, ['local', 'comercio', 'comercial'])) return 'El uso dominante incorpora actividad comercial, flujo de usuarios y reglas de ocupación propias de inmuebles con atención al público.';
-            if ($this->containsAny($text, ['bodega', 'logistic', 'industrial', 'zona franca'])) return 'El uso dominante se relaciona con actividad industrial, logística o régimen especial, por lo que cobran relevancia accesos, control, movilidad interna y soporte operativo.';
-            if ($this->containsAny($text, ['vivienda', 'residencial', 'habitacional'])) return 'El uso dominante corresponde a vivienda, donde pesan habitabilidad, seguridad, amenidades, convivencia y mantenimiento común.';
-        }
-        return match ($typology) {
-            'oficinas' => 'La vocación corresponde a funcionamiento corporativo y de servicios, con énfasis en imagen, acceso de usuarios, parqueo y administración común.',
-            'comercio' => 'La vocación corresponde a actividad comercial, con énfasis en visibilidad, flujo de visitantes, parqueo y reglas de uso.',
-            'bodegas' => 'La vocación corresponde a operación logística o industrial, con énfasis en movilidad, patios, seguridad y continuidad operativa.',
-            'residencial' => 'La vocación corresponde a uso habitacional, con énfasis en seguridad, amenidades, convivencia y sostenimiento común.',
-            default => 'La vocación se determina a partir del reglamento, la visita y los soportes del encargo.',
+        $profile = match ($typology) {
+            'oficinas' => 'Su vocación principal corresponde a funcionamiento corporativo, profesional o de servicios, con incidencia en imagen, acceso de usuarios, parqueo y administración común.',
+            'comercio' => 'Su vocación principal corresponde a actividad comercial, con incidencia en visibilidad, flujo de visitantes, parqueo y reglas de uso.',
+            'bodegas' => 'Su vocación principal corresponde a operación logística o industrial, con incidencia en movilidad, patios, seguridad y continuidad operativa.',
+            'residencial' => 'Su vocación principal corresponde a uso habitacional, con incidencia en seguridad, amenidades, convivencia y sostenimiento común.',
+            default => '',
         };
+        if ($profile !== '') return $profile;
+        $text = mb_strtolower($this->cleanName(($technical['uso_dominante'] ?? '') . ' ' . ($technical['naturaleza_conjunto'] ?? '')));
+        if ($this->containsAny($text, ['oficina', 'consultorio', 'corporativ', 'servicios'])) return 'Su vocación principal se orienta a actividades corporativas, profesionales o de servicios.';
+        if ($this->containsAny($text, ['local', 'comercio', 'comercial'])) return 'Su vocación principal incorpora actividad comercial y atención al público.';
+        if ($this->containsAny($text, ['bodega', 'logistic', 'industrial', 'zona franca'])) return 'Su vocación principal se relaciona con actividad industrial, logística o régimen especial.';
+        if ($this->containsAny($text, ['vivienda', 'residencial', 'habitacional'])) return 'Su vocación principal corresponde a vivienda.';
+        return 'La vocación funcional debe precisarse con el reglamento, la visita y los soportes del encargo.';
     }
     private function traceSummary(array $technical, string $limits): string
     {
