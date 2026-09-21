@@ -84,11 +84,12 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
         </section>
 
         <section class="mt-5 grid gap-4 lg:grid-cols-2" x-show="tab === 'identidad'">
-            <div class="lg:col-span-2"><?php $renderPhTabSummary('resumen_identificacion_ph', 'Resumen depurado para Entregable'); ?></div>
+            <div class="lg:col-span-2"><?php $renderPhTabSummary('resumen_identificacion_ph', 'Identificación PH para Entregable'); ?></div>
             <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950 lg:col-span-2">
                 <strong>Tipología PH de referencia:</strong>
                 <span x-text="phTypologyLabel()"></span>
             </div>
+            <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-identity-cross.php'; ?>
             <?php $renderPhInput('ph_name', 'Nombre de la copropiedad / agrupación', $phText('ph_name'), 'Ej. Edificio, conjunto, centro comercial o zona franca.'); ?>
             <?php $renderPhInput('ph_key', 'Llave técnica PH', $phText('ph_key'), 'NIT, matrícula matriz o nombre normalizado para reutilizarla luego.'); ?>
             <label class="label">Vínculo con sector por barrio

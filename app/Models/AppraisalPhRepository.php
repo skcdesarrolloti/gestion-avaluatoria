@@ -51,6 +51,7 @@ final class AppraisalPhRepository
         $query->execute([$appraisalId, $owner]);
         $data = $this->json((string) ($query->fetchColumn() ?: ''));
         return [
+            'property_registration' => (string) ($data['matricula_inmobiliaria'] ?? ''),
             'matrix_registration' => (string) ($data['matricula_matriz'] ?? ''),
             'private_unit' => (string) ($data['unidad_privada'] ?? ''),
             'coefficient' => (string) ($data['coeficiente_ph'] ?? ''),

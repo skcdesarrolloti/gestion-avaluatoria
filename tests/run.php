@@ -436,7 +436,7 @@ try {
         && str_contains((string) ($phAnalysis['technical']['dotacion_tipologia'] ?? ''), 'factores prioritarios')
         && ($phAnalysis['documents']['reglamento']['status'] ?? '') === 'warn'
         && ($phAnalysis['risks']['restricciones_uso']['status'] ?? '') === 'warn'
-        && str_contains((string) ($phAnalysis['core']['report_text'] ?? ''), 'no reemplaza estudio de títulos'),
+        && str_contains((string) ($phAnalysis['core']['report_text'] ?? ''), 'alcance técnico del avalúo'),
         'analizador PH migra lectura avanzada y texto preliminar');
     $emptyPhAnalysis = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
         '', ['ESCRITURA PUBLICA 2593 EDIFICIO CHAMBACU.pdf'], 'oficinas');

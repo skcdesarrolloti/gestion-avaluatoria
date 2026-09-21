@@ -15,20 +15,17 @@ final class AppraisalPhReportBuilder
         $use = $this->dominantUse($technical, $typology);
         [$advantages, $support] = $this->advantages($common, $typology);
         $level = $this->dotationLevel($technical);
-        $missing = $this->missingIdentity($core);
         $config = $this->configuration($technical);
         $rules = $this->rules($technical, $core);
         $admin = $this->administration($core, $technical);
-        $limits = 'La lectura proviene del reglamento y soportes cargados; debe cruzarse con visita, fotografías, '
-            . 'certificado de tradición, paz y salvo y certificación vigente de administración; no reemplaza estudio de títulos.';
+        $limits = 'La conclusión corresponde al alcance técnico del avalúo y se complementa con el análisis jurídico registrado en el expediente.';
         $trace = $this->traceSummary($technical, $limits);
 
         $tab = [
             'resumen_base_ph' => "Lectura comparativa: {$name} se analiza como {$label}. La dotación común se clasifica como {$level}. "
                 . "Para el inmueble, la copropiedad aporta {$advantages}; esto favorece operación, seguridad, acceso de usuarios y percepción comercial frente a inmuebles aislados o PH menos dotadas.",
             'resumen_trazabilidad_ph' => $trace,
-            'resumen_identificacion_ph' => "Identificación: el soporte reconoce {$name}. {$assets}"
-                . ($missing ? " Falta confirmar {$missing} para amarrar plenamente la unidad al bien sujeto." : ' La identificación básica queda trazable.'),
+            'resumen_identificacion_ph' => trim("Identificación: el soporte reconoce {$name} como copropiedad o agrupación bajo régimen de propiedad horizontal. {$assets}"),
             'resumen_tipologia_ph' => "Tipología y régimen: {$name} corresponde preliminarmente a {$label}. {$use} "
                 . 'La tipología orienta la comparación: oficinas contra PH corporativas, no contra residencial, logística o comercio de otra escala.',
             'resumen_configuracion_ph' => "Configuración predial: {$config} Esta información ayuda a entender escala, organización interna y soporte de funcionamiento del edificio.",
@@ -140,14 +137,8 @@ final class AppraisalPhReportBuilder
         $unit = $this->cleanName($core['private_unit'] ?? '');
         $coef = $this->cleanName($core['coefficient'] ?? '');
         if ($unit !== '' && $coef !== '') return "La unidad analizada corresponde a {$unit}, con coeficiente {$coef}.";
-        if ($unit !== '') return "La unidad analizada corresponde a {$unit}; el coeficiente debe confirmarse.";
-        return 'La unidad específica, parqueadero, depósito y coeficiente deben confirmarse contra certificado y reglamento.';
-    }
-
-    private function missingIdentity(array $core): string
-    {
-        return $this->presentMissing(['matrícula matriz' => $core['matrix_registration'] ?? '',
-            'unidad privada' => $core['private_unit'] ?? '', 'coeficiente' => $core['coefficient'] ?? '']);
+        if ($unit !== '') return "La unidad analizada corresponde a {$unit}.";
+        return '';
     }
 
     private function dotationLevel(array $technical): string
@@ -160,13 +151,6 @@ final class AppraisalPhReportBuilder
     {
         $names = [];
         foreach ($values as $label => $value) if ($this->hasText($value)) $names[] = $label;
-        return implode(', ', $names);
-    }
-
-    private function presentMissing(array $values): string
-    {
-        $names = [];
-        foreach ($values as $label => $value) if (!$this->hasText($value)) $names[] = $label;
         return implode(', ', $names);
     }
 

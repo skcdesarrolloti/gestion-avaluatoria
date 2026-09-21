@@ -43,9 +43,16 @@ final class AppraisalPhLegalTrace
         $lead = $parts ? 'De acuerdo con la ' . implode(', ', $parts) : 'De acuerdo con el folio jurídico';
         $act = trim((string) (($row['descripcion_acto'] ?? '') ?: 'acto relacionado con propiedad horizontal'));
         $support = trim((string) ($row['documento'] ?? ''));
-        $impact = trim((string) ($row['impacto_resumen'] ?? ''));
+        $impact = $this->cleanImpact((string) ($row['impacto_resumen'] ?? ''));
         return $lead . ', se registra ' . mb_strtolower($act) . ($support !== '' ? ', con soporte en ' . $support : '')
-            . '. ' . ($impact !== '' ? $impact : 'Debe complementarse con el reglamento de propiedad horizontal.');
+            . '. ' . ($impact !== '' ? $impact : 'El reglamento de propiedad horizontal aporta el soporte operativo del régimen.');
+    }
+
+    private function cleanImpact(string $text): string
+    {
+        $text = trim(preg_replace('/\s+/u', ' ', $text) ?? '');
+        $text = preg_replace('/\s*Debe\s+validarse\b[^.]*\./iu', '', $text) ?? $text;
+        return trim($text);
     }
 
     private function json(string $json): array
