@@ -3,7 +3,9 @@ import { createWorker, PSM } from 'tesseract.js';
 import { readPhPages } from './ph-page-reader.js';
 
 const assets = new URL('.', import.meta.url);
-pdfjsLib.GlobalWorkerOptions.workerSrc = new URL('pdf.worker.mjs', assets).toString();
+const workerUrl = new URL('pdf.worker.mjs', assets);
+workerUrl.searchParams.set('v', typeof __PH_WORKER_REVISION__ === 'string' ? __PH_WORKER_REVISION__ : 'development');
+pdfjsLib.GlobalWorkerOptions.workerSrc = workerUrl.toString();
 
 export async function preparePhPdfText(files, { onProgress = () => {} } = {}) {
     let worker;

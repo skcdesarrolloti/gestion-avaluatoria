@@ -114,3 +114,19 @@ Las pruebas antiguas de BD asumían solo dos migraciones y un catálogo ya retir
 se actualizaron sus fixtures al esquema/catálogo actual. No se tocaron bases reales,
 credenciales compartidas ni hosting. Publicación pendiente. Alcance y límites en
 [lectura PH](PH-LECTURA.md).
+
+## Corrección de caché del lector PH — 21/09/2026
+
+El hosting sirve JS con `Cache-Control: public, max-age=604800`. El import dinámico
+usaba una URL sin versión: un navegador podía conservar el lector anterior, que
+exportaba `preparePhPdfImages`, mientras la aplicación nueva llamaba a
+`preparePhPdfText`. En el bundle minificado esa llamada produce `s is not a function`.
+La compilación ahora incorpora hashes del contenido del lector y del worker PDF,
+y valida el contrato del módulo antes de invocarlo.
+
+Validación: 38 pruebas JS, 165 verificaciones PHP, lint PHP, compilación y tamaño
+inicial de 34,5 KB gzip. En Chrome se precargó intencionalmente un lector antiguo
+sin versión en un servidor local de fixtures; el formulario real y los bundles
+compilados cargaron la URL versionada, hicieron OCR de una página escaneada y
+completaron el envío multipart del PDF junto al JSON de texto. No hubo cambios
+nuevos en esquema o persistencia que requirieran repetir las pruebas MySQL.

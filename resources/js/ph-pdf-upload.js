@@ -1,3 +1,6 @@
+import { loadPhPdfReader } from './ph-reader-loader.js';
+
+const readerRevision = typeof __PH_READER_REVISION__ === 'string' ? __PH_READER_REVISION__ : 'development';
 const prepared = new WeakMap();
 const running = new Set();
 
@@ -30,7 +33,7 @@ async function prepare(event) {
         progress(form, 1, 'Preparando lectura completa del documento…');
         const files = [...(form.querySelector('input[type=file]')?.files || [])];
         if (!prepared.has(form) && files.some(file => /\.pdf$/i.test(file.name))) {
-            const { preparePhPdfText } = await import(new URL('ph-pdf-reader.js', import.meta.url));
+            const preparePhPdfText = await loadPhPdfReader(import.meta.url, readerRevision);
             prepared.set(form, await preparePhPdfText(files, {
                 onProgress: (message, fraction) => progress(form, 5 + fraction * 80, message),
             }));

@@ -5,6 +5,9 @@ permanecer abierta hasta confirmar el guardado. PDF.js obtiene texto de cada pá
 Tesseract en español e inglés lee las páginas sin una capa de texto suficiente.
 Las dependencias se sirven desde `public/assets/` y se cargan solo al analizar PH.
 No se envían imágenes a MiniMax ni se necesita configurar un proveedor para este flujo.
+La compilación enlaza el lector y su worker PDF mediante versiones SHA-256 de su
+contenido. Esto evita combinar la aplicación nueva con un lector anterior conservado
+en caché. Publicar juntos `app.js`, `ph-pdf-reader.js` y `pdf.worker.mjs`.
 
 Se procesan todas las páginas, sin el límite anterior de 6/300 páginas. Cada página
 se libera después de leerla; se conserva en memoria únicamente su texto y metadatos.
