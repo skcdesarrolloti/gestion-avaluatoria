@@ -1,4 +1,5 @@
 <section class="mt-5 grid gap-4 lg:grid-cols-2" x-show="tab === 'administracion'">
+    <div class="lg:col-span-2"><?php $renderPhTabSummary('resumen_administracion_ph', 'Resumen depurado para Entregable'); ?></div>
     <?php $renderPhInput('administration_name', 'Administración / razón social', $phText('administration_name')); ?>
     <?php $renderPhInput('administration_contact', 'Contacto de administración', $phText('administration_contact')); ?>
     <?php $renderPhInput('administration_phone', 'Teléfono', $phText('administration_phone')); ?>
@@ -38,6 +39,7 @@
 <?php endforeach; ?>
 
 <section class="mt-5 grid gap-4" x-show="tab === 'incidencia'">
+    <?php $renderPhTabSummary('resumen_incidencia_ph', 'Resumen depurado para Entregable'); ?>
     <?php $renderPhTextarea('diagnosis_text', 'Diagnóstico preliminar de copropiedad', $phText('diagnosis_text'), 'Resume si la PH está ordenada, requiere soportes o presenta alertas.', 5); ?>
     <?php $renderPhTextarea('report_text', 'Texto para el entregable', $phText('report_text'), 'Incluye la advertencia de que es informe técnico y no estudio de títulos.', 6); ?>
     <?php $renderTechTextarea('lectura_valuatoria', 'Incidencia funcional, comercial y valuatoria', $technicalValue('lectura_valuatoria')); ?>
@@ -45,6 +47,7 @@
 </section>
 
 <section class="mt-5 grid gap-4" x-show="tab === 'notas'">
+    <?php $renderPhTabSummary('resumen_notas_ph', 'Resumen depurado para Entregable'); ?>
     <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
         <h3 class="font-semibold text-slate-900">Notas normativas sugeridas</h3>
         <ul class="mt-2 space-y-1">

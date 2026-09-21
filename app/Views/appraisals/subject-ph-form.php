@@ -15,6 +15,13 @@ $renderTechTextarea = static function (string $key, string $label, string $value
         <textarea class="input mt-2 min-h-24" rows="3" name="ph[technical][<?= e($key) ?>]" placeholder="Pendiente de soporte documental"><?= e($value) ?></textarea>
     </label>
 <?php };
+$renderPhTabSummary = static function (string $key, string $label) use ($technicalValue): void { ?>
+    <label class="label rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-950"><?= e($label) ?>
+        <textarea class="input mt-2 min-h-24 bg-white" rows="3" name="ph[technical][<?= e($key) ?>]"
+            placeholder="Resumen depurado para revisar e incorporar luego al Entregable"><?= e($technicalValue($key)) ?></textarea>
+        <span class="mt-1 block text-xs font-normal text-emerald-800">Texto corto para informe; los extractos OCR quedan como soporte abajo.</span>
+    </label>
+<?php };
 ?>
 <form class="mt-6 space-y-6" method="post" action="<?= e(url($subjectActionBase . '/ph')) ?>"
     data-module-autosave data-save-in-place data-autosave-endpoint="<?= e(url($subjectActionBase . '/ph/autoguardar')) ?>">
@@ -42,6 +49,7 @@ $renderTechTextarea = static function (string $key, string $label, string $value
         <section class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4" x-show="tab === 'trazabilidad'">
             <h3 class="text-lg font-semibold">Documento y trazabilidad</h3>
             <p class="mt-2 text-sm leading-6 text-slate-600"><?= e($phSourceSummary ?: 'Aún no hay lectura documental cargada.') ?></p>
+            <div class="mt-4"><?php $renderPhTabSummary('resumen_trazabilidad_ph', 'Resumen depurado para Entregable'); ?></div>
             <div class="mt-4 rounded-xl bg-white p-4"><?php require BASE_PATH . '/app/Views/appraisals/subject-ph-documents.php'; ?></div>
             <div class="mt-4 grid gap-4 lg:grid-cols-2">
                 <?php $renderPhTextarea('regulation_document', 'PDF, escritura o reglamento leído', $phText('regulation_document'), 'Documento base del régimen PH.', 4); ?>
@@ -50,6 +58,7 @@ $renderTechTextarea = static function (string $key, string $label, string $value
         </section>
 
         <section class="mt-5 grid gap-4 lg:grid-cols-2" x-show="tab === 'identidad'">
+            <div class="lg:col-span-2"><?php $renderPhTabSummary('resumen_identificacion_ph', 'Resumen depurado para Entregable'); ?></div>
             <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950 lg:col-span-2">
                 <strong>Tipología PH de referencia:</strong>
                 <span x-text="phTypologyLabel()"></span>
@@ -73,6 +82,7 @@ $renderTechTextarea = static function (string $key, string $label, string $value
         </section>
 
         <section class="mt-5 grid gap-4 lg:grid-cols-2" x-show="tab === 'tipologia'">
+            <div class="lg:col-span-2"><?php $renderPhTabSummary('resumen_tipologia_ph', 'Resumen depurado para Entregable'); ?></div>
             <label class="label">Tipología y régimen
                 <select class="input mt-2" x-model="phTypology">
                     <option value="">Selecciona tipología PH</option>
@@ -87,16 +97,19 @@ $renderTechTextarea = static function (string $key, string $label, string $value
         </section>
 
         <section class="mt-5 grid gap-4 lg:grid-cols-2" x-show="tab === 'configuracion'">
+            <div class="lg:col-span-2"><?php $renderPhTabSummary('resumen_configuracion_ph', 'Resumen depurado para Entregable'); ?></div>
             <?php $renderPhInput('matrix_registration', 'Matrícula matriz', $phText('matrix_registration'), 'Puede venir del certificado de tradición.'); ?>
             <?php foreach (['etapas_copropiedad'=>'Etapas, sectores o manzanas','numero_edificios'=>'Bloques, torres, naves o edificios','numero_unidades'=>'Unidades privadas','resumen_areas_conjunto'=>'Cuadro general de áreas','lotes_por_etapa'=>'Lote matriz y lotes resultantes','organizacion_interna'=>'Organización interna','desarrollos_relevantes'=>'Desenglobes o ampliaciones','ubicacion_unidad'=>'Ubicación de la unidad objeto'] as $key=>$label) $renderTechTextarea($key, $label, $technicalValue($key)); ?>
         </section>
 
         <section class="mt-5 grid gap-4 lg:grid-cols-2" x-show="tab === 'reglas'">
+            <div class="lg:col-span-2"><?php $renderPhTabSummary('resumen_reglas_ph', 'Resumen depurado para Entregable'); ?></div>
             <?php $renderPhTextarea('restrictions_text', 'Restricciones de uso u operación', $phText('restrictions_text'), 'Usos, horarios, movilidad, residuos, cerramientos o adecuaciones.', 4); ?>
             <?php foreach (['usos_permitidos'=>'Usos permitidos','usos_restringidos'=>'Usos restringidos o prohibidos','reglas_constructivas'=>'Reglas constructivas','condiciones_normativas_operativas'=>'Condiciones operativas','condiciones_usuario_operador'=>'Usuario operador o administración','cargue_descargue'=>'Cargue, descargue y movilidad'] as $key=>$label) $renderTechTextarea($key, $label, $technicalValue($key)); ?>
         </section>
 
         <section class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4" x-show="tab === 'comunes'">
+            <?php $renderPhTabSummary('resumen_comunes_ph', 'Resumen depurado para Entregable'); ?>
             <div class="grid gap-4 lg:grid-cols-[1fr_22rem]">
                 <div>
                     <h3 class="text-lg font-semibold">Bienes comunes, amenidades y soporte comparable</h3>

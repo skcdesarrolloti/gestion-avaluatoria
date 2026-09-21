@@ -19,6 +19,7 @@ final class AppraisalPhDocumentAnalyzer
         }
         $core = (new AppraisalPhIdentityExtractor())->extract($text, $context);
         if (!empty($core['ph_name'])) $technical['naturaleza_conjunto'] = $core['ph_name'];
+        if (!empty($core['ciudad_municipio'])) $technical['ciudad_municipio'] = $core['ciudad_municipio'];
         if (isset(AppraisalPhCatalog::typologies()[$typology])) $core['ph_typology'] = $typology;
         foreach ([
             'regulation_document' => ['reglamento de propiedad horizontal', 'constitucion de propiedad horizontal'],
@@ -31,7 +32,7 @@ final class AppraisalPhDocumentAnalyzer
         $technical['fuente_documental'] = implode(', ', $fileNames);
         $reserve = $evidence->excerpts(['fondo de imprevistos', 'fondo de reserva'], 120);
         if ($reserve !== '') $core['reserve_fund'] = $reserve;
-        $technical['ciudad_municipio'] = $evidence->excerpts(['ubicado en', 'situado en', 'localizado en', 'municipio de']);
+        if (empty($technical['ciudad_municipio'])) $technical['ciudad_municipio'] = $this->city($content);
         $common = $this->map($evidence, AppraisalPhCatalog::commonAreas(),
             AppraisalPhComparativeCatalog::commonAreaRules());
         $technical = array_replace($technical, $this->comparativeTechnical($common, $typology));
@@ -56,10 +57,6 @@ final class AppraisalPhDocumentAnalyzer
             $photos[$key] = ['status'=>'', 'notes'=>'Pendiente de evidencia fotográfica y visita del bien sujeto.'];
         }
         $notes = 'Extractos documentales por confirmar; una mención no acredita existencia actual, cumplimiento ni riesgo materializado.';
-        $core['diagnosis_text'] = 'Lectura documental de ' . ($core['ph_name'] ?? 'la copropiedad') . '. ' . $notes;
-        $core['report_text'] = $core['diagnosis_text'] . ' '
-            . ($core['regulation_document'] ?? '')
-            . ' El criterio final corresponde al analista. Este apoyo no reemplaza estudio de títulos, certificación de administración ni visita.';
         $technical['salvedades_visita'] = 'Verificar estado, funcionamiento y mantenimiento de zonas comunes mediante visita y fotografías.';
         $technical['observaciones_extraccion'] = $notes;
         $technical['notas_normativas_ph'] = implode("\n", AppraisalPhCatalog::normNotes());
@@ -75,6 +72,13 @@ final class AppraisalPhDocumentAnalyzer
         $summary = $hasText ? count(array_filter($technical)) . ' campos técnicos con apoyo documental. '
             . 'Se recorrió todo el texto recibido; revisa los extractos y las páginas con lectura baja.'
             : 'No se extrajo texto útil. El soporte se conserva; revisa el OCR antes de diligenciar.';
+        if ($hasText) {
+            $report = (new AppraisalPhReportBuilder())->build($core, $technical, $common, $documents,
+                $risks, $photos, $typology, $summary, $findings);
+            $core['diagnosis_text'] = $report['diagnosis_text'];
+            $core['report_text'] = $report['report_text'];
+            $technical = array_replace($technical, $report['technical']);
+        }
         return ['has_text'=>$hasText, 'core'=>$hasText ? $core : [],
             'linkage'=>empty($core['ph_name']) ? [] : ['coproperty_name'=>$core['ph_name']],
             'technical'=>$hasText ? array_filter($technical) : [], 'common_areas'=>$hasText ? $common : [],
@@ -142,5 +146,14 @@ final class AppraisalPhDocumentAnalyzer
             default => 'especializada',
         };
         return ($levels[$key] ?? '') . ' Lectura orientativa, revisable por el analista.';
+    }
+
+    private function city(string $text): string
+    {
+        if (preg_match('/\bCartagena(?: de Indias)?\b/iu', $text)) return 'Cartagena de Indias';
+        if (preg_match('/\b(Bogot[aá](?: D\.?C\.?)?|Medell[ií]n|Cali|Barranquilla|Bucaramanga|Santa Marta|Pereira|Manizales|Armenia|C[uú]cuta|Ibagu[eé]|Villavicencio)\b/iu', $text, $m)) {
+            return trim((string) $m[1]);
+        }
+        return '';
     }
 }

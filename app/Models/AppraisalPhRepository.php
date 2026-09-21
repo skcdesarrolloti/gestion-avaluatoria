@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace App\Models;
 use App\Core\HttpException;
-use App\Services\AppraisalPhDocumentStorage;
+use App\Services\{AppraisalPhDocumentStorage, AppraisalPhReportBuilder};
 use App\Support\AppraisalPhCatalog;
 use PDO;
 final class AppraisalPhRepository
@@ -14,7 +14,7 @@ final class AppraisalPhRepository
         $query->execute([$appraisalId, $owner]);
         $row = $query->fetch();
         if (!$row) return AppraisalPhCatalog::defaults();
-        return array_replace(AppraisalPhCatalog::defaults(), $row, [
+        return $this->withGeneratedReport(array_replace(AppraisalPhCatalog::defaults(), $row, [
             'linkage' => $this->json((string) ($row['linkage_json'] ?? '')),
             'common_areas' => $this->json((string) ($row['common_areas_json'] ?? '')),
             'documents' => $this->json((string) ($row['documents_json'] ?? '')),
@@ -22,7 +22,7 @@ final class AppraisalPhRepository
             'photos' => $this->json((string) ($row['photos_json'] ?? '')),
             'technical' => $this->json((string) ($row['technical_json'] ?? '')),
             'findings' => $this->json((string) ($row['findings_json'] ?? '')),
-        ]);
+        ]));
     }
     public function save(string $appraisalId, int $owner, array $data, ?int $expected = null): void
     {
@@ -169,5 +169,23 @@ final class AppraisalPhRepository
     {
         $decoded = json_decode($json, true);
         return is_array($decoded) ? $decoded : [];
+    }
+
+    private function withGeneratedReport(array $profile): array
+    {
+        if (trim((string) ($profile['ph_name'] ?? '')) === ''
+            && empty($profile['common_areas']) && empty($profile['technical'])) return $profile;
+        $built = (new AppraisalPhReportBuilder())->build($profile, $profile['technical'] ?? [],
+            $profile['common_areas'] ?? [], $profile['documents'] ?? [], $profile['risks'] ?? [],
+            $profile['photos'] ?? [], (string) ($profile['ph_typology'] ?? ''),
+            (string) ($profile['source_summary'] ?? ''), $profile['findings'] ?? []);
+        foreach (['diagnosis_text', 'report_text'] as $key) {
+            if (trim((string) ($profile[$key] ?? '')) === '') $profile[$key] = $built[$key] ?? '';
+        }
+        $profile['technical'] = is_array($profile['technical'] ?? null) ? $profile['technical'] : [];
+        foreach (($built['technical'] ?? []) as $key => $value) {
+            if (trim((string) ($profile['technical'][$key] ?? '')) === '') $profile['technical'][$key] = $value;
+        }
+        return $profile;
     }
 }

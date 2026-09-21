@@ -53,4 +53,5 @@
             </p>
         </div>
     </div>
+    <?php $renderPhTabSummary('resumen_base_ph', 'Resumen depurado para Entregable'); ?>
 </section>

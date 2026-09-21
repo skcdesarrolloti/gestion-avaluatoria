@@ -90,6 +90,16 @@ final class AppraisalPhCatalog
                 'salvedades_validacion' => 'Aspectos que requieren plano, certificado o validación',
                 'observaciones_extraccion' => 'Salvedades de lectura y validación documental',
                 'notas_normativas_ph' => 'Notas normativas sugeridas',
+                'resumen_base_ph' => 'Resumen depurado: base PH común',
+                'resumen_trazabilidad_ph' => 'Resumen depurado: documento y trazabilidad',
+                'resumen_identificacion_ph' => 'Resumen depurado: identificación PH',
+                'resumen_tipologia_ph' => 'Resumen depurado: tipología y régimen',
+                'resumen_configuracion_ph' => 'Resumen depurado: configuración predial',
+                'resumen_comunes_ph' => 'Resumen depurado: bienes comunes y soporte',
+                'resumen_reglas_ph' => 'Resumen depurado: reglas de uso y operación',
+                'resumen_administracion_ph' => 'Resumen depurado: administración y cargas',
+                'resumen_incidencia_ph' => 'Resumen depurado: incidencia valuatoria',
+                'resumen_notas_ph' => 'Resumen depurado: notas normativas',
             ]],
         ];
     }

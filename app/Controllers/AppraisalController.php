@@ -4,6 +4,7 @@ namespace App\Controllers;
 use App\Core\Http;
 use App\Core\HttpException;
 use App\Core\Session;
+use App\Models\AppraisalPhRepository;
 use App\Models\AppraisalRepository;
 use App\Models\AppraiserRepository;
 use App\Models\IgacTypologyRepository;
@@ -13,7 +14,9 @@ use App\Support\AppraisalCatalog;
 
 final class AppraisalController
 {
-    public function __construct(private AppraisalRepository $appraisals, private array $user, private AppraiserRepository $appraisers, private IgacTypologyRepository $typologies) {}
+    public function __construct(private AppraisalRepository $appraisals, private array $user,
+        private AppraiserRepository $appraisers, private IgacTypologyRepository $typologies,
+        private ?AppraisalPhRepository $ph = null) {}
 
     public function index(): void
     {
@@ -41,7 +44,12 @@ final class AppraisalController
     }
 
     public function sector(string $id): void { view('appraisals/sector', ['title' => 'Sector y entorno', 'record' => $this->appraisals->find($id, $this->user['id'])]); }
-    public function deliverable(string $id): void { view('appraisals/deliverable', ['title' => 'Entregable', 'record' => $this->appraisals->find($id, $this->user['id'])]); }
+    public function deliverable(string $id): void
+    {
+        $record = $this->appraisals->find($id, $this->user['id']);
+        view('appraisals/deliverable', ['title' => 'Entregable', 'record' => $record,
+            'phProfile' => $this->ph?->profile($id, $this->user['id'])]);
+    }
 
     public function saveChapterZero(string $id): never
     {
