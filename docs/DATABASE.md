@@ -1,5 +1,10 @@
 # Crear y evolucionar la base sin SQL manual
 
+PH: la migración `202609210001_add_ph_profile_version.php` agrega `version` a
+`appraisal_ph_profiles`. Cada guardado incrementa la versión; edición y análisis
+rechazan versiones obsoletas con HTTP 409. El original y texto por páginas siguen
+en `appraisal_ph_documents`; no se agregan tablas para la lectura OCR del navegador.
+
 ## 1. Preparar las conexiones
 
 Copiar `.env.example` a `.env`. Se necesitan dos conexiones:

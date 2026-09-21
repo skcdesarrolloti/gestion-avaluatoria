@@ -6,7 +6,7 @@ use App\Models\AppraisalPhRepository;
 final class AppraisalPhDocumentReanalysisService
 {
     public function reanalyze(string $documentId, string $appraisalId, int $owner, string $typology,
-        AppraisalPhRepository $repo): array
+        AppraisalPhRepository $repo, ?int $expected = null): array
     {
         $document = $repo->documentForAnalysis($documentId, $appraisalId, $owner);
         $name = (string) $document['source_filename'];
@@ -21,10 +21,10 @@ final class AppraisalPhDocumentReanalysisService
                 if ($extension === '') $extension = mb_strtolower(pathinfo($path, PATHINFO_EXTENSION));
                 [$text, $names] = (new AppraisalPhDocumentUploadService())->readStoredText($path, $name, $extension);
             }
-            $analysis = (new AppraisalPhDocumentAnalyzer())->analyze($text, $names, $typology);
+            $analysis = (new AppraisalPhDocumentAnalyzer())->analyze($text, $names, $typology, $repo->profile($appraisalId, $owner));
             $repo->updateDocumentAnalysis($documentId, $appraisalId, $owner, mb_strlen($text),
                 (string) ($analysis['summary'] ?? 'Lectura preliminar PH.'), $text);
-            $repo->mergeAnalysis($appraisalId, $owner, $analysis);
+            $repo->mergeAnalysis($appraisalId, $owner, $analysis, $expected);
             return $analysis;
         } finally {
             if ($path !== '' && $resolver->temporary($path)) @unlink($path);

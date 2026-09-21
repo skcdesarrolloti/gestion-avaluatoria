@@ -24,36 +24,9 @@ final class AppraisalPhRepository
             'findings' => $this->json((string) ($row['findings_json'] ?? '')),
         ]);
     }
-    public function save(string $appraisalId, int $owner, array $data): void
+    public function save(string $appraisalId, int $owner, array $data, ?int $expected = null): void
     {
-        $now = gmdate('Y-m-d H:i:s');
-        $fields = ['ph_key', 'ph_name', 'ph_typology', 'administration_name', 'administration_contact',
-            'administration_phone', 'administration_email', 'matrix_registration', 'private_unit',
-            'coefficient', 'regulation_document', 'reform_documents', 'monthly_fee', 'fee_status',
-            'reserve_fund', 'insurance_status', 'restrictions_text', 'diagnosis_text', 'report_text'];
-        $json = [
-            'linkage_json' => $data['linkage'] ?? [],
-            'common_areas_json' => $data['common_areas'] ?? [],
-            'documents_json' => $data['documents'] ?? [],
-            'risks_json' => $data['risks'] ?? [],
-            'photos_json' => $data['photos'] ?? [],
-            'technical_json' => $data['technical'] ?? [],
-        ];
-        if ($this->exists($appraisalId, $owner)) {
-            $assignments = implode(', ', array_map(static fn (string $field): string => $field . ' = ?',
-                array_merge($fields, array_keys($json))));
-            $query = $this->db->prepare('UPDATE appraisal_ph_profiles SET ' . $assignments . ',
-                updated_at = ? WHERE appraisal_id = ? AND owner_id = ?');
-            $query->execute([...$this->values($fields, $data), ...$this->jsonValues($json),
-                $now, $appraisalId, $owner]);
-            return;
-        }
-        $columns = array_merge(['appraisal_id', 'owner_id'], $fields, array_keys($json), ['created_at', 'updated_at']);
-        $marks = implode(', ', array_fill(0, count($columns), '?'));
-        $query = $this->db->prepare('INSERT INTO appraisal_ph_profiles (' . implode(', ', $columns) . ')
-            VALUES (' . $marks . ')');
-        $query->execute([$appraisalId, $owner, ...$this->values($fields, $data),
-            ...$this->jsonValues($json), $now, $now]);
+        (new AppraisalPhProfileWriter($this->db))->save($appraisalId, $owner, $data, $expected);
     }
     public function searchByCoproperty(string $term, int $owner, string $excludeId = '', int $limit = 8): array
     {
@@ -142,14 +115,11 @@ final class AppraisalPhRepository
             WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
         $delete->execute([$id, $appraisalId, $owner]);
         $cleared = !$this->hasDocuments($appraisalId, $owner);
-        if ($cleared) $this->clearDocumentAnalysis($appraisalId, $owner);
+        // Deleting a source must preserve the analyst's saved work.
         return ['filename' => $filename, 'cleared' => $cleared];
     }
-    public function mergeAnalysis(string $appraisalId, int $owner, array $analysis): void
+    public function mergeAnalysis(string $appraisalId, int $owner, array $analysis, ?int $expected = null): void
     {
-        if (array_key_exists('has_text', $analysis) && $analysis['has_text'] === false) {
-            $this->clearDocumentAnalysis($appraisalId, $owner);
-        }
         $current = $this->profile($appraisalId, $owner);
         $data = array_replace($current, $this->mergeEmpty($current, $analysis['core'] ?? []));
         foreach (['linkage', 'technical', 'common_areas', 'documents', 'risks', 'photos'] as $key) {
@@ -157,11 +127,7 @@ final class AppraisalPhRepository
         }
         $data['source_summary'] = (string) ($analysis['summary'] ?? $current['source_summary'] ?? '');
         $data['findings'] = $analysis['findings'] ?? $current['findings'] ?? [];
-        $this->save($appraisalId, $owner, $data);
-        $query = $this->db->prepare('UPDATE appraisal_ph_profiles SET source_summary = ?, findings_json = ?
-            WHERE appraisal_id = ? AND owner_id = ?');
-        $query->execute([$data['source_summary'],
-            json_encode($data['findings'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), $appraisalId, $owner]);
+        $this->save($appraisalId, $owner, $data, $expected ?? (int) ($current['version'] ?? 0));
     }
     private function exists(string $appraisalId, int $owner): bool
     {
@@ -175,25 +141,14 @@ final class AppraisalPhRepository
         $query->execute([$appraisalId, $owner]);
         return (int) $query->fetchColumn() > 0;
     }
-    private function clearDocumentAnalysis(string $appraisalId, int $owner): void
-    {
-        $query = $this->db->prepare("UPDATE appraisal_ph_profiles SET ph_key = '', ph_name = '',
-            matrix_registration = '', private_unit = '', coefficient = '', regulation_document = '',
-            reform_documents = '', monthly_fee = '', restrictions_text = '', diagnosis_text = '',
-            report_text = '', linkage_json = '[]', common_areas_json = '[]', documents_json = '[]',
-            risks_json = '[]', technical_json = '[]', source_summary = '', findings_json = '[]',
-            updated_at = ? WHERE appraisal_id = ? AND owner_id = ?");
-        $query->execute([gmdate('Y-m-d H:i:s'), $appraisalId, $owner]);
-    }
-    private function values(array $fields, array $data): array
-    {
-        return array_map(static fn (string $field): mixed => $data[$field] ?? '', $fields);
-    }
     private function mergeEmpty(array $current, array $incoming): array
     {
         $merged = [];
         foreach ($incoming as $key => $value) {
-            if ($this->emptyValue($current[$key] ?? '') && !$this->emptyValue($value)) $merged[$key] = $value;
+            if (($this->emptyValue($current[$key] ?? '') || (is_array($current[$key] ?? null)
+                && ($current[$key]['status'] ?? '') === ''
+                && ($current[$key]['notes'] ?? '') === 'No identificado en el texto leído. Pendiente de soporte.'))
+                && !$this->emptyValue($value)) $merged[$key] = $value;
         }
         return $merged;
     }

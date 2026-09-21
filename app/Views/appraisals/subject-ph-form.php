@@ -1,6 +1,7 @@
 <form class="mt-6 space-y-6" method="post" action="<?= e(url($subjectActionBase . '/ph')) ?>"
-    data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/ph/autoguardar')) ?>">
+    data-module-autosave data-save-in-place data-autosave-endpoint="<?= e(url($subjectActionBase . '/ph/autoguardar')) ?>">
     <?= csrf_field() ?>
+    <input type="hidden" name="version" value="<?= (int) ($ph['version'] ?? 0) ?>">
     <input type="hidden" name="ph[ph_typology]" :value="phTypology">
     <div x-data="{ tab: 'identidad' }">
         <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
@@ -30,11 +31,11 @@
             </label>
             <label class="label">Vínculo jurídico por matrícula inmobiliaria
                 <input class="input mt-2" name="ph[linkage][legal_registration]"
-                    value="<?= e((string) (($linkage['legal_registration'] ?? '') ?: ($subject['property_registry'] ?? ''))) ?>">
+                    value="<?= e((string) (($linkage['legal_registration'] ?? '') ?: ($subject['property_registry'] ?? ''))) ?>" placeholder="Matrícula del bien sujeto, confirmada en jurídica">
             </label>
             <label class="label">Vínculo de copropiedad por nombre
                 <input class="input mt-2" name="ph[linkage][coproperty_name]"
-                    value="<?= e((string) (($linkage['coproperty_name'] ?? '') ?: $phText('ph_name'))) ?>">
+                    value="<?= e((string) (($linkage['coproperty_name'] ?? '') ?: $phText('ph_name'))) ?>" placeholder="Nombre según el reglamento">
             </label>
             <?php $renderPhInput('private_unit', 'Unidad privada analizada', $phText('private_unit')); ?>
             <?php $renderPhInput('coefficient', 'Coeficiente de copropiedad', $phText('coefficient')); ?>
@@ -79,8 +80,9 @@
                                     <?php endforeach; ?>
                                 </select>
                             </label>
+                            <label class="label mt-2">Evidencia y observación
                             <textarea class="input mt-2 min-h-20" rows="2" name="ph[<?= e($groupKey) ?>][<?= e($key) ?>][notes]"
-                                placeholder="Observación del analista"><?= e($phMap($groupKey, (string) $key, 'notes')) ?></textarea>
+                                placeholder="Observación del analista"><?= e($phMap($groupKey, (string) $key, 'notes')) ?></textarea></label>
                         </div>
                     <?php endforeach; ?>
                 </div>

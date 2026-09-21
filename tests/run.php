@@ -159,7 +159,7 @@ try {
         extracted_text TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE appraisal_ph_profiles (
         appraisal_id TEXT PRIMARY KEY, owner_id INTEGER, ph_key TEXT, ph_name TEXT, ph_typology TEXT,
-        linkage_json TEXT,
+        linkage_json TEXT, version INTEGER NOT NULL DEFAULT 0,
         administration_name TEXT, administration_contact TEXT, administration_phone TEXT,
         administration_email TEXT, matrix_registration TEXT, private_unit TEXT, coefficient TEXT,
         regulation_document TEXT, reform_documents TEXT, monthly_fee TEXT, fee_status TEXT,
@@ -443,10 +443,11 @@ try {
     ]));
     $phRepo->mergeAnalysis(str_repeat('d', 32), 1, $emptyPhAnalysis);
     $cleanedEmptyPh = $phRepo->profile(str_repeat('d', 32), 1);
-    expect(($cleanedEmptyPh['ph_name'] ?? '') === ''
+    expect(($cleanedEmptyPh['ph_name'] ?? '') === 'LECTURA VIEJA'
         && ($cleanedEmptyPh['source_summary'] ?? '') !== ''
-        && ($cleanedEmptyPh['linkage']['coproperty_name'] ?? '') === '',
-        'lectura PH sin texto limpia datos automaticos anteriores');
+        && ($cleanedEmptyPh['linkage']['coproperty_name'] ?? '') === ($phData['linkage']['coproperty_name'] ?? ''),
+        'lectura PH sin texto conserva trabajo anterior');
+    require __DIR__ . '/ph-analysis.php';
     $latePdf = tempnam(sys_get_temp_dir(), 'ga_late_pdf_');
     file_put_contents($latePdf, '%PDF' . str_repeat('0', 10 * 1024 * 1024)
         . "stream\nBT (Reglamento de propiedad horizontal Copropiedad TEXTO TARDIO) Tj ET\nendstream");
@@ -478,7 +479,7 @@ try {
         $cleanedPh = $phRepo->profile(str_repeat('a', 32), 1);
         expect(($deletedPhStorage['filename'] ?? '') !== '' && ($deletedPhStorage['cleared'] ?? false)
             && count($phRepo->documents(str_repeat('a', 32), 1)) === 0
-            && ($cleanedPh['ph_name'] ?? '') === '' && ($cleanedPh['source_summary'] ?? '') === '',
+            && ($cleanedPh['ph_name'] ?? '') === 'Conjunto Prueba' && ($cleanedPh['source_summary'] ?? '') !== '',
             'propiedad horizontal permite eliminar soporte cargado');
         $mixedZipPath = tempnam(sys_get_temp_dir(), 'ga_ph_mixed_zip_');
         $zip = new ZipArchive();
@@ -501,7 +502,7 @@ try {
             ->reanalyze((string) $scanDoc['id'], str_repeat('g', 32), 1, 'oficinas', $phRepo);
         $externalPh = $phRepo->profile(str_repeat('g', 32), 1);
         expect(($externalPh['matrix_registration'] ?? '') === '060-999888'
-            && ($externalPh['coefficient'] ?? '') === '2.5%',
+            && ($externalPh['coefficient'] ?? '') === '',
             'propiedad horizontal usa OCR externo para soporte escaneado');
         $phRepo->save(str_repeat('g', 32), 1, array_replace($externalPh, ['matrix_registration' => '']));
         (new AppraisalPhDocumentReanalysisService())->reanalyze((string) $scanDoc['id'],

@@ -1,92 +1,71 @@
-const preparedImages = new WeakMap();
+const prepared = new WeakMap();
+const running = new Set();
 
-function uploadParts(form) {
-    return {
-        panel: form.querySelector('[data-upload-progress-panel]'),
-        bar: form.querySelector('[data-upload-progress-bar]'),
-        text: form.querySelector('[data-upload-progress-text]'),
-        submits: [...form.querySelectorAll('button[type="submit"], input[type="submit"]')],
-    };
-}
-
-function setProgress(form, percent, message) {
-    const parts = uploadParts(form);
-    parts.panel?.classList.remove('hidden');
-    if (parts.bar) {
-        parts.bar.style.width = `${Math.max(0, Math.min(100, percent))}%`;
-        parts.bar.setAttribute('aria-valuenow', String(Math.round(percent)));
+function progress(form, percent, message) {
+    form.querySelector('[data-upload-progress-panel]')?.classList.remove('hidden');
+    const bar = form.querySelector('[data-upload-progress-bar]');
+    if (bar) {
+        bar.style.width = `${percent}%`;
+        bar.setAttribute('aria-valuenow', String(Math.round(percent)));
     }
-    if (parts.text) parts.text.textContent = message;
+    const label = form.querySelector('[data-upload-progress-text]');
+    if (label) label.textContent = message;
 }
 
-function setDisabled(form, disabled) {
-    uploadParts(form).submits.forEach(button => { button.disabled = disabled; });
-}
-
-function files(form) {
-    return [...(form.querySelector('input[type="file"][name="ph_document[]"], input[type="file"][name="ph_document"]')?.files ?? [])];
-}
-
-function hasPdf(items) {
-    return items.some(file => /\.pdf$/i.test(file.name) || String(file.type).includes('pdf'));
-}
-
-async function prepareClientPdf(event) {
+async function prepare(event) {
     const form = event.target;
     if (!(form instanceof HTMLFormElement) || !form.matches('[data-ph-pdf-render]')) return;
-    if (form.dataset.phPdfReady === '1' || !hasPdf(files(form))) return;
-    event.preventDefault();
-    event.stopImmediatePropagation();
-    setDisabled(form, true);
+    if (form.dataset.phPdfReady === '1') return;
+    event.preventDefault(); event.stopImmediatePropagation();
+    if (running.has(form)) return;
+    running.add(form);
+    const controls = [...form.querySelectorAll('button, input[type=file], select')];
     try {
-        setProgress(form, 1, 'Preparando PDF escaneado para MiniMax...');
-        const moduleUrl = new URL('ph-pdf-reader.js', import.meta.url).toString();
-        const { preparePhPdfImages } = await import(moduleUrl);
-        const maxPages = Number.parseInt(form.dataset.phPdfMaxPages || '300', 10);
-        const maxSide = Number.parseInt(form.dataset.phPdfMaxSide || '1200', 10);
-        const quality = Number.parseFloat(form.dataset.phPdfQuality || '0.72');
-        const images = await preparePhPdfImages(files(form), {
-            maxPages, maxSide, quality,
-            onProgress: (message, step) => setProgress(form, Math.min(28, 4 + (step / Math.max(maxPages, 1)) * 24), message),
-        });
-        if (images.length > 0) preparedImages.set(form, images);
+        if (window.gaFlushAutosaves && !await window.gaFlushAutosaves()) {
+            throw new Error('Guarda los cambios pendientes de la ficha antes de analizar el soporte.');
+        }
+        const profile = form.closest('[data-ph-section]')?.querySelector('[data-module-autosave] input[name=version]');
+        if (profile) form.querySelector('input[name=version]').value = profile.value;
+        controls.forEach(node => { node.disabled = true; });
+        progress(form, 1, 'Preparando lectura completa del documento…');
+        const files = [...(form.querySelector('input[type=file]')?.files || [])];
+        if (!prepared.has(form) && files.some(file => /\.pdf$/i.test(file.name))) {
+            const { preparePhPdfText } = await import(new URL('ph-pdf-reader.js', import.meta.url));
+            prepared.set(form, await preparePhPdfText(files, {
+                onProgress: (message, fraction) => progress(form, 5 + fraction * 80, message),
+            }));
+        }
+        if (window.gaFlushAutosaves && !await window.gaFlushAutosaves()) {
+            throw new Error('Hay cambios sin guardar. Reintenta cuando la ficha confirme el guardado.');
+        }
         form.dataset.phPdfReady = '1';
-        setProgress(form, 30, images.length > 0
-            ? 'PDF convertido. Subiendo soporte e imágenes para lectura IA/OCR...'
-            : 'Subiendo soporte PH...');
-        setDisabled(form, false);
-        if (event.submitter instanceof HTMLElement && typeof form.requestSubmit === 'function') form.requestSubmit(event.submitter);
-        else form.requestSubmit();
+        controls.forEach(node => { node.disabled = false; });
+        progress(form, 88, 'Lectura preparada. Guardando soporte y sugerencias…');
+        form.requestSubmit(event.submitter || undefined);
     } catch (error) {
-        form.dataset.phPdfReady = '1';
-        setDisabled(form, false);
-        setProgress(form, 100, 'No fue posible convertir el PDF en navegador; se subirá el soporte original.');
-        setTimeout(() => form.requestSubmit(), 300);
-    }
-}
-
-function appendPreparedImages(event) {
-    const form = event.target;
-    const body = event.detail?.body;
-    const images = preparedImages.get(form) || [];
-    if (!(form instanceof HTMLFormElement) || !(body instanceof FormData) || images.length === 0) return;
-    images.forEach(image => {
-        body.append('ph_client_pdf_image_data[]', image.dataUrl);
-        body.append('ph_client_pdf_image_name[]', image.name);
-    });
-}
-
-function resetPrepared(event) {
-    const input = event.target;
-    if (!(input instanceof HTMLInputElement) || input.type !== 'file') return;
-    const form = input.closest('form[data-ph-pdf-render]');
-    if (!form) return;
-    delete form.dataset.phPdfReady;
-    preparedImages.delete(form);
+        progress(form, 0, `Lectura no completada: ${error.message} Puedes reintentar.`);
+        controls.forEach(node => { node.disabled = false; });
+    } finally { running.delete(form); }
 }
 
 export function installPhPdfUpload() {
-    document.addEventListener('submit', prepareClientPdf, true);
-    document.addEventListener('change', resetPrepared, true);
-    document.addEventListener('ga:upload-formdata', appendPreparedImages, true);
+    document.addEventListener('submit', prepare, true);
+    document.addEventListener('change', event => {
+        const input = event.target;
+        const form = input.closest?.('form[data-ph-pdf-render]');
+        if (!form || input.type !== 'file') return;
+        prepared.delete(form); delete form.dataset.phPdfReady;
+    }, true);
+    document.addEventListener('ga:upload-formdata', event => {
+        const docs = prepared.get(event.target);
+        if (docs?.length) event.detail.body.set('ph_client_text',
+            new Blob([JSON.stringify(docs)], { type: 'application/json' }), 'lectura-ph.json');
+        const version = event.target.querySelector('input[name=version]');
+        if (version) event.detail.body.set('version', version.value);
+        delete event.target.dataset.phPdfReady;
+    });
+    window.addEventListener('beforeunload', event => {
+        if (!running.size) return;
+        event.preventDefault(); event.returnValue = '';
+    });
 }

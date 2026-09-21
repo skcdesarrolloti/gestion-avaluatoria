@@ -18,18 +18,18 @@ $statusClass = static function (string $status): string {
 };
 $renderPhInput = static function (string $name, string $label, string $value, string $help = ''): void { ?>
     <label class="label"><?= e($label) ?>
-        <input class="input mt-2" name="ph[<?= e($name) ?>]" value="<?= e($value) ?>">
+        <input class="input mt-2" name="ph[<?= e($name) ?>]" value="<?= e($value) ?>" placeholder="<?= e($help ?: 'Pendiente de soporte: ' . $label) ?>">
         <?php if ($help !== ''): ?><span class="mt-1 block text-xs font-normal text-slate-500"><?= e($help) ?></span><?php endif; ?>
     </label>
 <?php };
 $renderPhTextarea = static function (string $name, string $label, string $value, string $help = '', int $rows = 3): void { ?>
     <label class="label"><?= e($label) ?>
-        <textarea class="input mt-2 min-h-24" rows="<?= $rows ?>" name="ph[<?= e($name) ?>]"><?= e($value) ?></textarea>
+        <textarea class="input mt-2 min-h-24" rows="<?= $rows ?>" name="ph[<?= e($name) ?>]" placeholder="<?= e($help ?: 'Resume lo acreditado en el soporte') ?>"><?= e($value) ?></textarea>
         <?php if ($help !== ''): ?><span class="mt-1 block text-xs font-normal text-slate-500"><?= e($help) ?></span><?php endif; ?>
     </label>
 <?php };
 ?>
-<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
+<section data-ph-section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{
         phTypology: <?= e(json_encode((string) ($ph['ph_typology'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         phTypologyLabels: <?= e(json_encode($phCatalog['typologies'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>, phTypologyLabel() { return this.phTypologyLabels[this.phTypology] || 'Pendiente de selección' }
@@ -76,37 +76,36 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                     <?php $ocr = is_array($phOcrDiagnostics ?? null) ? $phOcrDiagnostics : []; ?>
                     <?php $phExternalOcr = !empty($ocr['external']); ?>
                     <p class="mt-2 text-xs font-semibold <?= !empty($ocr['pdf_ocr']) ? 'text-emerald-700' : 'text-amber-800' ?>">
-                        OCR PDF escaneado: <?= !empty($ocr['pdf_ocr']) ? 'disponible' : 'incompleto' ?>
+                        OCR adicional del servidor: <?= !empty($ocr['pdf_ocr']) ? 'disponible' : 'incompleto' ?>
                         · Tesseract <?= !empty($ocr['tesseract']) ? 'sí' : 'no' ?>
                         · pdftoppm <?= !empty($ocr['pdftoppm']) ? 'sí' : 'no' ?>
                         · ejecución PHP <?= (!empty($ocr['shell_exec']) && !empty($ocr['exec'])) ? 'sí' : 'no' ?>
                         · IA externa <?= !empty($ocr['external']) ? 'sí' : 'no' ?>
                         <?= !empty($ocr['external']) ? '· proveedor ' . e((string) ($ocr['external_provider'] ?? 'generic')) : '' ?>
                     </p>
-                    <?php if (empty($ocr['external'])): ?>
-                        <p class="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900">
-                            Leer con IA/OCR requiere configurar PH_EXTERNAL_OCR_ENDPOINT o MINIMAX_API_KEY en el servidor. Mientras aparezca IA externa no, los soportes escaneados quedarán cargados pero sin texto automático.
-                        </p>
-                    <?php elseif (($ocr['external_provider'] ?? '') === 'minimax' && empty($ocr['external_pdf_render'])): ?>
-                        <p class="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900">
-                            MiniMax leerá imágenes. Si subes PDF escaneado, el navegador convertirá hasta 300 páginas a imagen antes de enviarlas a MiniMax.
-                        </p>
-                    <?php endif; ?>
+                    <p class="mt-2 rounded-lg bg-blue-50 px-3 py-2 text-sm text-blue-950">
+                        Los PDF se leen completos, página por página, con OCR local en el navegador cuando hace falta.
+                        Mantén esta pestaña abierta. No se requiere una clave de IA para esta lectura.
+                        Los datos no acreditados quedan pendientes; las menciones del reglamento requieren revisión.
+                    </p>
                 </div>
                 <form class="grid gap-3 lg:min-w-80" method="post" enctype="multipart/form-data"
                     action="<?= e(url($subjectActionBase . '/ph/soportes')) ?>" data-upload-progress data-ph-pdf-render
-                    data-ph-pdf-max-pages="300" data-ph-pdf-max-side="1200" data-ph-pdf-quality="0.72"
                     data-upload-timeout="1800000" data-upload-chunk-url="<?= e(url($subjectActionBase . '/ph/soportes/chunk')) ?>" data-upload-finish-url="<?= e(url($subjectActionBase . '/ph/soportes/finalizar')) ?>">
                     <?= csrf_field() ?>
+                    <input type="hidden" name="version" value="<?= (int) ($ph['version'] ?? 0) ?>">
                     <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
+                    <label class="label">Tipología de referencia
                     <select class="input" name="ph_typology" x-model="phTypology">
                         <option value="">Selecciona tipología PH de referencia</option>
                         <?php foreach ($phCatalog['typologies'] as $value => $label): ?>
                             <option value="<?= e($value) ?>" <?= (string) ($ph['ph_typology'] ?? '') === (string) $value ? 'selected' : '' ?>><?= e($label) ?></option>
                         <?php endforeach; ?>
-                    </select>
+                    </select></label>
+                    <label class="label">Reglamento y soportes de propiedad horizontal
                     <input class="input" type="file" name="ph_document[]" multiple
-                        accept=".zip,.rar,.pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.tif,.tiff">
+                        accept=".zip,.rar,.pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.tif,.tiff" aria-describedby="ph-upload-help">
+                    </label><p id="ph-upload-help" class="text-xs text-slate-600">PDF digital o escaneado. Para lectura completa de PDFs dentro de ZIP/RAR, descomprime y selecciona los PDF directamente.</p>
                     <button class="btn-primary" type="submit">Leer soporte PH</button>
                     <?php require BASE_PATH . '/app/Views/appraisals/upload-progress.php'; ?>
                 </form>

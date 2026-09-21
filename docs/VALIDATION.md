@@ -87,3 +87,30 @@ archivo físico ya no existe, y que el diagnóstico solo marca faltante cuando t
 hay respaldo. También se comprobó que el banco sectorial conserva las secciones
 avanzadas, cuenta como listas solo las secciones validadas y toma la versión real del
 banco al generar la instantánea.
+
+## Lectura completa de PDFs PH — 21/09/2026
+
+- Lint PHP de app, configuración, rutas, migraciones, comandos y pruebas: correcto.
+- `php tests/run.php`: 165 verificaciones correctas.
+- `npm test`: 34 pruebas correctas; incluye PDF mixto de 244 páginas, error OCR,
+  ediciones durante guardado, desconexión y bloqueo tras HTTP 409.
+- `npm run build` y `npm run check:size`: correctos; 34,4 KB gzip iniciales.
+- `GA_TEST_PORT=3322 php tests/database.php`: 14 verificaciones contra una instancia
+  local desechable con solo `ga_test_app` y `ga_test_auth`. Incluye migraciones
+  repetidas, conservación de datos, versión PH y rechazo de conflictos.
+- `GA_TEST_HTTP=true php tests/http.php`: 19 verificaciones, incluido multipart PH,
+  prellenado sin borrar campos manuales, CSRF, conflictos y recuperación de texto.
+- OCR local del PDF Chambacú: 244/244 páginas procesadas; texto privado fuera de Git.
+  Una página escaneada también se leyó con el bundle real en Chrome sin proveedor IA.
+- Interfaz en navegador: pestañas, guardado confirmado y recuperación tras recarga.
+  Comprobación DOM a 390 y 1440 px sin desbordamiento horizontal del documento.
+  Capturas en ventana estrecha inspeccionadas; el capturador falló de forma intermitente
+  en los tamaños emulados, por lo que esa parte se comprobó además mediante DOM.
+- La extensión de Chrome no permitió seleccionar archivos locales; el transporte
+  completo se verificó por HTTP. No se probaron todos los 244 folios mediante la UI:
+  se procesaron completos con Tesseract local y se verificó el motor web con una página.
+
+Las pruebas antiguas de BD asumían solo dos migraciones y un catálogo ya retirado;
+se actualizaron sus fixtures al esquema/catálogo actual. No se tocaron bases reales,
+credenciales compartidas ni hosting. Publicación pendiente. Alcance y límites en
+[lectura PH](PH-LECTURA.md).

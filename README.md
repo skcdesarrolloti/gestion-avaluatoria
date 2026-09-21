@@ -81,27 +81,16 @@ Las Normas Internacionales de Valuación guardan sus PDFs en
 de la IVS correspondiente.
 Las Normas NIIF guardan sus PDFs en `storage/normas-niif/`; sirven como referencia
 contable y ayudan a distinguir campos normativos, metodológicos y operativos.
-El numeral 4 y los soportes PH aceptan PDF, DOCX, TXT e imágenes JPG/PNG/WEBP/TIFF.
-Las imágenes se intentan leer con Tesseract OCR si está instalado en el servidor; se
-puede fijar su ruta con `TESSERACT_BINARY`. Para PDFs escaneados se requiere además
-`pdftoppm` y se puede fijar con `PDFTOPPM_BINARY`. Si no hay OCR disponible, el archivo
-queda guardado y visible para revisión o diligenciamiento manual.
-Para PH también existe una ruta opcional de OCR/IA externo: configura
-`PH_EXTERNAL_OCR_ENDPOINT` para un endpoint que reciba `multipart/form-data` con el
-archivo en el campo `file` y responda JSON `{"text":"..."}`. El campo, la ruta del
-texto y el tiempo de espera se pueden ajustar con `PH_EXTERNAL_OCR_FILE_FIELD`,
-`PH_EXTERNAL_OCR_TEXT_KEY` y `PH_EXTERNAL_OCR_TIMEOUT_SECONDS`; si requiere token, usa
-`PH_EXTERNAL_OCR_TOKEN` y se enviará como `Authorization: Bearer`.
-Si se usará MiniMax directamente, configura `PH_OCR_PROVIDER=minimax` y
-`MINIMAX_API_KEY`. El módulo llama `https://api.minimax.io/v1/chat/completions`
-con `MiniMax-M3` por defecto, envía imágenes como `image_url` base64 y espera texto
-plano de vuelta. MiniMax directo admite JPG, PNG, WEBP y GIF; también ZIP con esas
-imágenes internas. Para PDF escaneado se requiere convertir páginas a imagen antes
-de llamar a MiniMax: instala/configura `pdftoppm` con `PDFTOPPM_BINARY`. Un ZIP que
-solo contenga PDFs escaneados también necesita esa conversión o debe subirse como PDF.
-En hosting compartido estos binarios normalmente no se instalan desde el módulo PHP:
-deben existir en el servidor o ser habilitados por el proveedor. El numeral 3.5 muestra
-un diagnóstico de disponibilidad OCR para confirmarlo.
+El numeral 3.5 lee PDF digitales, escaneados y mixtos página por página en el navegador,
+con PDF.js y Tesseract locales, sin clave de IA ni servicios externos. Envía el original
+junto con el texto por página, conserva el resultado en BD y prellena campos vacíos con
+extractos y referencias para revisión. Consulta [lectura PH](docs/PH-LECTURA.md) para el
+alcance, los límites del OCR y la actualización. No completa conclusiones del analista
+ni atribuye a la unidad el primer coeficiente encontrado en un reglamento.
+El OCR del servidor para otros formatos y el numeral 4 requiere Tesseract y, para PDF,
+Poppler. Las opciones existentes PH_EXTERNAL_OCR_ENDPOINT y PH_OCR_PROVIDER=minimax
+siguen disponibles mediante la acción explícita Leer con IA/OCR; no intervienen en la
+nueva lectura local de PDFs. Configura sus credenciales solo en el entorno privado.
 
 ```text
 app/Controllers/     Coordinación de solicitudes

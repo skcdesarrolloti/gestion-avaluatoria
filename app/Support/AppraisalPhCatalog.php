@@ -171,7 +171,7 @@ final class AppraisalPhCatalog
     public static function defaults(): array
     {
         return [
-            'ph_key' => '', 'ph_name' => '', 'administration_name' => '', 'administration_contact' => '',
+            'version' => 0, 'ph_key' => '', 'ph_name' => '', 'administration_name' => '', 'administration_contact' => '',
             'ph_typology' => '', 'linkage' => [],
             'administration_phone' => '', 'administration_email' => '', 'matrix_registration' => '',
             'private_unit' => '', 'coefficient' => '', 'regulation_document' => '', 'reform_documents' => '',

@@ -1,5 +1,11 @@
 # Entrega al responsable de la implementación
 
+Actualización PH del 21/09/2026: [lectura documental](PH-LECTURA.md). El numeral 3.5
+incorpora OCR local por página, referencias al documento, prellenado conservador y
+versionado optimista. Aplicar la migración nueva y publicar los assets OCR locales.
+Los campos no acreditados, las tablas ambiguas y el criterio valuatorio quedan al
+analista; no se implementó interpretación jurídica mediante un modelo externo.
+
 ## Punto de partida
 
 Proyecto: `C:\Workspace\desarrollo-skc\gestion-avaluatoria`.

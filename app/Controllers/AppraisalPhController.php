@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 namespace App\Controllers;
-use App\Core\{Http, Session};
+use App\Core\{Http, HttpException, Session};
 use App\Models\{AppraisalPhRepository, AppraisalRepository};
-use App\Services\{AppraisalPhChunkUploadService, AppraisalPhClientPdfOcrService, AppraisalPhDocumentReanalysisService, AppraisalPhDocumentStorage, AppraisalPhDocumentUploadService, AppraisalPhExternalOcrService, AppraisalPhInput};
+use App\Services\{AppraisalPhChunkUploadService, AppraisalPhClientText, AppraisalPhDocumentReanalysisService, AppraisalPhDocumentStorage, AppraisalPhDocumentUploadService, AppraisalPhExternalOcrService, AppraisalPhInput};
 
 final class AppraisalPhController
 {
@@ -12,25 +12,25 @@ final class AppraisalPhController
 
     public function save(string $id): never
     {
-        $this->saveAndRedirect($id, fn () => $this->ph->save($id, $this->user['id'], AppraisalPhInput::data()),
+        $this->saveAndRedirect($id, fn () => $this->ph->save($id, $this->user['id'], AppraisalPhInput::data(), $this->version()),
             'Propiedad horizontal guardada correctamente.');
     }
 
     public function autosave(string $id): never
     {
         $this->appraisals->find($id, $this->user['id']);
-        $this->ph->save($id, $this->user['id'], AppraisalPhInput::data());
-        Http::json(['ok' => true, 'saved_at' => gmdate('Y-m-d\TH:i:s\Z')]);
+        $version = $this->version();
+        $this->ph->save($id, $this->user['id'], AppraisalPhInput::data(), $version);
+        Http::json(['ok' => true, 'version' => $version + 1, 'saved_at' => gmdate('Y-m-d\TH:i:s\Z')]);
     }
 
     public function upload(string $id): never
     {
         $this->saveAndRedirect($id, function () use ($id): string {
             $typology = (string) ($_POST['ph_typology'] ?? '');
-            $clientText = (new AppraisalPhClientPdfOcrService())->extract($_FILES['ph_client_pdf_image'] ?? [],
-                (array) ($_POST['ph_client_pdf_image_data'] ?? []), (array) ($_POST['ph_client_pdf_image_name'] ?? []));
+            $clientText = AppraisalPhClientText::uploaded($_FILES['ph_client_text'] ?? []);
             $analysis = (new AppraisalPhDocumentUploadService())->store($_FILES['ph_document'] ?? [], $id,
-                $this->user['id'], $typology, $this->ph, $clientText);
+                $this->user['id'], $typology, $this->ph, $clientText, $this->version());
             if (($analysis['message'] ?? '') !== '') return (string) $analysis['message'];
             return ($analysis['has_text'] ?? true) === false
                 ? 'Soporte PH cargado, pero no se extrajo texto útil para diligenciar campos.'
@@ -42,7 +42,7 @@ final class AppraisalPhController
     {
         $this->appraisals->find($id, $this->user['id']);
         try { Http::json((new AppraisalPhChunkUploadService())->store($id, $this->user['id'])); }
-        catch (\Throwable $error) { Http::json(['ok' => false, 'message' => $error->getMessage()], 422); }
+        catch (HttpException $error) { throw $error; } catch (\Throwable $error) { Http::json(['ok' => false, 'message' => $error->getMessage()], 422); }
     }
 
     public function finishChunkUpload(string $id): never
@@ -50,9 +50,8 @@ final class AppraisalPhController
         $this->saveAndRedirect($id, function () use ($id): string {
             $file = (new AppraisalPhChunkUploadService())->finish($id, $this->user['id']);
             $typology = (string) ($_POST['ph_typology'] ?? '');
-            $clientText = (new AppraisalPhClientPdfOcrService())->extract($_FILES['ph_client_pdf_image'] ?? [],
-                (array) ($_POST['ph_client_pdf_image_data'] ?? []), (array) ($_POST['ph_client_pdf_image_name'] ?? []));
-            $analysis = (new AppraisalPhDocumentUploadService())->storePrepared($file, $id, $this->user['id'], $typology, $this->ph, $clientText);
+            $clientText = AppraisalPhClientText::uploaded($_FILES['ph_client_text'] ?? []);
+            $analysis = (new AppraisalPhDocumentUploadService())->storePrepared($file, $id, $this->user['id'], $typology, $this->ph, $clientText, $this->version());
             if (($analysis['message'] ?? '') !== '') return (string) $analysis['message'];
             return ($analysis['has_text'] ?? true) === false
                 ? 'Soporte PH cargado, pero no se extrajo texto útil para diligenciar campos.'
@@ -68,10 +67,21 @@ final class AppraisalPhController
             $path = $result['filename'] !== '' ? AppraisalPhDocumentStorage::path($result['filename']) : '';
             if ($path !== '' && is_file($path)) @unlink($path);
             Session::flash('ph_message', $result['cleared']
-                ? 'Soporte PH eliminado. Se limpió la lectura automática porque no quedan soportes cargados.'
+                ? 'Soporte PH eliminado. Se conservan los campos diligenciados.'
                 : 'Soporte PH eliminado.');
-        } catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
+        } catch (HttpException $error) { throw $error; } catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
         Http::redirect($this->safeReturn($id));
+    }
+
+    public function documentText(string $id, string $documentId): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        $document = $this->ph->documentForAnalysis($documentId, $id, $this->user['id']);
+        header('Content-Type: text/plain; charset=utf-8');
+        header('X-Content-Type-Options: nosniff');
+        header('Cache-Control: private, no-store');
+        echo (string) ($document['extracted_text'] ?? '');
+        exit;
     }
 
     public function loadDocument(string $id, string $documentId): never
@@ -80,13 +90,13 @@ final class AppraisalPhController
         try {
             $typology = (string) ($_POST['ph_typology'] ?? ($this->ph->profile($id, $this->user['id'])['ph_typology'] ?? ''));
             $analysis = (new AppraisalPhDocumentReanalysisService())->reanalyze($documentId, $id,
-                $this->user['id'], $typology, $this->ph);
+                $this->user['id'], $typology, $this->ph, $this->version());
             $message = ($analysis['has_text'] ?? true) === false
                 ? 'Soporte PH cargado, pero no se extrajo texto útil para diligenciar campos.'
                 : 'Soporte PH cargado en la ficha. Se llenaron los campos vacíos sugeridos.';
             Session::flash('ph_message', $message);
             $this->flashDocumentAction($documentId, 'ok', $message);
-        } catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
+        } catch (HttpException $error) { throw $error; } catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
         Http::redirect($this->safeReturn($id));
     }
 
@@ -96,13 +106,13 @@ final class AppraisalPhController
         try {
             $typology = (string) ($_POST['ph_typology'] ?? ($this->ph->profile($id, $this->user['id'])['ph_typology'] ?? ''));
             $analysis = (new AppraisalPhExternalOcrService())->reanalyze($documentId, $id,
-                $this->user['id'], $typology, $this->ph);
+                $this->user['id'], $typology, $this->ph, $this->version());
             $message = ($analysis['has_text'] ?? false)
                 ? 'OCR externo aplicado. Se llenaron los campos vacíos sugeridos.'
                 : 'El OCR externo no devolvió texto útil para diligenciar campos.';
             Session::flash('ph_message', $message);
             $this->flashDocumentAction($documentId, 'ok', $message);
-        } catch (\Throwable $error) {
+        } catch (HttpException $error) { throw $error; } catch (\Throwable $error) {
             $message = 'No se ejecutó la lectura IA/OCR: ' . $error->getMessage();
             Session::flash('ph_error', $message);
             $this->flashDocumentAction($documentId, 'error', $message);
@@ -124,8 +134,15 @@ final class AppraisalPhController
             $customMessage = $save();
             Session::flash('ph_message', is_string($customMessage) && $customMessage !== '' ? $customMessage : $message);
         }
-        catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
+        catch (HttpException $error) { throw $error; } catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
         Http::redirect($this->safeReturn($id));
+    }
+
+    private function version(): int
+    {
+        $value = $_POST['version'] ?? '';
+        if (!is_scalar($value) || !ctype_digit((string) $value)) throw new HttpException(422, 'Falta la versión de la ficha PH.');
+        return (int) $value;
     }
 
     private function safeReturn(string $id): string

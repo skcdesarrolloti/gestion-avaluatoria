@@ -8,7 +8,7 @@ final class AppraisalPhExternalOcrService
     public function __construct(private AppraisalExternalOcrClient $client = new AppraisalExternalOcrClient()) {}
 
     public function reanalyze(string $documentId, string $appraisalId, int $owner, string $typology,
-        AppraisalPhRepository $repo): array
+        AppraisalPhRepository $repo, ?int $expected = null): array
     {
         $document = $repo->documentForAnalysis($documentId, $appraisalId, $owner);
         $resolver = new AppraisalPhDocumentFileResolver();
@@ -16,10 +16,10 @@ final class AppraisalPhExternalOcrService
         try {
             $name = (string) $document['source_filename'];
             $text = $this->client->extract($path, $name, (string) ($document['mime_type'] ?? 'application/octet-stream'));
-            $analysis = (new AppraisalPhDocumentAnalyzer())->analyze($text, [$name], $typology);
+            $analysis = (new AppraisalPhDocumentAnalyzer())->analyze($text, [$name], $typology, $repo->profile($appraisalId, $owner));
             $repo->updateDocumentAnalysis($documentId, $appraisalId, $owner, mb_strlen($text),
                 'Lectura externa IA/OCR aplicada.', $text);
-            $repo->mergeAnalysis($appraisalId, $owner, $analysis);
+            $repo->mergeAnalysis($appraisalId, $owner, $analysis, $expected);
             return $analysis;
         } finally {
             if ($resolver->temporary($path)) @unlink($path);

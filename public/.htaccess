@@ -5,6 +5,10 @@ Require all granted
     Require all denied
 </FilesMatch>
 DirectoryIndex index.php
+<IfModule mod_mime.c>
+    AddType text/javascript .mjs
+    AddType application/wasm .wasm
+</IfModule>
 RewriteEngine On
 RewriteCond %{REQUEST_FILENAME} !-f
 RewriteRule ^ index.php [QSA,L]

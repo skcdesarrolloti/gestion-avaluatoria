@@ -19,7 +19,9 @@
 !/storage/fotos-avaluos/
 !/storage/fotos-avaluos/.gitkeep
 !/storage/rate-limits/
+/storage/rate-limits/*
 !/storage/rate-limits/.gitkeep
 !/storage/sessions/
+/storage/sessions/*
 !/storage/sessions/.gitkeep
 /tests/.runtime/

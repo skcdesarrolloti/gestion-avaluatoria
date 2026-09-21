@@ -19,7 +19,7 @@ test('submits marked upload form through xhr progress', () => {
     const originals = {
         document: globalThis.document, window: globalThis.window, history: globalThis.history,
         FormData: globalThis.FormData, HTMLFormElement: globalThis.HTMLFormElement,
-        XMLHttpRequest: globalThis.XMLHttpRequest,
+        XMLHttpRequest: globalThis.XMLHttpRequest, DOMParser: globalThis.DOMParser,
     };
     const listeners = {};
     const events = [];
@@ -47,7 +47,9 @@ test('submits marked upload form through xhr progress', () => {
     globalThis.XMLHttpRequest = Xhr;
     globalThis.window = { location: { href: current, assign: url => events.push(['assign', url]) } };
     globalThis.history = { replaceState: (_state, _title, url) => events.push(['history', url]) };
+    globalThis.DOMParser = class { parseFromString() { return { body: { marker: 'new' }, title: 'PH', querySelector: () => null }; } };
     globalThis.document = {
+        body: { replaceWith: body => events.push(['body', body.marker]) },
         addEventListener: (type, handler) => { listeners[type] = handler; },
         querySelector: () => ({ content: 'fresh-token' }),
         open: () => events.push(['open']),
@@ -60,6 +62,8 @@ test('submits marked upload form through xhr progress', () => {
     Xhr.last.upload.onprogress({ lengthComputable: true, loaded: 40, total: 100 });
     Object.assign(Xhr.last, { status: 200, responseURL: 'https://example.test/public/avaluos/abc/bien-sujeto', responseText: '<html>ok</html>' });
     Xhr.last.onload();
+    assert.deepEqual(events.find(event => event[0] === 'body'), ['body', 'new']);
+    assert.equal(events.some(event => event[0] === 'write'), false);
     assert.equal(prevented, true);
     assert.equal(bar.style.width, '100%');
     assert.equal(button.disabled, true);

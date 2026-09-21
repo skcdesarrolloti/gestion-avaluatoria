@@ -10,8 +10,11 @@
                     <span><?= e($doc['source_filename']) ?> · <?= e((string) $doc['extracted_chars']) ?> caracteres</span>
                     <div class="flex flex-wrap gap-2">
                     <?php if ($canLoad): ?>
+                        <a class="btn-secondary min-h-11 px-3 text-xs" target="_blank" rel="noopener"
+                            href="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/texto')) ?>">Texto por páginas</a>
                         <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/cargar')) ?>">
                             <?= csrf_field() ?>
+                            <input type="hidden" name="version" value="<?= (int) ($ph['version'] ?? 0) ?>">
                             <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
                             <input type="hidden" name="ph_typology" value="<?= e((string) ($ph['ph_typology'] ?? '')) ?>">
                             <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="submit">Cargar</button>
@@ -22,6 +25,7 @@
                         <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/ocr-externo')) ?>"
                             onsubmit="this.querySelector('button[type=submit]').textContent='Leyendo IA/OCR...';">
                             <?= csrf_field() ?>
+                            <input type="hidden" name="version" value="<?= (int) ($ph['version'] ?? 0) ?>">
                             <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
                             <input type="hidden" name="ph_typology" value="<?= e((string) ($ph['ph_typology'] ?? '')) ?>">
                             <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="submit"
@@ -36,6 +40,7 @@
                     <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/eliminar')) ?>"
                         onsubmit="return confirm('¿Eliminar este soporte PH del avalúo? Los campos ya diligenciados se conservarán.');">
                         <?= csrf_field() ?>
+                            <input type="hidden" name="version" value="<?= (int) ($ph['version'] ?? 0) ?>">
                         <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
                         <button class="btn-secondary min-h-9 px-3 py-1 text-xs text-red-700" type="submit">Eliminar</button>
                     </form>
@@ -46,6 +51,7 @@
                         <?= e($phActionMessage) ?>
                     </p>
                 <?php endif; ?>
+                <p class="mt-2 text-xs text-slate-600"><?= e((string) ($doc['analysis_message'] ?? '')) ?></p>
             </li>
         <?php endforeach; ?>
     </ul>

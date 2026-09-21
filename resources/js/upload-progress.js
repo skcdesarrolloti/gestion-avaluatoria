@@ -52,10 +52,15 @@ function renderResponse(xhr, form) {
     const nextUrl = uploadRedirectUrl(xhr.responseURL, form.action);
     const type = xhr.getResponseHeader('content-type') ?? '';
     if (type.includes('text/html') && xhr.responseText) {
+        const next = new DOMParser().parseFromString(xhr.responseText, 'text/html');
+        if (!next.body) throw new Error('Respuesta de carga inválida.');
+        document.title = next.title || document.title;
+        const token = next.querySelector('meta[name="csrf-token"]')?.content;
+        if (token) document.querySelector('meta[name="csrf-token"]')?.setAttribute('content', token);
+        window.Alpine?.destroyTree(document.body);
+        document.body.replaceWith(next.body);
+        window.Alpine?.initTree(document.body);
         history.replaceState({}, '', nextUrl);
-        document.open();
-        document.write(xhr.responseText);
-        document.close();
         return;
     }
     window.location.assign(nextUrl);

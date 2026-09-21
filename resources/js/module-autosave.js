@@ -4,7 +4,7 @@ const activeStates = new Set();
 
 function stateFor(form) {
     if (!states.has(form)) {
-        const state = { form, dirty: false, saving: false, timer: null, controller: null, promise: null };
+        const state = { form, dirty: false, saving: false, timer: null, controller: null, promise: null, revision: 0, conflict: false };
         states.set(form, state);
         activeStates.add(state);
     }
@@ -41,14 +41,21 @@ function updateVersion(form, result) {
     if (!Number.isInteger(result.version)) return;
     const field = form.querySelector('input[name="version"]');
     if (field) field.value = String(result.version);
+    form.closest?.('[data-ph-section]')?.querySelectorAll('input[name="version"]').forEach(node => {
+        node.value = String(result.version);
+    });
 }
 
 async function save(form) {
     const state = stateFor(form);
+    if (state.conflict) return;
     if (state.saving) return state.promise;
     if (!state.dirty) return;
+    const revision = state.revision;
     state.saving = true;
     state.controller = new AbortController();
+    const buttons = [...form.querySelectorAll('button[type="submit"]')];
+    buttons.forEach(button => { button.disabled = true; });
     setStatus(form, 'Guardando cambios...', 'saving');
     state.promise = (async () => { try {
         const response = await fetch(form.dataset.autosaveEndpoint, {
@@ -59,11 +66,12 @@ async function save(form) {
             signal: state.controller.signal,
         });
         const result = await response.json();
+        if (response.status === 409) state.conflict = true;
         if (!response.ok || result.ok !== true) throw new Error(result.message || 'No se pudo confirmar el guardado.');
         updateVersion(form, result);
-        state.dirty = false;
+        state.dirty = state.revision !== revision;
         const time = result.saved_at ? new Date(result.saved_at).toLocaleTimeString('es-CO') : new Date().toLocaleTimeString('es-CO');
-        setStatus(form, 'Autoguardado confirmado: ' + time, 'saved');
+        setStatus(form, state.dirty ? 'Cambios pendientes' : 'Autoguardado confirmado: ' + time, state.dirty ? 'pending' : 'saved');
     } catch (error) {
         if (error.name !== 'AbortError') setStatus(form, 'Pendiente de guardar: ' + error.message, 'error');
         state.dirty = true;
@@ -71,6 +79,8 @@ async function save(form) {
         state.saving = false;
         state.controller = null;
         state.promise = null;
+        buttons.forEach(button => { button.disabled = false; });
+        if (state.dirty && !state.conflict && state.revision !== revision) state.timer = setTimeout(() => save(form), 800);
     } })();
     return state.promise;
 }
@@ -80,7 +90,9 @@ function markDirty(form, target) {
     if (target instanceof HTMLInputElement && target.type === 'file') return;
     const state = stateFor(form);
     state.dirty = true;
+    state.revision++;
     clearTimeout(state.timer);
+    if (state.conflict) return;
     setStatus(form, 'Cambios pendientes', 'pending');
     state.timer = setTimeout(() => save(form), 800);
 }
@@ -94,9 +106,11 @@ function cancel(form) {
 }
 
 export async function flushModuleAutosaves() {
-    await Promise.all([...activeStates].map(state => {
+    for (const state of activeStates) if (state.form.isConnected === false) activeStates.delete(state);
+    await Promise.all([...activeStates].map(async state => {
         clearTimeout(state.timer);
-        return save(state.form);
+        await save(state.form);
+        if (state.dirty && !state.conflict) await save(state.form);
     }));
     return ![...activeStates].some(state => state.dirty || state.saving);
 }
@@ -105,7 +119,17 @@ export function installModuleAutosave() {
     window.gaFlushAutosaves = flushModuleAutosaves;
     document.addEventListener('input', event => markDirty(formFor(event.target), event.target));
     document.addEventListener('change', event => markDirty(formFor(event.target), event.target));
-    document.addEventListener('submit', event => cancel(event.target), true);
+    document.addEventListener('submit', event => {
+        const form = event.target;
+        if (form.hasAttribute?.('data-save-in-place')) {
+            event.preventDefault();
+            event.stopImmediatePropagation();
+            const state = stateFor(form);
+            clearTimeout(state.timer);
+            state.dirty = true;
+            save(form);
+        } else { cancel(form); }
+    }, true);
     window.addEventListener('beforeunload', event => {
         if (![...activeStates].some(state => state.dirty || state.saving)) return;
         event.preventDefault();

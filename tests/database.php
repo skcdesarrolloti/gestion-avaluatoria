@@ -32,18 +32,26 @@ $first(new App\Database\Schema($app));
 $app->exec("INSERT INTO appraisals (id, owner_id, titulo, created_at, updated_at)
     VALUES ('11111111111111111111111111111111', 1, 'Conservar datos', UTC_TIMESTAMP(), UTC_TIMESTAMP())");
 $migrator = new Migrator($app, $directory);
-expect(count($migrator->run()) === 2, 'migracion recupera tabla parcial y agrega columna');
+expect(count($migrator->run()) === count(glob($directory . '/*.php')), 'migracion recupera tabla parcial y agrega columnas');
 expect($migrator->run() === [], 'migracion repetida no duplica cambios');
 $repo = new AppraisalRepository($app);
 expect($repo->find(str_repeat('1', 32), 1)['titulo'] === 'Conservar datos', 'datos previos preservados al agregar columna');
 $id = $repo->create(1);
 expectStatus(404, fn () => $repo->find($id, 2), 'lectura de ficha ajena rechazada');
-$data = ['titulo' => 'Prueba Bogotá', 'tipo' => 'urbano', 'direccion' => 'Calle 10', 'municipio' => 'Bogotá', 'observaciones' => 'Borrador ñ'];
+$data = ['titulo' => 'Prueba Bogotá', 'tipo' => '', 'direccion' => 'Calle 10', 'municipio' => 'Bogotá', 'observaciones' => 'Borrador ñ'];
+$data = App\Services\AppraisalValidator::validate($data + ['version'=>1]);
 expect($repo->save($id, 1, 1, $data)['version'] === 2, 'guardado aumenta version');
 expectStatus(409, fn () => $repo->save($id, 1, 1, $data), 'version antigua rechazada');
 expectStatus(404, fn () => $repo->save($id, 2, 2, $data), 'escritura de ficha ajena rechazada');
 expect($repo->find($id, 1)['observaciones'] === 'Borrador ñ', 'persistencia utf8 y recarga');
 expect(count($repo->recent(2, 1)) === 0, 'listado aislado por propietario');
+$ph = new App\Models\AppraisalPhRepository($app);
+$ph->save($id, 1, ['ph_name'=>'PH persistente', 'technical'=>['uso_dominante'=>'Oficinas']], 0);
+expect((int) $ph->profile($id, 1)['version'] === 1, 'PH persiste versión inicial en MySQL');
+$ph->save($id, 1, ['ph_name'=>'PH editada'], 1);
+expectStatus(409, fn () => $ph->save($id, 1, ['ph_name'=>'Edición obsoleta'], 1), 'PH MySQL rechaza conflicto');
+expect($ph->profile($id, 1)['ph_name'] === 'PH editada', 'PH MySQL conserva edición tras conflicto');
+expect($ph->profile($id, 2)['ph_name'] === '', 'PH MySQL aísla propietario');
 // An applied migration must never be silently changed.
 $app->exec("UPDATE schema_migrations SET checksum = REPEAT('0', 64) WHERE version = '202609150002_add_observaciones.php'");
 $detected = false;

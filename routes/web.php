@@ -73,6 +73,7 @@ return [
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/soportes/chunk$#', 'subjectPh', 'uploadChunk', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/soportes/finalizar$#', 'subjectPh', 'finishChunkUpload', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/soportes$#', 'subjectPh', 'upload', true],
+    ['GET', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/soportes/([a-f0-9]{32})/texto$#', 'subjectPh', 'documentText', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/soportes/([a-f0-9]{32})/cargar$#', 'subjectPh', 'loadDocument', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/soportes/([a-f0-9]{32})/ocr-externo$#', 'subjectPh', 'externalOcr', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/soportes/([a-f0-9]{32})/eliminar$#', 'subjectPh', 'deleteDocument', true],

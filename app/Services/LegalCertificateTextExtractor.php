@@ -72,8 +72,7 @@ final class LegalCertificateTextExtractor
         if ($text !== '') return $text;
         $ocr = (new OcrTextExtractor())->pdf($path);
         if ($ocr !== '') return $ocr;
-        $fallback = preg_replace('/[^\PC\s]/u', ' ', $raw);
-        return is_string($fallback) ? trim($fallback) : '';
+        return ''; // PDF binary syntax is not document text.
     }
 
     private function image(string $path): string

@@ -84,3 +84,55 @@ test('module autosave posts form data and updates optimistic version', async () 
     assert.match(form.status.textContent, /Autoguardado confirmado/);
     cleanup();
 });
+
+test('module autosave preserves edits made while a save is in flight', async () => {
+    const { listeners, runTimer, cleanup } = setup();
+    const form = new HTMLFormElement(), input = new HTMLInputElement(form);
+    let resolve;
+    globalThis.fetch = () => new Promise(done => { resolve = done; });
+    listeners.input({ target: input });
+    const saving = runTimer();
+    listeners.input({ target: input });
+    resolve({ ok: true, json: async () => ({ ok: true, version: 8 }) });
+    await saving;
+    assert.equal(form.status.textContent, 'Cambios pendientes');
+    globalThis.fetch = async () => ({ ok: true, json: async () => ({ ok: true, version: 9 }) });
+    await runTimer();
+    assert.equal(form.version.value, '9');
+    assert.match(form.status.textContent, /confirmado/);
+    cleanup();
+});
+
+test('module autosave locks a conflict and retains the entered data', async () => {
+    const { listeners, runTimer, cleanup } = setup();
+    const form = new HTMLFormElement(), input = new HTMLInputElement(form);
+    let calls = 0;
+    globalThis.fetch = async () => {
+        calls++;
+        return { status: 409, ok: false, json: async () => ({ message: 'Conflicto entre pestañas' }) };
+    };
+    listeners.input({ target: input });
+    await runTimer();
+    listeners.input({ target: input });
+    await runTimer();
+    assert.equal(calls, 1);
+    assert.equal(input.value, 'Casa');
+    assert.equal(form.version.value, '7');
+    assert.match(form.status.textContent, /Conflicto/);
+    cleanup();
+});
+
+test('module autosave allows retry after network failure without reporting saved', async () => {
+    const { listeners, runTimer, cleanup } = setup();
+    const form = new HTMLFormElement(), input = new HTMLInputElement(form);
+    globalThis.fetch = async () => { throw new Error('Sin conexión'); };
+    listeners.input({ target: input });
+    await runTimer();
+    assert.match(form.status.textContent, /Sin conexión/);
+    assert.equal(form.version.value, '7');
+    globalThis.fetch = async () => ({ ok: true, json: async () => ({ ok: true, version: 8 }) });
+    listeners.input({ target: input });
+    await runTimer();
+    assert.match(form.status.textContent, /confirmado/);
+    cleanup();
+});
