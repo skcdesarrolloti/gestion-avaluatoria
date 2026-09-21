@@ -70,7 +70,7 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                 <div>
                     <h3 class="text-lg font-semibold">Preparar y cargar reglamento / soportes PH</h3>
                     <p class="mt-2 text-sm leading-6 text-slate-600">
-                        Sube ZIP/RAR hasta 300 MB o documentos sueltos hasta 50 MB. ZIP se abre siempre; RAR se procesa
+                        Sube ZIP/RAR/PDF hasta 300 MB o DOCX, TXT e imágenes hasta 50 MB. ZIP se abre siempre; RAR se procesa
                         si el servidor tiene extractor disponible y, si no, el sistema pedirá convertirlo a ZIP.
                     </p>
                     <?php $ocr = is_array($phOcrDiagnostics ?? null) ? $phOcrDiagnostics : []; ?>

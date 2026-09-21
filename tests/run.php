@@ -555,10 +555,8 @@ try {
         $largePdf = tempnam(sys_get_temp_dir(), 'ga_ph_large_pdf_');
         $handle = fopen($largePdf, 'wb');
         fwrite($handle, '%PDF'); ftruncate($handle, 60 * 1024 * 1024); fclose($handle);
-        $rejectedLargePdf = false;
-        try { \App\Services\AppraisalPhDocumentStorage::inspect($largePdf, 'reglamento-grande.pdf'); }
-        catch (\InvalidArgumentException) { $rejectedLargePdf = true; }
-        expect($rejectedLargePdf, 'propiedad horizontal limita soporte suelto mayor a 50MB');
+        $pdfInfo = \App\Services\AppraisalPhDocumentStorage::inspect($largePdf, 'reglamento-grande.pdf');
+        expect($pdfInfo['extension'] === 'pdf', 'propiedad horizontal acepta PDF mayor a 50MB');
         unlink($largeZip); unlink($largePdf);
         foreach (glob($phDir . '/*') ?: [] as $file) unlink($file);
         rmdir($phDir);

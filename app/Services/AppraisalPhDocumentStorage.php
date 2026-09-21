@@ -34,12 +34,12 @@ final class AppraisalPhDocumentStorage
         if ($size <= 0) {
             throw new \InvalidArgumentException('El soporte PH llegó vacío. Selecciona nuevamente el archivo o súbelo dentro de un ZIP/RAR válido.');
         }
-        $archive = in_array($ext, ['zip', 'rar'], true);
-        $limit = $archive ? self::MAX_ARCHIVE_BYTES : self::MAX_FILE_BYTES;
+        $largeSupport = in_array($ext, ['zip', 'rar', 'pdf'], true);
+        $limit = $largeSupport ? self::MAX_ARCHIVE_BYTES : self::MAX_FILE_BYTES;
         if ($size > $limit) {
-            throw new \InvalidArgumentException($archive
-                ? 'Cada ZIP/RAR PH debe pesar máximo 300 MB.'
-                : 'Cada soporte PH suelto debe pesar máximo 50 MB.');
+            throw new \InvalidArgumentException($largeSupport
+                ? 'Cada ZIP/RAR/PDF PH debe pesar máximo 300 MB.'
+                : 'Cada soporte PH suelto DOCX, TXT o imagen debe pesar máximo 50 MB.');
         }
         if ($ext === 'zip' && !self::startsWith($path, "PK\x03\x04")) throw new \InvalidArgumentException('El ZIP no parece válido.');
         if ($ext === 'rar' && !self::isRar($path)) throw new \InvalidArgumentException('El RAR no parece válido.');
