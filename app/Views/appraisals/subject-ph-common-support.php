@@ -11,21 +11,39 @@ $commonPill = static function (string $state): string {
     };
 };
 $commonLabels = $phCatalog['commonAreas'];
-$commonFoundText = static function (array $keys) use ($phMap, $commonLabels, $commonShort): string {
+$commonNames = static function (array $keys, bool $found) use ($phMap, $commonLabels): array {
     $names = [];
-    foreach ($keys as $key) if (trim($phMap('common_areas', (string) $key, 'status')) !== '') $names[] = (string) ($commonLabels[$key] ?? $key);
-    return $names ? $commonShort(implode(', ', array_slice($names, 0, 8))) : '';
+    foreach ($keys as $key) {
+        $has = trim($phMap('common_areas', (string) $key, 'status')) !== '';
+        if ($has === $found) $names[] = (string) ($commonLabels[$key] ?? $key);
+    }
+    return $names;
+};
+$commonMetric = static function (array $keys) use ($commonNames, $commonShort): array {
+    $found = $commonNames($keys, true); $missing = $commonNames($keys, false); $total = count($keys); $count = count($found);
+    $value = $count . ' de ' . $total . ' elementos';
+    $value .= $found ? ': ' . $commonShort(implode(', ', array_slice($found, 0, 8))) : ': sin elementos detectados';
+    $lack = $missing ? 'Faltan: ' . $commonShort(implode(', ', array_slice($missing, 0, 8))) : 'Sin faltantes en esta matriz.';
+    $state = $count === 0 ? 'warn' : ($count === $total ? 'ok' : 'warn');
+    return [$value, $state, $lack];
 };
 $commonGroupKeys = static fn (string $group) => array_keys($phCatalog['commonAreaGroups'][$group][1] ?? []);
+$essentialMetric = $commonMetric($commonGroupKeys('esenciales'));
+$amenityMetric = $commonMetric($commonGroupKeys('no_esenciales'));
+$exclusiveMetric = $commonMetric($commonGroupKeys('uso_exclusivo'));
+$supportMetric = $commonMetric($commonGroupKeys('soporte_operativo'));
 $priorityTotal = count($priorityKeys); $priorityCount = count($priorityFound);
-$priorityText = $commonFoundText($priorityKeys);
+$priorityFoundNames = $commonNames($priorityKeys, true); $priorityMissingNames = $commonNames($priorityKeys, false);
+$priorityValue = $priorityTotal > 0 ? $priorityCount . ' de ' . $priorityTotal . ' factores prioritarios' : 'Sin tipología seleccionada';
+if ($priorityTotal > 0) $priorityValue .= $priorityFoundNames ? ': ' . $commonShort(implode(', ', array_slice($priorityFoundNames, 0, 8))) : ': sin factores detectados';
+$priorityMissing = $priorityMissingNames ? 'Faltan prioritarios: ' . $commonShort(implode(', ', array_slice($priorityMissingNames, 0, 8))) : 'Listo para comparar contra PH similares.';
 $commonRows = [
     ['Texto editable para Entregable', $technicalValue('resumen_comunes_ph') !== '' ? 'Texto construido' : 'Sin texto construido', $technicalValue('resumen_comunes_ph') !== '' ? 'ok' : 'missing', 'Construir el párrafo con bienes comunes y aporte valuatorio.'],
-    ['Bienes comunes esenciales', $commonFoundText($commonGroupKeys('esenciales')) ?: 'Sin esenciales confirmados', ($commonStats['esenciales'][1] ?? 0) > 0 ? 'ok' : 'warn', 'Confirmar estructura, redes, escaleras, red contra incendio, tanques y evacuación.'],
-    ['Amenidades y bienes no esenciales', $commonFoundText($commonGroupKeys('no_esenciales')) ?: 'Sin amenidades confirmadas', ($commonStats['no_esenciales'][1] ?? 0) > 0 ? 'ok' : 'warn', 'Completar solo las amenidades que apliquen a la tipología.'],
-    ['Áreas comunes de uso exclusivo', $commonFoundText($commonGroupKeys('uso_exclusivo')) ?: 'Sin usos exclusivos confirmados', ($commonStats['uso_exclusivo'][1] ?? 0) > 0 ? 'ok' : 'warn', 'Precisar parqueaderos, depósitos, terrazas, patios o zonas asignadas.'],
-    ['Soporte operativo y técnico común', $commonFoundText($commonGroupKeys('soporte_operativo')) ?: 'Sin soporte operativo confirmado', ($commonStats['soporte_operativo'][1] ?? 0) > 0 ? 'ok' : 'warn', 'Confirmar portería, vigilancia, CCTV, administración, planta, subestación, vías o maniobra según tipología.'],
-    ['Dotación prioritaria por tipología', $priorityTotal > 0 ? $priorityCount . ' de ' . $priorityTotal . ' factores: ' . ($priorityText ?: 'sin factores detectados') : 'Sin tipología seleccionada', $priorityTotal === 0 ? 'missing' : ($priorityCount === 0 ? 'warn' : ($priorityCount >= min(5, $priorityTotal) ? 'ok' : 'warn')), 'Comparar únicamente contra PH de la misma tipología, escala y localización.'],
+    ['Bienes comunes esenciales', ...$essentialMetric],
+    ['Amenidades y bienes no esenciales', ...$amenityMetric],
+    ['Áreas comunes de uso exclusivo', ...$exclusiveMetric],
+    ['Soporte operativo y técnico común', ...$supportMetric],
+    ['Dotación prioritaria por tipología', $priorityValue, $priorityTotal === 0 ? 'missing' : ($priorityCount === 0 ? 'warn' : ($priorityCount >= min(5, $priorityTotal) ? 'ok' : 'warn')), $priorityMissing],
 ];
 ?>
 <div class="rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 lg:col-span-2">
