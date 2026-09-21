@@ -438,6 +438,9 @@ try {
         && ($phAnalysis['risks']['restricciones_uso']['status'] ?? '') === 'warn'
         && str_contains((string) ($phAnalysis['core']['report_text'] ?? ''), 'alcance técnico del avalúo'),
         'analizador PH migra lectura avanzada y texto preliminar');
+    expect(str_starts_with((string) ($phAnalysis['technical']['resumen_base_ph'] ?? ''), 'El inmueble se integra a')
+        && !str_contains((string) ($phAnalysis['technical']['resumen_base_ph'] ?? ''), 'Lectura comparativa'),
+        'resumen base PH queda redactado para entregable');
     $emptyPhAnalysis = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
         '', ['ESCRITURA PUBLICA 2593 EDIFICIO CHAMBACU.pdf'], 'oficinas');
     expect(!isset($emptyPhAnalysis['core']['ph_name'])

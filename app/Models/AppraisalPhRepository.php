@@ -192,7 +192,7 @@ final class AppraisalPhRepository
             'Administración y cargas:', 'Incidencia valuatoria:', 'Notas y salvedades:',
             'La copropiedad corresponde preliminarmente', 'Se revisa preliminarmente como',
             'Lectura preliminar PH sin hallazgos suficientes', 'Para el análisis de propiedad horizontal se tuvo como soporte',
-            'Condición especial PH:', 'Trazabilidad documental:'] as $prefix) {
+            'Condición especial PH:', 'Trazabilidad documental:', 'Lectura comparativa:'] as $prefix) {
             if (str_starts_with($text, $prefix)) return true;
         }
         return false;

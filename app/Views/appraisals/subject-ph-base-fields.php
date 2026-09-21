@@ -9,14 +9,18 @@ $phStatusPill = static function (string $state): string {
 $baseRows = [];
 $cityValue = trim((string) ($technical['ciudad_municipio'] ?? ''));
 $keyParts = array_filter([$phText('ph_name'), $currentTypology ? ($phCatalog['typologies'][$currentTypology] ?? $currentTypology) : '', $cityValue]);
-$baseRows[] = ['Texto editable para Entregable', $technicalValue('resumen_base_ph') !== '' ? 'Texto construido' : 'Sin texto construido', $technicalValue('resumen_base_ph') !== '' ? 'ok' : 'missing', 'Construir el resumen desde la matriz.'];
+$commonRows = [];
+foreach ($commonStats as [$groupTitle, $found, $total]) {
+    $state = $found >= max(1, ceil($total * 0.6)) ? 'ok' : ($found > 0 ? 'warn' : 'missing');
+    $commonRows[] = [$groupTitle, (int) $found . ' de ' . (int) $total . ' menciones', $state, 'Completar desde reglamento, visita o soporte manual.'];
+}
+$needsReview = count($keyParts) < 3 || trim((string) ($technical['nivel_dotacion_comparativa'] ?? '')) === ''
+    || array_filter($commonRows, static fn (array $row): bool => $row[2] !== 'ok') !== [];
+$baseRows[] = ['Texto editable para Entregable', $technicalValue('resumen_base_ph') !== '' ? 'Texto construido' : 'Sin texto construido', $technicalValue('resumen_base_ph') === '' ? 'missing' : ($needsReview ? 'warn' : 'ok'), 'Completar los campos en rojo o amarillo antes de pasar al Entregable.'];
 $baseRows[] = ['Tipología PH de referencia', $currentTypology ? ($phCatalog['typologies'][$currentTypology] ?? $currentTypology) : 'No seleccionada', $currentTypology ? 'ok' : 'missing', 'Seleccionar la tipología comparable.'];
 $baseRows[] = ['Llave principal', $keyParts ? implode(' · ', $keyParts) : 'Sin llave completa', count($keyParts) >= 3 ? 'ok' : ($keyParts ? 'warn' : 'missing'), 'Nombre + tipología + ciudad.'];
 $baseRows[] = ['Clasificación de dotación', trim((string) ($technical['nivel_dotacion_comparativa'] ?? '')) ?: 'Sin clasificación', trim((string) ($technical['nivel_dotacion_comparativa'] ?? '')) !== '' ? 'ok' : 'missing', 'Nivel comparable de dotación.'];
-foreach ($commonStats as [$groupTitle, $found, $total]) {
-    $state = $found >= max(1, ceil($total * 0.6)) ? 'ok' : ($found > 0 ? 'warn' : 'missing');
-    $baseRows[] = [$groupTitle, (int) $found . ' de ' . (int) $total . ' menciones', $state, 'Completar desde reglamento, visita o soporte manual.'];
-}
+$baseRows = array_merge($baseRows, $commonRows);
 ?>
 <div class="rounded-xl border border-slate-200 bg-white p-4 lg:col-span-2">
     <h4 class="font-semibold">Campos base para construir el Entregable</h4>

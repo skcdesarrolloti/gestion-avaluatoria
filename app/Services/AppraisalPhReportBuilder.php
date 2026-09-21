@@ -22,8 +22,7 @@ final class AppraisalPhReportBuilder
         $trace = $this->traceSummary($technical, $limits);
 
         $tab = [
-            'resumen_base_ph' => "Lectura comparativa: {$name} se analiza como {$label}. La dotación común se clasifica como {$level}. "
-                . "Para el inmueble, la copropiedad aporta {$advantages}; esto favorece operación, seguridad, acceso de usuarios y percepción comercial frente a inmuebles aislados o PH menos dotadas.",
+            'resumen_base_ph' => $this->baseSummary($name, $label, $advantages, $level),
             'resumen_trazabilidad_ph' => $trace,
             'resumen_identificacion_ph' => trim("Identificación: el soporte reconoce {$name} como copropiedad o agrupación bajo régimen de propiedad horizontal. {$assets}"),
             'resumen_tipologia_ph' => $this->typologySummary($name, $label, $technical, $typology),
@@ -39,6 +38,14 @@ final class AppraisalPhReportBuilder
             'report_text' => $this->report($name, $label, $assets, $use, $support, $level, $limits), 'technical' => $tab];
     }
 
+    private function baseSummary(string $name, string $label, string $advantages, string $level): string
+    {
+        $benefits = $advantages === 'soporte común por confirmar'
+            ? 'La incidencia específica de sus bienes comunes debe completarse con los elementos confirmados por el analista.'
+            : "La copropiedad aporta {$advantages}, elementos que fortalecen el funcionamiento del inmueble, el acceso de usuarios, la operación cotidiana y la percepción de organización y seguridad dentro del edificio.";
+        return "El inmueble se integra a {$name}, copropiedad sometida al régimen de propiedad horizontal y clasificada para este avalúo como {$label}. "
+            . "La dotación común identificada se clasifica como {$level}. {$benefits}";
+    }
     private function typologySummary(string $name, string $label, array $technical, string $typology): string
     {
         $summary = "Tipología y régimen: {$name} se analiza como {$label}. " . $this->useProfile($technical, $typology);
