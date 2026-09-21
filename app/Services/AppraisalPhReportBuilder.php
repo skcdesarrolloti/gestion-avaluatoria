@@ -26,8 +26,7 @@ final class AppraisalPhReportBuilder
                 . "Para el inmueble, la copropiedad aporta {$advantages}; esto favorece operación, seguridad, acceso de usuarios y percepción comercial frente a inmuebles aislados o PH menos dotadas.",
             'resumen_trazabilidad_ph' => $trace,
             'resumen_identificacion_ph' => trim("Identificación: el soporte reconoce {$name} como copropiedad o agrupación bajo régimen de propiedad horizontal. {$assets}"),
-            'resumen_tipologia_ph' => "Tipología y régimen: {$name} corresponde preliminarmente a {$label}. {$use} "
-                . 'La tipología orienta la comparación: oficinas contra PH corporativas, no contra residencial, logística o comercio de otra escala.',
+            'resumen_tipologia_ph' => $this->typologySummary($name, $label, $technical, $typology),
             'resumen_configuracion_ph' => "Configuración predial: {$config} Esta información ayuda a entender escala, organización interna y soporte de funcionamiento del edificio.",
             'resumen_comunes_ph' => "Bienes comunes y soporte: {$support} En términos valuatorios, estos elementos aportan funcionalidad, control, comodidad para usuarios y respaldo operativo.",
             'resumen_reglas_ph' => "Reglas de uso y operación: {$rules} Estas reglas inciden en imagen, convivencia, uso permitido, adecuaciones y comercialización de la unidad.",
@@ -40,14 +39,45 @@ final class AppraisalPhReportBuilder
             'report_text' => $this->report($name, $label, $assets, $use, $support, $level, $limits), 'technical' => $tab];
     }
 
+    private function typologySummary(string $name, string $label, array $technical, string $typology): string
+    {
+        $summary = "Tipología y régimen: {$name} se analiza como {$label}. " . $this->useProfile($technical, $typology);
+        if ($this->hasText($technical['regimen_especial'] ?? '')) {
+            $summary .= ' El reglamento contiene referencias a régimen especial, administración u operación específica, aspecto relevante para segmentar comparables y condiciones de ocupación.';
+        }
+        if ($this->hasText($technical['usos_complementarios'] ?? '') || $this->hasText($technical['relacion_funcional_usos'] ?? '')) {
+            $summary .= ' La presencia de usos complementarios exige valorar la unidad dentro de una copropiedad con interacción funcional entre actividades, usuarios y servicios comunes.';
+        }
+        return $summary . ' Para efectos valuatorios, la comparación se realiza con copropiedades de igual vocación, escala, localización y nivel de soporte común.';
+    }
+
+    private function useProfile(array $technical, string $typology): string
+    {
+        $text = mb_strtolower($this->cleanName(($technical['uso_dominante'] ?? '') . ' ' . ($technical['naturaleza_conjunto'] ?? '')));
+        if ($text !== '') {
+            if ($this->containsAny($text, ['oficina', 'consultorio', 'corporativ', 'servicios'])) return 'El uso dominante se orienta a actividades corporativas, profesionales o de servicios, con incidencia positiva en representatividad, atención de usuarios y comparabilidad frente a edificios empresariales.';
+            if ($this->containsAny($text, ['local', 'comercio', 'comercial'])) return 'El uso dominante incorpora actividad comercial, flujo de usuarios y reglas de ocupación propias de inmuebles con atención al público.';
+            if ($this->containsAny($text, ['bodega', 'logistic', 'industrial', 'zona franca'])) return 'El uso dominante se relaciona con actividad industrial, logística o régimen especial, por lo que cobran relevancia accesos, control, movilidad interna y soporte operativo.';
+            if ($this->containsAny($text, ['vivienda', 'residencial', 'habitacional'])) return 'El uso dominante corresponde a vivienda, donde pesan habitabilidad, seguridad, amenidades, convivencia y mantenimiento común.';
+        }
+        return match ($typology) {
+            'oficinas' => 'La vocación corresponde a funcionamiento corporativo y de servicios, con énfasis en imagen, acceso de usuarios, parqueo y administración común.',
+            'comercio' => 'La vocación corresponde a actividad comercial, con énfasis en visibilidad, flujo de visitantes, parqueo y reglas de uso.',
+            'bodegas' => 'La vocación corresponde a operación logística o industrial, con énfasis en movilidad, patios, seguridad y continuidad operativa.',
+            'residencial' => 'La vocación corresponde a uso habitacional, con énfasis en seguridad, amenidades, convivencia y sostenimiento común.',
+            default => 'La vocación se determina a partir del reglamento, la visita y los soportes del encargo.',
+        };
+    }
+
     private function traceSummary(array $technical, string $limits): string
     {
         $legal = $this->cleanName($technical['trazabilidad_juridica_ph'] ?? '');
         if ($legal !== '') return 'Condición especial PH: ' . $legal . ' ' . $limits;
         return 'Trazabilidad documental: para el análisis de propiedad horizontal se tuvo como soporte '
             . $this->source($technical) . '. La revisión permite ubicar referencias al reglamento, antecedentes, reformas o aclaraciones, bienes comunes, reglas de uso y administración. '
-            . 'El texto del avalúo debe incorporar únicamente hechos verificados y redactados por el analista. ' . $limits;
+            . 'El texto del avalúo incorpora únicamente hechos verificados y redactados por el analista. ' . $limits;
     }
+
     private function report(string $name, string $label, string $assets, string $use,
         string $support, string $level, string $limits): string
     {
@@ -95,14 +125,14 @@ final class AppraisalPhReportBuilder
     private function dominantUse(array $technical, string $typology): string
     {
         if ($this->hasText($technical['uso_dominante'] ?? '')) {
-            return 'El reglamento contiene referencia al uso o destino dominante, que debe resumirse como hecho técnico y verificable.';
+            return 'El reglamento contiene referencia al uso o destino dominante, útil para precisar la vocación funcional de la copropiedad.';
         }
         return match ($typology) {
-            'oficinas' => 'La lectura debe concentrarse en funcionamiento corporativo, atención de usuarios, parqueo y servicios comunes.',
-            'comercio' => 'La lectura debe concentrarse en flujo de público, visibilidad, parqueo, cargue liviano y reglas comerciales.',
-            'bodegas' => 'La lectura debe concentrarse en operación logística, circulación pesada, patios, seguridad y soporte técnico.',
-            'residencial' => 'La lectura debe concentrarse en habitabilidad, amenidades, seguridad, convivencia y mantenimiento común.',
-            default => 'La lectura debe precisar el uso dominante y los usos complementarios antes de cerrar el informe.',
+            'oficinas' => 'La lectura se concentra en funcionamiento corporativo, atención de usuarios, parqueo y servicios comunes.',
+            'comercio' => 'La lectura se concentra en flujo de público, visibilidad, parqueo, cargue liviano y reglas comerciales.',
+            'bodegas' => 'La lectura se concentra en operación logística, circulación pesada, patios, seguridad y soporte técnico.',
+            'residencial' => 'La lectura se concentra en habitabilidad, amenidades, seguridad, convivencia y mantenimiento común.',
+            default => 'La lectura aporta elementos para precisar el uso dominante y los usos complementarios.',
         };
     }
 
@@ -165,6 +195,11 @@ final class AppraisalPhReportBuilder
         return trim((string) $value) !== '';
     }
 
+    private function containsAny(string $text, array $needles): bool
+    {
+        foreach ($needles as $needle) if (str_contains($text, $needle)) return true;
+        return false;
+    }
     private function cleanName(mixed $value): string
     {
         return trim(preg_replace('/\s+/u', ' ', (string) $value) ?? '');

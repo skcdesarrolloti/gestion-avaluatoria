@@ -109,13 +109,14 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
         </section>
 
         <section class="mt-5 grid gap-4 lg:grid-cols-2" x-show="tab === 'tipologia'">
-            <div class="lg:col-span-2"><?php $renderPhTabSummary('resumen_tipologia_ph', 'Resumen depurado para Entregable'); ?></div>
+            <div class="lg:col-span-2"><?php $renderPhTabSummary('resumen_tipologia_ph', 'Tipología y régimen para Entregable'); ?></div>
             <label class="label">Tipología y régimen
                 <select class="input mt-2" x-model="phTypology">
                     <option value="">Selecciona tipología PH</option>
                     <?php foreach ($phCatalog['typologies'] as $value => $label): ?><option value="<?= e($value) ?>"><?= e($label) ?></option><?php endforeach; ?>
                 </select>
             </label>
+            <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-typology-support.php'; ?>
             <?php $renderTechTextarea('regimen_especial', 'Régimen especial', $technicalValue('regimen_especial')); ?>
             <?php $renderTechTextarea('naturaleza_conjunto', 'Naturaleza del conjunto', $technicalValue('naturaleza_conjunto')); ?>
             <?php $renderTechTextarea('uso_dominante', 'Uso dominante', $technicalValue('uso_dominante')); ?>
