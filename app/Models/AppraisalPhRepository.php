@@ -175,17 +175,41 @@ final class AppraisalPhRepository
     {
         if (trim((string) ($profile['ph_name'] ?? '')) === ''
             && empty($profile['common_areas']) && empty($profile['technical'])) return $profile;
+        $profile['technical'] = is_array($profile['technical'] ?? null) ? $profile['technical'] : [];
+        $city = $this->cleanCity((string) ($profile['technical']['ciudad_municipio'] ?? ''));
+        if ($city !== '') $profile['technical']['ciudad_municipio'] = $city;
         $built = (new AppraisalPhReportBuilder())->build($profile, $profile['technical'] ?? [],
             $profile['common_areas'] ?? [], $profile['documents'] ?? [], $profile['risks'] ?? [],
             $profile['photos'] ?? [], (string) ($profile['ph_typology'] ?? ''),
             (string) ($profile['source_summary'] ?? ''), $profile['findings'] ?? []);
         foreach (['diagnosis_text', 'report_text'] as $key) {
-            if (trim((string) ($profile[$key] ?? '')) === '') $profile[$key] = $built[$key] ?? '';
+            if ($this->replaceableReport((string) ($profile[$key] ?? ''))) $profile[$key] = $built[$key] ?? '';
         }
-        $profile['technical'] = is_array($profile['technical'] ?? null) ? $profile['technical'] : [];
         foreach (($built['technical'] ?? []) as $key => $value) {
-            if (trim((string) ($profile['technical'][$key] ?? '')) === '') $profile['technical'][$key] = $value;
+            if ($this->replaceableReport((string) ($profile['technical'][$key] ?? ''))) $profile['technical'][$key] = $value;
         }
         return $profile;
+    }
+
+    private function replaceableReport(string $text): bool
+    {
+        $text = trim($text);
+        if ($text === '') return true;
+        foreach (['Base comparativa:', 'Trazabilidad:', 'Identificación:', 'Tipología y régimen:',
+            'Configuración predial:', 'Bienes comunes y soporte:', 'Reglas de uso y operación:',
+            'Administración y cargas:', 'Incidencia valuatoria:', 'Notas y salvedades:',
+            'La copropiedad corresponde preliminarmente', 'Se revisa preliminarmente como',
+            'Lectura preliminar PH sin hallazgos suficientes'] as $prefix) {
+            if (str_starts_with($text, $prefix)) return true;
+        }
+        return false;
+    }
+
+    private function cleanCity(string $text): string
+    {
+        if ($text === '') return '';
+        if (preg_match('/\bCartagena(?: de Indias)?\b/iu', $text)) return 'Cartagena de Indias';
+        if (mb_strlen($text) > 80 || str_contains($text, '[')) return '';
+        return trim($text);
     }
 }
