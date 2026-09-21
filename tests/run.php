@@ -9,6 +9,7 @@ use App\Services\AppraisalValidator;
 use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalPhInput;
+use App\Services\AppraisalPhReportBuilder;
 use App\Services\AppraisalPhChunkUploadService;
 use App\Services\AppraisalPhDocumentReanalysisService;
 use App\Services\AppraisalPhDocumentUploadService;
@@ -397,6 +398,15 @@ try {
     $_POST = ['ph' => ['ph_name' => 'Edificio Llave Nombre']];
     expect(AppraisalPhInput::data()['ph_key'] === 'Edificio Llave Nombre',
         'propiedad horizontal usa nombre como llave tecnica');
+    $phReport = (new AppraisalPhReportBuilder())->build(['ph_name' => 'PH Prueba'], [], [
+        'lobby' => ['status' => 'ok'], 'red_incendio' => ['status' => 'warn'],
+        'cerramiento' => ['status' => 'risk'], 'piscina' => ['status' => 'na'],
+    ], [], [], [], 'oficinas', '', []);
+    $commonText = (string) ($phReport['technical']['resumen_comunes_ph'] ?? '');
+    expect(str_contains($commonText, 'Se verifican lobby')
+        && str_contains($commonText, 'Quedan por confirmar red contra incendio')
+        && str_contains($commonText, 'alertas o salvedades en cerramiento')
+        && !str_contains($commonText, 'piscina'), 'propiedad horizontal amarra estado de comunes al informe');
     $phApplicability = \App\Support\AppraisalPhCatalog::technicalApplicability();
     expect(in_array('muelles', $phApplicability['bodegas'], true)
         && !in_array('muelles', $phApplicability['residencial'], true)

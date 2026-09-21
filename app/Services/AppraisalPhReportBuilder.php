@@ -107,10 +107,9 @@ final class AppraisalPhReportBuilder
             'apoyo operativo especializado' => ['patios_maniobra', 'muelles_bahias', 'bascula', 'control_acceso_pesado', 'zona_espera_vehiculos'],
         ];
         $found = [];
-        foreach ($sets as $title => $keys) if ($this->hasAny($common, $keys)) $found[] = $title;
-        $support = $this->labels($common);
+        foreach ($sets as $title => $keys) if ($this->hasAny($common, $keys, ['ok'])) $found[] = $title;
         $advantage = $found ? implode(', ', $found) : 'soporte común por confirmar';
-        return [$advantage, $support ?: 'los bienes comunes específicos deben confirmarse con visita y soportes actuales.'];
+        return [$advantage, $this->commonSupport($common)];
     }
     private function commonSummary(string $support, string $typology): string
     {
@@ -129,15 +128,18 @@ final class AppraisalPhReportBuilder
         $source = $this->cleanName($technical['fuente_documental'] ?? '');
         return $source !== '' ? 'el documento fuente ' . $source : 'el reglamento o soporte documental cargado';
     }
-    private function labels(array $common): string
+    private function commonSupport(array $common): string
     {
-        $labels = AppraisalPhCatalog::commonAreas() + ['red_contra_incendios' => 'Red contra incendio', 'equipos_seguridad_vida' => 'Equipos de seguridad, evacuación o incendio'];
-        $names = [];
+        $labels = AppraisalPhCatalog::commonAreas(); $bucket = ['ok' => [], 'warn' => [], 'risk' => []];
         foreach ($common as $key => $row) {
-            if (($row['status'] ?? '') !== '') $names[] = mb_strtolower($labels[$key] ?? str_replace('_', ' ', (string) $key));
-            if (count($names) >= 9) break;
+            $status = (string) ($row['status'] ?? '');
+            if (isset($bucket[$status])) $bucket[$status][] = mb_strtolower($labels[$key] ?? str_replace('_', ' ', (string) $key));
         }
-        return $names ? 'se identifican menciones de ' . implode(', ', $names) . '.' : '';
+        $parts = [];
+        if ($bucket['ok']) $parts[] = 'se verifican ' . implode(', ', array_slice($bucket['ok'], 0, 9)) . '.';
+        if ($bucket['warn']) $parts[] = 'Quedan por confirmar ' . implode(', ', array_slice($bucket['warn'], 0, 9)) . '.';
+        if ($bucket['risk']) $parts[] = 'Se registran alertas o salvedades en ' . implode(', ', array_slice($bucket['risk'], 0, 9)) . '.';
+        return $parts ? implode(' ', $parts) : 'los bienes comunes específicos deben confirmarse con visita y soportes actuales.';
     }
     private function dominantUse(array $technical, string $typology): string
     {
@@ -192,8 +194,8 @@ final class AppraisalPhReportBuilder
         foreach ($values as $label => $value) if ($this->hasText($value)) $names[] = $label;
         return implode(', ', $names);
     }
-    private function hasAny(array $rows, array $keys): bool
-    { foreach ($keys as $key) if (($rows[$key]['status'] ?? '') !== '') return true; return false; }
+    private function hasAny(array $rows, array $keys, array $statuses): bool
+    { foreach ($keys as $key) if (in_array((string) ($rows[$key]['status'] ?? ''), $statuses, true)) return true; return false; }
     private function hasText(mixed $value): bool
     {
         return trim((string) $value) !== '';

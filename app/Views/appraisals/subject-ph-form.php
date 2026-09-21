@@ -1,12 +1,16 @@
 <?php
 $currentTypology = (string) ($ph['ph_typology'] ?? '');
 $priorityKeys = is_array($phCatalog['typologyPriorities'][$currentTypology] ?? null) ? $phCatalog['typologyPriorities'][$currentTypology] : [];
-$priorityFound = array_values(array_filter($priorityKeys, static fn (string $key): bool => trim($phMap('common_areas', $key, 'status')) !== ''));
+$phCommonStatus = static fn (string $key): string => trim($phMap('common_areas', $key, 'status'));
+$phCommonApplies = static fn (string $key): bool => $phCommonStatus($key) !== 'na';
+$phCommonReady = static fn (string $key): bool => in_array($phCommonStatus($key), ['ok', 'warn', 'risk'], true);
+$priorityFound = array_values(array_filter($priorityKeys, $phCommonReady));
 $commonStats = [];
 foreach ($phCatalog['commonAreaGroups'] as $groupKey => [$groupTitle, $items]) {
-    $found = 0;
-    foreach ($items as $key => $label) if (trim($phMap('common_areas', (string) $key, 'status')) !== '') $found++;
-    $commonStats[$groupKey] = [$groupTitle, $found, count($items)];
+    $keys = array_map('strval', array_keys($items));
+    $found = count(array_filter($keys, $phCommonReady));
+    $total = count(array_filter($keys, $phCommonApplies));
+    $commonStats[$groupKey] = [$groupTitle, $found, $total];
 }
 $hasPhReading = trim($phSourceSummary) !== '' || trim((string) ($technical['dotacion_tipologia'] ?? '')) !== '';
 $phDocumentCount = is_array($phDocuments ?? null) ? count($phDocuments) : 0;
