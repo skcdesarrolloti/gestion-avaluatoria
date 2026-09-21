@@ -477,6 +477,17 @@ try {
         && !str_contains((string) ($chambacuQuantity['technical']['numero_oficinas'] ?? ''), '15 oficinas')
         && ($chambacuQuantity['technical']['numero_parqueaderos'] ?? '') === '185 parqueaderos',
         'configuracion PH no confunde area con cantidad de oficinas');
+    $phAge = (new \App\Services\AppraisalPhAgeExtractor())->extract(
+        'Ley 675 de Agosto 3 de 2001. De acuerdo con la anotación No. 001, de fecha 29-12-2001, se registra acto constitutivo de propiedad horizontal.',
+        2026);
+    expect(($phAge['fecha_reglamento_ph'] ?? '') === '29-12-2001'
+        && ($phAge['edad_aproximada_ph'] ?? '') === '25 años aprox. (base 2001; corte 2026)',
+        'configuracion PH calcula edad desde registro y no desde fecha normativa');
+    $phAgeAtValueDate = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
+        'Reglamento de propiedad horizontal de fecha 29-12-2001 para Copropiedad EDAD PH.',
+        ['reglamento.txt'], 'oficinas', ['valuation_year' => 2025]);
+    expect(str_contains((string) ($phAgeAtValueDate['technical']['edad_aproximada_ph'] ?? ''), '24 años aprox.'),
+        'configuracion PH calcula edad con ano de fecha de valor cuando existe');
     $emptyPhAnalysis = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
         '', ['ESCRITURA PUBLICA 2593 EDIFICIO CHAMBACU.pdf'], 'oficinas');
     expect(!isset($emptyPhAnalysis['core']['ph_name'])

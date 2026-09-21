@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace App\Models;
 use App\Core\HttpException;
-use App\Services\{AppraisalPhDocumentStorage, AppraisalPhLegalTrace, AppraisalPhReportBuilder, AppraisalPhSubjectPrefill};
+use App\Services\{AppraisalPhAgeExtractor, AppraisalPhDocumentStorage, AppraisalPhLegalTrace, AppraisalPhReportBuilder, AppraisalPhSubjectPrefill};
 use App\Support\AppraisalPhCatalog;
 use PDO;
 final class AppraisalPhRepository
@@ -131,11 +131,7 @@ final class AppraisalPhRepository
         $this->save($appraisalId, $owner, $data, $expected ?? (int) ($current['version'] ?? 0));
     }
     private function hasDocuments(string $appraisalId, int $owner): bool
-    {
-        $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_ph_documents WHERE appraisal_id = ? AND owner_id = ?');
-        $query->execute([$appraisalId, $owner]);
-        return (int) $query->fetchColumn() > 0;
-    }
+    { $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_ph_documents WHERE appraisal_id = ? AND owner_id = ?'); $query->execute([$appraisalId, $owner]); return (int) $query->fetchColumn() > 0; }
     private function mergeEmpty(array $current, array $incoming): array
     {
         $merged = [];
@@ -156,10 +152,7 @@ final class AppraisalPhRepository
         return trim((string) $value) === '';
     }
     private function json(string $json): array
-    {
-        $decoded = json_decode($json, true);
-        return is_array($decoded) ? $decoded : [];
-    }
+    { $decoded = json_decode($json, true); return is_array($decoded) ? $decoded : []; }
 
     private function withGeneratedReport(array $profile): array
     {
@@ -167,9 +160,10 @@ final class AppraisalPhRepository
         $profile['linkage'] = is_array($profile['linkage'] ?? null) ? $profile['linkage'] : [];
         $legal = $this->legalPrefill((string) ($profile['appraisal_id'] ?? ''), (int) ($profile['owner_id'] ?? 0));
         $subject = (new AppraisalPhSubjectPrefill($this->db))->data((string) ($profile['appraisal_id'] ?? ''), (int) ($profile['owner_id'] ?? 0));
-        if (trim((string) ($profile['linkage']['legal_registration'] ?? '')) === '') {
+        $valuationYear = $this->valuationYear((string) ($profile['appraisal_id'] ?? ''), (int) ($profile['owner_id'] ?? 0));
+        if ($valuationYear > 0) $profile['valuation_year'] = $valuationYear;
+        if (trim((string) ($profile['linkage']['legal_registration'] ?? '')) === '')
             $profile['linkage']['legal_registration'] = $subject['property_registration'] ?: ($legal['property_registration'] ?? '');
-        }
         foreach (['matrix_registration', 'private_unit', 'coefficient'] as $key) {
             if (trim((string) ($profile[$key] ?? '')) === '') $profile[$key] = (string) (($legal[$key] ?? '') ?: ($subject[$key] ?? ''));
         }
@@ -177,6 +171,9 @@ final class AppraisalPhRepository
         if (trim((string) ($profile['ph_name'] ?? '')) === ''
             && empty($profile['common_areas']) && empty($profile['technical']) && $legalTrace === '') return $profile;
         if ($legalTrace !== '') $profile['technical']['trazabilidad_juridica_ph'] = $legalTrace;
+        foreach ((new AppraisalPhAgeExtractor())->extract($legalTrace, $valuationYear ?: null) as $key => $value) {
+            if (trim((string) ($profile['technical'][$key] ?? '')) === '') $profile['technical'][$key] = $value;
+        }
         $city = $this->cleanCity((string) ($profile['technical']['ciudad_municipio'] ?? ''));
         if ($city !== '') $profile['technical']['ciudad_municipio'] = $city;
         $built = (new AppraisalPhReportBuilder())->build($profile, $profile['technical'] ?? [],
@@ -191,7 +188,6 @@ final class AppraisalPhRepository
         }
         return $profile;
     }
-
     private function replaceableReport(string $text): bool
     {
         $text = trim($text);
@@ -208,11 +204,15 @@ final class AppraisalPhRepository
         return false;
     }
 
-    private function cleanCity(string $text): string
+    private function valuationYear(string $appraisalId, int $owner): int
     {
-        if ($text === '') return '';
-        if (preg_match('/\bCartagena(?: de Indias)?\b/iu', $text)) return 'Cartagena de Indias';
-        if (mb_strlen($text) > 80 || str_contains($text, '[')) return '';
-        return trim($text);
+        try {
+            $query = $this->db->prepare('SELECT value_date, report_date, visit_date FROM appraisals WHERE id = ? AND owner_id = ?');
+            $query->execute([$appraisalId, $owner]); $row = $query->fetch() ?: [];
+        } catch (\PDOException) { return 0; }
+        foreach (['value_date', 'report_date', 'visit_date'] as $key) if (preg_match('/^(\d{4})-\d{2}-\d{2}$/', (string) ($row[$key] ?? ''), $m)) return (int) $m[1];
+        return 0;
     }
+    private function cleanCity(string $text): string
+    { return $text === '' || mb_strlen($text) > 80 || str_contains($text, '[') ? '' : (preg_match('/\bCartagena(?: de Indias)?\b/iu', $text) ? 'Cartagena de Indias' : trim($text)); }
 }

@@ -36,6 +36,8 @@ final class AppraisalPhCatalog
                 'relacion_funcional_usos' => 'Relación funcional entre usos',
             ]],
             'configuracion' => ['Configuración general', [
+                'fecha_reglamento_ph' => 'Fecha / año de constitución o registro PH',
+                'edad_aproximada_ph' => 'Edad aproximada de la copropiedad',
                 'etapas_copropiedad' => 'Etapas, sectores o manzanas',
                 'numero_edificios' => 'Número de bloques / torres / naves', 'numero_pisos' => 'Número de pisos / niveles',
                 'numero_sotanos' => 'Número de sótanos', 'numero_ascensores' => 'Número de ascensores',
@@ -108,7 +110,8 @@ final class AppraisalPhCatalog
     public static function technicalApplicability(): array
     {
         $base = ['fuente_documental', 'escritura_reforma', 'ciudad_municipio', 'direccion_referencia',
-            'tipo_propiedad_horizontal', 'naturaleza_conjunto', 'uso_dominante', 'numero_edificios', 'numero_pisos',
+            'tipo_propiedad_horizontal', 'naturaleza_conjunto', 'uso_dominante', 'fecha_reglamento_ph',
+            'edad_aproximada_ph', 'numero_edificios', 'numero_pisos',
             'numero_sotanos', 'numero_ascensores', 'numero_unidades', 'numero_oficinas', 'numero_locales',
             'numero_parqueaderos', 'numero_depositos', 'resumen_areas_conjunto', 'area_lote_matriz', 'area_construida_total', 'ubicacion_unidad',
             'bienes_comunes_esenciales', 'bienes_comunes_no_esenciales', 'areas_uso_exclusivo',
@@ -141,30 +144,15 @@ final class AppraisalPhCatalog
         ];
     }
 
-    public static function commonAreas(): array
-    {
-        return AppraisalPhComparativeCatalog::commonAreas();
-    }
+    public static function commonAreas(): array { return AppraisalPhComparativeCatalog::commonAreas(); }
 
-    public static function commonAreaGroups(): array
-    {
-        return AppraisalPhComparativeCatalog::commonAreaGroups();
-    }
+    public static function commonAreaGroups(): array { return AppraisalPhComparativeCatalog::commonAreaGroups(); }
 
-    public static function typologyPriorities(): array
-    {
-        return AppraisalPhComparativeCatalog::typologyPriorities();
-    }
+    public static function typologyPriorities(): array { return AppraisalPhComparativeCatalog::typologyPriorities(); }
 
-    public static function dotationLevels(): array
-    {
-        return AppraisalPhComparativeCatalog::dotationLevels();
-    }
+    public static function dotationLevels(): array { return AppraisalPhComparativeCatalog::dotationLevels(); }
 
-    public static function normNotes(): array
-    {
-        return AppraisalPhComparativeCatalog::normNotes();
-    }
+    public static function normNotes(): array { return AppraisalPhComparativeCatalog::normNotes(); }
 
     public static function documents(): array
     {

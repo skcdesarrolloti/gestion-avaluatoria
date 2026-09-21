@@ -7,6 +7,8 @@ final class AppraisalPhConfigurationNarrative
     public function build(array $technical, array $core): string
     {
         $name = $this->clean($core['ph_name'] ?? '') ?: 'la copropiedad analizada';
+        $age = $this->presentValues(['fecha o año de registro/constitución PH' => $technical['fecha_reglamento_ph'] ?? '',
+            'edad aproximada de la copropiedad' => $technical['edad_aproximada_ph'] ?? '']);
         $scale = $this->presentValues(['lote matriz' => $technical['lotes_por_etapa'] ?? '',
             'área del lote matriz' => $technical['area_lote_matriz'] ?? '',
             'área construida o total' => ($technical['area_construida_total'] ?? '') ?: ($technical['resumen_areas_conjunto'] ?? '')]);
@@ -18,6 +20,7 @@ final class AppraisalPhConfigurationNarrative
             'distribución funcional interna' => $technical['organizacion_interna'] ?? '',
             'desenglobes o antecedentes prediales' => $technical['desarrollos_relevantes'] ?? '']);
         $summary = "La copropiedad {$name} presenta una configuración predial que permite relacionar el bien sujeto con la estructura física y jurídica de la propiedad horizontal.";
+        if ($age !== '') $summary .= " Como antecedente temporal se registra {$age}.";
         if ($scale !== '') $summary .= " En escala predial se identifica {$scale}.";
         if ($inventory !== '') $summary .= " La composición reportada incluye {$inventory}.";
         if ($organization !== '') $summary .= " La organización interna registra {$organization}.";

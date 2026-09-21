@@ -12,6 +12,8 @@ $configPill = static function (string $state): string {
 };
 $configText = $technicalValue('resumen_configuracion_ph');
 $matrix = $phText('matrix_registration');
+$regulationDate = $technicalValue('fecha_reglamento_ph');
+$approxAge = $technicalValue('edad_aproximada_ph');
 $lot = $technicalValue('lotes_por_etapa');
 $lotArea = $technicalValue('area_lote_matriz');
 $totalArea = $technicalValue('area_construida_total');
@@ -32,6 +34,8 @@ $unitLocation = $technicalValue('ubicacion_unidad');
 $configRows = [
     ['Texto editable para Entregable', $configText !== '' ? 'Texto construido' : 'Sin texto construido', $configText !== '' ? 'ok' : 'missing', 'Construir el párrafo con los campos completos.'],
     ['Matrícula matriz', $matrix ?: 'Sin matrícula matriz', $matrix !== '' ? 'ok' : 'missing', 'Tomar de jurídica, CTL, escritura o reglamento.'],
+    ['Fecha / año de constitución o registro PH', $configShort($regulationDate) ?: 'Sin fecha de registro PH', $regulationDate !== '' ? 'ok' : 'warn', 'Tomar del acto constitutivo, anotación de jurídica o escritura del reglamento.'],
+    ['Edad aproximada de la copropiedad', $configShort($approxAge) ?: 'Sin edad calculada', $approxAge !== '' ? 'ok' : 'warn', 'Se calcula desde el año de constitución o registro PH; confirmar contra edad constructiva si difiere.'],
     ['Lote matriz o predio de origen', $configShort($lot) ?: 'Sin lote matriz descrito', $lot !== '' ? 'ok' : 'warn', 'Precisar el predio sobre el que se desarrolló la PH.'],
     ['Área del lote matriz', $configShort($lotArea) ?: 'Sin área de lote', $lotArea !== '' ? 'ok' : 'warn', 'Ubicar área de lote o cabida en escritura, CTL o cuadro de áreas.'],
     ['Área construida o total del conjunto', $configShort($totalArea) ?: ($configShort($areas) ?: 'Sin área total'), ($totalArea !== '' || $areas !== '') ? 'ok' : 'warn', 'Tomar del cuadro de áreas, planos o reglamento.'],
