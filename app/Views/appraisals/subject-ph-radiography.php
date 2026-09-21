@@ -26,6 +26,7 @@
             </div>
         <?php endforeach; ?>
     </div>
+    <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-base-fields.php'; ?>
     <div class="grid gap-4 lg:grid-cols-2">
         <div class="rounded-xl border border-slate-200 bg-white p-4">
             <h4 class="font-semibold">Clasificación de dotación</h4>
@@ -53,5 +54,5 @@
             </p>
         </div>
     </div>
-    <?php $renderPhTabSummary('resumen_base_ph', 'Resumen depurado para Entregable'); ?>
+    <?php $renderPhTabSummary('resumen_base_ph', 'Texto editable para Entregable'); ?>
 </section>

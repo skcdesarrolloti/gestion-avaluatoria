@@ -60,22 +60,7 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
             <h3 class="text-lg font-semibold">Documento y trazabilidad</h3>
             <p class="mt-2 text-sm leading-6 text-slate-600"><?= e($phSourceSummary ?: 'Aún no hay lectura documental cargada.') ?></p>
             <div class="mt-4"><?php $renderPhTabSummary('resumen_trazabilidad_ph', 'Condición especial PH para Entregable'); ?></div>
-            <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
-                <?php foreach ([
-                    ['Documento fuente', $phDocumentCount > 0 ? $phDocumentCount . ' soporte(s) cargado(s)' : 'Sin soporte cargado'],
-                    ['Cobertura de lectura', $phCoverage],
-                    ['Contenido registrado', number_format($phExtractedChars, 0, ',', '.') . ' caracteres'],
-                    ['Uso en informe', 'Condición especial y hechos verificados'],
-                ] as [$title, $value]): ?>
-                    <div class="rounded-xl border border-slate-200 bg-white p-3">
-                        <p class="text-xs font-semibold uppercase tracking-wide text-slate-500"><?= e($title) ?></p>
-                        <p class="mt-2 text-sm font-semibold leading-5 text-slate-800"><?= e($value) ?></p>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-            <div class="mt-3 rounded-xl border border-amber-100 bg-amber-50 p-3 text-sm leading-6 text-amber-950">
-                <strong>Verificación documental:</strong> <?= e($phLowPages) ?>. Coteja esos apartes contra el documento original antes de cerrar conclusiones.
-            </div>
+            <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-document-fields.php'; ?>
             <div class="mt-4 rounded-xl bg-white p-4"><?php require BASE_PATH . '/app/Views/appraisals/subject-ph-documents.php'; ?></div>
             <div class="mt-4 grid gap-4 lg:grid-cols-2">
                 <?php $renderPhTextarea('regulation_document', 'Soporte del documento constitutivo / reglamento PH', $phText('regulation_document'), 'Referencia documental para revisión; no se copia literal al informe.', 4); ?>
