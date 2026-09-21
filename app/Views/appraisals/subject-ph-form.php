@@ -90,6 +90,9 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
                 <span x-text="phTypologyLabel()"></span>
             </div>
             <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-identity-cross.php'; ?>
+            <div class="rounded-xl border border-slate-200 bg-white p-3 text-sm leading-6 text-slate-700 lg:col-span-2">
+                <strong>Campos de identificación PH:</strong> nombre, llave técnica, vínculos con sector y jurídica, unidad privada y coeficiente.
+            </div>
             <?php $renderPhInput('ph_name', 'Nombre de la copropiedad / agrupación', $phText('ph_name'), 'Ej. Edificio, conjunto, centro comercial o zona franca.'); ?>
             <?php $renderPhInput('ph_key', 'Llave técnica PH', $phText('ph_key'), 'NIT, matrícula matriz o nombre normalizado para reutilizarla luego.'); ?>
             <label class="label">Vínculo con sector por barrio
@@ -110,13 +113,16 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
 
         <section class="mt-5 grid gap-4 lg:grid-cols-2" x-show="tab === 'tipologia'">
             <div class="lg:col-span-2"><?php $renderPhTabSummary('resumen_tipologia_ph', 'Tipología y régimen para Entregable'); ?></div>
-            <label class="label">Tipología y régimen
+            <label class="label">Tipología seleccionada
                 <select class="input mt-2" x-model="phTypology">
                     <option value="">Selecciona tipología PH</option>
                     <?php foreach ($phCatalog['typologies'] as $value => $label): ?><option value="<?= e($value) ?>"><?= e($label) ?></option><?php endforeach; ?>
                 </select>
             </label>
             <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-typology-support.php'; ?>
+            <div class="rounded-xl border border-slate-200 bg-white p-3 text-sm leading-6 text-slate-700 lg:col-span-2">
+                <strong>Campos de tipología y régimen:</strong> tipología seleccionada, régimen especial, naturaleza del conjunto, uso dominante, usos complementarios y relación funcional entre usos.
+            </div>
             <?php $renderTechTextarea('regimen_especial', 'Régimen especial', $technicalValue('regimen_especial')); ?>
             <?php $renderTechTextarea('naturaleza_conjunto', 'Naturaleza del conjunto', $technicalValue('naturaleza_conjunto')); ?>
             <?php $renderTechTextarea('uso_dominante', 'Uso dominante', $technicalValue('uso_dominante')); ?>
