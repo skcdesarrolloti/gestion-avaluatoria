@@ -92,6 +92,13 @@ archivo en el campo `file` y responda JSON `{"text":"..."}`. El campo, la ruta d
 texto y el tiempo de espera se pueden ajustar con `PH_EXTERNAL_OCR_FILE_FIELD`,
 `PH_EXTERNAL_OCR_TEXT_KEY` y `PH_EXTERNAL_OCR_TIMEOUT_SECONDS`; si requiere token, usa
 `PH_EXTERNAL_OCR_TOKEN` y se enviará como `Authorization: Bearer`.
+Si se usará MiniMax directamente, configura `PH_OCR_PROVIDER=minimax` y
+`MINIMAX_API_KEY`. El módulo llama `https://api.minimax.io/v1/chat/completions`
+con `MiniMax-M3` por defecto, envía imágenes como `image_url` base64 y espera texto
+plano de vuelta. MiniMax directo admite JPG, PNG, WEBP y GIF; también ZIP con esas
+imágenes internas. Para PDF escaneado se requiere convertir páginas a imagen antes
+de llamar a MiniMax: instala/configura `pdftoppm` con `PDFTOPPM_BINARY`. Un ZIP que
+solo contenga PDFs escaneados también necesita esa conversión o debe subirse como PDF.
 En hosting compartido estos binarios normalmente no se instalan desde el módulo PHP:
 deben existir en el servidor o ser habilitados por el proveedor. El numeral 3.5 muestra
 un diagnóstico de disponibilidad OCR para confirmarlo.

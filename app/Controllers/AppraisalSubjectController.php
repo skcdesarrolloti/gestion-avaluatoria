@@ -28,7 +28,10 @@ final class AppraisalSubjectController
             'units' => $this->appraisals->units($id, $this->user['id']),
             'phProfile' => $this->ph->profile($id, $this->user['id']),
             'phDocuments' => $this->ph->documents($id, $this->user['id']),
-            'phOcrDiagnostics' => (new OcrTextExtractor())->diagnostics() + ['external' => (new AppraisalExternalOcrClient())->diagnostics()['configured']],
+            'phOcrDiagnostics' => (new OcrTextExtractor())->diagnostics()
+                + ['external' => ($externalOcr = (new AppraisalExternalOcrClient())->diagnostics())['configured'],
+                    'external_provider' => $externalOcr['provider'] ?? 'generic',
+                    'external_pdf_render' => $externalOcr['pdf_render'] ?? false],
             'phLegalPrefill' => $this->ph->legalPrefill($id, $this->user['id']),
             'phSearchQuery' => $phSearch,
             'phSearchResults' => $phSearch !== ''

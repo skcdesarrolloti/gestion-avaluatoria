@@ -9,12 +9,18 @@ final class AppraisalExternalOcrClient
 
     public function diagnostics(): array
     {
-        return ['configured' => $this->endpoint() !== '', 'curl' => function_exists('curl_init')];
+        if ($this->provider() === 'minimax') {
+            $diagnostics = (new MiniMaxOcrClient())->diagnostics();
+            return ['configured' => $diagnostics['configured'], 'curl' => $diagnostics['curl'],
+                'provider' => 'minimax', 'pdf_render' => $diagnostics['pdf_render']];
+        }
+        return ['configured' => $this->endpoint() !== '', 'curl' => function_exists('curl_init'), 'provider' => 'generic'];
     }
 
     public function extract(string $path, string $filename, string $mime): string
     {
         if ($this->transport) return $this->normalizeText(($this->transport)($path, $filename, $mime));
+        if ($this->provider() === 'minimax') return (new MiniMaxOcrClient())->extract($path, $filename, $mime);
         $endpoint = $this->endpoint();
         if ($endpoint === '') throw new \RuntimeException('Configura PH_EXTERNAL_OCR_ENDPOINT para usar IA/OCR externo.');
         if (!function_exists('curl_init')) throw new \RuntimeException('El OCR externo requiere la extensión cURL de PHP.');
@@ -47,6 +53,11 @@ final class AppraisalExternalOcrClient
     {
         $endpoint = trim(Env::get('PH_EXTERNAL_OCR_ENDPOINT'));
         return preg_match('#^https?://#i', $endpoint) ? $endpoint : '';
+    }
+
+    private function provider(): string
+    {
+        return mb_strtolower(trim(Env::get('PH_OCR_PROVIDER', 'generic')));
     }
 
     private function valueByPath(array $data, string $path): mixed
