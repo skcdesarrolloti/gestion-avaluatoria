@@ -84,10 +84,10 @@ final class AppraisalPhComparativeCatalog
     public static function commonAreaRules(): array
     {
         return [
-            'terreno_estructura' => ['terreno', 'cimientos', 'estructura', 'columnas', 'placas'],
+            'terreno_estructura' => ['bienes comunes esenciales', 'terreno', 'cimientos', 'estructura', 'columnas', 'placas'],
             'fachadas_cubiertas' => ['fachada', 'fachadas', 'cubierta', 'cubiertas', 'tejado'],
             'circulaciones_esenciales' => ['escalera', 'escaleras', 'pasillos', 'circulaciones'],
-            'redes_servicios' => ['redes generales', 'servicios publicos', 'acueducto', 'alcantarillado'],
+            'redes_servicios' => ['redes generales', 'servicios publicos', 'acueducto', 'alcantarillado', 'instalaciones generales'],
             'equipos_seguridad_vida' => ['red contra incendio', 'hidrante', 'evacuacion', 'gabinete'],
             'lobby' => ['lobby', 'recepcion', 'vestibulo'],
             'salon_social' => ['salon social', 'sala comunal'],

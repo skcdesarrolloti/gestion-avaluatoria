@@ -17,7 +17,10 @@
                             <input type="hidden" name="version" value="<?= (int) ($ph['version'] ?? 0) ?>">
                             <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
                             <input type="hidden" name="ph_typology" value="<?= e((string) ($ph['ph_typology'] ?? '')) ?>">
-                            <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="submit">Cargar</button>
+                            <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="submit"
+                                title="Usa el texto OCR ya guardado para recalcular la ficha y la matriz por tipología.">
+                                Recalcular matriz
+                            </button>
                         </form>
                     <?php elseif ($hasFile): ?>
                         <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="button" disabled

@@ -96,7 +96,7 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                     <input type="hidden" name="version" value="<?= (int) ($ph['version'] ?? 0) ?>">
                     <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
                     <label class="label">Tipología de referencia
-                    <select class="input" name="ph_typology" x-model="phTypology">
+                    <select class="input" name="ph_typology" x-model="phTypology" required>
                         <option value="">Selecciona tipología PH de referencia</option>
                         <?php foreach ($phCatalog['typologies'] as $value => $label): ?>
                             <option value="<?= e($value) ?>" <?= (string) ($ph['ph_typology'] ?? '') === (string) $value ? 'selected' : '' ?>><?= e($label) ?></option>
