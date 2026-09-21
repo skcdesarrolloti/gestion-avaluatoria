@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace App\Models;
 use App\Core\HttpException;
-use App\Services\{AppraisalPhDocumentStorage, AppraisalPhReportBuilder};
+use App\Services\{AppraisalPhDocumentStorage, AppraisalPhLegalTrace, AppraisalPhReportBuilder};
 use App\Support\AppraisalPhCatalog;
 use PDO;
 final class AppraisalPhRepository
@@ -129,12 +129,6 @@ final class AppraisalPhRepository
         $data['findings'] = $analysis['findings'] ?? $current['findings'] ?? [];
         $this->save($appraisalId, $owner, $data, $expected ?? (int) ($current['version'] ?? 0));
     }
-    private function exists(string $appraisalId, int $owner): bool
-    {
-        $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_ph_profiles WHERE appraisal_id = ? AND owner_id = ?');
-        $query->execute([$appraisalId, $owner]);
-        return (int) $query->fetchColumn() > 0;
-    }
     private function hasDocuments(string $appraisalId, int $owner): bool
     {
         $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_ph_documents WHERE appraisal_id = ? AND owner_id = ?');
@@ -160,11 +154,6 @@ final class AppraisalPhRepository
         }
         return trim((string) $value) === '';
     }
-    private function jsonValues(array $data): array
-    {
-        return array_values(array_map(static fn (array $value): string =>
-            json_encode($value, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), $data));
-    }
     private function json(string $json): array
     {
         $decoded = json_decode($json, true);
@@ -173,9 +162,11 @@ final class AppraisalPhRepository
 
     private function withGeneratedReport(array $profile): array
     {
-        if (trim((string) ($profile['ph_name'] ?? '')) === ''
-            && empty($profile['common_areas']) && empty($profile['technical'])) return $profile;
         $profile['technical'] = is_array($profile['technical'] ?? null) ? $profile['technical'] : [];
+        $legalTrace = (new AppraisalPhLegalTrace($this->db))->build((string) ($profile['appraisal_id'] ?? ''), (int) ($profile['owner_id'] ?? 0));
+        if (trim((string) ($profile['ph_name'] ?? '')) === ''
+            && empty($profile['common_areas']) && empty($profile['technical']) && $legalTrace === '') return $profile;
+        if ($legalTrace !== '') $profile['technical']['trazabilidad_juridica_ph'] = $legalTrace;
         $city = $this->cleanCity((string) ($profile['technical']['ciudad_municipio'] ?? ''));
         if ($city !== '') $profile['technical']['ciudad_municipio'] = $city;
         $built = (new AppraisalPhReportBuilder())->build($profile, $profile['technical'] ?? [],
@@ -199,7 +190,8 @@ final class AppraisalPhRepository
             'Configuración predial:', 'Bienes comunes y soporte:', 'Reglas de uso y operación:',
             'Administración y cargas:', 'Incidencia valuatoria:', 'Notas y salvedades:',
             'La copropiedad corresponde preliminarmente', 'Se revisa preliminarmente como',
-            'Lectura preliminar PH sin hallazgos suficientes'] as $prefix) {
+            'Lectura preliminar PH sin hallazgos suficientes', 'Para el análisis de propiedad horizontal se tuvo como soporte',
+            'Condición especial PH:', 'Trazabilidad documental:'] as $prefix) {
             if (str_starts_with($text, $prefix)) return true;
         }
         return false;

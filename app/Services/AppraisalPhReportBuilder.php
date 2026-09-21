@@ -21,14 +21,12 @@ final class AppraisalPhReportBuilder
         $admin = $this->administration($core, $technical);
         $limits = 'La lectura proviene del reglamento y soportes cargados; debe cruzarse con visita, fotografías, '
             . 'certificado de tradición, paz y salvo y certificación vigente de administración; no reemplaza estudio de títulos.';
+        $trace = $this->traceSummary($technical, $limits);
 
         $tab = [
             'resumen_base_ph' => "Lectura comparativa: {$name} se analiza como {$label}. La dotación común se clasifica como {$level}. "
                 . "Para el inmueble, la copropiedad aporta {$advantages}; esto favorece operación, seguridad, acceso de usuarios y percepción comercial frente a inmuebles aislados o PH menos dotadas.",
-            'resumen_trazabilidad_ph' => 'Para el análisis de propiedad horizontal se tuvo como soporte '
-                . $this->source($technical) . ". La lectura documental permitió ubicar referencias al reglamento, "
-                . 'antecedentes, reformas o aclaraciones, bienes comunes, reglas de uso y administración. '
-                . "Los extractos OCR se conservan como evidencia de revisión; el cuerpo del avalúo debe usar solo hechos depurados. {$limits}",
+            'resumen_trazabilidad_ph' => $trace,
             'resumen_identificacion_ph' => "Identificación: el soporte reconoce {$name}. {$assets}"
                 . ($missing ? " Falta confirmar {$missing} para amarrar plenamente la unidad al bien sujeto." : ' La identificación básica queda trazable.'),
             'resumen_tipologia_ph' => "Tipología y régimen: {$name} corresponde preliminarmente a {$label}. {$use} "
@@ -45,6 +43,14 @@ final class AppraisalPhReportBuilder
             'report_text' => $this->report($name, $label, $assets, $use, $support, $level, $limits), 'technical' => $tab];
     }
 
+    private function traceSummary(array $technical, string $limits): string
+    {
+        $legal = $this->cleanName($technical['trazabilidad_juridica_ph'] ?? '');
+        if ($legal !== '') return 'Condición especial PH: ' . $legal . ' ' . $limits;
+        return 'Trazabilidad documental: para el análisis de propiedad horizontal se tuvo como soporte '
+            . $this->source($technical) . '. La revisión permite ubicar referencias al reglamento, antecedentes, reformas o aclaraciones, bienes comunes, reglas de uso y administración. '
+            . 'El texto del avalúo debe incorporar únicamente hechos verificados y redactados por el analista. ' . $limits;
+    }
     private function report(string $name, string $label, string $assets, string $use,
         string $support, string $level, string $limits): string
     {
@@ -92,7 +98,7 @@ final class AppraisalPhReportBuilder
     private function dominantUse(array $technical, string $typology): string
     {
         if ($this->hasText($technical['uso_dominante'] ?? '')) {
-            return 'El reglamento contiene referencia al uso o destino dominante, que debe resumirse como hecho técnico sin copiar el OCR.';
+            return 'El reglamento contiene referencia al uso o destino dominante, que debe resumirse como hecho técnico y verificable.';
         }
         return match ($typology) {
             'oficinas' => 'La lectura debe concentrarse en funcionamiento corporativo, atención de usuarios, parqueo y servicios comunes.',

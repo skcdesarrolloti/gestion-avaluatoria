@@ -13,11 +13,11 @@ $phDocumentCount = is_array($phDocuments ?? null) ? count($phDocuments) : 0;
 $phExtractedChars = 0;
 foreach (($phDocuments ?? []) as $doc) $phExtractedChars += (int) ($doc['extracted_chars'] ?? 0);
 $phCoverage = 'Pendiente';
-$phLowPages = 'No reportadas';
+$phLowPages = 'Sin observaciones pendientes';
 foreach ($phFindings as $finding) {
     $line = (string) $finding;
     if (str_contains($line, '[Cobertura:')) $phCoverage = trim($line, '[]');
-    if (str_starts_with($line, 'Páginas con lectura baja')) $phLowPages = $line;
+    if (str_starts_with($line, 'Páginas con lectura baja')) $phLowPages = str_replace('Páginas con lectura baja o sin texto (revisar original):', 'Páginas que requieren cotejo contra original:', $line);
 }
 $technicalValue = static fn (string $key): string => (string) ($technical[$key] ?? '');
 $renderTechTextarea = static function (string $key, string $label, string $value): void { ?>
@@ -28,8 +28,8 @@ $renderTechTextarea = static function (string $key, string $label, string $value
 $renderPhTabSummary = static function (string $key, string $label) use ($technicalValue): void { ?>
     <label class="label rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-950"><?= e($label) ?>
         <textarea class="input mt-2 min-h-24 bg-white" rows="3" name="ph[technical][<?= e($key) ?>]"
-            placeholder="Resumen depurado para revisar e incorporar luego al Entregable"><?= e($technicalValue($key)) ?></textarea>
-        <span class="mt-1 block text-xs font-normal text-emerald-800">Texto corto para informe; los extractos OCR quedan como soporte abajo.</span>
+            placeholder="Texto profesional para revisar e incorporar luego al Entregable"><?= e($technicalValue($key)) ?></textarea>
+        <span class="mt-1 block text-xs font-normal text-emerald-800">Texto para informe; el soporte documental queda abajo para revisión del analista.</span>
     </label>
 <?php };
 ?>
@@ -59,13 +59,13 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
         <section class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4" x-show="tab === 'trazabilidad'">
             <h3 class="text-lg font-semibold">Documento y trazabilidad</h3>
             <p class="mt-2 text-sm leading-6 text-slate-600"><?= e($phSourceSummary ?: 'Aún no hay lectura documental cargada.') ?></p>
-            <div class="mt-4"><?php $renderPhTabSummary('resumen_trazabilidad_ph', 'Resumen depurado para Entregable'); ?></div>
+            <div class="mt-4"><?php $renderPhTabSummary('resumen_trazabilidad_ph', 'Condición especial PH para Entregable'); ?></div>
             <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-4">
                 <?php foreach ([
                     ['Documento fuente', $phDocumentCount > 0 ? $phDocumentCount . ' soporte(s) cargado(s)' : 'Sin soporte cargado'],
                     ['Cobertura de lectura', $phCoverage],
-                    ['Texto extraído', number_format($phExtractedChars, 0, ',', '.') . ' caracteres'],
-                    ['Uso en informe', 'Solo texto depurado; OCR como evidencia'],
+                    ['Contenido registrado', number_format($phExtractedChars, 0, ',', '.') . ' caracteres'],
+                    ['Uso en informe', 'Condición especial y hechos verificados'],
                 ] as [$title, $value]): ?>
                     <div class="rounded-xl border border-slate-200 bg-white p-3">
                         <p class="text-xs font-semibold uppercase tracking-wide text-slate-500"><?= e($title) ?></p>
@@ -74,12 +74,12 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
                 <?php endforeach; ?>
             </div>
             <div class="mt-3 rounded-xl border border-amber-100 bg-amber-50 p-3 text-sm leading-6 text-amber-950">
-                <strong>Control de calidad:</strong> <?= e($phLowPages) ?>. Revisa esas páginas contra el PDF original antes de cerrar conclusiones.
+                <strong>Verificación documental:</strong> <?= e($phLowPages) ?>. Coteja esos apartes contra el documento original antes de cerrar conclusiones.
             </div>
             <div class="mt-4 rounded-xl bg-white p-4"><?php require BASE_PATH . '/app/Views/appraisals/subject-ph-documents.php'; ?></div>
             <div class="mt-4 grid gap-4 lg:grid-cols-2">
-                <?php $renderPhTextarea('regulation_document', 'Extractos del documento constitutivo / reglamento PH', $phText('regulation_document'), 'Evidencia OCR para revisión; no se copia literal al informe.', 4); ?>
-                <?php $renderPhTextarea('reform_documents', 'Extractos de reformas, aclaraciones y antecedentes', $phText('reform_documents'), 'Evidencia OCR para ubicar antecedentes y salvedades documentales.', 4); ?>
+                <?php $renderPhTextarea('regulation_document', 'Soporte del documento constitutivo / reglamento PH', $phText('regulation_document'), 'Referencia documental para revisión; no se copia literal al informe.', 4); ?>
+                <?php $renderPhTextarea('reform_documents', 'Soporte de reformas, aclaraciones y antecedentes', $phText('reform_documents'), 'Referencia documental para ubicar antecedentes, condiciones especiales y salvedades.', 4); ?>
             </div>
         </section>
 
