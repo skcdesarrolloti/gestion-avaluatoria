@@ -116,25 +116,10 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
 
         <section class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4" x-show="tab === 'comunes'">
             <?php $renderPhTabSummary('resumen_comunes_ph', 'Resumen depurado para Entregable'); ?>
-            <div class="grid gap-4 lg:grid-cols-[1fr_22rem]">
-                <div>
-                    <h3 class="text-lg font-semibold">Bienes comunes, amenidades y soporte comparable</h3>
-                    <p class="mt-2 text-sm leading-6 text-slate-600">
-                        Separa bienes esenciales, amenidades, áreas de uso exclusivo y soporte operativo.
-                        Compara solo contra copropiedades de la misma tipología y escala.
-                    </p>
-                </div>
-                <div class="rounded-xl border border-blue-100 bg-blue-50 p-3 text-sm leading-6 text-blue-950">
-                    <strong>Dotación por tipología:</strong>
-                    <?php foreach ($phCatalog['typologyPriorities'] as $typology => $priorityKeys): ?>
-                        <p class="mt-2" x-show="phTypology === '<?= e((string) $typology) ?>'">
-                            <?= e((string) ($phCatalog['typologies'][$typology] ?? $typology)) ?>:
-                            <?= e(implode(', ', array_map(static fn (string $key): string =>
-                                (string) ($phCatalog['commonAreas'][$key] ?? $key), $priorityKeys))) ?>.
-                        </p>
-                    <?php endforeach; ?>
-                    <p class="mt-2" x-show="!phTypology">Selecciona una tipología para ver los factores prioritarios.</p>
-                </div>
+            <div class="mt-4 grid gap-4 lg:grid-cols-2"><?php require BASE_PATH . '/app/Views/appraisals/subject-ph-common-support.php'; ?></div>
+            <div class="mt-5">
+                <h3 class="text-lg font-semibold">Detalle editable de bienes comunes, amenidades y soporte</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600">Diligencia o depura cada campo. La matriz superior resume qué está listo, qué requiere revisión y qué falta para el Entregable.</p>
             </div>
             <?php foreach ($phCatalog['commonAreaGroups'] as $groupKey => [$groupTitle, $items]): ?>
                 <div class="mt-4 rounded-xl border border-slate-200 bg-white p-4">
