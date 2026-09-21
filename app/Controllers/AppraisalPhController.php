@@ -27,7 +27,8 @@ final class AppraisalPhController
     {
         $this->saveAndRedirect($id, function () use ($id): string {
             $typology = (string) ($_POST['ph_typology'] ?? '');
-            $clientText = (new AppraisalPhClientPdfOcrService())->extract($_FILES['ph_client_pdf_image'] ?? []);
+            $clientText = (new AppraisalPhClientPdfOcrService())->extract($_FILES['ph_client_pdf_image'] ?? [],
+                (array) ($_POST['ph_client_pdf_image_data'] ?? []), (array) ($_POST['ph_client_pdf_image_name'] ?? []));
             $analysis = (new AppraisalPhDocumentUploadService())->store($_FILES['ph_document'] ?? [], $id,
                 $this->user['id'], $typology, $this->ph, $clientText);
             if (($analysis['message'] ?? '') !== '') return (string) $analysis['message'];
@@ -49,7 +50,8 @@ final class AppraisalPhController
         $this->saveAndRedirect($id, function () use ($id): string {
             $file = (new AppraisalPhChunkUploadService())->finish($id, $this->user['id']);
             $typology = (string) ($_POST['ph_typology'] ?? '');
-            $clientText = (new AppraisalPhClientPdfOcrService())->extract($_FILES['ph_client_pdf_image'] ?? []);
+            $clientText = (new AppraisalPhClientPdfOcrService())->extract($_FILES['ph_client_pdf_image'] ?? [],
+                (array) ($_POST['ph_client_pdf_image_data'] ?? []), (array) ($_POST['ph_client_pdf_image_name'] ?? []));
             $analysis = (new AppraisalPhDocumentUploadService())->storePrepared($file, $id, $this->user['id'], $typology, $this->ph, $clientText);
             if (($analysis['message'] ?? '') !== '') return (string) $analysis['message'];
             return ($analysis['has_text'] ?? true) === false

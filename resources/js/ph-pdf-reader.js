@@ -8,14 +8,7 @@ function isPdf(file) {
     return name.endsWith('.pdf') || type.includes('pdf');
 }
 
-function canvasBlob(canvas, quality = 0.86) {
-    return new Promise((resolve, reject) => {
-        canvas.toBlob(blob => blob ? resolve(blob) : reject(new Error('No se pudo preparar la página PDF como imagen.')),
-            'image/jpeg', quality);
-    });
-}
-
-async function renderPage(pdf, file, pageNumber, maxSide) {
+async function renderPage(pdf, file, pageNumber, maxSide, quality) {
     const page = await pdf.getPage(pageNumber);
     const base = page.getViewport({ scale: 1 });
     const scale = Math.min(2.2, Math.max(1.25, maxSide / Math.max(base.width, base.height)));
@@ -27,18 +20,18 @@ async function renderPage(pdf, file, pageNumber, maxSide) {
     context.fillStyle = '#fff';
     context.fillRect(0, 0, canvas.width, canvas.height);
     await page.render({ canvasContext: context, viewport }).promise;
-    const blob = await canvasBlob(canvas);
+    const dataUrl = canvas.toDataURL('image/jpeg', quality);
     canvas.width = 0;
     canvas.height = 0;
     return {
-        blob,
+        dataUrl,
         page: pageNumber,
         source: file.name,
         name: `${file.name.replace(/\.pdf$/i, '')}-pagina-${pageNumber}.jpg`,
     };
 }
 
-export async function preparePhPdfImages(files, { maxPages = 6, maxSide = 1600, onProgress = () => {} } = {}) {
+export async function preparePhPdfImages(files, { maxPages = 300, maxSide = 1200, quality = 0.72, onProgress = () => {} } = {}) {
     const pdfs = [...files].filter(isPdf);
     const images = [];
     let rendered = 0;
@@ -48,7 +41,7 @@ export async function preparePhPdfImages(files, { maxPages = 6, maxSide = 1600, 
         for (let page = 1; page <= pages; page += 1) {
             rendered += 1;
             onProgress(`Convirtiendo PDF para MiniMax: página ${page} de ${pdf.numPages}...`, rendered);
-            images.push(await renderPage(pdf, file, page, maxSide));
+            images.push(await renderPage(pdf, file, page, maxSide, quality));
             if (images.length >= maxPages) return images;
         }
     }

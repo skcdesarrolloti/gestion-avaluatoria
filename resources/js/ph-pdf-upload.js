@@ -42,10 +42,12 @@ async function prepareClientPdf(event) {
         setProgress(form, 1, 'Preparando PDF escaneado para MiniMax...');
         const moduleUrl = new URL('ph-pdf-reader.js', import.meta.url).toString();
         const { preparePhPdfImages } = await import(moduleUrl);
-        const maxPages = Number.parseInt(form.dataset.phPdfMaxPages || '6', 10);
+        const maxPages = Number.parseInt(form.dataset.phPdfMaxPages || '300', 10);
+        const maxSide = Number.parseInt(form.dataset.phPdfMaxSide || '1200', 10);
+        const quality = Number.parseFloat(form.dataset.phPdfQuality || '0.72');
         const images = await preparePhPdfImages(files(form), {
-            maxPages,
-            onProgress: (message, step) => setProgress(form, Math.min(28, 4 + step * 4), message),
+            maxPages, maxSide, quality,
+            onProgress: (message, step) => setProgress(form, Math.min(28, 4 + (step / Math.max(maxPages, 1)) * 24), message),
         });
         if (images.length > 0) preparedImages.set(form, images);
         form.dataset.phPdfReady = '1';
@@ -69,9 +71,8 @@ function appendPreparedImages(event) {
     const images = preparedImages.get(form) || [];
     if (!(form instanceof HTMLFormElement) || !(body instanceof FormData) || images.length === 0) return;
     images.forEach(image => {
-        body.append('ph_client_pdf_image[]', image.blob, image.name);
-        body.append('ph_client_pdf_source[]', image.source);
-        body.append('ph_client_pdf_page[]', String(image.page));
+        body.append('ph_client_pdf_image_data[]', image.dataUrl);
+        body.append('ph_client_pdf_image_name[]', image.name);
     });
 }
 

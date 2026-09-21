@@ -4,9 +4,10 @@ namespace App\Services;
 
 final class AppraisalPhClientPdfOcrService
 {
+    private const MAX_CLIENT_PAGES = 300;
     public function __construct(private MiniMaxOcrClient $client = new MiniMaxOcrClient()) {}
 
-    public function extract(array $files): string
+    public function extract(array $files, array $encodedImages = [], array $encodedNames = []): string
     {
         $texts = [];
         foreach ($this->files($files) as $file) {
@@ -25,6 +26,10 @@ final class AppraisalPhClientPdfOcrService
             }
             $texts[] = $this->client->extract($tmp, $name, $mime);
         }
+        foreach ($this->encodedFiles($encodedImages, $encodedNames) as $file) {
+            try { $texts[] = $this->client->extract($file['path'], $file['name'], $file['mime']); }
+            finally { @unlink($file['path']); }
+        }
         return trim(implode("\n\n", array_filter($texts)));
     }
 
@@ -40,11 +45,29 @@ final class AppraisalPhClientPdfOcrService
         }
         $items = [];
         foreach ($name as $index => $value) {
-            if (count($items) >= 12) break;
+            if (count($items) >= self::MAX_CLIENT_PAGES) break;
             if (trim((string) $value) === '' && (int) ($files['error'][$index] ?? UPLOAD_ERR_NO_FILE) === UPLOAD_ERR_NO_FILE) continue;
             $items[] = ['name' => (string) $value, 'tmp_name' => (string) ($files['tmp_name'][$index] ?? ''),
                 'error' => (int) ($files['error'][$index] ?? UPLOAD_ERR_NO_FILE)];
         }
         return $items;
+    }
+
+    private function encodedFiles(array $images, array $names): array
+    {
+        $files = [];
+        foreach (array_slice($images, 0, self::MAX_CLIENT_PAGES) as $index => $dataUrl) {
+            if (!is_string($dataUrl) || !preg_match('/^data:(image\/(?:jpeg|png|webp|gif));base64,(.+)$/s', $dataUrl, $match)) continue;
+            $data = base64_decode($match[2], true);
+            if (!is_string($data) || $data === '') continue;
+            $tmp = tempnam(sys_get_temp_dir(), 'ga_ph_client_pdf_');
+            if (!is_string($tmp) || file_put_contents($tmp, $data) === false) {
+                if (is_string($tmp)) @unlink($tmp);
+                continue;
+            }
+            $files[] = ['path' => $tmp, 'mime' => $match[1],
+                'name' => mb_substr(basename(str_replace('\\', '/', (string) ($names[$index] ?? 'pagina-pdf.jpg'))), 0, 220)];
+        }
+        return $files;
     }
 }

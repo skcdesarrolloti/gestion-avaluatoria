@@ -89,13 +89,14 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                         </p>
                     <?php elseif (($ocr['external_provider'] ?? '') === 'minimax' && empty($ocr['external_pdf_render'])): ?>
                         <p class="mt-2 rounded-lg bg-amber-50 px-3 py-2 text-xs font-semibold text-amber-900">
-                            MiniMax leerá imágenes. Si subes PDF escaneado, el navegador convertirá sus páginas a imagen antes de enviarlas a MiniMax.
+                            MiniMax leerá imágenes. Si subes PDF escaneado, el navegador convertirá hasta 300 páginas a imagen antes de enviarlas a MiniMax.
                         </p>
                     <?php endif; ?>
                 </div>
                 <form class="grid gap-3 lg:min-w-80" method="post" enctype="multipart/form-data"
                     action="<?= e(url($subjectActionBase . '/ph/soportes')) ?>" data-upload-progress data-ph-pdf-render
-                    data-ph-pdf-max-pages="6" data-upload-chunk-url="<?= e(url($subjectActionBase . '/ph/soportes/chunk')) ?>" data-upload-finish-url="<?= e(url($subjectActionBase . '/ph/soportes/finalizar')) ?>">
+                    data-ph-pdf-max-pages="300" data-ph-pdf-max-side="1200" data-ph-pdf-quality="0.72"
+                    data-upload-timeout="1800000" data-upload-chunk-url="<?= e(url($subjectActionBase . '/ph/soportes/chunk')) ?>" data-upload-finish-url="<?= e(url($subjectActionBase . '/ph/soportes/finalizar')) ?>">
                     <?= csrf_field() ?>
                     <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
                     <select class="input" name="ph_typology" x-model="phTypology">
