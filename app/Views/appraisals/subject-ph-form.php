@@ -124,22 +124,28 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
             <?php foreach ($phCatalog['commonAreaGroups'] as $groupKey => [$groupTitle, $items]): ?>
                 <div class="mt-4 rounded-xl border border-slate-200 bg-white p-4">
                     <h4 class="text-base font-semibold"><?= e($groupTitle) ?></h4>
-                    <div class="mt-3 grid gap-3 xl:grid-cols-2">
-                        <?php foreach ($items as $key => $label): ?>
-                            <?php $current = $phMap('common_areas', (string) $key, 'status'); ?>
-                            <div class="rounded-xl border p-3 <?= e($statusClass($current)) ?>">
-                                <label class="label text-sm"><?= e($label) ?>
-                                    <select class="input mt-2" name="ph[common_areas][<?= e($key) ?>][status]">
-                                        <?php foreach ($phCatalog['status'] as $value => $option): ?>
-                                            <option value="<?= e($value) ?>" <?= $current === (string) $value ? 'selected' : '' ?>><?= e($option) ?></option>
-                                        <?php endforeach; ?>
-                                    </select>
-                                </label>
-                                <label class="label mt-2">Evidencia y observación
-                                <textarea class="input mt-2 min-h-20" rows="2" name="ph[common_areas][<?= e($key) ?>][notes]"
-                                    placeholder="Página, cláusula, visita o salvedad"><?= e($phMap('common_areas', (string) $key, 'notes')) ?></textarea></label>
-                            </div>
-                        <?php endforeach; ?>
+                    <div class="mt-3 overflow-x-auto">
+                        <table class="w-full min-w-[52rem] text-left text-sm">
+                            <thead class="text-xs uppercase text-slate-500"><tr><th class="py-2 pr-3">Elemento</th><th class="py-2 pr-3">Estado</th><th class="py-2">Evidencia y observación</th></tr></thead>
+                            <tbody class="divide-y divide-slate-100">
+                                <?php foreach ($items as $key => $label): ?>
+                                    <?php $current = $phMap('common_areas', (string) $key, 'status'); ?>
+                                    <tr class="align-top <?= e($statusClass($current)) ?>">
+                                        <td class="w-64 py-2 pr-3 font-semibold text-slate-800"><?= e($label) ?></td>
+                                        <td class="w-56 py-2 pr-3">
+                                            <select class="input mt-0 min-h-10 py-2 text-sm" name="ph[common_areas][<?= e($key) ?>][status]">
+                                                <?php foreach ($phCatalog['status'] as $value => $option): ?>
+                                                    <option value="<?= e($value) ?>" <?= $current === (string) $value ? 'selected' : '' ?>><?= e($option) ?></option>
+                                                <?php endforeach; ?>
+                                            </select>
+                                        </td>
+                                        <td class="py-2">
+                                            <textarea class="input mt-0 min-h-14 py-2 text-sm" rows="2" name="ph[common_areas][<?= e($key) ?>][notes]" placeholder="Página, cláusula, visita o salvedad"><?= e($phMap('common_areas', (string) $key, 'notes')) ?></textarea>
+                                        </td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            </tbody>
+                        </table>
                     </div>
                 </div>
             <?php endforeach; ?>
