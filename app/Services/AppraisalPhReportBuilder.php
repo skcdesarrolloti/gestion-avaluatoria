@@ -26,7 +26,7 @@ final class AppraisalPhReportBuilder
             'resumen_identificacion_ph' => $this->identitySummary($name, $assets),
             'resumen_tipologia_ph' => $this->typologySummary($name, $label, $technical, $typology),
             'resumen_configuracion_ph' => (new AppraisalPhConfigurationNarrative())->build($technical, $core),
-            'resumen_comunes_ph' => "Bienes comunes y soporte: {$support} En términos valuatorios, estos elementos aportan funcionalidad, control, comodidad para usuarios y respaldo operativo.",
+            'resumen_comunes_ph' => $this->commonSummary($support, $typology),
             'resumen_reglas_ph' => "Reglas de uso y operación: {$rules} Estas reglas inciden en imagen, convivencia, uso permitido, adecuaciones y comercialización de la unidad.",
             'resumen_administracion_ph' => "Administración y cargas: {$admin} Para valor, liquidez y negociación se requiere confirmar expensas, paz y salvo, pólizas y estado administrativo actual.",
             'resumen_incidencia_ph' => "Incidencia valuatoria: la ubicación del bien dentro de {$name} aporta representatividad corporativa, seguridad, soporte común y servicios compartidos. "
@@ -100,11 +100,11 @@ final class AppraisalPhReportBuilder
     private function advantages(array $common, string $typology): array
     {
         $sets = [
-            'seguridad y control' => ['porteria', 'cctv_control', 'cerramiento', 'equipos_seguridad_vida'],
-            'movilidad interna y acceso' => ['ascensores', 'circulaciones_esenciales', 'parqueaderos_visitantes', 'parqueaderos_privados', 'vias_internas'],
-            'soporte técnico y continuidad' => ['redes_servicios', 'planta_electrica', 'tanques_bombeo', 'subestacion', 'basuras_residuos'],
-            'representatividad y atención' => ['lobby', 'coworking_salas', 'zonas_verdes'],
-            'apoyo operativo especializado' => ['patios_maniobra', 'muelles_bahias'],
+            'seguridad y control' => ['porteria', 'vigilancia', 'cctv_control', 'cerramiento', 'red_incendio', 'evacuacion_seguridad'],
+            'movilidad interna y acceso' => ['ascensores', 'circulaciones_esenciales', 'escaleras', 'parqueaderos_visitantes', 'parqueaderos_privados', 'vias_internas'],
+            'soporte técnico y continuidad' => ['redes_servicios', 'planta_electrica', 'tanques_bombeo', 'subestacion', 'cuartos_tecnicos', 'aseo_mantenimiento'],
+            'representatividad y atención' => ['lobby', 'areas_espera', 'banos_comunes', 'coworking_salas', 'zonas_verdes', 'plazoletas'],
+            'apoyo operativo especializado' => ['patios_maniobra', 'muelles_bahias', 'bascula', 'control_acceso_pesado', 'zona_espera_vehiculos'],
         ];
         $found = [];
         foreach ($sets as $title => $keys) if ($this->hasAny($common, $keys)) $found[] = $title;
@@ -112,6 +112,18 @@ final class AppraisalPhReportBuilder
         $advantage = $found ? implode(', ', $found) : 'soporte común por confirmar';
         return [$advantage, $support ?: 'los bienes comunes específicos deben confirmarse con visita y soportes actuales.'];
     }
+    private function commonSummary(string $support, string $typology): string
+    {
+        $focus = match ($typology) {
+            'residencial' => 'seguridad, habitabilidad, amenidades y sostenimiento común',
+            'oficinas' => 'representatividad corporativa, acceso de usuarios, parqueo, seguridad y continuidad operativa',
+            'comercio' => 'flujo de público, visibilidad operativa, parqueo, seguridad y soporte para atención a usuarios',
+            'bodegas' => 'movilidad logística, control de acceso, maniobra, seguridad industrial y continuidad operativa',
+            default => 'funcionalidad, seguridad, soporte común y compatibilidad entre usos',
+        };
+        return ucfirst($support) . " Estos elementos deben valorarse frente a copropiedades de la misma tipología, porque aportan {$focus} y pueden incidir en funcionalidad, deseabilidad, comercialización y comparación del inmueble.";
+    }
+
     private function source(array $technical): string
     {
         $source = $this->cleanName($technical['fuente_documental'] ?? '');
@@ -119,10 +131,10 @@ final class AppraisalPhReportBuilder
     }
     private function labels(array $common): string
     {
-        $labels = AppraisalPhCatalog::commonAreas();
+        $labels = AppraisalPhCatalog::commonAreas() + ['red_contra_incendios' => 'Red contra incendio', 'equipos_seguridad_vida' => 'Equipos de seguridad, evacuación o incendio'];
         $names = [];
         foreach ($common as $key => $row) {
-            if (($row['status'] ?? '') !== '') $names[] = mb_strtolower($labels[$key] ?? $key);
+            if (($row['status'] ?? '') !== '') $names[] = mb_strtolower($labels[$key] ?? str_replace('_', ' ', (string) $key));
             if (count($names) >= 9) break;
         }
         return $names ? 'se identifican menciones de ' . implode(', ', $names) . '.' : '';

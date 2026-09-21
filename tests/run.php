@@ -404,7 +404,8 @@ try {
         && in_array('vias_internas', $phApplicability['bodegas'], true),
         'propiedad horizontal filtra campos tecnicos por tipologia');
     expect(isset(\App\Support\AppraisalPhCatalog::commonAreaGroups()['esenciales'])
-        && in_array('patios_maniobra', \App\Support\AppraisalPhCatalog::typologyPriorities()['bodegas'], true)
+        && in_array('bascula', \App\Support\AppraisalPhCatalog::typologyPriorities()['bodegas'], true)
+        && in_array('areas_espera', \App\Support\AppraisalPhCatalog::typologyPriorities()['oficinas'], true)
         && in_array('piscina', \App\Support\AppraisalPhCatalog::typologyPriorities()['residencial'], true),
         'propiedad horizontal separa bienes comunes y prioridades por tipologia');
     $phRepo = new AppraisalPhRepository($db);
@@ -459,6 +460,13 @@ try {
     expect(str_starts_with((string) ($phAnalysis['technical']['resumen_configuracion_ph'] ?? ''), 'La copropiedad ')
         && !str_contains((string) ($phAnalysis['technical']['resumen_configuracion_ph'] ?? ''), 'Configuración predial:'),
         'resumen configuracion PH queda redactado para entregable');
+    $phCommonText = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
+        'Reglamento de propiedad horizontal. Lobby, ascensores, parqueaderos de visitantes, red contra incendio y vigilancia permanente.',
+        ['reglamento.txt'], 'oficinas');
+    expect(!str_starts_with((string) ($phCommonText['technical']['resumen_comunes_ph'] ?? ''), 'Bienes comunes')
+        && str_contains((string) ($phCommonText['technical']['resumen_comunes_ph'] ?? ''), 'red contra incendio')
+        && !str_contains((string) ($phCommonText['technical']['resumen_comunes_ph'] ?? ''), 'red_incendio'),
+        'resumen bienes comunes PH usa etiquetas legibles para entregable');
     $phQuantityAnalysis = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
         'El edificio cuenta con seis pisos, un sotano, seis ascensores, Oficinas: 40, Locales: 8, Parqueaderos: 120, Depositos: 20.',
         ['reglamento.txt'], 'oficinas');
