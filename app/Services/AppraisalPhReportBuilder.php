@@ -109,7 +109,7 @@ final class AppraisalPhReportBuilder
         $found = [];
         foreach ($sets as $title => $keys) if ($this->hasAny($common, $keys, ['ok'])) $found[] = $title;
         $advantage = $found ? implode(', ', $found) : 'soporte común por confirmar';
-        return [$advantage, $this->commonSupport($common, $typology)];
+        return [$advantage, (new AppraisalPhCommonNarrative())->support($common, $typology)];
     }
     private function commonSummary(string $support, string $typology): string { return ucfirst($support); }
     private function source(array $technical): string
@@ -117,40 +117,6 @@ final class AppraisalPhReportBuilder
         $source = $this->cleanName($technical['fuente_documental'] ?? '');
         return $source !== '' ? 'el documento fuente ' . $source : 'el reglamento o soporte documental cargado';
     }
-    private function commonSupport(array $common, string $typology): string
-    {
-        $parts = []; $labels = AppraisalPhCatalog::commonAreas();
-        $priority = array_values(array_filter(AppraisalPhCatalog::typologyPriorities()[$typology] ?? [],
-            fn (string $key): bool => $this->hasCommonEvidence($common, $key)));
-        if ($priority) $parts[] = 'Para la tipología ' . (AppraisalPhCatalog::typologies()[$typology] ?? 'seleccionada')
-            . ', los elementos prioritarios identificados son ' . $this->commonNames($priority, $labels) . '.';
-        foreach (AppraisalPhCatalog::commonAreaGroups() as [$title, $items]) {
-            $bucket = ['documento'=>[], 'sitio'=>[], 'analista'=>[], 'pendiente'=>[], 'riesgo'=>[]];
-            foreach ($items as $key => $label) {
-                if (!$this->hasCommonEvidence($common, (string) $key)) continue;
-                $status = (string) ($common[$key]['status'] ?? ''); $source = $this->commonSource((string) ($common[$key]['notes'] ?? ''));
-                if ($status === 'risk') $bucket['riesgo'][] = (string) $key;
-                elseif ($status === 'ok' && ($source === 'sitio' || $source === 'ambos')) $bucket['sitio'][] = (string) $key;
-                elseif ($source === 'documento') $bucket['documento'][] = (string) $key;
-                elseif ($status === 'ok') $bucket['analista'][] = (string) $key;
-                else $bucket['pendiente'][] = (string) $key;
-            }
-            $lines = [];
-            if ($bucket['documento']) $lines[] = 'el reglamento o soporte documental menciona ' . $this->commonNames($bucket['documento'], $labels);
-            if ($bucket['sitio']) $lines[] = 'en sitio o fotografías se verifica ' . $this->commonNames($bucket['sitio'], $labels);
-            if ($bucket['analista']) $lines[] = 'el analista verifica ' . $this->commonNames($bucket['analista'], $labels);
-            if ($bucket['pendiente']) $lines[] = 'pendiente de verificar en sitio ' . $this->commonNames($bucket['pendiente'], $labels);
-            if ($bucket['riesgo']) $lines[] = 'con alerta por depurar ' . $this->commonNames($bucket['riesgo'], $labels);
-            if ($lines) $parts[] = $title . ': ' . implode('; ', $lines) . '.';
-        }
-        return $parts ? implode(' ', $parts) : 'No se han identificado bienes comunes con soporte documental o verificación del analista para incorporar al Entregable.';
-    }
-    private function hasCommonEvidence(array $common, string $key): bool
-    { $status = (string) ($common[$key]['status'] ?? ''); return $status !== '' && $status !== 'na' && !str_starts_with(mb_strtolower((string) ($common[$key]['notes'] ?? '')), 'no identificado'); }
-    private function commonSource(string $text): string
-    { $text = mb_strtolower($text); $site = preg_match('/\bvisita\b|foto|fotograf|inspecci[oó]n|\bsitio\b|\bcampo\b/u', $text) === 1; $doc = preg_match('/menci[oó]n documental|reglamento|escritura|pdf|p\.|p[aá]gina|cl[aá]usula/u', $text) === 1; return $site && $doc ? 'ambos' : ($site ? 'sitio' : ($doc ? 'documento' : 'analista')); }
-    private function commonNames(array $keys, array $labels): string
-    { return implode(', ', array_slice(array_map(fn (string $key): string => mb_strtolower((string) ($labels[$key] ?? str_replace('_', ' ', $key))), $keys), 0, 9)); }
     private function dominantUse(array $technical, string $typology): string
     {
         if ($this->hasText($technical['uso_dominante'] ?? '')) {

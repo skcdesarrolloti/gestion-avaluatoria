@@ -401,14 +401,14 @@ try {
     $phReport = (new AppraisalPhReportBuilder())->build(['ph_name' => 'PH Prueba'], [], [
         'lobby' => ['status' => 'ok', 'notes' => 'Verificado por el analista'],
         'red_incendio' => ['status' => 'warn', 'notes' => 'Mención documental; confirmar situación actual. p. 10'],
-        'cerramiento' => ['status' => 'risk', 'notes' => 'Visita: deterioro por depurar'],
+        'cctv_control' => ['status' => 'risk', 'notes' => 'Visita: deterioro por depurar'],
         'piscina' => ['status' => 'na'],
     ], [], [], [], 'oficinas', '', []);
     $commonText = (string) ($phReport['technical']['resumen_comunes_ph'] ?? '');
     expect(str_contains($commonText, 'Para la tipología Oficinas y consultorios · PH corporativa')
         && str_contains($commonText, 'el reglamento o soporte documental menciona red contra incendio')
         && str_contains($commonText, 'el analista verifica lobby o recepción')
-        && str_contains($commonText, 'con alerta por depurar cerramiento')
+        && str_contains($commonText, 'con alerta por depurar cctv y control de acceso')
         && !str_contains($commonText, 'piscina'), 'propiedad horizontal amarra estado de comunes al informe');
     $phApplicability = \App\Support\AppraisalPhCatalog::technicalApplicability();
     expect(in_array('muelles', $phApplicability['bodegas'], true)

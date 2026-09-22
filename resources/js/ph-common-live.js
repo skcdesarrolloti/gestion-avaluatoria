@@ -1,6 +1,6 @@
-export function phCommonLive({ statuses = {}, labels = {}, notes = {}, groups = {}, priorities = [], typologyLabel = '', summary = '' } = {}) {
+export function phCommonLive({ statuses = {}, labels = {}, notes = {}, groups = {}, priorities = [], relevantKeys = [], typologyLabel = '', summary = '' } = {}) {
     return {
-        statuses, labels, notes, summary, groups, priorities, typologyLabel,
+        statuses, labels, notes, summary, groups, priorities, relevantKeys, typologyLabel, showOthers: false,
         openGroups: Object.fromEntries(Object.keys(groups).map(key => [key, true])),
         statusEffects: {
             '': 'Faltante: no alimenta el texto y queda pendiente en la matriz.',
@@ -13,6 +13,7 @@ export function phCommonLive({ statuses = {}, labels = {}, notes = {}, groups = 
         label(key) { return (this.labels[key] || key.replaceAll('_', ' ')).toLocaleLowerCase('es-CO'); },
         limited(names) { return names.slice(0, 9).join(', '); },
         hasEvidence(key) { return this.statuses[key] && this.statuses[key] !== 'na' && !String(this.notes[key] || '').toLowerCase().startsWith('no identificado'); },
+        isRelevant(key) { return !this.relevantKeys.length || this.relevantKeys.includes(key); },
         source(key) {
             const text = String(this.notes[key] || '').toLowerCase();
             const site = /\bvisita\b|foto|fotograf|inspecci[oó]n|\bsitio\b|\bcampo\b/.test(text);
@@ -22,12 +23,12 @@ export function phCommonLive({ statuses = {}, labels = {}, notes = {}, groups = 
         originLabel(key) { return ({ ambos: 'Reglamento y sitio', sitio: 'Sitio / fotografías', documento: 'Reglamento / documento', analista: 'Criterio del analista' })[this.source(key)]; },
         generatedSummary() {
             const parts = [];
-            const priority = this.priorities.filter(key => this.hasEvidence(key)).map(key => this.label(key));
+            const priority = this.priorities.filter(key => this.isRelevant(key) && this.hasEvidence(key)).map(key => this.label(key));
             if (priority.length) parts.push('Para la tipología ' + (this.typologyLabel || 'seleccionada') + ', los elementos prioritarios identificados son ' + this.limited(priority) + '.');
             Object.values(this.groups).forEach(group => {
                 const bucket = { documento: [], sitio: [], analista: [], pendiente: [], riesgo: [] };
                 (group.keys || []).forEach(key => {
-                    if (!this.hasEvidence(key)) return;
+                    if (!this.isRelevant(key) || !this.hasEvidence(key)) return;
                     const name = this.label(key), status = this.statuses[key], source = this.source(key);
                     if (status === 'risk') bucket.riesgo.push(name);
                     else if (status === 'ok' && (source === 'sitio' || source === 'ambos')) bucket.sitio.push(name);
@@ -54,8 +55,10 @@ export function phCommonLive({ statuses = {}, labels = {}, notes = {}, groups = 
         updateCommonNotes(key, value) { this.notes[key] = value; if (this.isAutomaticSummary(this.summary)) this.refreshSummary(); },
         toggleGroup(key) { this.openGroups[key] = !this.openGroups[key]; },
         isOpen(key) { return this.openGroups[key] !== false; },
-        readyCount(keys) { return keys.filter(key => ['ok', 'warn', 'risk'].includes(this.statuses[key])).length; },
-        applicableCount(keys) { return keys.filter(key => this.statuses[key] !== 'na').length; },
+        visibleKeys(keys) { return this.showOthers ? keys : keys.filter(key => this.isRelevant(key)); },
+        hiddenCount(keys) { return keys.filter(key => !this.isRelevant(key)).length; },
+        readyCount(keys) { return this.visibleKeys(keys).filter(key => ['ok', 'warn', 'risk'].includes(this.statuses[key])).length; },
+        applicableCount(keys) { return this.visibleKeys(keys).filter(key => this.statuses[key] !== 'na').length; },
         effectFor(key) { return this.statusEffects[this.statuses[key] || ''] || this.statusEffects['']; },
     };
 }

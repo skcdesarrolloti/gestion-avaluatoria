@@ -1,6 +1,8 @@
 <?php
 $currentTypology = (string) ($ph['ph_typology'] ?? '');
 $priorityKeys = is_array($phCatalog['typologyPriorities'][$currentTypology] ?? null) ? $phCatalog['typologyPriorities'][$currentTypology] : [];
+$essentialCommonKeys = array_keys($phCatalog['commonAreaGroups']['esenciales'][1] ?? []);
+$commonRelevantKeys = array_values(array_unique(array_map('strval', array_merge($essentialCommonKeys, $priorityKeys))));
 $phCommonStatus = static fn (string $key): string => trim($phMap('common_areas', $key, 'status'));
 $phCommonApplies = static fn (string $key): bool => $phCommonStatus($key) !== 'na';
 $phCommonReady = static fn (string $key): bool => in_array($phCommonStatus($key), ['ok', 'warn', 'risk'], true);
@@ -129,7 +131,7 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
         </section>
 
         <section class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4" x-show="tab === 'comunes'"
-            x-data='phCommonLive(<?= e(json_encode(["statuses" => $commonStatusMap, "labels" => $commonLabelMap, "notes" => $commonNotesMap, "groups" => $commonGroupMap, "priorities" => array_values($priorityKeys), "typologyLabel" => (string) ($phCatalog["typologies"][$currentTypology] ?? ""), "summary" => $technicalValue("resumen_comunes_ph")], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>)'>
+            x-data='phCommonLive(<?= e(json_encode(["statuses" => $commonStatusMap, "labels" => $commonLabelMap, "notes" => $commonNotesMap, "groups" => $commonGroupMap, "priorities" => array_values($priorityKeys), "relevantKeys" => $commonRelevantKeys, "typologyLabel" => (string) ($phCatalog["typologies"][$currentTypology] ?? ""), "summary" => $technicalValue("resumen_comunes_ph")], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>)'>
             <label class="label rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-950">Resumen depurado para Entregable
                 <textarea class="input mt-2 min-h-24 bg-white" rows="3" name="ph[technical][resumen_comunes_ph]"
                     data-common-summary x-model="summary" placeholder="Texto profesional para revisar e incorporar luego al Entregable"></textarea>
