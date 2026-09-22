@@ -17,11 +17,11 @@ final class AppraisalPhProfileWriter
         $values = array_map(static fn ($key) => $data[$key] ?? '', $fields);
         foreach (['linkage', 'common_areas', 'documents', 'risks', 'photos', 'technical'] as $key) {
             $fields[] = $key . '_json';
-            $values[] = json_encode($data[$key] ?? [], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
+            $values[] = json_encode($data[$key] ?? [], JSON_UNESCAPED_UNICODE | JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
         }
         if (array_key_exists('source_summary', $data)) {
             $fields[] = 'source_summary'; $values[] = $data['source_summary'];
-            $fields[] = 'findings_json'; $values[] = json_encode($data['findings'] ?? [], JSON_THROW_ON_ERROR);
+            $fields[] = 'findings_json'; $values[] = json_encode($data['findings'] ?? [], JSON_INVALID_UTF8_SUBSTITUTE | JSON_THROW_ON_ERROR);
         }
         $q = $this->db->prepare('SELECT version FROM appraisal_ph_profiles WHERE appraisal_id = ? AND owner_id = ?');
         $q->execute([$id, $owner]); $current = $q->fetchColumn();

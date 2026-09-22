@@ -1,15 +1,6 @@
 <section class="mt-5 grid gap-4 lg:grid-cols-2" x-show="tab === 'administracion'">
     <div class="lg:col-span-2"><?php $renderPhTabSummary('resumen_administracion_ph', 'Resumen depurado para Entregable'); ?></div>
-    <?php $renderPhInput('administration_name', 'Administración / razón social', $phText('administration_name')); ?>
-    <?php $renderPhInput('administration_contact', 'Contacto de administración', $phText('administration_contact')); ?>
-    <?php $renderPhInput('administration_phone', 'Teléfono', $phText('administration_phone')); ?>
-    <?php $renderPhInput('administration_email', 'Correo', $phText('administration_email')); ?>
-    <?php $renderPhInput('monthly_fee', 'Cuota de administración', $phText('monthly_fee')); ?>
-    <?php $renderPhInput('fee_status', 'Estado de expensas', $phText('fee_status'), 'Paz y salvo, pendiente o por confirmar.'); ?>
-    <?php $renderPhInput('reserve_fund', 'Fondo / imprevistos', $phText('reserve_fund')); ?>
-    <?php $renderPhInput('insurance_status', 'Seguros comunes', $phText('insurance_status')); ?>
-    <?php $renderTechTextarea('coeficientes_copropiedad', 'Coeficientes y módulos', $technicalValue('coeficientes_copropiedad')); ?>
-    <?php $renderTechTextarea('expensas_cuotas', 'Expensas, cuotas y cargas', $technicalValue('expensas_cuotas')); ?>
+    <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-admin-support.php'; ?>
 </section>
 
 <?php foreach ([

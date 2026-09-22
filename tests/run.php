@@ -419,6 +419,16 @@ try {
         && str_contains($rulesText, 'actividades lícitas de comercio')
         && str_contains($rulesText, 'cargue liviano por bahía posterior'),
         'propiedad horizontal integra hallazgos de reglas al resumen');
+    $adminReport = (new AppraisalPhReportBuilder())->build(['ph_name' => 'PH Admin',
+        'monthly_fee' => '$1.250.000', 'fee_status' => 'Paz y salvo vigente',
+        'reserve_fund' => '[Reglamento.pdf · p. 196] expensas comunes y extraordinarias.'],
+        ['coeficientes_copropiedad' => 'Coeficiente 1,25% para la oficina 419.',
+            'cargas_comercializacion' => 'Confirmar pólizas y certificación de administración.'], [], [], [], [], 'oficinas', '', []);
+    $adminText = (string) ($adminReport['technical']['resumen_administracion_ph'] ?? '');
+    expect(str_contains($adminText, '$1.250.000')
+        && str_contains($adminText, 'Paz y salvo vigente')
+        && str_contains($adminText, 'Coeficiente 1,25%'),
+        'propiedad horizontal integra hallazgos de administracion al resumen');
     $phApplicability = \App\Support\AppraisalPhCatalog::technicalApplicability();
     expect(in_array('muelles', $phApplicability['bodegas'], true)
         && !in_array('muelles', $phApplicability['residencial'], true)

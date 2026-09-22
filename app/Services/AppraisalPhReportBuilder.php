@@ -15,7 +15,7 @@ final class AppraisalPhReportBuilder
         $use = $this->dominantUse($technical, $typology);
         [$advantages, $support] = $this->advantages($common, $typology);
         $level = $this->dotationLevel($technical);
-        $admin = $this->administration($core, $technical);
+        $operations = new AppraisalPhOperationsNarrative();
         $limits = 'La conclusión corresponde al alcance técnico del avalúo y se complementa con el análisis jurídico registrado en el expediente.';
         $trace = $this->traceSummary($technical, $limits);
 
@@ -26,8 +26,8 @@ final class AppraisalPhReportBuilder
             'resumen_tipologia_ph' => $this->typologySummary($name, $label, $technical, $typology),
             'resumen_configuracion_ph' => (new AppraisalPhConfigurationNarrative())->build($technical, $core),
             'resumen_comunes_ph' => $this->commonSummary($support, $typology),
-            'resumen_reglas_ph' => $this->rulesSummary($name, $technical, $core, $typology),
-            'resumen_administracion_ph' => "Administración y cargas: {$admin} Para valor, liquidez y negociación se requiere confirmar expensas, paz y salvo, pólizas y estado administrativo actual.",
+            'resumen_reglas_ph' => $operations->rules($name, $technical, $core, $typology),
+            'resumen_administracion_ph' => $operations->administration($name, $core, $technical),
             'resumen_incidencia_ph' => "Incidencia valuatoria: la ubicación del bien dentro de {$name} aporta representatividad corporativa, seguridad, soporte común y servicios compartidos. "
                 . "Estos atributos pueden mejorar deseabilidad, funcionalidad y comparabilidad frente a unidades en copropiedades con menor dotación, sujeto al estado real observado.",
             'resumen_notas_ph' => 'Notas normativas: Ley 675 soporta la lectura de bienes comunes, coeficientes y expensas; Decreto 1420, Resolución IGAC 941 e IVS orientan suficiencia, trazabilidad y salvedades del informe.',
@@ -129,43 +129,6 @@ final class AppraisalPhReportBuilder
             default => 'La lectura aporta elementos para precisar el uso dominante y los usos complementarios.',
         };
     }
-    private function rulesSummary(string $name, array $technical, array $core, string $typology): string
-    {
-        $labels = ['usos_permitidos' => 'usos permitidos', 'usos_restringidos' => 'restricciones o prohibiciones',
-            'reglas_constructivas' => 'reglas constructivas y adecuaciones',
-            'condiciones_normativas_operativas' => 'condiciones operativas',
-            'condiciones_usuario_operador' => 'usuario operador o administración',
-            'cargue_descargue' => 'cargue, descargue y movilidad'];
-        $directKeys = array_fill_keys(AppraisalPhCatalog::technicalApplicability()[$typology] ?? [], true);
-        $direct = $extra = [];
-        $finding = function (string $label, mixed $value): string {
-            $text = $this->cleanName(preg_replace('/\[[^\]]+\]/u', ' ', (string) $value) ?? '');
-            $text = trim(preg_replace('/[-_=]{2,}|\s+\|\s+|contin[uú]a/iu', ' ', $text) ?? '', ' .;:-—');
-            if (mb_strlen($text) > 210) $text = mb_substr($text, 0, 207) . '…';
-            return $label . ($text !== '' ? ': ' . $text : '');
-        };
-        if ($this->hasText($core['restrictions_text'] ?? ''))
-            $direct[] = $finding('restricciones generales de uso u operación', $core['restrictions_text']);
-        foreach ($labels as $key => $label) {
-            if (!$this->hasText($technical[$key] ?? '')) continue;
-            $row = $finding($label, $technical[$key]);
-            (isset($directKeys[$key]) || in_array($key, ['usos_permitidos', 'usos_restringidos', 'reglas_constructivas'], true))
-                ? $direct[] = $row : $extra[] = $row;
-        }
-        if (!$direct && !$extra) {
-            return "Las reglas de uso y operación de {$name} aún requieren depuración del reglamento, la visita o los soportes del encargo antes de incorporarse al Entregable.";
-        }
-        $summary = "Las reglas de uso y operación de {$name} registran " . implode('; ', array_unique($direct ?: $extra)) . '.';
-        if ($extra) $summary .= ' Como condiciones complementarias por confirmar o aplicar según la unidad se registran ' . implode('; ', array_unique($extra)) . '.';
-        return $summary . ' Estos hallazgos orientan el uso admisible, las adecuaciones, la operación cotidiana, la imagen del inmueble y sus condiciones de comercialización dentro de la copropiedad.';
-    }
-    private function administration(array $core, array $technical): string
-    {
-        $parts = $this->present(['coeficientes' => $technical['coeficientes_copropiedad'] ?? '',
-            'expensas' => $technical['expensas_cuotas'] ?? '', 'fondo/imprevistos' => $core['reserve_fund'] ?? '',
-            'administración vigente' => $core['administration_name'] ?? '']);
-        return $parts ? 'el reglamento aporta referencias a ' . $parts . '.' : 'no hay soporte vigente suficiente de administración, cuota o estado de expensas.';
-    }
     private function assets(array $core): string
     {
         $linkage = is_array($core['linkage'] ?? null) ? $core['linkage'] : [];
@@ -183,12 +146,6 @@ final class AppraisalPhReportBuilder
     {
         $text = $this->cleanName($technical['nivel_dotacion_comparativa'] ?? '');
         return $text !== '' ? mb_strtolower(strtok($text, '.') ?: $text) : 'por confirmar';
-    }
-    private function present(array $values): string
-    {
-        $names = [];
-        foreach ($values as $label => $value) if ($this->hasText($value)) $names[] = $label;
-        return implode(', ', $names);
     }
     private function hasAny(array $rows, array $keys, array $statuses): bool
     { foreach ($keys as $key) if (in_array((string) ($rows[$key]['status'] ?? ''), $statuses, true)) return true; return false; }
