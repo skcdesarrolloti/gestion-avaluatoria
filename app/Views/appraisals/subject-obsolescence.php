@@ -36,8 +36,9 @@ $pill = static function (string $state): string { return match ($state) { 'ok' =
         <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800">IEO global: <?= e(number_format($globalIeo, 1, ',', '.')) ?> % Â· <?= e($globalLevel) ?></span>
     </div>
     <div class="mt-5 rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-sm leading-6 text-indigo-950">
-        <h3 class="font-semibold">Academia rÃ¡pida: cÃ³mo llenarlo sin complicar el avalÃºo</h3>
-        <div class="mt-3 grid gap-3 md:grid-cols-4"><p><strong>Sin hallazgo:</strong> Ãºsalo cuando el aspecto funciona razonablemente; no exige texto ni foto.</p><p><strong>Leve:</strong> afecta poco y basta una nota corta si quieres dejar trazabilidad.</p><p><strong>Relevante o crÃ­tica:</strong> describe el soporte en una frase; adjunta foto en 3.7 solo si el hecho se ve en campo.</p><p><strong>No aplica:</strong> Ãºsalo para factores que no corresponden a la tipologÃ­a o al encargo.</p></div>
+        <h3 class="font-semibold">Academia rápida: cómo se determina el IEO</h3>
+        <div class="mt-3 grid gap-3 lg:grid-cols-3"><p><strong>1. Cada factor se califica independiente.</strong> Estructura puede quedar sin hallazgo y cubierta puede ser relevante; no se mezclan.</p><p><strong>2. La conclusión del bloque no puntúa.</strong> Curabilidad, origen funcional o temporalidad describen el hallazgo predominante; no aplican a factores sanos.</p><p><strong>3. Fórmula:</strong> IEO = suma de puntajes ÷ máximo posible de factores aplicables. Pendiente y no aplica no entran al cálculo.</p></div>
+        <p class="mt-3 rounded-lg bg-white px-3 py-2 text-xs leading-5 text-indigo-900"><strong>Guía:</strong> Sin hallazgo = 0; Leve = 1; Relevante = 2; Crítica = 3. Si hay hallazgos con tratamientos diferentes, usa “No determinado” en la conclusión general y explica la diferencia en soporte o diagnóstico.</p>
     </div>
     <label class="label mt-6 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-950">Texto editable para el Entregable
         <textarea class="input mt-2 min-h-24 bg-white" rows="3" name="summary_text" placeholder="Texto profesional de obsolescencias para incorporar al informe"><?= e($summary) ?></textarea>
