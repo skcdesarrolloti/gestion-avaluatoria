@@ -436,6 +436,16 @@ try {
     expect(($storedPh['linkage']['legal_registration'] ?? '') === '060-PH31'
         && str_contains((string) ($storedPh['technical']['resumen_identificacion_ph'] ?? ''), '060-PH31'),
         'propiedad horizontal trae matricula del bien sujeto desde 3.1');
+    $phRepo->save(str_repeat('a', 32), 1, array_replace($storedPh, [
+        'common_areas' => ['porteria' => ['status' => 'ok', 'notes' => 'Acceso controlado']],
+        'technical' => array_replace($storedPh['technical'] ?? [], [
+            'resumen_comunes_ph' => 'Quedan por confirmar portería / acceso controlado.',
+        ]),
+    ]));
+    $updatedCommonSummary = (string) (($phRepo->profile(str_repeat('a', 32), 1)['technical']['resumen_comunes_ph'] ?? ''));
+    expect(str_starts_with($updatedCommonSummary, 'Se verifican portería')
+        && !str_starts_with($updatedCommonSummary, 'Quedan por confirmar'),
+        'propiedad horizontal recalcula resumen automatico de comunes al guardar');
     $phController = (new ReflectionClass(AppraisalPhController::class))->newInstanceWithoutConstructor();
     $phSafeReturn = new ReflectionMethod(AppraisalPhController::class, 'safeReturn');
     $phSafeReturn->setAccessible(true);
