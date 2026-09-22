@@ -10,7 +10,8 @@ final class AppraisalSubjectController
 {
     public function __construct(
         private AppraisalRepository $appraisals, private array $user, private IgacTypologyRepository $typologies,
-        private AppraisalSubjectRepository $subjects, private GeoMasterRepository $geo, private AppraisalPhRepository $ph
+        private AppraisalSubjectRepository $subjects, private GeoMasterRepository $geo, private AppraisalPhRepository $ph,
+        private \App\Models\AppraisalObsolescenceRepository $obsolescence
     ) {}
 
     public function show(string $id): void
@@ -22,6 +23,7 @@ final class AppraisalSubjectController
             (int) ($record['igac_property_units_count'] ?? 0), (int) ($record['igac_annex_units_count'] ?? 0));
         view('appraisals/subject', ['title' => 'Bien sujeto', 'record' => $record,
             'subject' => $subject,
+            'obsolescenceProfile' => $this->obsolescence->find($id, $this->user['id']),
             'geo' => ['departments' => $this->geo->departments(), 'cities' => $this->geo->cities(),
                 'neighborhoods' => $this->geo->neighborhoods()],
             'photos' => $this->appraisals->photos($id, $this->user['id']),

@@ -9,6 +9,7 @@ use App\Services\AppraisalValidator;
 use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalPhInput;
+use App\Services\AppraisalObsolescenceInput;
 use App\Services\AppraisalPhReportBuilder;
 use App\Services\AppraisalPhChunkUploadService;
 use App\Services\AppraisalPhDocumentReanalysisService;
@@ -398,6 +399,15 @@ try {
     $_POST = ['ph' => ['ph_name' => 'Edificio Llave Nombre']];
     expect(AppraisalPhInput::data()['ph_key'] === 'Edificio Llave Nombre',
         'propiedad horizontal usa nombre como llave tecnica');
+    $_POST = ['obsolescence' => ['factors' => ['fisica' => ['meta' => 'curable', 'items' => [
+        'estructura' => ['score' => '3', 'evidence' => 'Fisuras verificadas en visita.'],
+        'cubiertas' => ['score' => '9', 'evidence' => 'valor inválido'],
+    ]]]], 'summary_text' => 'Diagnóstico editable', 'quantification_text' => 'Cuantificar aparte'];
+    $obsData = AppraisalObsolescenceInput::data($_POST);
+    expect($obsData['factors']['fisica']['meta'] === 'curable'
+        && $obsData['factors']['fisica']['items']['estructura']['score'] === '3'
+        && $obsData['factors']['fisica']['items']['cubiertas']['score'] === '',
+        'obsolescencias normaliza factores, puntajes y evidencia');
     $phReport = (new AppraisalPhReportBuilder())->build(['ph_name' => 'PH Prueba'], [], [
         'lobby' => ['status' => 'ok', 'notes' => 'Verificado por el analista'],
         'red_incendio' => ['status' => 'warn', 'notes' => 'Mención documental; confirmar situación actual. p. 10'],
