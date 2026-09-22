@@ -1,2 +1,19 @@
-# A virtual host must serve public/. Deny exposure of .env, app/ and storage/.
-Require all denied
+# Prefer hosting this project with public/ as the document root.
+# When a shared host exposes the project root, allow only the public front controller
+# and keep application, configuration, storage and tooling paths private.
+Options -Indexes
+
+<IfModule mod_rewrite.c>
+    RewriteEngine On
+
+    RewriteRule ^(?:app|bin|config|database|docs|node_modules|resources|routes|scripts|storage|tests|tmp|build)(?:/|$) - [F,L]
+    RewriteRule ^(?:\.env(?:\..*)?|\.git(?:/|$)|\.gitattributes|\.gitignore|agent\.md|AGENTS\.md|bootstrap\.php|composer\.(?:json|lock)|package(?:-lock)?\.json|README\.md)$ - [F,L]
+
+    RewriteRule ^$ public/ [L]
+    RewriteRule ^public/ - [L]
+    RewriteRule ^(.+)$ public/$1 [L]
+</IfModule>
+
+<FilesMatch "^\.">
+    Require all denied
+</FilesMatch>
