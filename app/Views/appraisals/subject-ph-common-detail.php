@@ -13,14 +13,17 @@
                 </div>
                 <?php foreach ($phCatalog['commonAreaGroups'] as $groupKey => [$groupTitle, $items]): ?>
                     <?php $groupKeys = array_map('strval', array_keys($items)); $groupJson = e(json_encode($groupKeys, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)); ?>
-                    <details class="mt-4 rounded-xl border border-slate-200 bg-white shadow-sm" open>
-                        <summary class="cursor-pointer list-none rounded-xl bg-slate-900 px-4 py-3 text-white">
+                    <div class="mt-4 rounded-xl border border-slate-200 bg-white shadow-sm">
+                        <button class="w-full rounded-xl bg-slate-900 px-4 py-3 text-left text-white" type="button" @click="toggleGroup('<?= e((string) $groupKey) ?>')">
                             <span class="flex flex-wrap items-center justify-between gap-2">
                                 <span class="text-xl font-bold"><?= e($groupTitle) ?></span>
-                                <span class="rounded-full bg-white/15 px-3 py-1 text-sm font-semibold" x-text="readyCount(<?= $groupJson ?>) + ' de ' + applicableCount(<?= $groupJson ?>) + ' aplicables revisados'"></span>
+                                <span class="flex items-center gap-2">
+                                    <span class="rounded-full bg-white/15 px-3 py-1 text-sm font-semibold" x-text="readyCount(<?= $groupJson ?>) + ' de ' + applicableCount(<?= $groupJson ?>) + ' aplicables revisados'"></span>
+                                    <span class="text-sm font-bold" x-text="isOpen('<?= e((string) $groupKey) ?>') ? 'Cerrar' : 'Abrir'"></span>
+                                </span>
                             </span>
-                        </summary>
-                        <div class="overflow-x-auto p-3">
+                        </button>
+                        <div class="overflow-x-auto p-3" x-show="isOpen('<?= e((string) $groupKey) ?>')" x-cloak>
                             <table class="w-full min-w-[64rem] text-left text-sm">
                                 <thead class="text-xs uppercase text-slate-500"><tr><th class="py-2 pr-3">Elemento</th><th class="py-2 pr-3">Estado e impacto</th><th class="py-2">Evidencia y observación</th></tr></thead>
                                 <tbody class="divide-y divide-slate-100">
@@ -44,7 +47,7 @@
                                 </tbody>
                             </table>
                         </div>
-                    </details>
+                    </div>
                 <?php endforeach; ?>
             </div>
 

@@ -113,14 +113,7 @@ final class AppraisalPhReportBuilder
     }
     private function commonSummary(string $support, string $typology): string
     {
-        $focus = match ($typology) {
-            'residencial' => 'seguridad, habitabilidad, amenidades y sostenimiento común',
-            'oficinas' => 'representatividad corporativa, acceso de usuarios, parqueo, seguridad y continuidad operativa',
-            'comercio' => 'flujo de público, visibilidad operativa, parqueo, seguridad y soporte para atención a usuarios',
-            'bodegas' => 'movilidad logística, control de acceso, maniobra, seguridad industrial y continuidad operativa',
-            default => 'funcionalidad, seguridad, soporte común y compatibilidad entre usos',
-        };
-        return ucfirst($support) . " Estos elementos deben valorarse frente a copropiedades de la misma tipología, porque aportan {$focus} y pueden incidir en funcionalidad, deseabilidad, comercialización y comparación del inmueble.";
+        return ucfirst($support);
     }
 
     private function source(array $technical): string
@@ -130,16 +123,15 @@ final class AppraisalPhReportBuilder
     }
     private function commonSupport(array $common): string
     {
-        $labels = AppraisalPhCatalog::commonAreas(); $bucket = ['ok' => [], 'warn' => [], 'risk' => []];
-        foreach ($common as $key => $row) {
-            $status = (string) ($row['status'] ?? '');
-            if (isset($bucket[$status])) $bucket[$status][] = mb_strtolower($labels[$key] ?? str_replace('_', ' ', (string) $key));
-        }
         $parts = [];
-        if ($bucket['ok']) $parts[] = 'se verifican ' . implode(', ', array_slice($bucket['ok'], 0, 9)) . '.';
-        if ($bucket['warn']) $parts[] = 'Quedan por confirmar ' . implode(', ', array_slice($bucket['warn'], 0, 9)) . '.';
-        if ($bucket['risk']) $parts[] = 'Se registran alertas o salvedades en ' . implode(', ', array_slice($bucket['risk'], 0, 9)) . '.';
-        return $parts ? implode(' ', $parts) : 'los bienes comunes específicos deben confirmarse con visita y soportes actuales.';
+        foreach (AppraisalPhCatalog::commonAreaGroups() as [$title, $items]) {
+            $names = [];
+            foreach ($items as $key => $label) {
+                if ((string) ($common[$key]['status'] ?? '') === 'ok') $names[] = mb_strtolower((string) $label);
+            }
+            if ($names) $parts[] = $title . ': se verifican ' . implode(', ', array_slice($names, 0, 9)) . '.';
+        }
+        return $parts ? implode(' ', $parts) : 'No se han marcado bienes comunes verificados para incorporar al Entregable.';
     }
     private function dominantUse(array $technical, string $typology): string
     {

@@ -190,8 +190,7 @@ final class AppraisalPhRepository
     }
     private function replaceableReport(string $text): bool
     {
-        $text = trim($text);
-        if ($text === '') return true;
+        $text = trim($text); if ($text === '') return true;
         foreach (['Base comparativa:', 'Trazabilidad:', 'Identificación:', 'Tipología y régimen:',
             'Configuración predial:', 'Bienes comunes y soporte:', 'Reglas de uso y operación:',
             'Administración y cargas:', 'Incidencia valuatoria:', 'Notas y salvedades:',
@@ -199,7 +198,8 @@ final class AppraisalPhRepository
             'Lectura preliminar PH sin hallazgos suficientes', 'Para el análisis de propiedad horizontal se tuvo como soporte',
             'Condición especial PH:', 'Trazabilidad documental:', 'Lectura comparativa:',
             'El inmueble objeto de análisis forma parte de', 'La copropiedad ', 'Se verifican ',
-            'Quedan por confirmar ', 'Se registran alertas o salvedades en ', 'Los bienes comunes específicos deben confirmarse'] as $prefix) {
+            'Quedan por confirmar ', 'Se registran alertas o salvedades en ', 'Los bienes comunes específicos deben confirmarse',
+            'Bienes comunes esenciales:', 'Bienes comunes no esenciales', 'Áreas comunes de uso exclusivo:', 'Soporte operativo y técnico común:', 'No se han marcado bienes comunes verificados'] as $prefix) {
             if (str_starts_with($text, $prefix)) return true;
         }
         return false;
