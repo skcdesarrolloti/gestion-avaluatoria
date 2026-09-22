@@ -410,6 +410,15 @@ try {
         && str_contains($commonText, 'el analista verifica lobby o recepción')
         && str_contains($commonText, 'con alerta por depurar cctv y control de acceso')
         && !str_contains($commonText, 'piscina'), 'propiedad horizontal amarra estado de comunes al informe');
+    $rulesReport = (new AppraisalPhReportBuilder())->build(['ph_name' => 'PH Reglas',
+        'restrictions_text' => '[Reglamento.pdf · p. 10] No modificar fachadas ni afectar bienes comunes.'],
+        ['usos_permitidos' => '[Reglamento.pdf · p. 6] destinado a actividades lícitas de comercio y afines.',
+            'cargue_descargue' => 'Visita: cargue liviano por bahía posterior.'], [], [], [], [], 'oficinas', '', []);
+    $rulesText = (string) ($rulesReport['technical']['resumen_reglas_ph'] ?? '');
+    expect(str_contains($rulesText, 'No modificar fachadas')
+        && str_contains($rulesText, 'actividades lícitas de comercio')
+        && str_contains($rulesText, 'cargue liviano por bahía posterior'),
+        'propiedad horizontal integra hallazgos de reglas al resumen');
     $phApplicability = \App\Support\AppraisalPhCatalog::technicalApplicability();
     expect(in_array('muelles', $phApplicability['bodegas'], true)
         && !in_array('muelles', $phApplicability['residencial'], true)

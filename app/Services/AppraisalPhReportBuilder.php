@@ -134,22 +134,30 @@ final class AppraisalPhReportBuilder
         $labels = ['usos_permitidos' => 'usos permitidos', 'usos_restringidos' => 'restricciones o prohibiciones',
             'reglas_constructivas' => 'reglas constructivas y adecuaciones',
             'condiciones_normativas_operativas' => 'condiciones operativas',
-            'condiciones_usuario_operador' => 'condiciones de usuario operador o administración',
+            'condiciones_usuario_operador' => 'usuario operador o administración',
             'cargue_descargue' => 'cargue, descargue y movilidad'];
         $directKeys = array_fill_keys(AppraisalPhCatalog::technicalApplicability()[$typology] ?? [], true);
         $direct = $extra = [];
-        if ($this->hasText($core['restrictions_text'] ?? '')) $direct[] = 'restricciones generales de uso u operación';
+        $finding = function (string $label, mixed $value): string {
+            $text = $this->cleanName(preg_replace('/\[[^\]]+\]/u', ' ', (string) $value) ?? '');
+            $text = trim(preg_replace('/[-_=]{2,}|\s+\|\s+|contin[uú]a/iu', ' ', $text) ?? '', ' .;:-—');
+            if (mb_strlen($text) > 210) $text = mb_substr($text, 0, 207) . '…';
+            return $label . ($text !== '' ? ': ' . $text : '');
+        };
+        if ($this->hasText($core['restrictions_text'] ?? ''))
+            $direct[] = $finding('restricciones generales de uso u operación', $core['restrictions_text']);
         foreach ($labels as $key => $label) {
             if (!$this->hasText($technical[$key] ?? '')) continue;
+            $row = $finding($label, $technical[$key]);
             (isset($directKeys[$key]) || in_array($key, ['usos_permitidos', 'usos_restringidos', 'reglas_constructivas'], true))
-                ? $direct[] = $label : $extra[] = $label;
+                ? $direct[] = $row : $extra[] = $row;
         }
         if (!$direct && !$extra) {
             return "Las reglas de uso y operación de {$name} aún requieren depuración del reglamento, la visita o los soportes del encargo antes de incorporarse al Entregable.";
         }
-        $summary = "Las reglas de uso y operación de {$name} permiten depurar " . implode(', ', array_unique($direct ?: $extra)) . '.';
-        if ($extra) $summary .= ' Como condiciones complementarias por confirmar o aplicar según la unidad se registran ' . implode(', ', array_unique($extra)) . '.';
-        return $summary . ' Esta lectura orienta el uso admisible, las adecuaciones, la operación cotidiana, la imagen del inmueble y sus condiciones de comercialización dentro de la copropiedad.';
+        $summary = "Las reglas de uso y operación de {$name} registran " . implode('; ', array_unique($direct ?: $extra)) . '.';
+        if ($extra) $summary .= ' Como condiciones complementarias por confirmar o aplicar según la unidad se registran ' . implode('; ', array_unique($extra)) . '.';
+        return $summary . ' Estos hallazgos orientan el uso admisible, las adecuaciones, la operación cotidiana, la imagen del inmueble y sus condiciones de comercialización dentro de la copropiedad.';
     }
     private function administration(array $core, array $technical): string
     {
