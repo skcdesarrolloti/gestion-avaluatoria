@@ -199,7 +199,7 @@ final class AppraisalPhRepository
             'Condición especial PH:', 'Trazabilidad documental:', 'Lectura comparativa:',
             'El inmueble objeto de análisis forma parte de', 'La copropiedad ', 'Se verifican ',
             'Quedan por confirmar ', 'Se registran alertas o salvedades en ', 'Los bienes comunes específicos deben confirmarse',
-            'Bienes comunes esenciales:', 'Bienes comunes no esenciales', 'Áreas comunes de uso exclusivo:', 'Soporte operativo y técnico común:', 'No se han marcado bienes comunes verificados'] as $prefix) {
+            'Bienes comunes esenciales:', 'Bienes comunes no esenciales', 'Áreas comunes de uso exclusivo:', 'Soporte operativo y técnico común:', 'No se han marcado bienes comunes verificados', 'No se han identificado bienes comunes', 'Para la tipología '] as $prefix) {
             if (str_starts_with($text, $prefix)) return true;
         }
         return false;

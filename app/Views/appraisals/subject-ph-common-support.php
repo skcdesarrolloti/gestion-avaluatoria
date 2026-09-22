@@ -47,7 +47,7 @@ $priorityValue = $priorityKeys ? $priorityMetric[0] : 'Sin tipología selecciona
 $priorityState = $priorityKeys ? $priorityMetric[1] : 'missing';
 $priorityMissing = $priorityKeys ? $priorityMetric[2] : 'Seleccionar la tipología comparable.';
 $commonRows = [
-    ['Texto editable para Entregable', $technicalValue('resumen_comunes_ph') !== '' ? 'Texto construido' : 'Sin texto construido', $technicalValue('resumen_comunes_ph') !== '' ? 'ok' : 'missing', 'Marcar bienes verificados; el texto se arma por categorías.'],
+    ['Texto editable para Entregable', $technicalValue('resumen_comunes_ph') !== '' ? 'Texto construido' : 'Sin texto construido', $technicalValue('resumen_comunes_ph') !== '' ? 'ok' : 'missing', 'Depurar estados y notas; el texto se arma por fuente, categoría y tipología.'],
     ['Bienes comunes esenciales', ...$essentialMetric],
     ['Amenidades y bienes no esenciales', ...$amenityMetric],
     ['Áreas comunes de uso exclusivo', ...$exclusiveMetric],
@@ -57,7 +57,7 @@ $commonRows = [
 ?>
 <div class="rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6 lg:col-span-2">
     <h4 class="font-semibold text-slate-900">Campos de bienes comunes y soporte para construir el Entregable</h4>
-    <p class="mt-1 text-slate-600">La selección afecta el texto superior: solo Verificado / adecuado entra al resumen por categorías; los demás estados quedan como control de revisión en esta matriz.</p>
+    <p class="mt-1 text-slate-600">El texto superior separa soporte documental, verificación en sitio o por analista y alertas por depurar; las prioridades dependen de la tipología seleccionada.</p>
     <div class="mt-3 overflow-x-auto">
         <table class="w-full min-w-[56rem] text-left text-sm">
             <thead class="text-xs uppercase text-slate-500"><tr><th class="py-2 pr-3">Campo</th><th class="py-2 pr-3">Valor detectado</th><th class="py-2 pr-3">Estado</th><th class="py-2">Qué falta</th></tr></thead>

@@ -8,10 +8,12 @@ $priorityFound = array_values(array_filter($priorityKeys, $phCommonReady));
 $commonStats = [];
 $commonStatusMap = [];
 $commonLabelMap = [];
+$commonNotesMap = [];
 $commonGroupMap = [];
 foreach ($phCatalog['commonAreas'] as $key => $label) {
     $commonStatusMap[(string) $key] = $phCommonStatus((string) $key);
     $commonLabelMap[(string) $key] = (string) $label;
+    $commonNotesMap[(string) $key] = $phMap('common_areas', (string) $key, 'notes');
 }
 foreach ($phCatalog['commonAreaGroups'] as $groupKey => [$groupTitle, $items]) {
     $commonGroupMap[(string) $groupKey] = ['title' => (string) $groupTitle, 'keys' => array_map('strval', array_keys($items))];
@@ -127,7 +129,7 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
         </section>
 
         <section class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4" x-show="tab === 'comunes'"
-            x-data='phCommonLive(<?= e(json_encode(["statuses" => $commonStatusMap, "labels" => $commonLabelMap, "groups" => $commonGroupMap, "summary" => $technicalValue("resumen_comunes_ph")], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>)'>
+            x-data='phCommonLive(<?= e(json_encode(["statuses" => $commonStatusMap, "labels" => $commonLabelMap, "notes" => $commonNotesMap, "groups" => $commonGroupMap, "priorities" => array_values($priorityKeys), "typologyLabel" => (string) ($phCatalog["typologies"][$currentTypology] ?? ""), "summary" => $technicalValue("resumen_comunes_ph")], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>)'>
             <label class="label rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-950">Resumen depurado para Entregable
                 <textarea class="input mt-2 min-h-24 bg-white" rows="3" name="ph[technical][resumen_comunes_ph]"
                     data-common-summary x-model="summary" placeholder="Texto profesional para revisar e incorporar luego al Entregable"></textarea>

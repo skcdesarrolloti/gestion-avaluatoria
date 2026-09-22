@@ -399,13 +399,16 @@ try {
     expect(AppraisalPhInput::data()['ph_key'] === 'Edificio Llave Nombre',
         'propiedad horizontal usa nombre como llave tecnica');
     $phReport = (new AppraisalPhReportBuilder())->build(['ph_name' => 'PH Prueba'], [], [
-        'lobby' => ['status' => 'ok'], 'red_incendio' => ['status' => 'warn'],
-        'cerramiento' => ['status' => 'risk'], 'piscina' => ['status' => 'na'],
+        'lobby' => ['status' => 'ok', 'notes' => 'Verificado por el analista'],
+        'red_incendio' => ['status' => 'warn', 'notes' => 'Mención documental; confirmar situación actual. p. 10'],
+        'cerramiento' => ['status' => 'risk', 'notes' => 'Visita: deterioro por depurar'],
+        'piscina' => ['status' => 'na'],
     ], [], [], [], 'oficinas', '', []);
     $commonText = (string) ($phReport['technical']['resumen_comunes_ph'] ?? '');
-    expect(str_contains($commonText, 'Bienes comunes no esenciales y amenidades: se verifican lobby o recepción.')
-        && !str_contains($commonText, 'red contra incendio')
-        && !str_contains($commonText, 'cerramiento')
+    expect(str_contains($commonText, 'Para la tipología Oficinas y consultorios · PH corporativa')
+        && str_contains($commonText, 'el reglamento o soporte documental menciona red contra incendio')
+        && str_contains($commonText, 'el analista verifica lobby o recepción')
+        && str_contains($commonText, 'con alerta por depurar cerramiento')
         && !str_contains($commonText, 'piscina'), 'propiedad horizontal amarra estado de comunes al informe');
     $phApplicability = \App\Support\AppraisalPhCatalog::technicalApplicability();
     expect(in_array('muelles', $phApplicability['bodegas'], true)
@@ -443,7 +446,7 @@ try {
         ]),
     ]));
     $updatedCommonSummary = (string) (($phRepo->profile(str_repeat('a', 32), 1)['technical']['resumen_comunes_ph'] ?? ''));
-    expect(str_starts_with($updatedCommonSummary, 'Soporte operativo y técnico común: se verifican portería / acceso controlado')
+    expect(str_starts_with($updatedCommonSummary, 'Soporte operativo y técnico común: el analista verifica portería / acceso controlado')
         && !str_starts_with($updatedCommonSummary, 'Quedan por confirmar'),
         'propiedad horizontal recalcula resumen automatico de comunes al guardar');
     $phController = (new ReflectionClass(AppraisalPhController::class))->newInstanceWithoutConstructor();
@@ -483,9 +486,10 @@ try {
     $phCommonText = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
         'Reglamento de propiedad horizontal. Lobby, ascensores, parqueaderos de visitantes, red contra incendio y vigilancia permanente.',
         ['reglamento.txt'], 'oficinas');
-    expect(str_starts_with((string) ($phCommonText['technical']['resumen_comunes_ph'] ?? ''), 'No se han marcado bienes comunes verificados')
+    expect(str_contains((string) ($phCommonText['technical']['resumen_comunes_ph'] ?? ''), 'el reglamento o soporte documental menciona')
+        && str_contains((string) ($phCommonText['technical']['resumen_comunes_ph'] ?? ''), 'red contra incendio')
         && !str_contains((string) ($phCommonText['technical']['resumen_comunes_ph'] ?? ''), 'red_incendio'),
-        'resumen bienes comunes PH queda pendiente hasta verificacion del analista');
+        'resumen bienes comunes PH distingue soporte documental con etiquetas legibles');
     $phQuantityAnalysis = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
         'El edificio cuenta con seis pisos, un sotano, seis ascensores, Oficinas: 40, Locales: 8, Parqueaderos: 120, Depositos: 20.',
         ['reglamento.txt'], 'oficinas');
