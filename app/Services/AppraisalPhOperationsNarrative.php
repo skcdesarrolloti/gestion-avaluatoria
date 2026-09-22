@@ -59,6 +59,19 @@ final class AppraisalPhOperationsNarrative
         return [$summary, $report];
     }
 
+    public function notes(array $technical): string
+    {
+        $rows = ['marco normativo PH' => $technical['notas_normativas_ph'] ?? '',
+            'salvedades del reglamento' => $technical['salvedades_reglamento'] ?? '',
+            'salvedades de visita' => $technical['salvedades_visita'] ?? '',
+            'salvedades de validación documental' => $technical['salvedades_validacion'] ?? '',
+            'observaciones de lectura OCR' => $technical['observaciones_extraccion'] ?? ''];
+        $parts = [];
+        foreach ($rows as $label => $value) if ($this->has($value)) $parts[] = $this->item($label, $value, 170);
+        if (!$parts) return 'Notas normativas: completar normas pertinentes, salvedades de reglamento, visita, soportes pendientes y límites del análisis técnico antes de cerrar el Entregable.';
+        return 'Notas normativas y salvedades: ' . implode('; ', array_slice($parts, 0, 5)) . '. Estas notas delimitan el alcance técnico del avalúo y evitan presentar la lectura PH como estudio de títulos o certificación administrativa.';
+    }
+
     private function item(string $label, mixed $value, int $limit = 210): string
     { $text = $this->evidence($value, $limit); return $label . ($text !== '' ? ': ' . $text : ''); }
     private function evidence(mixed $value, int $limit): string

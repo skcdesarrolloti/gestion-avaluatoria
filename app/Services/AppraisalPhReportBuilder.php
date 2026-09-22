@@ -30,7 +30,7 @@ final class AppraisalPhReportBuilder
             'resumen_reglas_ph' => $operations->rules($name, $technical, $core, $typology),
             'resumen_administracion_ph' => $operations->administration($name, $core, $technical),
             'resumen_incidencia_ph' => $incidenceSummary,
-            'resumen_notas_ph' => 'Notas normativas: Ley 675 soporta la lectura de bienes comunes, coeficientes y expensas; Decreto 1420, Resolución IGAC 941 e IVS orientan suficiencia, trazabilidad y salvedades del informe.',
+            'resumen_notas_ph' => $operations->notes($technical),
         ];
         return ['diagnosis_text' => $tab['resumen_incidencia_ph'],
             'report_text' => $incidenceReport, 'technical' => $tab];

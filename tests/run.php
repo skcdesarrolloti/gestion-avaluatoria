@@ -440,6 +440,15 @@ try {
         && str_contains($incidenceText, 'Mejora acceso')
         && str_contains((string) ($incidenceReport['report_text'] ?? ''), 'Aporta imagen corporativa'),
         'propiedad horizontal integra incidencia valuatoria al resumen y texto final');
+    $notesReport = (new AppraisalPhReportBuilder())->build(['ph_name' => 'PH Notas'],
+        ['notas_normativas_ph' => 'Ley 675 para bienes comunes, coeficientes y expensas.',
+            'salvedades_validacion' => 'Confirmar paz y salvo, pólizas y certificado de administración.',
+            'observaciones_extraccion' => 'Revisar páginas con baja lectura contra original.'], [], [], [], [], 'oficinas', '', []);
+    $notesText = (string) ($notesReport['technical']['resumen_notas_ph'] ?? '');
+    expect(str_contains($notesText, 'Ley 675')
+        && str_contains($notesText, 'Confirmar paz y salvo')
+        && str_contains($notesText, 'baja lectura'),
+        'propiedad horizontal integra notas normativas y salvedades al resumen');
     $phApplicability = \App\Support\AppraisalPhCatalog::technicalApplicability();
     expect(in_array('muelles', $phApplicability['bodegas'], true)
         && !in_array('muelles', $phApplicability['residencial'], true)
