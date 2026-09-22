@@ -18,6 +18,7 @@ final class AppraisalPhReportBuilder
         $operations = new AppraisalPhOperationsNarrative();
         $limits = 'La conclusión corresponde al alcance técnico del avalúo y se complementa con el análisis jurídico registrado en el expediente.';
         $trace = $this->traceSummary($technical, $limits);
+        [$incidenceSummary, $incidenceReport] = $operations->incidence($name, $label, $core, $technical, $assets, $support, $level, $limits);
 
         $tab = [
             'resumen_base_ph' => $this->baseSummary($name, $label, $advantages, $level),
@@ -28,12 +29,11 @@ final class AppraisalPhReportBuilder
             'resumen_comunes_ph' => $this->commonSummary($support, $typology),
             'resumen_reglas_ph' => $operations->rules($name, $technical, $core, $typology),
             'resumen_administracion_ph' => $operations->administration($name, $core, $technical),
-            'resumen_incidencia_ph' => "Incidencia valuatoria: la ubicación del bien dentro de {$name} aporta representatividad corporativa, seguridad, soporte común y servicios compartidos. "
-                . "Estos atributos pueden mejorar deseabilidad, funcionalidad y comparabilidad frente a unidades en copropiedades con menor dotación, sujeto al estado real observado.",
+            'resumen_incidencia_ph' => $incidenceSummary,
             'resumen_notas_ph' => 'Notas normativas: Ley 675 soporta la lectura de bienes comunes, coeficientes y expensas; Decreto 1420, Resolución IGAC 941 e IVS orientan suficiencia, trazabilidad y salvedades del informe.',
         ];
         return ['diagnosis_text' => $tab['resumen_incidencia_ph'],
-            'report_text' => $this->report($name, $label, $assets, $use, $support, $level, $limits), 'technical' => $tab];
+            'report_text' => $incidenceReport, 'technical' => $tab];
     }
 
     private function identitySummary(string $name, string $assets): string

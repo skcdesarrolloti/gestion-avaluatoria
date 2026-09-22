@@ -81,6 +81,11 @@ final class AppraisalPhCatalog
                 'cargas_comercializacion' => 'Cargas o restricciones que afecten operación o comercialización',
             ]],
             'incidencia' => ['Incidencia funcional y valuatoria', [
+                'incidencia_funcional_ph' => 'Incidencia funcional',
+                'incidencia_comercial_ph' => 'Incidencia comercial',
+                'incidencia_operativa_ph' => 'Incidencia operativa',
+                'incidencia_cargas_ph' => 'Incidencia por cargas económicas',
+                'conclusion_valor_ph' => 'Conclusión para valor',
                 'incidencia_operacion_bodegas' => 'Incidencia sobre la operación de las bodegas',
                 'incidencia_valor_soporte_comun' => 'Aporte de valor del soporte común',
                 'incidencia_restricciones_regimen' => 'Incidencia del régimen especial y sus restricciones',
@@ -120,7 +125,8 @@ final class AppraisalPhCatalog
             'expensas_cuotas', 'responsabilidades_bienes_comunes', 'lectura_valuatoria',
             'salvedades_reglamento', 'salvedades_visita', 'salvedades_validacion',
             'observaciones_extraccion', 'dotacion_tipologia', 'nivel_dotacion_comparativa',
-            'comparacion_mercado_ph', 'notas_normativas_ph'];
+            'comparacion_mercado_ph', 'incidencia_funcional_ph', 'incidencia_comercial_ph',
+            'incidencia_operativa_ph', 'incidencia_cargas_ph', 'conclusion_valor_ph', 'notas_normativas_ph'];
         return [
             'residencial' => array_merge($base, ['etapas_copropiedad', 'numero_edificios',
                 'amenidades_relevantes', 'condiciones_normativas_operativas',

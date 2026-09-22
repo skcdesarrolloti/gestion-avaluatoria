@@ -40,6 +40,25 @@ final class AppraisalPhOperationsNarrative
         return "Para {$name} se registran " . implode('; ', array_slice($parts, 0, 7)) . '. Estos datos permiten depurar obligaciones económicas, coeficientes, seguros y cargas comunes que pueden incidir en valor, liquidez, negociación y cierre del avalúo.';
     }
 
+    public function incidence(string $name, string $label, array $core, array $technical,
+        string $assets, string $support, string $level, string $limits): array
+    {
+        $rows = ['incidencia funcional' => $technical['incidencia_funcional_ph'] ?? '',
+            'incidencia comercial' => $technical['incidencia_comercial_ph'] ?? '',
+            'incidencia operativa' => $technical['incidencia_operativa_ph'] ?? '',
+            'incidencia por restricciones' => $technical['incidencia_restricciones_regimen'] ?? '',
+            'incidencia por cargas económicas' => $technical['incidencia_cargas_ph'] ?? '',
+            'comparación con PH similares' => $technical['comparacion_mercado_ph'] ?? '',
+            'conclusión para valor' => $technical['conclusion_valor_ph'] ?? ''];
+        $parts = [];
+        foreach ($rows as $labelRow => $value) if ($this->has($value)) $parts[] = $this->item($labelRow, $value, 180);
+        $fallback = "La ubicación del bien dentro de {$name} aporta soporte común {$level}, con efectos posibles en funcionalidad, deseabilidad, operación y comparación frente a copropiedades similares.";
+        $summary = $parts ? "La incidencia valuatoria de {$name} registra " . implode('; ', array_slice($parts, 0, 6)) . '.' : $fallback;
+        $report = "El inmueble objeto de medición se localiza en {$name}, copropiedad analizada como {$label}. {$assets} "
+            . ($parts ? $summary : $fallback) . " La copropiedad cuenta con una dotación común {$level}; {$support} {$limits}";
+        return [$summary, $report];
+    }
+
     private function item(string $label, mixed $value, int $limit = 210): string
     { $text = $this->evidence($value, $limit); return $label . ($text !== '' ? ': ' . $text : ''); }
     private function evidence(mixed $value, int $limit): string

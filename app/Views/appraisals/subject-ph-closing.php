@@ -31,10 +31,7 @@
 
 <section class="mt-5 grid gap-4" x-show="tab === 'incidencia'">
     <?php $renderPhTabSummary('resumen_incidencia_ph', 'Resumen depurado para Entregable'); ?>
-    <?php $renderPhTextarea('diagnosis_text', 'Diagnóstico preliminar de copropiedad', $phText('diagnosis_text'), 'Resume si la PH está ordenada, requiere soportes o presenta alertas.', 5); ?>
-    <?php $renderPhTextarea('report_text', 'Texto para el entregable', $phText('report_text'), 'Incluye la advertencia de que es informe técnico y no estudio de títulos.', 6); ?>
-    <?php $renderTechTextarea('lectura_valuatoria', 'Incidencia funcional, comercial y valuatoria', $technicalValue('lectura_valuatoria')); ?>
-    <?php $renderTechTextarea('comparacion_mercado_ph', 'Comparación con copropiedades similares', $technicalValue('comparacion_mercado_ph')); ?>
+    <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-incidence-support.php'; ?>
 </section>
 
 <section class="mt-5 grid gap-4" x-show="tab === 'notas'">

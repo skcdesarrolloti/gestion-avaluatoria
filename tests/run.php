@@ -429,6 +429,17 @@ try {
         && str_contains($adminText, 'Paz y salvo vigente')
         && str_contains($adminText, 'Coeficiente 1,25%'),
         'propiedad horizontal integra hallazgos de administracion al resumen');
+    $_POST = ['ph' => ['technical' => ['incidencia_funcional_ph' => 'Mejora acceso y uso de la oficina.',
+        'incidencia_comercial_ph' => 'Aporta imagen corporativa y mayor deseabilidad.',
+        'conclusion_valor_ph' => 'Aporta positivamente al valor relativo.']]];
+    $incidenceInput = AppraisalPhInput::data();
+    $incidenceReport = (new AppraisalPhReportBuilder())->build(['ph_name' => 'PH Incidencia'],
+        $incidenceInput['technical'], [], [], [], [], 'oficinas', '', []);
+    $incidenceText = (string) ($incidenceReport['technical']['resumen_incidencia_ph'] ?? '');
+    expect(isset($incidenceInput['technical']['incidencia_funcional_ph'])
+        && str_contains($incidenceText, 'Mejora acceso')
+        && str_contains((string) ($incidenceReport['report_text'] ?? ''), 'Aporta imagen corporativa'),
+        'propiedad horizontal integra incidencia valuatoria al resumen y texto final');
     $phApplicability = \App\Support\AppraisalPhCatalog::technicalApplicability();
     expect(in_array('muelles', $phApplicability['bodegas'], true)
         && !in_array('muelles', $phApplicability['residencial'], true)
