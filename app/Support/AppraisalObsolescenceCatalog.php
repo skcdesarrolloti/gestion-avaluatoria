@@ -19,6 +19,6 @@ final class AppraisalObsolescenceCatalog
                 'ambiental' => 'Ambiental', 'urbanistico' => 'Urbanístico / regulatorio', 'vocacion' => 'Vocación del sector']],
         ];
     }
-    public static function scores(): array { return ['na'=>'N/A', '0'=>'0 · No evidenciada', '1'=>'1 · Baja', '2'=>'2 · Media', '3'=>'3 · Alta']; }
+    public static function scores(): array { return ['na'=>'No aplica al caso', '0'=>'Sin hallazgo', '1'=>'Leve', '2'=>'Relevante', '3'=>'Crítica']; }
     public static function defaults(): array { return ['summary_text'=>'', 'diagnosis_text'=>'', 'quantification_text'=>'', 'normative_text'=>'', 'factors'=>[], 'updated_at'=>null]; }
 }
