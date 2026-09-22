@@ -26,9 +26,60 @@ final class AppraisalObsolescenceCatalog
     public static function factorHelp(): array
     {
         return [
-            'fisica' => ['estructura'=>'Elementos portantes, estabilidad aparente, fisuras, asentamientos o señales que comprometan vida útil.', 'cubiertas'=>'Protección frente a intemperie: cubierta, fachada, cerramientos, filtraciones, humedad o deterioro visible.', 'instalaciones'=>'Redes eléctricas, hidrosanitarias, voz/datos, gas, equipos y suficiencia técnica frente al uso.', 'acabados'=>'Vigencia y estado de pisos, muros, cielos, carpinterías y terminaciones frente a comparables.', 'mantenimiento'=>'Conservación general, rutinas de mantenimiento, reparaciones diferidas y estado observable del inmueble.'],
-            'funcional' => ['distribucion'=>'Relación entre espacios, circulaciones, accesos, operación interna y facilidad de uso para la actividad valuada.', 'dimensiones'=>'Área, frente, fondo, altura, proporciones y capacidad física frente a lo esperado por mercado.', 'flexibilidad'=>'Capacidad de adaptarse a otros usuarios, divisiones, ampliaciones o cambios sin obras desproporcionadas.', 'adecuacion'=>'Compatibilidad entre diseño actual, uso permitido, tipología y operación real del inmueble.', 'especializacion'=>'Grado en que el inmueble fue hecho para un usuario o actividad específica y reduce mercado alternativo.', 'tecnologia'=>'Rezago o suficiencia de sistemas técnicos, conectividad, automatización, eficiencia y soporte operativo.'],
-            'externa' => ['mercado'=>'Condiciones de oferta, demanda, absorción, vacancia, competencia y apetito por esta tipología.', 'entorno'=>'Calidad urbana, vecindario, mezcla de usos, imagen, seguridad percibida y compatibilidad del sector.', 'accesibilidad'=>'Ingreso, transporte, conectividad vial, parqueo, maniobra y facilidad para usuarios o visitantes.', 'ambiental'=>'Ruido, olores, inundación, contaminación, restricciones ambientales o externalidades físicas del entorno.', 'urbanistico'=>'Normativa, usos permitidos, cargas, restricciones, licencias, afectaciones o cambios regulatorios.', 'vocacion'=>'Coherencia entre el inmueble y la tendencia del sector: consolidación, cambio de uso o pérdida de atractivo.'],
+            'fisica' => [
+                'estructura'=>'Elementos portantes, estabilidad aparente, fisuras, asentamientos o señales que comprometan vida útil.',
+                'cubiertas'=>'Cubierta, fachadas y cerramientos: protección frente a intemperie, filtraciones, humedad, fisuras o deterioro visible.',
+                'instalaciones'=>'Redes eléctricas, hidrosanitarias, voz/datos, gas, equipos y suficiencia técnica frente al uso.',
+                'acabados'=>'Estado y vigencia de pisos, muros, cielos, carpinterías y terminaciones frente a inmuebles comparables.',
+                'mantenimiento'=>'Conservación general, rutinas de mantenimiento, reparaciones diferidas y estado observable del inmueble.'
+            ],
+            'funcional' => [
+                'distribucion'=>'Mira si la organización de espacios, circulaciones y accesos permite operar bien el uso valuado.',
+                'dimensiones'=>'Área, frente, fondo, altura, proporciones y capacidad frente a lo esperado por mercado para esta tipología.',
+                'flexibilidad'=>'Capacidad de adaptarse a otro usuario, división, ampliación o cambio sin obras desproporcionadas.',
+                'adecuacion'=>'Compatibilidad entre diseño actual, uso permitido, tipología y operación real del inmueble.',
+                'especializacion'=>'Grado en que el inmueble fue hecho para un usuario o actividad específica y reduce mercado alternativo.',
+                'tecnologia'=>'Rezago o suficiencia de sistemas técnicos, conectividad, automatización, eficiencia y soporte operativo.'
+            ],
+            'externa' => [
+                'mercado'=>'Oferta, demanda, vacancia, competencia y apetito de mercado por esta tipología en el sector.',
+                'entorno'=>'Vecindario, mezcla de usos, imagen, seguridad percibida y compatibilidad de actividades alrededor.',
+                'accesibilidad'=>'Ingreso, transporte, conectividad vial, parqueo, maniobra y facilidad para usuarios o visitantes.',
+                'ambiental'=>'Ruido, olores, inundación, contaminación, restricciones ambientales o externalidades físicas del entorno.',
+                'urbanistico'=>'Usos permitidos, cargas, restricciones, licencias, afectaciones o cambios regulatorios que incidan en el inmueble.',
+                'vocacion'=>'Coherencia entre el inmueble y la tendencia del sector: consolidación, cambio de uso o pérdida de atractivo.'
+            ],
+        ];
+    }
+
+    public static function readerGuidance(): array
+    {
+        return [
+            'fisica' => [
+                'definition' => 'Se relaciona con la pérdida de funcionalidad o valor por deterioro físico, edad, uso, falta de mantenimiento, abandono u otros factores observables.',
+                'no_finding' => 'No se evidencian condiciones de obsolescencia física; el inmueble presenta estado de conservación funcional para su uso, sin señales aparentes que comprometan la ocupación.',
+                'support' => 'Sustento típico: visita, fotografías, edad aproximada, estado de conservación, mantenimiento, patologías visibles e instalaciones.',
+            ],
+            'funcional' => [
+                'definition' => 'Se relaciona con la pérdida de utilidad por distribución, dimensiones, adecuaciones especializadas, limitaciones de uso o diseño menos eficiente frente al mercado.',
+                'no_finding' => 'No se evidencian condiciones de obsolescencia funcional; los espacios y la distribución son acordes con la destinación y permiten el uso previsto.',
+                'support' => 'Sustento típico: tipología, uso permitido, distribución, circulaciones, áreas, flexibilidad, adecuaciones y comparación con inmuebles similares.',
+            ],
+            'externa' => [
+                'definition' => 'Se relaciona con pérdida de valor por factores externos: mercado, entorno, accesibilidad, regulación, ambiente o cambios en la vocación del sector.',
+                'no_finding' => 'No se evidencian condiciones de obsolescencia externa; el inmueble se integra al entorno y las actividades del sector son compatibles con su uso potencial.',
+                'support' => 'Sustento típico: entorno, mercado, accesibilidad, seguridad, compatibilidad de usos, norma urbana, vocación del sector y evidencia de visita.',
+            ],
+        ];
+    }
+
+    public static function valuationGuidance(): array
+    {
+        return [
+            'El IEO es un índice interno de lectura técnica; no es una depreciación automática ni un porcentaje de descuento.',
+            'Si no hay hallazgos materiales, la incidencia económica puede quedar como “sin efecto material observado”.',
+            'Si hay hallazgo material, el impacto debe sustentarse aparte: costo de corrección, ajuste frente a comparables, menor utilidad, restricción normativa o condición externa comprobable.',
+            'El informe debe diferenciar evidencia observada, soporte documental y criterio del analista.'
         ];
     }
     public static function defaults(): array { return ['summary_text'=>'', 'diagnosis_text'=>'', 'quantification_text'=>'', 'normative_text'=>'', 'factors'=>[], 'updated_at'=>null]; }
