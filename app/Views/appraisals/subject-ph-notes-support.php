@@ -36,6 +36,17 @@ $noteRows = [
     ['Soportes documentales PH', $docValue, $docState, 'Confirmar soportes vigentes para administración, expensas, pólizas y reglamento.'],
     ['Fotos requeridas para 3.6', $photoValue, $photoState, 'Completar evidencias de visita cuando el informe lo requiera.'],
 ];
+$noteTextareas = [
+    'salvedades_reglamento' => 'Salvedades del reglamento',
+    'salvedades_visita' => 'Salvedades de visita',
+    'salvedades_validacion' => 'Salvedades de validación documental',
+    'observaciones_extraccion' => 'Observaciones de lectura y OCR',
+];
+$noteGroups = [
+    'riesgos' => ['risks', 'Riesgos, restricciones y afectaciones PH', $phCatalog['risks'], $riskValue],
+    'documentos' => ['documents', 'Soportes documentales PH', $phCatalog['documents'], $docValue],
+    'fotos' => ['photos', 'Fotos requeridas para 3.6', $phCatalog['photos'], $photoValue],
+];
 ?>
 <div class="rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6">
     <h4 class="font-semibold text-slate-900">Campos de notas normativas y salvedades para construir el Entregable</h4>
@@ -53,39 +64,45 @@ $noteRows = [
 </div>
 <div class="rounded-xl border border-slate-200 bg-white p-4">
     <h4 class="font-semibold text-slate-900">Detalle editable de notas normativas y salvedades</h4>
-    <div class="mt-3 grid gap-4">
-        <label class="label">Notas normativas aplicables
-            <textarea class="input mt-2 min-h-28" rows="4" name="ph[technical][notas_normativas_ph]" placeholder="Normas pertinentes y alcance técnico aplicable al análisis PH"><?= e($normText) ?></textarea>
+    <p class="mt-1 text-sm text-slate-600">Campos cortos para cerrar alcance. Los listados largos quedan plegados debajo.</p>
+    <div class="mt-3 grid gap-3 lg:grid-cols-2">
+        <label class="label lg:col-span-2">Notas normativas aplicables
+            <textarea class="input mt-2 min-h-20" rows="2" name="ph[technical][notas_normativas_ph]" placeholder="Normas pertinentes y alcance técnico aplicable al análisis PH"><?= e($normText) ?></textarea>
             <span class="mt-1 block text-xs font-normal text-slate-500">No es para volcar leyes completas; solo referencias normativas que soportan el alcance y las salvedades del avalúo.</span>
         </label>
-        <?php $renderTechTextarea('salvedades_reglamento', 'Salvedades del reglamento', $technicalValue('salvedades_reglamento')); ?>
-        <?php $renderTechTextarea('salvedades_visita', 'Salvedades de visita', $technicalValue('salvedades_visita')); ?>
-        <?php $renderTechTextarea('salvedades_validacion', 'Salvedades de validación documental', $technicalValue('salvedades_validacion')); ?>
-        <?php $renderTechTextarea('observaciones_extraccion', 'Observaciones de lectura y OCR', $technicalValue('observaciones_extraccion')); ?>
+        <?php foreach ($noteTextareas as $key => $label): ?>
+            <label class="label"><?= e($label) ?>
+                <textarea class="input mt-2 min-h-16" rows="2" name="ph[technical][<?= e((string) $key) ?>]" placeholder="Pendiente de soporte documental"><?= e($technicalValue((string) $key)) ?></textarea>
+            </label>
+        <?php endforeach; ?>
     </div>
 </div>
-<?php foreach ([
-    'riesgos' => ['risks', 'Riesgos, restricciones y afectaciones PH', $phCatalog['risks']],
-    'documentos' => ['documents', 'Soportes documentales PH', $phCatalog['documents']],
-    'fotos' => ['photos', 'Fotos requeridas para 3.6', $phCatalog['photos']],
-] as $tabKey => [$groupKey, $title, $items]): ?>
-    <section class="rounded-xl border border-slate-200 bg-white p-4">
-        <h4 class="font-semibold text-slate-900"><?= e($title) ?></h4>
-        <div class="mt-3 grid gap-3 xl:grid-cols-2">
-            <?php foreach ($items as $key => $label): ?>
-                <?php $current = $phMap($groupKey, (string) $key, 'status'); ?>
-                <div class="rounded-xl border p-3 <?= e($statusClass($current)) ?>">
-                    <label class="label text-sm"><?= e($label) ?>
-                        <select class="input mt-2" name="ph[<?= e($groupKey) ?>][<?= e($key) ?>][status]">
-                            <?php foreach ($phCatalog['status'] as $value => $option): ?>
-                                <option value="<?= e($value) ?>" <?= $current === (string) $value ? 'selected' : '' ?>><?= e($option) ?></option>
-                            <?php endforeach; ?>
-                        </select>
-                    </label>
-                    <label class="label mt-2">Evidencia y observación
-                    <textarea class="input mt-2 min-h-20" rows="2" name="ph[<?= e($groupKey) ?>][<?= e($key) ?>][notes]" placeholder="Observación del analista"><?= e($phMap($groupKey, (string) $key, 'notes')) ?></textarea></label>
-                </div>
-            <?php endforeach; ?>
+<?php foreach ($noteGroups as [$groupKey, $title, $items, $metric]): ?>
+    <details class="rounded-xl border border-slate-200 bg-white p-4">
+        <summary class="flex cursor-pointer list-none items-center justify-between gap-3 font-semibold text-slate-900">
+            <span><?= e($title) ?></span>
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-600"><?= e($metric) ?> · abrir detalle</span>
+        </summary>
+        <div class="mt-3 overflow-x-auto">
+            <table class="w-full min-w-[52rem] text-left text-sm">
+                <thead class="text-xs uppercase text-slate-500"><tr><th class="py-2 pr-3">Campo</th><th class="py-2 pr-3">Estado</th><th class="py-2">Evidencia y observación</th></tr></thead>
+                <tbody class="divide-y divide-slate-100">
+                    <?php foreach ($items as $key => $label): ?>
+                        <?php $current = $phMap($groupKey, (string) $key, 'status'); ?>
+                        <tr class="<?= e($statusClass($current)) ?>">
+                            <td class="py-2 pr-3 font-semibold text-slate-800"><?= e((string) $label) ?></td>
+                            <td class="py-2 pr-3 align-top">
+                                <select class="input min-w-44" name="ph[<?= e($groupKey) ?>][<?= e($key) ?>][status]">
+                                    <?php foreach ($phCatalog['status'] as $value => $option): ?>
+                                        <option value="<?= e($value) ?>" <?= $current === (string) $value ? 'selected' : '' ?>><?= e($option) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </td>
+                            <td class="py-2 align-top"><textarea class="input min-h-14" rows="1" name="ph[<?= e($groupKey) ?>][<?= e($key) ?>][notes]" placeholder="Observación del analista"><?= e($phMap($groupKey, (string) $key, 'notes')) ?></textarea></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
         </div>
-    </section>
+    </details>
 <?php endforeach; ?>
