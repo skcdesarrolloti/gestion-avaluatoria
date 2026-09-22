@@ -15,23 +15,21 @@
                 <?php foreach ($phCatalog['commonAreaGroups'] as $groupKey => [$groupTitle, $items]): ?>
                     <?php $groupKeys = array_map('strval', array_keys($items)); $groupJson = e(json_encode($groupKeys, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)); ?>
                     <div class="mt-4 rounded-xl border border-slate-200 bg-white shadow-sm">
-                        <button class="w-full rounded-xl bg-slate-900 px-4 py-3 text-left text-white" type="button" @click="toggleGroup('<?= e((string) $groupKey) ?>')">
-                            <span class="flex flex-wrap items-center justify-between gap-2">
-                                <span class="text-xl font-bold"><?= e($groupTitle) ?></span>
-                                <span class="flex items-center gap-2">
-                                    <span class="rounded-full bg-white/15 px-3 py-1 text-sm font-semibold" x-text="readyCount(<?= $groupJson ?>) + ' de ' + applicableCount(<?= $groupJson ?>) + ' visibles revisados'"></span>
-                                    <span class="rounded-full bg-white/10 px-3 py-1 text-xs font-semibold" x-show="hiddenCount(<?= $groupJson ?>) > 0 && !showOthers" x-text="hiddenCount(<?= $groupJson ?>) + ' no prioritarios ocultos'"></span>
-                                    <span class="text-sm font-bold" x-text="isOpen('<?= e((string) $groupKey) ?>') ? 'Cerrar' : 'Abrir'"></span>
-                                </span>
+                        <div class="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-900 px-4 py-3 text-white">
+                            <span class="text-xl font-bold"><?= e($groupTitle) ?></span>
+                            <span class="flex flex-wrap items-center gap-2">
+                                <span class="rounded-full bg-white/15 px-3 py-1 text-sm font-semibold" x-text="readyCount(<?= $groupJson ?>, '<?= e((string) $groupKey) ?>') + ' de ' + applicableCount(<?= $groupJson ?>, '<?= e((string) $groupKey) ?>') + ' visibles revisados'"></span>
+                                <button class="rounded-full bg-white/10 px-3 py-1 text-xs font-bold hover:bg-white/20" type="button" x-show="hiddenCount(<?= $groupJson ?>) > 0" @click="toggleGroupOthers('<?= e((string) $groupKey) ?>')" x-text="groupShowsOthers('<?= e((string) $groupKey) ?>') ? 'Ocultar no prioritarios' : hiddenCount(<?= $groupJson ?>) + ' no prioritarios ocultos'"></button>
+                                <button class="rounded-full bg-white/10 px-3 py-1 text-sm font-bold hover:bg-white/20" type="button" @click="toggleGroup('<?= e((string) $groupKey) ?>')" x-text="isOpen('<?= e((string) $groupKey) ?>') ? 'Cerrar' : 'Abrir'"></button>
                             </span>
-                        </button>
+                        </div>
                         <div class="overflow-x-auto p-3" x-show="isOpen('<?= e((string) $groupKey) ?>')" x-cloak>
                             <table class="w-full min-w-[64rem] text-left text-sm">
                                 <thead class="text-xs uppercase text-slate-500"><tr><th class="py-2 pr-3">Elemento</th><th class="py-2 pr-3">Estado e impacto</th><th class="py-2">Evidencia y observación</th></tr></thead>
                                 <tbody class="divide-y divide-slate-100">
                                     <?php foreach ($items as $key => $label): ?>
                                         <?php $current = $phMap('common_areas', (string) $key, 'status'); ?>
-                                        <tr class="align-top" x-show="isRelevant('<?= e((string) $key) ?>') || showOthers" :class="rowClass('<?= e((string) $key) ?>')">
+                                        <tr class="align-top" x-show="isRelevant('<?= e((string) $key) ?>') || groupShowsOthers('<?= e((string) $groupKey) ?>')" :class="rowClass('<?= e((string) $key) ?>')">
                                             <td class="w-72 border-l-4 py-3 pl-3 pr-3 text-base font-bold text-slate-900" :class="isRelevant('<?= e((string) $key) ?>') ? 'border-blue-500' : 'border-slate-400'">
                                                 <?= e($label) ?>
                                                 <span class="mt-2 inline-flex rounded-full bg-blue-50 px-2 py-1 text-xs font-bold text-blue-800" x-show="priorities.includes('<?= e((string) $key) ?>')">Prioritario para la tipología</span>

@@ -1,6 +1,6 @@
 export function phCommonLive({ statuses = {}, labels = {}, notes = {}, groups = {}, priorities = [], relevantKeys = [], typologyLabel = '', summary = '' } = {}) {
     return {
-        statuses, labels, notes, summary, groups, priorities, relevantKeys, typologyLabel, showOthers: false,
+        statuses, labels, notes, summary, groups, priorities, relevantKeys, typologyLabel, showOthers: false, showOtherGroups: {},
         openGroups: Object.fromEntries(Object.keys(groups).map(key => [key, true])),
         statusEffects: {
             '': 'Faltante: no alimenta el texto y queda pendiente en la matriz.',
@@ -55,10 +55,12 @@ export function phCommonLive({ statuses = {}, labels = {}, notes = {}, groups = 
         updateCommonNotes(key, value) { this.notes[key] = value; if (this.isAutomaticSummary(this.summary)) this.refreshSummary(); },
         toggleGroup(key) { this.openGroups[key] = !this.openGroups[key]; },
         isOpen(key) { return this.openGroups[key] !== false; },
-        visibleKeys(keys) { return this.showOthers ? keys : keys.filter(key => this.isRelevant(key)); },
+        groupShowsOthers(key) { return this.showOthers || this.showOtherGroups[key] === true; },
+        toggleGroupOthers(key) { this.showOtherGroups[key] = !this.showOtherGroups[key]; this.openGroups[key] = true; },
+        visibleKeys(keys, groupKey = '') { return this.groupShowsOthers(groupKey) ? keys : keys.filter(key => this.isRelevant(key)); },
         hiddenCount(keys) { return keys.filter(key => !this.isRelevant(key)).length; },
-        readyCount(keys) { return this.visibleKeys(keys).filter(key => ['ok', 'warn', 'risk'].includes(this.statuses[key])).length; },
-        applicableCount(keys) { return this.visibleKeys(keys).filter(key => this.statuses[key] !== 'na').length; },
+        readyCount(keys, groupKey = '') { return this.visibleKeys(keys, groupKey).filter(key => ['ok', 'warn', 'risk'].includes(this.statuses[key])).length; },
+        applicableCount(keys, groupKey = '') { return this.visibleKeys(keys, groupKey).filter(key => this.statuses[key] !== 'na').length; },
         rowClass(key) {
             if (!this.isRelevant(key)) return 'bg-slate-100 opacity-80';
             return { 'bg-emerald-50': this.statuses[key] === 'ok', 'bg-amber-50': this.statuses[key] === 'warn', 'bg-red-50': this.statuses[key] === 'risk', 'bg-slate-50': this.statuses[key] === 'na' || this.statuses[key] === '' };
