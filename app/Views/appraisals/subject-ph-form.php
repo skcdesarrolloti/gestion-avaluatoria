@@ -121,38 +121,7 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
         <section class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4" x-show="tab === 'comunes'">
             <?php $renderPhTabSummary('resumen_comunes_ph', 'Resumen depurado para Entregable'); ?>
             <div class="mt-4 grid gap-4 lg:grid-cols-2"><?php require BASE_PATH . '/app/Views/appraisals/subject-ph-common-support.php'; ?></div>
-            <div class="mt-5">
-                <h3 class="text-lg font-semibold">Detalle editable de bienes comunes, amenidades y soporte</h3>
-                <p class="mt-2 text-sm leading-6 text-slate-600">Diligencia o depura cada campo. La matriz superior resume qué está listo, qué requiere revisión y qué falta para el Entregable.</p>
-            </div>
-            <?php foreach ($phCatalog['commonAreaGroups'] as $groupKey => [$groupTitle, $items]): ?>
-                <div class="mt-4 rounded-xl border border-slate-200 bg-white p-4">
-                    <h4 class="text-base font-semibold"><?= e($groupTitle) ?></h4>
-                    <div class="mt-3 overflow-x-auto">
-                        <table class="w-full min-w-[52rem] text-left text-sm">
-                            <thead class="text-xs uppercase text-slate-500"><tr><th class="py-2 pr-3">Elemento</th><th class="py-2 pr-3">Estado</th><th class="py-2">Evidencia y observación</th></tr></thead>
-                            <tbody class="divide-y divide-slate-100">
-                                <?php foreach ($items as $key => $label): ?>
-                                    <?php $current = $phMap('common_areas', (string) $key, 'status'); ?>
-                                    <tr class="align-top <?= e($statusClass($current)) ?>">
-                                        <td class="w-64 py-2 pr-3 font-semibold text-slate-800"><?= e($label) ?></td>
-                                        <td class="w-56 py-2 pr-3">
-                                            <select class="input mt-0 min-h-10 py-2 text-sm" name="ph[common_areas][<?= e($key) ?>][status]">
-                                                <?php foreach ($phCatalog['status'] as $value => $option): ?>
-                                                    <option value="<?= e($value) ?>" <?= $current === (string) $value ? 'selected' : '' ?>><?= e($option) ?></option>
-                                                <?php endforeach; ?>
-                                            </select>
-                                        </td>
-                                        <td class="py-2">
-                                            <textarea class="input mt-0 min-h-14 py-2 text-sm" rows="2" name="ph[common_areas][<?= e($key) ?>][notes]" placeholder="Página, cláusula, visita o salvedad"><?= e($phMap('common_areas', (string) $key, 'notes')) ?></textarea>
-                                        </td>
-                                    </tr>
-                                <?php endforeach; ?>
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-            <?php endforeach; ?>
+            <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-common-detail.php'; ?>
         </section>
 
         <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-closing.php'; ?>
