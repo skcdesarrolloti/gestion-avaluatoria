@@ -3,8 +3,7 @@
 ?>
             <div class="mt-5">
                 <h3 class="text-xl font-bold text-slate-950">Detalle editable de bienes comunes, amenidades y soporte</h3>
-                <p class="mt-2 text-sm leading-6 text-slate-600">La vista principal muestra bienes esenciales y elementos prioritarios de la tipología seleccionada. Los demás quedan como apoyo opcional para revisión, sin contaminar el resumen principal.</p>
-                <button class="mt-3 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm font-bold text-slate-700" type="button" @click="showOthers = !showOthers" x-text="showOthers ? 'Ocultar no prioritarios' : 'Mostrar otros elementos no prioritarios'"></button>
+                <p class="mt-2 text-sm leading-6 text-slate-600">Todos los componentes se muestran para revisión. Cada fila indica si aplica directamente para la tipología seleccionada o si podría aplicar como complemento según reglamento, visita o criterio del analista.</p>
                 <div class="mt-3 grid gap-2 text-xs sm:grid-cols-5">
                     <p class="rounded-lg bg-emerald-50 p-2 font-semibold text-emerald-800">Verificado: entra como beneficio.</p>
                     <p class="rounded-lg bg-amber-50 p-2 font-semibold text-amber-800">Por confirmar: queda pendiente.</p>
@@ -18,8 +17,7 @@
                         <div class="flex flex-wrap items-center justify-between gap-2 rounded-xl bg-slate-900 px-4 py-3 text-white">
                             <span class="text-xl font-bold"><?= e($groupTitle) ?></span>
                             <span class="flex flex-wrap items-center gap-2">
-                                <span class="rounded-full bg-white/15 px-3 py-1 text-sm font-semibold" x-text="readyCount(<?= $groupJson ?>, '<?= e((string) $groupKey) ?>') + ' de ' + applicableCount(<?= $groupJson ?>, '<?= e((string) $groupKey) ?>') + ' visibles revisados'"></span>
-                                <button class="rounded-full bg-white/10 px-3 py-1 text-xs font-bold hover:bg-white/20" type="button" x-show="hiddenCount(<?= $groupJson ?>) > 0" @click="toggleGroupOthers('<?= e((string) $groupKey) ?>')" x-text="groupShowsOthers('<?= e((string) $groupKey) ?>') ? 'Ocultar no prioritarios' : hiddenCount(<?= $groupJson ?>) + ' no prioritarios ocultos'"></button>
+                                <span class="rounded-full bg-white/15 px-3 py-1 text-sm font-semibold" x-text="readyCount(<?= $groupJson ?>) + ' de ' + applicableCount(<?= $groupJson ?>) + ' revisados'"></span>
                                 <button class="rounded-full bg-white/10 px-3 py-1 text-sm font-bold hover:bg-white/20" type="button" @click="toggleGroup('<?= e((string) $groupKey) ?>')" x-text="isOpen('<?= e((string) $groupKey) ?>') ? 'Cerrar' : 'Abrir'"></button>
                             </span>
                         </div>
@@ -29,11 +27,11 @@
                                 <tbody class="divide-y divide-slate-100">
                                     <?php foreach ($items as $key => $label): ?>
                                         <?php $current = $phMap('common_areas', (string) $key, 'status'); ?>
-                                        <tr class="align-top" x-show="isRelevant('<?= e((string) $key) ?>') || groupShowsOthers('<?= e((string) $groupKey) ?>')" :class="rowClass('<?= e((string) $key) ?>')">
-                                            <td class="w-72 border-l-4 py-3 pl-3 pr-3 text-base font-bold text-slate-900" :class="isRelevant('<?= e((string) $key) ?>') ? 'border-blue-500' : 'border-slate-400'">
+                                        <tr class="align-top" :class="rowClass('<?= e((string) $key) ?>')">
+                                            <td class="w-72 border-l-4 py-3 pl-3 pr-3 text-base font-bold text-slate-900" :class="isRelevant('<?= e((string) $key) ?>') ? 'border-blue-500' : 'border-amber-500'">
                                                 <?= e($label) ?>
-                                                <span class="mt-2 inline-flex rounded-full bg-blue-50 px-2 py-1 text-xs font-bold text-blue-800" x-show="priorities.includes('<?= e((string) $key) ?>')">Prioritario para la tipología</span>
-                                                <span class="mt-2 inline-flex rounded-full bg-slate-700 px-2 py-1 text-xs font-bold text-white" x-show="!isRelevant('<?= e((string) $key) ?>')">Apoyo no prioritario · no entra al resumen principal</span>
+                                                <span class="mt-2 inline-flex rounded-full bg-blue-50 px-2 py-1 text-xs font-bold text-blue-800" x-show="isRelevant('<?= e((string) $key) ?>')">Aplica para la tipología seleccionada</span>
+                                                <span class="mt-2 inline-flex rounded-full bg-amber-300 px-2 py-1 text-xs font-extrabold text-amber-950 shadow-sm" x-show="!isRelevant('<?= e((string) $key) ?>')">Podría aplicar para la tipología seleccionada</span>
                                             </td>
                                             <td class="w-80 py-3 pr-3">
                                                 <select class="input mt-0 min-h-10 py-2 text-sm" x-model="statuses['<?= e((string) $key) ?>']" @change="updateCommonStatus('<?= e((string) $key) ?>', $event.target.value)" name="ph[common_areas][<?= e($key) ?>][status]">
@@ -43,7 +41,6 @@
                                                 </select>
                                                 <p class="mt-2 rounded-lg bg-white/80 p-2 text-xs font-semibold text-slate-700" x-text="effectFor('<?= e((string) $key) ?>')"></p>
                                                 <p class="mt-2 rounded-lg bg-blue-50 p-2 text-xs font-semibold text-blue-800" x-text="'Origen: ' + originLabel('<?= e((string) $key) ?>')"></p>
-                                                <p class="mt-2 rounded-lg bg-slate-800 p-2 text-xs font-bold text-white" x-show="!isRelevant('<?= e((string) $key) ?>')">Campo abierto solo para consulta o caso excepcional.</p>
                                             </td>
                                             <td class="py-3">
                                                 <textarea class="input mt-0 min-h-14 py-2 text-sm" rows="2" x-model="notes['<?= e((string) $key) ?>']" @input="updateCommonNotes('<?= e((string) $key) ?>', $event.target.value)" name="ph[common_areas][<?= e($key) ?>][notes]" placeholder="Página, cláusula, visita, fotografía o salvedad"><?= e($phMap('common_areas', (string) $key, 'notes')) ?></textarea>

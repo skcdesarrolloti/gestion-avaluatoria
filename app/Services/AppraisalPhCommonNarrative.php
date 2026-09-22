@@ -10,18 +10,17 @@ final class AppraisalPhCommonNarrative
     {
         $parts = []; $labels = AppraisalPhCatalog::commonAreas();
         $groups = AppraisalPhCatalog::commonAreaGroups(); $priorityList = AppraisalPhCatalog::typologyPriorities()[$typology] ?? [];
-        $relevant = array_fill_keys($priorityList ? array_merge(array_keys($groups['esenciales'][1] ?? []), $priorityList) : array_keys($labels), true);
-        $priority = array_values(array_filter($priorityList, fn (string $key): bool => isset($relevant[$key]) && $this->hasEvidence($common, $key)));
+        $priority = array_values(array_filter($priorityList, fn (string $key): bool => $this->hasEvidence($common, $key)));
         if ($priority) $parts[] = 'Para la tipología ' . (AppraisalPhCatalog::typologies()[$typology] ?? 'seleccionada') . ', los elementos prioritarios identificados son ' . $this->names($priority, $labels) . '.';
-        foreach ($groups as [$title, $items]) $this->appendGroup($parts, $title, $items, $common, $labels, $relevant);
+        foreach ($groups as [$title, $items]) $this->appendGroup($parts, $title, $items, $common, $labels);
         return $parts ? implode(' ', $parts) : 'No se han identificado bienes comunes con soporte documental o verificación del analista para incorporar al Entregable.';
     }
 
-    private function appendGroup(array &$parts, string $title, array $items, array $common, array $labels, array $relevant): void
+    private function appendGroup(array &$parts, string $title, array $items, array $common, array $labels): void
     {
         $bucket = ['documento'=>[], 'sitio'=>[], 'analista'=>[], 'pendiente'=>[], 'riesgo'=>[]];
         foreach ($items as $key => $label) {
-            if (!isset($relevant[(string) $key]) || !$this->hasEvidence($common, (string) $key)) continue;
+            if (!$this->hasEvidence($common, (string) $key)) continue;
             $status = (string) ($common[$key]['status'] ?? ''); $source = $this->source((string) ($common[$key]['notes'] ?? ''));
             if ($status === 'risk') $bucket['riesgo'][] = (string) $key;
             elseif ($status === 'ok' && ($source === 'sitio' || $source === 'ambos')) $bucket['sitio'][] = (string) $key;

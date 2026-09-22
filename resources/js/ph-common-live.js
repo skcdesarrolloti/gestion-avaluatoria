@@ -1,6 +1,6 @@
 export function phCommonLive({ statuses = {}, labels = {}, notes = {}, groups = {}, priorities = [], relevantKeys = [], typologyLabel = '', summary = '' } = {}) {
     return {
-        statuses, labels, notes, summary, groups, priorities, relevantKeys, typologyLabel, showOthers: false, showOtherGroups: {},
+        statuses, labels, notes, summary, groups, priorities, relevantKeys, typologyLabel,
         openGroups: Object.fromEntries(Object.keys(groups).map(key => [key, true])),
         statusEffects: {
             '': 'Faltante: no alimenta el texto y queda pendiente en la matriz.',
@@ -23,12 +23,12 @@ export function phCommonLive({ statuses = {}, labels = {}, notes = {}, groups = 
         originLabel(key) { return ({ ambos: 'Reglamento y sitio', sitio: 'Sitio / fotografías', documento: 'Reglamento / documento', analista: 'Criterio del analista' })[this.source(key)]; },
         generatedSummary() {
             const parts = [];
-            const priority = this.priorities.filter(key => this.isRelevant(key) && this.hasEvidence(key)).map(key => this.label(key));
+            const priority = this.priorities.filter(key => this.hasEvidence(key)).map(key => this.label(key));
             if (priority.length) parts.push('Para la tipología ' + (this.typologyLabel || 'seleccionada') + ', los elementos prioritarios identificados son ' + this.limited(priority) + '.');
             Object.values(this.groups).forEach(group => {
                 const bucket = { documento: [], sitio: [], analista: [], pendiente: [], riesgo: [] };
                 (group.keys || []).forEach(key => {
-                    if (!this.isRelevant(key) || !this.hasEvidence(key)) return;
+                    if (!this.hasEvidence(key)) return;
                     const name = this.label(key), status = this.statuses[key], source = this.source(key);
                     if (status === 'risk') bucket.riesgo.push(name);
                     else if (status === 'ok' && (source === 'sitio' || source === 'ambos')) bucket.sitio.push(name);
@@ -55,14 +55,10 @@ export function phCommonLive({ statuses = {}, labels = {}, notes = {}, groups = 
         updateCommonNotes(key, value) { this.notes[key] = value; if (this.isAutomaticSummary(this.summary)) this.refreshSummary(); },
         toggleGroup(key) { this.openGroups[key] = !this.openGroups[key]; },
         isOpen(key) { return this.openGroups[key] !== false; },
-        groupShowsOthers(key) { return this.showOthers || this.showOtherGroups[key] === true; },
-        toggleGroupOthers(key) { this.showOtherGroups[key] = !this.showOtherGroups[key]; this.openGroups[key] = true; },
-        visibleKeys(keys, groupKey = '') { return this.groupShowsOthers(groupKey) ? keys : keys.filter(key => this.isRelevant(key)); },
-        hiddenCount(keys) { return keys.filter(key => !this.isRelevant(key)).length; },
-        readyCount(keys, groupKey = '') { return this.visibleKeys(keys, groupKey).filter(key => ['ok', 'warn', 'risk'].includes(this.statuses[key])).length; },
-        applicableCount(keys, groupKey = '') { return this.visibleKeys(keys, groupKey).filter(key => this.statuses[key] !== 'na').length; },
+        readyCount(keys) { return keys.filter(key => ['ok', 'warn', 'risk'].includes(this.statuses[key])).length; },
+        applicableCount(keys) { return keys.filter(key => this.statuses[key] !== 'na').length; },
         rowClass(key) {
-            if (!this.isRelevant(key)) return 'bg-slate-100 opacity-80';
+            if (!this.isRelevant(key)) return 'bg-amber-50';
             return { 'bg-emerald-50': this.statuses[key] === 'ok', 'bg-amber-50': this.statuses[key] === 'warn', 'bg-red-50': this.statuses[key] === 'risk', 'bg-slate-50': this.statuses[key] === 'na' || this.statuses[key] === '' };
         },
         effectFor(key) { return this.statusEffects[this.statuses[key] || ''] || this.statusEffects['']; },
