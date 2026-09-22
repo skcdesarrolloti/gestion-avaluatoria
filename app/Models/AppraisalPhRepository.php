@@ -192,7 +192,7 @@ final class AppraisalPhRepository
     {
         $text = trim($text); if ($text === '') return true;
         foreach (['Base comparativa:', 'Trazabilidad:', 'Identificación:', 'Tipología y régimen:',
-            'Configuración predial:', 'Bienes comunes y soporte:', 'Reglas de uso y operación:',
+            'Configuración predial:', 'Bienes comunes y soporte:', 'Reglas de uso y operación:', 'Las reglas de uso y operación de',
             'Administración y cargas:', 'Incidencia valuatoria:', 'Notas y salvedades:',
             'La copropiedad corresponde preliminarmente', 'Se revisa preliminarmente como',
             'Lectura preliminar PH sin hallazgos suficientes', 'Para el análisis de propiedad horizontal se tuvo como soporte',

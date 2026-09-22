@@ -15,7 +15,6 @@ final class AppraisalPhReportBuilder
         $use = $this->dominantUse($technical, $typology);
         [$advantages, $support] = $this->advantages($common, $typology);
         $level = $this->dotationLevel($technical);
-        $rules = $this->rules($technical, $core);
         $admin = $this->administration($core, $technical);
         $limits = 'La conclusión corresponde al alcance técnico del avalúo y se complementa con el análisis jurídico registrado en el expediente.';
         $trace = $this->traceSummary($technical, $limits);
@@ -27,7 +26,7 @@ final class AppraisalPhReportBuilder
             'resumen_tipologia_ph' => $this->typologySummary($name, $label, $technical, $typology),
             'resumen_configuracion_ph' => (new AppraisalPhConfigurationNarrative())->build($technical, $core),
             'resumen_comunes_ph' => $this->commonSummary($support, $typology),
-            'resumen_reglas_ph' => "Reglas de uso y operación: {$rules} Estas reglas inciden en imagen, convivencia, uso permitido, adecuaciones y comercialización de la unidad.",
+            'resumen_reglas_ph' => $this->rulesSummary($name, $technical, $core, $typology),
             'resumen_administracion_ph' => "Administración y cargas: {$admin} Para valor, liquidez y negociación se requiere confirmar expensas, paz y salvo, pólizas y estado administrativo actual.",
             'resumen_incidencia_ph' => "Incidencia valuatoria: la ubicación del bien dentro de {$name} aporta representatividad corporativa, seguridad, soporte común y servicios compartidos. "
                 . "Estos atributos pueden mejorar deseabilidad, funcionalidad y comparabilidad frente a unidades en copropiedades con menor dotación, sujeto al estado real observado.",
@@ -130,14 +129,27 @@ final class AppraisalPhReportBuilder
             default => 'La lectura aporta elementos para precisar el uso dominante y los usos complementarios.',
         };
     }
-    private function rules(array $technical, array $core): string
+    private function rulesSummary(string $name, array $technical, array $core, string $typology): string
     {
-        $parts = $this->present(['usos permitidos' => $technical['usos_permitidos'] ?? '',
-            'restricciones' => $technical['usos_restringidos'] ?? '',
-            'reglas constructivas' => $technical['reglas_constructivas'] ?? '',
-            'condiciones operativas' => $technical['condiciones_normativas_operativas'] ?? '',
-            'texto de restricciones' => $core['restrictions_text'] ?? '']);
-        return $parts ? 'se encontraron referencias a ' . $parts . '.' : 'no hay reglas depuradas suficientes; revisar reglamento y visita.';
+        $labels = ['usos_permitidos' => 'usos permitidos', 'usos_restringidos' => 'restricciones o prohibiciones',
+            'reglas_constructivas' => 'reglas constructivas y adecuaciones',
+            'condiciones_normativas_operativas' => 'condiciones operativas',
+            'condiciones_usuario_operador' => 'condiciones de usuario operador o administración',
+            'cargue_descargue' => 'cargue, descargue y movilidad'];
+        $directKeys = array_fill_keys(AppraisalPhCatalog::technicalApplicability()[$typology] ?? [], true);
+        $direct = $extra = [];
+        if ($this->hasText($core['restrictions_text'] ?? '')) $direct[] = 'restricciones generales de uso u operación';
+        foreach ($labels as $key => $label) {
+            if (!$this->hasText($technical[$key] ?? '')) continue;
+            (isset($directKeys[$key]) || in_array($key, ['usos_permitidos', 'usos_restringidos', 'reglas_constructivas'], true))
+                ? $direct[] = $label : $extra[] = $label;
+        }
+        if (!$direct && !$extra) {
+            return "Las reglas de uso y operación de {$name} aún requieren depuración del reglamento, la visita o los soportes del encargo antes de incorporarse al Entregable.";
+        }
+        $summary = "Las reglas de uso y operación de {$name} permiten depurar " . implode(', ', array_unique($direct ?: $extra)) . '.';
+        if ($extra) $summary .= ' Como condiciones complementarias por confirmar o aplicar según la unidad se registran ' . implode(', ', array_unique($extra)) . '.';
+        return $summary . ' Esta lectura orienta el uso admisible, las adecuaciones, la operación cotidiana, la imagen del inmueble y sus condiciones de comercialización dentro de la copropiedad.';
     }
     private function administration(array $core, array $technical): string
     {

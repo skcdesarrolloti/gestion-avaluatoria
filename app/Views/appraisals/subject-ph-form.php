@@ -39,15 +39,6 @@ $technicalValue = static fn (string $key): string => (string) ($technical[$key] 
 
 $technicalApplicability = \App\Support\AppraisalPhCatalog::technicalApplicability();
 $typologyTechnicalKeys = array_fill_keys($technicalApplicability[$currentTypology] ?? [], true);
-$renderRuleTextarea = static function (string $key, string $label, string $value) use ($typologyTechnicalKeys): void {
-    $applies = isset($typologyTechnicalKeys[$key]);
-    $badge = $applies ? 'Aplica para la tipología seleccionada' : 'Podría aplicar para la tipología seleccionada';
-    $badgeClass = $applies ? 'bg-blue-50 text-blue-800 border-blue-100' : 'bg-amber-200 text-amber-950 border-amber-300'; ?>
-    <label class="label rounded-xl border border-slate-200 bg-white p-3"><?= e($label) ?>
-        <span class="mt-2 inline-flex rounded-full border px-2 py-1 text-xs font-extrabold <?= e($badgeClass) ?>"><?= e($badge) ?></span>
-        <textarea class="input mt-2 min-h-24" rows="3" name="ph[technical][<?= e($key) ?>]" placeholder="Regla, página, cláusula o validación de visita"><?= e($value) ?></textarea>
-    </label>
-<?php };
 $renderTechTextarea = static function (string $key, string $label, string $value): void { ?>
     <label class="label"><?= e($label) ?>
         <textarea class="input mt-2 min-h-24" rows="3" name="ph[technical][<?= e($key) ?>]" placeholder="Pendiente de soporte documental"><?= e($value) ?></textarea>
@@ -138,14 +129,7 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
 
         <section class="mt-5 grid gap-4 lg:grid-cols-2" x-show="tab === 'reglas'">
             <div class="lg:col-span-2"><?php $renderPhTabSummary('resumen_reglas_ph', 'Resumen depurado para Entregable'); ?></div>
-            <div class="rounded-xl border border-blue-100 bg-blue-50 p-3 text-sm leading-6 text-blue-950 lg:col-span-2">
-                Revisa reglas de uso, restricciones, adecuaciones y operación. Azul indica aplicación directa a la tipología; amarillo indica regla complementaria que puede aplicar según la unidad o la visita.
-            </div>
-            <label class="label rounded-xl border border-slate-200 bg-white p-3 lg:col-span-2">Restricciones de uso u operación
-                <span class="mt-2 inline-flex rounded-full border border-blue-100 bg-blue-50 px-2 py-1 text-xs font-extrabold text-blue-800">Aplica para la tipología seleccionada</span>
-                <textarea class="input mt-2 min-h-24" rows="4" name="ph[restrictions_text]" placeholder="Usos, horarios, movilidad, residuos, cerramientos o adecuaciones."><?= e($phText('restrictions_text')) ?></textarea>
-            </label>
-            <?php foreach (['usos_permitidos'=>'Usos permitidos','usos_restringidos'=>'Usos restringidos o prohibidos','reglas_constructivas'=>'Reglas constructivas','condiciones_normativas_operativas'=>'Condiciones operativas','condiciones_usuario_operador'=>'Usuario operador o administración','cargue_descargue'=>'Cargue, descargue y movilidad'] as $key=>$label) $renderRuleTextarea($key, $label, $technicalValue($key)); ?>
+            <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-rules-support.php'; ?>
         </section>
 
         <section class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4" x-show="tab === 'comunes'"
