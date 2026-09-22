@@ -6,6 +6,12 @@ $phCommonApplies = static fn (string $key): bool => $phCommonStatus($key) !== 'n
 $phCommonReady = static fn (string $key): bool => in_array($phCommonStatus($key), ['ok', 'warn', 'risk'], true);
 $priorityFound = array_values(array_filter($priorityKeys, $phCommonReady));
 $commonStats = [];
+$commonStatusMap = [];
+$commonLabelMap = [];
+foreach ($phCatalog['commonAreas'] as $key => $label) {
+    $commonStatusMap[(string) $key] = $phCommonStatus((string) $key);
+    $commonLabelMap[(string) $key] = (string) $label;
+}
 foreach ($phCatalog['commonAreaGroups'] as $groupKey => [$groupTitle, $items]) {
     $keys = array_map('strval', array_keys($items));
     $found = count(array_filter($keys, $phCommonReady));
@@ -118,8 +124,13 @@ $renderPhTabSummary = static function (string $key, string $label) use ($technic
             <?php foreach (['usos_permitidos'=>'Usos permitidos','usos_restringidos'=>'Usos restringidos o prohibidos','reglas_constructivas'=>'Reglas constructivas','condiciones_normativas_operativas'=>'Condiciones operativas','condiciones_usuario_operador'=>'Usuario operador o administración','cargue_descargue'=>'Cargue, descargue y movilidad'] as $key=>$label) $renderTechTextarea($key, $label, $technicalValue($key)); ?>
         </section>
 
-        <section class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4" x-show="tab === 'comunes'">
-            <?php $renderPhTabSummary('resumen_comunes_ph', 'Resumen depurado para Entregable'); ?>
+        <section class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4" x-show="tab === 'comunes'"
+            x-data='phCommonLive(<?= e(json_encode(["statuses" => $commonStatusMap, "labels" => $commonLabelMap, "summary" => $technicalValue("resumen_comunes_ph"), "typology" => $currentTypology], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>)'>
+            <label class="label rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-950">Resumen depurado para Entregable
+                <textarea class="input mt-2 min-h-24 bg-white" rows="3" name="ph[technical][resumen_comunes_ph]"
+                    data-common-summary x-model="summary" placeholder="Texto profesional para revisar e incorporar luego al Entregable"></textarea>
+                <span class="mt-1 block text-xs font-normal text-emerald-800">Texto vivo para informe; cambia al modificar los estados y puede editarse antes de pasar al Entregable.</span>
+            </label>
             <div class="mt-4 grid gap-4 lg:grid-cols-2"><?php require BASE_PATH . '/app/Views/appraisals/subject-ph-common-support.php'; ?></div>
             <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-common-detail.php'; ?>
         </section>
