@@ -112,7 +112,7 @@ $formatAttributeAdjustment = static function (?float $value): string {
         <?php if ($attributeUnits): ?>
             <div class="mt-5 flex justify-end">
                 <p class="mr-auto self-center text-xs font-semibold text-slate-500" data-autosave-status>
-                    Autoguardado activo para textos y diferenciales. Las evidencias marcadas como Foto se cargan en 3.6.
+                    Autoguardado activo para textos y diferenciales. Las evidencias marcadas como Foto se cargan en 3.7.
                 </p>
                 <button class="btn-primary" type="submit" :disabled="busyAttributes"
                     x-text="busyAttributes ? 'Guardando...' : 'Guardar diferenciales'">Guardar diferenciales</button>

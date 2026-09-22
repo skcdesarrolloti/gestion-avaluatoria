@@ -1,11 +1,13 @@
 <?php
+$isPh = (string) ($record['regimen_ph'] ?? '') === 'si';
 $photoUnits = [['id' => '', 'label' => 'Sujeto general', 'kind' => 'general', 'typology' => 'Predio']];
+if ($isPh) $photoUnits[] = ['id' => '', 'label' => 'Copropiedad PH', 'kind' => 'ph', 'typology' => 'Zonas comunes'];
 $unitLabel = static fn (array $unit): string => ($unit['unit_kind'] === 'annex' ? 'Anexo ' : 'Unidad ') . (int) $unit['unit_index'];
 foreach (array_values(array_filter($units, static fn (array $unit): bool => $unit['unit_kind'] !== 'common')) as $unit) {
     $photoUnits[] = ['id' => (string) $unit['id'], 'label' => (string) ($unit['label'] ?: $unitLabel($unit)),
         'kind' => (string) $unit['unit_kind'], 'typology' => (string) $unit['igac_typology_hint']];
 }
-$photoCategories = [
+$basePhotoCategories = [
     'portada' => ['Portada', 'Foto principal. Puede ser horizontal cuando se requiere abarcar toda la propiedad.'],
     'fachada' => ['Fachada', 'Vista frontal o acceso principal de la unidad.'],
     'interior' => ['Interior', 'Espacios interiores representativos, si aplican.'],
@@ -14,17 +16,21 @@ $photoCategories = [
     'documento' => ['Documento / soporte', 'Capturas o fotos de documentos útiles para el entregable.'],
     'adicional' => ['Fotos adicionales', 'Agrega evidencias complementarias con nombre propio para el informe.'],
 ];
-if ((string) ($record['regimen_ph'] ?? '') === 'si') {
-    $photoCategories += [
-        'ph_acceso' => ['PH · fachada y acceso', 'Acceso, fachada o ingreso principal de la copropiedad.'],
-        'ph_porteria' => ['PH · portería y control', 'Portería, recepción, vigilancia o control de acceso.'],
-        'ph_comunes' => ['PH · zonas comunes', 'Zonas sociales, circulaciones, parqueaderos de visitantes o servicios comunes.'],
-        'ph_equipos' => ['PH · equipos y mantenimiento', 'Tanques, planta, red contra incendio, cuarto de basuras o estado de conservación común.'],
-    ];
+$phPhotoCategories = [];
+foreach (($phCatalog['photos'] ?? []) as $key => $label) {
+    $phPhotoCategories[(string) $key] = ['PH · ' . (string) $label,
+        'Evidencia fotográfica requerida por el análisis de propiedad horizontal.'];
 }
+$photoAnchor = static fn (array $photoUnit): string => $photoUnit['kind'] === 'ph'
+    ? 'fotos-ph' : 'fotos-' . ($photoUnit['id'] ?: 'general');
 $photoTabMap = [];
 foreach ($photoUnits as $photoUnit) {
-    $photoTabMap['fotos-' . ($photoUnit['id'] ?: 'general')] = $photoUnit['kind'] . ':' . $photoUnit['id'];
+    $photoTabMap[$photoAnchor($photoUnit)] = $photoUnit['kind'] . ':' . $photoUnit['id'];
+}
+$uploadedPhPhotos = [];
+foreach ($photos as $photo) {
+    $caption = (string) ($photo['caption'] ?? '');
+    if (str_starts_with($caption, 'ph_photo:')) $uploadedPhPhotos[substr($caption, 9)] = true;
 }
 $attributeLabels = \App\Support\AppraisalSpecialAttributeCatalog::labels();
 $storedAttributePhotos = [];
@@ -56,7 +62,7 @@ foreach (array_values(array_filter($units, static fn (array $unit): bool => $uni
     x-init="syncPhotoUnit()" @hashchange.window="syncPhotoUnit()">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">3.6 Registro fotográfico del sujeto</p>
+            <p class="eyebrow">3.7 Registro fotográfico del sujeto</p>
             <h2 class="mt-2 text-2xl font-semibold">Fotos organizadas para el entregable</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Carga o pega las imágenes que irán al informe. Todas se muestran con el mismo formato visual;
@@ -74,7 +80,7 @@ foreach (array_values(array_filter($units, static fn (array $unit): bool => $uni
     <div class="mt-6 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
         <?php foreach ($photoUnits as $photoUnit): ?>
             <?php $tabKey = $photoUnit['kind'] . ':' . $photoUnit['id']; ?>
-            <?php $tabAnchor = 'fotos-' . ($photoUnit['id'] ?: 'general'); ?>
+            <?php $tabAnchor = $photoAnchor($photoUnit); ?>
             <button class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold" type="button"
                 @click="activePhotoUnit = '<?= e($tabKey) ?>'; history.replaceState(null, '', '#<?= e($tabAnchor) ?>')"
                 :class="activePhotoUnit === '<?= e($tabKey) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'">
@@ -84,11 +90,10 @@ foreach (array_values(array_filter($units, static fn (array $unit): bool => $uni
     </div>
     <?php foreach ($photoUnits as $photoUnit): ?>
         <?php $tabKey = $photoUnit['kind'] . ':' . $photoUnit['id']; ?>
-        <?php $tabAnchor = 'fotos-' . ($photoUnit['id'] ?: 'general'); ?>
+        <?php $tabAnchor = $photoAnchor($photoUnit); ?>
         <div id="<?= e($tabAnchor) ?>" class="mt-6 scroll-mt-6" x-show="activePhotoUnit === '<?= e($tabKey) ?>'">
             <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
-                Las fotos de este grupo se usarán como soporte visual del entregable. Mantén una portada clara;
-                si el frente es amplio, usa foto horizontal y conserva el encuadre completo.
+                Las fotos de este grupo se usarán como soporte visual del entregable. En el grupo Copropiedad PH se cargan las evidencias requeridas por propiedad horizontal; si el frente es amplio, usa foto horizontal y conserva el encuadre completo.
             </div>
             <?php $unitRequirements = array_values(array_filter($attributePhotoRequirements,
                 static fn (array $row): bool => (string) $row['unit_id'] === (string) $photoUnit['id'])); ?>
@@ -132,18 +137,33 @@ foreach (array_values(array_filter($units, static fn (array $unit): bool => $uni
                     <?php endforeach; ?>
                 </div>
             <?php endif; ?>
+            <?php if ($photoUnit['kind'] === 'ph'): ?>
+                <div class="mt-5 rounded-xl border border-amber-200 bg-amber-50 p-4">
+                    <h3 class="text-sm font-semibold text-amber-950">Fotos requeridas por propiedad horizontal</h3>
+                    <div class="mt-3 flex flex-wrap gap-2">
+                        <?php foreach ($phPhotoCategories as $key => [$title, $_description]): ?>
+                            <span class="rounded-full px-3 py-1 text-xs font-semibold <?= isset($uploadedPhPhotos[$key]) ? 'bg-emerald-100 text-emerald-800' : 'bg-amber-100 text-amber-800' ?>">
+                                <?= e($title) ?> · <?= isset($uploadedPhPhotos[$key]) ? 'foto cargada' : 'por cargar' ?>
+                            </span>
+                        <?php endforeach; ?>
+                    </div>
+                    <p class="mt-3 text-xs leading-5 text-amber-900">Estas fotos alimentan los requerimientos PH y quedan dentro del registro fotográfico 3.7.</p>
+                </div>
+            <?php endif; ?>
+            <?php $unitPhotoCategories = $photoUnit['kind'] === 'ph' ? $phPhotoCategories : $basePhotoCategories; ?>
             <div class="mt-5 grid gap-5 xl:grid-cols-2">
-                <?php foreach ($photoCategories as $categoryKey => [$title, $description]): ?>
+                <?php foreach ($unitPhotoCategories as $categoryKey => [$title, $description]): ?>
                     <div id="<?= e($tabAnchor . '-' . $categoryKey) ?>" class="scroll-mt-6">
                         <?php
                     $photoUploadEmbedded = true;
                     $photoUploadUnitId = $photoUnit['id'];
                     $photoUploadUnitLabel = $photoUnit['label'];
                     $photoUploadTypology = $photoUnit['typology'];
-                    $photoUploadEyebrow = 'Foto para entregable';
+                    $photoUploadEyebrow = $photoUnit['kind'] === 'ph' ? 'Foto de copropiedad PH' : 'Foto para entregable';
                     $photoUploadTitle = $title;
                     $photoUploadDescription = $description . ' Pega con Ctrl+V o sube archivo; la vista previa conserva tamaño uniforme.';
-                    $photoUploadCaption = 'registro:' . ($photoUnit['id'] ?: 'general') . ':' . $categoryKey;
+                    $photoUploadCaption = $photoUnit['kind'] === 'ph'
+                        ? 'ph_photo:' . $categoryKey : 'registro:' . ($photoUnit['id'] ?: 'general') . ':' . $categoryKey;
                     $photoUploadReturnTo = $subjectActionBase . '#' . $tabAnchor;
                     $photoUploadCompact = true;
                     require BASE_PATH . '/app/Views/appraisals/photo-upload.php';

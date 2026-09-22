@@ -20,7 +20,7 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
 <div class="mt-7"
-    x-data="{ activeSubject: 'basic', syncSubject() { this.activeSubject = location.hash === '#superficies' ? 'surface' : (location.hash === '#construccion' ? 'construction' : (location.hash === '#atributos' ? 'attributes' : (location.hash === '#ph' ? 'ph' : (location.hash.startsWith('#fotos') ? 'photos' : 'basic')))) } }"
+    x-data="{ activeSubject: 'basic', syncSubject() { this.activeSubject = location.hash === '#superficies' ? 'surface' : (location.hash === '#construccion' ? 'construction' : (location.hash === '#atributos' ? 'attributes' : (location.hash === '#ph' ? 'ph' : (location.hash === '#obsolescencias' ? 'obsolescence' : (location.hash.startsWith('#fotos') ? 'photos' : 'basic'))))) } }"
     x-init="syncSubject()" @hashchange.window="syncSubject()">
     <div class="mb-3 flex flex-wrap justify-end">
         <button class="btn-secondary" type="button" aria-disabled="true"
@@ -61,9 +61,15 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
                 <span class="block text-xs font-medium opacity-80">Copropiedad y zonas comunes</span>
             </button>
             <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
+                @click="activeSubject = 'obsolescence'; history.replaceState(null, '', '#obsolescencias')"
+                :class="activeSubject === 'obsolescence' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:border-blue-700'">
+                <span class="block text-base">3.6 Obsolescencias</span>
+                <span class="block text-xs font-medium opacity-80">Diagnóstico IEO</span>
+            </button>
+            <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
                 @click="activeSubject = 'photos'; history.replaceState(null, '', '#fotos')"
                 :class="activeSubject === 'photos' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:border-blue-700'">
-                <span class="block text-base">3.6 Registro fotográfico</span>
+                <span class="block text-base">3.7 Registro fotográfico</span>
                 <span class="block text-xs font-medium opacity-80">Fotos para el entregable</span>
             </button>
         </div>
@@ -82,6 +88,9 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
     </div>
     <div class="mt-7" x-show="activeSubject === 'ph'">
         <?php require BASE_PATH . '/app/Views/appraisals/subject-ph.php'; ?>
+    </div>
+    <div class="mt-7" x-show="activeSubject === 'obsolescence'">
+        <?php require BASE_PATH . '/app/Views/appraisals/subject-obsolescence.php'; ?>
     </div>
     <div class="mt-7" x-show="activeSubject === 'photos'">
         <?php require BASE_PATH . '/app/Views/appraisals/subject-photos.php'; ?>

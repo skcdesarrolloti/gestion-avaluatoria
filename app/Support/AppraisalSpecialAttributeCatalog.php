@@ -34,7 +34,7 @@ final class AppraisalSpecialAttributeCatalog
                 'estado_conservacion' => ['Estado de conservación', 'Condición física observable y mantenimiento general.', self::condition()],
                 'mejoras_relevantes' => ['Mejoras relevantes', 'Adecuaciones u obras que agregan funcionalidad o valor.', self::relevance()],
                 'riesgos_afectaciones_fisicas' => ['Riesgos o afectaciones físicas', 'Humedad, inundación, remoción, deterioros o restricciones físicas observables.', self::risk()],
-                'evidencia_fotografica' => ['Evidencia fotográfica', 'Define si el diferencial requiere soporte fotográfico en 3.6.', self::evidenceNeed()],
+                'evidencia_fotografica' => ['Evidencia fotográfica', 'Define si el diferencial requiere soporte fotográfico en 3.7.', self::evidenceNeed()],
                 'impacto_valuatorio' => ['Impacto valuatorio', 'Lectura técnica del efecto esperado en valor.', self::marketImpact()],
                 'otro_atributo_especial' => ['Otro diferencial', 'Campo de apoyo para un atributo o demérito no previsto en el catálogo.', self::other()],
             ]],

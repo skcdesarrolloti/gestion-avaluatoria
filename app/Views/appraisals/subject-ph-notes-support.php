@@ -34,7 +34,7 @@ $noteRows = [
     ['Observaciones de lectura OCR', $notesShort($technicalValue('observaciones_extraccion')) ?: 'Sin observaciones de lectura', $technicalValue('observaciones_extraccion') !== '' ? 'ok' : 'warn', 'Mantener advertencias de baja lectura o revisión contra original.'],
     ['Riesgos y afectaciones PH', $riskValue, $riskState, 'Revisar alertas y salvedades antes de cerrar.'],
     ['Soportes documentales PH', $docValue, $docState, 'Confirmar soportes vigentes para administración, expensas, pólizas y reglamento.'],
-    ['Fotos requeridas para 3.6', $photoValue, $photoState, 'Completar evidencias de visita cuando el informe lo requiera.'],
+    ['Fotos requeridas para 3.7', $photoValue, $photoState, 'Completar evidencias de visita cuando el informe lo requiera.'],
 ];
 $noteTextareas = [
     'salvedades_reglamento' => 'Salvedades del reglamento',
@@ -45,7 +45,7 @@ $noteTextareas = [
 $noteGroups = [
     'riesgos' => ['risks', 'Riesgos, restricciones y afectaciones PH', $phCatalog['risks'], $riskValue],
     'documentos' => ['documents', 'Soportes documentales PH', $phCatalog['documents'], $docValue],
-    'fotos' => ['photos', 'Fotos requeridas para 3.6', $phCatalog['photos'], $photoValue],
+    'fotos' => ['photos', 'Fotos requeridas para 3.7', $phCatalog['photos'], $photoValue],
 ];
 ?>
 <div class="rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6">

@@ -715,7 +715,7 @@ try {
     $attributePhotoName = new ReflectionMethod(AppraisalSubjectController::class, 'attributePhotoName');
     expect($attributePhotoName->invoke($attributeNameController, 'attribute:vista_vivienda') === 'Vista'
         && $attributePhotoName->invoke($attributeNameController, 'registro:general:portada') === '',
-        'foto cargada en 3.6 puede heredar nombre del atributo');
+        'foto cargada en 3.7 puede heredar nombre del atributo');
     $sectorData = AppraisalSectorInput::data(['sector_name' => ' Bruselas ampliado ',
         'services_status' => 'completa', 'connectivity' => 'invalida',
         'sector_report_text' => str_repeat('x', 2500)]);
@@ -1283,6 +1283,8 @@ try {
     expect($safePhotoReturn->invoke($photoController, $photoRecordId) === $_POST['return_to'], 'retorno a fotos generales conservado');
     $_POST = ['return_to' => 'avaluos/' . $photoRecordId . '/bien-sujeto#fotos-' . $photoUnitId];
     expect($safePhotoReturn->invoke($photoController, $photoRecordId) === $_POST['return_to'], 'retorno a fotos de unidad conservado');
+    $_POST = ['return_to' => 'avaluos/' . $photoRecordId . '/bien-sujeto#fotos-ph'];
+    expect($safePhotoReturn->invoke($photoController, $photoRecordId) === $_POST['return_to'], 'retorno a fotos de copropiedad PH conservado');
     $_POST = [];
     $normsDir = sys_get_temp_dir() . '/ga_normas_' . bin2hex(random_bytes(4));
     putenv('NTS_STORAGE_DIR=' . $normsDir);
