@@ -13,13 +13,16 @@ final class AppraisalObsolescenceInput
             $group = is_array($posted[$groupKey] ?? null) ? $posted[$groupKey] : [];
             $meta = (string) ($group['meta'] ?? '');
             $rows[$groupKey] = ['meta' => array_key_exists($meta, $metaOptions) ? $meta : '', 'items' => []];
+            $hasFinding = false;
             foreach ($factors as $key => $_label) {
                 $item = is_array($group['items'][$key] ?? null) ? $group['items'][$key] : [];
                 $score = (string) ($item['score'] ?? '');
                 if (!array_key_exists($score, AppraisalObsolescenceCatalog::scores())) $score = '';
+                if (in_array($score, ['1', '2', '3'], true)) $hasFinding = true;
                 $rows[$groupKey]['items'][$key] = ['score' => $score,
                     'evidence' => mb_substr(trim((string) ($item['evidence'] ?? '')), 0, 1200)];
             }
+            if (!$hasFinding) $rows[$groupKey]['meta'] = '';
         }
         return ['summary_text' => self::text($post['summary_text'] ?? '', 2200),
             'diagnosis_text' => self::text($post['diagnosis_text'] ?? '', 1800),
