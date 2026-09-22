@@ -59,6 +59,10 @@ export function phCommonLive({ statuses = {}, labels = {}, notes = {}, groups = 
         hiddenCount(keys) { return keys.filter(key => !this.isRelevant(key)).length; },
         readyCount(keys) { return this.visibleKeys(keys).filter(key => ['ok', 'warn', 'risk'].includes(this.statuses[key])).length; },
         applicableCount(keys) { return this.visibleKeys(keys).filter(key => this.statuses[key] !== 'na').length; },
+        rowClass(key) {
+            if (!this.isRelevant(key)) return 'bg-slate-100 opacity-80';
+            return { 'bg-emerald-50': this.statuses[key] === 'ok', 'bg-amber-50': this.statuses[key] === 'warn', 'bg-red-50': this.statuses[key] === 'risk', 'bg-slate-50': this.statuses[key] === 'na' || this.statuses[key] === '' };
+        },
         effectFor(key) { return this.statusEffects[this.statuses[key] || ''] || this.statusEffects['']; },
     };
 }

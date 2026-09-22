@@ -31,11 +31,11 @@
                                 <tbody class="divide-y divide-slate-100">
                                     <?php foreach ($items as $key => $label): ?>
                                         <?php $current = $phMap('common_areas', (string) $key, 'status'); ?>
-                                        <tr class="align-top" x-show="isRelevant('<?= e((string) $key) ?>') || showOthers" :class="{'bg-emerald-50': statuses['<?= e((string) $key) ?>'] === 'ok', 'bg-amber-50': statuses['<?= e((string) $key) ?>'] === 'warn', 'bg-red-50': statuses['<?= e((string) $key) ?>'] === 'risk', 'bg-slate-50': statuses['<?= e((string) $key) ?>'] === 'na' || statuses['<?= e((string) $key) ?>'] === ''}">
-                                            <td class="w-72 py-3 pr-3 text-base font-bold text-slate-900">
+                                        <tr class="align-top" x-show="isRelevant('<?= e((string) $key) ?>') || showOthers" :class="rowClass('<?= e((string) $key) ?>')">
+                                            <td class="w-72 border-l-4 py-3 pl-3 pr-3 text-base font-bold text-slate-900" :class="isRelevant('<?= e((string) $key) ?>') ? 'border-blue-500' : 'border-slate-400'">
                                                 <?= e($label) ?>
                                                 <span class="mt-2 inline-flex rounded-full bg-blue-50 px-2 py-1 text-xs font-bold text-blue-800" x-show="priorities.includes('<?= e((string) $key) ?>')">Prioritario para la tipología</span>
-                                                <span class="mt-2 inline-flex rounded-full bg-slate-100 px-2 py-1 text-xs font-bold text-slate-600" x-show="!isRelevant('<?= e((string) $key) ?>')">No prioritario para esta tipología</span>
+                                                <span class="mt-2 inline-flex rounded-full bg-slate-700 px-2 py-1 text-xs font-bold text-white" x-show="!isRelevant('<?= e((string) $key) ?>')">Apoyo no prioritario · no entra al resumen principal</span>
                                             </td>
                                             <td class="w-80 py-3 pr-3">
                                                 <select class="input mt-0 min-h-10 py-2 text-sm" x-model="statuses['<?= e((string) $key) ?>']" @change="updateCommonStatus('<?= e((string) $key) ?>', $event.target.value)" name="ph[common_areas][<?= e($key) ?>][status]">
@@ -45,6 +45,7 @@
                                                 </select>
                                                 <p class="mt-2 rounded-lg bg-white/80 p-2 text-xs font-semibold text-slate-700" x-text="effectFor('<?= e((string) $key) ?>')"></p>
                                                 <p class="mt-2 rounded-lg bg-blue-50 p-2 text-xs font-semibold text-blue-800" x-text="'Origen: ' + originLabel('<?= e((string) $key) ?>')"></p>
+                                                <p class="mt-2 rounded-lg bg-slate-800 p-2 text-xs font-bold text-white" x-show="!isRelevant('<?= e((string) $key) ?>')">Campo abierto solo para consulta o caso excepcional.</p>
                                             </td>
                                             <td class="py-3">
                                                 <textarea class="input mt-0 min-h-14 py-2 text-sm" rows="2" x-model="notes['<?= e((string) $key) ?>']" @input="updateCommonNotes('<?= e((string) $key) ?>', $event.target.value)" name="ph[common_areas][<?= e($key) ?>][notes]" placeholder="Página, cláusula, visita, fotografía o salvedad"><?= e($phMap('common_areas', (string) $key, 'notes')) ?></textarea>
