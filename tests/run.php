@@ -6,6 +6,7 @@ use App\Core\Session;
 use App\Database\Schema;
 use App\Core\Http;
 use App\Services\AppraisalValidator;
+use App\Services\AppraiserRaaCertificateParser;
 use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterOneReport;
 use App\Services\AppraisalDossierNumberer;
@@ -136,8 +137,8 @@ try {
     $db->exec("CREATE TABLE valuation_ifrs_standards (slug TEXT PRIMARY KEY, group_code TEXT, standard_code TEXT, title TEXT, applicable_categories TEXT, measurement_focus TEXT, summary TEXT, field_relevance TEXT, source_reference TEXT, status TEXT, source_filename TEXT DEFAULT '', storage_filename TEXT DEFAULT '', file_size_bytes INTEGER, pdf_blob BLOB, imported_at TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_field_considerations (field_key TEXT PRIMARY KEY, field_label TEXT, classification TEXT, normative_basis TEXT, operational_use TEXT, ifrs_relation TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_appraisers (id TEXT PRIMARY KEY, code TEXT UNIQUE, full_name TEXT,
-        email TEXT, phone TEXT, raa_number TEXT, raa_categories TEXT, active TEXT, notes TEXT,
-        raa_expires_at TEXT, raa_source_filename TEXT, raa_storage_filename TEXT,
+        identification_number TEXT UNIQUE, email TEXT, phone TEXT, raa_number TEXT, raa_categories TEXT, active TEXT, notes TEXT,
+        raa_issued_at TEXT, raa_expires_at TEXT, raa_pin TEXT, raa_source_filename TEXT, raa_storage_filename TEXT,
         raa_file_size_bytes INTEGER, raa_uploaded_at TEXT, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE master_departments (id TEXT PRIMARY KEY, code TEXT, name TEXT UNIQUE,
         active TEXT, created_at TEXT, updated_at TEXT)");
@@ -210,10 +211,20 @@ try {
     $removeDuplicate(new Schema($db));
     expect($db->query("SELECT COUNT(*) FROM valuation_field_considerations WHERE field_key = 'tipo_avaluo'")->fetchColumn() === 0, 'consideracion duplicada de tipo de avaluo eliminada');
     $appraisers = new AppraiserRepository($db);
-    $baseAppraiser = ['id' => '', 'email' => '', 'phone' => '', 'raa_number' => '',
-        'raa_categories' => '["1"]', 'notes' => '', 'raa_expires_at' => '2026-12-31',
-        'raa_source_filename' => 'raa.pdf', 'raa_storage_filename' => 'raa-test.pdf',
-        'raa_file_size_bytes' => 100];
+    $raaText = 'El senor a\ NASSIF ABUITA NASSAR, identificado con la Cedula de ciudadania No. 73089485, se encuentra Activo '
+        . 'con numero de avaluador AVAL-73089485. Categoria 1 Inmuebles urbanos Categoria 11 Activos operacionales '
+        . 'Telefono: 3114156735 Correo Electronico: sucasagerencia@hotmail.com a los un (01) dias del mes de Julio del 2026 y tiene vigencia de 30 dias calendario PIN de Validacion: b40e0abe';
+    $raaParsed = (new AppraiserRaaCertificateParser())->parse($raaText, 'AVAL-73089485-20260701.pdf');
+    expect(($raaParsed['full_name'] ?? '') === 'Nassif Abuita Nassar'
+        && ($raaParsed['identification_number'] ?? '') === '73089485'
+        && ($raaParsed['raa_number'] ?? '') === 'AVAL-73089485'
+        && ($raaParsed['raa_issued_at'] ?? '') === '2026-07-01'
+        && ($raaParsed['raa_expires_at'] ?? '') === '2026-07-31'
+        && ($raaParsed['raa_categories'] ?? []) === ['1', '11'], 'parser RAA lee identidad categorias y vigencia');
+    $baseAppraiser = ['id' => '', 'identification_number' => '', 'email' => '', 'phone' => '', 'raa_number' => '',
+        'raa_categories' => '["1"]', 'notes' => '', 'raa_issued_at' => '2026-09-01',
+        'raa_expires_at' => '2026-12-31', 'raa_pin' => '', 'raa_source_filename' => 'raa.pdf',
+        'raa_storage_filename' => 'raa-test.pdf', 'raa_file_size_bytes' => 100];
     $activeAppraiserId = bin2hex(random_bytes(16));
     $inactiveAppraiserId = bin2hex(random_bytes(16));
     $appraisers->create(array_replace($baseAppraiser, ['id' => $activeAppraiserId, 'code' => '02',
@@ -222,6 +233,17 @@ try {
         'full_name' => 'Said', 'active' => 'No']));
     $appraiserRows = $appraisers->all();
     expect(count($appraiserRows) === 2 && $appraiserRows[0]['code'] === '02', 'maestro de peritos ordena activos primero');
+    $appraisers->updateRaa($activeAppraiserId, array_replace($baseAppraiser, [
+        'identification_number' => '73089485', 'email' => 'nuevo@example.com', 'phone' => '3114156735',
+        'raa_number' => 'AVAL-73089485', 'raa_categories' => '["1","11"]', 'raa_pin' => 'b40e0abe',
+        'raa_issued_at' => '2026-10-01', 'raa_expires_at' => '2026-10-31', 'active' => 'Si',
+        'notes' => 'Actualizado', 'raa_source_filename' => 'raa-nuevo.pdf', 'raa_storage_filename' => 'raa-nuevo.pdf',
+    ]));
+    $updatedAppraiser = $appraisers->find($activeAppraiserId);
+    expect(($updatedAppraiser['code'] ?? '') === '02' && ($updatedAppraiser['full_name'] ?? '') === 'Nassif Abuita'
+        && ($updatedAppraiser['identification_number'] ?? '') === '73089485'
+        && str_contains((string) ($updatedAppraiser['raa_categories'] ?? ''), '11'),
+        'actualizacion RAA conserva codigo nombre y actualiza cedula categorias vigencia');
     $db->exec("INSERT INTO appraisals (id, owner_id, appraiser_id, value_date, created_at, updated_at) VALUES
         ('99999999999999999999999999999999', 7, '$activeAppraiserId', '2026-09-18', '2026-09-01 00:00:00', '2026-09-01 00:00:00'),
         ('88888888888888888888888888888888', 7, '$activeAppraiserId', '2026-09-19', '2026-09-02 00:00:00', '2026-09-02 00:00:00')");

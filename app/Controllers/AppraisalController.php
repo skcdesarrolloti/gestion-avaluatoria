@@ -43,7 +43,7 @@ final class AppraisalController
     {
         $record = $this->appraisals->find($id, $this->user['id']);
         view('appraisals/chapter-zero', ['title' => 'Expediente valuatorio', 'record' => $record,
-            'appraisers' => $this->appraisers->all(),
+            'appraisers' => $this->appraisers->eligibleForAssignment(),
             'chapterZeroMessage' => Session::pullFlash('chapter_zero_message'),
             'chapterZeroError' => Session::pullFlash('chapter_zero_error'),
             'catalog' => ['selects' => AppraisalCatalog::selectFields(), 'notes' => AppraisalCatalog::notes()]]);
@@ -98,7 +98,8 @@ final class AppraisalController
         $result = $this->appraisals->save($id, $this->user['id'], $input['version'], $data);
         Http::json(['ok' => true] + $result);
     }
-    private function appraiserIds(): array { return array_column($this->appraisers->all(), 'id'); } private function igacCodes(): array { return array_column($this->typologies->categories(), 'code'); }
+    private function appraiserIds(): array { return array_column($this->appraisers->eligibleForAssignment(), 'id'); }
+    private function igacCodes(): array { return array_column($this->typologies->categories(), 'code'); }
     private function chapterZeroErrorMessage(\Throwable $error): string
     {
         $reference = substr(hash('sha256', 'chapter_zero|' . $error->getMessage() . '|' . microtime(true)), 0, 12);

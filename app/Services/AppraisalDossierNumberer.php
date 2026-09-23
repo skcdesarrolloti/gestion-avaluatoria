@@ -35,8 +35,8 @@ final class AppraisalDossierNumberer
 
     private function appraiserCode(string $id): string
     {
-        $query = $this->db->prepare('SELECT code FROM valuation_appraisers WHERE id = ? AND active = ?');
-        $query->execute([$id, 'Si']);
+        $query = $this->db->prepare('SELECT code FROM valuation_appraisers WHERE id = ? AND active = ? AND raa_expires_at >= ?');
+        $query->execute([$id, 'Si', (new \DateTimeImmutable('today', new \DateTimeZone('America/Bogota')))->format('Y-m-d')]);
         $raw = $query->fetchColumn();
         if ($raw === false) return '';
         $code = preg_replace('/[^A-Za-z0-9]/', '', (string) $raw) ?? '';
