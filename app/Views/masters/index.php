@@ -95,12 +95,19 @@ $today = new DateTimeImmutable('today', new DateTimeZone('America/Bogota'));
                                 <?= e($expired ? 'No usable' : (($appraiser['active'] ?? '') === 'Si' ? 'Usable' : 'Inactivo')) ?>
                             </span>
                         </div>
-                        <p class="mt-3 text-sm text-slate-600"><?= e($appraiser['email'] ?: 'Correo pendiente') ?><?= ($appraiser['phone'] ?? '') !== '' ? ' · ' . e($appraiser['phone']) : '' ?></p>
-                        <p class="mt-3 text-sm font-semibold <?= $expired ? 'text-red-700' : ($soon ? 'text-amber-700' : 'text-emerald-700') ?>">
-                            <?= e($expired ? 'RAA vencido' : ($soon ? 'RAA por vencer' : 'RAA vigente')) ?><?= $expires !== '' ? ' · vence ' . e($expires) : '' ?>
-                        </p>
-                        <p class="mt-1 text-xs text-slate-500">Expedido <?= e($appraiser['raa_issued_at'] ?? 'pendiente') ?><?= ($appraiser['raa_pin'] ?? '') !== '' ? ' · PIN ' . e($appraiser['raa_pin']) : '' ?></p>
-                        <?php if ($labels): ?><p class="mt-3 text-xs leading-5 text-slate-600"><?= e(implode(' · ', $labels)) ?></p><?php endif; ?>
+                        <div class="mt-4 grid gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
+                            <p><strong>Identificación RAA:</strong> cédula <?= e($appraiser['identification_number'] ?? 'pendiente') ?> · <?= e($appraiser['raa_number'] ?: 'RAA pendiente') ?></p>
+                            <p class="font-semibold <?= $expired ? 'text-red-700' : ($soon ? 'text-amber-700' : 'text-emerald-700') ?>">
+                                <?= e($expired ? 'RAA vencido' : ($soon ? 'RAA por vencer' : 'RAA vigente')) ?><?= $expires !== '' ? ' · vence ' . e($expires) : '' ?>
+                            </p>
+                            <p>Expedido <?= e($appraiser['raa_issued_at'] ?? 'pendiente') ?><?= ($appraiser['raa_pin'] ?? '') !== '' ? ' · PIN ' . e($appraiser['raa_pin']) : '' ?></p>
+                        </div>
+                        <div class="mt-3 grid gap-2 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
+                            <p><strong>Contacto RAA:</strong> <?= e($appraiser['raa_contact_city'] ?: 'Ciudad pendiente') ?><?= ($appraiser['raa_contact_department'] ?? '') !== '' ? ', ' . e($appraiser['raa_contact_department']) : '' ?></p>
+                            <p><?= e($appraiser['raa_contact_address'] ?: 'Dirección pendiente') ?></p>
+                            <p><?= e($appraiser['phone'] ?: 'Teléfono pendiente') ?> · <?= e($appraiser['email'] ?: 'Correo pendiente') ?></p>
+                        </div>
+                        <?php if ($labels): ?><p class="mt-3 text-xs leading-5 text-slate-600"><strong>Categorías:</strong> <?= e(implode(' · ', $labels)) ?></p><?php endif; ?>
                         <?php if (($appraiser['raa_storage_filename'] ?? '') !== ''): ?>
                             <a class="btn-secondary mt-4" target="_blank" rel="noopener" href="<?= e(url('maestros/peritos/' . $appraiser['id'] . '/raa')) ?>">Abrir soporte RAA</a>
                         <?php endif; ?>

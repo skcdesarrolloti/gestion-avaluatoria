@@ -45,13 +45,13 @@ final class AppraiserRepository
     {
         $now = gmdate('Y-m-d H:i:s');
         $query = $this->db->prepare('INSERT INTO valuation_appraisers
-            (id, code, full_name, identification_number, email, phone, raa_number, raa_categories,
+            (id, code, full_name, identification_number, email, phone, raa_number, raa_categories, raa_contact_city, raa_contact_department, raa_contact_address,
             active, notes, raa_issued_at, raa_expires_at, raa_pin, raa_source_filename,
             raa_storage_filename, raa_file_size_bytes, raa_uploaded_at, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)');
         $query->execute([$data['id'], $data['code'], $data['full_name'], $this->nullable($data['identification_number'] ?? ''),
-            $data['email'], $data['phone'], $data['raa_number'], $data['raa_categories'], $data['active'],
-            $data['notes'], $data['raa_issued_at'], $data['raa_expires_at'], $data['raa_pin'],
+            $data['email'], $data['phone'], $data['raa_number'], $data['raa_categories'], $data['raa_contact_city'],
+            $data['raa_contact_department'], $data['raa_contact_address'], $data['active'], $data['notes'], $data['raa_issued_at'], $data['raa_expires_at'], $data['raa_pin'],
             $data['raa_source_filename'], $data['raa_storage_filename'], $data['raa_file_size_bytes'],
             $now, $now, $now]);
     }
@@ -59,12 +59,13 @@ final class AppraiserRepository
     public function updateRaa(string $id, array $data): void
     {
         $query = $this->db->prepare('UPDATE valuation_appraisers SET identification_number = ?, email = ?, phone = ?, raa_number = ?,
-            raa_categories = ?, active = ?, notes = ?, raa_issued_at = ?, raa_expires_at = ?, raa_pin = ?,
+            raa_categories = ?, raa_contact_city = ?, raa_contact_department = ?, raa_contact_address = ?,
+            active = ?, notes = ?, raa_issued_at = ?, raa_expires_at = ?, raa_pin = ?,
             raa_source_filename = ?, raa_storage_filename = ?, raa_file_size_bytes = ?, raa_uploaded_at = ?,
             updated_at = ? WHERE id = ?');
         $now = gmdate('Y-m-d H:i:s');
-        $query->execute([$this->nullable($data['identification_number'] ?? ''), $data['email'], $data['phone'], $data['raa_number'], $data['raa_categories'],
-            $data['active'], $data['notes'], $data['raa_issued_at'], $data['raa_expires_at'], $data['raa_pin'],
+        $query->execute([$this->nullable($data['identification_number'] ?? ''), $data['email'], $data['phone'], $data['raa_number'], $data['raa_categories'], $data['raa_contact_city'],
+            $data['raa_contact_department'], $data['raa_contact_address'], $data['active'], $data['notes'], $data['raa_issued_at'], $data['raa_expires_at'], $data['raa_pin'],
             $data['raa_source_filename'], $data['raa_storage_filename'], $data['raa_file_size_bytes'], $now, $now, $id]);
     }
 
