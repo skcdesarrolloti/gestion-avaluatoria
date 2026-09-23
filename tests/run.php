@@ -568,6 +568,9 @@ try {
         && str_contains($richCommonText, 'planta eléctrica favorece continuidad operativa')
         && str_contains($richCommonText, 'las salas comunes o coworking agregan flexibilidad de uso'),
         'entregable PH resalta bienes comunes y amenidades con incidencia');
+    $sourceRef = (new \App\Services\AppraisalPhSourceReference())->fromText('Contenidos en ESCRITURA Nro 2593 de fecha 29-12-2001 en NOTARIA 61 de BOGOTA');
+    expect($sourceRef === 'Escritura Pública No. 2593 de fecha 29-12-2001, Notaría 61 de Bogotá',
+        'fuente PH normaliza escritura fecha y notaria para entregable');
     $phWarehouse = (new AppraisalPhReportBuilder())->build(['ph_name' => 'Parque Logístico'],
         ['fuente_documental' => 'ESCRITURA PUBLICA 2593 PARQUE LOGISTICO.pdf'],
         ['bascula' => ['status' => 'ok', 'notes' => 'Reglamento'],
@@ -576,12 +579,17 @@ try {
             'control_acceso_pesado' => ['status' => 'ok', 'notes' => 'Visita'],
             'vias_internas' => ['status' => 'ok', 'notes' => 'Reglamento']], [], [], [], 'bodegas', '', []);
     $warehouseText = (string) ($phWarehouse['report_text'] ?? '');
-    expect(str_contains($warehouseText, 'ESCRITURA PUBLICA 2593')
+    expect(str_contains($warehouseText, 'Escritura Pública No. 2593')
         && str_contains($warehouseText, 'báscula aporta control operativo')
         && str_contains($warehouseText, 'los muelles, bahías o rampas facilitan cargue y descargue')
         && str_contains($warehouseText, 'los patios de maniobra mejoran radios de giro')
         && str_contains($warehouseText, 'no a una afirmación libre del analista'),
         'entregable PH bodega resalta soporte logistico y fuente documental');
+    $phSourceReport = (new AppraisalPhReportBuilder())->build(['ph_name' => 'Edificio Fuente'],
+        ['fuente_acto_ph' => 'Escritura Pública No. 2593 de fecha 29-12-2001, Notaría 61 de Bogotá'],
+        [], [], [], [], 'oficinas', '', []);
+    expect(str_contains((string) ($phSourceReport['report_text'] ?? ''), 'soporte documental cargado: Escritura Pública No. 2593 de fecha 29-12-2001, Notaría 61 de Bogotá'),
+        'entregable PH cita fuente documental especifica');
     $phMixedReport = (new AppraisalPhReportBuilder())->build(['ph_name' => 'PH Mixta'],
         ['uso_dominante' => 'Comercio en primer piso y vivienda en niveles superiores',
             'usos_complementarios' => 'Locales, apartamentos y parqueaderos',

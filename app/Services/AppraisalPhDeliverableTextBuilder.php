@@ -128,7 +128,7 @@ final class AppraisalPhDeliverableTextBuilder
 
     private function sourceAttribution(array $technical): string
     {
-        $source = $this->sourceLabel($technical);
+        $source = (new AppraisalPhSourceReference())->fromData($technical);
         return $source !== '' ? 'La descripción de la copropiedad y de sus bienes comunes se toma del soporte documental cargado: ' . $source . '; por tanto, corresponde a una lectura documentada del reglamento o escritura y no a una afirmación libre del analista.' : '';
     }
 
@@ -172,12 +172,7 @@ final class AppraisalPhDeliverableTextBuilder
 
     private function sourceLabel(array $technical): string
     {
-        $source = $this->clean($technical['fuente_documental'] ?? '', 160);
-        if ($source === '') $source = $this->clean($technical['escritura_reforma'] ?? '', 160);
-        if ($source === '') return '';
-        $source = preg_replace('/\.(pdf|docx?|txt)$/iu', '', $source) ?? $source;
-        if (preg_match('/(escritura\s+p[uú]blica\s*(?:n[°oº]\.?\s*)?\d+)/iu', $source, $m)) return trim((string) $m[1]);
-        return trim($source);
+        return (new AppraisalPhSourceReference())->fromData($technical);
     }
 
     private function usableSummary(string $text, int $limit = 700): string

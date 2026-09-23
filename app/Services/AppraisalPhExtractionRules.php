@@ -9,6 +9,7 @@ final class AppraisalPhExtractionRules
         return [
             'fuente_documental' => ['escritura publica', 'reglamento de propiedad horizontal', 'documento'],
             'escritura_reforma' => ['escritura', 'notaria', 'acto de referencia'],
+            'fuente_acto_ph' => ['escritura publica', 'escritura nro', 'notaria'],
             'direccion_referencia' => ['ubicacion y determinacion', 'ubicado en', 'localizado en', 'direccion del inmueble'],
             'tipo_propiedad_horizontal' => ['propiedad horizontal', 'sometimiento'],
             'regimen_especial' => ['zona franca', 'usuario operador', 'regimen especial'],

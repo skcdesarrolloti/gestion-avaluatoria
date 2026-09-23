@@ -10,6 +10,7 @@ final class AppraisalPhReportBuilder
         array $risks, array $photos, string $typology, string $sourceSummary, array $findings): array
     {
         $label = AppraisalPhCatalog::typologies()[$typology] ?? 'propiedad horizontal';
+        $technical = $this->withSourceReference($technical, $core);
         $name = $this->cleanName($core['ph_name'] ?? '') ?: 'la copropiedad analizada';
         $assets = $this->assets($core);
         $use = $this->dominantUse($technical, $typology);
@@ -39,6 +40,13 @@ final class AppraisalPhReportBuilder
             'report_text' => $report, 'technical' => $tab];
     }
 
+    private function withSourceReference(array $technical, array $core): array
+    {
+        if (trim((string) ($technical['fuente_acto_ph'] ?? '')) !== '') return $technical;
+        $source = (new AppraisalPhSourceReference())->fromData($technical, $core);
+        if ($source !== '') $technical['fuente_acto_ph'] = $source;
+        return $technical;
+    }
     private function identitySummary(string $name, string $assets): string
     {
         $summary = "El inmueble objeto de análisis forma parte de {$name}, copropiedad sometida al régimen de propiedad horizontal.";

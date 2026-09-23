@@ -26,6 +26,7 @@ final class AppraisalPhCatalog
             'identificacion' => ['Identificación y naturaleza', [
                 'fuente_documental' => 'Fuente documental',
                 'escritura_reforma' => 'Escritura / acto de referencia',
+                'fuente_acto_ph' => 'Fuente corta para el entregable',
                 'ciudad_municipio' => 'Ciudad / municipio',
                 'direccion_referencia' => 'Dirección o referencia general',
                 'tipo_propiedad_horizontal' => 'Tipo de P.H. y sometimiento',
@@ -114,7 +115,7 @@ final class AppraisalPhCatalog
     }
     public static function technicalApplicability(): array
     {
-        $base = ['fuente_documental', 'escritura_reforma', 'ciudad_municipio', 'direccion_referencia',
+        $base = ['fuente_documental', 'escritura_reforma', 'fuente_acto_ph', 'ciudad_municipio', 'direccion_referencia',
             'tipo_propiedad_horizontal', 'naturaleza_conjunto', 'uso_dominante', 'fecha_reglamento_ph',
             'edad_aproximada_ph', 'numero_edificios', 'numero_pisos',
             'numero_sotanos', 'numero_ascensores', 'numero_unidades', 'numero_oficinas', 'numero_locales',

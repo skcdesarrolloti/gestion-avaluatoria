@@ -30,6 +30,8 @@ final class AppraisalPhDocumentAnalyzer
             if ($value !== '') $core[$key] = $value;
         }
         $technical['fuente_documental'] = implode(', ', $fileNames);
+        $sourceRef = (new AppraisalPhSourceReference())->fromText($content . ' ' . (string) ($technical['escritura_reforma'] ?? ''));
+        if ($sourceRef !== '') $technical['fuente_acto_ph'] = $sourceRef;
         $reserve = $evidence->excerpts(['fondo de imprevistos', 'fondo de reserva'], 120);
         if ($reserve !== '') $core['reserve_fund'] = $reserve;
         if (empty($technical['ciudad_municipio'])) $technical['ciudad_municipio'] = $this->city($content);

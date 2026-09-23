@@ -52,7 +52,7 @@ final class AppraisalPhOperationsNarrative
             'conclusión para valor' => $technical['conclusion_valor_ph'] ?? ''];
         $parts = [];
         foreach ($rows as $labelRow => $value) if ($this->has($value) && !$this->isInstruction($value)) $parts[] = $this->item($labelRow, $value, 180);
-        $dotation = trim($level) !== '' && $level !== 'por confirmar' ? " soporte común {$level}" : ' soporte común identificado';
+        $dotation = $this->dotationText($level);
         $fallback = "La ubicación del bien dentro de {$name} aporta{$dotation}, con efectos posibles en funcionalidad, deseabilidad, operación y comparación frente a copropiedades similares.";
         $summary = $parts ? "La incidencia valuatoria de {$name} registra " . implode('; ', array_slice($parts, 0, 6)) . '.' : $fallback;
         $report = "El inmueble objeto de medición se localiza en {$name}, copropiedad analizada como {$label}. {$assets} "
@@ -82,6 +82,13 @@ final class AppraisalPhOperationsNarrative
         return mb_strlen($text) > $limit ? mb_substr($text, 0, max(0, $limit - 3)) . '…' : $text;
     }
     private function has(mixed $value): bool { return trim((string) $value) !== ''; }
+    private function dotationText(string $level): string
+    {
+        $level = trim($level);
+        if ($level === '' || $level === 'por confirmar') return ' soporte común identificado';
+        $label = trim(strtok($level, ':') ?: $level);
+        return $label !== '' ? ' soporte común de dotación ' . $label : ' soporte común identificado';
+    }
     private function isInstruction(mixed $value): bool
     {
         $text = mb_strtolower(trim((string) $value));
