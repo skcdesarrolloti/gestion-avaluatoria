@@ -4,7 +4,7 @@ use App\Support\AppraisalCatalog;
 [$label, $placeholder, , $help, $options] = AppraisalCatalog::selectFields()[$name];
 $label = $name === 'aplica_niif' ? 'Activo empresarial' : $label;
 $plain = !in_array($name, ['tipo_inmueble', 'subtipo_funcional'], true);
-$support = AppraisalCatalog::fieldSupport($name);
+$fieldSupport = AppraisalCatalog::fieldSupport($name);
 ?>
 <label class="label" <?= $plain ? 'x-data="{ selected: ' . e(json_encode($field($name), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) . ' }"' : '' ?>><?= e($label) ?>
     <?php if ($name === 'tipo_inmueble'): ?>
@@ -30,7 +30,7 @@ $support = AppraisalCatalog::fieldSupport($name);
         </select>
     <?php endif; ?>
     <span class="mt-1 block text-xs leading-5 text-slate-500"><?= e($help) ?></span>
-    <?php if ($support !== ''): ?><span class="mt-1 block text-xs leading-5 text-slate-500">Soporte: <?= e($support) ?></span><?php endif; ?>
+    <?php if ($fieldSupport !== ''): ?><span class="mt-1 block text-xs leading-5 text-slate-500">Soporte: <?= e($fieldSupport) ?></span><?php endif; ?>
     <?php $academyValue = $name === 'tipo_inmueble' ? 'selectedPropertyType'
         : ($name === 'subtipo_funcional' ? 'selectedSubtype' : 'selected'); ?>
     <?php if ($name === 'base_valor'): ?>

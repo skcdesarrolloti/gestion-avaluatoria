@@ -90,6 +90,18 @@ try {
     expectStatus(422, fn () => AppraisalValidator::validate(array_replace($data, [
         'tipo_inmueble' => 'edificio', 'subtipo_funcional' => 'lote_urbano',
     ])), 'subtipo incompatible rechazado');
+    $chapterOneViewRecord = array_replace(\App\Support\AppraisalCatalog::defaults(), [
+        'titulo' => 'Informe de avalúo', 'tipo' => 'comercial', 'tipo_derecho' => 'dominio_pleno',
+        'finalidad' => 'negociacion', 'intended_use' => 'Negociación',
+    ]);
+    $field = static fn (string $name): string => (string) ($chapterOneViewRecord[$name] ?? '');
+    $selected = static fn (string $name, string $value): string => $field($name) === $value ? 'selected' : '';
+    ob_start();
+    require BASE_PATH . '/app/Views/appraisals/chapter-zero-identification-fields.php';
+    $chapterOneViewHtml = ob_get_clean();
+    expect(str_contains($chapterOneViewHtml, 'Uso previsto del informe')
+        && str_contains($chapterOneViewHtml, 'Fecha de solicitud')
+        && str_contains($chapterOneViewHtml, 'Documentos aportados o insumos'), 'numeral 1.2 renderiza despues de selectores');
     expectStatus(419, fn () => Session::csrf(), 'CSRF obligatorio');
     $_SERVER['HTTP_X_CSRF_TOKEN'] = 'test-token';
     Session::csrf();

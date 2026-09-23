@@ -15,6 +15,13 @@ try {
             . ' at ' . basename($error->getFile()) . ':' . $error->getLine());
         $message .= ' Referencia: ' . $reference;
     }
+    while (ob_get_level() > 0) {
+        $statusInfo = ob_get_status();
+        if (!(bool) ($statusInfo['del'] ?? true)) {
+            break;
+        }
+        ob_end_clean();
+    }
     if (App\Core\Http::wantsJson()) {
         App\Core\Http::json(['ok' => false, 'message' => $message, 'errors' => $known ? $error->errors : []], $status);
     }
