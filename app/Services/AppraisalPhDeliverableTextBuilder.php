@@ -13,7 +13,7 @@ final class AppraisalPhDeliverableTextBuilder
         if ($assets !== '') $intro .= ' ' . $assets;
         if (($configuration = $this->configuration($technical)) !== '') $intro .= ' ' . $configuration;
 
-        $paragraphs = [$intro, $this->typologyLens($typology, $technical), $this->commons($typology, $technical, $common, $support, $level)];
+        $paragraphs = [$intro, $this->sourceAttribution($technical), $this->typologyLens($typology, $technical), $this->commons($typology, $technical, $common, $support, $level)];
         foreach ([$rules, $admin, $incidence, $notes] as $text) {
             $text = $this->usableSummary($text);
             if ($text !== '') $paragraphs[] = $text;
@@ -67,7 +67,7 @@ final class AppraisalPhDeliverableTextBuilder
         if ($amenities) $text .= ' Además, los bienes comunes no esenciales y amenidades como ' . implode(', ', $amenities) . ' pueden fortalecer imagen, comodidad, permanencia de usuarios y deseabilidad frente a copropiedades con menor dotación.';
         if ($exclusive) $text .= ' También se observan bienes comunes de uso exclusivo o asignado: ' . implode(', ', $exclusive) . ', cuya incidencia debe asociarse al derecho o unidad correspondiente.';
         if ($priority) $text .= ' Para la tipología seleccionada se consideran especialmente relevantes ' . implode(', ', array_slice($priority, 0, 7)) . '.';
-        if (($extra = $this->commonImpact($common, $technical)) !== '') $text .= ' ' . $extra;
+        if (($extra = $this->commonImpact($common, $technical, $typology)) !== '') $text .= ' ' . $extra;
         $dotation = $this->clean($technical['dotacion_tipologia'] ?? '', 240);
         if ($dotation !== '') $text .= ' ' . $dotation;
         return $text;
@@ -111,16 +111,29 @@ final class AppraisalPhDeliverableTextBuilder
         return array_slice(array_values(array_unique($out)), 0, $limit);
     }
 
-    private function commonImpact(array $common, array $technical): string
+    private function sourceAttribution(array $technical): string
+    {
+        $source = $this->sourceLabel($technical);
+        return $source !== '' ? 'La descripción de la copropiedad y de sus bienes comunes se toma del soporte documental cargado: ' . $source . '; por tanto, corresponde a una lectura documentada del reglamento o escritura y no a una afirmación libre del analista.' : '';
+    }
+
+    private function commonImpact(array $common, array $technical, string $typology): string
     {
         $parts = [];
+        if ($typology === 'bodegas') {
+            if ($this->hasCommon($common, 'bascula')) $parts[] = 'la báscula aporta control operativo y trazabilidad de cargas';
+            if ($this->hasCommon($common, 'muelles_bahias')) $parts[] = 'los muelles, bahías o rampas facilitan cargue y descargue';
+            if ($this->hasCommon($common, 'patios_maniobra')) $parts[] = 'los patios de maniobra mejoran radios de giro y circulación logística';
+            if ($this->hasCommon($common, 'control_acceso_pesado')) $parts[] = 'el control de acceso pesado reduce fricción operativa';
+            if ($this->hasCommon($common, 'vias_internas')) $parts[] = 'las vías internas fortalecen movilidad y segregación de flujos';
+        }
         if ($this->hasCommon($common, 'planta_electrica')) $parts[] = 'la planta eléctrica favorece continuidad operativa';
         if ($this->hasCommon($common, 'red_incendio')) $parts[] = 'la red contra incendio aporta seguridad y cumplimiento operativo';
         if ($this->hasCommon($common, 'cctv_control') || $this->hasCommon($common, 'vigilancia')) $parts[] = 'el control y vigilancia refuerzan percepción de seguridad';
         if ($this->multipleElevators($technical) || $this->hasCommon($common, 'ascensores')) $parts[] = 'la presencia de ascensores mejora accesibilidad y circulación vertical';
         if ($this->hasCommon($common, 'coworking_salas')) $parts[] = 'las salas comunes o coworking agregan flexibilidad de uso';
         if ($this->hasCommon($common, 'piscina') || $this->hasCommon($common, 'gimnasio')) $parts[] = 'las amenidades recreativas pueden mejorar deseabilidad residencial';
-        return $parts ? ucfirst(implode('; ', array_slice($parts, 0, 4))) . '.' : '';
+        return $parts ? ucfirst(implode('; ', array_slice($parts, 0, 7))) . '.' : '';
     }
 
     private function hasCommon(array $common, string $key): bool
@@ -134,6 +147,16 @@ final class AppraisalPhDeliverableTextBuilder
     private function multipleElevators(array $technical): bool
     {
         return preg_match('/\b([2-9]|[1-9]\d+)\b/u', (string) ($technical['numero_ascensores'] ?? '')) === 1;
+    }
+
+    private function sourceLabel(array $technical): string
+    {
+        $source = $this->clean($technical['fuente_documental'] ?? '', 160);
+        if ($source === '') $source = $this->clean($technical['escritura_reforma'] ?? '', 160);
+        if ($source === '') return '';
+        $source = preg_replace('/\.(pdf|docx?|txt)$/iu', '', $source) ?? $source;
+        if (preg_match('/(escritura\s+p[uú]blica\s*(?:n[°oº]\.?\s*)?\d+)/iu', $source, $m)) return trim((string) $m[1]);
+        return trim($source);
     }
 
     private function usableSummary(string $text, int $limit = 700): string
