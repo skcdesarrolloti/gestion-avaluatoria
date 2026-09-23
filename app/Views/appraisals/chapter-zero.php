@@ -37,7 +37,7 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
         data-module-autosave
         data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/expediente/autoguardar')) ?>"
         x-data="{
-            busy: false, active: 'configuracion',
+            busy: false, active: window.location.hash === '#identificacion' ? 'identificacion' : 'configuracion',
             notes: <?= e(json_encode($initial['notes'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             subtypeByProperty: <?= e(json_encode(AppraisalCatalog::subtypesByPropertyType(), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             selectedPropertyType: <?= e(json_encode($field('tipo_inmueble'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
@@ -46,7 +46,8 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
             annexUnits: <?= e((string) $count('igac_annex_units_count')) ?>,
             subtypeOptions() { return this.subtypeByProperty[this.selectedPropertyType] || {} },
             syncSubtype() { if (this.selectedSubtype && !this.subtypeOptions()[this.selectedSubtype]) this.selectedSubtype = '' },
-            academy(field, value) { return value && this.notes[field] ? this.notes[field][value] : null }
+            academy(field, value) { return value && this.notes[field] ? this.notes[field][value] : null },
+            setActive(section) { this.active = section; history.replaceState(null, '', '#' + section) }
         }" @submit="busy = true">
         <?= csrf_field() ?>
         <input type="hidden" name="version" value="<?= e($record['version']) ?>">
@@ -54,6 +55,7 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
         <input type="hidden" name="igac_typology_hint" value="<?= e($field('igac_typology_hint')) ?>">
         <input type="hidden" name="direccion" value="<?= e($field('direccion')) ?>">
         <input type="hidden" name="municipio" value="<?= e($field('municipio')) ?>">
+        <input type="hidden" name="active_section" :value="active">
 
         <section class="scroll-mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
             <div class="flex flex-wrap items-start justify-between gap-4">
@@ -67,10 +69,10 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
             <nav class="mt-6 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Subsecciones del expediente">
                 <button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
                     :class="active === 'configuracion' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800'"
-                    @click="active = 'configuracion'">1.1 Configuración</button>
+                    @click="setActive('configuracion')">1.1 Configuración</button>
                 <button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
                     :class="active === 'identificacion' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800'"
-                    @click="active = 'identificacion'">1.2 Identificación del encargo</button>
+                    @click="setActive('identificacion')">1.2 Identificación del encargo</button>
             </nav>
 
             <div class="mt-6 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950"
@@ -189,26 +191,10 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
                 </label>
             </div>
 
+            <?php require BASE_PATH . '/app/Views/appraisals/chapter-zero-actions.php'; ?>
+
         </section>
 
-        <aside class="space-y-4">
-            <div class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-                <h2 class="font-semibold">Guardar expediente</h2>
-                <p class="mt-3 text-sm leading-6 text-slate-600">
-                    Guarda 1.1 y 1.2 antes de continuar con Sector o Bien sujeto.
-                </p>
-                <button class="btn-primary mt-5 w-full" type="submit" :disabled="busy"
-                    x-text="busy ? 'Guardando...' : 'Guardar expediente'">Guardar expediente</button>
-                <p class="mt-3 text-xs font-semibold text-slate-500" data-autosave-status>
-                    Autoguardado activo
-                </p>
-            </div>
-            <p class="px-2 text-xs leading-5 text-slate-500">
-                El número de expediente se asigna con el perito responsable y permanece visible en todos los módulos.
-            </p>
-            <button class="btn-secondary w-full" type="submit" name="next" value="sector">
-                Guardar y continuar a Sector
-            </button>
-        </aside>
+        <?php require BASE_PATH . '/app/Views/appraisals/chapter-zero-aside.php'; ?>
     </form>
 </div>

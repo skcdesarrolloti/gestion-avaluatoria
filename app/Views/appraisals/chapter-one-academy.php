@@ -6,15 +6,17 @@ $chapterOneAcademy = [
     ['IVS · alcance y reporte', 'El valuador debe comunicar alcance, base de valor, fecha, propósito, supuestos, limitaciones y datos relevantes.', 'El capítulo separa encargo, uso del informe, base de valor, fechas, alcance, limitaciones y soporte documental.'],
 ];
 ?>
-<section class="mt-5 rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-sm leading-6 text-indigo-950">
-    <div class="flex flex-wrap items-start justify-between gap-3">
-        <div><h3 class="font-semibold">Academia normativa aplicada al numeral 1</h3><p class="mt-1 text-indigo-800">Norma a la mano para construir la memoria descriptiva sin recargar el informe.</p></div>
-        <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-indigo-800">NTS + Decreto 1420 + IVS</span>
-    </div>
+<details class="mt-5 rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-sm leading-6 text-indigo-950">
+    <summary class="cursor-pointer list-none">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+            <div><h3 class="font-semibold">Academia normativa aplicada al numeral 1</h3><p class="mt-1 text-indigo-800">Toca para consultar norma, aplicación y efecto en el entregable.</p></div>
+            <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-indigo-800">NTS + Decreto 1420 + IVS</span>
+        </div>
+    </summary>
     <div class="mt-4 overflow-x-auto rounded-lg border border-indigo-100 bg-white">
         <table class="min-w-full text-left text-xs md:text-sm">
             <thead class="bg-indigo-50 uppercase text-indigo-800"><tr><th class="p-3">Referencia</th><th class="p-3">Qué pide</th><th class="p-3">Cómo se aplica aquí</th></tr></thead>
             <tbody class="divide-y divide-indigo-100"><?php foreach ($chapterOneAcademy as [$ref, $asks, $use]): ?><tr><td class="p-3 font-semibold text-indigo-900"><?= e($ref) ?></td><td class="p-3"><?= e($asks) ?></td><td class="p-3"><?= e($use) ?></td></tr><?php endforeach; ?></tbody>
         </table>
     </div>
-</section>
+</details>

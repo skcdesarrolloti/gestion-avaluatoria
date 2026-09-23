@@ -71,7 +71,7 @@ final class AppraisalController
             $this->appraisals->saveChapterZero($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $data);
             $this->dossiers?->assignIfMissing($id, $this->user['id']);
             Session::flash('chapter_zero_message', 'Expediente guardado correctamente.');
-            Http::redirect('avaluos/' . $id . ((string) ($_POST['next'] ?? '') === 'sector' ? '/sector' : ((string) ($_POST['next'] ?? '') === 'subject' ? '/bien-sujeto#atributos' : ((string) ($_POST['next'] ?? '') === 'deliverable' ? '/entregable' : '/expediente'))));
+            Http::redirect($this->chapterZeroRedirect($id));
         } catch (\Throwable $error) {
             Session::flash('chapter_zero_error', $this->chapterZeroErrorMessage($error));
             Http::redirect('avaluos/' . $id . '/expediente');
@@ -97,6 +97,16 @@ final class AppraisalController
         $data = AppraisalValidator::validate($input);
         $result = $this->appraisals->save($id, $this->user['id'], $input['version'], $data);
         Http::json(['ok' => true] + $result);
+    }
+
+    private function chapterZeroRedirect(string $id): string
+    {
+        $next = (string) ($_POST['next'] ?? '');
+        if ($next === 'sector') return 'avaluos/' . $id . '/sector';
+        if ($next === 'subject') return 'avaluos/' . $id . '/bien-sujeto#atributos';
+        if ($next === 'deliverable') return 'avaluos/' . $id . '/entregable';
+        $section = (string) ($_POST['active_section'] ?? 'configuracion');
+        return 'avaluos/' . $id . '/expediente#' . ($section === 'identificacion' ? 'identificacion' : 'configuracion');
     }
     private function appraiserIds(): array { return array_column($this->appraisers->eligibleForAssignment(), 'id'); }
     private function igacCodes(): array { return array_column($this->typologies->categories(), 'code'); }

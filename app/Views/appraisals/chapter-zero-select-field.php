@@ -31,10 +31,10 @@ $plain = !in_array($name, ['tipo_inmueble', 'subtipo_funcional'], true);
     <span class="mt-1 block text-xs leading-5 text-slate-500"><?= e($help) ?></span>
     <?php $academyValue = $name === 'tipo_inmueble' ? 'selectedPropertyType'
         : ($name === 'subtipo_funcional' ? 'selectedSubtype' : 'selected'); ?>
-    <span class="mt-3 block rounded-xl border border-teal-100 bg-teal-50 p-3 text-xs leading-5 text-teal-950"
+    <details class="mt-3 rounded-xl border border-teal-100 bg-teal-50 p-3 text-xs leading-5 text-teal-950"
         x-show="academy('<?= e($name) ?>', <?= $academyValue ?>)">
-        <strong class="block text-teal-900">Academia del campo</strong>
-        <span class="mt-1 block"><strong>Qué es:</strong>
+        <summary class="cursor-pointer font-semibold text-teal-900">Ver academia del campo</summary>
+        <span class="mt-2 block"><strong>Qué es:</strong>
             <span x-text="academy('<?= e($name) ?>', <?= $academyValue ?>)?.what"></span></span>
         <span class="mt-1 block"><strong>Cuándo aplica:</strong>
             <span x-text="academy('<?= e($name) ?>', <?= $academyValue ?>)?.when"></span></span>
@@ -45,5 +45,5 @@ $plain = !in_array($name, ['tipo_inmueble', 'subtipo_funcional'], true);
             <strong>Justificación para el informe:</strong>
             <span x-text="academy('<?= e($name) ?>', <?= $academyValue ?>)?.report"></span>
         </span>
-    </span>
+    </details>
 </label>
