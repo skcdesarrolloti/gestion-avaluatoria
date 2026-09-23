@@ -212,6 +212,30 @@ test('module autosave allows retry after network failure without reporting saved
 });
 
 
+test('save-in-place submit stays in module and posts to autosave endpoint', async () => {
+    const { listeners, cleanup } = setup();
+    const form = new HTMLFormElement();
+    form.attrs.add('data-save-in-place');
+    let prevented = false, stopped = false, calls = 0;
+    globalThis.fetch = async (url, request) => {
+        calls++;
+        assert.equal(url, '/avaluos/abc/expediente/autoguardar');
+        assert.equal(request.method, 'POST');
+        return { ok: true, json: async () => ({ ok: true, version: 8, saved_at: new Date().toISOString() }) };
+    };
+    listeners.submit({
+        target: form,
+        preventDefault() { prevented = true; },
+        stopImmediatePropagation() { stopped = true; },
+    });
+    await globalThis.window.gaFlushAutosaves();
+    assert.equal(prevented, true);
+    assert.equal(stopped, true);
+    assert.equal(calls, 1);
+    assert.equal(form.version.value, '8');
+    assert.match(form.status.textContent, /confirmado/);
+    cleanup();
+});
 test('module autosave reports html server errors without injecting pages', async () => {
     const { listeners, runTimer, cleanup } = setup();
     const form = new HTMLFormElement(), input = new HTMLInputElement(form);
