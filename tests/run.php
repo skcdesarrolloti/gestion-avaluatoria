@@ -537,7 +537,11 @@ Certificado de tradicion.",
         ['summary_text' => 'No presenta obsolescencia fisica, funcional ni externa material.']
     );
     $chapterText = $chapterReport['text'];
-    expect(str_contains($chapterText, '3.3 Aspectos generales')
+    expect(str_contains($chapterText, '3. Descripción general')
+        && str_contains($chapterText, '3.2 Terreno, superficies y linderos')
+        && str_contains($chapterText, '3.3.2 Aspectos generales')
+        && str_contains($chapterText, '3.3.4 Áreas construidas')
+        && str_contains($chapterText, '3.4 Diferenciales valuatorios')
         && str_contains($chapterText, 'Oficina 206: niveles: 1')
         && str_contains($chapterText, 'escritura') && str_contains($chapterText, '33,42')
         && str_contains($chapterText, 'Estructura: Concreto reforzado (bueno)')

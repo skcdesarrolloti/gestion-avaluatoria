@@ -29,8 +29,10 @@ final class AppraisalReportNoteCatalog
                 '2.11.3'=>'Frecuencia','2.11.4'=>'Calidad del servicio','2.12'=>'Edificaciones importantes','2.13'=>'Tipos de edificación',
             ],
             '3' => [
-                '3.1'=>'Identificación y características','3.2'=>'Áreas y superficies adoptadas','3.3'=>'Aspectos generales de la construcción',
-                '3.3.1'=>'Materiales y conservación','3.4'=>'Diferenciales valuatorios','3.5'=>'Propiedad horizontal',
+                '3'=>'Descripción general del activo','3.1'=>'Identificación y características','3.2'=>'Terreno, superficies y linderos',
+                '3.3'=>'Construcciones y mejoras','3.3.1'=>'Construcciones y descripción documental',
+                '3.3.2'=>'Aspectos generales de la construcción','3.3.3'=>'Materiales y conservación',
+                '3.3.4'=>'Áreas construidas','3.4'=>'Diferenciales valuatorios','3.5'=>'Propiedad horizontal',
                 '3.6'=>'Obsolescencias','3.7'=>'Registro fotográfico y soportes',
             ],
             '4' => ['4'=>'Características jurídicas', '4.1'=>'Certificado y titularidad', '4.2'=>'Afectaciones, limitaciones y salvedades'],
