@@ -56,11 +56,18 @@ final class AppraisalPhDeliverableTextBuilder
 
     private function commons(string $typology, array $technical, array $common, string $support, string $level): string
     {
-        $items = $this->commonItems($common, $typology);
+        $essential = $this->groupNames($common, 'esenciales', 7);
+        $operational = $this->groupNames($common, 'soporte_operativo', 9);
+        $amenities = $this->groupNames($common, 'no_esenciales', 8);
+        $exclusive = $this->groupNames($common, 'uso_exclusivo', 4);
+        $priority = $this->commonItems($common, $typology);
         $text = "La copropiedad cuenta con áreas, bienes y servicios comunes de dotación {$level}.";
-        if ($items) $text .= ' Entre los elementos identificados se registran ' . implode(', ', $items) . '.';
-        $support = $this->usableSummary($support, 900);
-        if ($support !== '') $text .= ' ' . $support;
+        if ($essential) $text .= ' Los bienes comunes esenciales identificados incluyen ' . implode(', ', $essential) . ', que soportan existencia, estabilidad, acceso, redes y funcionamiento básico del edificio.';
+        if ($operational) $text .= ' Como soporte operativo y técnico se registran ' . implode(', ', $operational) . ', elementos que inciden en seguridad, continuidad, movilidad interna y administración cotidiana.';
+        if ($amenities) $text .= ' Además, los bienes comunes no esenciales y amenidades como ' . implode(', ', $amenities) . ' pueden fortalecer imagen, comodidad, permanencia de usuarios y deseabilidad frente a copropiedades con menor dotación.';
+        if ($exclusive) $text .= ' También se observan bienes comunes de uso exclusivo o asignado: ' . implode(', ', $exclusive) . ', cuya incidencia debe asociarse al derecho o unidad correspondiente.';
+        if ($priority) $text .= ' Para la tipología seleccionada se consideran especialmente relevantes ' . implode(', ', array_slice($priority, 0, 7)) . '.';
+        if (($extra = $this->commonImpact($common, $technical)) !== '') $text .= ' ' . $extra;
         $dotation = $this->clean($technical['dotacion_tipologia'] ?? '', 240);
         if ($dotation !== '') $text .= ' ' . $dotation;
         return $text;
@@ -89,6 +96,44 @@ final class AppraisalPhDeliverableTextBuilder
             isset($priority[(string) $key]) ? $items[] = $label : $other[] = $label;
         }
         return array_slice(array_values(array_unique(array_merge($items, $other))), 0, 14);
+    }
+
+    private function groupNames(array $common, string $group, int $limit): array
+    {
+        $groups = AppraisalPhCatalog::commonAreaGroups();
+        $labels = AppraisalPhCatalog::commonAreas();
+        $keys = array_keys($groups[$group][1] ?? []);
+        $out = [];
+        foreach ($keys as $key) {
+            if (!$this->hasCommon($common, (string) $key)) continue;
+            $out[] = mb_strtolower((string) ($labels[(string) $key] ?? str_replace('_', ' ', (string) $key)));
+        }
+        return array_slice(array_values(array_unique($out)), 0, $limit);
+    }
+
+    private function commonImpact(array $common, array $technical): string
+    {
+        $parts = [];
+        if ($this->hasCommon($common, 'planta_electrica')) $parts[] = 'la planta eléctrica favorece continuidad operativa';
+        if ($this->hasCommon($common, 'red_incendio')) $parts[] = 'la red contra incendio aporta seguridad y cumplimiento operativo';
+        if ($this->hasCommon($common, 'cctv_control') || $this->hasCommon($common, 'vigilancia')) $parts[] = 'el control y vigilancia refuerzan percepción de seguridad';
+        if ($this->multipleElevators($technical) || $this->hasCommon($common, 'ascensores')) $parts[] = 'la presencia de ascensores mejora accesibilidad y circulación vertical';
+        if ($this->hasCommon($common, 'coworking_salas')) $parts[] = 'las salas comunes o coworking agregan flexibilidad de uso';
+        if ($this->hasCommon($common, 'piscina') || $this->hasCommon($common, 'gimnasio')) $parts[] = 'las amenidades recreativas pueden mejorar deseabilidad residencial';
+        return $parts ? ucfirst(implode('; ', array_slice($parts, 0, 4))) . '.' : '';
+    }
+
+    private function hasCommon(array $common, string $key): bool
+    {
+        $row = $common[$key] ?? null;
+        $status = is_array($row) ? (string) ($row['status'] ?? '') : '';
+        $notes = is_array($row) ? mb_strtolower((string) ($row['notes'] ?? '')) : '';
+        return in_array($status, ['ok', 'warn', 'risk'], true) && !str_starts_with($notes, 'no identificado');
+    }
+
+    private function multipleElevators(array $technical): bool
+    {
+        return preg_match('/\b([2-9]|[1-9]\d+)\b/u', (string) ($technical['numero_ascensores'] ?? '')) === 1;
     }
 
     private function usableSummary(string $text, int $limit = 700): string

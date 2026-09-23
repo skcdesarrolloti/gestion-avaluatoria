@@ -553,6 +553,21 @@ try {
         && str_contains((string) ($phQuantityAnalysis['core']['report_text'] ?? ''), 'ascensores: 6 ascensores')
         && str_contains((string) ($phQuantityAnalysis['core']['report_text'] ?? ''), 'parqueaderos: 120 parqueaderos'),
         'entregable PH integra configuracion cargada');
+    $phCommonRich = (new AppraisalPhReportBuilder())->build(['ph_name' => 'PH Dotado'],
+        ['numero_ascensores' => '6 ascensores'],
+        ['terreno_estructura' => ['status' => 'ok', 'notes' => 'Reglamento'],
+            'red_incendio' => ['status' => 'ok', 'notes' => 'Reglamento'],
+            'planta_electrica' => ['status' => 'ok', 'notes' => 'Visita'],
+            'ascensores' => ['status' => 'ok', 'notes' => 'Visita'],
+            'lobby' => ['status' => 'ok', 'notes' => 'Visita'],
+            'coworking_salas' => ['status' => 'ok', 'notes' => 'Visita']], [], [], [], 'oficinas', '', []);
+    $richCommonText = (string) ($phCommonRich['report_text'] ?? '');
+    expect(str_contains($richCommonText, 'bienes comunes esenciales')
+        && str_contains($richCommonText, 'soporte operativo y técnico')
+        && str_contains($richCommonText, 'bienes comunes no esenciales y amenidades')
+        && str_contains($richCommonText, 'planta eléctrica favorece continuidad operativa')
+        && str_contains($richCommonText, 'las salas comunes o coworking agregan flexibilidad de uso'),
+        'entregable PH resalta bienes comunes y amenidades con incidencia');
     $phMixedReport = (new AppraisalPhReportBuilder())->build(['ph_name' => 'PH Mixta'],
         ['uso_dominante' => 'Comercio en primer piso y vivienda en niveles superiores',
             'usos_complementarios' => 'Locales, apartamentos y parqueaderos',
