@@ -4,11 +4,14 @@ namespace App\Controllers;
 use App\Core\Http;
 use App\Core\HttpException;
 use App\Core\Session;
+use App\Models\AppraisalObsolescenceRepository;
 use App\Models\AppraisalPhRepository;
 use App\Models\AppraisalRepository;
+use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraiserRepository;
 use App\Models\IgacTypologyRepository;
 use App\Services\AppraisalChapterZeroInput;
+use App\Services\AppraisalSubjectChapterReport;
 use App\Services\AppraisalValidator;
 use App\Support\AppraisalCatalog;
 
@@ -16,7 +19,8 @@ final class AppraisalController
 {
     public function __construct(private AppraisalRepository $appraisals, private array $user,
         private AppraiserRepository $appraisers, private IgacTypologyRepository $typologies,
-        private ?AppraisalPhRepository $ph = null) {}
+        private ?AppraisalPhRepository $ph = null, private ?AppraisalSubjectRepository $subjects = null,
+        private ?AppraisalObsolescenceRepository $obsolescence = null) {}
 
     public function index(): void
     {
@@ -47,8 +51,13 @@ final class AppraisalController
     public function deliverable(string $id): void
     {
         $record = $this->appraisals->find($id, $this->user['id']);
+        $phProfile = $this->ph?->profile($id, $this->user['id']) ?? [];
+        $subject = $this->subjects?->find($id, $this->user['id']) ?? [];
+        $units = $this->appraisals->units($id, $this->user['id']);
+        $obsolescence = $this->obsolescence?->find($id, $this->user['id']) ?? [];
+        $subjectChapter = (new AppraisalSubjectChapterReport())->build($record, $subject, $units, $phProfile, $obsolescence);
         view('appraisals/deliverable', ['title' => 'Entregable', 'record' => $record,
-            'phProfile' => $this->ph?->profile($id, $this->user['id'])]);
+            'phProfile' => $phProfile, 'subjectChapter' => $subjectChapter]);
     }
 
     public function saveChapterZero(string $id): never

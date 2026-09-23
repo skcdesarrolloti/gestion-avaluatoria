@@ -17,6 +17,7 @@ use App\Services\AppraisalPhDocumentUploadService;
 use App\Services\AppraisalExternalOcrClient;
 use App\Services\AppraisalPhExternalOcrService;
 use App\Services\AppraisalSectorInput;
+use App\Services\AppraisalSubjectChapterReport;
 use App\Services\AppraisalMidasReview;
 use App\Services\AppraisalMidasSupportUploadService;
 use App\Services\AppraisalLegalInput;
@@ -371,6 +372,30 @@ try {
     $constructionRows = AppraisalChapterZeroInput::unitConstructionData();
     expect($constructionRows[0]['built_area_adopted_m2'] === '85.25'
         && str_contains($constructionRows[0]['construction_conservation_json'], 'estructura'), 'construccion por unidad normalizada');
+    $chapterReport = (new AppraisalSubjectChapterReport())->build(
+        ['titulo' => 'Avaluo oficina 206', 'destinacion' => 'oficina'],
+        ['subject_title' => 'Oficina 206 y Parqueadero 60', 'adopted_address' => 'Edificio 19 Chambacu',
+            'city_name' => 'Cartagena de Indias', 'property_registry' => '040-243371', 'cadastral_reference' => '01-02-0678-0169-901'],
+        [[
+            'unit_kind' => 'property', 'unit_index' => 1, 'label' => 'Oficina 206',
+            'area_deed_m2' => '33.42', 'area_tax_m2' => '33.00', 'area_certificate_m2' => '33.42',
+            'area_adopted_m2' => '33.42', 'area_adopted_source' => 'deed',
+            'built_area_adopted_m2' => '33.42', 'built_area_adopted_source' => 'deed',
+            'construction_floors' => '1', 'construction_age_years' => '25', 'construction_remaining_life_years' => '74',
+            'construction_rentable_units' => '1', 'construction_state' => 'completa',
+            'construction_specifics_json' => '{"material_estructura":"Concreto reforzado","material_pisos":"Baldosas ceramicas"}',
+            'construction_conservation_json' => '{"estructura":"B","pisos":"B"}',
+        ]],
+        ['report_text' => 'La copropiedad aporta ascensores, recepcion, seguridad y administracion comun.'],
+        ['summary_text' => 'No presenta obsolescencia fisica, funcional ni externa material.']
+    );
+    $chapterText = $chapterReport['text'];
+    expect(str_contains($chapterText, '3.3 Aspectos generales')
+        && str_contains($chapterText, 'Oficina 206: niveles: 1')
+        && str_contains($chapterText, 'escritura') && str_contains($chapterText, '33,42')
+        && str_contains($chapterText, 'Estructura: Concreto reforzado (bueno)')
+        && str_contains($chapterText, 'NTS S 03')
+        && str_contains($chapterText, 'Ley 675 de 2001'), 'entregable sujeto integra construccion areas PH obsolescencias y normas');
     $_POST = ['unit_attributes' => [$unitId => ['items' => ['esquinero_medianero' => ['value' => 'esquinero',
         'state' => 'bueno', 'impact' => 'positivo_medio', 'evidence' => 'visita',
         'rating' => '4', 'weight' => '3',
