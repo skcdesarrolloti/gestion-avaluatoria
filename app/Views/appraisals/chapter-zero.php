@@ -6,6 +6,7 @@ $field = static fn (string $name): string => (string) ($record[$name] ?? '');
 $count = static fn (string $name): int => max(0, (int) ($record[$name] ?? 0));
 $defaultAppraiserId = $field('appraiser_id') !== '' ? $field('appraiser_id') : (count($appraisers) === 1 ? (string) $appraisers[0]['id'] : '');
 $selectedAppraiser = static fn (string $value): string => $defaultAppraiserId === $value ? 'selected' : '';
+$hasDossierNumber = trim($field('expediente_number')) !== '';
 $notes = $catalog['notes'] ?? [];
 $initial = ['notes' => $notes];
 $currentStep = 'expediente';
@@ -39,7 +40,7 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
         data-module-autosave
         data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/expediente/autoguardar')) ?>"
         x-data="{
-            busy: false, active: window.location.hash === '#identificacion' ? 'identificacion' : 'configuracion',
+            busy: false, active: window.location.hash === '#identificacion' || (window.location.hash === '' && <?= $hasDossierNumber ? 'true' : 'false' ?>) ? 'identificacion' : 'configuracion',
             notes: <?= e(json_encode($initial['notes'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             subtypeByProperty: <?= e(json_encode(AppraisalCatalog::subtypesByPropertyType(), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             selectedPropertyType: <?= e(json_encode($field('tipo_inmueble'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
@@ -50,7 +51,7 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
             syncSubtype() { if (this.selectedSubtype && !this.subtypeOptions()[this.selectedSubtype]) this.selectedSubtype = '' },
             academy(field, value) { return value && this.notes[field] ? this.notes[field][value] : null },
             setActive(section) { this.active = section; history.replaceState(null, '', '#' + section) }
-        }" @submit="busy = true">
+        }" @submit="busy = true" @ga:dossier-created.window="setActive('identificacion')">
         <?= csrf_field() ?>
         <input type="hidden" name="version" value="<?= e($record['version']) ?>">
         <input type="hidden" name="igac_category" value="<?= e($field('igac_category')) ?>">

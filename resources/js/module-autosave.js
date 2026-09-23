@@ -53,6 +53,17 @@ function updateDossierNumber(form, result) {
         if ('value' in node) node.value = result.expediente_number;
         else node.textContent = result.expediente_number;
     });
+    form.ownerDocument.querySelectorAll('[data-dossier-card]').forEach(card => {
+        card.classList.remove('border-amber-200', 'bg-amber-50', 'text-amber-950');
+        card.classList.add('border-emerald-200', 'bg-emerald-50', 'text-emerald-950');
+    });
+    form.ownerDocument.querySelectorAll('[data-dossier-state]').forEach(node => { node.textContent = 'Expediente creado'; });
+    form.ownerDocument.querySelectorAll('[data-dossier-help]').forEach(node => {
+        node.classList.remove('text-amber-900');
+        node.classList.add('text-emerald-900');
+    });
+    form.ownerDocument.querySelectorAll('[data-create-dossier-panel]').forEach(node => { node.hidden = true; });
+    window.dispatchEvent?.(new CustomEvent('ga:dossier-created', { detail: { expediente_number: result.expediente_number } }));
 }
 
 async function save(form) {

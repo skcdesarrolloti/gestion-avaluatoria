@@ -10,9 +10,29 @@ class HTMLFormElement {
         this.status = { textContent: '', dataset: {} };
         this.dossier = { value: 'Pendiente de asignar' };
         this.banner = { textContent: 'Pendiente de asignar' };
+        this.cardClasses = new Set(['border-amber-200', 'bg-amber-50', 'text-amber-950']);
+        this.card = { classList: {
+            add: (...names) => names.forEach(name => this.cardClasses.add(name)),
+            remove: (...names) => names.forEach(name => this.cardClasses.delete(name)),
+            contains: name => this.cardClasses.has(name),
+        } };
+        this.dossierState = { textContent: 'Número de expediente' };
+        this.dossierHelpClasses = new Set(['text-amber-900']);
+        this.dossierHelp = { classList: {
+            add: (...names) => names.forEach(name => this.dossierHelpClasses.add(name)),
+            remove: (...names) => names.forEach(name => this.dossierHelpClasses.delete(name)),
+            contains: name => this.dossierHelpClasses.has(name),
+        } };
+        this.createPanel = { hidden: false };
         this.attrs = new Set();
         this.ownerDocument = {
-            querySelectorAll: selector => selector === '[data-expediente-number-output]' ? [this.dossier, this.banner] : [],
+            querySelectorAll: selector => ({
+                '[data-expediente-number-output]': [this.dossier, this.banner],
+                '[data-dossier-card]': [this.card],
+                '[data-dossier-state]': [this.dossierState],
+                '[data-dossier-help]': [this.dossierHelp],
+                '[data-create-dossier-panel]': [this.createPanel],
+            }[selector] || []),
         };
     }
     matches(selector) { return selector === '[data-module-autosave]'; }
@@ -51,6 +71,7 @@ function setup() {
         setTimeout: globalThis.setTimeout,
         clearTimeout: globalThis.clearTimeout,
         fetch: globalThis.fetch,
+        CustomEvent: globalThis.CustomEvent,
     };
     const listeners = {};
     globalThis.HTMLFormElement = HTMLFormElement;
@@ -63,7 +84,9 @@ function setup() {
         querySelectorAll: () => [],
         addEventListener: (type, handler) => { listeners[type] = handler; },
     };
-    globalThis.window = { addEventListener: () => {} };
+    const dispatched = [];
+    globalThis.window = { addEventListener: () => {}, dispatchEvent: event => dispatched.push(event) };
+    globalThis.CustomEvent = class { constructor(type, params = {}) { this.type = type; this.detail = params.detail || {}; } };
     globalThis.FormData = class {
         constructor(form) {
             this.values = new Map([['_token', 'old'], ['version', form.version.value]]);
@@ -80,6 +103,7 @@ function setup() {
         listeners,
         runTimer: () => timerCallback(),
         timerDelay: () => timerDelay,
+        dispatched,
         cleanup: () => Object.entries(originals).forEach(([key, value]) => { globalThis[key] = value; }),
     };
 }
@@ -118,7 +142,7 @@ test('appraiser change only saves draft without creating dossier number', async 
 });
 
 test('create dossier button sends explicit flag and updates number', async () => {
-    const { listeners, runTimer, timerDelay, cleanup } = setup();
+    const { listeners, runTimer, timerDelay, dispatched, cleanup } = setup();
     const form = new HTMLFormElement(), button = new CreateDossierButton(form);
     globalThis.fetch = async (url, request) => {
         assert.equal(request.body.get('create_expediente'), '1');
@@ -128,6 +152,10 @@ test('create dossier button sends explicit flag and updates number', async () =>
     assert.equal(timerDelay(), 0);
     await runTimer();
     assert.equal(form.dossier.value, '01-2026-09-001');
+    assert.equal(form.dossierState.textContent, 'Expediente creado');
+    assert.equal(form.cardClasses.has('bg-emerald-50'), true);
+    assert.equal(form.createPanel.hidden, true);
+    assert.equal(dispatched.at(-1).type, 'ga:dossier-created');
     cleanup();
 });
 
