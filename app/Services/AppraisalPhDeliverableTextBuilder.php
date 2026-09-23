@@ -7,13 +7,13 @@ use App\Support\AppraisalPhCatalog;
 final class AppraisalPhDeliverableTextBuilder
 {
     public function build(string $name, string $label, string $assets, array $technical, array $common,
-        string $support, string $level, string $rules, string $admin, string $incidence, string $notes, string $limits): string
+        string $support, string $level, string $typology, string $rules, string $admin, string $incidence, string $notes, string $limits): string
     {
         $intro = "El inmueble objeto de medición se localiza en {$name}, copropiedad sometida al régimen de propiedad horizontal y analizada para este avalúo como {$label}.";
         if ($assets !== '') $intro .= ' ' . $assets;
         if (($configuration = $this->configuration($technical)) !== '') $intro .= ' ' . $configuration;
 
-        $paragraphs = [$intro, $this->commons($technical, $common, $support, $level)];
+        $paragraphs = [$intro, $this->typologyLens($typology, $technical), $this->commons($typology, $technical, $common, $support, $level)];
         foreach ([$rules, $admin, $incidence, $notes] as $text) {
             $text = $this->usableSummary($text);
             if ($text !== '') $paragraphs[] = $text;
@@ -35,9 +35,29 @@ final class AppraisalPhDeliverableTextBuilder
         return $text;
     }
 
-    private function commons(array $technical, array $common, string $support, string $level): string
+    private function typologyLens(string $typology, array $technical): string
     {
-        $items = $this->commonItems($common);
+        $dominant = $this->clean($technical['uso_dominante'] ?? '', 180);
+        $complementary = $this->clean($technical['usos_complementarios'] ?? '', 220);
+        $relation = $this->clean($technical['relacion_funcional_usos'] ?? '', 260);
+        $base = match ($typology) {
+            'residencial' => 'La lectura se orienta a habitabilidad, convivencia, seguridad, amenidades y sostenimiento de zonas comunes propias de vivienda.',
+            'oficinas' => 'La lectura se orienta a imagen corporativa, acceso de usuarios, ascensores, parqueaderos, recepción, seguridad y administración común.',
+            'comercio' => 'La lectura se orienta a flujo de público, visibilidad, horarios, parqueo, señalización, cargue liviano, residuos y reglas de operación comercial.',
+            'bodegas' => 'La lectura se orienta a movilidad interna, patios, muelles, control de acceso pesado, redes, seguridad y continuidad operativa.',
+            'mixto' => 'La lectura se orienta por componentes: identifica qué parte es residencial, comercial, corporativa, logística u otra, y evita comparar o concluir con un solo mercado promedio.',
+            default => 'La lectura se orienta por la tipología seleccionada y debe precisarse con reglamento, visita y soportes del encargo.',
+        };
+        $details = [];
+        if ($dominant !== '') $details[] = 'uso dominante: ' . $dominant;
+        if ($complementary !== '') $details[] = 'usos complementarios: ' . $complementary;
+        if ($relation !== '') $details[] = 'relación funcional: ' . $relation;
+        return $base . ($details ? ' Se registra ' . implode('; ', $details) . '.' : '');
+    }
+
+    private function commons(string $typology, array $technical, array $common, string $support, string $level): string
+    {
+        $items = $this->commonItems($common, $typology);
         $text = "La copropiedad cuenta con áreas, bienes y servicios comunes de dotación {$level}.";
         if ($items) $text .= ' Entre los elementos identificados se registran ' . implode(', ', $items) . '.';
         $support = $this->usableSummary($support, 900);
@@ -57,17 +77,19 @@ final class AppraisalPhDeliverableTextBuilder
         return $out;
     }
 
-    private function commonItems(array $common): array
+    private function commonItems(array $common, string $typology): array
     {
         $labels = AppraisalPhCatalog::commonAreas();
-        $items = [];
+        $priority = array_fill_keys(AppraisalPhCatalog::typologyPriorities()[$typology] ?? [], true);
+        $items = $other = [];
         foreach ($common as $key => $row) {
             $status = is_array($row) ? (string) ($row['status'] ?? '') : '';
             $notes = is_array($row) ? mb_strtolower((string) ($row['notes'] ?? '')) : '';
             if (!in_array($status, ['ok', 'warn', 'risk'], true) || str_starts_with($notes, 'no identificado')) continue;
-            $items[] = mb_strtolower((string) ($labels[(string) $key] ?? str_replace('_', ' ', (string) $key)));
+            $label = mb_strtolower((string) ($labels[(string) $key] ?? str_replace('_', ' ', (string) $key)));
+            isset($priority[(string) $key]) ? $items[] = $label : $other[] = $label;
         }
-        return array_slice(array_values(array_unique($items)), 0, 14);
+        return array_slice(array_values(array_unique(array_merge($items, $other))), 0, 14);
     }
 
     private function usableSummary(string $text, int $limit = 700): string

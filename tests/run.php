@@ -553,6 +553,17 @@ try {
         && str_contains((string) ($phQuantityAnalysis['core']['report_text'] ?? ''), 'ascensores: 6 ascensores')
         && str_contains((string) ($phQuantityAnalysis['core']['report_text'] ?? ''), 'parqueaderos: 120 parqueaderos'),
         'entregable PH integra configuracion cargada');
+    $phMixedReport = (new AppraisalPhReportBuilder())->build(['ph_name' => 'PH Mixta'],
+        ['uso_dominante' => 'Comercio en primer piso y vivienda en niveles superiores',
+            'usos_complementarios' => 'Locales, apartamentos y parqueaderos',
+            'relacion_funcional_usos' => 'Accesos y circulaciones diferenciadas por uso'],
+        ['lobby' => ['status' => 'ok', 'notes' => 'Visita: recepción compartida'],
+            'zonas_verdes' => ['status' => 'ok', 'notes' => 'Amenidad residencial'],
+            'muelles_bahias' => ['status' => 'ok', 'notes' => 'Bahía comercial']], [], [], [], 'mixto', '', []);
+    expect(str_contains((string) ($phMixedReport['report_text'] ?? ''), 'identifica qué parte es residencial, comercial')
+        && str_contains((string) ($phMixedReport['report_text'] ?? ''), 'evita comparar o concluir con un solo mercado promedio')
+        && str_contains((string) ($phMixedReport['report_text'] ?? ''), 'usos complementarios: Locales, apartamentos y parqueaderos'),
+        'entregable PH mixto separa componentes por tipologia');
     $chambacuQuantity = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
         'area de construccion de 15.394,86 metros cuadrados. area de oficinas para un total de ciento cinco (105) oficinas. piso adicional intermedio que comprende veintiseis (26) oficinas. semisotano para ciento ochenta y cinco (185) parqueaderos.',
         ['reglamento.txt'], 'oficinas');

@@ -33,7 +33,7 @@ final class AppraisalPhReportBuilder
             'resumen_notas_ph' => $operations->notes($technical),
         ];
         $report = (new AppraisalPhDeliverableTextBuilder())->build($name, $label, $assets, $technical, $common,
-            $support, $level, $tab['resumen_reglas_ph'], $tab['resumen_administracion_ph'],
+            $support, $level, $typology, $tab['resumen_reglas_ph'], $tab['resumen_administracion_ph'],
             $tab['resumen_incidencia_ph'], $tab['resumen_notas_ph'], $limits);
         return ['diagnosis_text' => $tab['resumen_incidencia_ph'],
             'report_text' => $report, 'technical' => $tab];
@@ -71,6 +71,7 @@ final class AppraisalPhReportBuilder
             'comercio' => 'Su vocación principal corresponde a actividad comercial, con incidencia en visibilidad, flujo de visitantes, parqueo y reglas de uso.',
             'bodegas' => 'Su vocación principal corresponde a operación logística o industrial, con incidencia en movilidad, patios, seguridad y continuidad operativa.',
             'residencial' => 'Su vocación principal corresponde a uso habitacional, con incidencia en seguridad, amenidades, convivencia y sostenimiento común.',
+            'mixto' => 'Su vocación principal combina usos; la lectura debe separar componentes habitacionales, comerciales, corporativos u operativos según el reglamento y la visita.',
             default => '',
         };
         if ($profile !== '') return $profile;
@@ -129,6 +130,7 @@ final class AppraisalPhReportBuilder
             'comercio' => 'La lectura se concentra en flujo de público, visibilidad, parqueo, cargue liviano y reglas comerciales.',
             'bodegas' => 'La lectura se concentra en operación logística, circulación pesada, patios, seguridad y soporte técnico.',
             'residencial' => 'La lectura se concentra en habitabilidad, amenidades, seguridad, convivencia y mantenimiento común.',
+            'mixto' => 'La lectura separa los componentes de uso y sus reglas comunes para no mezclar variables de vivienda, comercio, oficinas o logística.',
             default => 'La lectura aporta elementos para precisar el uso dominante y los usos complementarios.',
         };
     }
