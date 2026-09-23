@@ -11,6 +11,7 @@ use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraiserRepository;
 use App\Models\IgacTypologyRepository;
 use App\Services\AppraisalChapterOneReport;
+use App\Services\AppraisalDossierNumberer;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalSubjectChapterReport;
 use App\Services\AppraisalValidator;
@@ -21,7 +22,7 @@ final class AppraisalController
     public function __construct(private AppraisalRepository $appraisals, private array $user,
         private AppraiserRepository $appraisers, private IgacTypologyRepository $typologies,
         private ?AppraisalPhRepository $ph = null, private ?AppraisalSubjectRepository $subjects = null,
-        private ?AppraisalObsolescenceRepository $obsolescence = null) {}
+        private ?AppraisalObsolescenceRepository $obsolescence = null, private ?AppraisalDossierNumberer $dossiers = null) {}
 
     public function index(): void
     {
@@ -68,6 +69,7 @@ final class AppraisalController
             $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
                 $this->igacCodes(), $this->appraiserIds());
             $this->appraisals->saveChapterZero($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $data);
+            $this->dossiers?->assignIfMissing($id, $this->user['id']);
             Session::flash('chapter_zero_message', 'Expediente guardado correctamente.');
             Http::redirect('avaluos/' . $id . ((string) ($_POST['next'] ?? '') === 'sector' ? '/sector' : ((string) ($_POST['next'] ?? '') === 'subject' ? '/bien-sujeto#atributos' : ((string) ($_POST['next'] ?? '') === 'deliverable' ? '/entregable' : '/expediente'))));
         } catch (\Throwable $error) {
@@ -80,7 +82,8 @@ final class AppraisalController
         $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
             $this->igacCodes(), $this->appraiserIds());
         $result = $this->appraisals->saveChapterZero($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $data);
-        Http::json(['ok' => true] + $result);
+        $dossier = $this->dossiers?->assignIfMissing($id, $this->user['id']);
+        Http::json(['ok' => true, 'expediente_number' => $dossier] + $result);
     }
     public function edit(string $id): void
     {

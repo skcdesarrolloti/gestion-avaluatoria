@@ -10,12 +10,14 @@ final class AppraisalRepository
 {
     public function __construct(private PDO $db) {}
 
-    public function recent(int $owner, int $page): array
+    public function recent(int $owner, int $page, string $search = ''): array
     {
-        $offset = (max(1, $page) - 1) * 20;
-        $query = $this->db->prepare("SELECT id, titulo, tipo, municipio, updated_at
-            FROM appraisals WHERE owner_id = ? ORDER BY updated_at DESC, id DESC LIMIT 21 OFFSET $offset");
-        $query->execute([$owner]);
+        $offset = (max(1, $page) - 1) * 20; $search = trim($search);
+        $where = 'owner_id = ?'; $params = [$owner];
+        if ($search !== '') { $where .= ' AND (expediente_number LIKE ? OR titulo LIKE ? OR municipio LIKE ?)'; $needle = '%' . $search . '%'; $params = [$owner, $needle, $needle, $needle]; }
+        $query = $this->db->prepare("SELECT id, expediente_number, titulo, tipo, municipio, updated_at
+            FROM appraisals WHERE $where ORDER BY updated_at DESC, id DESC LIMIT 21 OFFSET $offset");
+        $query->execute($params);
         return $query->fetchAll();
     }
 
@@ -23,8 +25,8 @@ final class AppraisalRepository
     {
         $id = bin2hex(random_bytes(16));
         $now = gmdate('Y-m-d H:i:s');
-        $query = $this->db->prepare('INSERT INTO appraisals (id, owner_id, created_at, updated_at) VALUES (?, ?, ?, ?)');
-        $query->execute([$id, $owner, $now, $now]);
+        $query = $this->db->prepare('INSERT INTO appraisals (id, owner_id, expediente_number, created_at, updated_at) VALUES (?, ?, ?, ?, ?)');
+        $query->execute([$id, $owner, null, $now, $now]);
         return $id;
     }
 

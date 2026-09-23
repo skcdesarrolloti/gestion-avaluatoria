@@ -2,7 +2,6 @@
 $sv = static fn (string $key): string => (string) ($subject[$key] ?? '');
 $fieldHelp = static fn (string $key): string => (string) ($subjectHelp[$key] ?? '');
 $subjectActionBase = $subjectActionBase ?? 'avaluos/' . $record['id'] . '/bien-sujeto';
-$internalCode = 'INT_' . preg_replace('/[^A-Za-z0-9_]+/', '_', (string) ($record['titulo'] ?: substr($record['id'], 0, 8)));
 $textLabels = [
     'subject_title' => ['Título o identificación', 'Ej. Lote Bruselas'],
     'address' => ['Dirección física', 'Ej. Barrio Bruselas D 25 No. 49-72'],
@@ -95,8 +94,8 @@ $tabs = [
         <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="activeTab === 'identificacion'">
             <h3 class="text-base font-semibold">Identificación</h3>
             <div class="mt-5 grid gap-5 md:grid-cols-3">
-                <label class="label">Código interno <span class="help-dot" title="Llave interna del sujeto. Se genera automáticamente y no debe editarse manualmente.">?</span>
-                    <input class="input bg-slate-50" value="<?= e($internalCode) ?>" readonly>
+                <label class="label">Expediente valuatorio <span class="help-dot" title="Número visible del expediente. Se asigna en el módulo 1 con perito, año, mes y consecutivo.">?</span>
+                    <input class="input bg-slate-50" value="<?= e(trim((string) ($record['expediente_number'] ?? '')) !== '' ? (string) $record['expediente_number'] : 'Pendiente de asignar') ?>" readonly>
                 </label>
                 <?php foreach ($tabs['identificacion'][1] as $key) require BASE_PATH . '/app/Views/appraisals/subject-basic-field.php'; ?>
             </div>

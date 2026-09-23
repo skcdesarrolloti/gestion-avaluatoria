@@ -135,7 +135,7 @@ final class Kernel
                 'valuations' => new ValuationController(),
                 default => new AppraisalController(new AppraisalRepository($db), $user, new AppraiserRepository($db),
                     new IgacTypologyRepository(), new \App\Models\AppraisalPhRepository($db), new AppraisalSubjectRepository($db),
-                    new \App\Models\AppraisalObsolescenceRepository($db)),
+                    new \App\Models\AppraisalObsolescenceRepository($db), new \App\Services\AppraisalDossierNumberer($db)),
             };
             $instance->$action(...array_slice($matches, 1));
             return;

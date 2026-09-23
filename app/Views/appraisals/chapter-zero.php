@@ -90,6 +90,7 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
                         <?php endforeach; ?>
                     </select>
                 </label>
+                <?php require BASE_PATH . '/app/Views/appraisals/appraisal-dossier-field.php'; ?>
                 <?php foreach ($configurationSelects as $name) {
                     require BASE_PATH . '/app/Views/appraisals/chapter-zero-select-field.php';
                     if ($name === 'subtipo_funcional'): ?>
@@ -203,7 +204,7 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
                 </p>
             </div>
             <p class="px-2 text-xs leading-5 text-slate-500">
-                El consecutivo técnico se asignará cuando el expediente quede formalmente configurado.
+                El número de expediente se asigna con el perito responsable y permanece visible en todos los módulos.
             </p>
             <button class="btn-secondary w-full" type="submit" name="next" value="sector">
                 Guardar y continuar a Sector

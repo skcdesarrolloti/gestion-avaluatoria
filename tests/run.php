@@ -8,6 +8,7 @@ use App\Core\Http;
 use App\Services\AppraisalValidator;
 use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterOneReport;
+use App\Services\AppraisalDossierNumberer;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalPhInput;
 use App\Services\AppraisalObsolescenceInput;
@@ -110,7 +111,7 @@ try {
     expect($diagnostics[array_key_last($diagnostics)]['ok'] === false, 'diagnostico auth falla sin base configurada');
     $db = new PDO('sqlite::memory:', null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
     fixture($db);
-    $db->exec("CREATE TABLE appraisals (id TEXT PRIMARY KEY, owner_id INTEGER, titulo TEXT DEFAULT '', tipo TEXT DEFAULT '',
+    $db->exec("CREATE TABLE appraisals (id TEXT PRIMARY KEY, expediente_number TEXT DEFAULT NULL, owner_id INTEGER, appraiser_id TEXT DEFAULT '', titulo TEXT DEFAULT '', tipo TEXT DEFAULT '',
         direccion TEXT DEFAULT '', municipio TEXT DEFAULT '', client_name TEXT DEFAULT '', requester_name TEXT DEFAULT '',
         requester_identification TEXT DEFAULT '', property_owner_name TEXT DEFAULT '', report_recipient TEXT DEFAULT '',
         tipo_derecho TEXT DEFAULT '', destinacion TEXT DEFAULT '', tipo_inmueble TEXT DEFAULT '', finalidad TEXT DEFAULT '',
@@ -213,12 +214,21 @@ try {
         'raa_categories' => '["1"]', 'notes' => '', 'raa_expires_at' => '2026-12-31',
         'raa_source_filename' => 'raa.pdf', 'raa_storage_filename' => 'raa-test.pdf',
         'raa_file_size_bytes' => 100];
-    $appraisers->create(array_replace($baseAppraiser, ['id' => bin2hex(random_bytes(16)), 'code' => '02',
+    $activeAppraiserId = bin2hex(random_bytes(16));
+    $inactiveAppraiserId = bin2hex(random_bytes(16));
+    $appraisers->create(array_replace($baseAppraiser, ['id' => $activeAppraiserId, 'code' => '02',
         'full_name' => 'Nassif Abuita', 'active' => 'Si']));
-    $appraisers->create(array_replace($baseAppraiser, ['id' => bin2hex(random_bytes(16)), 'code' => '01',
+    $appraisers->create(array_replace($baseAppraiser, ['id' => $inactiveAppraiserId, 'code' => '01',
         'full_name' => 'Said', 'active' => 'No']));
     $appraiserRows = $appraisers->all();
     expect(count($appraiserRows) === 2 && $appraiserRows[0]['code'] === '02', 'maestro de peritos ordena activos primero');
+    $db->exec("INSERT INTO appraisals (id, owner_id, appraiser_id, value_date, created_at, updated_at) VALUES
+        ('99999999999999999999999999999999', 7, '$activeAppraiserId', '2026-09-18', '2026-09-01 00:00:00', '2026-09-01 00:00:00'),
+        ('88888888888888888888888888888888', 7, '$activeAppraiserId', '2026-09-19', '2026-09-02 00:00:00', '2026-09-02 00:00:00')");
+    $numberer = new AppraisalDossierNumberer($db);
+    expect($numberer->assignIfMissing('99999999999999999999999999999999', 7) === '02-2026-09-001'
+        && $numberer->assignIfMissing('88888888888888888888888888888888', 7) === '02-2026-09-002',
+        'expediente asigna codigo perito ano mes y consecutivo');
     $geo = new GeoMasterRepository($db);
     $geo->createDepartment(['code' => '05', 'name' => 'Antioquia', 'active' => 'Si']);
     $departmentId = $geo->departments()[0]['id'];

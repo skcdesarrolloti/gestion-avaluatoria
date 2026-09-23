@@ -88,7 +88,7 @@ final class AppraisalCatalog
     public static function defaults(): array
     {
         return array_fill_keys(array_merge(self::fieldKeys(), array_keys(self::assignmentFields()), [
-            'visit_date', 'value_date', 'report_date',
+            'visit_date', 'value_date', 'report_date', 'expediente_number',
         ]), '');
     }
 

@@ -34,7 +34,9 @@ final class AppraisalChapterOneReport
     private function request(array $r): string
     {
         $requester = $this->first($r['requester_name'] ?? '', $r['client_name'] ?? 'el solicitante');
-        return 'El presente estudio técnico de avalúo fue solicitado por ' . $this->end($requester);
+        $dossier = $this->text($r['expediente_number'] ?? '');
+        return ($dossier !== '' ? 'Expediente valuatorio No. ' . $dossier . '. ' : '')
+            . 'El presente estudio técnico de avalúo fue solicitado por ' . $this->end($requester);
     }
     private function requester(array $r): string
     {
