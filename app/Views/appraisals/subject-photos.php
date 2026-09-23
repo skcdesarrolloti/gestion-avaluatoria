@@ -77,6 +77,7 @@ foreach (array_values(array_filter($units, static fn (array $unit): bool => $uni
             </span>
         </div>
     </div>
+    <?php $academyModule = '3.7'; require BASE_PATH . '/app/Views/appraisals/subject-normative-academy.php'; ?>
     <div class="mt-6 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
         <?php foreach ($photoUnits as $photoUnit): ?>
             <?php $tabKey = $photoUnit['kind'] . ':' . $photoUnit['id']; ?>

@@ -54,6 +54,7 @@ $dynamicOptions = [
             <?= count($surfaceUnits) ?> unidad(es)
         </span>
     </div>
+    <?php $academyModule = '3.2'; require BASE_PATH . '/app/Views/appraisals/subject-normative-academy.php'; ?>
     <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/superficies')) ?>"
         data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/superficies/autoguardar')) ?>"
         @submit="busySurface = true">

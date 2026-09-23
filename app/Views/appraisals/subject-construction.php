@@ -111,6 +111,7 @@ $typologyUsefulLife = static function (array $unit) use ($typologyLookup): strin
         </div>
         <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"><?= count($constructionUnits) ?> unidad(es)</span>
     </div>
+    <?php $academyModule = '3.3'; require BASE_PATH . '/app/Views/appraisals/subject-normative-academy.php'; ?>
     <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/construcciones')) ?>"
         data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/construcciones/autoguardar')) ?>"
         @submit="busyConstruction = true">

@@ -76,6 +76,7 @@ $tabs = [
         </div>
         <a class="btn-secondary" href="<?= e(url('maestros')) ?>">Abrir maestros</a>
     </div>
+    <?php $academyModule = '3.1'; require BASE_PATH . '/app/Views/appraisals/subject-normative-academy.php'; ?>
     <?php if ($subjectMessage): ?><p class="mt-5 rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($subjectMessage) ?></p><?php endif; ?>
     <?php if ($subjectError): ?><p class="mt-5 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($subjectError) ?></p><?php endif; ?>
     <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/ficha-basica')) ?>"

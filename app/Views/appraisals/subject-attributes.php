@@ -50,6 +50,7 @@ $formatAttributeAdjustment = static function (?float $value): string {
             <?= count($attributeUnits) ?> unidad(es)
         </span>
     </div>
+    <?php $academyModule = '3.4'; require BASE_PATH . '/app/Views/appraisals/subject-normative-academy.php'; ?>
     <div class="mt-5 rounded-xl border border-teal-100 bg-teal-50 p-4 text-sm leading-6 text-teal-950">
         <div class="flex flex-wrap items-center justify-between gap-3">
             <strong class="text-base">Academia del campo</strong>
