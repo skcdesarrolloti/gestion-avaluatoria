@@ -44,11 +44,16 @@ $noFindingText = 'Obsolescencia física: ' . $readerGuidance['fisica']['no_findi
 $generated = $activeFindings ? 'Obsolescencias: se registran hallazgos de nivel ' . mb_strtolower($globalLevel) . ' con IEO diagnóstico global de ' . number_format($globalIeo, 1, ',', '.') . ' %. ' . implode('; ', $activeFindings) . '. La incidencia económica se sustenta aparte solo si el efecto es material.' : $noFindingText;
 $summary = trim((string) ($obs['summary_text'] ?? '')) ?: $generated;
 $pill = static function (string $state): string { return match ($state) { 'ok' => '<span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">Completo</span>', 'warn' => '<span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">Revisar</span>', default => '<span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">Opcional</span>' }; };
+$groupInfo = [];
+foreach ($groups as $groupKey => [$code, $title, , , $items]) {
+    $groupInfo[$groupKey] = ['code' => $code, 'title' => $title, 'items' => $items, 'no_finding' => $readerGuidance[$groupKey]['no_finding']];
+}
 $scoreJson = json_encode($scoreStateAll, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_THROW_ON_ERROR);
 $evidenceJson = json_encode($evidenceStateAll, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_THROW_ON_ERROR);
 $scoreHelpJson = json_encode($scoreHelp, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_THROW_ON_ERROR);
+$groupInfoJson = json_encode($groupInfo, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_HEX_AMP | JSON_HEX_QUOT | JSON_HEX_TAG | JSON_THROW_ON_ERROR);
 ?>
-<form class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" method="post" action="<?= e(url($subjectActionBase . '/obsolescencias')) ?>" data-module-autosave data-save-in-place data-autosave-endpoint="<?= e(url($subjectActionBase . '/obsolescencias/autoguardar')) ?>" data-obsolescence-scores='<?= e($scoreJson) ?>' data-obsolescence-evidence='<?= e($evidenceJson) ?>' data-obsolescence-score-help='<?= e($scoreHelpJson) ?>' x-data="obsolescenceLive">
+<form class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" method="post" action="<?= e(url($subjectActionBase . '/obsolescencias')) ?>" data-module-autosave data-save-in-place data-autosave-endpoint="<?= e(url($subjectActionBase . '/obsolescencias/autoguardar')) ?>" data-obsolescence-scores='<?= e($scoreJson) ?>' data-obsolescence-evidence='<?= e($evidenceJson) ?>' data-obsolescence-score-help='<?= e($scoreHelpJson) ?>' data-obsolescence-groups='<?= e($groupInfoJson) ?>' data-obsolescence-summary='<?= e($summary) ?>' x-data="obsolescenceLive">
     <?= csrf_field() ?>
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div><p class="eyebrow">3.6 Obsolescencias</p><h2 class="mt-2 text-2xl font-semibold">Lectura técnica de obsolescencias</h2><p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Pensado para sustentar el texto del informe. La calificación ordena la revisión; la afectación del valor se decide aparte si hay soporte material.</p></div>
@@ -75,8 +80,10 @@ $scoreHelpJson = json_encode($scoreHelp, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS 
         </div>
     </div>
 
-    <label class="label mt-6 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-950">Texto editable para el Entregable<textarea class="input mt-2 min-h-28 bg-white" rows="4" name="summary_text" placeholder="Texto profesional de obsolescencias para incorporar al informe"><?= e($summary) ?></textarea><span class="mt-1 block text-xs font-normal text-emerald-800">Puede quedar como el texto histórico del informe: definición breve, resultado observado y salvedad de soporte.</span></label>
-    <div class="mt-3 rounded-xl border border-emerald-100 bg-white p-4 text-sm leading-6 text-slate-700"><p class="font-semibold text-emerald-900">Texto sugerido actualizado</p><p class="mt-1"><?= e($generated) ?></p></div>
+    <div class="mt-6 grid gap-4 xl:grid-cols-[1fr_1fr]">
+        <label class="label rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-950">Texto editable para el Entregable<textarea class="input mt-2 min-h-36 bg-white" rows="5" name="summary_text" x-model="summaryText" placeholder="Texto profesional de obsolescencias para incorporar al informe"><?= e($summary) ?></textarea><span class="mt-1 block text-xs font-normal text-emerald-800">Este es el texto que se guarda. Puedes usar el sugerido y luego ajustarlo.</span></label>
+        <div class="rounded-xl border border-emerald-100 bg-white p-4 text-sm leading-6 text-slate-700"><div class="flex flex-wrap items-center justify-between gap-3"><p class="font-semibold text-emerald-900">Resultado sugerido para el entregable</p><button type="button" class="rounded-lg bg-emerald-100 px-3 py-2 text-xs font-bold text-emerald-800" @click="summaryText = deliverableText()">Usar este texto</button></div><p class="mt-2 whitespace-pre-wrap" x-text="deliverableText()"><?= e($generated) ?></p></div>
+    </div>
 
     <div class="mt-5 rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6">
         <h3 class="font-semibold text-slate-900">Matriz de control para construir el Entregable</h3>

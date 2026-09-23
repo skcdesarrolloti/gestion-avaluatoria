@@ -4,10 +4,14 @@ export function obsolescenceLive() {
     allScores: {},
     allEvidence: {},
     scoreHelp: {},
+    groupInfo: {},
+    summaryText: '',
     init() {
       this.allScores = this.readJson('obsolescenceScores');
       this.allEvidence = this.readJson('obsolescenceEvidence');
       this.scoreHelp = this.readJson('obsolescenceScoreHelp');
+      this.groupInfo = this.readJson('obsolescenceGroups');
+      this.summaryText = this.$el.dataset.obsolescenceSummary || this.deliverableText();
     },
     readJson(name) {
       try {
@@ -95,6 +99,45 @@ export function obsolescenceLive() {
     },
     globalLabel() {
       return `IEO diagnóstico global: ${this.format(this.globalIeo())} % · ${this.levelFrom(this.globalIeo())}`;
+    },
+    deliverableText() {
+      const parts = ['Obsolescencias:'];
+      for (const group of Object.keys(this.groupInfo)) {
+        parts.push(this.groupText(group));
+      }
+      parts.push(this.economicText());
+      return parts.join(' ');
+    },
+    groupText(group) {
+      const info = this.groupInfo[group] || { title: group, items: {}, no_finding: '' };
+      const findings = this.findings(group);
+      if (findings.length === 0) {
+        return `${info.title}: ${info.no_finding}`;
+      }
+      const labels = findings.map((finding) => finding.label).join(', ');
+      const supports = findings.map((finding) => finding.evidence).filter(Boolean);
+      const supportText = supports.length ? ` Soporte observado: ${supports.join('; ')}.` : ' Requiere completar soporte breve antes de cerrar el informe.';
+      return `${info.title}: se identifican hallazgos de nivel ${this.groupLevel(group).toLowerCase()} en ${labels}.${supportText}`;
+    },
+    findings(group) {
+      const labels = (this.groupInfo[group] || {}).items || {};
+      return Object.entries(this.allScores[group] || {})
+        .filter(([, score]) => ['1', '2', '3'].includes(score))
+        .map(([item, score]) => ({
+          item,
+          score,
+          label: labels[item] || item,
+          evidence: this.evidence(group, item),
+        }));
+    },
+    economicText() {
+      if (this.globalIeo() === 0) {
+        return 'Con la información revisada no se advierte efecto económico material por obsolescencia y no se aplica descuento automático.';
+      }
+      if (Object.keys(this.groupInfo).some((group) => this.missing(group) > 0)) {
+        return 'La incidencia económica queda pendiente hasta completar el soporte de los hallazgos relevantes o críticos.';
+      }
+      return 'El IEO es un indicador diagnóstico y no equivale a depreciación automática; cualquier incidencia económica debe sustentarse aparte mediante mercado, costos, comparables o criterio técnico verificable.';
     },
     format(value) {
       return value.toFixed(1).replace('.', ',');
