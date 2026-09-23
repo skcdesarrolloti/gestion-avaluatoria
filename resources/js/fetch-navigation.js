@@ -196,6 +196,7 @@ export function installFetchNavigation() {
         if (event.defaultPrevented) return;
         const form = event.target;
         if (!(form instanceof HTMLFormElement) || form.closest('[data-no-fetch]') || form.enctype === 'multipart/form-data') return;
+        if (form.matches?.('[data-module-autosave]') && !event.submitter) { event.preventDefault(); return; }
         if ((form.target || '').trim() !== '') return;
         const method = (form.method || 'GET').toUpperCase();
         if (!['GET', 'POST'].includes(method)) return;

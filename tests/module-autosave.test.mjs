@@ -210,3 +210,20 @@ test('module autosave allows retry after network failure without reporting saved
     assert.match(form.status.textContent, /confirmado/);
     cleanup();
 });
+
+
+test('module autosave reports html server errors without injecting pages', async () => {
+    const { listeners, runTimer, cleanup } = setup();
+    const form = new HTMLFormElement(), input = new HTMLInputElement(form);
+    globalThis.fetch = async () => ({
+        ok: false,
+        status: 500,
+        headers: { get: () => 'text/html; charset=utf-8' },
+        text: async () => '<!doctype html><body><header>Menu</header><main>No pudimos completar la solicitud</main></body>',
+    });
+    listeners.input({ target: input });
+    await runTimer();
+    assert.match(form.status.textContent, /No pudimos completar la solicitud/);
+    assert.equal(form.version.value, '7');
+    cleanup();
+});

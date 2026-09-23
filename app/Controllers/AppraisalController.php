@@ -83,11 +83,16 @@ final class AppraisalController
     }
     public function autosaveChapterZero(string $id): never
     {
-        $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
-            $this->igacCodes(), $this->appraiserIds());
-        $result = $this->appraisals->saveChapterZero($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $data);
-        $dossier = $this->createDossierIfRequested($id);
-        Http::json(['ok' => true, 'expediente_number' => $dossier] + $result);
+        try {
+            $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
+                $this->igacCodes(), $this->appraiserIds());
+            $result = $this->appraisals->saveChapterZero($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $data);
+            $dossier = $this->createDossierIfRequested($id);
+            Http::json(['ok' => true, 'expediente_number' => $dossier] + $result);
+        } catch (\Throwable $error) {
+            Http::json(['ok' => false, 'message' => $this->chapterZeroErrorMessage($error)],
+                $error instanceof HttpException ? $error->status : 500);
+        }
     }
     public function edit(string $id): void
     {

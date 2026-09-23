@@ -151,3 +151,25 @@ test('leaves multipart uploads to native browser submit', () => {
     assert.equal(prevented, false);
     Object.assign(globalThis, originals);
 });
+
+
+test('implicit enter submit in module autosave forms does not navigate', () => {
+    const originals = { document: globalThis.document, window: globalThis.window, HTMLFormElement: globalThis.HTMLFormElement, FormData: globalThis.FormData };
+    const listeners = {};
+    globalThis.HTMLFormElement = class {};
+    const form = new globalThis.HTMLFormElement();
+    form.enctype = '';
+    form.target = '';
+    form.method = 'POST';
+    form.action = 'https://example.test/public/avaluos/abc/expediente';
+    form.closest = () => null;
+    form.matches = selector => selector === '[data-module-autosave]';
+    globalThis.document = { addEventListener: (type, handler) => { listeners[type] = handler; } };
+    globalThis.window = { location: { href: current }, addEventListener() {} };
+    globalThis.FormData = class {};
+    installFetchNavigation();
+    let prevented = false;
+    listeners.submit({ defaultPrevented: false, submitter: null, preventDefault: () => { prevented = true; }, target: form });
+    assert.equal(prevented, true);
+    Object.assign(globalThis, originals);
+});
