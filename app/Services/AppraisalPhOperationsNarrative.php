@@ -51,11 +51,12 @@ final class AppraisalPhOperationsNarrative
             'comparación con PH similares' => $technical['comparacion_mercado_ph'] ?? '',
             'conclusión para valor' => $technical['conclusion_valor_ph'] ?? ''];
         $parts = [];
-        foreach ($rows as $labelRow => $value) if ($this->has($value)) $parts[] = $this->item($labelRow, $value, 180);
-        $fallback = "La ubicación del bien dentro de {$name} aporta soporte común {$level}, con efectos posibles en funcionalidad, deseabilidad, operación y comparación frente a copropiedades similares.";
+        foreach ($rows as $labelRow => $value) if ($this->has($value) && !$this->isInstruction($value)) $parts[] = $this->item($labelRow, $value, 180);
+        $dotation = trim($level) !== '' && $level !== 'por confirmar' ? " soporte común {$level}" : ' soporte común identificado';
+        $fallback = "La ubicación del bien dentro de {$name} aporta{$dotation}, con efectos posibles en funcionalidad, deseabilidad, operación y comparación frente a copropiedades similares.";
         $summary = $parts ? "La incidencia valuatoria de {$name} registra " . implode('; ', array_slice($parts, 0, 6)) . '.' : $fallback;
         $report = "El inmueble objeto de medición se localiza en {$name}, copropiedad analizada como {$label}. {$assets} "
-            . ($parts ? $summary : $fallback) . " La copropiedad cuenta con una dotación común {$level}; {$support} {$limits}";
+            . ($parts ? $summary : $fallback) . " La copropiedad cuenta con soporte común identificado; {$support} {$limits}";
         return [$summary, $report];
     }
 
@@ -81,4 +82,11 @@ final class AppraisalPhOperationsNarrative
         return mb_strlen($text) > $limit ? mb_substr($text, 0, max(0, $limit - 3)) . '…' : $text;
     }
     private function has(mixed $value): bool { return trim((string) $value) !== ''; }
+    private function isInstruction(mixed $value): bool
+    {
+        $text = mb_strtolower(trim((string) $value));
+        return str_starts_with($text, 'comparar con copropiedades')
+            || str_starts_with($text, 'selecciona tipología')
+            || str_contains($text, 'no reemplaza visita');
+    }
 }

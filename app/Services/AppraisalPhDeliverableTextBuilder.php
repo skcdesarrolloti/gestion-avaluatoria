@@ -11,8 +11,7 @@ final class AppraisalPhDeliverableTextBuilder
     {
         $intro = "El inmueble objeto de medición se localiza en {$name}, copropiedad sometida al régimen de propiedad horizontal y analizada para este avalúo como {$label}.";
         if ($assets !== '') $intro .= ' ' . $assets;
-        if (($configuration = $this->configuration($technical)) !== '') $intro .= ' ' . $configuration;
-
+        if (($configuration = $this->configuration($technical, $typology)) !== '') $intro .= ' ' . $configuration;
         $paragraphs = [$intro, $this->sourceAttribution($technical), $this->typologyLens($typology, $technical), $this->commons($typology, $technical, $common, $support, $level)];
         foreach ([$rules, $admin, $incidence, $notes] as $text) {
             $text = $this->usableSummary($text);
@@ -22,15 +21,15 @@ final class AppraisalPhDeliverableTextBuilder
         return implode("\n\n", array_values(array_filter($paragraphs)));
     }
 
-    private function configuration(array $technical): string
+    private function configuration(array $technical, string $typology): string
     {
         $facts = $this->values(['número de pisos' => 'numero_pisos', 'sótanos' => 'numero_sotanos',
             'ascensores' => 'numero_ascensores', 'edad aproximada' => 'edad_aproximada_ph',
             'uso o destinación dominante' => 'uso_dominante', 'unidades privadas' => 'numero_unidades',
-            'parqueaderos' => 'numero_parqueaderos'], $technical);
-        $text = $facts ? 'La configuración registrada incluye ' . implode('; ', $facts) . '.' : '';
+            'parqueaderos' => 'numero_parqueaderos'], $technical, $typology);
+        $text = $facts ? 'La configuración documental útil para el avalúo registra ' . implode('; ', $facts) . '.' : '';
         $distribution = $this->clean($technical['organizacion_interna'] ?? '', 420);
-        if ($distribution !== '') $text .= ($text !== '' ? ' ' : '') . 'La distribución funcional reportada indica: ' . $distribution . '.';
+        if ($distribution !== '') $text .= ($text !== '' ? ' ' : '') . 'La distribución funcional depurada indica: ' . $distribution . '.';
         return $text;
     }
 
@@ -61,10 +60,10 @@ final class AppraisalPhDeliverableTextBuilder
         $amenities = $this->groupNames($common, 'no_esenciales', 8);
         $exclusive = $this->groupNames($common, 'uso_exclusivo', 4);
         $priority = $this->commonItems($common, $typology);
-        $text = "La copropiedad cuenta con áreas, bienes y servicios comunes de dotación {$level}.";
+        $text = $this->dotationPhrase($level);
         if ($essential) $text .= ' Los bienes comunes esenciales identificados incluyen ' . implode(', ', $essential) . ', que soportan existencia, estabilidad, acceso, redes y funcionamiento básico del edificio.';
         if ($operational) $text .= ' Como soporte operativo y técnico se registran ' . implode(', ', $operational) . ', elementos que inciden en seguridad, continuidad, movilidad interna y administración cotidiana.';
-        if ($amenities) $text .= ' Además, los bienes comunes no esenciales y amenidades como ' . implode(', ', $amenities) . ' pueden fortalecer imagen, comodidad, permanencia de usuarios y deseabilidad frente a copropiedades con menor dotación.';
+        if ($amenities) $text .= ' Además, los bienes comunes no esenciales y amenidades identificados —' . implode(', ', $amenities) . '— pueden fortalecer imagen, comodidad, permanencia de usuarios y deseabilidad frente a copropiedades con menor dotación.';
         if ($exclusive) $text .= ' También se observan bienes comunes de uso exclusivo o asignado: ' . implode(', ', $exclusive) . ', cuya incidencia debe asociarse al derecho o unidad correspondiente.';
         if ($priority) $text .= ' Para la tipología seleccionada se consideran especialmente relevantes ' . implode(', ', array_slice($priority, 0, 7)) . '.';
         if (($extra = $this->commonImpact($common, $technical, $typology)) !== '') $text .= ' ' . $extra;
@@ -73,14 +72,36 @@ final class AppraisalPhDeliverableTextBuilder
         return $text;
     }
 
-    private function values(array $map, array $technical): array
+    private function values(array $map, array $technical, string $typology): array
     {
         $out = [];
         foreach ($map as $label => $key) {
-            $value = $this->clean($technical[$key] ?? '', 120);
+            $value = $this->technicalValue((string) $key, $technical[$key] ?? '', $typology);
             if ($value !== '') $out[] = $label . ': ' . $value;
         }
         return $out;
+    }
+
+    private function dotationPhrase(string $level): string
+    {
+        $level = trim($level);
+        if ($level === '' || $level === 'por confirmar' || str_contains($level, 'sin evidencia')) return 'La copropiedad cuenta con áreas, bienes y servicios comunes identificados en los soportes revisados.';
+        return "La copropiedad cuenta con áreas, bienes y servicios comunes de dotación {$level}.";
+    }
+
+    private function technicalValue(string $key, mixed $value, string $typology): string
+    {
+        $value = $this->clean($value, 120);
+        if ($value === '' || preg_match('/\?|mencionado|por confirmar|sin evidencia|verificar vigencia/iu', $value)) return '';
+        if (in_array($key, ['numero_pisos', 'numero_sotanos', 'numero_ascensores', 'numero_unidades', 'numero_parqueaderos'], true) && !preg_match('/\b\d+\b/u', $value)) return '';
+        if ($key === 'numero_pisos' && $this->doubtfulFloors($value, $typology)) return '';
+        return $value;
+    }
+
+    private function doubtfulFloors(string $value, string $typology): bool
+    {
+        if (!preg_match('/\b(\d+)\s+pisos?\b/iu', $value, $m)) return false;
+        return (int) $m[1] <= 2 && in_array($typology, ['oficinas', 'comercio', 'mixto'], true);
     }
 
     private function commonItems(array $common, string $typology): array
@@ -89,9 +110,7 @@ final class AppraisalPhDeliverableTextBuilder
         $priority = array_fill_keys(AppraisalPhCatalog::typologyPriorities()[$typology] ?? [], true);
         $items = $other = [];
         foreach ($common as $key => $row) {
-            $status = is_array($row) ? (string) ($row['status'] ?? '') : '';
-            $notes = is_array($row) ? mb_strtolower((string) ($row['notes'] ?? '')) : '';
-            if (!in_array($status, ['ok', 'warn', 'risk'], true) || str_starts_with($notes, 'no identificado')) continue;
+            if (!$this->hasCommon($common, (string) $key)) continue;
             $label = mb_strtolower((string) ($labels[(string) $key] ?? str_replace('_', ' ', (string) $key)));
             isset($priority[(string) $key]) ? $items[] = $label : $other[] = $label;
         }
@@ -100,13 +119,9 @@ final class AppraisalPhDeliverableTextBuilder
 
     private function groupNames(array $common, string $group, int $limit): array
     {
-        $groups = AppraisalPhCatalog::commonAreaGroups();
-        $labels = AppraisalPhCatalog::commonAreas();
-        $keys = array_keys($groups[$group][1] ?? []);
-        $out = [];
-        foreach ($keys as $key) {
-            if (!$this->hasCommon($common, (string) $key)) continue;
-            $out[] = mb_strtolower((string) ($labels[(string) $key] ?? str_replace('_', ' ', (string) $key)));
+        $groups = AppraisalPhCatalog::commonAreaGroups(); $labels = AppraisalPhCatalog::commonAreas(); $out = [];
+        foreach (array_keys($groups[$group][1] ?? []) as $key) {
+            if ($this->hasCommon($common, (string) $key)) $out[] = mb_strtolower((string) ($labels[(string) $key] ?? str_replace('_', ' ', (string) $key)));
         }
         return array_slice(array_values(array_unique($out)), 0, $limit);
     }
@@ -138,16 +153,22 @@ final class AppraisalPhDeliverableTextBuilder
 
     private function hasCommon(array $common, string $key): bool
     {
-        $row = $common[$key] ?? null;
-        $status = is_array($row) ? (string) ($row['status'] ?? '') : '';
+        $row = $common[$key] ?? null; $status = is_array($row) ? (string) ($row['status'] ?? '') : '';
         $notes = is_array($row) ? mb_strtolower((string) ($row['notes'] ?? '')) : '';
-        return in_array($status, ['ok', 'warn', 'risk'], true) && !str_starts_with($notes, 'no identificado');
+        return in_array($status, ['ok', 'warn', 'risk'], true) && !str_starts_with($notes, 'no identificado') && !$this->sensitiveFalsePositive($key, $notes);
+    }
+
+    private function sensitiveFalsePositive(string $key, string $notes): bool
+    {
+        if ($key === 'juegos' && !preg_match('/juegos? infantiles?|recreación infantil|parque infantil/iu', $notes)) return true;
+        if ($key === 'canchas' && !preg_match('/cancha|zona deportiva|escenario deportivo/iu', $notes)) return true;
+        if ($key === 'piscina' && !preg_match('/piscina/iu', $notes)) return true;
+        if ($key === 'gimnasio' && !preg_match('/gimnasio/iu', $notes)) return true;
+        return false;
     }
 
     private function multipleElevators(array $technical): bool
-    {
-        return preg_match('/\b([2-9]|[1-9]\d+)\b/u', (string) ($technical['numero_ascensores'] ?? '')) === 1;
-    }
+    { return preg_match('/\b([2-9]|[1-9]\d+)\b/u', (string) ($technical['numero_ascensores'] ?? '')) === 1; }
 
     private function sourceLabel(array $technical): string
     {
@@ -162,9 +183,7 @@ final class AppraisalPhDeliverableTextBuilder
     private function usableSummary(string $text, int $limit = 700): string
     {
         $text = $this->clean($text, $limit);
-        foreach (['aún requieren depuración', 'requieren soporte vigente', 'completar normas pertinentes'] as $marker) {
-            if (str_contains(mb_strtolower($text), $marker)) return '';
-        }
+        foreach (['aún requieren depuración', 'requieren soporte vigente', 'completar normas pertinentes', 'comparar con copropiedades'] as $marker) if (str_contains(mb_strtolower($text), $marker)) return '';
         return $text;
     }
 
@@ -175,10 +194,11 @@ final class AppraisalPhDeliverableTextBuilder
         if ($this->contaminated($text)) return '';
         return mb_strlen($text) > $limit ? mb_substr($text, 0, max(0, $limit - 3)) . '…' : $text;
     }
+
     private function contaminated(string $text): bool
     {
         $fold = strtr(mb_strtolower($text), ['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u']);
-        if ($text === '' || str_contains($text, '?') || str_contains($fold, 'fq ii')) return true;
-        return preg_match('/\\b(articulo|capitulo|tribunal|conciliacion|notaria|protocolizacion|antecedentes)\\b/u', $fold) === 1;
+        if ($text === '' || str_contains($text, '?') || str_contains($fold, 'fq ii') || preg_match('/\b_[a-z]/iu', $text) === 1) return true;
+        return preg_match('/\b(articulo|capitulo|tribunal|conciliacion|notaria|protocolizacion|antecedentes)\b/u', $fold) === 1;
     }
 }

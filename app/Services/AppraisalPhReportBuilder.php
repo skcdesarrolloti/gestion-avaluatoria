@@ -141,7 +141,7 @@ final class AppraisalPhReportBuilder
         $unit = $this->cleanName($core['private_unit'] ?? '');
         $coef = $this->validCoefficient($core['coefficient'] ?? '');
         $parts = [];
-        if ($registration !== '') $parts[] = "se identifica registralmente con matrícula inmobiliaria {$registration}";
+        if ($registration !== '') $parts[] = "la unidad objeto se identifica con matrícula inmobiliaria {$registration}";
         if ($unit !== '' && $coef !== '') $parts[] = "la unidad privada analizada corresponde a {$unit}, con coeficiente de copropiedad {$coef}";
         elseif ($unit !== '') $parts[] = "la unidad privada analizada corresponde a {$unit}";
         return $parts ? ucfirst(implode('; ', $parts)) . '.' : '';
