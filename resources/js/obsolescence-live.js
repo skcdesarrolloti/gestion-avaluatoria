@@ -48,12 +48,21 @@ export function obsolescenceLive() {
       return this.levelFrom(this.ieo(group));
     },
     groupCalc(group) {
-      if (!this.applicable(group)) return 'Sin factores revisados';
-      return `${this.sum(group)} de ${this.max(group)} puntos posibles = ${this.format(this.ieo(group))} %`;
+      if (!this.applicable(group)) return 'Pendiente de revisión.';
+      const findings = this.findings(group).length;
+      const findingText = findings === 1 ? '1 factor con hallazgo' : `${findings} factores con hallazgo`;
+      return `Resultado de apoyo interno: ${this.groupLevel(group)}; ${this.applicable(group)} factores revisados; ${findingText}.`;
     },
     groupSummary(code, group) {
-      if (!this.applicable(group)) return `${code} · Sin factores revisados`;
-      return `${code} · ${this.format(this.ieo(group))} % · ${this.groupLevel(group)}`;
+      if (!this.applicable(group)) return `${code} · Pendiente`;
+      const findings = this.findings(group).length;
+      return `${code} · ${this.groupLevel(group)} · ${findings} hallazgo${findings === 1 ? '' : 's'}`;
+    },
+    groupTabResult(group) {
+      if (!this.applicable(group)) return 'Pendiente';
+      const findings = this.findings(group).length;
+      if (findings === 0) return 'Sin hallazgos';
+      return `${this.groupLevel(group)} · ${findings} hallazgo${findings === 1 ? '' : 's'}`;
     },
     evidence(group, item) {
       return ((this.allEvidence[group] || {})[item] || '').trim();
@@ -98,15 +107,18 @@ export function obsolescenceLive() {
       return this.globalApplicable() ? (this.globalSum() / (this.globalApplicable() * 3)) * 100 : 0;
     },
     globalLabel() {
-      return `IEO diagnóstico global: ${this.format(this.globalIeo())} % · ${this.levelFrom(this.globalIeo())}`;
+      if (!this.globalApplicable()) return 'Resultado global: pendiente de revisión';
+      const totalFindings = Object.keys(this.groupInfo).reduce((total, group) => total + this.findings(group).length, 0);
+      if (totalFindings === 0) return 'Resultado global: sin hallazgos de obsolescencia';
+      return `Resultado global: ${this.levelFrom(this.globalIeo()).toLowerCase()} · ${totalFindings} hallazgo${totalFindings === 1 ? '' : 's'}`;
     },
     deliverableText() {
-      const parts = ['Obsolescencias:'];
+      const parts = [];
       for (const group of Object.keys(this.groupInfo)) {
         parts.push(this.groupText(group));
       }
       parts.push(this.economicText());
-      return parts.join(' ');
+      return parts.join('\n\n');
     },
     groupText(group) {
       const info = this.groupInfo[group] || { title: group, items: {}, no_finding: '' };
@@ -115,9 +127,9 @@ export function obsolescenceLive() {
         return `${info.title}: ${info.no_finding}`;
       }
       const labels = findings.map((finding) => finding.label).join(', ');
-      const supports = findings.map((finding) => finding.evidence).filter(Boolean);
-      const supportText = supports.length ? ` Soporte observado: ${supports.join('; ')}.` : ' Requiere completar soporte breve antes de cerrar el informe.';
-      return `${info.title}: se identifican hallazgos de nivel ${this.groupLevel(group).toLowerCase()} en ${labels}.${supportText}`;
+      const supports = findings.map((finding) => `${finding.label}: ${finding.evidence}`).filter((text) => !text.endsWith(': '));
+      const supportText = supports.length ? ` Soporte registrado: ${supports.join('; ')}.` : ' Requiere completar soporte breve antes de cerrar el informe.';
+      return `${info.title}: se identifican hallazgos en ${labels}. La lectura técnica preliminar del bloque es ${this.groupLevel(group).toLowerCase()}.${supportText}`;
     },
     findings(group) {
       const labels = (this.groupInfo[group] || {}).items || {};
@@ -132,12 +144,12 @@ export function obsolescenceLive() {
     },
     economicText() {
       if (this.globalIeo() === 0) {
-        return 'Con la información revisada no se advierte efecto económico material por obsolescencia y no se aplica descuento automático.';
+        return 'Incidencia valuatoria: con la información revisada no se advierte efecto económico material por obsolescencia y no se aplica descuento automático.';
       }
       if (Object.keys(this.groupInfo).some((group) => this.missing(group) > 0)) {
-        return 'La incidencia económica queda pendiente hasta completar el soporte de los hallazgos relevantes o críticos.';
+        return 'Incidencia valuatoria: queda pendiente hasta completar el soporte de los hallazgos relevantes o críticos.';
       }
-      return 'El IEO es un indicador diagnóstico y no equivale a depreciación automática; cualquier incidencia económica debe sustentarse aparte mediante mercado, costos, comparables o criterio técnico verificable.';
+      return 'Incidencia valuatoria: la calificación anterior es una ayuda interna de revisión y no equivale a depreciación automática; cualquier incidencia económica debe sustentarse aparte mediante mercado, costos, comparables o criterio técnico verificable, conforme al enfoque de valuación aplicado.';
     },
     format(value) {
       return value.toFixed(1).replace('.', ',');

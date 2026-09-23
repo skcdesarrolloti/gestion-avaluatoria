@@ -39,9 +39,21 @@ $totalApplicable = array_sum(array_column($metrics, 'applicable'));
 $globalIeo = $totalApplicable > 0 ? round(($totalSum / ($totalApplicable * 3)) * 100, 1) : 0.0;
 $globalLevel = $levelFromIeo($globalIeo);
 $activeFindings = [];
-foreach ($groups as $groupKey => [, $title]) if ($metrics[(string) $groupKey]['findings']) $activeFindings[] = $title . ': ' . implode(', ', array_slice($metrics[(string) $groupKey]['findings'], 0, 4));
-$noFindingText = 'Obsolescencia física: ' . $readerGuidance['fisica']['no_finding'] . ' Obsolescencia funcional: ' . $readerGuidance['funcional']['no_finding'] . ' Obsolescencia externa: ' . $readerGuidance['externa']['no_finding'] . ' El IEO es una lectura de control y no genera depreciación automática.';
-$generated = $activeFindings ? 'Obsolescencias: se registran hallazgos de nivel ' . mb_strtolower($globalLevel) . ' con IEO diagnóstico global de ' . number_format($globalIeo, 1, ',', '.') . ' %. ' . implode('; ', $activeFindings) . '. La incidencia económica se sustenta aparte solo si el efecto es material.' : $noFindingText;
+$generatedSections = [];
+foreach ($groups as $groupKey => [, $title, , , $items]) {
+    $findings = [];
+    foreach ($metrics[(string) $groupKey]['findings'] as $label) $findings[] = $label;
+    if ($findings) {
+        $activeFindings[] = $title . ': ' . implode(', ', array_slice($findings, 0, 4));
+        $generatedSections[] = $title . ': se identifican hallazgos en ' . implode(', ', $findings) . '. La lectura técnica preliminar del bloque es ' . mb_strtolower((string) $metrics[(string) $groupKey]['level']) . '; la incidencia en valor debe sustentarse de forma separada si el efecto es material.';
+    } else {
+        $generatedSections[] = $title . ': ' . $readerGuidance[(string) $groupKey]['no_finding'];
+    }
+}
+$generatedSections[] = $activeFindings ? 'Incidencia valuatoria: la calificación anterior es una ayuda interna de revisión y no equivale a depreciación automática; cualquier incidencia económica debe sustentarse aparte mediante mercado, costos, comparables o criterio técnico verificable, conforme al enfoque de valuación aplicado.' : 'Incidencia valuatoria: con la información revisada no se advierte efecto económico material por obsolescencia y no se aplica descuento automático.';
+$generated = implode("
+
+", $generatedSections);
 $summary = trim((string) ($obs['summary_text'] ?? '')) ?: $generated;
 $pill = static function (string $state): string { return match ($state) { 'ok' => '<span class="rounded-full bg-emerald-100 px-3 py-1 text-xs font-bold text-emerald-800">Completo</span>', 'warn' => '<span class="rounded-full bg-amber-100 px-3 py-1 text-xs font-bold text-amber-800">Revisar</span>', default => '<span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-bold text-slate-700">Opcional</span>' }; };
 $groupInfo = [];
@@ -57,18 +69,18 @@ $groupInfoJson = json_encode($groupInfo, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS 
     <?= csrf_field() ?>
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div><p class="eyebrow">3.6 Obsolescencias</p><h2 class="mt-2 text-2xl font-semibold">Lectura técnica de obsolescencias</h2><p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Pensado para sustentar el texto del informe. La calificación ordena la revisión; la afectación del valor se decide aparte si hay soporte material.</p></div>
-        <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800" x-text="globalLabel()">IEO diagnóstico global: <?= e(number_format($globalIeo, 1, ',', '.')) ?> % · <?= e($globalLevel) ?></span>
+        <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800" x-text="globalLabel()">Resultado global: <?= e($globalLevel) ?></span>
     </div>
 
     <div class="mt-5 grid gap-4 xl:grid-cols-[1.3fr_1fr]">
         <div class="rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-sm leading-6 text-indigo-950">
-            <h3 class="font-semibold">Academia para el analista</h3>
+            <h3 class="font-semibold">Guía normativa y de revisión</h3>
             <div class="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                <p><strong>1. Revise factor por factor.</strong> Si está bien, use “0 · Sin hallazgo”.</p>
-                <p><strong>2. Califique solo lo observado.</strong> Pendiente y N/A no entran al índice.</p>
+                <p><strong>1. Revise factor por factor.</strong> Si está bien, use “Sin hallazgo”.</p>
+                <p><strong>2. Califique solo lo observado.</strong> La escala es apoyo interno; no es norma ni descuento.</p>
                 <p><strong>3. Soporte hallazgos.</strong> Relevante y crítica deben explicar la evidencia.</p>
-                <p><strong>4. Lea el resultado.</strong> IEO = puntos obtenidos / puntos posibles revisados.</p>
-                <p><strong>5. No castigue automático.</strong> El IEO no es depreciación ni descuento.</p>
+                <p><strong>4. Informe por tipo.</strong> Física, funcional y externa deben quedar diferenciadas.</p>
+                <p><strong>5. No castigue automático.</strong> La obsolescencia solo incide en valor si se sustenta.</p>
                 <p><strong>6. Si afecta valor, sustente.</strong> Use costos, mercado, comparables o criterio verificable.</p>
             </div>
         </div>
@@ -90,13 +102,13 @@ $groupInfoJson = json_encode($groupInfo, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS 
         <div class="mt-3 overflow-x-auto"><table class="w-full min-w-[54rem] text-left text-sm"><thead class="text-xs uppercase text-slate-500"><tr><th class="py-2 pr-3">Campo</th><th class="py-2 pr-3">Lectura</th><th class="py-2 pr-3">Estado</th><th class="py-2">Qué hacer</th></tr></thead><tbody class="divide-y divide-slate-100">
             <tr><td class="py-2 pr-3 font-semibold">Texto editable</td><td class="py-2 pr-3">Texto para informe</td><td class="py-2 pr-3"><?= $pill('ok') ?></td><td class="py-2 text-slate-600">Ajustar con el criterio del analista.</td></tr>
             <?php foreach ($groups as $groupKey => [$code, $title]): ?>
-                <tr><td class="py-2 pr-3 font-semibold"><?= e($title) ?></td><td class="py-2 pr-3" x-text="groupSummary('<?= e($code) ?>', '<?= e((string) $groupKey) ?>')"><?= e($code . ' · ' . number_format((float) $metrics[(string) $groupKey]['ieo'], 1, ',', '.') . ' % · ' . $metrics[(string) $groupKey]['level']) ?></td><td class="py-2 pr-3"><span class="rounded-full px-3 py-1 text-xs font-bold" :class="stateClass('<?= e((string) $groupKey) ?>')" x-text="stateText('<?= e((string) $groupKey) ?>')"><?= e($metrics[(string) $groupKey]['missing'] > 0 ? 'Revisar' : ($metrics[(string) $groupKey]['applicable'] > 0 ? 'Completo' : 'Opcional')) ?></span></td><td class="py-2 text-slate-600" x-text="actionText('<?= e((string) $groupKey) ?>')"><?= e($metrics[(string) $groupKey]['missing'] > 0 ? 'Agregar soporte breve en hallazgos relevantes o críticos.' : ($metrics[(string) $groupKey]['applicable'] > 0 ? 'Listo para lectura.' : 'Pendiente; marque 0 si ya revisó y no encontró hallazgos.')) ?></td></tr>
+                <tr><td class="py-2 pr-3 font-semibold"><?= e($title) ?></td><td class="py-2 pr-3" x-text="groupSummary('<?= e($code) ?>', '<?= e((string) $groupKey) ?>')"><?= e($code . ' · ' . $metrics[(string) $groupKey]['level'] . ' · ' . count($metrics[(string) $groupKey]['findings']) . ' hallazgos') ?></td><td class="py-2 pr-3"><span class="rounded-full px-3 py-1 text-xs font-bold" :class="stateClass('<?= e((string) $groupKey) ?>')" x-text="stateText('<?= e((string) $groupKey) ?>')"><?= e($metrics[(string) $groupKey]['missing'] > 0 ? 'Revisar' : ($metrics[(string) $groupKey]['applicable'] > 0 ? 'Completo' : 'Opcional')) ?></span></td><td class="py-2 text-slate-600" x-text="actionText('<?= e((string) $groupKey) ?>')"><?= e($metrics[(string) $groupKey]['missing'] > 0 ? 'Agregar soporte breve en hallazgos relevantes o críticos.' : ($metrics[(string) $groupKey]['applicable'] > 0 ? 'Listo para lectura.' : 'Pendiente; marque 0 si ya revisó y no encontró hallazgos.')) ?></td></tr>
             <?php endforeach; ?>
             <tr><td class="py-2 pr-3 font-semibold">Incidencia económica</td><td class="py-2 pr-3"><?= e($short((string) ($obs['quantification_text'] ?? '')) ?: 'Sin efecto económico definido') ?></td><td class="py-2 pr-3"><?= $pill(trim((string) ($obs['quantification_text'] ?? '')) !== '' ? 'ok' : 'warn') ?></td><td class="py-2 text-slate-600">Definir si no hay efecto material o si se cuantifica aparte.</td></tr>
         </tbody></table></div>
     </div>
 
-    <div class="mt-5 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2"><?php foreach ($groups as $groupKey => [$code, $title]): ?><button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold" @click="activeObs='<?= e((string) $groupKey) ?>'" :class="activeObs === '<?= e((string) $groupKey) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'"><?= e($code . ' · ' . $title) ?></button><?php endforeach; ?></div>
+    <div class="mt-5 grid gap-2 rounded-xl bg-slate-100 p-2 lg:grid-cols-3"><?php foreach ($groups as $groupKey => [$code, $title]): ?><button type="button" class="min-h-16 rounded-lg px-4 py-3 text-left text-sm font-semibold" @click="activeObs='<?= e((string) $groupKey) ?>'" :class="activeObs === '<?= e((string) $groupKey) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'"><span class="block"><?= e($code . ' · ' . $title) ?></span><span class="mt-1 inline-flex rounded-full bg-white/80 px-2 py-1 text-xs text-slate-700" x-text="groupTabResult('<?= e((string) $groupKey) ?>')"><?= e($metrics[(string) $groupKey]['level']) ?></span></button><?php endforeach; ?></div>
 
     <?php foreach ($groups as $groupKey => [$code, $title, $metaLabel, $metaOptions, $items]): ?>
         <?php require BASE_PATH . '/app/Views/appraisals/subject-obsolescence-group.php'; ?>
