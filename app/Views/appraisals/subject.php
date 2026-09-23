@@ -24,7 +24,7 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
     x-init="syncSubject()" @hashchange.window="syncSubject()">
     <div class="mb-3 flex flex-wrap justify-end">
         <button class="btn-secondary" type="button" aria-disabled="true"
-            title="Pendiente de construir después de terminar 3.5 PH.">
+            title="Disponible cuando se cierre la revisión técnica del bien sujeto.">
             Imprimir documento de Inspección Bien Sujeto
         </button>
     </div>
@@ -96,3 +96,4 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
         <?php require BASE_PATH . '/app/Views/appraisals/subject-photos.php'; ?>
     </div>
 </div>
+
