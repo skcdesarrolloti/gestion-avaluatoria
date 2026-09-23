@@ -46,6 +46,14 @@ function updateVersion(form, result) {
     });
 }
 
+function updateDossierNumber(form, result) {
+    if (!result.expediente_number) return;
+    form.ownerDocument.querySelectorAll('[data-expediente-number-output]').forEach(node => {
+        if ('value' in node) node.value = result.expediente_number;
+        else node.textContent = result.expediente_number;
+    });
+}
+
 async function save(form) {
     const state = stateFor(form);
     if (state.conflict) return;
@@ -69,6 +77,7 @@ async function save(form) {
         if (response.status === 409) state.conflict = true;
         if (!response.ok || result.ok !== true) throw new Error(result.message || 'No se pudo confirmar el guardado.');
         updateVersion(form, result);
+        updateDossierNumber(form, result);
         state.dirty = state.revision !== revision;
         const time = result.saved_at ? new Date(result.saved_at).toLocaleTimeString('es-CO') : new Date().toLocaleTimeString('es-CO');
         setStatus(form, state.dirty ? 'Cambios pendientes' : 'Autoguardado confirmado: ' + time, state.dirty ? 'pending' : 'saved');
@@ -94,7 +103,7 @@ function markDirty(form, target) {
     clearTimeout(state.timer);
     if (state.conflict) return;
     setStatus(form, 'Cambios pendientes', 'pending');
-    state.timer = setTimeout(() => save(form), 800);
+    state.timer = setTimeout(() => save(form), target?.hasAttribute?.('data-autosave-now') ? 0 : 800);
 }
 
 function cancel(form) {

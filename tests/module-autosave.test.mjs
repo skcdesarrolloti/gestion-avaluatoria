@@ -8,6 +8,11 @@ class HTMLFormElement {
         this.dataset = { autosaveEndpoint: '/avaluos/abc/expediente/autoguardar' };
         this.version = { name: 'version', value: '7' };
         this.status = { textContent: '', dataset: {} };
+        this.dossier = { value: 'Pendiente de asignar' };
+        this.banner = { textContent: 'Pendiente de asignar' };
+        this.ownerDocument = {
+            querySelectorAll: selector => selector === '[data-expediente-number-output]' ? [this.dossier, this.banner] : [],
+        };
     }
     matches(selector) { return selector === '[data-module-autosave]'; }
     querySelector(selector) { return selector === 'input[name="version"]' ? this.version : null; }
@@ -18,7 +23,10 @@ class HTMLInputElement {
     constructor(form) { this.form = form; this.type = 'text'; this.name = 'titulo'; this.value = 'Casa'; }
 }
 
-class HTMLSelectElement {}
+class HTMLSelectElement {
+    constructor(form) { this.form = form; this.name = 'appraiser_id'; this.attrs = new Set(['data-autosave-now']); }
+    hasAttribute(name) { return this.attrs.has(name); }
+}
 class HTMLTextAreaElement {}
 
 function setup() {
@@ -54,13 +62,14 @@ function setup() {
         delete(key) { this.values.delete(key); }
         get(key) { return this.values.get(key); }
     };
-    let timerCallback = null;
-    globalThis.setTimeout = callback => { timerCallback = callback; return 1; };
+    let timerCallback = null, timerDelay = null;
+    globalThis.setTimeout = (callback, delay) => { timerCallback = callback; timerDelay = delay; return 1; };
     globalThis.clearTimeout = () => {};
     installModuleAutosave();
     return {
         listeners,
         runTimer: () => timerCallback(),
+        timerDelay: () => timerDelay,
         cleanup: () => Object.entries(originals).forEach(([key, value]) => { globalThis[key] = value; }),
     };
 }
@@ -75,13 +84,26 @@ test('module autosave posts form data and updates optimistic version', async () 
         assert.equal(request.headers['X-CSRF-Token'], 'csrf-token');
         assert.equal(request.credentials, 'same-origin');
         assert.equal(request.body.get('version'), '7');
-        return { ok: true, json: async () => ({ ok: true, version: 8, saved_at: new Date().toISOString() }) };
+        return { ok: true, json: async () => ({ ok: true, version: 8, expediente_number: '01-2026-09-001', saved_at: new Date().toISOString() }) };
     };
     listeners.input({ target: input });
     assert.equal(form.status.textContent, 'Cambios pendientes');
     await runTimer();
     assert.equal(form.version.value, '8');
+    assert.equal(form.dossier.value, '01-2026-09-001');
+    assert.equal(form.banner.textContent, '01-2026-09-001');
     assert.match(form.status.textContent, /Autoguardado confirmado/);
+    cleanup();
+});
+
+test('appraiser change saves immediately to create dossier number', async () => {
+    const { listeners, runTimer, timerDelay, cleanup } = setup();
+    const form = new HTMLFormElement(), select = new HTMLSelectElement(form);
+    globalThis.fetch = async () => ({ ok: true, json: async () => ({ ok: true, version: 8, expediente_number: '01-2026-09-001' }) });
+    listeners.change({ target: select });
+    assert.equal(timerDelay(), 0);
+    await runTimer();
+    assert.equal(form.dossier.value, '01-2026-09-001');
     cleanup();
 });
 

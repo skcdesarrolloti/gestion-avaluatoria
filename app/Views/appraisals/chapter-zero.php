@@ -85,7 +85,7 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
 
             <div class="mt-6 grid gap-5 md:grid-cols-2" x-show="active === 'configuracion'">
                 <label class="label">Perito responsable
-                    <select class="input" name="appraiser_id">
+                    <select class="input" name="appraiser_id" data-autosave-now>
                         <option value="">Selecciona perito</option>
                         <?php foreach ($appraisers as $appraiser): ?>
                             <option value="<?= e($appraiser['id']) ?>" <?= $selectedAppraiser($appraiser['id']) ?>>
