@@ -160,6 +160,10 @@ final class AppraisalPhCatalog
 
     public static function normNotes(): array { return AppraisalPhComparativeCatalog::normNotes(); }
 
+    public static function normativeAcademy(): array { return AppraisalPhComparativeCatalog::normativeAcademy(); }
+
+    public static function deliverableFilter(): array { return AppraisalPhComparativeCatalog::deliverableFilter(); }
+
     public static function documents(): array
     {
         return [

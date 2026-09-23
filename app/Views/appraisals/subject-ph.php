@@ -64,6 +64,8 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
             La tipología orienta la comparación; la matrícula matriz y la escritura validan la identidad.
             Si el documento ya tiene texto OCR guardado, puedes recargarlo desde soportes sin repetir la lectura pesada.
         </div>
+        <?php $phAcademy = $phCatalog['normativeAcademy'] ?? []; $phDeliverableFilter = $phCatalog['deliverableFilter'] ?? []; ?>
+        <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-academy.php'; ?>
         <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-search.php'; ?>
         <section class="mt-5 rounded-xl border border-slate-200 bg-slate-50 p-4">
             <div class="grid gap-4 lg:grid-cols-[1fr_auto]">

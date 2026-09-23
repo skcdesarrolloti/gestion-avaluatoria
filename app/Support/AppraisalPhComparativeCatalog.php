@@ -158,6 +158,30 @@ final class AppraisalPhComparativeCatalog
         ];
     }
 
+
+    public static function normativeAcademy(): array
+    {
+        return [
+            ['src'=>'Ley 675 de 2001', 'asks'=>'Distinguir bienes privados, bienes comunes, coeficientes, expensas, administración y reglas del reglamento.', 'use'=>'La ficha separa identificación PH, unidad, coeficiente, bienes comunes, reglas, administración y salvedades para no mezclar soporte con conclusión.'],
+            ['src'=>'Decreto 1420 de 1998', 'asks'=>'En inmuebles sometidos a PH, el avalúo debe considerar derechos, coeficientes, áreas, bienes comunes e incidencia propia de la copropiedad.', 'use'=>'El módulo no toma el primer dato del reglamento; vincula matrícula, unidad, tipología y soporte antes de construir el texto.'],
+            ['src'=>'NTS S 03 / NTS I 01', 'asks'=>'El informe debe ser suficiente, trazable y claro sobre información examinada, soportes, salvedades y alcance.', 'use'=>'Los resúmenes depurados son el texto corto para informe; los extractos extensos quedan como soporte revisable.'],
+            ['src'=>'NTS M 01', 'asks'=>'La metodología debe usar información pertinente y comparación contra bienes de características similares.', 'use'=>'La dotación común se compara por tipología: residencial, oficinas, comercio, bodegas o mixto; no contra cualquier PH.'],
+            ['src'=>'IVS 104 / IVS 106', 'asks'=>'Los datos e insumos relevantes deben documentarse y el reporte debe permitir seguir el juicio profesional.', 'use'=>'Cada dato puede quedar como reglamento/documento, visita, criterio del analista, pendiente o alerta; esa fuente orienta la confiabilidad.'],
+            ['src'=>'IVS 400', 'asks'=>'En derechos inmobiliarios se analiza el interés valuado, derechos asociados, restricciones, cargas y características del inmueble.', 'use'=>'La incidencia valuatoria resume si la PH aporta, limita o es neutra para funcionalidad, comercialización y comparabilidad.'],
+            ['src'=>'Ayuda interna', 'asks'=>'Una mención documental no prueba por sí sola estado actual, funcionamiento ni vigencia administrativa.', 'use'=>'Reglamento y OCR alimentan la matriz; visita, fotos, paz y salvo, administración o certificado confirman lo que sea material.'],
+        ];
+    }
+
+    public static function deliverableFilter(): array
+    {
+        return [
+            ['type'=>'Va al entregable', 'tone'=>'ok', 'items'=>'Nombre y tipo de PH, vínculo con la unidad, coeficiente cuando aplique, tipología, bienes comunes relevantes, restricciones materiales, cargas vigentes, salvedades e incidencia valuatoria.'],
+            ['type'=>'Queda como soporte', 'tone'=>'info', 'items'=>'Extractos largos del reglamento, páginas OCR, listados completos de amenidades sin efecto, trazabilidad de documentos, referencias de búsqueda y notas de lectura.'],
+            ['type'=>'Requiere validar', 'tone'=>'warn', 'items'=>'Estado actual de zonas comunes, funcionamiento de equipos, paz y salvo, pólizas, cuotas extraordinarias, reformas, administración vigente y páginas con baja lectura.'],
+            ['type'=>'No concluir automático', 'tone'=>'risk', 'items'=>'No afirmar conservación, operación, cumplimiento, seguridad o impacto en valor solo por aparecer en el reglamento; debe existir soporte suficiente o salvedad.'],
+        ];
+    }
+
     public static function normNotes(): array
     {
         return [
