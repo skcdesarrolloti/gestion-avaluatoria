@@ -29,28 +29,49 @@ final class AppraiserRaaImportService
     private function data(array $post, array $file, array $parsed, ?array $existing): array
     {
         $id = $existing ? (string) $existing['id'] : bin2hex(random_bytes(16));
-        $categories = $parsed['raa_categories'] ?: $this->manualCategories($post);
+        $categories = $this->categories($parsed, $post, $existing);
+        $postEmail = trim((string) ($post['email'] ?? ''));
+        $postPhone = trim((string) ($post['phone'] ?? ''));
         return [
             'id' => $id,
             'code' => $existing ? (string) $existing['code'] : $this->code((string) ($post['code'] ?? '')),
             'full_name' => $existing ? (string) $existing['full_name'] : $parsed['full_name'],
             'identification_number' => $existing && (string) ($existing['identification_number'] ?? '') !== ''
                 ? (string) $existing['identification_number'] : $parsed['identification_number'],
-            'email' => $this->email($parsed['email'] ?: trim((string) ($post['email'] ?? ''))),
-            'phone' => $parsed['phone'] ?: trim((string) ($post['phone'] ?? '')),
+            'email' => $this->email($this->keep($parsed['email'] ?: $postEmail, $existing, 'email')),
+            'phone' => $this->keep($parsed['phone'] ?: $postPhone, $existing, 'phone'),
             'raa_number' => $parsed['raa_number'],
             'raa_categories' => json_encode($categories, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
-            'active' => 'Si', 'notes' => trim((string) ($post['notes'] ?? '')),
-            'raa_issued_at' => $parsed['raa_issued_at'] ?: null,
+            'active' => 'Si', 'notes' => $this->keep(trim((string) ($post['notes'] ?? '')), $existing, 'notes'),
+            'raa_issued_at' => $parsed['raa_issued_at'] ?: ($existing['raa_issued_at'] ?? null),
             'raa_expires_at' => $parsed['raa_expires_at'],
-            'raa_pin' => $parsed['raa_pin'],
-            'raa_contact_city' => $parsed['raa_contact_city'] ?? '',
-            'raa_contact_department' => $parsed['raa_contact_department'] ?? '',
-            'raa_contact_address' => $parsed['raa_contact_address'] ?? '',
+            'raa_pin' => $this->keep($parsed['raa_pin'], $existing, 'raa_pin'),
+            'raa_contact_city' => $this->keep($parsed['raa_contact_city'] ?? '', $existing, 'raa_contact_city'),
+            'raa_contact_department' => $this->keep($parsed['raa_contact_department'] ?? '', $existing, 'raa_contact_department'),
+            'raa_contact_address' => $this->keep($parsed['raa_contact_address'] ?? '', $existing, 'raa_contact_address'),
             'raa_source_filename' => basename(str_replace('\\', '/', (string) $file['name'])),
             'raa_storage_filename' => 'raa-' . $id . '.pdf',
             'raa_file_size_bytes' => 0,
         ];
+    }
+
+
+    private function categories(array $parsed, array $post, ?array $existing): array
+    {
+        $categories = $parsed['raa_categories'] ?: $this->manualCategories($post);
+        if ($categories === [] && $existing && (string) ($existing['raa_categories'] ?? '') !== '') {
+            $stored = json_decode((string) $existing['raa_categories'], true);
+            $categories = is_array($stored) ? array_map('strval', $stored) : [];
+        }
+        if ($categories === []) throw new \InvalidArgumentException('El certificado RAA no reporta categorías autorizadas legibles. Marca las categorías manuales como respaldo.');
+        return array_values(array_unique(array_map('strval', $categories)));
+    }
+
+    private function keep(string $value, ?array $existing, string $field): string
+    {
+        $value = trim($value);
+        if ($value !== '') return $value;
+        return $existing ? (string) ($existing[$field] ?? '') : '';
     }
 
     private function validateUpload(array $file): void

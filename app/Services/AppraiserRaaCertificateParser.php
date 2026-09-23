@@ -28,7 +28,6 @@ final class AppraiserRaaCertificateParser
         if ($data['full_name'] === '' || $data['identification_number'] === '' || $data['raa_number'] === '') {
             throw new \InvalidArgumentException('El certificado RAA no permitió identificar nombre, cédula y número AVAL.');
         }
-        if ($data['raa_categories'] === []) throw new \InvalidArgumentException('El certificado RAA no reporta categorías autorizadas legibles.');
         return $data;
     }
 

@@ -82,7 +82,11 @@ $today = new DateTimeImmutable('today', new DateTimeZone('America/Bogota'));
                     $days = $expiry ? (int) $today->diff($expiry)->format('%r%a') : null;
                     $expired = $days !== null && $days < 0;
                     $soon = $days !== null && $days >= 0 && $days <= 30;
-                    $labels = App\Support\RaaCategoryCatalog::labels((string) ($appraiser['raa_categories'] ?? ''));
+                    $storedCodes = json_decode((string) ($appraiser['raa_categories'] ?? ''), true);
+                    $catalog = App\Support\RaaCategoryCatalog::all();
+                    $labels = is_array($storedCodes) ? array_values(array_filter(array_map(
+                        static fn ($code): string => isset($catalog[(string) $code]) ? (string) $code . ' · ' . $catalog[(string) $code] : '',
+                        $storedCodes))) : [];
                     ?>
                     <article class="rounded-xl border border-slate-200 p-5 <?= $expired ? 'bg-red-50/40' : 'bg-white' ?>">
                         <div class="flex flex-wrap items-start justify-between gap-3">
@@ -95,7 +99,10 @@ $today = new DateTimeImmutable('today', new DateTimeZone('America/Bogota'));
                                 <?= e($expired ? 'No usable' : (($appraiser['active'] ?? '') === 'Si' ? 'Usable' : 'Inactivo')) ?>
                             </span>
                         </div>
-                        <div class="mt-4 grid gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
+                        <div class="mt-4 rounded-xl border border-amber-100 bg-amber-50 p-3 text-xs leading-5 text-amber-900">
+                            <strong>Datos protegidos al actualizar:</strong> código interno <?= e($appraiser['code']) ?>, nombre y cédula. El RAA mensual solo actualiza vigencia, soporte, contacto y categorías autorizadas.
+                        </div>
+                        <div class="mt-3 grid gap-3 rounded-xl border border-slate-100 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
                             <p><strong>Identificación RAA:</strong> cédula <?= e($appraiser['identification_number'] ?? 'pendiente') ?> · <?= e($appraiser['raa_number'] ?: 'RAA pendiente') ?></p>
                             <p class="font-semibold <?= $expired ? 'text-red-700' : ($soon ? 'text-amber-700' : 'text-emerald-700') ?>">
                                 <?= e($expired ? 'RAA vencido' : ($soon ? 'RAA por vencer' : 'RAA vigente')) ?><?= $expires !== '' ? ' · vence ' . e($expires) : '' ?>
@@ -107,7 +114,13 @@ $today = new DateTimeImmutable('today', new DateTimeZone('America/Bogota'));
                             <p><?= e($appraiser['raa_contact_address'] ?: 'Dirección pendiente') ?></p>
                             <p><?= e($appraiser['phone'] ?: 'Teléfono pendiente') ?> · <?= e($appraiser['email'] ?: 'Correo pendiente') ?></p>
                         </div>
-                        <?php if ($labels): ?><p class="mt-3 text-xs leading-5 text-slate-600"><strong>Categorías:</strong> <?= e(implode(' · ', $labels)) ?></p><?php endif; ?>
+                        <?php if ($labels): ?>
+                            <div class="mt-3 flex flex-wrap gap-2 text-xs">
+                                <?php foreach ($labels as $label): ?>
+                                    <span class="rounded-full bg-teal-50 px-3 py-1 font-semibold text-teal-800"><?= e($label) ?></span>
+                                <?php endforeach; ?>
+                            </div>
+                        <?php endif; ?>
                         <?php if (($appraiser['raa_storage_filename'] ?? '') !== ''): ?>
                             <a class="btn-secondary mt-4" target="_blank" rel="noopener" href="<?= e(url('maestros/peritos/' . $appraiser['id'] . '/raa')) ?>">Abrir soporte RAA</a>
                         <?php endif; ?>
