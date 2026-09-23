@@ -84,11 +84,11 @@ final class AppraisalRepository
     public function saveChapterZero(string $id, int $owner, int $version, array $data): array
     {
         $now = gmdate('Y-m-d H:i:s');
-        $fields = ['titulo', 'tipo', 'direccion', 'municipio', 'client_name', 'requester_name',
+        $fields = ['titulo', 'tipo', 'direccion', 'municipio', 'client_name', 'requester_name', 'requester_identification',
             'property_owner_name', 'report_recipient', 'observaciones', 'tipo_derecho', 'tipo_negocio', 'destinacion',
             'tipo_inmueble', 'subtipo_funcional', 'finalidad', 'intended_use', 'visit_date', 'value_date',
             'report_date', 'assignment_scope', 'assignment_limitations', 'assignment_hypotheses',
-            'assignment_report_text', 'base_valor', 'aplica_niif', 'regimen_ph', 'estructura_metodo', 'appraiser_id',
+            'assignment_report_text', 'source_documents', 'base_valor', 'aplica_niif', 'regimen_ph', 'estructura_metodo', 'appraiser_id',
             'igac_category', 'igac_typology_hint', 'igac_property_units_count', 'igac_annex_units_count',
             'inspection_notes', 'configuration_status'];
         $set = implode(', ', array_map(static fn (string $field): string => $field . ' = ?', $fields));

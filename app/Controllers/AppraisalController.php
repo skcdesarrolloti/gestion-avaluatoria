@@ -10,6 +10,7 @@ use App\Models\AppraisalRepository;
 use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraiserRepository;
 use App\Models\IgacTypologyRepository;
+use App\Services\AppraisalChapterOneReport;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalSubjectChapterReport;
 use App\Services\AppraisalValidator;
@@ -55,9 +56,10 @@ final class AppraisalController
         $subject = $this->subjects?->find($id, $this->user['id']) ?? [];
         $units = $this->appraisals->units($id, $this->user['id']);
         $obsolescence = $this->obsolescence?->find($id, $this->user['id']) ?? [];
+        $chapterOne = (new AppraisalChapterOneReport())->build($record, $subject, $units);
         $subjectChapter = (new AppraisalSubjectChapterReport())->build($record, $subject, $units, $phProfile, $obsolescence);
         view('appraisals/deliverable', ['title' => 'Entregable', 'record' => $record,
-            'phProfile' => $phProfile, 'subjectChapter' => $subjectChapter]);
+            'phProfile' => $phProfile, 'chapterOne' => $chapterOne, 'subjectChapter' => $subjectChapter]);
     }
 
     public function saveChapterZero(string $id): never

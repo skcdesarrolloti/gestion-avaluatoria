@@ -2,6 +2,9 @@
 <?php
 $ph = is_array($phProfile ?? null) ? $phProfile : [];
 $phTechnical = is_array($ph['technical'] ?? null) ? $ph['technical'] : [];
+$chapterOneData = is_array($chapterOne ?? null) ? $chapterOne : ['sections' => [], 'text' => ''];
+$chapterOneText = (string) ($chapterOneData['text'] ?? '');
+$chapterOneSections = is_array($chapterOneData['sections'] ?? null) ? $chapterOneData['sections'] : [];
 $chapter = is_array($subjectChapter ?? null) ? $subjectChapter : ['sections' => [], 'text' => ''];
 $chapterText = (string) ($chapter['text'] ?? '');
 $chapterSections = is_array($chapter['sections'] ?? null) ? $chapter['sections'] : [];
@@ -24,13 +27,42 @@ $phSummaryKeys = [
         <p class="eyebrow">Entregable</p>
         <h1 class="mt-2 text-3xl font-semibold tracking-tight">Informe consolidado del avalúo</h1>
         <p class="mt-3 max-w-3xl text-slate-600">
-            Aquí se arma la narrativa que pasa al informe. El capítulo 3 toma la ficha del bien sujeto,
-            superficies, construcción, PH, obsolescencias y fotografías con soporte normativo visible.
+            Aquí se arma la narrativa que pasa al informe. Los capítulos consolidados toman los datos del expediente,
+            bien sujeto, PH, obsolescencias y soportes normativos visibles.
         </p>
     </div>
     <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Único entregable</span>
 </div>
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
+
+
+<section class="mt-8 rounded-2xl border border-blue-100 bg-blue-50 p-6 shadow-sm sm:p-8">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+            <p class="eyebrow">Capítulo 1 · Memoria descriptiva</p>
+            <h2 class="mt-2 text-2xl font-semibold text-blue-950">Texto consolidado del expediente valuatorio</h2>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-blue-900">
+                Se construye con solicitante, encargo, activo, derecho valuado, uso previsto, base de valor,
+                fechas, documentos e insumos. Si falta un dato, el texto lo deja como pendiente.
+            </p>
+        </div>
+        <a class="rounded-full bg-white px-4 py-2 text-sm font-bold text-blue-800" href="<?= e(url('avaluos/' . $record['id'] . '/expediente')) ?>">Editar expediente</a>
+    </div>
+    <textarea class="input mt-5 min-h-80 bg-white font-mono text-sm leading-6" rows="18" readonly><?= e($chapterOneText) ?></textarea>
+</section>
+
+<section class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <p class="eyebrow">Capítulo 1 por secciones</p>
+    <h2 class="mt-2 text-2xl font-semibold">Cómo queda la memoria descriptiva</h2>
+    <div class="mt-5 grid gap-4">
+        <?php foreach ($chapterOneSections as $section): ?>
+            <article class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6">
+                <h3 class="font-semibold text-slate-950"><?= e((string) ($section[0] ?? 'Sección')) ?></h3>
+                <p class="mt-2 whitespace-pre-wrap text-slate-700"><?= e((string) ($section[1] ?? '')) ?></p>
+            </article>
+        <?php endforeach; ?>
+    </div>
+</section>
 
 <section class="mt-8 rounded-2xl border border-emerald-100 bg-emerald-50 p-6 shadow-sm sm:p-8">
     <div class="flex flex-wrap items-start justify-between gap-4">

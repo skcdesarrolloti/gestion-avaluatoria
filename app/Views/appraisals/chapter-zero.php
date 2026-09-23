@@ -63,6 +63,7 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
                 </div>
                 <div class="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-800">1.1 / 1.2</div>
             </div>
+            <?php require BASE_PATH . '/app/Views/appraisals/chapter-one-academy.php'; ?>
             <nav class="mt-6 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Subsecciones del expediente">
                 <button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
                     :class="active === 'configuracion' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800'"
@@ -133,6 +134,10 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
                     <input class="input" name="requester_name" maxlength="160" value="<?= e($field('requester_name')) ?>"
                         placeholder="Quien pide o radica el avalúo">
                 </label>
+                <label class="label">Identificación del solicitante
+                    <input class="input" name="requester_identification" maxlength="80" value="<?= e($field('requester_identification')) ?>"
+                        placeholder="NIT, cédula o identificación reportada">
+                </label>
                 <label class="label">Propietario del inmueble
                     <input class="input" name="property_owner_name" maxlength="160" value="<?= e($field('property_owner_name')) ?>"
                         placeholder="Nombre del propietario, si se conoce">
@@ -168,6 +173,14 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
                 <label class="label md:col-span-2">Hipótesis de trabajo
                     <textarea class="input" name="assignment_hypotheses" rows="3" maxlength="2000"
                         placeholder="Supuestos razonables usados para producir el informe, si aplican."><?= e($field('assignment_hypotheses')) ?></textarea>
+                </label>
+                <label class="label md:col-span-2">Documentos aportados o insumos
+                    <textarea class="input" name="source_documents" rows="4" maxlength="3000"
+                        placeholder="Ej. Escritura pública, certificado de tradición, predial, RUT, reglamento PH, fotografías o soportes del encargo."><?= e($field('source_documents')) ?></textarea>
+                </label>
+                <label class="label md:col-span-2">Texto adicional para memoria descriptiva
+                    <textarea class="input" name="assignment_report_text" rows="4" maxlength="5000"
+                        placeholder="Ajustes narrativos del capítulo 1 que no estén cubiertos por los campos anteriores."><?= e($field('assignment_report_text')) ?></textarea>
                 </label>
                 <label class="label md:col-span-2">Observaciones generales
                     <textarea class="input" name="observaciones" rows="4" maxlength="4000"

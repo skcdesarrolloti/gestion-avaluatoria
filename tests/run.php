@@ -7,6 +7,7 @@ use App\Database\Schema;
 use App\Core\Http;
 use App\Services\AppraisalValidator;
 use App\Services\AppraisalAttributeInput;
+use App\Services\AppraisalChapterOneReport;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalPhInput;
 use App\Services\AppraisalObsolescenceInput;
@@ -109,9 +110,14 @@ try {
     expect($diagnostics[array_key_last($diagnostics)]['ok'] === false, 'diagnostico auth falla sin base configurada');
     $db = new PDO('sqlite::memory:', null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
     fixture($db);
-    $db->exec("CREATE TABLE appraisals (id TEXT PRIMARY KEY, owner_id INTEGER, titulo TEXT DEFAULT '',
-        tipo TEXT DEFAULT '', direccion TEXT DEFAULT '', municipio TEXT DEFAULT '', client_name TEXT DEFAULT '',
-        property_owner_name TEXT DEFAULT '', version INTEGER DEFAULT 1, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE appraisals (id TEXT PRIMARY KEY, owner_id INTEGER, titulo TEXT DEFAULT '', tipo TEXT DEFAULT '',
+        direccion TEXT DEFAULT '', municipio TEXT DEFAULT '', client_name TEXT DEFAULT '', requester_name TEXT DEFAULT '',
+        requester_identification TEXT DEFAULT '', property_owner_name TEXT DEFAULT '', report_recipient TEXT DEFAULT '',
+        tipo_derecho TEXT DEFAULT '', destinacion TEXT DEFAULT '', tipo_inmueble TEXT DEFAULT '', finalidad TEXT DEFAULT '',
+        intended_use TEXT DEFAULT '', base_valor TEXT DEFAULT '', regimen_ph TEXT DEFAULT '', assignment_scope TEXT DEFAULT '',
+        assignment_limitations TEXT DEFAULT '', assignment_hypotheses TEXT DEFAULT '', assignment_report_text TEXT DEFAULT '',
+        source_documents TEXT DEFAULT '', visit_date TEXT, value_date TEXT, report_date TEXT,
+        version INTEGER DEFAULT 1, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_standard_categories (code TEXT PRIMARY KEY, name TEXT, group_type TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_standards (slug TEXT PRIMARY KEY, category_code TEXT, standard_code TEXT, title TEXT, kind TEXT, sector_code TEXT, source_filename TEXT, storage_filename TEXT, summary TEXT, file_size_bytes INTEGER, pdf_blob BLOB, imported_at TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("INSERT INTO valuation_standard_categories VALUES
@@ -369,6 +375,22 @@ try {
         'built_area_adopted_m2' => '85,25', 'construction_year' => '2010',
         'conservation' => ['estructura' => 'B'], 'services' => ['energia' => 'si'],
         'specifics' => ['estructura' => 'Concreto']]]];
+    $chapterOneReport = (new AppraisalChapterOneReport())->build([
+        'client_name' => 'Asociacion Central de Pensionados de Ecopetrol S.A.', 'requester_name' => 'Dra Martha Espinosa B.',
+        'requester_identification' => '830.133.850-6', 'report_recipient' => 'Asociacion Central de Pensionados de Ecopetrol S.A.',
+        'tipo' => 'comercial', 'tipo_derecho' => 'dominio_pleno', 'destinacion' => 'comercial', 'tipo_inmueble' => 'oficina',
+        'finalidad' => 'patrimonial', 'intended_use' => 'Actualizar libros contables.', 'base_valor' => 'mercado',
+        'regimen_ph' => 'si', 'source_documents' => "Escritura publica 259.
+Certificado de tradicion.",
+        'visit_date' => '2024-01-18', 'value_date' => '2024-01-18', 'report_date' => '2024-01-31', 'created_at' => '2024-01-15 00:00:00',
+    ], ['adopted_address' => 'K 13 B # 26-78', 'city_name' => 'Cartagena de Indias'], [
+        ['unit_kind' => 'property', 'label' => 'Oficina 206'], ['unit_kind' => 'annex', 'label' => 'Parqueadero No 60']
+    ]);
+    expect(str_contains($chapterOneReport['text'], '1.1 Solicitud del avalúo')
+        && str_contains($chapterOneReport['text'], '830.133.850-6')
+        && str_contains($chapterOneReport['text'], 'Valor de Mercado')
+        && str_contains($chapterOneReport['text'], 'Oficina 206, Parqueadero No 60')
+        && str_contains($chapterOneReport['text'], 'NTS S 03'), 'entregable expediente construye memoria descriptiva normativa');
     $constructionRows = AppraisalChapterZeroInput::unitConstructionData();
     expect($constructionRows[0]['built_area_adopted_m2'] === '85.25'
         && str_contains($constructionRows[0]['construction_conservation_json'], 'estructura'), 'construccion por unidad normalizada');
@@ -1441,3 +1463,4 @@ try {
 } finally {
     session_destroy();
 }
+

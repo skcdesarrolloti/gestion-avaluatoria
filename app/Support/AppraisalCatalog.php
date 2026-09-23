@@ -78,10 +78,10 @@ final class AppraisalCatalog
     public static function assignmentFields(): array
     {
         return [
-            'client_name' => 160, 'requester_name' => 160, 'property_owner_name' => 160,
-            'report_recipient' => 160, 'intended_use' => 220, 'assignment_scope' => 2000,
-            'assignment_limitations' => 2000, 'assignment_hypotheses' => 2000,
-            'assignment_report_text' => 5000,
+            'client_name' => 160, 'requester_name' => 160, 'requester_identification' => 80,
+            'property_owner_name' => 160, 'report_recipient' => 160, 'intended_use' => 220,
+            'assignment_scope' => 2000, 'assignment_limitations' => 2000, 'assignment_hypotheses' => 2000,
+            'assignment_report_text' => 5000, 'source_documents' => 3000,
         ];
     }
 
