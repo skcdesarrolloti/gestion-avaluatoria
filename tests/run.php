@@ -260,6 +260,17 @@ try {
     expect($numberer->assignIfMissing('99999999999999999999999999999999', 7) === '02-2026-09-001'
         && $numberer->assignIfMissing('88888888888888888888888888888888', 7) === '02-2026-09-002',
         'expediente asigna codigo perito ano mes y consecutivo');
+    $secondActiveAppraiserId = bin2hex(random_bytes(16));
+    $appraisers->create(array_replace($baseAppraiser, ['id' => $secondActiveAppraiserId, 'code' => '03',
+        'full_name' => 'Perito Segundo', 'active' => 'Si', 'identification_number' => '90000003']));
+    $db->exec("INSERT INTO appraisals (id, owner_id, appraiser_id, value_date, created_at, updated_at) VALUES
+        ('77777777777777777777777777777777', 7, '$secondActiveAppraiserId', '2026-09-20', '2026-09-03 00:00:00', '2026-09-03 00:00:00')");
+    expect($numberer->assignIfMissing('77777777777777777777777777777777', 7) === '03-2026-09-001',
+        'consecutivo del expediente inicia por cada perito');
+    $_POST = ['version' => 1, 'appraiser_id' => ''];
+    $chapterZeroData = AppraisalChapterZeroInput::chapterZeroData(1, [], [$activeAppraiserId]);
+    expect($chapterZeroData['appraiser_id'] === $activeAppraiserId,
+        'expediente toma perito unico vigente si no se selecciona manualmente');
     $geo = new GeoMasterRepository($db);
     $geo->createDepartment(['code' => '05', 'name' => 'Antioquia', 'active' => 'Si']);
     $departmentId = $geo->departments()[0]['id'];
@@ -1504,4 +1515,3 @@ Certificado de tradicion.",
 } finally {
     session_destroy();
 }
-

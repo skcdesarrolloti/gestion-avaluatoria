@@ -4,6 +4,8 @@ use App\Support\AppraisalCatalog;
 $selected = static fn (string $name, string $value): string => (string) ($record[$name] ?? '') === $value ? 'selected' : '';
 $field = static fn (string $name): string => (string) ($record[$name] ?? '');
 $count = static fn (string $name): int => max(0, (int) ($record[$name] ?? 0));
+$defaultAppraiserId = $field('appraiser_id') !== '' ? $field('appraiser_id') : (count($appraisers) === 1 ? (string) $appraisers[0]['id'] : '');
+$selectedAppraiser = static fn (string $value): string => $defaultAppraiserId === $value ? 'selected' : '';
 $notes = $catalog['notes'] ?? [];
 $initial = ['notes' => $notes];
 $currentStep = 'expediente';
@@ -86,11 +88,20 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
                     <select class="input" name="appraiser_id">
                         <option value="">Selecciona perito</option>
                         <?php foreach ($appraisers as $appraiser): ?>
-                            <option value="<?= e($appraiser['id']) ?>" <?= $selected('appraiser_id', $appraiser['id']) ?>>
+                            <option value="<?= e($appraiser['id']) ?>" <?= $selectedAppraiser($appraiser['id']) ?>>
                                 <?= e($appraiser['code'] . ' · ' . $appraiser['full_name']) ?>
                             </option>
                         <?php endforeach; ?>
                     </select>
+                    <?php if (count($appraisers) === 1 && $field('appraiser_id') === ''): ?>
+                        <span class="mt-1 block text-xs leading-5 text-emerald-700">
+                            Se selecciona automáticamente porque solo hay un perito vigente.
+                        </span>
+                    <?php elseif (count($appraisers) === 0): ?>
+                        <span class="mt-1 block text-xs leading-5 text-red-700">
+                            No hay peritos con RAA vigente. Actualiza el RAA en Maestros para asignar expediente.
+                        </span>
+                    <?php endif; ?>
                 </label>
                 <?php require BASE_PATH . '/app/Views/appraisals/appraisal-dossier-field.php'; ?>
                 <?php foreach ($configurationSelects as $name) {
