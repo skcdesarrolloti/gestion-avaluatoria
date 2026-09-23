@@ -153,7 +153,6 @@ final class AppraisalPhRepository
     }
     private function json(string $json): array
     { $decoded = json_decode($json, true); return is_array($decoded) ? $decoded : []; }
-
     private function withGeneratedReport(array $profile): array
     {
         $profile['technical'] = is_array($profile['technical'] ?? null) ? $profile['technical'] : [];
@@ -197,14 +196,14 @@ final class AppraisalPhRepository
             'La copropiedad corresponde preliminarmente', 'Se revisa preliminarmente como',
             'Lectura preliminar PH sin hallazgos suficientes', 'Para el análisis de propiedad horizontal se tuvo como soporte',
             'Condición especial PH:', 'Trazabilidad documental:', 'Lectura comparativa:',
-            'El inmueble objeto de análisis forma parte de', 'La copropiedad ', 'Se verifican ',
+            'El inmueble objeto de análisis forma parte de', 'El inmueble objeto de medición se localiza en',
+            'La copropiedad ', 'Se verifican ',
             'Quedan por confirmar ', 'Se registran alertas o salvedades en ', 'Los bienes comunes específicos deben confirmarse',
             'Bienes comunes esenciales:', 'Bienes comunes no esenciales', 'Áreas comunes de uso exclusivo:', 'Soporte operativo y técnico común:', 'No se han marcado bienes comunes verificados', 'No se han identificado bienes comunes', 'Para la tipología '] as $prefix) {
             if (str_starts_with($text, $prefix)) return true;
         }
         return false;
     }
-
     private function valuationYear(string $appraisalId, int $owner): int
     {
         try {

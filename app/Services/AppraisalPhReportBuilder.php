@@ -18,7 +18,7 @@ final class AppraisalPhReportBuilder
         $operations = new AppraisalPhOperationsNarrative();
         $limits = 'La conclusión corresponde al alcance técnico del avalúo y se complementa con el análisis jurídico registrado en el expediente.';
         $trace = $this->traceSummary($technical, $limits);
-        [$incidenceSummary, $incidenceReport] = $operations->incidence($name, $label, $core, $technical, $assets, $support, $level, $limits);
+        [$incidenceSummary] = $operations->incidence($name, $label, $core, $technical, $assets, $support, $level, $limits);
 
         $tab = [
             'resumen_base_ph' => $this->baseSummary($name, $label, $advantages, $level),
@@ -32,8 +32,11 @@ final class AppraisalPhReportBuilder
             'resumen_incidencia_ph' => $incidenceSummary,
             'resumen_notas_ph' => $operations->notes($technical),
         ];
+        $report = (new AppraisalPhDeliverableTextBuilder())->build($name, $label, $assets, $technical, $common,
+            $support, $level, $tab['resumen_reglas_ph'], $tab['resumen_administracion_ph'],
+            $tab['resumen_incidencia_ph'], $tab['resumen_notas_ph'], $limits);
         return ['diagnosis_text' => $tab['resumen_incidencia_ph'],
-            'report_text' => $incidenceReport, 'technical' => $tab];
+            'report_text' => $report, 'technical' => $tab];
     }
 
     private function identitySummary(string $name, string $assets): string

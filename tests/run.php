@@ -549,6 +549,10 @@ try {
         && str_contains((string) ($phQuantityAnalysis['technical']['resumen_configuracion_ph'] ?? ''), '40 oficinas')
         && str_contains((string) ($phQuantityAnalysis['technical']['resumen_configuracion_ph'] ?? ''), '120 parqueaderos'),
         'configuracion PH extrae cantidades especificas de unidades y niveles');
+    expect(str_contains((string) ($phQuantityAnalysis['core']['report_text'] ?? ''), 'número de pisos: 6 pisos')
+        && str_contains((string) ($phQuantityAnalysis['core']['report_text'] ?? ''), 'ascensores: 6 ascensores')
+        && str_contains((string) ($phQuantityAnalysis['core']['report_text'] ?? ''), 'parqueaderos: 120 parqueaderos'),
+        'entregable PH integra configuracion cargada');
     $chambacuQuantity = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
         'area de construccion de 15.394,86 metros cuadrados. area de oficinas para un total de ciento cinco (105) oficinas. piso adicional intermedio que comprende veintiseis (26) oficinas. semisotano para ciento ochenta y cinco (185) parqueaderos.',
         ['reglamento.txt'], 'oficinas');

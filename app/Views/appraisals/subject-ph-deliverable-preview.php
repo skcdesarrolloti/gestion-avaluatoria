@@ -2,6 +2,8 @@
 $phTechnicalPreview = is_array($ph['technical'] ?? null) ? $ph['technical'] : [];
 $phReportText = trim((string) ($ph['report_text'] ?? ''));
 $phPreviewRows = [
+    'resumen_base_ph' => 'Base PH común',
+    'resumen_trazabilidad_ph' => 'Documento y trazabilidad',
     'resumen_identificacion_ph' => 'Identificación PH',
     'resumen_tipologia_ph' => 'Tipología y régimen',
     'resumen_configuracion_ph' => 'Configuración predial',
