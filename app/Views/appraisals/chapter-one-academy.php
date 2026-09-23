@@ -1,6 +1,6 @@
 <?php
 $chapterOneAcademy = [
-    ['NTS S 03', 'Identificar solicitante, activo, derechos valuados, uso previsto, base de valor, fecha de valoración, alcance, hipótesis, condiciones restrictivas e información examinada.', 'Cada campo del expediente alimenta una subsección de la memoria descriptiva; lo no soportado queda como pendiente o salvedad.'],
+    ['NTS S 03', 'Identificar solicitante y calidad en que actúa, activo, derechos valuados, uso previsto, base de valor, fecha de valoración, alcance, hipótesis, condiciones restrictivas e información examinada.', 'Cada campo del expediente alimenta una subsección de la memoria descriptiva; lo no soportado queda como pendiente o salvedad.'],
     ['NTS I 01', 'El informe debe presentar identificación suficiente del solicitante, objeto, documentos, insumos y condiciones del encargo.', 'Los documentos aportados se relacionan en 1.11 y los datos base pasan al texto consolidado sin copiar soportes completos.'],
     ['Decreto 1420 de 1998 · arts. 21 y 22', 'La lectura debe considerar localización, destinación, características físicas, jurídicas y económicas del inmueble.', 'La localización, tipo de bien, destinación, PH y derecho valuado quedan vinculados con la ficha del bien sujeto.'],
     ['IVS · alcance y reporte', 'El valuador debe comunicar alcance, base de valor, fecha, propósito, supuestos, limitaciones y datos relevantes.', 'El capítulo separa encargo, uso del informe, base de valor, fechas, alcance, limitaciones y soporte documental.'],

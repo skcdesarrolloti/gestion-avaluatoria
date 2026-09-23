@@ -34,15 +34,22 @@ final class AppraisalChapterOneReport
     private function request(array $r): string
     {
         $requester = $this->first($r['requester_name'] ?? '', $r['client_name'] ?? 'el solicitante');
+        $capacity = $this->text($r['requester_capacity'] ?? '');
+        $client = $this->text($r['client_name'] ?? '');
+        $detail = $capacity !== '' ? ', en calidad de ' . $capacity : '';
+        if ($client !== '' && mb_strtolower($client) !== mb_strtolower($requester)) $detail .= ' de ' . $client;
         $dossier = $this->text($r['expediente_number'] ?? '');
         return ($dossier !== '' ? 'Expediente valuatorio No. ' . $dossier . '. ' : '')
-            . 'El presente estudio técnico de avalúo fue solicitado por ' . $this->end($requester);
+            . 'El presente estudio técnico de avalúo fue solicitado por ' . $this->end($requester . $detail);
     }
     private function requester(array $r): string
     {
         $name = $this->first($r['client_name'] ?? '', $r['requester_name'] ?? 'solicitante pendiente de precisar');
         $id = $this->text($r['requester_identification'] ?? '');
-        return 'Razón social o nombre del solicitante: ' . $this->end($name) . ($id !== '' ? ' Identificación: ' . $id . '.' : ' Identificación pendiente de soporte o diligenciamiento.');
+        $capacity = $this->text($r['requester_capacity'] ?? '');
+        $text = 'Razón social o nombre del solicitante: ' . $this->end($name)
+            . ($id !== '' ? ' Identificación: ' . $id . '.' : ' Identificación pendiente de soporte o diligenciamiento.');
+        return $capacity !== '' ? $text . ' Calidad o cargo reportado para la solicitud: ' . $this->end($capacity) : $text;
     }
     private function assignment(array $r, array $s, array $u): string
     {
@@ -79,7 +86,7 @@ final class AppraisalChapterOneReport
     private function destination(array $r): string { return ucfirst(mb_strtolower($this->labelFor('destinacion', $r['destinacion'] ?? 'destinación pendiente de precisar'))) . '.'; }
     private function dates(array $r): string
     {
-        return 'Fecha de solicitud: ' . $this->date($r['created_at'] ?? '') . ";\nFecha de visita o verificación: " . $this->date($r['visit_date'] ?? '') . ";\nFecha del informe: " . $this->date($r['report_date'] ?? '') . ";\nFecha de aplicación del valor: " . $this->date($r['value_date'] ?? '') . '.';
+        return 'Fecha de solicitud: ' . $this->date($this->first($r['request_date'] ?? '', $r['created_at'] ?? '')) . ";\nFecha de visita o verificación: " . $this->date($r['visit_date'] ?? '') . ";\nFecha del informe: " . $this->date($r['report_date'] ?? '') . ";\nFecha de aplicación del valor: " . $this->date($r['value_date'] ?? '') . '.';
     }
     private function documents(array $r): string
     {

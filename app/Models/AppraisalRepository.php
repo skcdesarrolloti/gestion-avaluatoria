@@ -15,7 +15,7 @@ final class AppraisalRepository
         $offset = (max(1, $page) - 1) * 20; $search = trim($search);
         $where = 'owner_id = ?'; $params = [$owner];
         if ($createdOnly) $where .= " AND expediente_number IS NOT NULL AND expediente_number <> ''";
-        if ($search !== '') { $where .= ' AND (expediente_number LIKE ? OR titulo LIKE ? OR municipio LIKE ? OR property_owner_name LIKE ? OR client_name LIKE ? OR requester_name LIKE ? OR report_recipient LIKE ?)'; $needle = '%' . $search . '%'; $params = array_merge([$owner], array_fill(0, 7, $needle)); }
+        if ($search !== '') { $where .= ' AND (expediente_number LIKE ? OR titulo LIKE ? OR municipio LIKE ? OR property_owner_name LIKE ? OR client_name LIKE ? OR requester_name LIKE ? OR requester_capacity LIKE ? OR report_recipient LIKE ?)'; $needle = '%' . $search . '%'; $params = array_merge([$owner], array_fill(0, 8, $needle)); }
         $query = $this->db->prepare("SELECT id, expediente_number, titulo, tipo, municipio, property_owner_name, client_name, updated_at
             FROM appraisals WHERE $where ORDER BY updated_at DESC, id DESC LIMIT 21 OFFSET $offset");
         $query->execute($params);
@@ -82,8 +82,8 @@ final class AppraisalRepository
     {
         $now = gmdate('Y-m-d H:i:s');
         $fields = ['titulo', 'tipo', 'direccion', 'municipio', 'client_name', 'requester_name', 'requester_identification',
-            'property_owner_name', 'report_recipient', 'observaciones', 'tipo_derecho', 'tipo_negocio', 'destinacion',
-            'tipo_inmueble', 'subtipo_funcional', 'finalidad', 'intended_use', 'visit_date', 'value_date',
+            'requester_capacity', 'property_owner_name', 'report_recipient', 'observaciones', 'tipo_derecho', 'tipo_negocio', 'destinacion',
+            'tipo_inmueble', 'subtipo_funcional', 'finalidad', 'intended_use', 'request_date', 'visit_date', 'value_date',
             'report_date', 'assignment_scope', 'assignment_limitations', 'assignment_hypotheses',
             'assignment_report_text', 'source_documents', 'base_valor', 'aplica_niif', 'regimen_ph', 'estructura_metodo', 'appraiser_id',
             'igac_category', 'igac_typology_hint', 'igac_property_units_count', 'igac_annex_units_count',

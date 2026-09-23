@@ -79,7 +79,7 @@ final class AppraisalCatalog
     {
         return [
             'client_name' => 160, 'requester_name' => 160, 'requester_identification' => 80,
-            'property_owner_name' => 160, 'report_recipient' => 160, 'intended_use' => 220,
+            'requester_capacity' => 220, 'property_owner_name' => 160, 'report_recipient' => 160, 'intended_use' => 220,
             'assignment_scope' => 2000, 'assignment_limitations' => 2000, 'assignment_hypotheses' => 2000,
             'assignment_report_text' => 5000, 'source_documents' => 3000,
         ];
@@ -88,7 +88,7 @@ final class AppraisalCatalog
     public static function defaults(): array
     {
         return array_fill_keys(array_merge(self::fieldKeys(), array_keys(self::assignmentFields()), [
-            'visit_date', 'value_date', 'report_date', 'expediente_number',
+            'request_date', 'visit_date', 'value_date', 'report_date', 'expediente_number',
         ]), '');
     }
 
