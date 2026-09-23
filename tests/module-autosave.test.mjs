@@ -10,11 +10,14 @@ class HTMLFormElement {
         this.status = { textContent: '', dataset: {} };
         this.dossier = { value: 'Pendiente de asignar' };
         this.banner = { textContent: 'Pendiente de asignar' };
+        this.attrs = new Set();
         this.ownerDocument = {
             querySelectorAll: selector => selector === '[data-expediente-number-output]' ? [this.dossier, this.banner] : [],
         };
     }
     matches(selector) { return selector === '[data-module-autosave]'; }
+    hasAttribute(name) { return this.attrs.has(name); }
+    removeAttribute(name) { this.attrs.delete(name); }
     querySelector(selector) { return selector === 'input[name="version"]' ? this.version : null; }
     querySelectorAll(selector) { return selector === '[data-autosave-status]' ? [this.status] : []; }
 }
@@ -29,7 +32,7 @@ class HTMLSelectElement {
 }
 class HTMLTextAreaElement {}
 
-function setup() {
+function setup(autoForms = []) {
     const originals = {
         HTMLFormElement: globalThis.HTMLFormElement,
         HTMLInputElement: globalThis.HTMLInputElement,
@@ -51,7 +54,7 @@ function setup() {
     globalThis.CSS = { escape: value => value };
     globalThis.document = {
         querySelector: selector => selector === 'meta[name="csrf-token"]' ? { content: 'csrf-token' } : null,
-        querySelectorAll: () => [],
+        querySelectorAll: selector => selector === '[data-module-autosave][data-autosave-on-load]' ? autoForms : [],
         addEventListener: (type, handler) => { listeners[type] = handler; },
     };
     globalThis.window = { addEventListener: () => {} };
@@ -104,6 +107,18 @@ test('appraiser change saves immediately to create dossier number', async () => 
     assert.equal(timerDelay(), 0);
     await runTimer();
     assert.equal(form.dossier.value, '01-2026-09-001');
+    cleanup();
+});
+
+test('auto selected appraiser saves on page load', async () => {
+    const form = new HTMLFormElement();
+    form.attrs.add('data-autosave-on-load');
+    globalThis.fetch = async () => ({ ok: true, json: async () => ({ ok: true, version: 8, expediente_number: '01-2026-09-001' }) });
+    const { runTimer, timerDelay, cleanup } = setup([form]);
+    assert.equal(timerDelay(), 0);
+    await runTimer();
+    assert.equal(form.dossier.value, '01-2026-09-001');
+    assert.equal(form.hasAttribute('data-autosave-on-load'), false);
     cleanup();
 });
 

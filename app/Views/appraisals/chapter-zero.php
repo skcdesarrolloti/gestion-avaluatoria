@@ -6,6 +6,7 @@ $field = static fn (string $name): string => (string) ($record[$name] ?? '');
 $count = static fn (string $name): int => max(0, (int) ($record[$name] ?? 0));
 $defaultAppraiserId = $field('appraiser_id') !== '' ? $field('appraiser_id') : (count($appraisers) === 1 ? (string) $appraisers[0]['id'] : '');
 $selectedAppraiser = static fn (string $value): string => $defaultAppraiserId === $value ? 'selected' : '';
+$autoAssignAppraiser = $field('appraiser_id') === '' && $defaultAppraiserId !== '';
 $notes = $catalog['notes'] ?? [];
 $initial = ['notes' => $notes];
 $currentStep = 'expediente';
@@ -37,6 +38,7 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', '
     <form id="expediente-form" class="grid gap-7 lg:grid-cols-[1fr_18rem]" method="post"
         action="<?= e(url('avaluos/' . $record['id'] . '/expediente')) ?>"
         data-module-autosave
+        <?= $autoAssignAppraiser ? 'data-autosave-on-load' : '' ?>
         data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/expediente/autoguardar')) ?>"
         x-data="{
             busy: false, active: window.location.hash === '#identificacion' ? 'identificacion' : 'configuracion',

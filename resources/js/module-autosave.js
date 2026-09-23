@@ -94,7 +94,7 @@ async function save(form) {
     return state.promise;
 }
 
-function markDirty(form, target) {
+function markDirty(form, target, delay = null) {
     if (!form?.matches?.('[data-module-autosave]') || !form.dataset.autosaveEndpoint) return;
     if (target instanceof HTMLInputElement && target.type === 'file') return;
     const state = stateFor(form);
@@ -103,7 +103,7 @@ function markDirty(form, target) {
     clearTimeout(state.timer);
     if (state.conflict) return;
     setStatus(form, 'Cambios pendientes', 'pending');
-    state.timer = setTimeout(() => save(form), target?.hasAttribute?.('data-autosave-now') ? 0 : 800);
+    state.timer = setTimeout(() => save(form), delay ?? (target?.hasAttribute?.('data-autosave-now') ? 0 : 800));
 }
 
 function cancel(form) {
@@ -128,6 +128,10 @@ export function installModuleAutosave() {
     window.gaFlushAutosaves = flushModuleAutosaves;
     document.addEventListener('input', event => markDirty(formFor(event.target), event.target));
     document.addEventListener('change', event => markDirty(formFor(event.target), event.target));
+    document.querySelectorAll('[data-module-autosave][data-autosave-on-load]').forEach(form => {
+        form.removeAttribute?.('data-autosave-on-load');
+        markDirty(form, form, 0);
+    });
     document.addEventListener('submit', event => {
         const form = event.target;
         if (form.hasAttribute?.('data-save-in-place')) {
