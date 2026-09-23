@@ -69,8 +69,8 @@ final class AppraisalController
             $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
                 $this->igacCodes(), $this->appraiserIds());
             $this->appraisals->saveChapterZero($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $data);
-            $this->dossiers?->assignIfMissing($id, $this->user['id']);
-            Session::flash('chapter_zero_message', 'Expediente guardado correctamente.');
+            $dossier = $this->createDossierIfRequested($id);
+            Session::flash('chapter_zero_message', $dossier ? 'Expediente ' . $dossier . ' creado correctamente.' : 'Expediente guardado correctamente.');
             Http::redirect($this->chapterZeroRedirect($id));
         } catch (\Throwable $error) {
             Session::flash('chapter_zero_error', $this->chapterZeroErrorMessage($error));
@@ -82,7 +82,7 @@ final class AppraisalController
         $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
             $this->igacCodes(), $this->appraiserIds());
         $result = $this->appraisals->saveChapterZero($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $data);
-        $dossier = $this->dossiers?->assignIfMissing($id, $this->user['id']);
+        $dossier = $this->createDossierIfRequested($id);
         Http::json(['ok' => true, 'expediente_number' => $dossier] + $result);
     }
     public function edit(string $id): void
@@ -110,6 +110,14 @@ final class AppraisalController
     }
     private function appraiserIds(): array { return array_column($this->appraisers->eligibleForAssignment(), 'id'); }
     private function igacCodes(): array { return array_column($this->typologies->categories(), 'code'); }
+    private function wantsDossierCreation(): bool { return (string) ($_POST['create_expediente'] ?? '') === '1'; }
+    private function createDossierIfRequested(string $id): ?string
+    {
+        if (!$this->wantsDossierCreation()) return null;
+        $number = $this->dossiers?->assignIfMissing($id, $this->user['id']);
+        if (!$number) throw new HttpException(422, 'Selecciona un perito vigente para crear el expediente.');
+        return $number;
+    }
     private function chapterZeroErrorMessage(\Throwable $error): string
     {
         $reference = substr(hash('sha256', 'chapter_zero|' . $error->getMessage() . '|' . microtime(true)), 0, 12);

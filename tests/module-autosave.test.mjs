@@ -27,12 +27,18 @@ class HTMLInputElement {
 }
 
 class HTMLSelectElement {
-    constructor(form) { this.form = form; this.name = 'appraiser_id'; this.attrs = new Set(['data-autosave-now']); }
+    constructor(form) { this.form = form; this.name = 'appraiser_id'; this.attrs = new Set(); }
     hasAttribute(name) { return this.attrs.has(name); }
 }
 class HTMLTextAreaElement {}
 
-function setup(autoForms = []) {
+class CreateDossierButton {
+    constructor(form) { this.form = form; }
+    closest(selector) { return selector === '[data-create-dossier]' ? this : null; }
+    hasAttribute() { return false; }
+}
+
+function setup() {
     const originals = {
         HTMLFormElement: globalThis.HTMLFormElement,
         HTMLInputElement: globalThis.HTMLInputElement,
@@ -54,7 +60,7 @@ function setup(autoForms = []) {
     globalThis.CSS = { escape: value => value };
     globalThis.document = {
         querySelector: selector => selector === 'meta[name="csrf-token"]' ? { content: 'csrf-token' } : null,
-        querySelectorAll: selector => selector === '[data-module-autosave][data-autosave-on-load]' ? autoForms : [],
+        querySelectorAll: () => [],
         addEventListener: (type, handler) => { listeners[type] = handler; },
     };
     globalThis.window = { addEventListener: () => {} };
@@ -64,6 +70,7 @@ function setup(autoForms = []) {
         }
         delete(key) { this.values.delete(key); }
         get(key) { return this.values.get(key); }
+        set(key, value) { this.values.set(key, value); }
     };
     let timerCallback = null, timerDelay = null;
     globalThis.setTimeout = (callback, delay) => { timerCallback = callback; timerDelay = delay; return 1; };
@@ -99,26 +106,28 @@ test('module autosave posts form data and updates optimistic version', async () 
     cleanup();
 });
 
-test('appraiser change saves immediately to create dossier number', async () => {
+test('appraiser change only saves draft without creating dossier number', async () => {
     const { listeners, runTimer, timerDelay, cleanup } = setup();
     const form = new HTMLFormElement(), select = new HTMLSelectElement(form);
-    globalThis.fetch = async () => ({ ok: true, json: async () => ({ ok: true, version: 8, expediente_number: '01-2026-09-001' }) });
+    globalThis.fetch = async () => ({ ok: true, json: async () => ({ ok: true, version: 8 }) });
     listeners.change({ target: select });
-    assert.equal(timerDelay(), 0);
+    assert.equal(timerDelay(), 800);
     await runTimer();
-    assert.equal(form.dossier.value, '01-2026-09-001');
+    assert.equal(form.dossier.value, 'Pendiente de asignar');
     cleanup();
 });
 
-test('auto selected appraiser saves on page load', async () => {
-    const form = new HTMLFormElement();
-    form.attrs.add('data-autosave-on-load');
-    globalThis.fetch = async () => ({ ok: true, json: async () => ({ ok: true, version: 8, expediente_number: '01-2026-09-001' }) });
-    const { runTimer, timerDelay, cleanup } = setup([form]);
+test('create dossier button sends explicit flag and updates number', async () => {
+    const { listeners, runTimer, timerDelay, cleanup } = setup();
+    const form = new HTMLFormElement(), button = new CreateDossierButton(form);
+    globalThis.fetch = async (url, request) => {
+        assert.equal(request.body.get('create_expediente'), '1');
+        return { ok: true, json: async () => ({ ok: true, version: 8, expediente_number: '01-2026-09-001' }) };
+    };
+    listeners.click({ target: button, preventDefault() { this.prevented = true; } });
     assert.equal(timerDelay(), 0);
     await runTimer();
     assert.equal(form.dossier.value, '01-2026-09-001');
-    assert.equal(form.hasAttribute('data-autosave-on-load'), false);
     cleanup();
 });
 

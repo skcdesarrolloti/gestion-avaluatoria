@@ -8,6 +8,14 @@ $expedienteNumber = trim((string) ($record['expediente_number'] ?? ''));
     </label>
     <p class="mt-2 text-xs leading-5 text-amber-900">
         Formato: código del perito + año + mes + consecutivo. Ejemplo: 02-2026-09-001.
-        Se asigna automáticamente al guardar este módulo con perito responsable seleccionado.
+        Se crea solo cuando pulses el botón, con el perito responsable seleccionado.
     </p>
+    <?php if ($expedienteNumber === ''): ?>
+        <button class="btn-primary mt-3" type="submit" name="create_expediente" value="1" data-create-dossier>
+            Crear expediente
+        </button>
+        <p class="mt-2 text-xs leading-5 text-amber-900">
+            El consecutivo queda fijo una vez creado. Guardar cambios no consume nuevos consecutivos.
+        </p>
+    <?php endif; ?>
 </div>

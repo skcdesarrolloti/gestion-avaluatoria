@@ -4,7 +4,7 @@ const activeStates = new Set();
 
 function stateFor(form) {
     if (!states.has(form)) {
-        const state = { form, dirty: false, saving: false, timer: null, controller: null, promise: null, revision: 0, conflict: false };
+        const state = { form, dirty: false, saving: false, timer: null, controller: null, promise: null, revision: 0, conflict: false, extras: {} };
         states.set(form, state);
         activeStates.add(state);
     }
@@ -31,9 +31,10 @@ function formFor(target) {
     return target.closest?.('form') ?? null;
 }
 
-function formBody(form) {
+function formBody(form, extras = {}) {
     const body = new FormData(form);
     form.querySelectorAll('input[type="file"][name]').forEach(input => body.delete(input.name));
+    Object.entries(extras).forEach(([key, value]) => body.set(key, value));
     return body;
 }
 
@@ -60,6 +61,8 @@ async function save(form) {
     if (state.saving) return state.promise;
     if (!state.dirty) return;
     const revision = state.revision;
+    const extras = state.extras;
+    state.extras = {};
     state.saving = true;
     state.controller = new AbortController();
     const buttons = [...form.querySelectorAll('button[type="submit"]')];
@@ -68,7 +71,7 @@ async function save(form) {
     state.promise = (async () => { try {
         const response = await fetch(form.dataset.autosaveEndpoint, {
             method: 'POST',
-            body: formBody(form),
+            body: formBody(form, extras),
             headers: { Accept: 'application/json', 'X-CSRF-Token': csrfToken() },
             credentials: 'same-origin',
             signal: state.controller.signal,
@@ -94,11 +97,12 @@ async function save(form) {
     return state.promise;
 }
 
-function markDirty(form, target, delay = null) {
+function markDirty(form, target, delay = null, extras = {}) {
     if (!form?.matches?.('[data-module-autosave]') || !form.dataset.autosaveEndpoint) return;
     if (target instanceof HTMLInputElement && target.type === 'file') return;
     const state = stateFor(form);
     state.dirty = true;
+    state.extras = { ...state.extras, ...extras };
     state.revision++;
     clearTimeout(state.timer);
     if (state.conflict) return;
@@ -128,9 +132,11 @@ export function installModuleAutosave() {
     window.gaFlushAutosaves = flushModuleAutosaves;
     document.addEventListener('input', event => markDirty(formFor(event.target), event.target));
     document.addEventListener('change', event => markDirty(formFor(event.target), event.target));
-    document.querySelectorAll('[data-module-autosave][data-autosave-on-load]').forEach(form => {
-        form.removeAttribute?.('data-autosave-on-load');
-        markDirty(form, form, 0);
+    document.addEventListener('click', event => {
+        const button = event.target.closest?.('[data-create-dossier]');
+        if (!button?.form) return;
+        event.preventDefault();
+        markDirty(button.form, button, 0, { create_expediente: '1' });
     });
     document.addEventListener('submit', event => {
         const form = event.target;
