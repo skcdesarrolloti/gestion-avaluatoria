@@ -18,7 +18,7 @@ final class AppraisalPhDeliverableTextBuilder
             $text = $this->usableSummary($text);
             if ($text !== '') $paragraphs[] = $text;
         }
-        $paragraphs[] = $limits . ' La lectura de propiedad horizontal no constituye estudio de títulos ni certificación administrativa; organiza los soportes revisados para sustentar la incidencia técnica en el avalúo.';
+        $paragraphs[] = $limits . ' Esta descripción se soporta, de forma general, en la Ley 675 de 2001 para régimen de propiedad horizontal, bienes comunes, coeficientes y expensas; en el Decreto 1420 de 1998 para la lectura valuatoria de inmuebles sometidos a PH; y en NTS/IVS como criterios de suficiencia, trazabilidad, soporte y limitaciones del informe. La lectura de propiedad horizontal no constituye estudio de títulos ni certificación administrativa; organiza los soportes revisados para sustentar la incidencia técnica en el avalúo.';
         return implode("\n\n", array_values(array_filter($paragraphs)));
     }
 
@@ -27,8 +27,7 @@ final class AppraisalPhDeliverableTextBuilder
         $facts = $this->values(['número de pisos' => 'numero_pisos', 'sótanos' => 'numero_sotanos',
             'ascensores' => 'numero_ascensores', 'edad aproximada' => 'edad_aproximada_ph',
             'uso o destinación dominante' => 'uso_dominante', 'unidades privadas' => 'numero_unidades',
-            'oficinas' => 'numero_oficinas', 'locales' => 'numero_locales',
-            'parqueaderos' => 'numero_parqueaderos', 'depósitos' => 'numero_depositos'], $technical);
+            'parqueaderos' => 'numero_parqueaderos'], $technical);
         $text = $facts ? 'La configuración registrada incluye ' . implode('; ', $facts) . '.' : '';
         $distribution = $this->clean($technical['organizacion_interna'] ?? '', 420);
         if ($distribution !== '') $text .= ($text !== '' ? ' ' : '') . 'La distribución funcional reportada indica: ' . $distribution . '.';
@@ -105,6 +104,13 @@ final class AppraisalPhDeliverableTextBuilder
     {
         $text = trim(preg_replace('/\s+/u', ' ', preg_replace('/\[[^\]]+\]/u', ' ', (string) $value) ?? '') ?? '');
         $text = trim(preg_replace('/[-_=]{2,}|\s+\|\s+|\bcontin[uú]a\b/iu', ' ', $text) ?? '', ' .;:-—');
+        if ($this->contaminated($text)) return '';
         return mb_strlen($text) > $limit ? mb_substr($text, 0, max(0, $limit - 3)) . '…' : $text;
+    }
+    private function contaminated(string $text): bool
+    {
+        $fold = strtr(mb_strtolower($text), ['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u']);
+        if ($text === '' || str_contains($text, '?') || str_contains($fold, 'fq ii')) return true;
+        return preg_match('/\\b(articulo|capitulo|tribunal|conciliacion|notaria|protocolizacion|antecedentes)\\b/u', $fold) === 1;
     }
 }

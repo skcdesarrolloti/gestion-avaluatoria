@@ -564,6 +564,19 @@ try {
         && str_contains((string) ($phMixedReport['report_text'] ?? ''), 'evita comparar o concluir con un solo mercado promedio')
         && str_contains((string) ($phMixedReport['report_text'] ?? ''), 'usos complementarios: Locales, apartamentos y parqueaderos'),
         'entregable PH mixto separa componentes por tipologia');
+    $phDirtyReport = (new AppraisalPhReportBuilder())->build(['ph_name' => 'PH OCR', 'coefficient' => '%'],
+        ['numero_pisos' => '2 pisos', 'numero_oficinas' => '15 oficinas',
+            'organizacion_interna' => '?s deberán _ ser abogados titulados. Tribunal de conciliación.',
+            'uso_dominante' => '?partida y ern cierra. ARTICULO SEIS DESTINO...',
+            'salvedades_validacion' => '?NDEROS DE LOS LOTES PROTOCOLIZACION CERTIFICADOS'],
+        [], [], [], [], 'oficinas', '', []);
+    $dirtyText = (string) ($phDirtyReport['report_text'] ?? '');
+    expect(!str_contains($dirtyText, 'coeficiente de copropiedad %')
+        && !str_contains($dirtyText, '15 oficinas')
+        && !str_contains($dirtyText, 'Tribunal de conciliación')
+        && !str_contains($dirtyText, '?partida')
+        && str_contains($dirtyText, 'Ley 675 de 2001'),
+        'entregable PH descarta OCR contaminado y agrega soporte normativo breve');
     $chambacuQuantity = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
         'area de construccion de 15.394,86 metros cuadrados. area de oficinas para un total de ciento cinco (105) oficinas. piso adicional intermedio que comprende veintiseis (26) oficinas. semisotano para ciento ochenta y cinco (185) parqueaderos.',
         ['reglamento.txt'], 'oficinas');

@@ -139,13 +139,18 @@ final class AppraisalPhReportBuilder
         $linkage = is_array($core['linkage'] ?? null) ? $core['linkage'] : [];
         $registration = $this->cleanName($linkage['legal_registration'] ?? '');
         $unit = $this->cleanName($core['private_unit'] ?? '');
-        $coef = $this->cleanName($core['coefficient'] ?? '');
+        $coef = $this->validCoefficient($core['coefficient'] ?? '');
         $parts = [];
         if ($registration !== '') $parts[] = "se identifica registralmente con matrícula inmobiliaria {$registration}";
         if ($unit !== '' && $coef !== '') $parts[] = "la unidad privada analizada corresponde a {$unit}, con coeficiente de copropiedad {$coef}";
         elseif ($unit !== '') $parts[] = "la unidad privada analizada corresponde a {$unit}";
-        elseif ($coef !== '') $parts[] = "se registra coeficiente de copropiedad {$coef}";
         return $parts ? ucfirst(implode('; ', $parts)) . '.' : '';
+    }
+    private function validCoefficient(mixed $value): string
+    {
+        $coef = $this->cleanName($value);
+        if ($coef === '' || $coef === '%' || !preg_match('/\d/u', $coef) || str_contains($coef, '?')) return '';
+        return $coef;
     }
     private function dotationLevel(array $technical): string
     {
