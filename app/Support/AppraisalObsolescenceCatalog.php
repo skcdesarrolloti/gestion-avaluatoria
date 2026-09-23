@@ -73,13 +73,26 @@ final class AppraisalObsolescenceCatalog
         ];
     }
 
+    public static function normativeAcademy(): array
+    {
+        return [
+            ['src'=>'NTS S 03 · Informe', 'asks'=>'El informe debe identificar alcance, información examinada, metodología, análisis, soportes, hipótesis y salvedades.', 'use'=>'Aquí cada hallazgo queda separado por tipo de obsolescencia, factor revisado y soporte breve para que el texto sea trazable.'],
+            ['src'=>'NTS M 01 / metodología', 'asks'=>'La depreciación u obsolescencia solo debe incorporarse cuando haga parte del método aplicado y esté explicada.', 'use'=>'Marcar un hallazgo no descuenta valor; solo advierte que el analista debe decidir si afecta costo, mercado, renta o comparación.'],
+            ['src'=>'Decreto 422 de 2000', 'asks'=>'Si el avalúo usa un sistema de depreciación, se debe indicar el método usado y por qué es apropiado frente a alternativas.', 'use'=>'El campo “Incidencia económica” deja constancia de que no hay efecto material o de que la cuantificación se soporta aparte.'],
+            ['src'=>'IVS 103 · Enfoques', 'asks'=>'El valuador selecciona el enfoque y método más apropiado según el activo, propósito, datos disponibles y circunstancias.', 'use'=>'La obsolescencia se lee como insumo del enfoque seleccionado; no reemplaza el juicio profesional ni la selección metodológica.'],
+            ['src'=>'IVS 104 · Datos', 'asks'=>'Los datos e insumos significativos deben ser relevantes, observables cuando sea posible y consistentes con el propósito.', 'use'=>'El soporte breve debe decir de dónde sale el hallazgo: visita, foto, documento, mercado, comparable, norma o cálculo.'],
+            ['src'=>'IVS 106 · Reporte', 'asks'=>'La documentación y el informe deben permitir seguir la lógica, los supuestos, las limitaciones y las conclusiones.', 'use'=>'El texto sugerido separa física, funcional, externa e incidencia valuatoria para que el lector no confunda diagnóstico con descuento.'],
+            ['src'=>'Ayuda interna', 'asks'=>'La escala Sin hallazgo / Leve / Relevante / Crítica no proviene de NTS ni IVS.', 'use'=>'Solo prioriza revisión y alertas en pantalla. No es fórmula normativa, no es porcentaje de depreciación y no genera castigo automático.'],
+        ];
+    }
+
     public static function valuationGuidance(): array
     {
         return [
-            'NTS: el informe debe dejar trazabilidad de metodología, soportes, salvedades y criterio del valuador; esta pantalla organiza esa lectura.',
-            'IVS: la obsolescencia se analiza dentro del enfoque y método aplicable, con datos e insumos verificables y documentación suficiente; no hay una escala normativa 0-3 en este módulo.',
-            'La escala de revisión es una ayuda interna de control; no es una escala normativa ni un porcentaje de descuento.',
-            'Si hay hallazgo material, el impacto debe sustentarse aparte: costo de corrección, ajuste frente a comparables, menor utilidad, restricción normativa o condición externa comprobable.',
+            'Si no hay hallazgo: dejarlo dicho en cada bloque y no aplicar descuento por obsolescencia.',
+            'Si hay hallazgo leve: documentar la señal; normalmente queda como advertencia si no tiene efecto material.',
+            'Si hay hallazgo relevante o crítico: soportar el efecto con visita, fotografías, documento, mercado, comparables, costo de corrección o restricción verificable.',
+            'Si se cuantifica: explicar aparte el método usado y la razón técnica; el puntaje de esta pantalla no es el cálculo económico.',
         ];
     }
     public static function defaults(): array { return ['summary_text'=>'', 'diagnosis_text'=>'', 'quantification_text'=>'', 'normative_text'=>'', 'factors'=>[], 'updated_at'=>null]; }

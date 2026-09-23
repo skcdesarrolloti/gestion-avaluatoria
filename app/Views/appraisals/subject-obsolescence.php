@@ -8,6 +8,7 @@ $scoreHelp = AppraisalObsolescenceCatalog::scoreHelp();
 $metaHelp = AppraisalObsolescenceCatalog::metaHelp();
 $factorHelp = AppraisalObsolescenceCatalog::factorHelp();
 $readerGuidance = AppraisalObsolescenceCatalog::readerGuidance();
+$normativeAcademy = AppraisalObsolescenceCatalog::normativeAcademy();
 $valuationGuidance = AppraisalObsolescenceCatalog::valuationGuidance();
 $factor = static fn (string $g, string $k, string $f): string => (string) ($obs['factors'][$g]['items'][$k][$f] ?? '');
 $meta = static fn (string $g): string => (string) ($obs['factors'][$g]['meta'] ?? '');
@@ -72,25 +73,7 @@ $groupInfoJson = json_encode($groupInfo, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS 
         <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800" x-text="globalLabel()">Resultado global: <?= e($globalLevel) ?></span>
     </div>
 
-    <div class="mt-5 grid gap-4 xl:grid-cols-[1.3fr_1fr]">
-        <div class="rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-sm leading-6 text-indigo-950">
-            <h3 class="font-semibold">Guía normativa y de revisión</h3>
-            <div class="mt-3 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
-                <p><strong>1. Revise factor por factor.</strong> Si está bien, use “Sin hallazgo”.</p>
-                <p><strong>2. Califique solo lo observado.</strong> La escala es apoyo interno; no es norma ni descuento.</p>
-                <p><strong>3. Soporte hallazgos.</strong> Relevante y crítica deben explicar la evidencia.</p>
-                <p><strong>4. Informe por tipo.</strong> Física, funcional y externa deben quedar diferenciadas.</p>
-                <p><strong>5. No castigue automático.</strong> La obsolescencia solo incide en valor si se sustenta.</p>
-                <p><strong>6. Si afecta valor, sustente.</strong> Use costos, mercado, comparables o criterio verificable.</p>
-            </div>
-        </div>
-        <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
-            <h3 class="font-semibold">Dónde se afecta el avalúo si aplica</h3>
-            <ul class="mt-2 list-disc space-y-1 pl-5">
-                <?php foreach ($valuationGuidance as $note): ?><li><?= e($note) ?></li><?php endforeach; ?>
-            </ul>
-        </div>
-    </div>
+    <?php require BASE_PATH . '/app/Views/appraisals/subject-obsolescence-academy.php'; ?>
 
     <div class="mt-6 grid gap-4 xl:grid-cols-[1fr_1fr]">
         <label class="label rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-950">Texto editable para el Entregable<textarea class="input mt-2 min-h-36 bg-white" rows="5" name="summary_text" x-model="summaryText" placeholder="Texto profesional de obsolescencias para incorporar al informe"><?= e($summary) ?></textarea><span class="mt-1 block text-xs font-normal text-emerald-800">Este es el texto que se guarda. Puedes usar el sugerido y luego ajustarlo.</span></label>
