@@ -5,6 +5,9 @@ $phTechnical = is_array($ph['technical'] ?? null) ? $ph['technical'] : [];
 $chapterOneData = is_array($chapterOne ?? null) ? $chapterOne : ['sections' => [], 'text' => ''];
 $chapterOneText = (string) ($chapterOneData['text'] ?? '');
 $chapterOneSections = is_array($chapterOneData['sections'] ?? null) ? $chapterOneData['sections'] : [];
+$sectorChapterData = is_array($sectorChapter ?? null) ? $sectorChapter : ['sections' => [], 'text' => ''];
+$sectorChapterText = (string) ($sectorChapterData['text'] ?? '');
+$sectorChapterSections = is_array($sectorChapterData['sections'] ?? null) ? $sectorChapterData['sections'] : [];
 $chapter = is_array($subjectChapter ?? null) ? $subjectChapter : ['sections' => [], 'text' => ''];
 $chapterText = (string) ($chapter['text'] ?? '');
 $chapterSections = is_array($chapter['sections'] ?? null) ? $chapter['sections'] : [];
@@ -56,6 +59,35 @@ $phSummaryKeys = [
     <h2 class="mt-2 text-2xl font-semibold">Cómo queda la memoria descriptiva</h2>
     <div class="mt-5 grid gap-4">
         <?php foreach ($chapterOneSections as $section): ?>
+            <article class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6">
+                <h3 class="font-semibold text-slate-950"><?= e((string) ($section[0] ?? 'Sección')) ?></h3>
+                <p class="mt-2 whitespace-pre-wrap text-slate-700"><?= e((string) ($section[1] ?? '')) ?></p>
+            </article>
+        <?php endforeach; ?>
+    </div>
+</section>
+
+
+<section class="mt-8 rounded-2xl border border-amber-100 bg-amber-50 p-6 shadow-sm sm:p-8">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+            <p class="eyebrow">Capítulo 2 · Información del sector</p>
+            <h2 class="mt-2 text-2xl font-semibold text-amber-950">Texto consolidado del sector y entorno</h2>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-amber-900">
+                Se construye con barrio, delimitación, servicios, usos, norma urbana, vías, transporte,
+                edificaciones, soportes gráficos y salvedades. El banco barrial y MIDAS quedan como respaldo.
+            </p>
+        </div>
+        <a class="rounded-full bg-white px-4 py-2 text-sm font-bold text-amber-800" href="<?= e(url('avaluos/' . $record['id'] . '/sector')) ?>">Editar sector</a>
+    </div>
+    <textarea class="input mt-5 min-h-80 bg-white font-mono text-sm leading-6" rows="18" readonly><?= e($sectorChapterText) ?></textarea>
+</section>
+
+<section class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <p class="eyebrow">Capítulo 2 por secciones</p>
+    <h2 class="mt-2 text-2xl font-semibold">Cómo queda la información del sector</h2>
+    <div class="mt-5 grid gap-4">
+        <?php foreach ($sectorChapterSections as $section): ?>
             <article class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6">
                 <h3 class="font-semibold text-slate-950"><?= e((string) ($section[0] ?? 'Sección')) ?></h3>
                 <p class="mt-2 whitespace-pre-wrap text-slate-700"><?= e((string) ($section[1] ?? '')) ?></p>

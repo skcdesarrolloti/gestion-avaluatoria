@@ -135,20 +135,19 @@ final class Kernel
                 'valuations' => new ValuationController(),
                 default => new AppraisalController(new AppraisalRepository($db), $user, new AppraiserRepository($db),
                     new IgacTypologyRepository(), new \App\Models\AppraisalPhRepository($db), new AppraisalSubjectRepository($db),
-                    new \App\Models\AppraisalObsolescenceRepository($db), new \App\Services\AppraisalDossierNumberer($db)),
+                    new \App\Models\AppraisalObsolescenceRepository($db), new \App\Services\AppraisalDossierNumberer($db),
+                    new \App\Models\AppraisalSectorRepository($db), new \App\Models\AppraisalSectorSectionRepository($db)),
             };
             $instance->$action(...array_slice($matches, 1));
             return;
         }
         throw new HttpException($matchedPath ? 405 : 404, $matchedPath ? 'Método no permitido.' : 'Página no encontrada.');
     }
-
     private function postedUsername(): string
     {
         $username = $_POST['username'] ?? '';
         return is_string($username) ? substr($username, 0, 190) : '';
     }
-
     private function uploadLikelyExceededPostLimit(): bool
     {
         $length = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0);
@@ -158,7 +157,6 @@ final class Kernel
         $limit = $this->iniBytes((string) ini_get('post_max_size'));
         return $limit > 0 && $length > $limit;
     }
-
     private function iniBytes(string $value): int
     {
         $value = trim($value);

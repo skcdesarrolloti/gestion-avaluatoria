@@ -21,6 +21,7 @@ use App\Services\AppraisalPhDocumentUploadService;
 use App\Services\AppraisalExternalOcrClient;
 use App\Services\AppraisalPhExternalOcrService;
 use App\Services\AppraisalSectorInput;
+use App\Services\AppraisalSectorChapterReport;
 use App\Services\AppraisalSubjectChapterReport;
 use App\Services\AppraisalMidasReview;
 use App\Services\AppraisalMidasSupportUploadService;
@@ -483,6 +484,21 @@ Certificado de tradicion.",
     expect(str_contains($reasonableBasis['text'], 'Valor Razonable')
         && str_contains($reasonableBasis['text'], 'participantes de mercado')
         && str_contains($reasonableBasis['text'], 'activo'), 'base de valor razonable queda definida de forma ampliada');
+    $sectorChapter = (new AppraisalSectorChapterReport())->build([],
+        ['neighborhood_name' => 'Chambacú', 'locality_name' => 'Localidad Histórica y del Caribe Norte', 'commune_ucg' => 'UCG 1', 'city_name' => 'Cartagena de Indias'],
+        ['services_status' => 'completa', 'predominant_use' => 'comercial', 'urban_norm' => 'Mixto 2 institucional y comercial',
+            'access_roads' => 'Avenida Pedro de Heredia y vías internas del proyecto.', 'public_space_state' => 'bueno',
+            'public_transport' => 'amplio', 'connectivity' => 'alta', 'nearby_facilities' => 'Parque Espíritu del Manglar y Mall Plaza.',
+            'sector_report_text' => 'Entorno con locales comerciales y bodegas fuera del perímetro inmediato.'],
+        ['01' => ['data_json' => json_encode(['barrio' => 'Chambacú', 'norte' => 'Laguna del Cabrero', 'sur' => 'Ciudad Antigua'])],
+         '03' => ['data_json' => json_encode(['acueducto' => 'SI', 'energia' => 'SI', 'gas' => 'SI', 'internet_operadores' => ['Claro', 'Tigo']])],
+         '11' => ['data_json' => json_encode(['tipos_transporte_identificados' => ['Ruta Transcaribe', 'Taxis'], 'detalle_rutas_transporte' => 'Rutas sobre la Avenida Pedro de Heredia.'])],
+         '12' => ['data_json' => json_encode(['edificaciones_ancla' => 'Parque Espíritu del Manglar y Mall Plaza.'])]]);
+    expect(str_contains($sectorChapter['text'], '2.1 Localización')
+        && str_contains($sectorChapter['text'], '2.13 Tipos de edificación')
+        && str_contains($sectorChapter['text'], 'Chambacú')
+        && str_contains($sectorChapter['text'], 'Avenida Pedro de Heredia')
+        && str_contains($sectorChapter['text'], 'NTS I 01'), 'entregable sectorial respeta contenido del capitulo 2 del word');
     $constructionRows = AppraisalChapterZeroInput::unitConstructionData();
     expect($constructionRows[0]['built_area_adopted_m2'] === '85.25'
         && str_contains($constructionRows[0]['construction_conservation_json'], 'estructura'), 'construccion por unidad normalizada');

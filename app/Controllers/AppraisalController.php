@@ -7,10 +7,13 @@ use App\Core\Session;
 use App\Models\AppraisalObsolescenceRepository;
 use App\Models\AppraisalPhRepository;
 use App\Models\AppraisalRepository;
+use App\Models\AppraisalSectorRepository;
+use App\Models\AppraisalSectorSectionRepository;
 use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraiserRepository;
 use App\Models\IgacTypologyRepository;
 use App\Services\AppraisalChapterOneReport;
+use App\Services\AppraisalSectorChapterReport;
 use App\Services\AppraisalDossierNumberer;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalSubjectChapterReport;
@@ -22,7 +25,8 @@ final class AppraisalController
     public function __construct(private AppraisalRepository $appraisals, private array $user,
         private AppraiserRepository $appraisers, private IgacTypologyRepository $typologies,
         private ?AppraisalPhRepository $ph = null, private ?AppraisalSubjectRepository $subjects = null,
-        private ?AppraisalObsolescenceRepository $obsolescence = null, private ?AppraisalDossierNumberer $dossiers = null) {}
+        private ?AppraisalObsolescenceRepository $obsolescence = null, private ?AppraisalDossierNumberer $dossiers = null,
+        private ?AppraisalSectorRepository $sectors = null, private ?AppraisalSectorSectionRepository $sectorSections = null) {}
 
     public function index(): void
     {
@@ -62,9 +66,12 @@ final class AppraisalController
         $units = $this->appraisals->units($id, $this->user['id']);
         $obsolescence = $this->obsolescence?->find($id, $this->user['id']) ?? [];
         $chapterOne = (new AppraisalChapterOneReport())->build($record, $subject, $units);
+        $sector = $this->sectors?->find($id, $this->user['id']) ?? [];
+        $sectorRows = $this->sectorSections?->sections($id, $this->user['id']) ?? [];
+        $sectorChapter = (new AppraisalSectorChapterReport())->build($record, $subject, $sector, $sectorRows);
         $subjectChapter = (new AppraisalSubjectChapterReport())->build($record, $subject, $units, $phProfile, $obsolescence);
         view('appraisals/deliverable', ['title' => 'Entregable', 'record' => $record,
-            'phProfile' => $phProfile, 'chapterOne' => $chapterOne, 'subjectChapter' => $subjectChapter]);
+            'phProfile' => $phProfile, 'chapterOne' => $chapterOne, 'sectorChapter' => $sectorChapter, 'subjectChapter' => $subjectChapter]);
     }
 
     public function saveChapterZero(string $id): never
