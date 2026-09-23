@@ -148,3 +148,4 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional',
         <?php require BASE_PATH . '/app/Views/appraisals/chapter-zero-aside.php'; ?>
     </form>
 </div>
+<?php require BASE_PATH . '/app/Views/appraisals/report-extra-notes.php'; ?>

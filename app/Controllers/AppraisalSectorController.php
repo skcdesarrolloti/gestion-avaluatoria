@@ -3,19 +3,19 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, Session};
 use App\Models\{AppraisalRepository, AppraisalSectorRepository, AppraisalSectorSectionRepository,
-    AppraisalSectorMidasFileRepository, AppraisalSubjectRepository, GeoMasterRepository, NeighborhoodSectorRepository, SectorBankRepository};
+    AppraisalSectorMidasFileRepository, AppraisalSubjectRepository, GeoMasterRepository, NeighborhoodSectorRepository,
+    SectorBankRepository, AppraisalReportNoteRepository};
 use App\Services\{AppraisalPhotoUploadService, AppraisalSectorInput, AppraisalSectorPrefill, AppraisalSectorRedirect,
     AppraisalSectorSectionInput, GeoNeighborhoodResolver};
-use App\Support\{AppraisalSectorAdvancedCatalog, AppraisalSectorCatalog, SectorBankCatalog};
+use App\Support\{AppraisalReportNoteCatalog, AppraisalSectorAdvancedCatalog, AppraisalSectorCatalog, SectorBankCatalog};
 final class AppraisalSectorController
 {
     public function __construct(
         private AppraisalRepository $appraisals, private AppraisalSectorRepository $sectors,
         private AppraisalSectorSectionRepository $sectorSections, private AppraisalSubjectRepository $subjects,
         private NeighborhoodSectorRepository $neighborhoodSectors, private SectorBankRepository $sectorBank, private GeoMasterRepository $geo,
-        private AppraisalSectorMidasFileRepository $midasFiles, private array $user
+        private AppraisalSectorMidasFileRepository $midasFiles, private AppraisalReportNoteRepository $reportNotes, private array $user
     ) {}
-
     public function show(string $id): void
     {
         $record = $this->appraisals->find($id, $this->user['id']);
@@ -67,6 +67,10 @@ final class AppraisalSectorController
             'sectorAdvancedCatalog' => AppraisalSectorAdvancedCatalog::sections(),
             'sectorBankSources' => SectorBankCatalog::sources(),
             'photos' => $this->appraisals->photos($id, $this->user['id']),
+            'reportNotes' => $this->reportNotes->byChapter($id, $this->user['id'], '2'),
+            'reportNoteSections' => AppraisalReportNoteCatalog::sections('2'),
+            'reportNoteChapter' => '2',
+            'reportNoteReturn' => 'avaluos/' . $id . '/sector',
             'photoMessage' => Session::pullFlash('sector_photo_message'),
             'photoError' => Session::pullFlash('sector_photo_error'),
             'midasFileMessage' => Session::pullFlash('sector_midas_file_message'),
@@ -78,17 +82,14 @@ final class AppraisalSectorController
             'sectorError' => $sectorError,
         ]);
     }
-
     public function save(string $id): never
     {
         try { $this->persistSector($id); Session::flash('sector_message', 'Numeral 2 guardado y banco barrial actualizado.'); }
         catch (\Throwable $error) { Session::flash('sector_error', $error->getMessage()); }
         AppraisalSectorRedirect::afterSave($id, $_POST);
     }
-
     public function autosave(string $id): never
     { $this->persistSector($id); Http::json(['ok' => true, 'saved_at' => gmdate('Y-m-d\TH:i:s\Z')]); }
-
     private function persistSector(string $id): void
     {
         $this->appraisals->find($id, $this->user['id']); $data = AppraisalSectorInput::data($_POST);
@@ -130,7 +131,6 @@ final class AppraisalSectorController
         }
         Http::redirect('avaluos/' . $id . '/sector');
     }
-
     public function refreshSources(string $id): never
     {
         $this->appraisals->find($id, $this->user['id']);
@@ -154,7 +154,6 @@ final class AppraisalSectorController
         }
         Http::redirect('avaluos/' . $id . '/sector');
     }
-
     public function uploadPhotos(string $id): never
     {
         $record = $this->appraisals->find($id, $this->user['id']);

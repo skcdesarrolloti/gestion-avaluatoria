@@ -7,6 +7,7 @@ use App\Core\Session;
 use App\Models\AppraisalObsolescenceRepository;
 use App\Models\AppraisalPhRepository;
 use App\Models\AppraisalRepository;
+use App\Models\AppraisalReportNoteRepository;
 use App\Models\AppraisalSectorRepository;
 use App\Models\AppraisalSectorSectionRepository;
 use App\Models\AppraisalSubjectRepository;
@@ -17,8 +18,10 @@ use App\Services\AppraisalSectorChapterReport;
 use App\Services\AppraisalDossierNumberer;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalSubjectChapterReport;
+use App\Services\AppraisalReportNoteIntegrator;
 use App\Services\AppraisalValidator;
 use App\Support\AppraisalCatalog;
+use App\Support\AppraisalReportNoteCatalog;
 
 final class AppraisalController
 {
@@ -26,7 +29,8 @@ final class AppraisalController
         private AppraiserRepository $appraisers, private IgacTypologyRepository $typologies,
         private ?AppraisalPhRepository $ph = null, private ?AppraisalSubjectRepository $subjects = null,
         private ?AppraisalObsolescenceRepository $obsolescence = null, private ?AppraisalDossierNumberer $dossiers = null,
-        private ?AppraisalSectorRepository $sectors = null, private ?AppraisalSectorSectionRepository $sectorSections = null) {}
+        private ?AppraisalSectorRepository $sectors = null, private ?AppraisalSectorSectionRepository $sectorSections = null,
+        private ?AppraisalReportNoteRepository $reportNotes = null) {}
 
     public function index(): void
     {
@@ -52,6 +56,10 @@ final class AppraisalController
             'appraisers' => $this->appraisers->eligibleForAssignment(),
             'dossierSearch' => $dossierSearch,
             'dossierRows' => array_slice($this->appraisals->recent($this->user['id'], 1, $dossierSearch, true), 0, 12),
+            'reportNotes' => $this->reportNotes?->byChapter($id, $this->user['id'], '1') ?? [],
+            'reportNoteSections' => AppraisalReportNoteCatalog::sections('1'),
+            'reportNoteChapter' => '1',
+            'reportNoteReturn' => 'avaluos/' . $id . '/expediente#identificacion',
             'chapterZeroMessage' => Session::pullFlash('chapter_zero_message'),
             'chapterZeroError' => Session::pullFlash('chapter_zero_error'),
             'catalog' => ['selects' => AppraisalCatalog::selectFields(), 'notes' => AppraisalCatalog::notes()]]);
@@ -65,11 +73,16 @@ final class AppraisalController
         $subject = $this->subjects?->find($id, $this->user['id']) ?? [];
         $units = $this->appraisals->units($id, $this->user['id']);
         $obsolescence = $this->obsolescence?->find($id, $this->user['id']) ?? [];
-        $chapterOne = (new AppraisalChapterOneReport())->build($record, $subject, $units);
+        $notes = $this->reportNotes?->byAppraisal($id, $this->user['id']) ?? [];
+        $integrator = new AppraisalReportNoteIntegrator();
+        $chapterOne = $integrator->apply((new AppraisalChapterOneReport())->build($record, $subject, $units),
+            $this->chapterNotes($notes, '1'));
         $sector = $this->sectors?->find($id, $this->user['id']) ?? [];
         $sectorRows = $this->sectorSections?->sections($id, $this->user['id']) ?? [];
-        $sectorChapter = (new AppraisalSectorChapterReport())->build($record, $subject, $sector, $sectorRows);
-        $subjectChapter = (new AppraisalSubjectChapterReport())->build($record, $subject, $units, $phProfile, $obsolescence);
+        $sectorChapter = $integrator->apply((new AppraisalSectorChapterReport())->build($record, $subject, $sector, $sectorRows),
+            $this->chapterNotes($notes, '2'));
+        $subjectChapter = $integrator->apply((new AppraisalSubjectChapterReport())->build($record, $subject, $units, $phProfile, $obsolescence),
+            $this->chapterNotes($notes, '3'));
         view('appraisals/deliverable', ['title' => 'Entregable', 'record' => $record,
             'phProfile' => $phProfile, 'chapterOne' => $chapterOne, 'sectorChapter' => $sectorChapter, 'subjectChapter' => $subjectChapter]);
     }
@@ -142,5 +155,9 @@ final class AppraisalController
         return $error instanceof HttpException
             ? $error->getMessage()
             : 'No fue posible guardar el expediente. Referencia: ' . $reference . '.';
+    }
+    private function chapterNotes(array $notes, string $chapter): array
+    {
+        return array_values(array_filter($notes, static fn (array $note): bool => (string) ($note['chapter_code'] ?? '') === $chapter));
     }
 }

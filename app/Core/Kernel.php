@@ -117,11 +117,14 @@ final class Kernel
                 'maintenance' => new MaintenanceController($db, $user),
                 'masters' => new MasterDataController(new AppraiserRepository($db)),
                 'standards' => new StandardController(new ValuationStandardRepository($db)),
+                'reportNotes' => new \App\Controllers\AppraisalReportNoteController(
+                    new AppraisalRepository($db), new \App\Models\AppraisalReportNoteRepository($db), $user),
                 'sector' => new \App\Controllers\AppraisalSectorController(new AppraisalRepository($db),
                     new \App\Models\AppraisalSectorRepository($db),
                     new \App\Models\AppraisalSectorSectionRepository($db), new AppraisalSubjectRepository($db),
                     new \App\Models\NeighborhoodSectorRepository($db), new \App\Models\SectorBankRepository($db),
-                    new GeoMasterRepository($db), new AppraisalSectorMidasFileRepository($db), $user),
+                    new GeoMasterRepository($db), new AppraisalSectorMidasFileRepository($db),
+                    new \App\Models\AppraisalReportNoteRepository($db), $user),
                 'sectorMidas' => new \App\Controllers\AppraisalSectorMidasController(new AppraisalRepository($db),
                     new \App\Models\AppraisalSectorRepository($db), new \App\Models\AppraisalSectorSectionRepository($db),
                     new AppraisalSubjectRepository($db), new \App\Models\SectorBankRepository($db), new AppraisalSectorMidasFileRepository($db), $user),
@@ -129,14 +132,16 @@ final class Kernel
                     new AppraisalLegalRepository($db), new AppraisalSubjectRepository($db), $user),
                 'subject' => new AppraisalSubjectController(new AppraisalRepository($db), $user,
                     new IgacTypologyRepository(), new AppraisalSubjectRepository($db), new GeoMasterRepository($db),
-                    new \App\Models\AppraisalPhRepository($db), new \App\Models\AppraisalObsolescenceRepository($db)),
+                    new \App\Models\AppraisalPhRepository($db), new \App\Models\AppraisalObsolescenceRepository($db),
+                    new \App\Models\AppraisalReportNoteRepository($db)),
                 'subjectPh' => new \App\Controllers\AppraisalPhController(new AppraisalRepository($db), new \App\Models\AppraisalPhRepository($db), $user),
                 'obsolescence' => new \App\Controllers\AppraisalObsolescenceController(new AppraisalRepository($db), new \App\Models\AppraisalObsolescenceRepository($db), $user),
                 'valuations' => new ValuationController(),
                 default => new AppraisalController(new AppraisalRepository($db), $user, new AppraiserRepository($db),
                     new IgacTypologyRepository(), new \App\Models\AppraisalPhRepository($db), new AppraisalSubjectRepository($db),
                     new \App\Models\AppraisalObsolescenceRepository($db), new \App\Services\AppraisalDossierNumberer($db),
-                    new \App\Models\AppraisalSectorRepository($db), new \App\Models\AppraisalSectorSectionRepository($db)),
+                    new \App\Models\AppraisalSectorRepository($db), new \App\Models\AppraisalSectorSectionRepository($db),
+                    new \App\Models\AppraisalReportNoteRepository($db)),
             };
             $instance->$action(...array_slice($matches, 1));
             return;
@@ -171,12 +176,10 @@ final class Kernel
             default => $bytes,
         };
     }
-
     private function authService(): AuthService
     {
         return new AuthService(new FuncionarioRepository(Database::connection('auth')));
     }
-
     private function loginInfrastructureError(\Throwable $error): void
     {
         error_log('Gestion avaluatoria login auth ' . get_class($error) . ' code=' . $error->getCode()
@@ -184,7 +187,6 @@ final class Kernel
         Session::flash('login_error', $this->loginErrorMessage($error));
         Session::flash('login_username', $this->postedUsername());
     }
-
     private function loginErrorMessage(\Throwable $error): string
     {
         $text = $error->getMessage();
@@ -208,7 +210,6 @@ final class Kernel
         }
         return 'No se pudo verificar el acceso. Revisa la conexión de funcionarios.';
     }
-
     private function loginData(): array
     {
         return ['title' => 'Iniciar sesión', 'error' => Session::pullFlash('login_error'),

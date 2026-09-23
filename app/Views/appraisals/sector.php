@@ -150,7 +150,6 @@ $sectorFormId = 'sector-form';
     <?php require BASE_PATH . '/app/Views/appraisals/sector-neighborhood-history.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/sector-midas-support.php'; ?>
 </section>
-
 <?php require BASE_PATH . '/app/Views/appraisals/sector-midas-review.php'; ?>
 
 <form id="<?= e($sectorFormId) ?>" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/sector')) ?>"
@@ -211,3 +210,4 @@ $sectorFormId = 'sector-form';
             @click="prepareSectorSave()" x-text="advanceLabel()">Guardar y pasar</button>
     </div>
 </section>
+<?php require BASE_PATH . '/app/Views/appraisals/report-extra-notes.php'; ?>

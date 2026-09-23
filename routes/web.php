@@ -56,6 +56,7 @@ return [
     ['GET', '#^/avaluos/([a-f0-9]{32})/caracteristicas-juridicas/certificados/([a-f0-9]{32})$#', 'legalCharacteristics', 'certificate', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/caracteristicas-juridicas/certificados/([a-f0-9]{32})/eliminar$#', 'legalCharacteristics', 'deleteCertificate', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/entregable$#', 'appraisals', 'deliverable', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/notas-entregable$#', 'reportNotes', 'save', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ficha-basica$#', 'subject', 'saveBasic', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ficha-basica/autoguardar$#', 'subject', 'autosaveBasic', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/preclasificacion$#', 'subject', 'savePreclassification', true],

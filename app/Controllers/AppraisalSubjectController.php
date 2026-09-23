@@ -2,18 +2,17 @@
 declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, HttpException, Session};
-use App\Models\{AppraisalPhRepository, AppraisalRepository, AppraisalSubjectRepository, GeoMasterRepository, IgacTypologyRepository};
+use App\Models\{AppraisalPhRepository, AppraisalRepository, AppraisalReportNoteRepository, AppraisalSubjectRepository, GeoMasterRepository, IgacTypologyRepository};
 use App\Services\{AppraisalAttributeInput, AppraisalChapterZeroInput, AppraisalExternalOcrClient, AppraisalPhotoUploadService, OcrTextExtractor};
 use App\Support\{AppraisalCatalog, AppraisalPhCatalog, AppraisalSpecialAttributeCatalog, AppraisalSubjectCatalog};
-
+use App\Support\AppraisalReportNoteCatalog;
 final class AppraisalSubjectController
 {
     public function __construct(
         private AppraisalRepository $appraisals, private array $user, private IgacTypologyRepository $typologies,
         private AppraisalSubjectRepository $subjects, private GeoMasterRepository $geo, private AppraisalPhRepository $ph,
-        private \App\Models\AppraisalObsolescenceRepository $obsolescence
+        private \App\Models\AppraisalObsolescenceRepository $obsolescence, private ?AppraisalReportNoteRepository $reportNotes = null
     ) {}
-
     public function show(string $id): void
     {
         $record = $this->appraisals->find($id, $this->user['id']);
@@ -54,6 +53,10 @@ final class AppraisalSubjectController
             'specialAttributeOptions' => AppraisalSpecialAttributeCatalog::selectOptions(),
             'subjectCatalog' => AppraisalSubjectCatalog::selects(),
             'subjectHelp' => AppraisalSubjectCatalog::helps(),
+            'reportNotes' => $this->reportNotes?->byChapter($id, $this->user['id'], '3') ?? [],
+            'reportNoteSections' => AppraisalReportNoteCatalog::sections('3'),
+            'reportNoteChapter' => '3',
+            'reportNoteReturn' => 'avaluos/' . $id . '/bien-sujeto',
             'subjectMessage' => Session::pullFlash('subject_message'),
             'subjectError' => Session::pullFlash('subject_error'),
             'phMessage' => Session::pullFlash('ph_message'),
@@ -67,16 +70,12 @@ final class AppraisalSubjectController
             'preclassError' => Session::pullFlash('chapter_zero_preclass_error'),
             'catalog' => ['selects' => AppraisalCatalog::selectFields(), 'notes' => AppraisalCatalog::notes()]]);
     }
-
     public function saveBasic(string $id): never
     { $this->saveSubjectData($id, fn () => $this->subjects->save($id, $this->user['id'], $_POST), 'Ficha básica del sujeto guardada correctamente.', '#ficha-basica'); }
-
     public function autosaveBasic(string $id): never
     { $this->appraisals->find($id, $this->user['id']); $this->subjects->save($id, $this->user['id'], $_POST); $this->savedJson(); }
-
     public function saveUnits(string $id): never
     { $this->saveUnitsAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }
-
     public function autosaveUnits(string $id): never
     {
         $this->appraisals->find($id, $this->user['id']);

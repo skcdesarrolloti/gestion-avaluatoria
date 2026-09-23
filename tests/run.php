@@ -22,6 +22,7 @@ use App\Services\AppraisalExternalOcrClient;
 use App\Services\AppraisalPhExternalOcrService;
 use App\Services\AppraisalSectorInput;
 use App\Services\AppraisalSectorChapterReport;
+use App\Services\AppraisalReportNoteIntegrator;
 use App\Services\AppraisalSubjectChapterReport;
 use App\Services\AppraisalMidasReview;
 use App\Services\AppraisalMidasSupportUploadService;
@@ -51,6 +52,7 @@ use App\Controllers\AppraisalSubjectController;
 use App\Models\AppraisalLegalRepository;
 use App\Models\AppraisalPhRepository;
 use App\Models\AppraisalRepository;
+use App\Models\AppraisalReportNoteRepository;
 use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraiserRepository;
 use App\Models\FuncionarioRepository;
@@ -141,6 +143,9 @@ try {
         assignment_description TEXT DEFAULT '', assignment_limitations TEXT DEFAULT '', assignment_hypotheses TEXT DEFAULT '', assignment_report_text TEXT DEFAULT '',
         source_documents TEXT DEFAULT '', source_documents_json TEXT DEFAULT '', location_description TEXT DEFAULT '', location_image_reference TEXT DEFAULT '', request_date TEXT, visit_date TEXT, value_date TEXT, report_date TEXT,
         version INTEGER DEFAULT 1, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE appraisal_report_notes (id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER,
+        chapter_code TEXT, section_code TEXT, title TEXT, body TEXT, source_note TEXT,
+        sort_order INTEGER, include_in_report INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_standard_categories (code TEXT PRIMARY KEY, name TEXT, group_type TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_standards (slug TEXT PRIMARY KEY, category_code TEXT, standard_code TEXT, title TEXT, kind TEXT, sector_code TEXT, source_filename TEXT, storage_filename TEXT, summary TEXT, file_size_bytes INTEGER, pdf_blob BLOB, imported_at TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("INSERT INTO valuation_standard_categories VALUES
@@ -484,6 +489,18 @@ Certificado de tradicion.",
     expect(str_contains($reasonableBasis['text'], 'Valor Razonable')
         && str_contains($reasonableBasis['text'], 'participantes de mercado')
         && str_contains($reasonableBasis['text'], 'activo'), 'base de valor razonable queda definida de forma ampliada');
+    $notes = new AppraisalReportNoteRepository($db);
+    $notes->saveRows('11111111111111111111111111111111', 7, '1', [[
+        'section_code' => '1.3.4', 'title' => 'Alcance NIIF',
+        'body' => 'Cuando la finalidad es contable, la base se explica sobre el activo medido.',
+        'source_note' => 'Encargo y soporte NIIF aportado', 'sort_order' => 1,
+    ]]);
+    $integratedReport = (new AppraisalReportNoteIntegrator())->apply($reasonableBasis,
+        $notes->byChapter('11111111111111111111111111111111', 7, '1'));
+    expect(str_contains($integratedReport['text'], 'Ampliaciones del analista')
+        && str_contains($integratedReport['text'], 'Alcance NIIF')
+        && str_contains($integratedReport['text'], 'Encargo y soporte NIIF aportado'),
+        'ampliaciones por numeral alimentan el entregable desde base de datos');
     $sectorChapter = (new AppraisalSectorChapterReport())->build([],
         ['neighborhood_name' => 'Chambacú', 'locality_name' => 'Localidad Histórica y del Caribe Norte', 'commune_ucg' => 'UCG 1', 'city_name' => 'Cartagena de Indias'],
         ['services_status' => 'completa', 'predominant_use' => 'comercial', 'urban_norm' => 'Mixto 2 institucional y comercial',

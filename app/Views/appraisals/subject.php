@@ -17,6 +17,7 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
     </div>
     <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Sujeto del avalúo</span>
 </div>
+<?php require BASE_PATH . '/app/Views/appraisals/report-extra-notes.php'; ?>
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
 <div class="mt-7"
