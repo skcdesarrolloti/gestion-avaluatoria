@@ -74,19 +74,25 @@ final class AppraisalChapterOneReport
         $key = (string) ($r['base_valor'] ?? '');
         $basis = $this->basisLabel($r);
         $definitions = [
-            'mercado' => 'Los criterios empleados se fundamentan en la base de Valor de Mercado, entendida como la cuantía estimada por la que un bien podría intercambiarse en la fecha de valuación entre partes dispuestas, informadas, prudentes y sin coacción, tras una comercialización adecuada.',
-            'razonable' => 'Los criterios empleados se fundamentan en la base de Valor Razonable, entendida como una medición orientada a participantes de mercado en una transacción ordenada en la fecha de medición, especialmente cuando el encargo tiene finalidad contable, financiera o de revelación bajo NIIF.',
-            'depreciable' => 'Los criterios empleados se fundamentan en la base de Valor Depreciable, usada para analizar costo atribuible, vida útil, depreciación, deterioro o reposición del activo cuando la finalidad exige separar componentes físicos y económicos sujetos a consumo o desgaste.',
-            'renta' => 'Los criterios empleados se fundamentan en la base de Valor de Renta, orientada a estimar la capacidad del inmueble para producir cánones o ingresos inmobiliarios, distinguiendo la renta propia del activo de ingresos de negocios que puedan operar en él.',
-            'catastral' => 'Los criterios empleados se fundamentan en la base de Valor Catastral, aplicable para finalidades administrativas, fiscales o catastrales conforme al marco competente; esta base no reemplaza automáticamente el valor de mercado.',
-            'residual' => 'Los criterios empleados se fundamentan en la base de Valor Residual, estimada a partir del potencial de desarrollo o aprovechamiento del activo, descontando costos, tiempos, utilidad esperada, riesgos y restricciones normativas verificables.',
+            'mercado' => 'Los criterios empleados se fundamentan en la base de Valor de Mercado. Definición del Valor de Mercado: la cuantía estimada por la que un bien podría intercambiarse en la fecha de valuación, entre un comprador dispuesto a comprar y un vendedor dispuesto a vender, en una transacción libre tras una comercialización adecuada, en la que las partes hayan actuado con información suficiente, de manera prudente y sin coacción.',
+            'razonable' => 'Los criterios empleados se fundamentan en la base de Valor Razonable. Definición del Valor Razonable: precio que sería recibido por vender un activo o pagado por transferir un pasivo en una transacción ordenada entre participantes de mercado en la fecha de medición. Cuando el encargo se formula bajo NIIF, la lectura se expresa sobre el activo y sus circunstancias de uso, mercado, estado, restricciones y datos observables disponibles.',
+            'depreciable' => 'Los criterios empleados se fundamentan en la base de Valor Depreciable. Definición del Valor Depreciable: importe de un activo, o el importe que lo sustituya, que se distribuye sistemáticamente durante su vida útil. Esta base exige relacionar costo atribuible, vida útil, depreciación acumulada, deterioro, reposición o consumo de beneficios económicos según el alcance contable o técnico del encargo.',
+            'renta' => 'Los criterios empleados se fundamentan en la base de Valor de Renta. Definición del Valor de Renta: estimación del ingreso periódico atribuible al derecho inmobiliario analizado, conforme a condiciones de mercado, uso permitido, estado del activo, gastos, vacancia, riesgo y demás variables aplicables. Debe distinguirse la renta inmobiliaria de los ingresos del negocio que eventualmente opere en el inmueble.',
+            'catastral' => 'Los criterios empleados se fundamentan en la base de Valor Catastral. Definición del Valor Catastral: valor determinado para fines catastrales, fiscales o administrativos conforme al marco técnico y legal aplicable por la autoridad competente. Esta base no reemplaza automáticamente el valor de mercado ni el valor razonable, salvo que el encargo y la norma aplicable así lo exijan.',
+            'residual' => 'Los criterios empleados se fundamentan en la base de Valor Residual. Definición del Valor Residual: estimación que parte del valor esperado del proyecto, desarrollo o aprovechamiento permitido del activo y descuenta costos directos e indirectos, tiempos, utilidad esperada, riesgo, financiación y restricciones normativas verificables para inferir el valor del suelo o del activo base.',
         ];
         return $definitions[$key] ?? 'Los criterios empleados se fundamentan en la base de ' . $basis . ', según la finalidad, el alcance y la información disponible del encargo.';
     }
     private function valueDate(array $r): string { return 'La fecha de aplicación de la estimación corresponde a ' . $this->date($r['value_date'] ?? '') . '.'; }
     private function scope(array $r): string { return $this->text($r['assignment_scope'] ?? '') ?: 'El informe puede ser utilizado por el destinatario para los fines indicados en el encargo, dentro del alcance técnico, documental y temporal aquí señalado.'; }
     private function limitations(array $r): string { return $this->text($r['assignment_limitations'] ?? '') ?: 'No se registran condiciones contingentes o restrictivas especiales distintas de las salvedades, soportes y limitaciones expresamente indicadas en el informe.'; }
-    private function location(array $r, array $s, array $u): string { return $this->locationText($r, $s) !== '' ? 'El inmueble se localiza en ' . $this->locationText($r, $s) . '.' : 'La localización queda pendiente de precisión en la ficha del bien sujeto.'; }
+    private function location(array $r, array $s, array $u): string
+    {
+        $manual = $this->text($r['location_description'] ?? '');
+        $base = $manual !== '' ? $manual : ($this->locationText($r, $s) !== '' ? 'El inmueble se localiza en ' . $this->locationText($r, $s) . '.' : 'La localización queda pendiente de precisión en la ficha del bien sujeto.');
+        $image = $this->text($r['location_image_reference'] ?? '');
+        return $image !== '' ? $base . ' Soporte visual de localización: ' . $this->end($image) : $base;
+    }
     private function object(array $r): string { return 'El objeto del avalúo es estimar ' . mb_strtolower($this->basisLabel($r)) . ' del inmueble objeto de valuación, conforme a la finalidad del encargo.'; }
     private function recipient(array $r): string { return 'El destinatario de la valuación corresponde a ' . $this->end($this->first($r['report_recipient'] ?? '', $r['client_name'] ?? 'el solicitante')); }
     private function type(array $r): string { return 'Corresponde a ' . mb_strtolower($this->labelFor('tipo', $r['tipo'] ?? 'avalúo pendiente de clasificar')) . ' para un activo con destinación ' . mb_strtolower($this->labelFor('destinacion', $r['destinacion'] ?? 'por definir')) . '.'; }
@@ -98,13 +104,27 @@ final class AppraisalChapterOneReport
     }
     private function documents(array $r): string
     {
+        $selected = $this->selectedDocumentLabels($r);
         $docs = $this->blockText($r['source_documents'] ?? '');
-        if ($docs !== '') return $docs;
+        $parts = [];
+        if ($selected) $parts[] = 'Documentos marcados como aportados o revisados: ' . implode('; ', $selected) . '.';
+        if ($docs !== '') $parts[] = $docs;
+        if ($parts) return implode("\n", $parts);
         return 'Documentos e insumos pendientes de relacionar: escritura pública, certificado de tradición y libertad, impuesto predial, documentos de identificación tributaria, reglamento de propiedad horizontal, fotografías y demás soportes aportados según aplique.';
     }
     private function normative(array $r): string
     {
         return 'Este capítulo se estructura con base en NTS S 03 y NTS I 01 para identificar solicitante, activo, derechos valuados, uso previsto, base de valor, fechas, alcance, condiciones restrictivas, información examinada y salvedades. El Decreto 1420 de 1998 soporta la identificación de localización, características físicas, jurídicas y económicas del inmueble. Las IVS se toman como referencia de alcance, base de valor, datos, supuestos, limitaciones y reporte. La información consignada organiza el encargo valuatorio y no sustituye estudio de títulos, certificación administrativa ni verificación jurídica especializada.';
+    }
+
+    private function selectedDocumentLabels(array $r): array
+    {
+        $decoded = json_decode((string) ($r['source_documents_json'] ?? ''), true);
+        if (!is_array($decoded)) return [];
+        $options = AppraisalCatalog::sourceDocumentOptions();
+        $labels = [];
+        foreach ($decoded as $key) if (isset($options[(string) $key])) $labels[] = $options[(string) $key];
+        return $labels;
     }
 
     private function locationText(array $r, array $s): string { return $this->first($s['adopted_address'] ?? '', $s['address'] ?? '', $r['direccion'] ?? '') . ($this->first($s['city_name'] ?? '', $r['municipio'] ?? '') !== '' ? ', ' . $this->first($s['city_name'] ?? '', $r['municipio'] ?? '') : ''); }

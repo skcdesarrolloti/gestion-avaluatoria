@@ -79,9 +79,10 @@ final class AppraisalCatalog
     {
         return [
             'client_name' => 160, 'requester_name' => 160, 'requester_identification' => 80,
-            'requester_capacity' => 220, 'property_owner_name' => 160, 'report_recipient' => 160, 'intended_use' => 220,
+            'requester_capacity' => 220, 'property_owner_name' => 160, 'report_recipient' => 160, 'intended_use' => 1200,
             'assignment_description' => 2000, 'assignment_scope' => 2000, 'assignment_limitations' => 2000, 'assignment_hypotheses' => 2000,
             'assignment_report_text' => 5000, 'source_documents' => 3000,
+            'location_description' => 2000, 'location_image_reference' => 1000, 'source_documents_json' => 2000,
         ];
     }
 
@@ -90,6 +91,22 @@ final class AppraisalCatalog
         return array_fill_keys(array_merge(self::fieldKeys(), array_keys(self::assignmentFields()), [
             'request_date', 'visit_date', 'value_date', 'report_date', 'expediente_number',
         ]), '');
+    }
+
+    public static function sourceDocumentOptions(): array
+    {
+        return [
+            'solicitud' => 'Solicitud del avalúo o comunicación del encargo',
+            'identificacion_solicitante' => 'Identificación, RUT o soporte del solicitante',
+            'certificado_tradicion' => 'Certificado de tradición y libertad',
+            'escritura_publica' => 'Escritura pública o título aportado',
+            'impuesto_predial' => 'Factura o paz y salvo de impuesto predial',
+            'reglamento_ph' => 'Reglamento de propiedad horizontal o escritura PH',
+            'soporte_areas' => 'Soporte de áreas: escritura, certificado, catastro o predial',
+            'fotografias' => 'Fotografías de visita, entorno, fachada o localización',
+            'mapa_localizacion' => 'Mapa, captura o referencia de localización',
+            'otros' => 'Otros soportes del encargo',
+        ];
     }
 
     public static function allowedValues(string $field): array
@@ -108,8 +125,8 @@ final class AppraisalCatalog
             'tipo_inmueble' => 'NTS I 01: permite describir el activo urbano según su tipología física y funcional.',
             'subtipo_funcional' => 'Ayuda interna: precisa la tipología para activar campos técnicos y comparables pertinentes.',
             'finalidad' => 'NTS S 03: define el propósito y uso que se pretende dar a la valuación.',
-            'base_valor' => 'NTS S 01/S 02 e IVS: la base de valor define la premisa de medición que debe explicarse en el informe.',
-            'aplica_niif' => 'NIIF/IVS: se activa cuando el encargo tenga medición contable, valor razonable o deterioro.',
+            'base_valor' => 'NTS S 03, NTS I 01 e IVS: la base de valor define la premisa de medición y debe salir explicada de forma amplia en el informe.',
+            'aplica_niif' => 'NIIF/IVS: se activa cuando el encargo exige medición contable del activo, valor razonable, deterioro o revelación financiera.',
             'regimen_ph' => 'Ley 675 de 2001, Decreto 1420 de 1998 y NTS I 01: identifica si el bien está sometido a propiedad horizontal.',
             'estructura_metodo' => 'NTS M 01: ordena la unidad de análisis para evitar duplicar áreas, comunes o componentes.',
         ][$field] ?? '';

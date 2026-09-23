@@ -10,8 +10,8 @@ $hasDossierNumber = trim($field('expediente_number')) !== '';
 $notes = $catalog['notes'] ?? [];
 $initial = ['notes' => $notes];
 $currentStep = 'expediente';
-$configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional', 'destinacion',
-    'base_valor', 'aplica_niif', 'regimen_ph', 'estructura_metodo'];
+$configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional',
+    'aplica_niif', 'regimen_ph', 'estructura_metodo'];
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">

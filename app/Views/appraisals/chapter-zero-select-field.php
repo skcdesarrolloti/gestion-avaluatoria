@@ -2,7 +2,7 @@
 use App\Support\AppraisalCatalog;
 
 [$label, $placeholder, , $help, $options] = AppraisalCatalog::selectFields()[$name];
-$label = $name === 'aplica_niif' ? 'Activo empresarial' : $label;
+$label = $name === 'aplica_niif' ? '¿Aplica NIIF al activo?' : $label;
 $plain = !in_array($name, ['tipo_inmueble', 'subtipo_funcional'], true);
 $fieldSupport = AppraisalCatalog::fieldSupport($name);
 ?>

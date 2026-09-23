@@ -9,6 +9,7 @@ use App\Services\AppraisalValidator;
 use App\Services\AppraiserRaaCertificateParser;
 use App\Services\AppraisalAttributeInput;
 use App\Services\AppraisalChapterOneReport;
+use App\Services\AppraisalAssignmentInput;
 use App\Services\AppraisalDossierNumberer;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalPhInput;
@@ -101,7 +102,14 @@ try {
     $chapterOneViewHtml = ob_get_clean();
     expect(str_contains($chapterOneViewHtml, 'Uso previsto del informe')
         && str_contains($chapterOneViewHtml, 'Fecha de solicitud')
+        && str_contains($chapterOneViewHtml, 'Localización y dirección del inmueble')
+        && str_contains($chapterOneViewHtml, 'Checklist documental')
         && str_contains($chapterOneViewHtml, 'Documentos aportados o insumos'), 'numeral 1.2 renderiza despues de selectores');
+    $_POST = ['intended_use' => str_repeat('uso ', 80), 'source_documents_selected' => ['escritura_publica', 'mapa_localizacion', 'invalido']];
+    $assignmentInput = AppraisalAssignmentInput::data();
+    expect(strlen($assignmentInput['intended_use']) > 220
+        && json_decode($assignmentInput['source_documents_json'], true) === ['escritura_publica', 'mapa_localizacion'], 'expediente acepta concepto amplio y checklist documental');
+    $_POST = [];
     expectStatus(419, fn () => Session::csrf(), 'CSRF obligatorio');
     $_SERVER['HTTP_X_CSRF_TOKEN'] = 'test-token';
     Session::csrf();
@@ -130,7 +138,7 @@ try {
         tipo_derecho TEXT DEFAULT '', destinacion TEXT DEFAULT '', tipo_inmueble TEXT DEFAULT '', finalidad TEXT DEFAULT '',
         intended_use TEXT DEFAULT '', base_valor TEXT DEFAULT '', regimen_ph TEXT DEFAULT '', assignment_scope TEXT DEFAULT '',
         assignment_description TEXT DEFAULT '', assignment_limitations TEXT DEFAULT '', assignment_hypotheses TEXT DEFAULT '', assignment_report_text TEXT DEFAULT '',
-        source_documents TEXT DEFAULT '', request_date TEXT, visit_date TEXT, value_date TEXT, report_date TEXT,
+        source_documents TEXT DEFAULT '', source_documents_json TEXT DEFAULT '', location_description TEXT DEFAULT '', location_image_reference TEXT DEFAULT '', request_date TEXT, visit_date TEXT, value_date TEXT, report_date TEXT,
         version INTEGER DEFAULT 1, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_standard_categories (code TEXT PRIMARY KEY, name TEXT, group_type TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_standards (slug TEXT PRIMARY KEY, category_code TEXT, standard_code TEXT, title TEXT, kind TEXT, sector_code TEXT, source_filename TEXT, storage_filename TEXT, summary TEXT, file_size_bytes INTEGER, pdf_blob BLOB, imported_at TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
@@ -451,8 +459,11 @@ try {
         'tipo' => 'comercial', 'tipo_derecho' => 'dominio_pleno', 'destinacion' => 'comercial', 'tipo_inmueble' => 'oficina',
         'finalidad' => 'patrimonial', 'intended_use' => 'Actualizar libros contables.',
         'assignment_description' => 'Realizar el avaluo para establecer el valor de mercado del inmueble comercial.', 'base_valor' => 'mercado',
-        'regimen_ph' => 'si', 'source_documents' => "Escritura publica 259.
+        'regimen_ph' => 'si', 'source_documents_json' => json_encode(['escritura_publica', 'certificado_tradicion', 'mapa_localizacion']),
+        'source_documents' => "Escritura publica 259.
 Certificado de tradicion.",
+        'location_description' => 'Los inmuebles objeto del avalúo están localizados en el Edificio 19 del Proyecto Integrado Chambacú.',
+        'location_image_reference' => 'Insertar captura satelital de ubicación cargada en el registro fotográfico.',
         'request_date' => '2024-01-15', 'visit_date' => '2024-01-18', 'value_date' => '2024-01-18', 'report_date' => '2024-01-31', 'created_at' => '2024-01-15 00:00:00',
     ], ['adopted_address' => 'K 13 B # 26-78', 'city_name' => 'Cartagena de Indias'], [
         ['unit_kind' => 'property', 'label' => 'Oficina 206'], ['unit_kind' => 'annex', 'label' => 'Parqueadero No 60']
@@ -463,11 +474,15 @@ Certificado de tradicion.",
         && str_contains($chapterOneReport['text'], 'establecer el valor de mercado')
         && str_contains($chapterOneReport['text'], '830.133.850-6')
         && str_contains($chapterOneReport['text'], 'Valor de Mercado')
+        && str_contains($chapterOneReport['text'], 'comprador dispuesto a comprar')
+        && str_contains($chapterOneReport['text'], 'Soporte visual de localización')
+        && str_contains($chapterOneReport['text'], 'Escritura pública o título aportado')
         && str_contains($chapterOneReport['text'], 'Oficina 206, Parqueadero No 60')
         && str_contains($chapterOneReport['text'], 'NTS S 03'), 'entregable expediente construye memoria descriptiva normativa');
     $reasonableBasis = (new AppraisalChapterOneReport())->build(['base_valor' => 'razonable'], [], []);
     expect(str_contains($reasonableBasis['text'], 'Valor Razonable')
-        && str_contains($reasonableBasis['text'], 'participantes de mercado'), 'base de valor razonable queda definida de forma ampliada');
+        && str_contains($reasonableBasis['text'], 'participantes de mercado')
+        && str_contains($reasonableBasis['text'], 'activo'), 'base de valor razonable queda definida de forma ampliada');
     $constructionRows = AppraisalChapterZeroInput::unitConstructionData();
     expect($constructionRows[0]['built_area_adopted_m2'] === '85.25'
         && str_contains($constructionRows[0]['construction_conservation_json'], 'estructura'), 'construccion por unidad normalizada');
