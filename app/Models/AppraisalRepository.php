@@ -84,7 +84,7 @@ final class AppraisalRepository
         $fields = ['titulo', 'tipo', 'direccion', 'municipio', 'client_name', 'requester_name', 'requester_identification',
             'requester_capacity', 'property_owner_name', 'report_recipient', 'observaciones', 'tipo_derecho', 'tipo_negocio', 'destinacion',
             'tipo_inmueble', 'subtipo_funcional', 'finalidad', 'intended_use', 'request_date', 'visit_date', 'value_date',
-            'report_date', 'assignment_scope', 'assignment_limitations', 'assignment_hypotheses',
+            'report_date', 'assignment_description', 'assignment_scope', 'assignment_limitations', 'assignment_hypotheses',
             'assignment_report_text', 'source_documents', 'base_valor', 'aplica_niif', 'regimen_ph', 'estructura_metodo', 'appraiser_id',
             'igac_category', 'igac_typology_hint', 'igac_property_units_count', 'igac_annex_units_count',
             'inspection_notes', 'configuration_status'];

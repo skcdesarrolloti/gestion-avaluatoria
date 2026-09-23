@@ -117,7 +117,7 @@ try {
         requester_identification TEXT DEFAULT '', requester_capacity TEXT DEFAULT '', property_owner_name TEXT DEFAULT '', report_recipient TEXT DEFAULT '',
         tipo_derecho TEXT DEFAULT '', destinacion TEXT DEFAULT '', tipo_inmueble TEXT DEFAULT '', finalidad TEXT DEFAULT '',
         intended_use TEXT DEFAULT '', base_valor TEXT DEFAULT '', regimen_ph TEXT DEFAULT '', assignment_scope TEXT DEFAULT '',
-        assignment_limitations TEXT DEFAULT '', assignment_hypotheses TEXT DEFAULT '', assignment_report_text TEXT DEFAULT '',
+        assignment_description TEXT DEFAULT '', assignment_limitations TEXT DEFAULT '', assignment_hypotheses TEXT DEFAULT '', assignment_report_text TEXT DEFAULT '',
         source_documents TEXT DEFAULT '', request_date TEXT, visit_date TEXT, value_date TEXT, report_date TEXT,
         version INTEGER DEFAULT 1, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_standard_categories (code TEXT PRIMARY KEY, name TEXT, group_type TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
@@ -437,7 +437,8 @@ try {
         'client_name' => 'Asociacion Central de Pensionados de Ecopetrol S.A.', 'requester_name' => 'Dra Martha Espinosa B.',
         'requester_identification' => '830.133.850-6', 'requester_capacity' => 'directora Oficina Cartagena', 'report_recipient' => 'Asociacion Central de Pensionados de Ecopetrol S.A.',
         'tipo' => 'comercial', 'tipo_derecho' => 'dominio_pleno', 'destinacion' => 'comercial', 'tipo_inmueble' => 'oficina',
-        'finalidad' => 'patrimonial', 'intended_use' => 'Actualizar libros contables.', 'base_valor' => 'mercado',
+        'finalidad' => 'patrimonial', 'intended_use' => 'Actualizar libros contables.',
+        'assignment_description' => 'Realizar el avaluo para establecer el valor de mercado del inmueble comercial.', 'base_valor' => 'mercado',
         'regimen_ph' => 'si', 'source_documents' => "Escritura publica 259.
 Certificado de tradicion.",
         'request_date' => '2024-01-15', 'visit_date' => '2024-01-18', 'value_date' => '2024-01-18', 'report_date' => '2024-01-31', 'created_at' => '2024-01-15 00:00:00',
@@ -447,6 +448,7 @@ Certificado de tradicion.",
     expect(str_contains($chapterOneReport['text'], '1.1 Solicitud del avalúo')
         && str_contains($chapterOneReport['text'], 'directora Oficina Cartagena')
         && str_contains($chapterOneReport['text'], '15 de enero de 2024')
+        && str_contains($chapterOneReport['text'], 'establecer el valor de mercado')
         && str_contains($chapterOneReport['text'], '830.133.850-6')
         && str_contains($chapterOneReport['text'], 'Valor de Mercado')
         && str_contains($chapterOneReport['text'], 'Oficina 206, Parqueadero No 60')

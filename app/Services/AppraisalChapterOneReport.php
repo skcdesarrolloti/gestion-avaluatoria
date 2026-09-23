@@ -53,7 +53,7 @@ final class AppraisalChapterOneReport
     }
     private function assignment(array $r, array $s, array $u): string
     {
-        if ($this->text($r['assignment_scope'] ?? '') !== '') return $this->text($r['assignment_scope']);
+        if ($this->text($r['assignment_description'] ?? '') !== '') return $this->text($r['assignment_description']);
         return 'De acuerdo con la solicitud, el encargo valuatorio consiste en realizar el avalúo del activo identificado, con el fin de establecer ' . mb_strtolower($this->basisLabel($r)) . ' para un inmueble con destinación ' . mb_strtolower($this->labelFor('destinacion', $r['destinacion'] ?? 'por definir')) . '.';
     }
     private function asset(array $r, array $s, array $u): string
