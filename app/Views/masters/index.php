@@ -48,7 +48,11 @@ $today = new DateTimeImmutable('today', new DateTimeZone('America/Bogota'));
             <label class="label md:col-span-2">Observaciones internas
                 <textarea class="input min-h-11" name="notes" rows="3" placeholder="Dato administrativo o salvedad sobre el soporte RAA."></textarea>
             </label>
-            <fieldset class="md:col-span-2">
+            <div class="md:col-span-2 flex flex-wrap items-center gap-3 rounded-xl border border-teal-100 bg-teal-50 p-4">
+                <button class="btn-primary" type="submit" :disabled="busy" x-text="busy ? 'Leyendo RAA...' : 'Cargar RAA'">Cargar RAA</button>
+                <span class="text-sm leading-6 text-teal-900">El sistema leerá el PDF, validará vigencia y actualizará el maestro del perito.</span>
+            </div>
+            <fieldset class="md:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-4">
                 <legend class="label">Categorías manuales solo como respaldo si el PDF no permite lectura</legend>
                 <div class="mt-3 grid gap-3 md:grid-cols-2">
                     <?php foreach ($categories as $code => $label): ?>
@@ -59,9 +63,6 @@ $today = new DateTimeImmutable('today', new DateTimeZone('America/Bogota'));
                     <?php endforeach; ?>
                 </div>
             </fieldset>
-            <div class="md:col-span-2">
-                <button class="btn-primary" type="submit" :disabled="busy" x-text="busy ? 'Leyendo RAA...' : 'Guardar desde RAA'">Guardar desde RAA</button>
-            </div>
         </form>
     </section>
 
