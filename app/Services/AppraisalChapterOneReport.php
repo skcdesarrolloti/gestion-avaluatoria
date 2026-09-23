@@ -71,9 +71,17 @@ final class AppraisalChapterOneReport
     }
     private function valueBasis(array $r): string
     {
+        $key = (string) ($r['base_valor'] ?? '');
         $basis = $this->basisLabel($r);
-        if (($r['base_valor'] ?? '') === 'mercado') return 'Los criterios empleados se fundamentan en la base de Valor de Mercado, entendida como la cuantía estimada por la que un bien podría intercambiarse en la fecha de valuación entre partes dispuestas, informadas, prudentes y sin coacción, tras una comercialización adecuada.';
-        return 'Los criterios empleados se fundamentan en la base de ' . $basis . ', según la finalidad, el alcance y la información disponible del encargo.';
+        $definitions = [
+            'mercado' => 'Los criterios empleados se fundamentan en la base de Valor de Mercado, entendida como la cuantía estimada por la que un bien podría intercambiarse en la fecha de valuación entre partes dispuestas, informadas, prudentes y sin coacción, tras una comercialización adecuada.',
+            'razonable' => 'Los criterios empleados se fundamentan en la base de Valor Razonable, entendida como una medición orientada a participantes de mercado en una transacción ordenada en la fecha de medición, especialmente cuando el encargo tiene finalidad contable, financiera o de revelación bajo NIIF.',
+            'depreciable' => 'Los criterios empleados se fundamentan en la base de Valor Depreciable, usada para analizar costo atribuible, vida útil, depreciación, deterioro o reposición del activo cuando la finalidad exige separar componentes físicos y económicos sujetos a consumo o desgaste.',
+            'renta' => 'Los criterios empleados se fundamentan en la base de Valor de Renta, orientada a estimar la capacidad del inmueble para producir cánones o ingresos inmobiliarios, distinguiendo la renta propia del activo de ingresos de negocios que puedan operar en él.',
+            'catastral' => 'Los criterios empleados se fundamentan en la base de Valor Catastral, aplicable para finalidades administrativas, fiscales o catastrales conforme al marco competente; esta base no reemplaza automáticamente el valor de mercado.',
+            'residual' => 'Los criterios empleados se fundamentan en la base de Valor Residual, estimada a partir del potencial de desarrollo o aprovechamiento del activo, descontando costos, tiempos, utilidad esperada, riesgos y restricciones normativas verificables.',
+        ];
+        return $definitions[$key] ?? 'Los criterios empleados se fundamentan en la base de ' . $basis . ', según la finalidad, el alcance y la información disponible del encargo.';
     }
     private function valueDate(array $r): string { return 'La fecha de aplicación de la estimación corresponde a ' . $this->date($r['value_date'] ?? '') . '.'; }
     private function scope(array $r): string { return $this->text($r['assignment_scope'] ?? '') ?: 'El informe puede ser utilizado por el destinatario para los fines indicados en el encargo, dentro del alcance técnico, documental y temporal aquí señalado.'; }

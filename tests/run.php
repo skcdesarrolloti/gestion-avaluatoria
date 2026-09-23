@@ -453,6 +453,9 @@ Certificado de tradicion.",
         && str_contains($chapterOneReport['text'], 'Valor de Mercado')
         && str_contains($chapterOneReport['text'], 'Oficina 206, Parqueadero No 60')
         && str_contains($chapterOneReport['text'], 'NTS S 03'), 'entregable expediente construye memoria descriptiva normativa');
+    $reasonableBasis = (new AppraisalChapterOneReport())->build(['base_valor' => 'razonable'], [], []);
+    expect(str_contains($reasonableBasis['text'], 'Valor Razonable')
+        && str_contains($reasonableBasis['text'], 'participantes de mercado'), 'base de valor razonable queda definida de forma ampliada');
     $constructionRows = AppraisalChapterZeroInput::unitConstructionData();
     expect($constructionRows[0]['built_area_adopted_m2'] === '85.25'
         && str_contains($constructionRows[0]['construction_conservation_json'], 'estructura'), 'construccion por unidad normalizada');

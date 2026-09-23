@@ -97,6 +97,24 @@ final class AppraisalCatalog
         return array_keys(self::selectFields()[$field][4] ?? []);
     }
 
+
+    public static function fieldSupport(string $field): string
+    {
+        return [
+            'tipo' => 'NTS S 03: clasifica el tipo de avalúo conforme al encargo y al uso previsto.',
+            'tipo_derecho' => 'NTS S 03: identifica el derecho de propiedad o interés objeto de valuación.',
+            'tipo_negocio' => 'NTS M 01 e IVS: orienta el enfoque y los datos comparables entre venta o renta.',
+            'destinacion' => 'NTS S 03 y Decreto 1420 de 1998: describe el uso económico actual o predominante del bien.',
+            'tipo_inmueble' => 'NTS I 01: permite describir el activo urbano según su tipología física y funcional.',
+            'subtipo_funcional' => 'Ayuda interna: precisa la tipología para activar campos técnicos y comparables pertinentes.',
+            'finalidad' => 'NTS S 03: define el propósito y uso que se pretende dar a la valuación.',
+            'base_valor' => 'NTS S 01/S 02 e IVS: la base de valor define la premisa de medición que debe explicarse en el informe.',
+            'aplica_niif' => 'NIIF/IVS: se activa cuando el encargo tenga medición contable, valor razonable o deterioro.',
+            'regimen_ph' => 'Ley 675 de 2001, Decreto 1420 de 1998 y NTS I 01: identifica si el bien está sometido a propiedad horizontal.',
+            'estructura_metodo' => 'NTS M 01: ordena la unidad de análisis para evitar duplicar áreas, comunes o componentes.',
+        ][$field] ?? '';
+    }
+
     public static function subtypeOptions(): array
     {
         return [
