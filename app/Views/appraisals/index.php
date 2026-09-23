@@ -8,7 +8,7 @@
 </div>
 <form class="mt-7 flex flex-wrap gap-3 rounded-2xl border border-slate-200 bg-white p-4" method="get" action="<?= e(url()) ?>">
     <label class="label grow">Buscar expediente
-        <input class="input" name="q" value="<?= e($searchValue) ?>" placeholder="Ej. 02-2026-09-001, cliente, título o municipio">
+        <input class="input" name="q" value="<?= e($searchValue) ?>" placeholder="Número, título, propietario, cliente, solicitante o municipio">
     </label>
     <button class="btn-primary self-end" type="submit">Buscar</button>
     <?php if ($searchValue !== ''): ?><a class="btn-secondary self-end" href="<?= e(url()) ?>">Limpiar</a><?php endif; ?>

@@ -267,6 +267,12 @@ try {
         ('77777777777777777777777777777777', 7, '$secondActiveAppraiserId', '2026-09-20', '2026-09-03 00:00:00', '2026-09-03 00:00:00')");
     expect($numberer->assignIfMissing('77777777777777777777777777777777', 7) === '03-2026-09-001',
         'consecutivo del expediente inicia por cada perito');
+    $db->exec("UPDATE appraisals SET titulo = 'Oficina Chambacu', property_owner_name = 'Asociacion Central', client_name = 'Ecopetrol' WHERE id = '99999999999999999999999999999999'");
+    $db->exec("INSERT INTO appraisals (id, owner_id, titulo, property_owner_name, created_at, updated_at) VALUES
+        ('66666666666666666666666666666666', 7, 'Borrador sin expediente', 'Asociacion Central', '2026-09-04 00:00:00', '2026-09-04 00:00:00')");
+    $createdSearch = (new AppraisalRepository($db))->recent(7, 1, 'Asociacion', true);
+    expect(count($createdSearch) === 1 && $createdSearch[0]['expediente_number'] === '02-2026-09-001',
+        'busqueda lateral trae expedientes creados por propietario y excluye borradores');
     $_POST = ['version' => 1, 'appraiser_id' => ''];
     $chapterZeroData = AppraisalChapterZeroInput::chapterZeroData(1, [], [$activeAppraiserId]);
     expect($chapterZeroData['appraiser_id'] === $activeAppraiserId,

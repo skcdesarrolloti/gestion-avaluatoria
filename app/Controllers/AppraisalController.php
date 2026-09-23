@@ -28,9 +28,10 @@ final class AppraisalController
     {
         $page = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT) ?: 1;
         $page = max(1, min(100000, $page));
-        $rows = $this->appraisals->recent($this->user['id'], $page);
+        $search = trim((string) ($_GET['q'] ?? ''));
+        $rows = $this->appraisals->recent($this->user['id'], $page, $search);
         view('appraisals/index', ['title' => 'Mis avalúos', 'rows' => array_slice($rows, 0, 20),
-            'hasNext' => count($rows) > 20, 'page' => $page]);
+            'hasNext' => count($rows) > 20, 'page' => $page, 'search' => $search]);
     }
 
     public function create(): never
@@ -42,8 +43,11 @@ final class AppraisalController
     public function chapterZero(string $id): void
     {
         $record = $this->appraisals->find($id, $this->user['id']);
+        $dossierSearch = trim((string) ($_GET['expediente_q'] ?? ''));
         view('appraisals/chapter-zero', ['title' => 'Expediente valuatorio', 'record' => $record,
             'appraisers' => $this->appraisers->eligibleForAssignment(),
+            'dossierSearch' => $dossierSearch,
+            'dossierRows' => array_slice($this->appraisals->recent($this->user['id'], 1, $dossierSearch, true), 0, 12),
             'chapterZeroMessage' => Session::pullFlash('chapter_zero_message'),
             'chapterZeroError' => Session::pullFlash('chapter_zero_error'),
             'catalog' => ['selects' => AppraisalCatalog::selectFields(), 'notes' => AppraisalCatalog::notes()]]);
