@@ -45,8 +45,6 @@ $tabs = [
     'ubicacion' => ['Ubicación territorial', []],
     'referencia' => ['Referencia', ['point_reference', 'alternate_nomenclature']],
     'registro' => ['Registro y catastro', ['property_registry', 'cadastral_reference', 'registry_office', 'stratum']],
-    'norma' => ['Norma urbana', ['urban_license', 'permitted_use', 'urban_treatment']],
-    'restricciones' => ['Restricciones', ['restrictions', 'legal_urban_affectations']],
     'entorno' => ['Entorno', ['centrality', 'immediate_environment', 'road_condition']],
     'acceso' => ['Acceso y movilidad', ['access_facility', 'transport_connectivity', 'loading_unloading']],
     'usos' => ['Usos y ocupación', ['current_use', 'main_potential_use', 'complementary_potential_uses',
@@ -58,7 +56,7 @@ $tabs = [
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{
-        activeTab: ['identificacion','tipologias','ubicacion','registro','fuentes','referencia','norma','restricciones','entorno','acceso','usos','servicios','cierre'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'identificacion',
+        activeTab: ['identificacion','tipologias','ubicacion','registro','fuentes','referencia','entorno','acceso','usos','servicios','cierre'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'identificacion',
         busy: false,
         typologyHint: <?= e(json_encode($field('igac_typology_hint'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         igacCategory: <?= e(json_encode($field('igac_category'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,

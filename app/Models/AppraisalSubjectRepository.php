@@ -59,9 +59,6 @@ final class AppraisalSubjectRepository
         $fillable = ['neighborhood_name' => $predio['territory'] ?? '', 'locality_name' => $predio['locality'] ?? '',
             'commune_ucg' => $predio['commune_ucg'] ?? '', 'zone_sector' => $predio['land_use'] ?? '',
             'property_registry' => $predio['property_registry'] ?? '', 'cadastral_reference' => $predio['cadastral_reference'] ?? '', 'stratum' => $this->stratum((string) ($predio['stratum'] ?? '')),
-            'current_use' => $this->useCategory((string) ($predio['land_use'] ?? '')), 'urban_treatment' => $this->treatment((string) ($predio['urban_treatment'] ?? '')),
-            'restrictions' => trim((string) ($predio['risk'] ?? '')) !== '' ? 'amenaza_riesgo' : '',
-            'legal_urban_affectations' => trim((string) ($predio['risk'] ?? '')) !== '' ? 'riesgo' : '',
             'subject_reference_date' => $this->date((string) ($predio['updated_on'] ?? ''))];
         foreach ($fillable as $key => $value) if (($current[$key] ?? '') === '') $data[$key] = $value;
         foreach ($data as $key => $value) if ($value === '' || $value === null) unset($data[$key]);
@@ -77,11 +74,7 @@ final class AppraisalSubjectRepository
     }
 
     private function stratum(string $value): string { $digits = preg_replace('/\D+/', '', $value) ?? ''; return in_array($digits, ['1','2','3','4','5','6'], true) ? $digits : ''; }
-    private function treatment(string $value): string { $key = $this->key($value); return str_contains($key, 'mejoramiento') ? 'mejoramiento_integral' : (str_contains($key, 'conservacion') ? 'conservacion' : ''); }
-    private function useCategory(string $value): string { $key = $this->key($value); foreach (['residencial','comercial','industrial','institucional','mixto'] as $use) if (str_contains($key, $use)) return $use; return ''; }
     private function date(string $value): ?string { return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : null; }
-    private function key(string $value): string
-    { $text = strtr(mb_strtolower(trim($value)), ['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u','ñ'=>'n']); return preg_replace('/[^a-z0-9]+/', '', $text) ?? ''; }
 
     public function searchByNeighborhood(string $neighborhoodId, int $owner, string $excludeId = '', int $limit = 8): array
     {

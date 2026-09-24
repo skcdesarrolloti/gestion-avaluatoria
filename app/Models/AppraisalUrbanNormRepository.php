@@ -70,10 +70,10 @@ final class AppraisalUrbanNormRepository
             'use_prohibited_text', 'norm_unit_basic_text', 'norm_free_area_text', 'norm_min_lot_front_text',
             'norm_max_height_text', 'norm_construction_index_text', 'norm_isolation_text', 'norm_other_potential_text',
             'planning_concept_number', 'official_concept_scope',
-            'land_classification', 'activity_area', 'normative_zone', 'urban_treatment', 'current_use',
-            'intended_use', 'applicable_activity', 'urban_norms_applied', 'heritage_context',
+            'land_classification', 'activity_area', 'normative_zone', 'urban_treatment', 'urban_license',
+            'permitted_use', 'current_use', 'intended_use', 'applicable_activity', 'urban_norms_applied', 'heritage_context',
             'environmental_context', 'risk_context', 'use_cross_result', 'midas_result', 'restrictions',
-            'conclusion', 'support_summary', 'analyst_notes', 'source_limitations'];
+            'legal_urban_affectations', 'conclusion', 'support_summary', 'analyst_notes', 'source_limitations'];
         $limits = ['cadastral_reference' => 80, 'cadastral_reference_short' => 80,
             'cadastral_reference_long' => 120, 'document_slug' => 100, 'table_slug' => 120,
             'category_slug' => 140, 'source_status' => 60, 'pot_state' => 80, 'midas_query_option' => 80,
@@ -86,11 +86,11 @@ final class AppraisalUrbanNormRepository
             'norm_isolation_text' => 70000, 'norm_other_potential_text' => 70000,
             'planning_concept_number' => 120,
             'official_concept_scope' => 5000, 'land_classification' => 120, 'activity_area' => 160,
-            'normative_zone' => 160, 'urban_treatment' => 160, 'current_use' => 160,
-            'intended_use' => 220, 'applicable_activity' => 160, 'urban_norms_applied' => 5000,
+            'normative_zone' => 160, 'urban_treatment' => 160, 'urban_license' => 220,
+            'permitted_use' => 5000, 'current_use' => 160, 'intended_use' => 220, 'applicable_activity' => 160, 'urban_norms_applied' => 5000,
             'heritage_context' => 5000, 'environmental_context' => 5000, 'risk_context' => 5000,
             'use_cross_result' => 40, 'midas_result' => 5000, 'restrictions' => 5000,
-            'conclusion' => 5000, 'support_summary' => 5000, 'analyst_notes' => 5000,
+            'legal_urban_affectations' => 5000, 'conclusion' => 5000, 'support_summary' => 5000, 'analyst_notes' => 5000,
             'source_limitations' => 5000];
         $data = [];
         foreach ($keys as $key) $data[$key] = mb_substr(trim((string) ($input[$key] ?? '')), 0, $limits[$key]);
@@ -158,10 +158,12 @@ final class AppraisalUrbanNormRepository
             'norm_isolation_text' => '', 'norm_other_potential_text' => '',
             'planning_concept_number' => '', 'planning_concept_date' => null, 'official_concept_scope' => '',
             'land_classification' => '', 'activity_area' => '', 'normative_zone' => '', 'urban_treatment' => '',
-            'current_use' => '', 'intended_use' => '', 'applicable_activity' => '', 'urban_norms_applied' => '',
+            'urban_license' => '', 'permitted_use' => '', 'current_use' => '', 'intended_use' => '',
+            'applicable_activity' => '', 'urban_norms_applied' => '',
             'heritage_context' => '', 'environmental_context' => '', 'risk_context' => '',
-            'use_cross_result' => '', 'restrictions' => '', 'conclusion' => '', 'support_summary' => '',
-            'analyst_notes' => '', 'source_limitations' => '', 'version' => 0, 'updated_at' => null];
+            'use_cross_result' => '', 'restrictions' => '', 'legal_urban_affectations' => '',
+            'conclusion' => '', 'support_summary' => '', 'analyst_notes' => '',
+            'source_limitations' => '', 'version' => 0, 'updated_at' => null];
     }
 
     private function date(mixed $value): ?string

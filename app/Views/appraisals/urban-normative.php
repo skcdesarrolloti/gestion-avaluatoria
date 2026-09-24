@@ -19,7 +19,7 @@ $input = static function (string $name, string $label, string $placeholder = '',
     <div>
         <p class="eyebrow">Numeral 5 · Normatividad urbana</p>
         <h1 class="mt-2 text-3xl font-semibold tracking-tight">Uso del suelo, POT y determinantes urbanísticas</h1>
-        <p class="mt-3 max-w-3xl text-slate-600">Registra la consulta MIDAS por número predial, la opción Uso del suelo, el cuadro normativo aplicable y las salvedades urbanísticas que alimentan el entregable.</p>
+        <p class="mt-3 max-w-3xl text-slate-600">Registra MIDAS, POT, cuadros, soportes y salvedades urbanísticas para el entregable.</p>
     </div>
     <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Capítulo 5</span>
 </div>
@@ -45,11 +45,11 @@ $input = static function (string $name, string $label, string $placeholder = '',
             <div>
                 <p class="eyebrow">Consulta MIDAS</p>
                 <h2 class="mt-2 text-2xl font-semibold">Número predial y opción Uso del suelo</h2>
-                <p class="mt-2 text-sm leading-6 text-slate-600">Copia aquí exactamente la lectura que haces en MIDAS al consultar el predial y seleccionar Uso del suelo.</p>
+                <p class="mt-2 text-sm leading-6 text-slate-600">Lectura MIDAS por predial y opción Uso del suelo.</p>
                 <p class="mt-2 text-xs font-semibold text-teal-800" data-autosave-status>Autoguardado activo</p>
             </div>
             <div class="flex flex-wrap gap-2">
-                <a class="btn-primary" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto#midas')) ?>">Investigar en módulo 3</a>
+                <a class="btn-primary" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto#registro')) ?>">Consultar desde módulo 3</a>
                 <label class="inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
                     <input type="checkbox" name="midas_consulted" value="1" <?= e($checked('midas_consulted')) ?>> MIDAS consultado
                 </label>
@@ -71,7 +71,7 @@ $input = static function (string $name, string $label, string $placeholder = '',
                 <input class="input" type="text" name="cadastral_reference_long"
                     value="<?= e($value('cadastral_reference_long')) ?>" inputmode="numeric" maxlength="120"
                     placeholder="Ej. referencia predial nacional si MIDAS la devuelve">
-                <span class="mt-1 block text-xs font-medium text-slate-500">Si MIDAS devuelve la referencia que faltaba, quedará guardada aquí.</span>
+                <span class="mt-1 block text-xs font-medium text-slate-500">Si MIDAS la devuelve, se guarda aquí.</span>
             </label>
             <?php $input('midas_query_option', 'Opción seleccionada en MIDAS', 'Uso del suelo'); ?>
             <?php $input('midas_consulted_on', 'Fecha de consulta MIDAS', '', 'date'); ?>
@@ -82,7 +82,7 @@ $input = static function (string $name, string $label, string $placeholder = '',
                     <?php foreach ($sourceOptions as $key => $label): ?><option value="<?= e($key) ?>" <?= e($selected('source_status', (string) $key)) ?>><?= e($label) ?></option><?php endforeach; ?>
                 </select>
             </label>
-            <div class="md:col-span-3"><?php $textarea('midas_usage_result', 'Resultado leído en MIDAS · Uso del suelo', 'Transcribe el uso, área de actividad, zona, tratamiento, restricciones o mensaje No disponible.', 5); ?></div>
+            <div class="md:col-span-3"><?php $textarea('midas_usage_result', 'Resultado leído en MIDAS · Uso del suelo', 'Uso, área, zona, tratamiento, restricciones o No disponible.', 5); ?></div>
             <?php if ($value('midas_predio_raw') !== '' || $value('midas_usage_raw') !== ''): ?>
                 <div class="md:col-span-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-900">
                     Lectura guardada: <?= $value('midas_predio_raw') !== '' ? 'predio MIDAS para numeral 3' : '' ?><?= $value('midas_predio_raw') !== '' && $value('midas_usage_raw') !== '' ? ' y ' : '' ?><?= $value('midas_usage_raw') !== '' ? 'reglamentación Uso Suelo para numeral 5' : '' ?>.
@@ -117,18 +117,20 @@ $input = static function (string $name, string $label, string $placeholder = '',
             <?php $input('activity_area', 'Área de actividad'); ?>
             <?php $input('normative_zone', 'Zona normativa'); ?>
             <?php $input('urban_treatment', 'Tratamiento urbanístico'); ?>
-            <?php $input('current_use', 'Uso actual identificado'); ?>
+            <?php $input('urban_license', 'Licencia, acto o soporte urbanístico', 'Licencia, reconocimiento, concepto o No reporta con fuente'); ?>
+            <div class="md:col-span-2"><?php $textarea('permitted_use', 'Uso permitido / compatibilidad sustentada', 'Principal, compatible, complementario, restringido o prohibido, con fuente.', 4); ?></div>
+            <?php $input('current_use', 'Uso normativo identificado'); ?>
             <?php $input('intended_use', 'Uso pretendido o finalidad del encargo'); ?>
             <?php $input('applicable_activity', 'Actividad aplicable en el cuadro'); ?>
             <?php $input('pot_state', 'Estado del POT o instrumento usado', 'POT vigente, proyecto, resolución especial...'); ?>
-            <div class="md:col-span-2"><?php $textarea('urban_norms_applied', 'Normas urbanísticas pertinentes aplicadas', 'Relaciona POT, Decreto 0977, Decreto 1077, Ley 388, resoluciones, plan parcial, licencia o acto especial que aplique.', 5); ?></div>
+            <div class="md:col-span-2"><?php $textarea('urban_norms_applied', 'Normas urbanísticas pertinentes aplicadas', 'POT, Decreto 0977, Decreto 1077, Ley 388, resolución, plan parcial, licencia o acto aplicable.', 5); ?></div>
             <?php $input('use_regulation_table', 'Cuadro de reglamentación identificado', 'Ej. Cuadro No. 7 · Actividad mixta'); ?>
             <div class="md:col-span-2 grid gap-4">
-                <?php $textarea('use_principal_text', 'Uso principal leído en MIDAS', 'Actividades principales y detalle del cuadro.', 5, 70000); ?>
-                <?php $textarea('use_compatible_text', 'Uso compatible leído en MIDAS', 'Actividades compatibles y detalle del cuadro.', 5, 70000); ?>
-                <?php $textarea('use_complementary_text', 'Uso complementario leído en MIDAS', 'Actividades complementarias y detalle del cuadro.', 5, 70000); ?>
-                <?php $textarea('use_restricted_text', 'Uso restringido leído en MIDAS', 'Actividades restringidas y detalle del cuadro.', 5, 70000); ?>
-                <?php $textarea('use_prohibited_text', 'Uso prohibido leído en MIDAS', 'Actividades prohibidas y detalle del cuadro.', 5, 70000); ?>
+                <?php $textarea('use_principal_text', 'Uso principal leído en MIDAS', 'Actividades principales.', 5, 70000); ?>
+                <?php $textarea('use_compatible_text', 'Uso compatible leído en MIDAS', 'Actividades compatibles.', 5, 70000); ?>
+                <?php $textarea('use_complementary_text', 'Uso complementario leído en MIDAS', 'Actividades complementarias.', 5, 70000); ?>
+                <?php $textarea('use_restricted_text', 'Uso restringido leído en MIDAS', 'Actividades restringidas.', 5, 70000); ?>
+                <?php $textarea('use_prohibited_text', 'Uso prohibido leído en MIDAS', 'Actividades prohibidas.', 5, 70000); ?>
             </div>
             <div class="md:col-span-2 grid gap-4 rounded-xl border border-amber-100 bg-amber-50 p-4">
                 <h3 class="font-semibold text-amber-950">Campos para potencial constructivo</h3>
@@ -138,7 +140,7 @@ $input = static function (string $name, string $label, string $placeholder = '',
                 <?php $textarea('norm_max_height_text', 'Altura máxima', 'Pisos o regla de altura máxima aplicable.', 3, 70000); ?>
                 <?php $textarea('norm_construction_index_text', 'Índice de construcción', 'Índice por tipología o condición normativa.', 4, 70000); ?>
                 <?php $textarea('norm_isolation_text', 'Aislamientos', 'Antejardín, retiros laterales, posteriores y demás aislamientos.', 4, 70000); ?>
-                <?php $textarea('norm_other_potential_text', 'Otros parámetros urbanísticos', 'Estacionamientos, ocupación, cesiones, observaciones o parámetros pendientes.', 4, 70000); ?>
+                <?php $textarea('norm_other_potential_text', 'Otros parámetros urbanísticos', 'Estacionamientos, ocupación, cesiones u observaciones.', 4, 70000); ?>
             </div>
         </div>
     </section>
@@ -147,20 +149,21 @@ $input = static function (string $name, string $label, string $placeholder = '',
         <div class="mt-6 grid gap-4 md:grid-cols-2">
             <?php $input('planning_concept_number', 'Radicado o número de concepto de uso del suelo'); ?>
             <?php $input('planning_concept_date', 'Fecha del concepto oficial', '', 'date'); ?>
-            <?php $textarea('official_concept_scope', 'Alcance del concepto oficial', 'Actividad consultada, respuesta, salvedades y autoridad que expide.', 4); ?>
-            <?php $textarea('heritage_context', 'Patrimonio, conservación o Centro Histórico', 'Indica si aplica área de influencia, periferia histórica, BIC, tratamiento de conservación o autoridad patrimonial.', 4); ?>
+            <?php $textarea('official_concept_scope', 'Alcance del concepto oficial', 'Actividad, respuesta, salvedades y autoridad.', 4); ?>
+            <?php $textarea('heritage_context', 'Patrimonio, conservación o Centro Histórico', 'Área de influencia, BIC, conservación o autoridad patrimonial.', 4); ?>
             <?php $textarea('environmental_context', 'Determinantes ambientales o protección', 'Rondas, protección, autoridad ambiental, restricciones o pendientes.', 4); ?>
             <?php $textarea('risk_context', 'Riesgo, amenaza o afectaciones externas', 'Amenaza, riesgo, reserva vial, espacio público, servidumbres urbanísticas o cargas externas.', 4); ?>
+            <?php $textarea('legal_urban_affectations', 'Afectaciones jurídicas o urbanísticas sustentadas', 'Afectación vial, reserva, protección, patrimonio, servidumbre o carga con fuente.', 4); ?>
         </div>
     </section>
     <section id="cierre" x-show="tab === 'cierre'" class="rounded-2xl border border-emerald-100 bg-emerald-50 p-6 shadow-sm sm:p-8">
         <p class="eyebrow">Texto para el entregable</p><h2 class="mt-2 text-2xl font-semibold">Conclusión urbanística del analista</h2>
         <div class="mt-6 grid gap-4">
-            <?php $textarea('restrictions', 'Restricciones o condiciones urbanísticas', 'Condiciones que limitan, condicionan o afectan el uso o desarrollo.', 4); ?>
-            <?php $textarea('conclusion', 'Conclusión que debe pasar al numeral 5', 'Redacta la conclusión urbanística del avalúo con fuente, uso y efecto valuatorio.', 5); ?>
-            <?php $textarea('source_limitations', 'Limitaciones de la consulta', 'Ej. MIDAS no disponible, falta concepto oficial, información contradictoria, pendiente validar con Planeación.', 4); ?>
-            <?php $textarea('support_summary', 'Soportes revisados', 'Captura MIDAS, concepto, POT, certificado, plano, licencia, resolución, visita o documento revisado.', 3); ?>
-            <?php $textarea('analyst_notes', 'Notas internas del analista', 'Observaciones que no necesariamente pasan al informe.', 3); ?>
+            <?php $textarea('restrictions', 'Restricciones o condiciones urbanísticas', 'Condiciones que limitan el uso o desarrollo.', 4); ?>
+            <?php $textarea('conclusion', 'Conclusión que debe pasar al numeral 5', 'Conclusión urbanística con fuente, uso y efecto valuatorio.', 5); ?>
+            <?php $textarea('source_limitations', 'Limitaciones de la consulta', 'MIDAS no disponible, falta concepto, contradicción o pendiente de Planeación.', 4); ?>
+            <?php $textarea('support_summary', 'Soportes revisados', 'MIDAS, concepto, POT, certificado, plano, licencia, resolución o visita.', 3); ?>
+            <?php $textarea('analyst_notes', 'Notas internas del analista', 'Observaciones internas.', 3); ?>
         </div>
     </section>
     <div class="flex flex-wrap justify-end gap-3">

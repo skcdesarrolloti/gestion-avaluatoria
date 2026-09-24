@@ -17,13 +17,16 @@ final class AppraisalSubjectMidasController
         try {
             $reference = $this->reference($_POST, $subject);
             $predio = (new MidasPredioSearch())->consult($reference);
+            $urbanFields = [];
             if (!empty($predio['predio'])) {
                 $this->subjects->applyMidasPredio($id, $this->user['id'], $predio['predio']);
                 $this->appraisals->applyMidasAreasToFirstUnit($id, $this->user['id'], $predio['predio']);
+                $urbanFields = $this->urbanFields($predio['predio']);
                 $reference = (string) (($predio['predio']['cadastral_reference'] ?? '') ?: ($predio['predio']['national_cadastral_reference'] ?? $reference));
             }
             $usage = (new UrbanNormMidasUsageSearch())->consult($reference);
-            if (!empty($usage['fields'])) $this->saveUrbanFields($id, $usage['fields']);
+            $urbanFields = array_replace($urbanFields, $usage['fields'] ?? []);
+            if ($urbanFields !== []) $this->saveUrbanFields($id, $urbanFields);
             $ok = ($predio['ok'] ?? false) || ($usage['ok'] ?? false);
             Session::flash($ok ? 'subject_message' : 'subject_error', $this->consultMessage($predio, $usage));
         } catch (\Throwable $error) { Session::flash('subject_error', $error->getMessage()); }
@@ -90,6 +93,11 @@ final class AppraisalSubjectMidasController
         foreach (['cadastral_reference_long' => 'national_cadastral_reference', 'cadastral_reference_short' => 'cadastral_reference',
             'current_use' => 'land_use', 'land_classification' => 'land_classification', 'urban_treatment' => 'urban_treatment'] as $target => $source) {
             if (($predio[$source] ?? '') !== '') $fields[$target] = (string) $predio[$source];
+        }
+        if (($predio['risk'] ?? '') !== '') {
+            $fields['risk_context'] = (string) $predio['risk'];
+            $fields['restrictions'] = (string) $predio['risk'];
+            $fields['legal_urban_affectations'] = (string) $predio['risk'];
         }
         if (($predio['land_use'] ?? '') !== '') { $fields['midas_activity'] = (string) $predio['land_use']; $fields['midas_usage_result'] = $this->summary($predio); }
         return $fields;

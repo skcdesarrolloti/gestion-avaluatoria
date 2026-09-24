@@ -254,9 +254,11 @@ try {
         norm_construction_index_text TEXT, norm_isolation_text TEXT, norm_other_potential_text TEXT,
         planning_concept_number TEXT,
         planning_concept_date TEXT, official_concept_scope TEXT,
-        land_classification TEXT, activity_area TEXT, normative_zone TEXT, urban_treatment TEXT, current_use TEXT,
+        land_classification TEXT, activity_area TEXT, normative_zone TEXT, urban_treatment TEXT,
+        urban_license TEXT, permitted_use TEXT, current_use TEXT,
         intended_use TEXT, applicable_activity TEXT, urban_norms_applied TEXT, heritage_context TEXT,
         environmental_context TEXT, risk_context TEXT, use_cross_result TEXT, restrictions TEXT,
+        legal_urban_affectations TEXT,
         conclusion TEXT, support_summary TEXT, analyst_notes TEXT, source_limitations TEXT, version INTEGER, updated_at TEXT)");
     $db->exec("CREATE TABLE appraisal_urban_norm_references (id TEXT PRIMARY KEY, appraisal_id TEXT,
         owner_id INTEGER, document_slug TEXT, table_slug TEXT, category_slug TEXT, reference_type TEXT,
@@ -309,7 +311,10 @@ try {
         'use_principal_text' => 'Comercial 2 e Institucional 3.',
         'use_restricted_text' => 'Comercial 3 e Institucional 4.',
         'norm_max_height_text' => '4 pisos.',
+        'urban_license' => 'No reporta licencia en los soportes revisados.',
+        'permitted_use' => 'Uso restringido según cruce del cuadro y la actividad consultada.',
         'urban_norms_applied' => 'Decreto 0977 de 2001 y cuadro de actividad mixta.',
+        'legal_urban_affectations' => 'Pendiente concepto de Planeación por uso restringido.',
         'use_cross_result' => 'restringido', 'conclusion' => 'Requiere validación de Planeación para uso restringido.',
     ]);
     $savedUrban = $urbanProfile->profile('urban-appraisal-1', 1);
@@ -318,6 +323,9 @@ try {
     expect($savedUrban['midas_query_option'] === 'Uso del suelo'
         && str_contains($savedUrban['urban_norms_applied'], 'Decreto 0977'),
         'ficha urbana conserva consulta MIDAS y normas pertinentes');
+    expect(str_contains($savedUrban['permitted_use'], 'Uso restringido')
+        && str_contains($savedUrban['legal_urban_affectations'], 'Planeación'),
+        'ficha urbana conserva licencia compatibilidad y afectaciones del numeral 5');
     expect(str_contains((string) $savedUrban['use_restricted_text'], 'Comercial 3'),
         'ficha urbana conserva reglamentacion MIDAS por tipo de uso');
     expect(($savedUrban['norm_max_height_text'] ?? '') === '4 pisos.', 'ficha urbana conserva campos de potencial constructivo');
