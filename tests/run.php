@@ -46,6 +46,7 @@ use App\Services\MidasWfsLayerAnalyzer;
 use App\Services\MidasWfsLayerCatalog;
 use App\Services\MidasWfsSearch;
 use App\Services\UrbanNormMidasTextParser;
+use App\Services\UrbanNormMidasUsageSearch;
 use App\Services\LegalCertificateParser;
 use App\Services\RateLimiter;
 use App\Controllers\AppraisalController;
@@ -326,6 +327,18 @@ try {
         && str_contains($midasParsed['usage']['use_restricted_text'] ?? '', 'COMERCIAL 3')
         && str_contains($midasParsed['usage']['norm_min_lot_front_text'] ?? '', 'AML 200'),
         'parser MIDAS separa ficha predial reglamentacion y potencial constructivo');
+    $midasLive = (new UrbanNormMidasUsageSearch())->fieldsFromLandUseResponse(['datos' => [
+        'referencia' => '<h2>PREDIO: 010303810024000</h2>',
+        'encabezado' => '<h2 class="encabezado_title">MIXTO 2</h2><p>Uso mixto del suelo.</p>',
+        'cuadro' => '<table><tr><td class="label">PRINCIPAL</td><td class="value">COMERCIAL 2, INSTITUCIONAL 3</td></tr><tr><td class="label">RESTRINGIDO</td><td class="value">COMERCIAL 3</td></tr></table>',
+        'cuerpo' => '<h2>USO PRINCIPAL</h2><p><b>COMERCIAL 2:</b> venta de bienes.</p><h2>USO PROHIBIDO</h2><p><b>INDUSTRIAL 3:</b> industria pesada.</p>',
+    ]], '010303810024000');
+    expect(($midasLive['ok'] ?? false) === true
+        && ($midasLive['fields']['midas_activity'] ?? '') === 'MIXTO 2'
+        && str_contains($midasLive['fields']['use_principal_text'] ?? '', 'COMERCIAL 2')
+        && str_contains($midasLive['fields']['use_restricted_text'] ?? '', 'COMERCIAL 3')
+        && str_contains($midasLive['fields']['use_prohibited_text'] ?? '', 'INDUSTRIAL 3'),
+        'consulta automatica MIDAS Uso Suelo carga campos del numeral 5');
     expectStatus(409, fn () => $urbanProfile->save('urban-appraisal-1', 1, 0, []),
         'ficha urbana rechaza version obsoleta');
     $refId = $urbanProfile->addReference('urban-appraisal-1', 1, [

@@ -3,12 +3,26 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, Session};
 use App\Models\{AppraisalRepository, AppraisalSubjectRepository, AppraisalUrbanNormRepository};
-use App\Services\UrbanNormMidasTextParser;
+use App\Services\{UrbanNormMidasTextParser, UrbanNormMidasUsageSearch};
 
 final class AppraisalSubjectMidasController
 {
     public function __construct(private AppraisalRepository $appraisals,
         private AppraisalSubjectRepository $subjects, private AppraisalUrbanNormRepository $urban, private array $user) {}
+
+    public function consult(string $id): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        $subject = $this->subjects->find($id, $this->user['id']);
+        try {
+            $reference = $this->reference($_POST, $subject);
+            $result = (new UrbanNormMidasUsageSearch())->consult($reference);
+            if (!empty($result['fields'])) $this->saveUrbanFields($id, $result['fields']);
+            $key = ($result['ok'] ?? false) ? 'subject_message' : 'subject_error';
+            Session::flash($key, (string) ($result['message'] ?? 'Consulta MIDAS finalizada.'));
+        } catch (\Throwable $error) { Session::flash('subject_error', $error->getMessage()); }
+        Http::redirect('avaluos/' . $id . '/bien-sujeto#midas');
+    }
 
     public function process(string $id): never
     {
@@ -28,6 +42,13 @@ final class AppraisalSubjectMidasController
         Http::redirect('avaluos/' . $id . '/bien-sujeto#midas');
     }
 
+    private function saveUrbanFields(string $id, array $fields): void
+    {
+        $profile = $this->urban->profile($id, $this->user['id']);
+        $fields = array_filter($fields, static fn ($value): bool => trim((string) $value) !== '');
+        $this->urban->save($id, $this->user['id'], (int) ($profile['version'] ?? 0), array_replace($profile, $fields));
+    }
+
     private function saveUrban(string $id, array $predio, array $usage, string $raw): void
     {
         $profile = $this->urban->profile($id, $this->user['id']);
@@ -36,6 +57,15 @@ final class AppraisalSubjectMidasController
         if ($usage !== []) $data['midas_usage_raw'] = $raw;
         $data['midas_consulted'] = '1'; $data['source_status'] = 'midas';
         $this->urban->save($id, $this->user['id'], (int) ($profile['version'] ?? 0), $data);
+    }
+
+    private function reference(array $input, array $subject): string
+    {
+        foreach (['midas_national_cadastral_reference', 'midas_cadastral_reference', 'cadastral_reference'] as $key) {
+            $digits = preg_replace('/\D+/', '', (string) ($input[$key] ?? $subject[$key] ?? '')) ?? '';
+            if ($digits !== '') return $digits;
+        }
+        throw new \RuntimeException('Registra primero la referencia catastral en Registro y catastro del numeral 3.');
     }
 
     private function urbanFields(array $predio): array

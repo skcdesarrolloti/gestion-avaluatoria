@@ -10,22 +10,30 @@ $midasKeys = ['midas_national_cadastral_reference', 'midas_property_registry', '
         <p class="eyebrow">MIDAS desde el numeral 3</p>
         <h3 class="mt-2 text-base font-semibold">Ficha del predio y lectura de Uso Suelo</h3>
         <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Pega aquí la lectura completa de MIDAS. Si contiene el bloque Predios, se actualiza esta ficha;
-            si contiene Uso Suelo o el cuadro POT, también se envía al numeral 5.
+            Consulta automáticamente el Uso Suelo con la referencia catastral guardada aquí. Si MIDAS demora o bloquea el cargue,
+            usa el respaldo manual pegando la lectura completa para actualizar esta ficha y enviar la reglamentación al numeral 5.
         </p>
     </div>
-    <a class="btn-secondary" target="_blank" rel="noopener" href="https://midas.cartagena.gov.co/#/home">Consultar MIDAS</a>
+    <div class="flex flex-wrap gap-3">
+        <button class="btn-primary" type="submit" formaction="<?= e(url($subjectActionBase . '/midas/consultar')) ?>">
+            Consultar MIDAS automáticamente
+        </button>
+        <a class="btn-secondary" target="_blank" rel="noopener" href="https://midas.cartagena.gov.co/#/home">Abrir MIDAS manual</a>
+    </div>
 </div>
+<p class="mt-3 text-xs font-medium text-amber-700">
+    La consulta usa solo números: el sistema retira guiones, espacios y puntos antes de enviar la referencia a MIDAS.
+</p>
 <label class="label mt-5">Lectura completa copiada de MIDAS
     <textarea class="input min-h-48" name="midas_pasted_text" rows="9" maxlength="70000"
         placeholder="Pega el bloque Predios, Uso Suelo o el cuadro de reglamentación. Espera a que MIDAS cargue todo antes de copiar."></textarea>
     <span class="mt-1 block text-xs font-medium text-slate-500">
-        MIDAS no recibe guiones en la búsqueda; usa la referencia catastral solo con números.
+        Respaldo manual: úsalo cuando MIDAS no entregue respuesta automática o cuando necesites cargar la ficha predial completa.
     </span>
 </label>
 <div class="mt-4 flex flex-wrap gap-3">
-    <button class="btn-primary" type="submit" formaction="<?= e(url($subjectActionBase . '/midas/procesar')) ?>">
-        Procesar lectura MIDAS
+    <button class="btn-secondary" type="submit" formaction="<?= e(url($subjectActionBase . '/midas/procesar')) ?>">
+        Procesar lectura MIDAS pegada
     </button>
     <a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana#pot')) ?>">
         Ver depósito normativo del numeral 5

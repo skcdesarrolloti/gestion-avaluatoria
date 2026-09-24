@@ -4,100 +4,116 @@ namespace App\Services;
 
 final class UrbanNormMidasUsageSearch
 {
-    private const ENDPOINT = 'https://midas.cartagena.gov.co:2083/api/Search/Criterio';
+    private const ENDPOINT = 'https://midas.cartagena.gov.co:2083/api/Ordenamiento/UsoSuelo';
 
     public function consult(string $reference): array
     {
-        $reference = trim($reference);
+        $reference = $this->digits($reference);
         if ($reference === '') throw new \InvalidArgumentException('Primero registra la referencia catastral en el bien sujeto.');
         $json = $this->request($reference);
-        if (!is_array($json)) return ['ok' => false, 'message' => 'MIDAS no respondió. Abre MIDAS y registra la lectura manual.'];
-        $record = $this->bestRecord($json, $reference);
-        if ($record === []) return ['ok' => false, 'message' => 'MIDAS no devolvió un predio asociado a esa referencia.'];
-        $flat = $this->flatten($record);
-        $usage = $this->field($flat, ['uso_suelo', 'uso del suelo', 'uso', 'uso_principal', 'actividad', 'actividad_economica']);
-        $zone = $this->field($flat, ['zona', 'zona_normativa', 'sector_normativo', 'area_actividad']);
-        $treatment = $this->field($flat, ['tratamiento', 'tratamiento_urbanistico']);
-        $classification = $this->field($flat, ['clasificacion', 'clasificacion_suelo', 'clase_suelo']);
-        [$short, $long] = $this->references($flat, $reference);
-        $summary = $this->summary($usage, $zone, $treatment, $classification);
-        return ['ok' => $summary !== '', 'message' => $summary !== '' ? 'Consulta MIDAS incorporada al numeral 5.' : 'MIDAS respondió, pero no se identificó el campo de uso del suelo.',
-            'fields' => ['midas_consulted' => '1', 'midas_query_option' => 'Uso del suelo',
-                'midas_consulted_on' => date('Y-m-d'), 'midas_usage_result' => $summary,
-                'midas_activity' => $usage, 'land_classification' => $classification,
-                'activity_area' => $zone, 'urban_treatment' => $treatment,
-                'cadastral_reference_short' => $short, 'cadastral_reference_long' => $long,
-                'midas_support_reference' => 'Consulta MIDAS por referencia catastral ' . $reference,
-                'source_status' => 'midas']];
+        if (!is_array($json)) return ['ok' => false, 'message' => 'MIDAS no respondió. Usa el respaldo de pegar la lectura completa.'];
+        return $this->fieldsFromLandUseResponse($json, $reference);
+    }
+
+    public function fieldsFromLandUseResponse(array $json, string $reference): array
+    {
+        $datos = is_array($json['datos'] ?? null) ? $json['datos'] : [];
+        if ($datos === []) return ['ok' => false, 'message' => 'MIDAS respondió, pero no devolvió la reglamentación de Uso Suelo.'];
+        $headerHtml = (string) ($datos['encabezado'] ?? '');
+        $tableRows = $this->tableRows((string) ($datos['cuadro'] ?? ''));
+        $sections = $this->sections((string) ($datos['cuerpo'] ?? ''));
+        $usage = $this->title($headerHtml) ?: $this->firstNonEmpty($tableRows);
+        $headerText = $this->cleanHtml($headerHtml);
+        $summary = trim('MIDAS reporta ' . $usage . ($headerText !== '' ? '. ' . $headerText : ''));
+        [$short, $long] = $this->referenceFields($reference, (string) ($datos['referencia'] ?? ''));
+        $fields = ['midas_consulted' => '1', 'midas_query_option' => 'Uso del suelo',
+            'midas_consulted_on' => date('Y-m-d'), 'midas_usage_result' => $summary,
+            'midas_activity' => $usage, 'current_use' => $usage, 'use_regulation_table' => $usage,
+            'cadastral_reference_short' => $short, 'cadastral_reference_long' => $long,
+            'midas_support_reference' => 'Consulta automática MIDAS Uso Suelo por referencia ' . $reference,
+            'source_status' => 'midas', 'midas_usage_raw' => json_encode($datos, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: ''];
+        foreach ($this->targets() as $label => $field) $fields[$field] = $this->merge($tableRows[$label] ?? '', $sections[$label] ?? '');
+        $hasUse = $usage !== '' || $fields['use_principal_text'] !== '' || $fields['use_compatible_text'] !== '';
+        return ['ok' => $hasUse, 'message' => $hasUse
+            ? 'Consulta MIDAS automática cargada: Uso Suelo quedó guardado en el numeral 5.'
+            : 'MIDAS respondió, pero no se identificó el cuadro de Uso Suelo.', 'fields' => $fields];
     }
 
     private function request(string $reference): ?array
     {
-        foreach ([['criterio' => $reference], ['search' => $reference], ['q' => $reference]] as $payload) {
-            $headers = "Content-Type: application/json\r\nAccept: application/json, text/plain, */*\r\n"
-                . "Origin: https://midas.cartagena.gov.co\r\nReferer: https://midas.cartagena.gov.co/\r\n";
-            $context = stream_context_create(['http' => ['method' => 'POST', 'header' => $headers,
-                'content' => json_encode($payload, JSON_THROW_ON_ERROR), 'timeout' => 8, 'ignore_errors' => true]]);
-            $response = @file_get_contents(self::ENDPOINT, false, $context);
-            $json = is_string($response) ? json_decode($response, true) : null;
-            if (is_array($json)) return $json;
+        $payload = json_encode(['criterio' => $reference], JSON_THROW_ON_ERROR);
+        $headers = "Content-Type: application/json\r\nAccept: application/json, text/plain, */*\r\n"
+            . "Origin: https://midas.cartagena.gov.co\r\nReferer: https://midas.cartagena.gov.co/\r\n"
+            . "User-Agent: Mozilla/5.0 GestionAvaluatoria/1.0\r\n";
+        $context = stream_context_create(['http' => ['method' => 'POST', 'header' => $headers,
+            'content' => $payload, 'timeout' => 15, 'ignore_errors' => true]]);
+        $response = @file_get_contents(self::ENDPOINT, false, $context);
+        $json = is_string($response) ? json_decode($response, true) : null;
+        return is_array($json) ? $json : null;
+    }
+
+    private function tableRows(string $html): array
+    {
+        $rows = [];
+        preg_match_all('/<tr[^>]*>\s*<td[^>]*class="[^"]*label[^"]*"[^>]*>(.*?)<\/td>\s*<td[^>]*class="[^"]*value[^"]*"[^>]*>(.*?)<\/td>\s*<\/tr>/is', $html, $matches, PREG_SET_ORDER);
+        foreach ($matches as $match) {
+            $key = $this->targetKey($this->cleanHtml($match[1]));
+            if ($key !== '') $rows[$key] = $this->cleanHtml($match[2]);
         }
-        return null;
+        return $rows;
     }
 
-    private function bestRecord(array $json, string $reference): array
+    private function sections(string $html): array
     {
-        $records = [];
-        $this->collect($json, $this->key($reference), $records);
-        usort($records, static fn (array $a, array $b): int => ($b['_score'] ?? 0) <=> ($a['_score'] ?? 0));
-        unset($records[0]['_score']);
-        return $records[0] ?? [];
-    }
-
-    private function collect(mixed $value, string $needle, array &$records): void
-    {
-        if (!is_array($value)) return;
-        $text = $this->key(implode(' ', array_map(static fn ($v): string => is_scalar($v) ? (string) $v : '', $value)));
-        $score = str_contains($text, $needle) ? 2 : 0;
-        $score += $this->hasKeys($value, ['uso', 'suelo', 'tratamiento', 'predial', 'referencia']) ? 1 : 0;
-        if ($score > 1) $records[] = $value + ['_score' => $score];
-        foreach ($value as $child) $this->collect($child, $needle, $records);
-    }
-
-    private function summary(string ...$parts): string
-    {
-        $text = array_filter($parts, static fn (string $part): bool => trim($part) !== '');
-        return $text ? 'MIDAS reporta: ' . implode('; ', array_unique($text)) . '.' : '';
-    }
-
-    private function flatten(array $record, string $prefix = ''): array
-    {
-        $flat = [];
-        foreach ($record as $key => $value) {
-            $name = $this->key($prefix . ' ' . (string) $key);
-            if (is_array($value)) $flat += $this->flatten($value, $name);
-            elseif (is_scalar($value)) $flat[$name] = trim((string) $value);
+        $sections = [];
+        preg_match_all('/<h2[^>]*>\s*(USO\s+[^<]+)\s*<\/h2>(.*?)(?=<h2[^>]*>\s*USO\s+|\z)/is', $html, $matches, PREG_SET_ORDER);
+        foreach ($matches as $match) {
+            $key = $this->targetKey($this->cleanHtml($match[1]));
+            if ($key !== '') $sections[$key] = $this->cleanHtml($match[2]);
         }
-        return $flat;
+        return $sections;
     }
 
-    private function field(array $flat, array $aliases): string
+    private function targets(): array
     {
-        foreach ($aliases as $alias) foreach ($flat as $field => $value) {
-            $key = $this->key($alias);
-            if (($field === $key || str_ends_with($field, $key)) && $value !== '') return $value;
-        }
+        return ['principal' => 'use_principal_text', 'compatible' => 'use_compatible_text',
+            'complementario' => 'use_complementary_text', 'restringido' => 'use_restricted_text',
+            'prohibido' => 'use_prohibited_text'];
+    }
+
+    private function targetKey(string $text): string
+    {
+        $key = $this->key(str_replace('USO ', '', $text));
+        foreach (array_keys($this->targets()) as $target) if (str_contains($key, $target)) return $target;
         return '';
     }
 
-    private function references(array $flat, string $queried): array
+    private function title(string $html): string
+    {
+        return preg_match('/<h2[^>]*>(.*?)<\/h2>/is', $html, $match) ? $this->cleanHtml($match[1]) : (strtok($this->cleanHtml($html), "\n") ?: '');
+    }
+
+    private function merge(string $row, string $section): string
+    {
+        $row = trim($row); $section = trim($section);
+        if ($row === '') return $section;
+        if ($section === '' || str_contains($this->key($section), $this->key($row))) return $row;
+        return $row . "\n\n" . $section;
+    }
+
+    private function cleanHtml(string $html): string
+    {
+        $html = preg_replace('/<\s*(br|\/p|\/div|\/h[1-6]|\/tr)\b[^>]*>/i', "\n", $html) ?? $html;
+        $text = html_entity_decode(strip_tags($html), ENT_QUOTES | ENT_HTML5, 'UTF-8');
+        $text = preg_replace('/[ \t\x{00a0}]+/u', ' ', $text) ?? $text;
+        return trim(preg_replace('/\n{2,}/', "\n", $text) ?? $text);
+    }
+
+    private function referenceFields(string $queried, string $html): array
     {
         $numbers = [$queried];
-        foreach ($flat as $key => $value) {
-            if (!str_contains($key, 'predial') && !str_contains($key, 'catastral') && !str_contains($key, 'referencia')) continue;
-            $digits = preg_replace('/\D+/', '', $value) ?? '';
-            if ($digits !== '') $numbers[] = $digits;
-        }
+        preg_match_all('/\d{10,}/', $html, $matches);
+        foreach ($matches[0] ?? [] as $number) $numbers[] = $number;
         $short = $long = '';
         foreach (array_unique($numbers) as $digits) {
             if (mb_strlen($digits) >= 20 && $long === '') $long = $digits;
@@ -106,12 +122,11 @@ final class UrbanNormMidasUsageSearch
         return [$short, $long];
     }
 
-    private function hasKeys(array $record, array $keys): bool
-    {
-        $haystack = $this->key(implode(' ', array_keys($record)));
-        foreach ($keys as $key) if (str_contains($haystack, $this->key($key))) return true;
-        return false;
-    }
+    private function firstNonEmpty(array $values): string
+    { foreach ($values as $value) if (trim((string) $value) !== '') return (string) $value; return ''; }
+
+    private function digits(string $value): string
+    { return preg_replace('/\D+/', '', $value) ?? ''; }
 
     private function key(string $value): string
     {
