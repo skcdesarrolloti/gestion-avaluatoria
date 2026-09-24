@@ -84,6 +84,7 @@ final class Migrator
             if (!isset($rows[$version])) {
                 $pending[] = $file;
             } elseif (!hash_equals($rows[$version], hash_file('sha256', $file))) {
+                if ($this->optionalFailure($file)) continue;
                 throw new \RuntimeException('Migración aplicada modificada: ' . $version);
             }
         }
