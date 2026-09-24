@@ -26,7 +26,17 @@ $input = static function (string $name, string $label, string $placeholder = '',
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 <?php if ($urbanMessage): ?><p class="mt-6 rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($urbanMessage) ?></p><?php endif; ?>
 <?php if ($urbanError): ?><p class="mt-6 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($urbanError) ?></p><?php endif; ?>
-<section class="mt-7 rounded-2xl border border-indigo-100 bg-indigo-50 p-6 shadow-sm sm:p-8">
+<div class="mt-7 space-y-6" x-data="{ tab: (location.hash || '#midas').slice(1) }">
+<nav class="rounded-xl bg-slate-200/70 p-2" aria-label="Submenú normatividad urbana">
+    <div class="flex gap-2 overflow-x-auto">
+        <?php foreach ([['midas','5.1 Consulta MIDAS'],['pot','5.2 POT y cuadros'],['determinantes','5.3 Determinantes'],['fuentes','5.4 Archivos y normas'],['cierre','5.5 Cierre']] as [$key, $label]): ?>
+            <button class="inline-flex min-h-11 shrink-0 items-center rounded-lg px-4 py-2 text-sm font-semibold"
+                :class="tab === '<?= e($key) ?>' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:bg-blue-50'"
+                type="button" @click="tab = '<?= e($key) ?>'; history.replaceState(null, '', '#<?= e($key) ?>')"><?= e($label) ?></button>
+        <?php endforeach; ?>
+    </div>
+</nav>
+<section x-show="tab === 'fuentes'" class="rounded-2xl border border-indigo-100 bg-indigo-50 p-6 shadow-sm sm:p-8">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Academia normativa aplicada al numeral 5</p>
@@ -48,10 +58,10 @@ $input = static function (string $name, string $label, string $placeholder = '',
         <?php endforeach; ?>
     </div>
 </section>
-<form class="mt-7 space-y-6" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana')) ?>" data-module-autosave data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/autoguardar')) ?>">
+<form class="space-y-6" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana')) ?>" data-module-autosave data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/autoguardar')) ?>">
     <?= csrf_field() ?>
     <input type="hidden" name="version" value="<?= e((string) ($profile['version'] ?? 0)) ?>">
-    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <section id="midas" x-show="tab === 'midas'" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div class="flex flex-wrap items-start justify-between gap-5">
             <div>
                 <p class="eyebrow">Consulta MIDAS</p>
@@ -59,9 +69,12 @@ $input = static function (string $name, string $label, string $placeholder = '',
                 <p class="mt-2 text-sm leading-6 text-slate-600">Copia aquí exactamente la lectura que haces en MIDAS al consultar el predial y seleccionar Uso del suelo.</p>
                 <p class="mt-2 text-xs font-semibold text-teal-800" data-autosave-status>Autoguardado activo</p>
             </div>
-            <label class="inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
-                <input type="checkbox" name="midas_consulted" value="1" <?= e($checked('midas_consulted')) ?>> MIDAS consultado
-            </label>
+            <div class="flex flex-wrap gap-2">
+                <button class="btn-primary" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/midas/consultar')) ?>">Consultar MIDAS</button>
+                <label class="inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
+                    <input type="checkbox" name="midas_consulted" value="1" <?= e($checked('midas_consulted')) ?>> MIDAS consultado
+                </label>
+            </div>
         </div>
         <div class="mt-6 grid gap-4 md:grid-cols-3">
             <?php $input('cadastral_reference', 'Número predial o referencia catastral consultada', 'Ej. referencia predial de MIDAS'); ?>
@@ -77,7 +90,7 @@ $input = static function (string $name, string $label, string $placeholder = '',
             <div class="md:col-span-3"><?php $textarea('midas_usage_result', 'Resultado leído en MIDAS · Uso del suelo', 'Transcribe el uso, área de actividad, zona, tratamiento, restricciones o mensaje No disponible.', 5); ?></div>
         </div>
     </section>
-    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <section id="pot" x-show="tab === 'pot'" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <p class="eyebrow">Cruce normativo</p><h2 class="mt-2 text-2xl font-semibold">POT, cuadros de uso y normas pertinentes</h2>
         <div class="mt-6 grid gap-4 md:grid-cols-2">
             <label class="label">Documento normativo fuente
@@ -111,7 +124,7 @@ $input = static function (string $name, string $label, string $placeholder = '',
             <div class="md:col-span-2"><?php $textarea('urban_norms_applied', 'Normas urbanísticas pertinentes aplicadas', 'Relaciona POT, Decreto 0977, Decreto 1077, Ley 388, resoluciones, plan parcial, licencia o acto especial que aplique.', 5); ?></div>
         </div>
     </section>
-    <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <section id="determinantes" x-show="tab === 'determinantes'" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <p class="eyebrow">Determinantes y concepto</p><h2 class="mt-2 text-2xl font-semibold">Planeación, patrimonio, ambiente y riesgo</h2>
         <div class="mt-6 grid gap-4 md:grid-cols-2">
             <?php $input('planning_concept_number', 'Radicado o número de concepto de uso del suelo'); ?>
@@ -122,7 +135,7 @@ $input = static function (string $name, string $label, string $placeholder = '',
             <?php $textarea('risk_context', 'Riesgo, amenaza o afectaciones externas', 'Amenaza, riesgo, reserva vial, espacio público, servidumbres urbanísticas o cargas externas.', 4); ?>
         </div>
     </section>
-    <section class="rounded-2xl border border-emerald-100 bg-emerald-50 p-6 shadow-sm sm:p-8">
+    <section id="cierre" x-show="tab === 'cierre'" class="rounded-2xl border border-emerald-100 bg-emerald-50 p-6 shadow-sm sm:p-8">
         <p class="eyebrow">Texto para el entregable</p><h2 class="mt-2 text-2xl font-semibold">Conclusión urbanística del analista</h2>
         <div class="mt-6 grid gap-4">
             <?php $textarea('restrictions', 'Restricciones o condiciones urbanísticas', 'Condiciones que limitan, condicionan o afectan el uso o desarrollo.', 4); ?>
@@ -137,4 +150,5 @@ $input = static function (string $name, string $label, string $placeholder = '',
         <button class="btn-primary" type="submit" name="next" value="deliverable">Guardar y pasar a Entregable</button>
     </div>
 </form>
+</div>
 <?php require BASE_PATH . '/app/Views/appraisals/report-extra-notes.php'; ?>

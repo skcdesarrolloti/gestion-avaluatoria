@@ -81,8 +81,8 @@ final class UrbanNormativeRepository
     public function stats(?array $documents = null): array
     {
         if ($documents !== null) return ['documents' => count($documents),
-            'available' => count(array_filter($documents, fn ($d): bool => (bool) $d['has_file'])),
-            'missing' => count(array_filter($documents, fn ($d): bool => !(bool) $d['has_file']))];
+            'available' => count(array_filter($documents, fn ($d): bool => (bool) $d['has_source'])),
+            'missing' => count(array_filter($documents, fn ($d): bool => !(bool) $d['has_source']))];
         return ['documents' => (int) $this->db->query('SELECT COUNT(*) FROM urban_norm_documents')->fetchColumn(),
             'tables' => (int) $this->db->query('SELECT COUNT(*) FROM urban_norm_tables')->fetchColumn(),
             'categories' => (int) $this->db->query('SELECT COUNT(*) FROM urban_norm_use_categories')->fetchColumn(),
@@ -111,7 +111,9 @@ final class UrbanNormativeRepository
         $filename = (string) ($row['storage_filename'] ?? '');
         $path = $filename !== '' ? self::storagePath($filename) : '';
         $hasBlob = is_string($row['pdf_blob'] ?? null) && $row['pdf_blob'] !== '';
-        return $row + ['has_blob' => $hasBlob, 'has_file' => ($path !== '' && is_file($path)) || $hasBlob,
+        $hasFile = ($path !== '' && is_file($path)) || $hasBlob;
+        return $row + ['has_blob' => $hasBlob, 'has_file' => $hasFile,
+            'has_link' => trim((string) ($row['source_url'] ?? '')) !== '', 'has_source' => $hasFile || trim((string) ($row['source_url'] ?? '')) !== '',
             'file_path' => $path, 'storage_filename' => $filename, 'source_filename' => $row['source_filename'] ?? ''];
     }
 }

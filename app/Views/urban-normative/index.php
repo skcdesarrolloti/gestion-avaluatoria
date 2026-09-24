@@ -23,7 +23,7 @@ $typeLabels = ['pot' => 'POT', 'cuadro_uso' => 'Cuadros de uso', 'sistema_consul
         <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Sube aquí los PDF base. Cuando diligencies el numeral 5 podrás escoger el documento, cuadro o categoría aplicable sin volver pesado el formulario.</p>
         <div class="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
             <span class="rounded-full bg-slate-100 px-3 py-1 text-slate-600"><?= e($stats['documents']) ?> documento(s)</span>
-            <span class="rounded-full bg-teal-50 px-3 py-1 text-teal-700"><?= e($stats['available']) ?> PDF cargado(s)</span>
+            <span class="rounded-full bg-teal-50 px-3 py-1 text-teal-700"><?= e($stats['available']) ?> fuente(s) disponible(s)</span>
             <span class="rounded-full bg-amber-50 px-3 py-1 text-amber-700"><?= e($stats['missing']) ?> pendiente(s)</span>
         </div>
         <?php if (!empty($importNotice)): ?>
@@ -64,7 +64,7 @@ $typeLabels = ['pot' => 'POT', 'cuadro_uso' => 'Cuadros de uso', 'sistema_consul
                     <?php if (!empty($doc['source_url'])): ?><div><dt class="font-semibold text-slate-950">URL oficial</dt><dd><a class="text-teal-700 underline" href="<?= e($doc['source_url']) ?>" target="_blank" rel="noopener">Abrir fuente externa</a></dd></div><?php endif; ?>
                 </dl>
                 <div class="mt-4 flex flex-wrap items-center justify-between gap-3 border-t border-slate-100 pt-4">
-                    <span class="text-xs font-semibold <?= $doc['has_file'] ? 'text-emerald-700' : 'text-amber-700' ?>"><?= $doc['has_file'] ? 'PDF disponible' : 'Pendiente de archivo' ?></span>
+                    <span class="text-xs font-semibold <?= $doc['has_source'] ? 'text-emerald-700' : 'text-amber-700' ?>"><?= $doc['has_file'] ? 'PDF interno disponible' : ($doc['has_link'] ? 'Link oficial disponible' : 'Pendiente de fuente') ?></span>
                     <?php if ($doc['has_file']): ?><a class="btn-secondary" target="_blank" rel="noopener" href="<?= e(url('normatividad-urbana/' . $doc['slug'] . '/archivo')) ?>">Abrir PDF</a><?php endif; ?>
                 </div>
                 <form class="mt-4 grid gap-2" method="post" action="<?= e(url('normatividad-urbana/' . $doc['slug'] . '/importar')) ?>" enctype="multipart/form-data" x-data="{ busy: false }" @submit="busy = true">

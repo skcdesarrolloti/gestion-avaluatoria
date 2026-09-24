@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, Session};
 use App\Models\{AppraisalRepository, AppraisalReportNoteRepository, AppraisalSubjectRepository, AppraisalUrbanNormRepository, UrbanNormativeRepository};
+use App\Services\UrbanNormMidasUsageSearch;
 use App\Support\{AppraisalReportNoteCatalog, UrbanNormativeAcademy};
 
 final class AppraisalUrbanNormController
@@ -58,6 +59,24 @@ final class AppraisalUrbanNormController
         $this->appraisals->find($id, $this->user['id']);
         $version = $this->profiles->save($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $_POST);
         Http::json(['ok' => true, 'version' => $version, 'saved_at' => gmdate('c')]);
+    }
+
+    public function consultMidas(string $id): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        $subject = $this->subjects->find($id, $this->user['id']);
+        try {
+            $version = $this->profiles->save($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $_POST);
+            $reference = trim((string) ($_POST['cadastral_reference'] ?? $subject['cadastral_reference'] ?? ''));
+            $result = (new UrbanNormMidasUsageSearch())->consult($reference);
+            if (!empty($result['fields'])) {
+                $profile = $this->profiles->profile($id, $this->user['id']);
+                $this->profiles->save($id, $this->user['id'], $version, array_replace($profile, $result['fields']));
+            }
+            $key = ($result['ok'] ?? false) ? 'urban_norm_message' : 'urban_norm_error';
+            Session::flash($key, (string) ($result['message'] ?? 'Consulta MIDAS finalizada.'));
+        } catch (\Throwable $error) { Session::flash('urban_norm_error', $error->getMessage()); }
+        Http::redirect('avaluos/' . $id . '/normatividad-urbana#midas');
     }
 
     private function prefilledProfile(array $profile, array $subject): array
