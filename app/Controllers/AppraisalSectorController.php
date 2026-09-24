@@ -47,6 +47,7 @@ final class AppraisalSectorController
             $advancedRows = [];
             $sectorError = $this->sectorWarning($sectorError, $error, 'sector_advanced_show');
         }
+        $reportNotes = $this->reportNotes->byChapter($id, $this->user['id'], '2');
         view('appraisals/sector', [
             'title' => 'Sector y entorno',
             'record' => $record,
@@ -67,9 +68,8 @@ final class AppraisalSectorController
             'sectorAdvancedCatalog' => AppraisalSectorAdvancedCatalog::sections(),
             'sectorBankSources' => SectorBankCatalog::sources(),
             'photos' => $this->appraisals->photos($id, $this->user['id']),
-            'reportNotes' => $this->reportNotes->byChapter($id, $this->user['id'], '2'),
-            'reportNoteSections' => AppraisalReportNoteCatalog::withCustom('2',
-                $this->reportNotes->customSections($id, $this->user['id'], '2')),
+            'reportNotes' => $reportNotes,
+            'reportNoteSections' => AppraisalReportNoteCatalog::withNoteSections('2', $reportNotes),
             'reportNoteChapter' => '2',
             'reportNoteReturn' => 'avaluos/' . $id . '/sector',
             'photoMessage' => Session::pullFlash('sector_photo_message'),

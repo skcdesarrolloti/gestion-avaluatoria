@@ -29,7 +29,15 @@ final class Migrator
             foreach ($this->pending($files) as $file) {
                 $checksum = hash_file('sha256', $file);
                 $migration = require $file;
-                $migration(new Schema($this->db));
+                try {
+                    $migration(new Schema($this->db));
+                } catch (\Throwable $error) {
+                    if (!$this->optionalFailure($file)) {
+                        throw $error;
+                    }
+                    error_log('Gestion avaluatoria migracion opcional omitida '
+                        . basename($file) . ' ' . get_class($error) . ' code=' . $error->getCode());
+                }
                 $query = $this->db->prepare('INSERT INTO schema_migrations (version, checksum) VALUES (?, ?)');
                 $query->execute([basename($file), $checksum]);
                 $applied[] = basename($file);
@@ -92,5 +100,10 @@ final class Migrator
             }
             throw $error;
         }
+    }
+
+    private function optionalFailure(string $file): bool
+    {
+        return basename($file) === '202609230009_create_appraisal_report_note_sections.php';
     }
 }

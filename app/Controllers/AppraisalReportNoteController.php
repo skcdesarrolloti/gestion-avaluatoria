@@ -15,7 +15,7 @@ final class AppraisalReportNoteController
         $rows = is_array($_POST['report_notes'] ?? null) ? $_POST['report_notes'] : [];
         $sections = is_array($_POST['report_note_sections'] ?? null) ? $_POST['report_note_sections'] : [];
         try {
-            $this->notes->saveCustomSections($id, $this->user['id'], $chapter, $sections);
+            $rows = $this->applySectionLabels($rows, $sections, $chapter);
             $this->notes->saveRows($id, $this->user['id'], $chapter, $rows);
             Session::flash('report_note_message', 'Ampliaciones del entregable guardadas.');
         } catch (\Throwable $error) {
@@ -25,6 +25,22 @@ final class AppraisalReportNoteController
     }
 
     private function chapter(string $value): string { return in_array($value, ['1', '2', '3', '4'], true) ? $value : '1'; }
+    private function applySectionLabels(array $rows, array $sections, string $chapter): array
+    {
+        $labels = [];
+        foreach ($sections as $section) {
+            if (!is_array($section)) continue;
+            $code = trim((string) ($section['section_code'] ?? '')); $label = trim((string) ($section['label'] ?? ''));
+            if (preg_match('/^' . preg_quote($chapter, '/') . '(?:\.\d+){1,3}$/', $code) && $label !== '') $labels[$code] = $label;
+        }
+        foreach ($rows as &$row) {
+            if (is_array($row) && trim((string) ($row['title'] ?? '')) === '') {
+                $code = trim((string) ($row['section_code'] ?? ''));
+                if (isset($labels[$code])) $row['title'] = $labels[$code];
+            }
+        }
+        return $rows;
+    }
     private function returnTo(string $id, string $chapter): string
     {
         $target = (string) ($_POST['return_to'] ?? '');

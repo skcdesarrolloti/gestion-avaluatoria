@@ -17,6 +17,7 @@ final class AppraisalSubjectController
     {
         $record = $this->appraisals->find($id, $this->user['id']);
         $subject = $this->subjects->find($id, $this->user['id']);
+        $reportNotes = $this->reportNotes?->byChapter($id, $this->user['id'], '3') ?? [];
         $phSearch = mb_substr(trim((string) ($_GET['copropiedad'] ?? '')), 0, 190);
         $this->appraisals->ensureUnits($id, $this->user['id'],
             (int) ($record['igac_property_units_count'] ?? 0), (int) ($record['igac_annex_units_count'] ?? 0));
@@ -53,9 +54,8 @@ final class AppraisalSubjectController
             'specialAttributeOptions' => AppraisalSpecialAttributeCatalog::selectOptions(),
             'subjectCatalog' => AppraisalSubjectCatalog::selects(),
             'subjectHelp' => AppraisalSubjectCatalog::helps(),
-            'reportNotes' => $this->reportNotes?->byChapter($id, $this->user['id'], '3') ?? [],
-            'reportNoteSections' => AppraisalReportNoteCatalog::withCustom('3',
-                $this->reportNotes?->customSections($id, $this->user['id'], '3') ?? []),
+            'reportNotes' => $reportNotes,
+            'reportNoteSections' => AppraisalReportNoteCatalog::withNoteSections('3', $reportNotes),
             'reportNoteChapter' => '3',
             'reportNoteReturn' => 'avaluos/' . $id . '/bien-sujeto',
             'subjectMessage' => Session::pullFlash('subject_message'),

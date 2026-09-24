@@ -19,6 +19,22 @@ final class AppraisalReportNoteCatalog
         return $sections;
     }
 
+    public static function withNoteSections(string $chapter, array $notes): array
+    {
+        $base = self::sections($chapter); $custom = [];
+        foreach ($notes as $note) {
+            $code = (string) ($note['section_code'] ?? '');
+            $title = trim((string) ($note['title'] ?? ''));
+            if ($code !== '' && !isset($base[$code]) && $title !== '') $custom[$code] = $title;
+        }
+        return self::withCustom($chapter, $custom);
+    }
+
+    public static function noteSectionLabels(string $chapter, array $notes): array
+    {
+        return array_diff_key(self::withNoteSections($chapter, $notes), self::sections($chapter));
+    }
+
     public static function all(): array
     {
         return [
