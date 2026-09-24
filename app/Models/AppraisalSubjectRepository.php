@@ -48,29 +48,28 @@ final class AppraisalSubjectRepository
     {
         if ($predio === []) return;
         $current = $this->find($appraisalId, $owner);
-        $data = ['address_midas' => $predio['address'] ?? '', 'neighborhood_name' => $predio['territory'] ?? '',
-            'locality_name' => $predio['locality'] ?? '', 'commune_ucg' => $predio['commune_ucg'] ?? '',
-            'zone_sector' => $predio['land_use'] ?? '', 'property_registry' => $predio['property_registry'] ?? '',
-            'cadastral_reference' => $predio['cadastral_reference'] ?? '', 'stratum' => $this->stratum((string) ($predio['stratum'] ?? '')),
+        $data = ['address_midas' => $predio['address'] ?? '', 'midas_updated_on' => $this->date((string) ($predio['updated_on'] ?? '')), 'midas_predio_raw' => $predio['_raw'] ?? ''];
+        $sourceMap = ['midas_national_cadastral_reference' => 'national_cadastral_reference',
+            'midas_property_registry' => 'property_registry', 'midas_address' => 'address', 'midas_cadastral_reference' => 'cadastral_reference',
+            'midas_territory' => 'territory', 'midas_locality' => 'locality', 'midas_commune_ucg' => 'commune_ucg', 'midas_land_use' => 'land_use',
+            'midas_urban_treatment' => 'urban_treatment', 'midas_risk' => 'risk', 'midas_land_classification' => 'land_classification', 'midas_dane_block_code' => 'dane_block_code', 'midas_dane_block_side' => 'dane_block_side',
+            'midas_block_number' => 'block_number', 'midas_property_number' => 'property_number', 'midas_stratum' => 'stratum', 'midas_stratum_record' => 'stratum_record', 'midas_stratum_atypical' => 'stratum_atypical',
+            'midas_stratum_observation' => 'stratum_observation', 'midas_building_name' => 'building_name', 'midas_land_area_m2' => 'land_area_m2', 'midas_built_area_m2' => 'built_area_m2'];
+        foreach ($sourceMap as $target => $source) $data[$target] = $predio[$source] ?? '';
+        $fillable = ['neighborhood_name' => $predio['territory'] ?? '', 'locality_name' => $predio['locality'] ?? '',
+            'commune_ucg' => $predio['commune_ucg'] ?? '', 'zone_sector' => $predio['land_use'] ?? '',
+            'property_registry' => $predio['property_registry'] ?? '', 'cadastral_reference' => $predio['cadastral_reference'] ?? '', 'stratum' => $this->stratum((string) ($predio['stratum'] ?? '')),
             'current_use' => $this->useCategory((string) ($predio['land_use'] ?? '')), 'urban_treatment' => $this->treatment((string) ($predio['urban_treatment'] ?? '')),
             'restrictions' => trim((string) ($predio['risk'] ?? '')) !== '' ? 'amenaza_riesgo' : '',
             'legal_urban_affectations' => trim((string) ($predio['risk'] ?? '')) !== '' ? 'riesgo' : '',
-            'subject_reference_date' => $this->date((string) ($predio['updated_on'] ?? '')), 'midas_updated_on' => $this->date((string) ($predio['updated_on'] ?? '')),
-            'midas_predio_raw' => $predio['_raw'] ?? ''];
-        foreach (['midas_national_cadastral_reference' => 'national_cadastral_reference', 'midas_property_registry' => 'property_registry',
-            'midas_address' => 'address', 'midas_cadastral_reference' => 'cadastral_reference', 'midas_territory' => 'territory',
-            'midas_locality' => 'locality', 'midas_commune_ucg' => 'commune_ucg', 'midas_land_use' => 'land_use',
-            'midas_urban_treatment' => 'urban_treatment', 'midas_risk' => 'risk', 'midas_land_classification' => 'land_classification',
-            'midas_dane_block_code' => 'dane_block_code', 'midas_dane_block_side' => 'dane_block_side', 'midas_block_number' => 'block_number',
-            'midas_property_number' => 'property_number', 'midas_stratum' => 'stratum', 'midas_stratum_record' => 'stratum_record',
-            'midas_stratum_atypical' => 'stratum_atypical', 'midas_stratum_observation' => 'stratum_observation', 'midas_building_name' => 'building_name',
-            'midas_land_area_m2' => 'land_area_m2', 'midas_built_area_m2' => 'built_area_m2'] as $target => $source) $data[$target] = $predio[$source] ?? '';
-        foreach ($data as $key => $value) if ($value === '') unset($data[$key]);
+            'subject_reference_date' => $this->date((string) ($predio['updated_on'] ?? ''))];
+        foreach ($fillable as $key => $value) if (($current[$key] ?? '') === '') $data[$key] = $value;
+        foreach ($data as $key => $value) if ($value === '' || $value === null) unset($data[$key]);
         if ($data === []) return;
-        if (($current['adopted_source'] ?? '') === '') $data['adopted_source'] = 'midas';
-        if (($current['adopted_address'] ?? '') === '' && !empty($data['address_midas'])) $data['adopted_address'] = $data['address_midas'];
-        if (!$this->exists($appraisalId, $owner)) { $this->insert($appraisalId, $owner,
-            array_replace(AppraisalSubjectCatalog::defaults(), $data), gmdate('Y-m-d H:i:s')); return; }
+        if (!$this->exists($appraisalId, $owner)) {
+            $this->insert($appraisalId, $owner, array_replace(AppraisalSubjectCatalog::defaults(), $data), gmdate('Y-m-d H:i:s'));
+            return;
+        }
         $set = implode(', ', array_map(static fn (string $key): string => $key . ' = ?', array_keys($data)));
         $query = $this->db->prepare('UPDATE appraisal_subjects SET ' . $set
             . ', updated_at = ? WHERE appraisal_id = ? AND owner_id = ?');

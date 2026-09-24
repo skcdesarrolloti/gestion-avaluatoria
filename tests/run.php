@@ -481,6 +481,33 @@ try {
         'busqueda por barrio encuentra avaluos relacionados');
     expect($subject['neighborhood_name'] === 'El Poblado' && $subject['locality_name'] === 'Zona urbana'
         && $subject['commune_ucg'] === 'Comuna 14', 'ficha sujeto deriva ubicacion desde barrio');
+    $db->prepare('UPDATE appraisal_subjects SET address = ?, address_certificate = ?, adopted_source = ?,
+        adopted_address = ?, property_registry = ?, cadastral_reference = ?, stratum = ?, current_use = ?,
+        urban_treatment = ?, restrictions = ?, legal_urban_affectations = ? WHERE appraisal_id = ? AND owner_id = ?')
+        ->execute(['Dirección visita', 'Dirección CTL', 'certificado', 'Dirección adoptada por visita',
+            '060-CTL', '01-CTL', '3', 'residencial', 'consolidacion', 'sin_restricciones',
+            'sin_afectaciones', str_repeat('a', 32), 1]);
+    $subjectRepo->applyMidasPredio(str_repeat('a', 32), 1, [
+        'address' => 'C 30 50A 83', 'territory' => 'Barrio Zaragocilla',
+        'locality' => 'Histórica y del Caribe Norte', 'commune_ucg' => '8', 'land_use' => 'Mixto 2',
+        'urban_treatment' => 'Mejoramiento Integral Parcial', 'risk' => 'Expansividad Moderada (100.0 %)',
+        'land_classification' => 'Suelo Urbano', 'property_registry' => '060-MIDAS',
+        'cadastral_reference' => '010303810024000', 'national_cadastral_reference' => '130010103000003810024000000000',
+        'stratum' => '1', 'land_area_m2' => '529.00', 'built_area_m2' => '329.00',
+        'updated_on' => '2026-05-31',
+    ]);
+    $protectedSubject = $subjectRepo->find(str_repeat('a', 32), 1);
+    expect($protectedSubject['adopted_source'] === 'certificado'
+        && $protectedSubject['adopted_address'] === 'Dirección adoptada por visita'
+        && $protectedSubject['property_registry'] === '060-CTL'
+        && $protectedSubject['cadastral_reference'] === '01-CTL'
+        && $protectedSubject['stratum'] === '3'
+        && $protectedSubject['current_use'] === 'residencial'
+        && $protectedSubject['urban_treatment'] === 'consolidacion'
+        && $protectedSubject['address_midas'] === 'C 30 50A 83'
+        && $protectedSubject['midas_cadastral_reference'] === '010303810024000'
+        && $protectedSubject['midas_land_area_m2'] === '529.00',
+        'consulta MIDAS conserva campos adoptados y guarda fuentes separadas');
     $seedStyleNeighborhoodId = 'geo-neigh-crespo-test-00000000';
     $db->prepare('INSERT INTO master_neighborhoods
         (id, city_id, locality_id, name, commune_ucg, zone_sector, active, notes, created_at, updated_at)
