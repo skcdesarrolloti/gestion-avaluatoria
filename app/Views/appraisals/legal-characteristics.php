@@ -61,7 +61,7 @@ $trafficCounts = \App\Support\AppraisalLegalView::trafficCounts($annotations);
     <?php require BASE_PATH . '/app/Views/appraisals/legal-linkage-search.php'; ?>
     <form class="mt-6 grid gap-4 lg:grid-cols-[1fr_auto]" method="post" enctype="multipart/form-data"
         data-legal-certificate-form
-        action="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas/certificado')) ?>">
+        action="<?= e(url('avaluos/' . $record['id'] . '/juridicas/certificado')) ?>">
         <?= csrf_field() ?>
         <textarea name="client_extracted_text" hidden data-client-extracted-text></textarea>
         <label class="label">Certificado registral
@@ -74,7 +74,7 @@ $trafficCounts = \App\Support\AppraisalLegalView::trafficCounts($annotations);
     </form>
     <?php if ($latest): ?>
         <form class="mt-4 flex flex-wrap items-center gap-3" method="post"
-            action="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas/reanalizar')) ?>">
+            action="<?= e(url('avaluos/' . $record['id'] . '/juridicas/reanalizar')) ?>">
             <?= csrf_field() ?>
             <button class="btn-secondary" type="submit">Reanalizar último certificado cargado</button>
             <span class="text-sm leading-6 text-slate-500">
@@ -92,7 +92,7 @@ $trafficCounts = \App\Support\AppraisalLegalView::trafficCounts($annotations);
                     <?php foreach ($certificates as $certificate): ?>
                         <tr>
                             <td class="px-4 py-3">
-                                <a class="font-semibold text-blue-800 underline" href="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas/certificados/' . $certificate['id'])) ?>">
+                                <a class="font-semibold text-blue-800 underline" href="<?= e(url('avaluos/' . $record['id'] . '/juridicas/certificados/' . $certificate['id'])) ?>">
                                     <?= e($certificate['source_filename']) ?>
                                 </a>
                                 <span class="block text-xs text-slate-500"><?= e(number_format((int) $certificate['file_size_bytes'] / 1024, 1, ',', '.')) ?> KB</span>
@@ -101,7 +101,7 @@ $trafficCounts = \App\Support\AppraisalLegalView::trafficCounts($annotations);
                             <td class="px-4 py-3 text-slate-600"><?= e($certificate['created_at']) ?></td>
                             <td class="px-4 py-3">
                                 <form method="post"
-                                    action="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas/certificados/' . $certificate['id'] . '/eliminar')) ?>"
+                                    action="<?= e(url('avaluos/' . $record['id'] . '/juridicas/certificados/' . $certificate['id'] . '/eliminar')) ?>"
                                     onsubmit="return confirm('¿Eliminar este certificado del avalúo? Los campos ya diligenciados se conservarán.');">
                                     <?= csrf_field() ?>
                                     <button class="btn-secondary min-h-9 px-3 py-1 text-xs text-red-700" type="submit">Eliminar</button>
@@ -115,9 +115,9 @@ $trafficCounts = \App\Support\AppraisalLegalView::trafficCounts($annotations);
     <?php endif; ?>
 </section>
 
-<form class="mt-7 space-y-6" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas')) ?>"
+<form class="mt-7 space-y-6" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/juridicas')) ?>"
     data-module-autosave
-    data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas/autoguardar')) ?>">
+    data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/juridicas/autoguardar')) ?>">
     <?= csrf_field() ?>
     <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div class="flex flex-wrap items-start justify-between gap-5">

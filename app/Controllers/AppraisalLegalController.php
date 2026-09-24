@@ -43,7 +43,7 @@ final class AppraisalLegalController
             'reportNotes' => $reportNotes,
             'reportNoteSections' => AppraisalReportNoteCatalog::withNoteSections('4', $reportNotes),
             'reportNoteChapter' => '4',
-            'reportNoteReturn' => 'avaluos/' . $id . '/caracteristicas-juridicas',
+            'reportNoteReturn' => 'avaluos/' . $id . '/juridicas',
             'legalMessage' => Session::pullFlash('legal_message'),
             'legalError' => Session::pullFlash('legal_error'),
         ]);
@@ -63,7 +63,7 @@ final class AppraisalLegalController
         } catch (\Throwable $error) {
             Session::flash('legal_error', $error->getMessage());
         }
-        Http::redirect('avaluos/' . $id . '/caracteristicas-juridicas');
+        Http::redirect('avaluos/' . $id . '/juridicas');
     }
 
     public function save(string $id): never
@@ -77,7 +77,7 @@ final class AppraisalLegalController
         }
         $target = (string) ($_POST['next'] ?? '') === 'deliverable'
             ? 'avaluos/' . $id . '/entregable'
-            : 'avaluos/' . $id . '/caracteristicas-juridicas';
+            : 'avaluos/' . $id . '/juridicas';
         Http::redirect($target);
     }
 
@@ -112,7 +112,7 @@ final class AppraisalLegalController
         } catch (\Throwable $error) {
             Session::flash('legal_error', $error->getMessage());
         }
-        Http::redirect('avaluos/' . $id . '/caracteristicas-juridicas');
+        Http::redirect('avaluos/' . $id . '/juridicas');
     }
 
     public function certificate(string $id, string $certificateId): never
@@ -148,7 +148,7 @@ final class AppraisalLegalController
         } catch (\Throwable $error) {
             Session::flash('legal_error', $error->getMessage());
         }
-        Http::redirect('avaluos/' . $id . '/caracteristicas-juridicas');
+        Http::redirect('avaluos/' . $id . '/juridicas');
     }
 
     private function certificatePath(array $file): string

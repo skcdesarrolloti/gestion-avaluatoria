@@ -44,7 +44,7 @@ final class AppraisalReportNoteController
     private function returnTo(string $id, string $chapter): string
     {
         $target = (string) ($_POST['return_to'] ?? '');
-        $allowed = ['1' => 'expediente', '2' => 'sector', '3' => 'bien-sujeto', '4' => 'caracteristicas-juridicas'];
+        $allowed = ['1' => 'expediente', '2' => 'sector', '3' => 'bien-sujeto', '4' => 'juridicas'];
         $path = 'avaluos/' . $id . '/' . ($allowed[$chapter] ?? 'entregable');
         return preg_match('#^avaluos/' . preg_quote($id, '#') . '/[a-z0-9-]+(?:\#[a-z0-9_-]+)?$#', $target) ? $target : $path;
     }

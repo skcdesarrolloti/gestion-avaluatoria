@@ -140,7 +140,7 @@ $phSummaryKeys = [
                 La lectura no reemplaza el estudio de títulos y conserva trazabilidad de las fuentes.
             </p>
         </div>
-        <a class="rounded-full bg-white px-4 py-2 text-sm font-bold text-indigo-800" href="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas')) ?>">Editar módulo 4</a>
+        <a class="rounded-full bg-white px-4 py-2 text-sm font-bold text-indigo-800" href="<?= e(url('avaluos/' . $record['id'] . '/juridicas')) ?>">Editar módulo 4</a>
     </div>
     <textarea class="input mt-5 min-h-80 bg-white font-mono text-sm leading-6" rows="18" readonly><?= e($legalChapterText) ?></textarea>
 </section>

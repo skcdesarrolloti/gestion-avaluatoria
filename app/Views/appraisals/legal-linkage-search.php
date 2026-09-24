@@ -20,7 +20,7 @@ $legalResults = is_array($legalSearchResults ?? null) ? $legalSearchResults : []
             </p>
         </div>
         <form class="grid gap-2 sm:grid-cols-[minmax(220px,1fr)_auto]" method="get"
-            action="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas')) ?>">
+            action="<?= e(url('avaluos/' . $record['id'] . '/juridicas')) ?>">
             <label class="sr-only" for="legal-matricula-search">Buscar por matrícula o referencia catastral</label>
             <input id="legal-matricula-search" class="input bg-white" name="matricula"
                 value="<?= e($legalQuery ?: $legalExpectedRegistry) ?>"
@@ -31,7 +31,7 @@ $legalResults = is_array($legalSearchResults ?? null) ? $legalSearchResults : []
     <?php if ($legalQuery !== ''): ?>
         <?php if ($legalResults): ?>
             <div class="mt-4 grid gap-3 lg:grid-cols-2">
-                <?php $searchResultRoute = 'caracteristicas-juridicas'; ?>
+                <?php $searchResultRoute = 'juridicas'; ?>
                 <?php foreach ($legalResults as $item): ?>
                     <?php require BASE_PATH . '/app/Views/appraisals/search-result-card.php'; ?>
                 <?php endforeach; ?>
