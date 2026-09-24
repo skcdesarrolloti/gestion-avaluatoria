@@ -4,6 +4,19 @@ $field = static fn (string $name): string => (string) ($record[$name] ?? '');
 $count = static fn (string $name): int => max(0, (int) ($record[$name] ?? 0));
 $currentStep = 'sujeto';
 $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
+$safeSubjectPartial = static function (string $path, string $label): void {
+    try {
+        require BASE_PATH . '/app/Views/appraisals/' . $path;
+    } catch (Throwable $error) {
+        $ref = bin2hex(random_bytes(6));
+        error_log('Gestion avaluatoria sujeto parcial [' . $ref . '] ' . $label . ' '
+            . get_class($error) . ' code=' . $error->getCode() . ' at ' . basename($error->getFile()) . ':' . $error->getLine());
+        echo '<section class="rounded-2xl border border-amber-200 bg-amber-50 p-5 text-sm text-amber-900">';
+        echo '<p class="font-semibold">Este bloque no se pudo cargar: ' . e($label) . '.</p>';
+        echo '<p class="mt-2">El resto del capítulo 3 queda disponible. Referencia: ' . e($ref) . '.</p>';
+        echo '</section>';
+    }
+};
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
@@ -17,7 +30,7 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
     </div>
     <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Sujeto del avalúo</span>
 </div>
-<?php require BASE_PATH . '/app/Views/appraisals/report-extra-notes.php'; ?>
+<?php $safeSubjectPartial('report-extra-notes.php', 'Ampliaciones del entregable'); ?>
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
 <div class="mt-7"
@@ -76,25 +89,25 @@ $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
         </div>
     </div>
     <div class="mt-7" x-show="activeSubject === 'basic'">
-        <?php require BASE_PATH . '/app/Views/appraisals/subject-basic.php'; ?>
+        <?php $safeSubjectPartial('subject-basic.php', '3.1 Ficha básica'); ?>
     </div>
     <div class="mt-7" x-show="activeSubject === 'surface'">
-        <?php require BASE_PATH . '/app/Views/appraisals/subject-surface.php'; ?>
+        <?php $safeSubjectPartial('subject-surface.php', '3.2 Superficies'); ?>
     </div>
     <div class="mt-7" x-show="activeSubject === 'construction'">
-        <?php require BASE_PATH . '/app/Views/appraisals/subject-construction.php'; ?>
+        <?php $safeSubjectPartial('subject-construction.php', '3.3 Construcción'); ?>
     </div>
     <div class="mt-7" x-show="activeSubject === 'attributes'">
-        <?php require BASE_PATH . '/app/Views/appraisals/subject-attributes.php'; ?>
+        <?php $safeSubjectPartial('subject-attributes.php', '3.4 Diferenciales valuatorios'); ?>
     </div>
     <div class="mt-7" x-show="activeSubject === 'ph'">
-        <?php require BASE_PATH . '/app/Views/appraisals/subject-ph.php'; ?>
+        <?php $safeSubjectPartial('subject-ph.php', '3.5 Propiedad horizontal'); ?>
     </div>
     <div class="mt-7" x-show="activeSubject === 'obsolescence'">
-        <?php require BASE_PATH . '/app/Views/appraisals/subject-obsolescence.php'; ?>
+        <?php $safeSubjectPartial('subject-obsolescence.php', '3.6 Obsolescencias'); ?>
     </div>
     <div class="mt-7" x-show="activeSubject === 'photos'">
-        <?php require BASE_PATH . '/app/Views/appraisals/subject-photos.php'; ?>
+        <?php $safeSubjectPartial('subject-photos.php', '3.7 Registro fotográfico'); ?>
     </div>
 </div>
 

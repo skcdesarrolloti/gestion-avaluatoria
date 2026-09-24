@@ -17,7 +17,7 @@ final class AppraisalSubjectController
     {
         $record = $this->appraisals->find($id, $this->user['id']);
         $subject = $this->subjects->find($id, $this->user['id']);
-        $reportNotes = $this->reportNotes?->byChapter($id, $this->user['id'], '3') ?? [];
+        try { $reportNotes = $this->reportNotes?->byChapter($id, $this->user['id'], '3') ?? []; } catch (\Throwable $error) { error_log('Gestion avaluatoria sujeto notas ' . get_class($error) . ' code=' . $error->getCode()); $reportNotes = []; }
         $phSearch = mb_substr(trim((string) ($_GET['copropiedad'] ?? '')), 0, 190);
         $this->appraisals->ensureUnits($id, $this->user['id'],
             (int) ($record['igac_property_units_count'] ?? 0), (int) ($record['igac_annex_units_count'] ?? 0));
