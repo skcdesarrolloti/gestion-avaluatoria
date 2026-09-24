@@ -31,7 +31,6 @@ $safeSubjectPartial = static function (string $path, string $label, array $conte
     </div>
     <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Sujeto del avalúo</span>
 </div>
-<?php $safeSubjectPartial('report-extra-notes.php', 'Ampliaciones del entregable', get_defined_vars()); ?>
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
 <div class="mt-7"
@@ -111,4 +110,4 @@ $safeSubjectPartial = static function (string $path, string $label, array $conte
         <?php $safeSubjectPartial('subject-photos.php', '3.7 Registro fotográfico', get_defined_vars()); ?>
     </div>
 </div>
-
+<?php $safeSubjectPartial('report-extra-notes.php', 'Ampliaciones del entregable', get_defined_vars()); ?>
