@@ -4,7 +4,7 @@ namespace App\Services;
 
 final class AppraisalReportNoteIntegrator
 {
-    public function apply(array $chapterReport, array $notes): array
+    public function apply(array $chapterReport, array $notes, array $sectionLabels = []): array
     {
         $sections = is_array($chapterReport['sections'] ?? null) ? $chapterReport['sections'] : [];
         foreach ($sections as &$section) {
@@ -14,7 +14,9 @@ final class AppraisalReportNoteIntegrator
         }
         unset($section);
         foreach ($this->withoutSection($notes, array_map(fn (array $s): string => $this->sectionCode((string) ($s[0] ?? '')), $sections)) as $note) {
-            $sections[] = ['Ampliación ' . (string) $note['section_code'], $this->noteText($note)];
+            $code = (string) $note['section_code'];
+            $title = isset($sectionLabels[$code]) ? $code . ' ' . $sectionLabels[$code] : 'Ampliación ' . $code;
+            $sections[] = [$title, $this->noteText($note)];
         }
         return ['sections' => $sections, 'text' => $this->plainText($sections)];
     }

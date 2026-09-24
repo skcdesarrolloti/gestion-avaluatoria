@@ -25,6 +25,37 @@ final class AppraisalReportNoteRepository
         return $query->fetchAll();
     }
 
+    public function customSections(string $appraisalId, int $owner, string $chapter): array
+    {
+        $query = $this->db->prepare('SELECT section_code, label FROM appraisal_report_note_sections
+            WHERE appraisal_id = ? AND owner_id = ? AND chapter_code = ? ORDER BY section_code');
+        $query->execute([$appraisalId, $owner, $chapter]);
+        $out = [];
+        foreach ($query->fetchAll() as $row) $out[(string) $row['section_code']] = (string) $row['label'];
+        return $out;
+    }
+
+    public function customSectionsByAppraisal(string $appraisalId, int $owner): array
+    {
+        $query = $this->db->prepare('SELECT chapter_code, section_code, label FROM appraisal_report_note_sections
+            WHERE appraisal_id = ? AND owner_id = ? ORDER BY chapter_code, section_code');
+        $query->execute([$appraisalId, $owner]);
+        $out = [];
+        foreach ($query->fetchAll() as $row) $out[(string) $row['chapter_code']][(string) $row['section_code']] = (string) $row['label'];
+        return $out;
+    }
+
+    public function saveCustomSections(string $appraisalId, int $owner, string $chapter, array $rows): void
+    {
+        foreach ($rows as $row) {
+            if (!is_array($row)) continue;
+            $section = $this->section($row['section_code'] ?? '', $chapter);
+            $label = $this->limit($row['label'] ?? '', 180);
+            if ($section === $chapter || $label === '') continue;
+            $this->upsertSection($appraisalId, $owner, $chapter, $section, $label);
+        }
+    }
+
     public function saveRows(string $appraisalId, int $owner, string $chapter, array $rows): void
     {
         foreach ($rows as $index => $row) {
@@ -59,6 +90,23 @@ final class AppraisalReportNoteRepository
 
     private function delete(string $id, string $appraisalId, int $owner): void
     { $this->db->prepare('DELETE FROM appraisal_report_notes WHERE id = ? AND appraisal_id = ? AND owner_id = ?')->execute([$id, $appraisalId, $owner]); }
+    private function upsertSection(string $appraisalId, int $owner, string $chapter, string $section, string $label): void
+    {
+        $query = $this->db->prepare('SELECT id FROM appraisal_report_note_sections
+            WHERE appraisal_id = ? AND owner_id = ? AND chapter_code = ? AND section_code = ?');
+        $query->execute([$appraisalId, $owner, $chapter, $section]);
+        $id = (string) ($query->fetchColumn() ?: '');
+        $now = gmdate('Y-m-d H:i:s');
+        if ($id !== '') {
+            $this->db->prepare('UPDATE appraisal_report_note_sections SET label = ?, updated_at = ? WHERE id = ?')
+                ->execute([$label, $now, $id]);
+            return;
+        }
+        $this->db->prepare('INSERT INTO appraisal_report_note_sections
+            (id, appraisal_id, owner_id, chapter_code, section_code, label, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+            ->execute([bin2hex(random_bytes(16)), $appraisalId, $owner, $chapter, $section, $label, $now, $now]);
+    }
     private function id(string $value): string { return preg_match('/^[a-f0-9]{32}$/', $value) ? $value : ''; }
     private function section(mixed $value, string $chapter): string
     { $text = $this->limit($value, 20); return preg_match('/^' . preg_quote($chapter, '/') . '(?:\.\d+){0,3}$/', $text) ? $text : $chapter; }

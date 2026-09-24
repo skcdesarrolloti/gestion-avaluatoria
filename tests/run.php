@@ -71,6 +71,7 @@ use App\Support\AppraisalSectorFieldGuidance;
 use App\Support\AppraisalLegalCatalog;
 use App\Support\AppraisalLegalView;
 use App\Support\AppraisalSpecialAttributeCatalog;
+use App\Support\AppraisalReportNoteCatalog;
 use App\Support\SectorBankCatalog;
 
 // All fixtures are in memory; never connect to the configured production database.
@@ -146,6 +147,8 @@ try {
     $db->exec("CREATE TABLE appraisal_report_notes (id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER,
         chapter_code TEXT, section_code TEXT, title TEXT, body TEXT, source_note TEXT,
         sort_order INTEGER, include_in_report INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE appraisal_report_note_sections (id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER,
+        chapter_code TEXT, section_code TEXT, label TEXT, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_standard_categories (code TEXT PRIMARY KEY, name TEXT, group_type TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_standards (slug TEXT PRIMARY KEY, category_code TEXT, standard_code TEXT, title TEXT, kind TEXT, sector_code TEXT, source_filename TEXT, storage_filename TEXT, summary TEXT, file_size_bytes INTEGER, pdf_blob BLOB, imported_at TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("INSERT INTO valuation_standard_categories VALUES
@@ -501,6 +504,21 @@ Certificado de tradicion.",
         && str_contains($integratedReport['text'], 'Alcance NIIF')
         && str_contains($integratedReport['text'], 'Encargo y soporte NIIF aportado'),
         'ampliaciones por numeral alimentan el entregable desde base de datos');
+    $notes->saveCustomSections('11111111111111111111111111111111', 7, '2', [[
+        'section_code' => '2.14', 'label' => 'Incidencia comercial adicional',
+    ]]);
+    $customSections = $notes->customSections('11111111111111111111111111111111', 7, '2');
+    $sectionOptions = AppraisalReportNoteCatalog::withCustom('2', $customSections);
+    $notes->saveRows('11111111111111111111111111111111', 7, '2', [[
+        'section_code' => '2.14', 'title' => 'Flujo peatonal',
+        'body' => 'La cercanía al nodo institucional aporta exposición comercial.',
+    ]]);
+    $customIntegrated = (new AppraisalReportNoteIntegrator())->apply(['sections' => [], 'text' => ''],
+        $notes->byChapter('11111111111111111111111111111111', 7, '2'), $customSections);
+    expect(($sectionOptions['2.14'] ?? '') === 'Incidencia comercial adicional'
+        && str_contains($customIntegrated['text'], '2.14 Incidencia comercial adicional')
+        && str_contains($customIntegrated['text'], 'Flujo peatonal'),
+        'numeral personalizado se agrega al desplegable y titula el entregable');
     $sectorChapter = (new AppraisalSectorChapterReport())->build([],
         ['neighborhood_name' => 'Chambacú', 'locality_name' => 'Localidad Histórica y del Caribe Norte', 'commune_ucg' => 'UCG 1', 'city_name' => 'Cartagena de Indias'],
         ['services_status' => 'completa', 'predominant_use' => 'comercial', 'urban_norm' => 'Mixto 2 institucional y comercial',

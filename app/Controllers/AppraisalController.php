@@ -57,7 +57,8 @@ final class AppraisalController
             'dossierSearch' => $dossierSearch,
             'dossierRows' => array_slice($this->appraisals->recent($this->user['id'], 1, $dossierSearch, true), 0, 12),
             'reportNotes' => $this->reportNotes?->byChapter($id, $this->user['id'], '1') ?? [],
-            'reportNoteSections' => AppraisalReportNoteCatalog::sections('1'),
+            'reportNoteSections' => AppraisalReportNoteCatalog::withCustom('1',
+                $this->reportNotes?->customSections($id, $this->user['id'], '1') ?? []),
             'reportNoteChapter' => '1',
             'reportNoteReturn' => 'avaluos/' . $id . '/expediente#identificacion',
             'chapterZeroMessage' => Session::pullFlash('chapter_zero_message'),
@@ -74,15 +75,16 @@ final class AppraisalController
         $units = $this->appraisals->units($id, $this->user['id']);
         $obsolescence = $this->obsolescence?->find($id, $this->user['id']) ?? [];
         $notes = $this->reportNotes?->byAppraisal($id, $this->user['id']) ?? [];
+        $customSections = $this->reportNotes?->customSectionsByAppraisal($id, $this->user['id']) ?? [];
         $integrator = new AppraisalReportNoteIntegrator();
         $chapterOne = $integrator->apply((new AppraisalChapterOneReport())->build($record, $subject, $units),
-            $this->chapterNotes($notes, '1'));
+            $this->chapterNotes($notes, '1'), $customSections['1'] ?? []);
         $sector = $this->sectors?->find($id, $this->user['id']) ?? [];
         $sectorRows = $this->sectorSections?->sections($id, $this->user['id']) ?? [];
         $sectorChapter = $integrator->apply((new AppraisalSectorChapterReport())->build($record, $subject, $sector, $sectorRows),
-            $this->chapterNotes($notes, '2'));
+            $this->chapterNotes($notes, '2'), $customSections['2'] ?? []);
         $subjectChapter = $integrator->apply((new AppraisalSubjectChapterReport())->build($record, $subject, $units, $phProfile, $obsolescence),
-            $this->chapterNotes($notes, '3'));
+            $this->chapterNotes($notes, '3'), $customSections['3'] ?? []);
         view('appraisals/deliverable', ['title' => 'Entregable', 'record' => $record,
             'phProfile' => $phProfile, 'chapterOne' => $chapterOne, 'sectorChapter' => $sectorChapter, 'subjectChapter' => $subjectChapter]);
     }

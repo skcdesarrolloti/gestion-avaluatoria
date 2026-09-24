@@ -13,7 +13,9 @@ final class AppraisalReportNoteController
         $this->appraisals->find($id, $this->user['id']);
         $chapter = $this->chapter((string) ($_POST['chapter_code'] ?? ''));
         $rows = is_array($_POST['report_notes'] ?? null) ? $_POST['report_notes'] : [];
+        $sections = is_array($_POST['report_note_sections'] ?? null) ? $_POST['report_note_sections'] : [];
         try {
+            $this->notes->saveCustomSections($id, $this->user['id'], $chapter, $sections);
             $this->notes->saveRows($id, $this->user['id'], $chapter, $rows);
             Session::flash('report_note_message', 'Ampliaciones del entregable guardadas.');
         } catch (\Throwable $error) {

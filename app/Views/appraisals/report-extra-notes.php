@@ -5,7 +5,10 @@ $reportNoteSections = is_array($reportNoteSections ?? null) ? $reportNoteSection
 $reportNoteReturn = (string) ($reportNoteReturn ?? ('avaluos/' . $record['id']));
 $nextIndex = count($reportNoteRows);
 ?>
-<section class="mt-8 rounded-2xl border border-indigo-100 bg-indigo-50 p-6 shadow-sm sm:p-8">
+<section class="mt-8 rounded-2xl border border-indigo-100 bg-indigo-50 p-6 shadow-sm sm:p-8"
+    x-data="{customCode: '', customLabel: '', chapter: '<?= e($reportNoteChapter) ?>',
+        customReady() { return this.customCode.trim().startsWith(this.chapter + '.') && this.customLabel.trim().length > 0 },
+        customText() { return this.customCode.trim() + ' · ' + this.customLabel.trim() }}">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Ampliaciones del entregable</p>
@@ -27,6 +30,27 @@ $nextIndex = count($reportNoteRows);
         <?= csrf_field() ?>
         <input type="hidden" name="chapter_code" value="<?= e($reportNoteChapter) ?>">
         <input type="hidden" name="return_to" value="<?= e($reportNoteReturn) ?>">
+        <article class="rounded-xl border border-indigo-100 bg-white p-4">
+            <p class="text-sm font-semibold text-indigo-900">Crear numeral para este capítulo</p>
+            <p class="mt-1 text-xs leading-5 text-slate-600">
+                Si necesitas insertar un punto que no existe, escribe el número y su descripción. Al guardar,
+                quedará disponible en el desplegable de este avalúo.
+            </p>
+            <div class="mt-3 grid gap-4 md:grid-cols-3">
+                <label class="label">Nuevo numeral
+                    <input class="input" name="report_note_sections[0][section_code]" maxlength="20"
+                        x-model="customCode"
+                        placeholder="Ej. <?= e($reportNoteChapter) ?>.14 o <?= e($reportNoteChapter) ?>.3.5">
+                    <span class="help">Debe iniciar por el capítulo <?= e($reportNoteChapter) ?> y seguir la numeración del informe.</span>
+                </label>
+                <label class="label md:col-span-2">Descripción del numeral
+                    <input class="input" name="report_note_sections[0][label]" maxlength="180"
+                        x-model="customLabel"
+                        placeholder="Ej. Información complementaria de mercado">
+                    <span class="help">Este texto aparecerá junto al número en la lista desplegable y en el entregable.</span>
+                </label>
+            </div>
+        </article>
         <?php foreach ($reportNoteRows as $i => $note): ?>
             <article class="rounded-xl border border-indigo-100 bg-white p-4">
                 <input type="hidden" name="report_notes[<?= e((string) $i) ?>][id]" value="<?= e((string) ($note['id'] ?? '')) ?>">
@@ -60,7 +84,9 @@ $nextIndex = count($reportNoteRows);
             <p class="text-sm font-semibold text-indigo-900">Nueva ampliación</p>
             <div class="mt-3 grid gap-4 md:grid-cols-3">
                 <label class="label">Numeral
-                    <select class="input" name="report_notes[<?= e((string) $nextIndex) ?>][section_code]">
+                    <select class="input" name="report_notes[<?= e((string) $nextIndex) ?>][section_code]"
+                        x-ref="newReportNoteSection" x-effect="customReady() && ($refs.newReportNoteSection.value = customCode.trim())">
+                        <option x-show="customReady()" :value="customCode.trim()" x-text="customText()"></option>
                         <?php foreach ($reportNoteSections as $code => $label): ?>
                             <option value="<?= e((string) $code) ?>"><?= e($code . ' · ' . $label) ?></option>
                         <?php endforeach; ?>

@@ -9,6 +9,16 @@ final class AppraisalReportNoteCatalog
         return self::all()[$chapter] ?? self::all()['1'];
     }
 
+    public static function withCustom(string $chapter, array $custom): array
+    {
+        $sections = self::sections($chapter);
+        foreach ($custom as $code => $label) {
+            if (is_string($code) && is_string($label) && $code !== '' && $label !== '') $sections[$code] = $label;
+        }
+        uksort($sections, 'strnatcmp');
+        return $sections;
+    }
+
     public static function all(): array
     {
         return [
