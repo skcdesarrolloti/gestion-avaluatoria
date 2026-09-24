@@ -3,9 +3,9 @@ $currentStep = 'urbana';
 $value = static fn (string $key): string => (string) ($profile[$key] ?? '');
 $checked = static fn (string $key): string => !empty($profile[$key]) ? 'checked' : '';
 $selected = static fn (string $key, string $val): string => (string) ($profile[$key] ?? '') === $val ? 'selected' : '';
-$textarea = static function (string $name, string $label, string $placeholder, int $rows = 4) use ($value): void { ?>
+$textarea = static function (string $name, string $label, string $placeholder, int $rows = 4, int $limit = 5000) use ($value): void { ?>
     <label class="label"><?= e($label) ?>
-        <textarea class="input min-h-32" name="<?= e($name) ?>" rows="<?= e((string) $rows) ?>" maxlength="5000" placeholder="<?= e($placeholder) ?>"><?= e($value($name)) ?></textarea>
+        <textarea class="input min-h-32" name="<?= e($name) ?>" rows="<?= e((string) $rows) ?>" maxlength="<?= e((string) $limit) ?>" placeholder="<?= e($placeholder) ?>"><?= e($value($name)) ?></textarea>
     </label>
 <?php };
 $input = static function (string $name, string $label, string $placeholder = '', string $type = 'text') use ($value): void { ?>
@@ -36,28 +36,7 @@ $input = static function (string $name, string $label, string $placeholder = '',
         <?php endforeach; ?>
     </div>
 </nav>
-<section x-show="tab === 'fuentes'" class="rounded-2xl border border-indigo-100 bg-indigo-50 p-6 shadow-sm sm:p-8">
-    <div class="flex flex-wrap items-start justify-between gap-4">
-        <div>
-            <p class="eyebrow">Academia normativa aplicada al numeral 5</p>
-            <h2 class="mt-2 text-2xl font-semibold text-indigo-950">Fuentes que debes revisar antes de concluir</h2>
-            <p class="mt-2 max-w-3xl text-sm leading-6 text-indigo-900">MIDAS trae la lectura práctica por predio; la conclusión se soporta con POT, cuadros de usos, conceptos, determinantes y normas urbanísticas pertinentes.</p>
-        </div>
-        <div class="flex flex-wrap gap-2">
-            <a class="btn-secondary" target="_blank" rel="noopener" href="<?= e(url('normatividad-urbana')) ?>">Abrir biblioteca de archivos</a>
-            <span class="rounded-full bg-white px-3 py-1 text-sm font-semibold text-indigo-800">MIDAS + POT + Planeación</span>
-        </div>
-    </div>
-    <div class="mt-5 grid gap-4 md:grid-cols-2">
-        <?php foreach ($academyBlocks as [$title, $rule, $use]): ?>
-            <article class="rounded-xl border border-indigo-100 bg-white p-4">
-                <h3 class="font-semibold text-indigo-950"><?= e($title) ?></h3>
-                <p class="mt-2 text-sm leading-6 text-slate-700"><?= e($rule) ?></p>
-                <p class="mt-2 text-xs font-semibold leading-5 text-teal-800"><?= e($use) ?></p>
-            </article>
-        <?php endforeach; ?>
-    </div>
-</section>
+<?php require BASE_PATH . '/app/Views/appraisals/urban-normative-sources.php'; ?>
 <form class="space-y-6" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana')) ?>" data-module-autosave data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/autoguardar')) ?>">
     <?= csrf_field() ?>
     <input type="hidden" name="version" value="<?= e((string) ($profile['version'] ?? 0)) ?>">
@@ -71,6 +50,7 @@ $input = static function (string $name, string $label, string $placeholder = '',
             </div>
             <div class="flex flex-wrap gap-2">
                 <button class="btn-primary" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/midas/consultar')) ?>">Consultar MIDAS</button>
+                <button class="btn-secondary" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/midas/procesar')) ?>">Procesar lectura pegada</button>
                 <label class="inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
                     <input type="checkbox" name="midas_consulted" value="1" <?= e($checked('midas_consulted')) ?>> MIDAS consultado
                 </label>
@@ -104,6 +84,15 @@ $input = static function (string $name, string $label, string $placeholder = '',
                 </select>
             </label>
             <div class="md:col-span-3"><?php $textarea('midas_usage_result', 'Resultado leído en MIDAS · Uso del suelo', 'Transcribe el uso, área de actividad, zona, tratamiento, restricciones o mensaje No disponible.', 5); ?></div>
+            <label class="label md:col-span-3">Lectura completa copiada de MIDAS
+                <textarea class="input min-h-48" name="midas_pasted_text" rows="9" maxlength="70000" placeholder="Pega aquí el bloque de Predios o el resultado de Uso Suelo. Al procesar, el sistema separa predio para numeral 3 y reglamentación para numeral 5."></textarea>
+                <span class="mt-1 block text-xs font-medium text-slate-500">MIDAS puede tardar en cargar. Espera a que aparezca todo el cuadro antes de copiarlo y procesarlo.</span>
+            </label>
+            <?php if ($value('midas_predio_raw') !== '' || $value('midas_usage_raw') !== ''): ?>
+                <div class="md:col-span-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-900">
+                    Lectura guardada: <?= $value('midas_predio_raw') !== '' ? 'predio MIDAS para numeral 3' : '' ?><?= $value('midas_predio_raw') !== '' && $value('midas_usage_raw') !== '' ? ' y ' : '' ?><?= $value('midas_usage_raw') !== '' ? 'reglamentación Uso Suelo para numeral 5' : '' ?>.
+                </div>
+            <?php endif; ?>
         </div>
     </section>
     <section id="pot" x-show="tab === 'pot'" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
@@ -138,6 +127,14 @@ $input = static function (string $name, string $label, string $placeholder = '',
             <?php $input('applicable_activity', 'Actividad aplicable en el cuadro'); ?>
             <?php $input('pot_state', 'Estado del POT o instrumento usado', 'POT vigente, proyecto, resolución especial...'); ?>
             <div class="md:col-span-2"><?php $textarea('urban_norms_applied', 'Normas urbanísticas pertinentes aplicadas', 'Relaciona POT, Decreto 0977, Decreto 1077, Ley 388, resoluciones, plan parcial, licencia o acto especial que aplique.', 5); ?></div>
+            <?php $input('use_regulation_table', 'Cuadro de reglamentación identificado', 'Ej. Cuadro No. 7 · Actividad mixta'); ?>
+            <div class="md:col-span-2 grid gap-4">
+                <?php $textarea('use_principal_text', 'Uso principal leído en MIDAS', 'Actividades principales y detalle del cuadro.', 5, 70000); ?>
+                <?php $textarea('use_compatible_text', 'Uso compatible leído en MIDAS', 'Actividades compatibles y detalle del cuadro.', 5, 70000); ?>
+                <?php $textarea('use_complementary_text', 'Uso complementario leído en MIDAS', 'Actividades complementarias y detalle del cuadro.', 5, 70000); ?>
+                <?php $textarea('use_restricted_text', 'Uso restringido leído en MIDAS', 'Actividades restringidas y detalle del cuadro.', 5, 70000); ?>
+                <?php $textarea('use_prohibited_text', 'Uso prohibido leído en MIDAS', 'Actividades prohibidas y detalle del cuadro.', 5, 70000); ?>
+            </div>
         </div>
     </section>
     <section id="determinantes" x-show="tab === 'determinantes'" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">

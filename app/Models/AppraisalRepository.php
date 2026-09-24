@@ -161,6 +161,11 @@ final class AppraisalRepository
                 $now, $unit['id'], $id, $owner]);
         }
     }
+
+    public function applyMidasAreasToFirstUnit(string $id, int $owner, array $predio): void
+    { $fields = []; $values = []; foreach (['area_midas_m2' => 'land_area_m2', 'built_area_midas_m2' => 'built_area_m2'] as $column => $source) { $value = $this->decimal($predio[$source] ?? ''); if ($value !== null) { $fields[] = $column . ' = ?'; $values[] = $value; } } if ($fields === []) return; $unit = $this->db->prepare('SELECT id FROM appraisal_units WHERE appraisal_id = ? AND owner_id = ? ORDER BY unit_kind = "property" DESC, unit_index ASC LIMIT 1'); $unit->execute([$id, $owner]); $unitId = $unit->fetchColumn(); if (!is_string($unitId) || $unitId === '') return; $this->db->prepare('UPDATE appraisal_units SET ' . implode(', ', $fields) . ', updated_at = ? WHERE id = ? AND appraisal_id = ? AND owner_id = ?')->execute([...$values, gmdate('Y-m-d H:i:s'), $unitId, $id, $owner]); }
+
+    private function decimal(mixed $value): ?float { $text = trim((string) $value); if ($text === '') return null; $num = str_replace(',', '.', preg_replace('/[^\d,.-]/', '', $text) ?? ''); return is_numeric($num) ? (float) $num : null; }
     public function saveUnitAttributes(string $id, int $owner, array $units): void
     { $query = $this->unitUpdate(['special_attributes_json', 'special_attributes_report_text']); $now = gmdate('Y-m-d H:i:s'); foreach ($units as $unit) $query->execute([$unit['special_attributes_json'], $unit['special_attributes_report_text'], $now, $unit['id'], $id, $owner]); }
 

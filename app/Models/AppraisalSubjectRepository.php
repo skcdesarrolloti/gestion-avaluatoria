@@ -44,6 +44,55 @@ final class AppraisalSubjectRepository
         return $query->fetchAll();
     }
 
+    public function applyMidasPredio(string $appraisalId, int $owner, array $predio): void
+    {
+        if ($predio === []) return;
+        $current = $this->find($appraisalId, $owner);
+        $data = ['address_midas' => $predio['address'] ?? '', 'neighborhood_name' => $predio['territory'] ?? '',
+            'locality_name' => $predio['locality'] ?? '', 'commune_ucg' => $predio['commune_ucg'] ?? '',
+            'zone_sector' => $predio['land_use'] ?? '', 'property_registry' => $predio['property_registry'] ?? '',
+            'cadastral_reference' => $predio['cadastral_reference'] ?? '', 'stratum' => $this->stratum((string) ($predio['stratum'] ?? '')),
+            'current_use' => $this->useCategory((string) ($predio['land_use'] ?? '')), 'urban_treatment' => $this->treatment((string) ($predio['urban_treatment'] ?? '')),
+            'restrictions' => $this->riskRestriction((string) ($predio['risk'] ?? '')), 'legal_urban_affectations' => $this->riskAffectation((string) ($predio['risk'] ?? '')),
+            'subject_reference_date' => $this->date((string) ($predio['updated_on'] ?? ''))];
+        foreach ($data as $key => $value) if ($value === '') unset($data[$key]);
+        if ($data === []) return;
+        if (($current['adopted_source'] ?? '') === '') $data['adopted_source'] = 'midas';
+        if (($current['adopted_address'] ?? '') === '' && !empty($data['address_midas'])) {
+            $data['adopted_address'] = $data['address_midas'];
+        }
+        if (!$this->exists($appraisalId, $owner)) { $this->insert($appraisalId, $owner,
+            array_replace(AppraisalSubjectCatalog::defaults(), $data), gmdate('Y-m-d H:i:s')); return; }
+        $set = implode(', ', array_map(static fn (string $key): string => $key . ' = ?', array_keys($data)));
+        $query = $this->db->prepare('UPDATE appraisal_subjects SET ' . $set
+            . ', updated_at = ? WHERE appraisal_id = ? AND owner_id = ?');
+        $query->execute([...array_values($data), gmdate('Y-m-d H:i:s'), $appraisalId, $owner]);
+    }
+
+    private function stratum(string $value): string
+    { $digits = preg_replace('/\D+/', '', $value) ?? ''; return in_array($digits, ['1','2','3','4','5','6'], true) ? $digits : ''; }
+
+    private function treatment(string $value): string
+    { $key = $this->key($value); return str_contains($key, 'mejoramiento') ? 'mejoramiento_integral' : (str_contains($key, 'conservacion') ? 'conservacion' : ''); }
+
+    private function useCategory(string $value): string
+    { $key = $this->key($value); foreach (['residencial','comercial','industrial','institucional','mixto'] as $use) if (str_contains($key, $use)) return $use; return ''; }
+
+    private function riskRestriction(string $value): string
+    { return trim($value) !== '' ? 'amenaza_riesgo' : ''; }
+
+    private function riskAffectation(string $value): string
+    { return trim($value) !== '' ? 'riesgo' : ''; }
+
+    private function date(string $value): ?string
+    { return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : null; }
+
+    private function key(string $value): string
+    {
+        $text = strtr(mb_strtolower(trim($value)), ['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u','ñ'=>'n']);
+        return preg_replace('/[^a-z0-9]+/', '', $text) ?? '';
+    }
+
     public function searchByNeighborhood(string $neighborhoodId, int $owner, string $excludeId = '', int $limit = 8): array
     {
         if (trim($neighborhoodId) === '') return [];

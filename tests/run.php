@@ -45,6 +45,7 @@ use App\Services\MidasGeometry;
 use App\Services\MidasWfsLayerAnalyzer;
 use App\Services\MidasWfsLayerCatalog;
 use App\Services\MidasWfsSearch;
+use App\Services\UrbanNormMidasTextParser;
 use App\Services\LegalCertificateParser;
 use App\Services\RateLimiter;
 use App\Controllers\AppraisalController;
@@ -197,6 +198,8 @@ try {
         energy_service TEXT, gas_service TEXT, sewer_service TEXT, internet_service TEXT,
         service_continuity TEXT, subject_reference_date TEXT, latitude TEXT, longitude TEXT,
         notes TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE appraisal_units (id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER,
+        unit_kind TEXT, unit_index INTEGER, area_midas_m2 REAL, built_area_midas_m2 REAL, updated_at TEXT)");
     $db->exec("CREATE TABLE appraisal_legal_profiles (
         appraisal_id TEXT PRIMARY KEY, owner_id INTEGER, source_certificate_id TEXT,
         status TEXT, data_json TEXT, annotations_json TEXT, alerts_json TEXT,
@@ -236,7 +239,10 @@ try {
         document_slug TEXT, table_slug TEXT, category_slug TEXT, source_status TEXT,
         pot_state TEXT, midas_consulted INTEGER, midas_query_option TEXT, midas_consulted_on TEXT,
         midas_layers TEXT, midas_usage_result TEXT, midas_activity TEXT, midas_support_reference TEXT,
-        midas_result TEXT, planning_concept_number TEXT, planning_concept_date TEXT, official_concept_scope TEXT,
+        midas_result TEXT, midas_predio_raw TEXT, midas_usage_raw TEXT, use_regulation_table TEXT,
+        use_principal_text TEXT, use_compatible_text TEXT, use_complementary_text TEXT,
+        use_restricted_text TEXT, use_prohibited_text TEXT, planning_concept_number TEXT,
+        planning_concept_date TEXT, official_concept_scope TEXT,
         land_classification TEXT, activity_area TEXT, normative_zone TEXT, urban_treatment TEXT, current_use TEXT,
         intended_use TEXT, applicable_activity TEXT, urban_norms_applied TEXT, heritage_context TEXT,
         environmental_context TEXT, risk_context TEXT, use_cross_result TEXT, restrictions TEXT,
@@ -289,6 +295,8 @@ try {
         'category_slug' => 'mixto-2', 'source_status' => 'soportado', 'midas_consulted' => '1',
         'cadastral_reference' => '010203040001000', 'midas_query_option' => 'Uso del suelo',
         'midas_consulted_on' => '2026-09-24', 'midas_usage_result' => 'MIDAS reporta actividad mixta.',
+        'use_principal_text' => 'Comercial 2 e Institucional 3.',
+        'use_restricted_text' => 'Comercial 3 e Institucional 4.',
         'urban_norms_applied' => 'Decreto 0977 de 2001 y cuadro de actividad mixta.',
         'use_cross_result' => 'restringido', 'conclusion' => 'Requiere validación de Planeación para uso restringido.',
     ]);
@@ -298,6 +306,13 @@ try {
     expect($savedUrban['midas_query_option'] === 'Uso del suelo'
         && str_contains($savedUrban['urban_norms_applied'], 'Decreto 0977'),
         'ficha urbana conserva consulta MIDAS y normas pertinentes');
+    expect(str_contains((string) $savedUrban['use_restricted_text'], 'Comercial 3'),
+        'ficha urbana conserva reglamentacion MIDAS por tipo de uso');
+    $midasParsed = (new UrbanNormMidasTextParser())->parse("01 Número Predial Nacional:\n130010103000003810024000000000\n07 Uso De Suelo:\nMixto 2\n08 Tratamiento:\nMejoramiento Integral Parcial\n20 Área Terreno (M2):\n529.00\n21 Área Construida (M2):\n329.00\n22 Referencia Catastral:\n010303810024000\nUSO PRINCIPAL\nCOMERCIAL 2: venta de bienes.\nUSO COMPATIBLE\nRESIDENCIAL: vivienda.\nUSO COMPLEMENTARIO\nINSTITUCIONAL 3: universidad.\nUSO RESTRINGIDO\nCOMERCIAL 3: talleres.\nUSO PROHIBIDO\nINDUSTRIAL 3: industria pesada.");
+    expect(($midasParsed['predio']['land_use'] ?? '') === 'Mixto 2'
+        && ($midasParsed['predio']['land_area_m2'] ?? '') === '529.00'
+        && str_contains($midasParsed['usage']['use_restricted_text'] ?? '', 'COMERCIAL 3'),
+        'parser MIDAS separa ficha predial y reglamentacion de uso suelo');
     expectStatus(409, fn () => $urbanProfile->save('urban-appraisal-1', 1, 0, []),
         'ficha urbana rechaza version obsoleta');
     $refId = $urbanProfile->addReference('urban-appraisal-1', 1, [

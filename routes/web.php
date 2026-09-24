@@ -68,6 +68,7 @@ return [
     ['GET', '#^/avaluos/([a-f0-9]{32})/normatividad-urbana$#', 'urbanNormative', 'show', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/normatividad-urbana$#', 'urbanNormative', 'save', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/normatividad-urbana/midas/consultar$#', 'urbanNormative', 'consultMidas', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/normatividad-urbana/midas/procesar$#', 'urbanNormative', 'processMidasText', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/normatividad-urbana/autoguardar$#', 'urbanNormative', 'autosave', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/entregable$#', 'appraisals', 'deliverable', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/notas-entregable$#', 'reportNotes', 'save', true],
