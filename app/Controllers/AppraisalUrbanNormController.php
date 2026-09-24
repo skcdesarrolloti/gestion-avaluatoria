@@ -47,7 +47,7 @@ final class AppraisalUrbanNormController
         $this->appraisals->find($id, $this->user['id']);
         try {
             $this->profiles->save($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $_POST);
-            Session::flash('urban_norm_message', 'Normatividad urbana guardada correctamente.');
+            Session::flash('urban_norm_message', 'Cambios del numeral 5 guardados. La lectura MIDAS solo se actualiza con el botón Consultar MIDAS.');
         } catch (\Throwable $error) { Session::flash('urban_norm_error', $error->getMessage()); }
         $target = (string) ($_POST['next'] ?? '') === 'deliverable'
             ? 'avaluos/' . $id . '/entregable' : 'avaluos/' . $id . '/normatividad-urbana';
@@ -67,11 +67,12 @@ final class AppraisalUrbanNormController
         $subject = $this->subjects->find($id, $this->user['id']);
         try {
             $version = $this->profiles->save($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $_POST);
-            $reference = trim((string) ($_POST['cadastral_reference'] ?? $subject['cadastral_reference'] ?? ''));
+            $reference = $this->midasReference($_POST, $subject);
             $result = (new UrbanNormMidasUsageSearch())->consult($reference);
             if (!empty($result['fields'])) {
                 $profile = $this->profiles->profile($id, $this->user['id']);
-                $this->profiles->save($id, $this->user['id'], $version, array_replace($profile, $result['fields']));
+                $fields = array_filter($result['fields'], static fn ($value): bool => trim((string) $value) !== '');
+                $this->profiles->save($id, $this->user['id'], $version, array_replace($profile, $fields));
             }
             $key = ($result['ok'] ?? false) ? 'urban_norm_message' : 'urban_norm_error';
             Session::flash($key, (string) ($result['message'] ?? 'Consulta MIDAS finalizada.'));
@@ -81,8 +82,14 @@ final class AppraisalUrbanNormController
 
     private function prefilledProfile(array $profile, array $subject): array
     {
-        if ((string) ($profile['cadastral_reference'] ?? '') === '') {
-            $profile['cadastral_reference'] = (string) ($subject['cadastral_reference'] ?? '');
+        $subjectReference = (string) ($subject['cadastral_reference'] ?? '');
+        if ($subjectReference !== '') {
+            $profile['cadastral_reference'] = $subjectReference;
+        }
+        $digits = $this->digits($subjectReference);
+        if ($digits !== '' && (string) ($profile['cadastral_reference_short'] ?? '') === ''
+            && (string) ($profile['cadastral_reference_long'] ?? '') === '') {
+            $profile[mb_strlen($digits) >= 20 ? 'cadastral_reference_long' : 'cadastral_reference_short'] = $digits;
         }
         if ((string) ($profile['midas_query_option'] ?? '') === '') {
             $profile['midas_query_option'] = 'Uso del suelo';
@@ -97,5 +104,19 @@ final class AppraisalUrbanNormController
             $profile['restrictions'] = (string) ($subject['legal_urban_affectations'] ?? '');
         }
         return $profile;
+    }
+
+    private function midasReference(array $input, array $subject): string
+    {
+        foreach (['cadastral_reference_long', 'cadastral_reference_short', 'cadastral_reference'] as $key) {
+            $digits = $this->digits((string) ($input[$key] ?? ''));
+            if ($digits !== '') return $digits;
+        }
+        return $this->digits((string) ($subject['cadastral_reference'] ?? ''));
+    }
+
+    private function digits(string $value): string
+    {
+        return preg_replace('/\D+/', '', $value) ?? '';
     }
 }

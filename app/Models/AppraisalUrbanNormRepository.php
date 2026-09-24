@@ -62,14 +62,16 @@ final class AppraisalUrbanNormRepository
 
     private function normalized(array $input): array
     {
-        $keys = ['cadastral_reference', 'document_slug', 'table_slug', 'category_slug', 'source_status',
+        $keys = ['cadastral_reference', 'cadastral_reference_short', 'cadastral_reference_long',
+            'document_slug', 'table_slug', 'category_slug', 'source_status',
             'pot_state', 'midas_query_option', 'midas_layers', 'midas_usage_result', 'midas_activity',
             'midas_support_reference', 'planning_concept_number', 'official_concept_scope',
             'land_classification', 'activity_area', 'normative_zone', 'urban_treatment', 'current_use',
             'intended_use', 'applicable_activity', 'urban_norms_applied', 'heritage_context',
             'environmental_context', 'risk_context', 'use_cross_result', 'midas_result', 'restrictions',
             'conclusion', 'support_summary', 'analyst_notes', 'source_limitations'];
-        $limits = ['cadastral_reference' => 80, 'document_slug' => 100, 'table_slug' => 120,
+        $limits = ['cadastral_reference' => 80, 'cadastral_reference_short' => 80,
+            'cadastral_reference_long' => 120, 'document_slug' => 100, 'table_slug' => 120,
             'category_slug' => 140, 'source_status' => 60, 'pot_state' => 80, 'midas_query_option' => 80,
             'midas_layers' => 500, 'midas_usage_result' => 5000, 'midas_activity' => 180,
             'midas_support_reference' => 220, 'planning_concept_number' => 120,
@@ -133,7 +135,8 @@ final class AppraisalUrbanNormRepository
     private function defaults(string $appraisalId, int $owner): array
     {
         return ['appraisal_id' => $appraisalId, 'owner_id' => $owner, 'cadastral_reference' => '',
-            'document_slug' => '', 'table_slug' => '', 'category_slug' => '', 'source_status' => 'pendiente',
+            'cadastral_reference_short' => '', 'cadastral_reference_long' => '', 'document_slug' => '',
+            'table_slug' => '', 'category_slug' => '', 'source_status' => 'pendiente',
             'pot_state' => '', 'midas_consulted' => 0, 'midas_query_option' => 'Uso del suelo',
             'midas_consulted_on' => null, 'midas_layers' => '', 'midas_usage_result' => '',
             'midas_activity' => '', 'midas_support_reference' => '', 'midas_result' => '',

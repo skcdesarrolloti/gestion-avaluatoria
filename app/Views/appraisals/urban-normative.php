@@ -77,7 +77,23 @@ $input = static function (string $name, string $label, string $placeholder = '',
             </div>
         </div>
         <div class="mt-6 grid gap-4 md:grid-cols-3">
-            <?php $input('cadastral_reference', 'Número predial o referencia catastral consultada', 'Ej. referencia predial de MIDAS'); ?>
+            <label class="label">Referencia catastral registrada en 3.1
+                <input class="input bg-slate-100 text-slate-700" type="text" name="cadastral_reference"
+                    value="<?= e($value('cadastral_reference')) ?>" readonly aria-readonly="true">
+                <span class="mt-1 block text-xs font-medium text-slate-500">Campo protegido: se actualiza desde Bien sujeto · Registro y catastro.</span>
+            </label>
+            <label class="label">Referencia catastral corta para MIDAS
+                <input class="input" type="text" name="cadastral_reference_short"
+                    value="<?= e($value('cadastral_reference_short')) ?>" inputmode="numeric" maxlength="80"
+                    placeholder="Ej. 010206780169901">
+                <span class="mt-1 block text-xs font-medium text-amber-700">Digite los números sin separaciones: sin guiones, espacios ni puntos.</span>
+            </label>
+            <label class="label">Referencia catastral larga para MIDAS
+                <input class="input" type="text" name="cadastral_reference_long"
+                    value="<?= e($value('cadastral_reference_long')) ?>" inputmode="numeric" maxlength="120"
+                    placeholder="Ej. referencia predial nacional si MIDAS la devuelve">
+                <span class="mt-1 block text-xs font-medium text-slate-500">Si MIDAS devuelve la referencia que faltaba, quedará guardada aquí.</span>
+            </label>
             <?php $input('midas_query_option', 'Opción seleccionada en MIDAS', 'Uso del suelo'); ?>
             <?php $input('midas_consulted_on', 'Fecha de consulta MIDAS', '', 'date'); ?>
             <?php $input('midas_activity', 'Actividad o uso consultado', 'Ej. oficina, comercio, vivienda, institucional'); ?>

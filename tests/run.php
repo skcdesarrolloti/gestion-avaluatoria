@@ -232,7 +232,8 @@ try {
     $db->exec("CREATE TABLE urban_norm_use_rules (id INTEGER PRIMARY KEY AUTOINCREMENT, category_slug TEXT,
         rule_type TEXT, content TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE appraisal_urban_norm_profiles (appraisal_id TEXT PRIMARY KEY, owner_id INTEGER,
-        cadastral_reference TEXT, document_slug TEXT, table_slug TEXT, category_slug TEXT, source_status TEXT,
+        cadastral_reference TEXT, cadastral_reference_short TEXT, cadastral_reference_long TEXT,
+        document_slug TEXT, table_slug TEXT, category_slug TEXT, source_status TEXT,
         pot_state TEXT, midas_consulted INTEGER, midas_query_option TEXT, midas_consulted_on TEXT,
         midas_layers TEXT, midas_usage_result TEXT, midas_activity TEXT, midas_support_reference TEXT,
         midas_result TEXT, planning_concept_number TEXT, planning_concept_date TEXT, official_concept_scope TEXT,

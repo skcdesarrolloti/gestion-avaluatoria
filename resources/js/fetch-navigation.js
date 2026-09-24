@@ -1,5 +1,6 @@
 const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 const flushAutosaves = () => typeof window.gaFlushAutosaves === 'function' ? window.gaFlushAutosaves() : Promise.resolve(true);
+let busyTimer = null;
 
 export function syncFormToken(body, token = csrfToken()) {
     if (body instanceof FormData && token) body.set('_token', token);
@@ -7,8 +8,7 @@ export function syncFormToken(body, token = csrfToken()) {
 }
 
 export function isFetchableUrl(href, currentHref = window.location.href) {
-    let url;
-    let current;
+    let url; let current;
     try {
         url = new URL(href, currentHref);
         current = new URL(currentHref);
@@ -31,9 +31,14 @@ function setBusy(active, text = 'Cargando...') {
     document.documentElement.dataset.fetchBusy = active ? 'true' : 'false';
     document.body?.setAttribute('aria-busy', active ? 'true' : 'false');
     if (!loader) return;
-    loader.hidden = !active;
+    clearTimeout(busyTimer);
+    if (!active) {
+        loader.hidden = true;
+        return;
+    }
     const label = loader.querySelector('[data-loader-text]');
     if (label) label.textContent = text;
+    busyTimer = setTimeout(() => { loader.hidden = false; }, 300);
 }
 
 function updateHeadFrom(nextDocument) {
@@ -141,10 +146,7 @@ async function visit(url, { method = 'GET', body = null, replace = false, text, 
     setBusy(true, text);
     try {
         const headers = { Accept: 'text/html', 'X-Requested-With': 'fetch' };
-        if (method !== 'GET') {
-            syncFormToken(body);
-            headers['X-CSRF-Token'] = csrfToken();
-        }
+        if (method !== 'GET') { syncFormToken(body); headers['X-CSRF-Token'] = csrfToken(); }
         const response = await fetch(url, { method, body, headers, credentials: 'same-origin' });
         if (response.status === 419 && method !== 'GET' && retryCsrf && await refreshCsrf()) {
             return visit(url, { method, body, replace, text, retryCsrf: false });
@@ -176,11 +178,7 @@ function scrollToTarget(hash) {
 }
 
 function formBody(form, submitter) {
-    try {
-        return new FormData(form, submitter);
-    } catch {
-        return new FormData(form);
-    }
+    try { return new FormData(form, submitter); } catch { return new FormData(form); }
 }
 
 export function installFetchNavigation() {

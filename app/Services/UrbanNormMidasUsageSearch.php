@@ -19,12 +19,14 @@ final class UrbanNormMidasUsageSearch
         $zone = $this->field($flat, ['zona', 'zona_normativa', 'sector_normativo', 'area_actividad']);
         $treatment = $this->field($flat, ['tratamiento', 'tratamiento_urbanistico']);
         $classification = $this->field($flat, ['clasificacion', 'clasificacion_suelo', 'clase_suelo']);
+        [$short, $long] = $this->references($flat, $reference);
         $summary = $this->summary($usage, $zone, $treatment, $classification);
         return ['ok' => $summary !== '', 'message' => $summary !== '' ? 'Consulta MIDAS incorporada al numeral 5.' : 'MIDAS respondió, pero no se identificó el campo de uso del suelo.',
             'fields' => ['midas_consulted' => '1', 'midas_query_option' => 'Uso del suelo',
                 'midas_consulted_on' => date('Y-m-d'), 'midas_usage_result' => $summary,
                 'midas_activity' => $usage, 'land_classification' => $classification,
                 'activity_area' => $zone, 'urban_treatment' => $treatment,
+                'cadastral_reference_short' => $short, 'cadastral_reference_long' => $long,
                 'midas_support_reference' => 'Consulta MIDAS por referencia catastral ' . $reference,
                 'source_status' => 'midas']];
     }
@@ -86,6 +88,22 @@ final class UrbanNormMidasUsageSearch
             if (($field === $key || str_ends_with($field, $key)) && $value !== '') return $value;
         }
         return '';
+    }
+
+    private function references(array $flat, string $queried): array
+    {
+        $numbers = [$queried];
+        foreach ($flat as $key => $value) {
+            if (!str_contains($key, 'predial') && !str_contains($key, 'catastral') && !str_contains($key, 'referencia')) continue;
+            $digits = preg_replace('/\D+/', '', $value) ?? '';
+            if ($digits !== '') $numbers[] = $digits;
+        }
+        $short = $long = '';
+        foreach (array_unique($numbers) as $digits) {
+            if (mb_strlen($digits) >= 20 && $long === '') $long = $digits;
+            if (mb_strlen($digits) < 20 && $short === '') $short = $digits;
+        }
+        return [$short, $long];
     }
 
     private function hasKeys(array $record, array $keys): bool
