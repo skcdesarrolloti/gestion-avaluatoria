@@ -14,7 +14,7 @@ $midasKeys = ['midas_national_cadastral_reference', 'midas_property_registry', '
             si contiene Uso Suelo o el cuadro POT, también se envía al numeral 5.
         </p>
     </div>
-    <a class="btn-secondary" target="_blank" rel="noopener" href="https://midas.cartagena.gov.co/#/home">Abrir MIDAS</a>
+    <a class="btn-secondary" target="_blank" rel="noopener" href="https://midas.cartagena.gov.co/#/home">Consultar MIDAS</a>
 </div>
 <label class="label mt-5">Lectura completa copiada de MIDAS
     <textarea class="input min-h-48" name="midas_pasted_text" rows="9" maxlength="70000"
