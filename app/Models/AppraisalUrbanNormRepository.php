@@ -62,17 +62,24 @@ final class AppraisalUrbanNormRepository
 
     private function normalized(array $input): array
     {
-        $keys = ['document_slug', 'table_slug', 'category_slug', 'source_status', 'pot_state',
-            'midas_layers', 'planning_concept_number', 'land_classification', 'activity_area',
-            'normative_zone', 'urban_treatment', 'current_use', 'intended_use', 'applicable_activity',
-            'use_cross_result', 'midas_result', 'restrictions', 'conclusion', 'support_summary', 'analyst_notes'];
-        $limits = ['document_slug' => 100, 'table_slug' => 120, 'category_slug' => 140,
-            'source_status' => 60, 'pot_state' => 80, 'midas_layers' => 500,
-            'planning_concept_number' => 120, 'land_classification' => 120, 'activity_area' => 160,
+        $keys = ['cadastral_reference', 'document_slug', 'table_slug', 'category_slug', 'source_status',
+            'pot_state', 'midas_query_option', 'midas_layers', 'midas_usage_result', 'midas_activity',
+            'midas_support_reference', 'planning_concept_number', 'official_concept_scope',
+            'land_classification', 'activity_area', 'normative_zone', 'urban_treatment', 'current_use',
+            'intended_use', 'applicable_activity', 'urban_norms_applied', 'heritage_context',
+            'environmental_context', 'risk_context', 'use_cross_result', 'midas_result', 'restrictions',
+            'conclusion', 'support_summary', 'analyst_notes', 'source_limitations'];
+        $limits = ['cadastral_reference' => 80, 'document_slug' => 100, 'table_slug' => 120,
+            'category_slug' => 140, 'source_status' => 60, 'pot_state' => 80, 'midas_query_option' => 80,
+            'midas_layers' => 500, 'midas_usage_result' => 5000, 'midas_activity' => 180,
+            'midas_support_reference' => 220, 'planning_concept_number' => 120,
+            'official_concept_scope' => 5000, 'land_classification' => 120, 'activity_area' => 160,
             'normative_zone' => 160, 'urban_treatment' => 160, 'current_use' => 160,
-            'intended_use' => 220, 'applicable_activity' => 160, 'use_cross_result' => 40,
-            'midas_result' => 5000, 'restrictions' => 5000, 'conclusion' => 5000,
-            'support_summary' => 5000, 'analyst_notes' => 5000];
+            'intended_use' => 220, 'applicable_activity' => 160, 'urban_norms_applied' => 5000,
+            'heritage_context' => 5000, 'environmental_context' => 5000, 'risk_context' => 5000,
+            'use_cross_result' => 40, 'midas_result' => 5000, 'restrictions' => 5000,
+            'conclusion' => 5000, 'support_summary' => 5000, 'analyst_notes' => 5000,
+            'source_limitations' => 5000];
         $data = [];
         foreach ($keys as $key) $data[$key] = mb_substr(trim((string) ($input[$key] ?? '')), 0, $limits[$key]);
         foreach (['document_slug', 'table_slug', 'category_slug'] as $key) {
@@ -125,13 +132,17 @@ final class AppraisalUrbanNormRepository
 
     private function defaults(string $appraisalId, int $owner): array
     {
-        return ['appraisal_id' => $appraisalId, 'owner_id' => $owner, 'document_slug' => '',
-            'table_slug' => '', 'category_slug' => '', 'source_status' => 'pendiente', 'pot_state' => '',
-            'midas_consulted' => 0, 'midas_consulted_on' => null, 'midas_layers' => '', 'midas_result' => '',
-            'planning_concept_number' => '', 'planning_concept_date' => null, 'land_classification' => '',
-            'activity_area' => '', 'normative_zone' => '', 'urban_treatment' => '', 'current_use' => '',
-            'intended_use' => '', 'applicable_activity' => '', 'use_cross_result' => '', 'restrictions' => '',
-            'conclusion' => '', 'support_summary' => '', 'analyst_notes' => '', 'version' => 0, 'updated_at' => null];
+        return ['appraisal_id' => $appraisalId, 'owner_id' => $owner, 'cadastral_reference' => '',
+            'document_slug' => '', 'table_slug' => '', 'category_slug' => '', 'source_status' => 'pendiente',
+            'pot_state' => '', 'midas_consulted' => 0, 'midas_query_option' => 'Uso del suelo',
+            'midas_consulted_on' => null, 'midas_layers' => '', 'midas_usage_result' => '',
+            'midas_activity' => '', 'midas_support_reference' => '', 'midas_result' => '',
+            'planning_concept_number' => '', 'planning_concept_date' => null, 'official_concept_scope' => '',
+            'land_classification' => '', 'activity_area' => '', 'normative_zone' => '', 'urban_treatment' => '',
+            'current_use' => '', 'intended_use' => '', 'applicable_activity' => '', 'urban_norms_applied' => '',
+            'heritage_context' => '', 'environmental_context' => '', 'risk_context' => '',
+            'use_cross_result' => '', 'restrictions' => '', 'conclusion' => '', 'support_summary' => '',
+            'analyst_notes' => '', 'source_limitations' => '', 'version' => 0, 'updated_at' => null];
     }
 
     private function date(mixed $value): ?string

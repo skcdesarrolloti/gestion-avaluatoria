@@ -39,6 +39,13 @@ final class UrbanNormativeRepository
         return $query->fetchAll();
     }
 
+    public function categories(): array
+    {
+        return $this->db->query('SELECT c.*, t.table_code, t.title table_title
+            FROM urban_norm_use_categories c JOIN urban_norm_tables t ON t.slug = c.table_slug
+            ORDER BY t.sort_order ASC, c.sort_order ASC')->fetchAll();
+    }
+
     public function categoryWithRules(string $slug): array
     {
         $query = $this->db->prepare('SELECT c.*, t.table_code, t.title table_title, d.title document_title

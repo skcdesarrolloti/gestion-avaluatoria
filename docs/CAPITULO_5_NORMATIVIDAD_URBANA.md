@@ -214,3 +214,7 @@ Cuando falte fuente oficial:
 Cuando se reciban el POT, el cuadro de reglamentación de suelos o conceptos de Planeación, convertirlos en catálogos seleccionables y mantener el PDF/soporte asociado. La aplicación debe permitir actualizar o agregar actos normativos sin borrar capturas, conclusiones ni soportes anteriores.
 
 
+
+## Ajuste funcional incorporado
+
+El numeral 5 queda como módulo propio en `/avaluos/{id}/normatividad-urbana`. La captura inicia con la consulta real en MIDAS: número predial o referencia catastral, opción consultada `Uso del suelo`, fecha, actividad consultada, resultado leído y soporte. Después se cruza con POT, cuadro de usos, categoría, concepto oficial, patrimonio, ambiente, riesgo y normas urbanísticas pertinentes. La conclusión guardada alimenta el entregable como capítulo 5.

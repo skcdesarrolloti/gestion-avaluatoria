@@ -24,7 +24,7 @@ final class AppraisalReportNoteController
         Http::redirect($this->returnTo($id, $chapter));
     }
 
-    private function chapter(string $value): string { return in_array($value, ['1', '2', '3', '4'], true) ? $value : '1'; }
+    private function chapter(string $value): string { return in_array($value, ['1', '2', '3', '4', '5'], true) ? $value : '1'; }
     private function applySectionLabels(array $rows, array $sections, string $chapter): array
     {
         $labels = [];
@@ -44,7 +44,7 @@ final class AppraisalReportNoteController
     private function returnTo(string $id, string $chapter): string
     {
         $target = (string) ($_POST['return_to'] ?? '');
-        $allowed = ['1' => 'expediente', '2' => 'sector', '3' => 'bien-sujeto', '4' => 'juridicas'];
+        $allowed = ['1' => 'expediente', '2' => 'sector', '3' => 'bien-sujeto', '4' => 'juridicas', '5' => 'normatividad-urbana'];
         $path = 'avaluos/' . $id . '/' . ($allowed[$chapter] ?? 'entregable');
         return preg_match('#^avaluos/' . preg_quote($id, '#') . '/[a-z0-9-]+(?:\#[a-z0-9_-]+)?$#', $target) ? $target : $path;
     }

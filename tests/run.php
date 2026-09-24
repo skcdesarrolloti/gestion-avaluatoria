@@ -232,12 +232,14 @@ try {
     $db->exec("CREATE TABLE urban_norm_use_rules (id INTEGER PRIMARY KEY AUTOINCREMENT, category_slug TEXT,
         rule_type TEXT, content TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE appraisal_urban_norm_profiles (appraisal_id TEXT PRIMARY KEY, owner_id INTEGER,
-        document_slug TEXT, table_slug TEXT, category_slug TEXT, source_status TEXT, pot_state TEXT,
-        midas_consulted INTEGER, midas_consulted_on TEXT, midas_layers TEXT, midas_result TEXT,
-        planning_concept_number TEXT, planning_concept_date TEXT, land_classification TEXT,
-        activity_area TEXT, normative_zone TEXT, urban_treatment TEXT, current_use TEXT,
-        intended_use TEXT, applicable_activity TEXT, use_cross_result TEXT, restrictions TEXT,
-        conclusion TEXT, support_summary TEXT, analyst_notes TEXT, version INTEGER, updated_at TEXT)");
+        cadastral_reference TEXT, document_slug TEXT, table_slug TEXT, category_slug TEXT, source_status TEXT,
+        pot_state TEXT, midas_consulted INTEGER, midas_query_option TEXT, midas_consulted_on TEXT,
+        midas_layers TEXT, midas_usage_result TEXT, midas_activity TEXT, midas_support_reference TEXT,
+        midas_result TEXT, planning_concept_number TEXT, planning_concept_date TEXT, official_concept_scope TEXT,
+        land_classification TEXT, activity_area TEXT, normative_zone TEXT, urban_treatment TEXT, current_use TEXT,
+        intended_use TEXT, applicable_activity TEXT, urban_norms_applied TEXT, heritage_context TEXT,
+        environmental_context TEXT, risk_context TEXT, use_cross_result TEXT, restrictions TEXT,
+        conclusion TEXT, support_summary TEXT, analyst_notes TEXT, source_limitations TEXT, version INTEGER, updated_at TEXT)");
     $db->exec("CREATE TABLE appraisal_urban_norm_references (id TEXT PRIMARY KEY, appraisal_id TEXT,
         owner_id INTEGER, document_slug TEXT, table_slug TEXT, category_slug TEXT, reference_type TEXT,
         source_label TEXT, source_date TEXT, extracted_text TEXT, support_filename TEXT,
@@ -284,11 +286,17 @@ try {
     $urbanVersion = $urbanProfile->save('urban-appraisal-1', 1, 0, [
         'document_slug' => 'pot-0977-cuadros-uso', 'table_slug' => 'pot-0977-cuadro-7-mixta',
         'category_slug' => 'mixto-2', 'source_status' => 'soportado', 'midas_consulted' => '1',
-        'midas_consulted_on' => '2026-09-24', 'use_cross_result' => 'restringido',
-        'conclusion' => 'Requiere validación de Planeación para uso restringido.',
+        'cadastral_reference' => '010203040001000', 'midas_query_option' => 'Uso del suelo',
+        'midas_consulted_on' => '2026-09-24', 'midas_usage_result' => 'MIDAS reporta actividad mixta.',
+        'urban_norms_applied' => 'Decreto 0977 de 2001 y cuadro de actividad mixta.',
+        'use_cross_result' => 'restringido', 'conclusion' => 'Requiere validación de Planeación para uso restringido.',
     ]);
-    expect($urbanVersion === 1 && $urbanProfile->profile('urban-appraisal-1', 1)['category_slug'] === 'mixto-2',
+    $savedUrban = $urbanProfile->profile('urban-appraisal-1', 1);
+    expect($urbanVersion === 1 && $savedUrban['category_slug'] === 'mixto-2',
         'ficha urbana guarda categoria aplicada');
+    expect($savedUrban['midas_query_option'] === 'Uso del suelo'
+        && str_contains($savedUrban['urban_norms_applied'], 'Decreto 0977'),
+        'ficha urbana conserva consulta MIDAS y normas pertinentes');
     expectStatus(409, fn () => $urbanProfile->save('urban-appraisal-1', 1, 0, []),
         'ficha urbana rechaza version obsoleta');
     $refId = $urbanProfile->addReference('urban-appraisal-1', 1, [

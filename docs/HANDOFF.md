@@ -18,7 +18,7 @@ leyes, decretos, resoluciones y documentos derogados cuando el responsable los e
 Las leyes extensas se modelan como documento fuente más artículos o fragmentos
 pertinentes, no como texto completo indiscriminado. Las IVS quedan en menú separado.
 Las NIIF quedan en otro menú independiente para consultas de medición contable.
-La Normatividad Urbana queda modelada como biblioteca del capítulo 5, iniciada con los cuadros de usos del Decreto 0977 de 2001, y como ficha por avalúo para MIDAS, concepto, usos y soportes.
+La Normatividad Urbana queda modelada como biblioteca y módulo del capítulo 5, iniciada con los cuadros de usos del Decreto 0977 de 2001, y como ficha por avalúo para MIDAS por predial, opción Uso del suelo, concepto, usos, determinantes y soportes.
 Incluye catálogo de Tipologías Constructivas IGAC con imágenes, agrupado por categoría.
 Solo implementa datos iniciales, no fórmulas, aprobación ni generación de informes.
 

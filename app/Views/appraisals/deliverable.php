@@ -14,6 +14,9 @@ $chapterSections = is_array($chapter['sections'] ?? null) ? $chapter['sections']
 $legalChapterData = is_array($legalChapter ?? null) ? $legalChapter : ['sections' => [], 'text' => ''];
 $legalChapterText = (string) ($legalChapterData['text'] ?? '');
 $legalChapterSections = is_array($legalChapterData['sections'] ?? null) ? $legalChapterData['sections'] : [];
+$urbanChapterData = is_array($urbanChapter ?? null) ? $urbanChapter : ['sections' => [], 'text' => ''];
+$urbanChapterText = (string) ($urbanChapterData['text'] ?? '');
+$urbanChapterSections = is_array($urbanChapterData['sections'] ?? null) ? $urbanChapterData['sections'] : [];
 $phSummaryKeys = [
     'resumen_base_ph' => 'Base PH común',
     'resumen_trazabilidad_ph' => 'Documento y trazabilidad',
@@ -150,6 +153,34 @@ $phSummaryKeys = [
     <h2 class="mt-2 text-2xl font-semibold">Cómo queda la identificación jurídica</h2>
     <div class="mt-5 grid gap-4">
         <?php foreach ($legalChapterSections as $section): ?>
+            <article class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6">
+                <h3 class="font-semibold text-slate-950"><?= e((string) ($section[0] ?? 'Sección')) ?></h3>
+                <p class="mt-2 whitespace-pre-wrap text-slate-700"><?= e((string) ($section[1] ?? '')) ?></p>
+            </article>
+        <?php endforeach; ?>
+    </div>
+</section>
+
+<section class="mt-8 rounded-2xl border border-teal-100 bg-teal-50 p-6 shadow-sm sm:p-8">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+            <p class="eyebrow">Capítulo 5 · Normatividad urbana</p>
+            <h2 class="mt-2 text-2xl font-semibold text-teal-950">Texto consolidado de uso del suelo</h2>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-teal-900">
+                Integra la consulta MIDAS por predial, la opción Uso del suelo, el POT, cuadros de usos,
+                concepto de Planeación, determinantes y conclusión urbanística del analista.
+            </p>
+        </div>
+        <a class="rounded-full bg-white px-4 py-2 text-sm font-bold text-teal-800" href="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana')) ?>">Editar módulo 5</a>
+    </div>
+    <textarea class="input mt-5 min-h-80 bg-white font-mono text-sm leading-6" rows="18" readonly><?= e($urbanChapterText) ?></textarea>
+</section>
+
+<section class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <p class="eyebrow">Capítulo 5 por secciones</p>
+    <h2 class="mt-2 text-2xl font-semibold">Cómo queda la normatividad urbana</h2>
+    <div class="mt-5 grid gap-4">
+        <?php foreach ($urbanChapterSections as $section): ?>
             <article class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6">
                 <h3 class="font-semibold text-slate-950"><?= e((string) ($section[0] ?? 'Sección')) ?></h3>
                 <p class="mt-2 whitespace-pre-wrap text-slate-700"><?= e((string) ($section[1] ?? '')) ?></p>

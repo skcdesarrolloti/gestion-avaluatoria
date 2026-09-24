@@ -1,8 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace App\Core;
-use App\Controllers\{AppraisalController, AppraisalLegalController, AppraisalSubjectController, AuthController, DiagnosticController, IgacTypologyController, IfrsStandardController,
-    InternationalStandardController, LegalFrameworkController, MaintenanceController, MasterDataController, StandardController, ValuationController};
+use App\Controllers\{AppraisalController, AppraisalLegalController, AppraisalSubjectController, AuthController, DiagnosticController, IgacTypologyController, IfrsStandardController, InternationalStandardController, LegalFrameworkController, MaintenanceController, MasterDataController, StandardController, ValuationController};
 use App\Database\Migrator;
 use App\Models\{AppraisalLegalRepository, AppraisalRepository, AppraisalSectorMidasFileRepository, AppraisalSubjectRepository,
     AppraiserRepository, FuncionarioRepository, GeoMasterRepository, IgacTypologyRepository,
@@ -120,8 +119,7 @@ final class Kernel
                 'reportNotes' => new \App\Controllers\AppraisalReportNoteController(
                     new AppraisalRepository($db), new \App\Models\AppraisalReportNoteRepository($db), $user),
                 'sector' => new \App\Controllers\AppraisalSectorController(new AppraisalRepository($db),
-                    new \App\Models\AppraisalSectorRepository($db),
-                    new \App\Models\AppraisalSectorSectionRepository($db), new AppraisalSubjectRepository($db),
+                    new \App\Models\AppraisalSectorRepository($db), new \App\Models\AppraisalSectorSectionRepository($db), new AppraisalSubjectRepository($db),
                     new \App\Models\NeighborhoodSectorRepository($db), new \App\Models\SectorBankRepository($db),
                     new GeoMasterRepository($db), new AppraisalSectorMidasFileRepository($db),
                     new \App\Models\AppraisalReportNoteRepository($db), $user),
@@ -129,8 +127,9 @@ final class Kernel
                     new \App\Models\AppraisalSectorRepository($db), new \App\Models\AppraisalSectorSectionRepository($db),
                     new AppraisalSubjectRepository($db), new \App\Models\SectorBankRepository($db), new AppraisalSectorMidasFileRepository($db), $user),
                 'legalCharacteristics' => new AppraisalLegalController(new AppraisalRepository($db),
-                    new AppraisalLegalRepository($db), new AppraisalSubjectRepository($db), $user,
-                    new \App\Models\AppraisalReportNoteRepository($db)),
+                    new AppraisalLegalRepository($db), new AppraisalSubjectRepository($db), $user, new \App\Models\AppraisalReportNoteRepository($db)),
+                'urbanNormative' => new \App\Controllers\AppraisalUrbanNormController(new AppraisalRepository($db),
+                    new \App\Models\AppraisalUrbanNormRepository($db), new \App\Models\UrbanNormativeRepository($db), new AppraisalSubjectRepository($db), $user, new \App\Models\AppraisalReportNoteRepository($db)),
                 'subject' => new AppraisalSubjectController(new AppraisalRepository($db), $user,
                     new IgacTypologyRepository(), new AppraisalSubjectRepository($db), new GeoMasterRepository($db),
                     new \App\Models\AppraisalPhRepository($db), new \App\Models\AppraisalObsolescenceRepository($db),
@@ -138,11 +137,12 @@ final class Kernel
                 'subjectPh' => new \App\Controllers\AppraisalPhController(new AppraisalRepository($db), new \App\Models\AppraisalPhRepository($db), $user),
                 'obsolescence' => new \App\Controllers\AppraisalObsolescenceController(new AppraisalRepository($db), new \App\Models\AppraisalObsolescenceRepository($db), $user),
                 'valuations' => new ValuationController(),
-                default => new AppraisalController(new AppraisalRepository($db), $user, new AppraiserRepository($db),
-                    new IgacTypologyRepository(), new \App\Models\AppraisalPhRepository($db), new AppraisalSubjectRepository($db),
+                default => new AppraisalController(new AppraisalRepository($db), $user, new AppraiserRepository($db), new IgacTypologyRepository(),
+                    new \App\Models\AppraisalPhRepository($db), new AppraisalSubjectRepository($db),
                     new \App\Models\AppraisalObsolescenceRepository($db), new \App\Services\AppraisalDossierNumberer($db),
                     new \App\Models\AppraisalSectorRepository($db), new \App\Models\AppraisalSectorSectionRepository($db),
-                    new \App\Models\AppraisalReportNoteRepository($db), new AppraisalLegalRepository($db)),
+                    new \App\Models\AppraisalReportNoteRepository($db), new AppraisalLegalRepository($db),
+                    new \App\Models\AppraisalUrbanNormRepository($db)),
             };
             $instance->$action(...array_slice($matches, 1));
             return;

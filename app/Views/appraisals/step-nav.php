@@ -5,6 +5,7 @@ $steps = [
     ['key' => 'sector', 'label' => '2 · Sector y entorno', 'href' => url('avaluos/' . $record['id'] . '/sector')],
     ['key' => 'sujeto', 'label' => '3 · Bien sujeto', 'href' => url('avaluos/' . $record['id'] . '/bien-sujeto')],
     ['key' => 'juridicas', 'label' => '4 · Características jurídicas', 'href' => url('avaluos/' . $record['id'] . '/juridicas')],
+    ['key' => 'urbana', 'label' => '5 · Normatividad urbana', 'href' => url('avaluos/' . $record['id'] . '/normatividad-urbana')],
     ['key' => 'entregable', 'label' => 'Entregable', 'href' => url('avaluos/' . $record['id'] . '/entregable')],
 ];
 ?>

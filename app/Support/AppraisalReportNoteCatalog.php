@@ -69,6 +69,15 @@ final class AppraisalReportNoteCatalog
                 '4.4'=>'Tradición, gravámenes, limitaciones y medidas cautelares',
                 '4.5'=>'Salvedades y conclusión jurídica',
             ],
+            '5' => [
+                '5'=>'Normatividad urbana',
+                '5.1'=>'Consulta MIDAS y referencia predial',
+                '5.2'=>'POT, clasificación y tratamiento urbanístico',
+                '5.3'=>'Cuadro de usos y actividad aplicable',
+                '5.4'=>'Concepto de uso del suelo y normas complementarias',
+                '5.5'=>'Patrimonio, ambiente, riesgo y determinantes',
+                '5.6'=>'Restricciones, salvedades y conclusión urbanística',
+            ],
         ];
     }
 }
