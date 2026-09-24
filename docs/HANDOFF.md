@@ -18,6 +18,7 @@ leyes, decretos, resoluciones y documentos derogados cuando el responsable los e
 Las leyes extensas se modelan como documento fuente más artículos o fragmentos
 pertinentes, no como texto completo indiscriminado. Las IVS quedan en menú separado.
 Las NIIF quedan en otro menú independiente para consultas de medición contable.
+La Normatividad Urbana queda modelada como biblioteca del capítulo 5, iniciada con los cuadros de usos del Decreto 0977 de 2001, y como ficha por avalúo para MIDAS, concepto, usos y soportes.
 Incluye catálogo de Tipologías Constructivas IGAC con imágenes, agrupado por categoría.
 Solo implementa datos iniciales, no fórmulas, aprobación ni generación de informes.
 
@@ -91,6 +92,20 @@ valor elegido. Ejemplo: si `Centralidad` queda en `Alta`, el informe puede expli
 que la centralidad mide la inserción urbana, cercanía a equipamientos, servicios y
 nodos de actividad, siempre que aplique al caso. La fuente de estas ayudas debe ser
 el catálogo del módulo, no una redacción duplicada en la plantilla del documento.
+
+
+## Normatividad urbana
+
+El capítulo 5 debe consultar una biblioteca liviana, no cargar el módulo con todo el
+POT. La implementación registra documentos fuente, cuadros, categorías de uso, reglas
+y parámetros en tablas reutilizables. Cada avalúo conserva una ficha propia con la
+fuente adoptada, resultado de MIDAS, concepto de Planeación si existe, clasificación
+del suelo, área de actividad, tratamiento, uso actual y uso pretendido, cruce frente
+al cuadro de usos, restricciones, conclusión del analista y soportes.
+
+La primera semilla corresponde al PDF de cuadros de reglamentación de usos del Decreto
+0977 de 2001 entregado por el usuario. Queda listo para sumar resoluciones o actos de
+Planeación como nuevos documentos de academia urbana sin duplicar campos del avalúo.
 
 ## Pruebas aisladas
 

@@ -58,6 +58,13 @@ No debes crear tablas ni pegar sentencias SQL. El programa hace esa parte.
 | `valuation_ifrs_standards` | Catálogo NIIF/NIC y metadatos del PDF privado |
 | `valuation_field_considerations` | Clasificación de campos del expediente como normativos, derivados u operativos |
 | `appraisal_sector_profile_sections` | Borradores avanzados por sección sectorial dentro de cada avalúo |
+| `urban_norm_documents` | Biblioteca fuente de normatividad urbana para capítulo 5, con metadatos del documento y PDF privado |
+| `urban_norm_tables` | Cuadros normativos del documento urbano, como los cuadros de usos del Decreto 0977 de 2001 |
+| `urban_norm_use_categories` | Categorías de uso urbanístico por cuadro, grupo y orden de consulta |
+| `urban_norm_use_rules` | Reglas de uso principal, compatible, complementario, restringido y prohibido por categoría |
+| `urban_norm_parameters` | Parámetros urbanísticos futuros por categoría sin cargar el módulo con texto completo |
+| `appraisal_urban_norm_profiles` | Ficha del capítulo 5 por avalúo, con consulta MIDAS, concepto, clasificación, uso y conclusión |
+| `appraisal_urban_norm_references` | Soportes y extractos urbanos asociados al avalúo y a la biblioteca normativa |
 
 `owner_id` guarda `_ID` del funcionario. No hay FK entre servidores/bases ni copia de
 contraseñas. `id` es aleatorio (32 caracteres hexadecimales), pero siempre se comprueba
@@ -70,6 +77,14 @@ pero solo almacena como consulta los artículos, incisos o extractos necesarios 
 la categoría/finalidad del avalúo.
 Las NIIF se guardan separadas de IVS y del marco jurídico nacional; se consultan
 cuando el encargo tenga finalidad financiera, valor razonable, deterioro o revelación.
+
+Normatividad Urbana queda separada en biblioteca y ficha del avalúo. La biblioteca
+conserva el documento fuente y solo organiza cuadros, categorías, reglas y parámetros
+consultables. La ficha por avalúo guarda lo que el analista adopta para el inmueble:
+fuente, resultado MIDAS, concepto de Planeación, clasificación urbanística, uso,
+restricciones, conclusión y soportes. Si el analista aún no selecciona documento,
+cuadro o categoría, esas referencias se guardan como NULL para no forzar decisiones
+ficticias ni romper llaves foráneas.
 
 ## 4. Nueva tabla o columna
 

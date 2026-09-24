@@ -55,6 +55,7 @@ use App\Models\AppraisalPhRepository;
 use App\Models\AppraisalRepository;
 use App\Models\AppraisalReportNoteRepository;
 use App\Models\AppraisalSubjectRepository;
+use App\Models\AppraisalUrbanNormRepository;
 use App\Models\AppraiserRepository;
 use App\Models\FuncionarioRepository;
 use App\Models\GeoMasterRepository;
@@ -67,6 +68,7 @@ use App\Models\AppraisalSectorSectionRepository;
 use App\Models\AppraisalSectorMidasFileRepository;
 use App\Models\SectorBankRepository;
 use App\Models\ValuationStandardRepository;
+use App\Models\UrbanNormativeRepository;
 use App\Support\AppraisalSectorCatalog;
 use App\Support\AppraisalSectorFieldGuidance;
 use App\Support\AppraisalLegalCatalog;
@@ -217,6 +219,29 @@ try {
         id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER, source_filename TEXT,
         storage_filename TEXT, mime_type TEXT, file_size_bytes INTEGER, extracted_chars INTEGER,
         analysis_status TEXT, analysis_message TEXT, file_blob BLOB, created_at TEXT)");
+    $db->exec("CREATE TABLE urban_norm_documents (slug TEXT PRIMARY KEY, title TEXT, document_type TEXT,
+        issuer TEXT, jurisdiction TEXT, normative_reference TEXT, issued_on TEXT, status TEXT,
+        version_label TEXT, source_url TEXT, source_filename TEXT, storage_filename TEXT,
+        file_size_bytes INTEGER, pdf_blob BLOB, imported_at TEXT, summary TEXT,
+        sort_order INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE urban_norm_tables (slug TEXT PRIMARY KEY, document_slug TEXT, table_code TEXT,
+        title TEXT, scope TEXT, page_start INTEGER, page_end INTEGER, sort_order INTEGER,
+        created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE urban_norm_use_categories (slug TEXT PRIMARY KEY, table_slug TEXT, code TEXT,
+        name TEXT, activity_group TEXT, description TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE urban_norm_use_rules (id INTEGER PRIMARY KEY AUTOINCREMENT, category_slug TEXT,
+        rule_type TEXT, content TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE appraisal_urban_norm_profiles (appraisal_id TEXT PRIMARY KEY, owner_id INTEGER,
+        document_slug TEXT, table_slug TEXT, category_slug TEXT, source_status TEXT, pot_state TEXT,
+        midas_consulted INTEGER, midas_consulted_on TEXT, midas_layers TEXT, midas_result TEXT,
+        planning_concept_number TEXT, planning_concept_date TEXT, land_classification TEXT,
+        activity_area TEXT, normative_zone TEXT, urban_treatment TEXT, current_use TEXT,
+        intended_use TEXT, applicable_activity TEXT, use_cross_result TEXT, restrictions TEXT,
+        conclusion TEXT, support_summary TEXT, analyst_notes TEXT, version INTEGER, updated_at TEXT)");
+    $db->exec("CREATE TABLE appraisal_urban_norm_references (id TEXT PRIMARY KEY, appraisal_id TEXT,
+        owner_id INTEGER, document_slug TEXT, table_slug TEXT, category_slug TEXT, reference_type TEXT,
+        source_label TEXT, source_date TEXT, extracted_text TEXT, support_filename TEXT,
+        storage_filename TEXT, file_size_bytes INTEGER, pdf_blob BLOB, created_at TEXT)");
     $db->exec("INSERT INTO valuation_legal_categories VALUES
         ('A', 'Marco jurídico general', 'general', 0, '2026-09-15 00:00:00', '2026-09-15 00:00:00'),
         ('1', 'Inmuebles urbanos', 'category', 11, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
@@ -238,6 +263,40 @@ try {
     $db->exec("INSERT INTO valuation_ifrs_standards VALUES ('ifrs-13-fair-value-measurement', 'G', 'NIIF 13 / IFRS 13', 'Medición del valor razonable', 'A,1,2', 'Valor razonable', 'Marco NIIF para medición.', 'Respalda base/tipo de valor.', 'IFRS Foundation', 'vigente', '', '', NULL, NULL, NULL, 1, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
     $db->exec("INSERT INTO valuation_field_considerations VALUES ('base_valor', 'Base/tipo de valor', 'Normativo directo', 'NTS, IVS 102, NIIF 13, NIC 36', 'Define la base de valor.', 'Campo central cuando aplica NIIF.', 1, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
     $db->exec("INSERT INTO valuation_field_considerations VALUES ('tipo_avaluo', 'Tipo de avalúo', 'Derivado metodológico', 'NTS e IVS según encargo', 'Duplicado legado.', 'Puede activar NIIF.', 2, '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
+    $db->exec("INSERT INTO urban_norm_documents VALUES ('pot-0977-cuadros-uso',
+        'Cuadros de reglamentación de usos del Decreto 0977 de 2001', 'cuadro_uso',
+        'Alcaldía Mayor de Cartagena de Indias', 'Cartagena de Indias', 'Decreto 0977 de 2001',
+        '2001-11-20', 'vigente', 'POT 2001', '', 'cuadro.pdf', 'pot-0977-cuadros-uso.pdf',
+        NULL, NULL, NULL, 'Cuadros de uso', 10, '2026-09-24 00:00:00', '2026-09-24 00:00:00')");
+    $db->exec("INSERT INTO urban_norm_tables VALUES ('pot-0977-cuadro-7-mixta',
+        'pot-0977-cuadros-uso', 'Cuadro No. 7', 'Actividad mixta',
+        'Suelo urbano y expansión', 12, 12, 70, '2026-09-24 00:00:00', '2026-09-24 00:00:00')");
+    $db->exec("INSERT INTO urban_norm_use_categories VALUES ('mixto-2', 'pot-0977-cuadro-7-mixta',
+        'Mixto 2', 'Actividad mixta 2', 'mixta', '', 62, '2026-09-24 00:00:00', '2026-09-24 00:00:00')");
+    $db->exec("INSERT INTO urban_norm_use_rules (category_slug, rule_type, content, sort_order, created_at, updated_at)
+        VALUES ('mixto-2', 'principal', 'Institucional 3; Comercial 2.', 1, '2026-09-24 00:00:00', '2026-09-24 00:00:00'),
+        ('mixto-2', 'restringido', 'Institucional 4; Comercio 3.', 4, '2026-09-24 00:00:00', '2026-09-24 00:00:00')");
+    $urbanLibrary = new UrbanNormativeRepository($db);
+    expect($urbanLibrary->stats()['categories'] === 1, 'catalogo urbano cuenta categorias normativas');
+    expect($urbanLibrary->categoryWithRules('mixto-2')['rules']['restringido'] === 'Institucional 4; Comercio 3.',
+        'catalogo urbano recupera reglas de uso');
+    $urbanProfile = new AppraisalUrbanNormRepository($db);
+    $urbanVersion = $urbanProfile->save('urban-appraisal-1', 1, 0, [
+        'document_slug' => 'pot-0977-cuadros-uso', 'table_slug' => 'pot-0977-cuadro-7-mixta',
+        'category_slug' => 'mixto-2', 'source_status' => 'soportado', 'midas_consulted' => '1',
+        'midas_consulted_on' => '2026-09-24', 'use_cross_result' => 'restringido',
+        'conclusion' => 'Requiere validación de Planeación para uso restringido.',
+    ]);
+    expect($urbanVersion === 1 && $urbanProfile->profile('urban-appraisal-1', 1)['category_slug'] === 'mixto-2',
+        'ficha urbana guarda categoria aplicada');
+    expectStatus(409, fn () => $urbanProfile->save('urban-appraisal-1', 1, 0, []),
+        'ficha urbana rechaza version obsoleta');
+    $refId = $urbanProfile->addReference('urban-appraisal-1', 1, [
+        'document_slug' => 'pot-0977-cuadros-uso', 'table_slug' => 'pot-0977-cuadro-7-mixta',
+        'category_slug' => 'mixto-2', 'reference_type' => 'cuadro', 'source_label' => 'Cuadro No. 7',
+    ]);
+    expect(strlen($refId) === 32 && count($urbanProfile->references('urban-appraisal-1', 1)) === 1,
+        'ficha urbana registra referencia normativa');
     $removeDuplicate = require dirname(__DIR__) . '/database/migrations/202609150014_remove_duplicate_appraisal_consideration.php';
     $removeDuplicate(new Schema($db));
     expect($db->query("SELECT COUNT(*) FROM valuation_field_considerations WHERE field_key = 'tipo_avaluo'")->fetchColumn() === 0, 'consideracion duplicada de tipo de avaluo eliminada');

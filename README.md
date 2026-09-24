@@ -15,6 +15,7 @@ completos de InversKC. El proyecto original permanece intacto.
 - Menú separado de Normas Internacionales de Valuación con estructura IVS y PDFs por norma.
 - Menú de Normas NIIF aplicables a medición contable, con PDFs por norma.
 - Catálogo de Tipologías Constructivas IGAC como referencia visual por categoría.
+- Biblioteca de Normatividad Urbana para el capítulo 5, iniciada con los cuadros de usos del Decreto 0977 de 2001.
 - Instalador y migraciones automáticas de tablas y columnas.
 - Assets locales compilados y estructura pequeña, sin dependencias PHP externas.
 
@@ -87,6 +88,14 @@ junto con el texto por página, conserva el resultado en BD y prellena campos va
 extractos y referencias para revisión. Consulta [lectura PH](docs/PH-LECTURA.md) para el
 alcance, los límites del OCR y la actualización. No completa conclusiones del analista
 ni atribuye a la unidad el primer coeficiente encontrado en un reglamento.
+
+La Normatividad Urbana del capítulo 5 sigue el mismo criterio de biblioteca normativa:
+`urban_norm_documents` registra el documento fuente, `urban_norm_tables` sus cuadros,
+`urban_norm_use_categories` las categorías de uso y `urban_norm_use_rules` las reglas
+de uso principal, compatible, complementario, restringido o prohibido. La ficha del
+avalúo referencia esa biblioteca y conserva consulta MIDAS, concepto de Planeación,
+clasificación, tratamiento, uso y soportes sin duplicar el PDF en Git.
+
 El OCR del servidor para otros formatos y el numeral 4 requiere Tesseract y, para PDF,
 Poppler. Las opciones existentes PH_EXTERNAL_OCR_ENDPOINT y PH_OCR_PROVIDER=minimax
 siguen disponibles mediante la acción explícita Leer con IA/OCR; no intervienen en la
