@@ -33,7 +33,10 @@ $input = static function (string $name, string $label, string $placeholder = '',
             <h2 class="mt-2 text-2xl font-semibold text-indigo-950">Fuentes que debes revisar antes de concluir</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-indigo-900">MIDAS trae la lectura práctica por predio; la conclusión se soporta con POT, cuadros de usos, conceptos, determinantes y normas urbanísticas pertinentes.</p>
         </div>
-        <span class="rounded-full bg-white px-3 py-1 text-sm font-semibold text-indigo-800">MIDAS + POT + Planeación</span>
+        <div class="flex flex-wrap gap-2">
+            <a class="btn-secondary" target="_blank" rel="noopener" href="<?= e(url('normatividad-urbana')) ?>">Abrir biblioteca de archivos</a>
+            <span class="rounded-full bg-white px-3 py-1 text-sm font-semibold text-indigo-800">MIDAS + POT + Planeación</span>
+        </div>
     </div>
     <div class="mt-5 grid gap-4 md:grid-cols-2">
         <?php foreach ($academyBlocks as [$title, $rule, $use]): ?>

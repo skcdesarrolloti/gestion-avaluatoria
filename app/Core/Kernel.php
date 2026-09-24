@@ -1,7 +1,7 @@
 <?php
 declare(strict_types=1);
 namespace App\Core;
-use App\Controllers\{AppraisalController, AppraisalLegalController, AppraisalSubjectController, AuthController, DiagnosticController, IgacTypologyController, IfrsStandardController, InternationalStandardController, LegalFrameworkController, MaintenanceController, MasterDataController, StandardController, ValuationController};
+use App\Controllers\{AppraisalController, AppraisalLegalController, AppraisalSubjectController, AuthController, DiagnosticController, IgacTypologyController, IfrsStandardController, InternationalStandardController, LegalFrameworkController, MaintenanceController, MasterDataController, StandardController, UrbanNormativeLibraryController, ValuationController};
 use App\Database\Migrator;
 use App\Models\{AppraisalLegalRepository, AppraisalRepository, AppraisalSectorMidasFileRepository, AppraisalSubjectRepository,
     AppraiserRepository, FuncionarioRepository, GeoMasterRepository, IgacTypologyRepository,
@@ -35,18 +35,20 @@ final class Kernel
             }
             if ($method === 'POST' && !($controller === 'sectorMidas' && $action === 'consult')) {
                 if (in_array($action, ['import', 'importFile'], true)
-                    && in_array($controller, ['standards', 'legal', 'international', 'ifrs'], true)
+                    && in_array($controller, ['standards', 'legal', 'international', 'ifrs', 'urbanNorms'], true)
                     && $this->uploadLikelyExceededPostLimit()) {
                     $flash = match ($controller) {
                         'legal' => 'legal_import',
                         'international' => 'international_import',
                         'ifrs' => 'ifrs_import',
+                        'urbanNorms' => 'urban_norm_import',
                         default => 'standards_import',
                     };
                     $route = match ($controller) {
                         'legal' => 'marco-juridico-valuatorio',
                         'international' => 'normas-internacionales-valuacion',
                         'ifrs' => 'normas-niif',
+                        'urbanNorms' => 'normatividad-urbana',
                         default => 'normas-tecnicas-sectoriales',
                     };
                     Session::flash($flash, json_encode([
@@ -110,6 +112,7 @@ final class Kernel
             $instance = match ($controller) {
                 'auth' => new AuthController($auth),
                 'ifrs' => new IfrsStandardController(new IfrsStandardRepository($db)),
+                'urbanNorms' => new UrbanNormativeLibraryController(new \App\Models\UrbanNormativeRepository($db)),
                 'typologies' => new IgacTypologyController(new IgacTypologyRepository()),
                 'international' => new InternationalStandardController(new InternationalStandardRepository($db)),
                 'legal' => new LegalFrameworkController(new LegalDocumentRepository($db)),
@@ -157,18 +160,14 @@ final class Kernel
     private function uploadLikelyExceededPostLimit(): bool
     {
         $length = (int) ($_SERVER['CONTENT_LENGTH'] ?? 0);
-        if ($length <= 0 || $_POST || $_FILES) {
-            return false;
-        }
+        if ($length <= 0 || $_POST || $_FILES) return false;
         $limit = $this->iniBytes((string) ini_get('post_max_size'));
         return $limit > 0 && $length > $limit;
     }
     private function iniBytes(string $value): int
     {
         $value = trim($value);
-        if ($value === '') {
-            return 0;
-        }
+        if ($value === '') return 0;
         $bytes = (int) $value;
         return match (strtolower(substr($value, -1))) {
             'g' => $bytes * 1024 * 1024 * 1024,
