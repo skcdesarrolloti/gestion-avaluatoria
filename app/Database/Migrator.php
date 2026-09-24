@@ -107,6 +107,7 @@ final class Migrator
     {
         return in_array(basename($file), [
             '202609230009_create_appraisal_report_note_sections.php',
+            '202609240002_seed_decreto_0977_usage_tables.php',
             '202609240004_add_midas_usage_fields_to_urban_norm_profiles.php',
             '202609240005_seed_urban_normative_academy_documents.php',
         ], true);

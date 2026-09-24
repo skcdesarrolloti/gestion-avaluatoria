@@ -14,7 +14,8 @@ try {
         error_log("Gestion avaluatoria [$reference] " . get_class($error) . ' code=' . $error->getCode()
             . ' at ' . basename($error->getFile()) . ':' . $error->getLine());
         $message .= ' Referencia: ' . $reference;
-        $safeDetail = get_class($error) . ' en ' . basename($error->getFile()) . ':' . $error->getLine();
+        $safeText = $error instanceof PDOException ? ('codigo ' . $error->getCode()) : mb_substr($error->getMessage(), 0, 180);
+        $safeDetail = get_class($error) . ' en ' . basename($error->getFile()) . ':' . $error->getLine() . ($safeText !== '' ? ' · ' . $safeText : '');
     }
     while (ob_get_level() > 0) {
         $statusInfo = ob_get_status();
