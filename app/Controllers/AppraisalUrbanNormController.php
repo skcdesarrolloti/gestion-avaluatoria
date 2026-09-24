@@ -18,15 +18,21 @@ final class AppraisalUrbanNormController
         $subject = $this->subjects->find($id, $this->user['id']);
         try { $notes = $this->reportNotes?->byChapter($id, $this->user['id'], '5') ?? []; }
         catch (\Throwable $error) { error_log('Gestion avaluatoria urbano notas ' . get_class($error)); $notes = []; }
+        try { $profile = $this->profiles->profile($id, $this->user['id']); }
+        catch (\Throwable $error) { error_log('Gestion avaluatoria urbano perfil ' . get_class($error)); $profile = []; }
+        try { $documents = $this->library->documentsWithTables(); $categories = $this->library->categories(); }
+        catch (\Throwable $error) { error_log('Gestion avaluatoria urbano biblioteca ' . get_class($error)); $documents = []; $categories = []; }
+        try { $references = $this->profiles->references($id, $this->user['id']); }
+        catch (\Throwable $error) { $references = []; }
         view('appraisals/urban-normative', [
             'title' => 'Normatividad urbana', 'record' => $record, 'subject' => $subject,
-            'profile' => $this->prefilledProfile($this->profiles->profile($id, $this->user['id']), $subject),
-            'urbanDocuments' => $this->library->documentsWithTables(),
-            'urbanCategories' => $this->library->categories(),
+            'profile' => $this->prefilledProfile($profile, $subject),
+            'urbanDocuments' => $documents,
+            'urbanCategories' => $categories,
             'academyBlocks' => UrbanNormativeAcademy::blocks(),
             'sourceOptions' => UrbanNormativeAcademy::sourceOptions(),
             'useResults' => UrbanNormativeAcademy::useResults(),
-            'references' => $this->profiles->references($id, $this->user['id']),
+            'references' => $references,
             'reportNotes' => $notes,
             'reportNoteSections' => AppraisalReportNoteCatalog::withNoteSections('5', $notes),
             'reportNoteChapter' => '5', 'reportNoteReturn' => 'avaluos/' . $id . '/normatividad-urbana',

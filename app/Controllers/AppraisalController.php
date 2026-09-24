@@ -93,7 +93,8 @@ final class AppraisalController
         $legalCertificates = $this->legal?->certificates($id, $this->user['id']) ?? [];
         $legalChapter = $integrator->apply((new AppraisalLegalChapterReport())->build($legalProfile, $legalCertificates),
             $this->chapterNotes($notes, '4'), AppraisalReportNoteCatalog::noteSectionLabels('4', $this->chapterNotes($notes, '4')));
-        $urbanProfile = $this->urbanNorms?->profile($id, $this->user['id']) ?? [];
+        try { $urbanProfile = $this->urbanNorms?->profile($id, $this->user['id']) ?? []; }
+        catch (\Throwable $error) { error_log('Gestion avaluatoria entregable urbano ' . get_class($error)); $urbanProfile = []; }
         $urbanChapter = $integrator->apply((new AppraisalUrbanNormChapterReport())->build($urbanProfile),
             $this->chapterNotes($notes, '5'), AppraisalReportNoteCatalog::noteSectionLabels('5', $this->chapterNotes($notes, '5')));
         view('appraisals/deliverable', ['title' => 'Entregable', 'record' => $record,

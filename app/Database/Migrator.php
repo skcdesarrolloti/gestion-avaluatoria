@@ -104,6 +104,10 @@ final class Migrator
 
     private function optionalFailure(string $file): bool
     {
-        return basename($file) === '202609230009_create_appraisal_report_note_sections.php';
+        return in_array(basename($file), [
+            '202609230009_create_appraisal_report_note_sections.php',
+            '202609240004_add_midas_usage_fields_to_urban_norm_profiles.php',
+            '202609240005_seed_urban_normative_academy_documents.php',
+        ], true);
     }
 }
