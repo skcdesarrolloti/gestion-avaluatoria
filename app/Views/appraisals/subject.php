@@ -4,8 +4,9 @@ $field = static fn (string $name): string => (string) ($record[$name] ?? '');
 $count = static fn (string $name): int => max(0, (int) ($record[$name] ?? 0));
 $currentStep = 'sujeto';
 $subjectActionBase = 'avaluos/' . $record['id'] . '/bien-sujeto';
-$safeSubjectPartial = static function (string $path, string $label): void {
+$safeSubjectPartial = static function (string $path, string $label, array $context): void {
     try {
+        extract($context, EXTR_SKIP);
         require BASE_PATH . '/app/Views/appraisals/' . $path;
     } catch (Throwable $error) {
         $ref = bin2hex(random_bytes(6));
@@ -30,7 +31,7 @@ $safeSubjectPartial = static function (string $path, string $label): void {
     </div>
     <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Sujeto del avalúo</span>
 </div>
-<?php $safeSubjectPartial('report-extra-notes.php', 'Ampliaciones del entregable'); ?>
+<?php $safeSubjectPartial('report-extra-notes.php', 'Ampliaciones del entregable', get_defined_vars()); ?>
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
 <div class="mt-7"
@@ -89,25 +90,25 @@ $safeSubjectPartial = static function (string $path, string $label): void {
         </div>
     </div>
     <div class="mt-7" x-show="activeSubject === 'basic'">
-        <?php $safeSubjectPartial('subject-basic.php', '3.1 Ficha básica'); ?>
+        <?php $safeSubjectPartial('subject-basic.php', '3.1 Ficha básica', get_defined_vars()); ?>
     </div>
     <div class="mt-7" x-show="activeSubject === 'surface'">
-        <?php $safeSubjectPartial('subject-surface.php', '3.2 Superficies'); ?>
+        <?php $safeSubjectPartial('subject-surface.php', '3.2 Superficies', get_defined_vars()); ?>
     </div>
     <div class="mt-7" x-show="activeSubject === 'construction'">
-        <?php $safeSubjectPartial('subject-construction.php', '3.3 Construcción'); ?>
+        <?php $safeSubjectPartial('subject-construction.php', '3.3 Construcción', get_defined_vars()); ?>
     </div>
     <div class="mt-7" x-show="activeSubject === 'attributes'">
-        <?php $safeSubjectPartial('subject-attributes.php', '3.4 Diferenciales valuatorios'); ?>
+        <?php $safeSubjectPartial('subject-attributes.php', '3.4 Diferenciales valuatorios', get_defined_vars()); ?>
     </div>
     <div class="mt-7" x-show="activeSubject === 'ph'">
-        <?php $safeSubjectPartial('subject-ph.php', '3.5 Propiedad horizontal'); ?>
+        <?php $safeSubjectPartial('subject-ph.php', '3.5 Propiedad horizontal', get_defined_vars()); ?>
     </div>
     <div class="mt-7" x-show="activeSubject === 'obsolescence'">
-        <?php $safeSubjectPartial('subject-obsolescence.php', '3.6 Obsolescencias'); ?>
+        <?php $safeSubjectPartial('subject-obsolescence.php', '3.6 Obsolescencias', get_defined_vars()); ?>
     </div>
     <div class="mt-7" x-show="activeSubject === 'photos'">
-        <?php $safeSubjectPartial('subject-photos.php', '3.7 Registro fotográfico'); ?>
+        <?php $safeSubjectPartial('subject-photos.php', '3.7 Registro fotográfico', get_defined_vars()); ?>
     </div>
 </div>
 
