@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, Session};
 use App\Models\{AppraisalRepository, AppraisalSubjectRepository, AppraisalUrbanNormRepository};
-use App\Services\{UrbanNormMidasTextParser, UrbanNormMidasUsageSearch};
+use App\Services\{MidasPredioSearch, UrbanNormMidasTextParser, UrbanNormMidasUsageSearch};
 
 final class AppraisalSubjectMidasController
 {
@@ -16,12 +16,18 @@ final class AppraisalSubjectMidasController
         $subject = $this->subjects->find($id, $this->user['id']);
         try {
             $reference = $this->reference($_POST, $subject);
-            $result = (new UrbanNormMidasUsageSearch())->consult($reference);
-            if (!empty($result['fields'])) $this->saveUrbanFields($id, $result['fields']);
-            $key = ($result['ok'] ?? false) ? 'subject_message' : 'subject_error';
-            Session::flash($key, (string) ($result['message'] ?? 'Consulta MIDAS finalizada.'));
+            $predio = (new MidasPredioSearch())->consult($reference);
+            if (!empty($predio['predio'])) {
+                $this->subjects->applyMidasPredio($id, $this->user['id'], $predio['predio']);
+                $this->appraisals->applyMidasAreasToFirstUnit($id, $this->user['id'], $predio['predio']);
+                $reference = (string) (($predio['predio']['cadastral_reference'] ?? '') ?: ($predio['predio']['national_cadastral_reference'] ?? $reference));
+            }
+            $usage = (new UrbanNormMidasUsageSearch())->consult($reference);
+            if (!empty($usage['fields'])) $this->saveUrbanFields($id, $usage['fields']);
+            $ok = ($predio['ok'] ?? false) || ($usage['ok'] ?? false);
+            Session::flash($ok ? 'subject_message' : 'subject_error', $this->consultMessage($predio, $usage));
         } catch (\Throwable $error) { Session::flash('subject_error', $error->getMessage()); }
-        Http::redirect('avaluos/' . $id . '/bien-sujeto#midas');
+        Http::redirect('avaluos/' . $id . '/bien-sujeto#registro');
     }
 
     public function process(string $id): never
@@ -39,7 +45,17 @@ final class AppraisalSubjectMidasController
             if ($usage !== [] || $predio !== []) $this->saveUrban($id, $predio, $usage, $raw);
             Session::flash('subject_message', $this->message($predio, $usage));
         } catch (\Throwable $error) { Session::flash('subject_error', $error->getMessage()); }
-        Http::redirect('avaluos/' . $id . '/bien-sujeto#midas');
+        Http::redirect('avaluos/' . $id . '/bien-sujeto#registro');
+    }
+
+    private function consultMessage(array $predio, array $usage): string
+    {
+        $messages = [];
+        if (($predio['ok'] ?? false)) $messages[] = 'ficha Predios guardada en el numeral 3';
+        elseif (($predio['message'] ?? '') !== '') $messages[] = (string) $predio['message'];
+        if (($usage['ok'] ?? false)) $messages[] = 'Uso Suelo enviado al numeral 5';
+        elseif (($usage['message'] ?? '') !== '') $messages[] = (string) $usage['message'];
+        return $messages ? 'Consulta MIDAS: ' . implode('; ', $messages) . '.' : 'MIDAS no devolvió información para guardar.';
     }
 
     private function saveUrbanFields(string $id, array $fields): void

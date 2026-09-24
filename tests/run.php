@@ -41,6 +41,7 @@ use App\Services\InternationalStandardFileImportService;
 use App\Services\LegalDocumentFileImportService;
 use App\Services\LegalDocumentImportService;
 use App\Services\MidasLayerPlan;
+use App\Services\MidasPredioSearch;
 use App\Services\MidasGeometry;
 use App\Services\MidasWfsLayerAnalyzer;
 use App\Services\MidasWfsLayerCatalog;
@@ -339,6 +340,38 @@ try {
         && str_contains($midasLive['fields']['use_restricted_text'] ?? '', 'COMERCIAL 3')
         && str_contains($midasLive['fields']['use_prohibited_text'] ?? '', 'INDUSTRIAL 3'),
         'consulta automatica MIDAS Uso Suelo carga campos del numeral 5');
+    $midasPredio = (new MidasPredioSearch())->mappedFromInfo([
+        '01 NÚMERO PREDIAL NACIONAL' => ['valor' => '130010103000003810024000000000'],
+        '02 MATRÍCULA INMOBILIARIA' => ['valor' => '060-260018'],
+        '03 DIRECCIÓN' => ['valor' => 'C 30 50A 83'],
+        '04 TERRITORIO' => ['valor' => 'BARRIO ZARAGOCILLA'],
+        '05 LOCALIDAD' => ['valor' => 'Historica y del Caribe Norte'],
+        '06 UNIDAD COMUNERA DE GOBIERNO' => ['valor' => '8'],
+        '07 USO DE SUELO' => ['valor' => 'Mixto 2'],
+        '08 TRATAMIENTO' => ['valor' => 'Mejoramiento Integral Parcial'],
+        '09 RIESGOS' => ['valor' => 'Expansividad Moderada (100.0 %)'],
+        '10 CLASIFICACIÓN DEL SUELO' => ['valor' => 'Suelo Urbano'],
+        '11 CÓDIGO MANZANA DANE' => ['valor' => '21030101'],
+        '12 LADO MANZANA DANE' => ['valor' => 'B'],
+        '13 NÚMERO DE MANZANA' => ['valor' => '381'],
+        '14 NÚMERO DE PREDIO' => ['valor' => '24'],
+        '15 ESTRATO SOCIOECONÓMICO' => ['valor' => '1'],
+        '16 ACTA  ESTRATIFICACIÓN' => ['valor' => ''],
+        '17 ATIPICIDAD ESTRATIFICACIÓN' => ['valor' => 'No'],
+        '18 OBSERVACIÓN ESTRATIFICACIÓN' => ['valor' => ''],
+        '19 NOMBRE EDIFICACIÓN' => ['valor' => ''],
+        '20 ÁREA TERRENO (M2)' => ['valor' => '529.00'],
+        '21 ÁREA CONSTRUIDA (M2)' => ['valor' => '329.00'],
+        '22 REFERENCIA CATASTRAL' => ['valor' => '010303810024000'],
+        '23 FECHA ACTUALIZACIÓN' => ['valor' => '2026-05-31'],
+    ]);
+    expect(($midasPredio['national_cadastral_reference'] ?? '') === '130010103000003810024000000000'
+        && ($midasPredio['cadastral_reference'] ?? '') === '010303810024000'
+        && ($midasPredio['land_use'] ?? '') === 'Mixto 2'
+        && ($midasPredio['dane_block_code'] ?? '') === '21030101'
+        && ($midasPredio['built_area_m2'] ?? '') === '329.00'
+        && ($midasPredio['updated_on'] ?? '') === '2026-05-31',
+        'consulta automatica MIDAS Predios mapea campos del numeral 3');
     expectStatus(409, fn () => $urbanProfile->save('urban-appraisal-1', 1, 0, []),
         'ficha urbana rechaza version obsoleta');
     $refId = $urbanProfile->addReference('urban-appraisal-1', 1, [

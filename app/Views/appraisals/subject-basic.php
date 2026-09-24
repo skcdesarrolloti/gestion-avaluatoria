@@ -45,7 +45,6 @@ $tabs = [
     'ubicacion' => ['Ubicación territorial', []],
     'referencia' => ['Referencia', ['point_reference', 'alternate_nomenclature']],
     'registro' => ['Registro y catastro', ['property_registry', 'cadastral_reference', 'registry_office', 'stratum']],
-    'midas' => ['Investigación MIDAS', []],
     'norma' => ['Norma urbana', ['urban_license', 'permitted_use', 'urban_treatment']],
     'restricciones' => ['Restricciones', ['restrictions', 'legal_urban_affectations']],
     'entorno' => ['Entorno', ['centrality', 'immediate_environment', 'road_condition']],
@@ -59,7 +58,7 @@ $tabs = [
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{
-        activeTab: 'identificacion',
+        activeTab: ['identificacion','tipologias','ubicacion','registro','fuentes','referencia','norma','restricciones','entorno','acceso','usos','servicios','cierre'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'identificacion',
         busy: false,
         typologyHint: <?= e(json_encode($field('igac_typology_hint'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         igacCategory: <?= e(json_encode($field('igac_category'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
@@ -100,7 +99,7 @@ $tabs = [
         <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
             <?php foreach ($tabs as $key => [$title]): ?>
                 <button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
-                    @click="activeTab = '<?= e($key) ?>'"
+                    @click="activeTab = '<?= e($key) ?>'; history.replaceState(null, '', '#<?= e($key) ?>')"
                     :class="activeTab === '<?= e($key) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'">
                     <?= e($title) ?>
                 </button>
@@ -127,16 +126,16 @@ $tabs = [
                 una ficha inicial para completar y guardar.
             </div>
         </div>
-        <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="activeTab === 'midas'">
-            <?php require BASE_PATH . '/app/Views/appraisals/subject-midas.php'; ?>
-        </div>
         <?php foreach ($tabs as $tabKey => [$title, $keys]): ?>
-            <?php if (in_array($tabKey, ['identificacion', 'ubicacion', 'tipologias', 'midas'], true)) continue; ?>
+            <?php if (in_array($tabKey, ['identificacion', 'ubicacion', 'tipologias'], true)) continue; ?>
             <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="activeTab === '<?= e($tabKey) ?>'">
                 <h3 class="text-base font-semibold"><?= e($title) ?></h3>
                 <div class="mt-5 grid gap-5 md:grid-cols-3">
                     <?php foreach ($keys as $key) require BASE_PATH . '/app/Views/appraisals/subject-basic-field.php'; ?>
                 </div>
+                <?php if ($tabKey === 'registro'): ?>
+                    <?php require BASE_PATH . '/app/Views/appraisals/subject-midas.php'; ?>
+                <?php endif; ?>
                 <?php if ($tabKey === 'cierre'): ?>
                     <label class="label mt-5 block">Observaciones generales <span class="help-dot" title="<?= e($fieldHelp('notes')) ?>">?</span>
                         <textarea class="input" name="notes" rows="4" maxlength="2000"
