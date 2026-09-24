@@ -152,6 +152,22 @@ test('leaves multipart uploads to native browser submit', () => {
     Object.assign(globalThis, originals);
 });
 
+test('leaves marked forms to native browser submit', () => {
+    const originals = { document: globalThis.document, window: globalThis.window, HTMLFormElement: globalThis.HTMLFormElement };
+    const listeners = {};
+    globalThis.HTMLFormElement = class {};
+    const form = new globalThis.HTMLFormElement();
+    form.enctype = '';
+    form.closest = selector => selector === '[data-no-fetch]' ? form : null;
+    globalThis.document = { addEventListener: (type, handler) => { listeners[type] = handler; } };
+    globalThis.window = { location: { href: current }, addEventListener() {} };
+    installFetchNavigation();
+    let prevented = false;
+    listeners.submit({ defaultPrevented: false, preventDefault: () => { prevented = true; }, target: form });
+    assert.equal(prevented, false);
+    Object.assign(globalThis, originals);
+});
+
 
 test('implicit enter submit in module autosave forms does not navigate', () => {
     const originals = { document: globalThis.document, window: globalThis.window, HTMLFormElement: globalThis.HTMLFormElement, FormData: globalThis.FormData };

@@ -3,7 +3,8 @@
     <h1 class="mt-3 text-3xl font-semibold tracking-tight">Bienvenido</h1>
     <p class="mt-3 text-sm leading-6 text-slate-600">Ingresa con el usuario que utilizas en las aplicaciones de SuCasa.</p>
     <?php if (!empty($error)): ?><p role="alert" class="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-800"><?= e($error) ?></p><?php endif; ?>
-    <form class="mt-7 space-y-5" method="post" action="<?= e(url('login')) ?>" x-data="{ submitting: false }" @submit="submitting = true">
+    <form class="mt-7 space-y-5" method="post" action="<?= e(url('login')) ?>" data-no-fetch
+        x-data="{ submitting: false }" @submit="submitting = true">
         <?= csrf_field() ?>
         <div>
             <label for="username" class="label">Usuario</label>
