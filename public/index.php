@@ -14,6 +14,7 @@ try {
         error_log("Gestion avaluatoria [$reference] " . get_class($error) . ' code=' . $error->getCode()
             . ' at ' . basename($error->getFile()) . ':' . $error->getLine());
         $message .= ' Referencia: ' . $reference;
+        $safeDetail = get_class($error) . ' en ' . basename($error->getFile()) . ':' . $error->getLine();
     }
     while (ob_get_level() > 0) {
         $statusInfo = ob_get_status();
@@ -26,5 +27,5 @@ try {
         App\Core\Http::json(['ok' => false, 'message' => $message, 'errors' => $known ? $error->errors : []], $status);
     }
     http_response_code($status);
-    view('error', ['title' => 'Aviso', 'message' => $message]);
+    view('error', ['title' => 'Aviso', 'message' => $message, 'detail' => !empty($_SESSION['user']) ? ($safeDetail ?? '') : '']);
 }

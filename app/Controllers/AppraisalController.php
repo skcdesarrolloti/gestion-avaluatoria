@@ -42,10 +42,13 @@ final class AppraisalController
         $page = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT) ?: 1;
         $page = max(1, min(100000, $page));
         $search = trim((string) ($_GET['q'] ?? ''));
-        $rows = $this->appraisals->recent($this->user['id'], $page, $search);
+        try { $rows = $this->appraisals->recent($this->user['id'], $page, $search); $indexError = ''; }
+        catch (\Throwable $error) {
+            error_log('Gestion avaluatoria listado avaluos ' . get_class($error) . ' at ' . basename($error->getFile()) . ':' . $error->getLine());
+            $rows = []; $indexError = 'No se pudo cargar el listado. Si el problema persiste, revisa migraciones pendientes.';
+        }
         view('appraisals/index', ['title' => 'Mis avalúos', 'rows' => array_slice($rows, 0, 20),
-            'hasNext' => count($rows) > 20, 'page' => $page, 'search' => $search]);
-    }
+            'hasNext' => count($rows) > 20, 'page' => $page, 'search' => $search, 'indexError' => $indexError]);    }
 
     public function create(): never
     {

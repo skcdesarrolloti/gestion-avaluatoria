@@ -6,6 +6,7 @@
         <?= csrf_field() ?><button class="btn-primary" type="submit" :disabled="busy" x-text="busy ? 'Creando…' : 'Crear ficha'">Crear ficha</button>
     </form>
 </div>
+<?php if (!empty($indexError ?? '')): ?><p class="mt-6 rounded-xl bg-amber-50 p-4 text-sm font-semibold text-amber-800"><?= e($indexError) ?></p><?php endif; ?>
 <form class="mt-7 flex flex-wrap gap-3 rounded-2xl border border-slate-200 bg-white p-4" method="get" action="<?= e(url()) ?>">
     <label class="label grow">Buscar expediente
         <input class="input" name="q" value="<?= e($searchValue) ?>" placeholder="Número, título, propietario, cliente, solicitante o municipio">
