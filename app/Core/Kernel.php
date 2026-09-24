@@ -129,7 +129,8 @@ final class Kernel
                     new \App\Models\AppraisalSectorRepository($db), new \App\Models\AppraisalSectorSectionRepository($db),
                     new AppraisalSubjectRepository($db), new \App\Models\SectorBankRepository($db), new AppraisalSectorMidasFileRepository($db), $user),
                 'legalCharacteristics' => new AppraisalLegalController(new AppraisalRepository($db),
-                    new AppraisalLegalRepository($db), new AppraisalSubjectRepository($db), $user),
+                    new AppraisalLegalRepository($db), new AppraisalSubjectRepository($db), $user,
+                    new \App\Models\AppraisalReportNoteRepository($db)),
                 'subject' => new AppraisalSubjectController(new AppraisalRepository($db), $user,
                     new IgacTypologyRepository(), new AppraisalSubjectRepository($db), new GeoMasterRepository($db),
                     new \App\Models\AppraisalPhRepository($db), new \App\Models\AppraisalObsolescenceRepository($db),
@@ -141,7 +142,7 @@ final class Kernel
                     new IgacTypologyRepository(), new \App\Models\AppraisalPhRepository($db), new AppraisalSubjectRepository($db),
                     new \App\Models\AppraisalObsolescenceRepository($db), new \App\Services\AppraisalDossierNumberer($db),
                     new \App\Models\AppraisalSectorRepository($db), new \App\Models\AppraisalSectorSectionRepository($db),
-                    new \App\Models\AppraisalReportNoteRepository($db)),
+                    new \App\Models\AppraisalReportNoteRepository($db), new AppraisalLegalRepository($db)),
             };
             $instance->$action(...array_slice($matches, 1));
             return;

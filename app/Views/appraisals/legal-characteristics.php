@@ -36,6 +36,7 @@ $trafficCounts = \App\Support\AppraisalLegalView::trafficCounts($annotations);
     <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-700">Numeral 4</span>
 </div>
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
+<?php require BASE_PATH . '/app/Views/appraisals/legal-normative-academy.php'; ?>
 
 <?php if ($legalMessage): ?>
     <p class="mt-6 rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($legalMessage) ?></p>
@@ -214,4 +215,5 @@ $trafficCounts = \App\Support\AppraisalLegalView::trafficCounts($annotations);
         <button class="btn-primary" type="submit" name="next" value="deliverable">Guardar y pasar a Entregable</button>
     </div>
 </form>
+<?php require BASE_PATH . '/app/Views/appraisals/report-extra-notes.php'; ?>
 <script type="module" src="<?= e(asset_url('assets/legal-certificate-reader.js')) ?>"></script>

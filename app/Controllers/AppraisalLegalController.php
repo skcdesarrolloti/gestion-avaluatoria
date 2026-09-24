@@ -5,6 +5,7 @@ use App\Core\Http;
 use App\Core\Session;
 use App\Models\AppraisalLegalRepository;
 use App\Models\AppraisalRepository;
+use App\Models\AppraisalReportNoteRepository;
 use App\Models\AppraisalSubjectRepository;
 use App\Services\AppraisalLegalCertificateUploadService;
 use App\Services\AppraisalLegalInput;
@@ -12,16 +13,20 @@ use App\Services\LegalCertificateCancellationMatcher;
 use App\Services\LegalCertificateParser;
 use App\Services\LegalCertificateTextExtractor;
 use App\Support\AppraisalLegalCatalog;
+use App\Support\AppraisalReportNoteCatalog;
 
 final class AppraisalLegalController
 {
     public function __construct(private AppraisalRepository $appraisals,
-        private AppraisalLegalRepository $legal, private AppraisalSubjectRepository $subjects, private array $user) {}
+        private AppraisalLegalRepository $legal, private AppraisalSubjectRepository $subjects, private array $user,
+        private ?AppraisalReportNoteRepository $reportNotes = null) {}
 
     public function show(string $id): void
     {
         $record = $this->appraisals->find($id, $this->user['id']);
         $subject = $this->subjects->find($id, $this->user['id']);
+        try { $reportNotes = $this->reportNotes?->byChapter($id, $this->user['id'], '4') ?? []; }
+        catch (\Throwable $error) { error_log('Gestion avaluatoria juridico notas ' . get_class($error) . ' code=' . $error->getCode()); $reportNotes = []; }
         $search = mb_substr(trim((string) ($_GET['matricula'] ?? '')), 0, 80);
         view('appraisals/legal-characteristics', [
             'title' => 'Características jurídicas',
@@ -35,6 +40,10 @@ final class AppraisalLegalController
             'certificates' => $this->legal->certificates($id, $this->user['id']),
             'legalGroups' => AppraisalLegalCatalog::groups(),
             'legalLabels' => AppraisalLegalCatalog::labels(),
+            'reportNotes' => $reportNotes,
+            'reportNoteSections' => AppraisalReportNoteCatalog::withNoteSections('4', $reportNotes),
+            'reportNoteChapter' => '4',
+            'reportNoteReturn' => 'avaluos/' . $id . '/caracteristicas-juridicas',
             'legalMessage' => Session::pullFlash('legal_message'),
             'legalError' => Session::pullFlash('legal_error'),
         ]);

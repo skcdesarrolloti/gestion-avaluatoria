@@ -11,6 +11,9 @@ $sectorChapterSections = is_array($sectorChapterData['sections'] ?? null) ? $sec
 $chapter = is_array($subjectChapter ?? null) ? $subjectChapter : ['sections' => [], 'text' => ''];
 $chapterText = (string) ($chapter['text'] ?? '');
 $chapterSections = is_array($chapter['sections'] ?? null) ? $chapter['sections'] : [];
+$legalChapterData = is_array($legalChapter ?? null) ? $legalChapter : ['sections' => [], 'text' => ''];
+$legalChapterText = (string) ($legalChapterData['text'] ?? '');
+$legalChapterSections = is_array($legalChapterData['sections'] ?? null) ? $legalChapterData['sections'] : [];
 $phSummaryKeys = [
     'resumen_base_ph' => 'Base PH común',
     'resumen_trazabilidad_ph' => 'Documento y trazabilidad',
@@ -119,6 +122,34 @@ $phSummaryKeys = [
     <h2 class="mt-2 text-2xl font-semibold">Cómo queda estructurado el capítulo</h2>
     <div class="mt-5 grid gap-4">
         <?php foreach ($chapterSections as $section): ?>
+            <article class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6">
+                <h3 class="font-semibold text-slate-950"><?= e((string) ($section[0] ?? 'Sección')) ?></h3>
+                <p class="mt-2 whitespace-pre-wrap text-slate-700"><?= e((string) ($section[1] ?? '')) ?></p>
+            </article>
+        <?php endforeach; ?>
+    </div>
+</section>
+
+<section class="mt-8 rounded-2xl border border-indigo-100 bg-indigo-50 p-6 shadow-sm sm:p-8">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+            <p class="eyebrow">Capítulo 4 · Características jurídicas</p>
+            <h2 class="mt-2 text-2xl font-semibold text-indigo-950">Texto consolidado jurídico</h2>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-indigo-900">
+                Integra certificado, folio, titularidad, catastro, PH, tradición, cargas, salvedades y soporte normativo.
+                La lectura no reemplaza el estudio de títulos y conserva trazabilidad de las fuentes.
+            </p>
+        </div>
+        <a class="rounded-full bg-white px-4 py-2 text-sm font-bold text-indigo-800" href="<?= e(url('avaluos/' . $record['id'] . '/caracteristicas-juridicas')) ?>">Editar módulo 4</a>
+    </div>
+    <textarea class="input mt-5 min-h-80 bg-white font-mono text-sm leading-6" rows="18" readonly><?= e($legalChapterText) ?></textarea>
+</section>
+
+<section class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <p class="eyebrow">Capítulo 4 por secciones</p>
+    <h2 class="mt-2 text-2xl font-semibold">Cómo queda la identificación jurídica</h2>
+    <div class="mt-5 grid gap-4">
+        <?php foreach ($legalChapterSections as $section): ?>
             <article class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6">
                 <h3 class="font-semibold text-slate-950"><?= e((string) ($section[0] ?? 'Sección')) ?></h3>
                 <p class="mt-2 whitespace-pre-wrap text-slate-700"><?= e((string) ($section[1] ?? '')) ?></p>

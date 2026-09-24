@@ -61,7 +61,14 @@ final class AppraisalReportNoteCatalog
                 '3.3.4'=>'Áreas construidas','3.4'=>'Diferenciales valuatorios','3.5'=>'Propiedad horizontal',
                 '3.6'=>'Obsolescencias','3.7'=>'Registro fotográfico y soportes',
             ],
-            '4' => ['4'=>'Características jurídicas', '4.1'=>'Certificado y titularidad', '4.2'=>'Afectaciones, limitaciones y salvedades'],
+            '4' => [
+                '4'=>'Identificación de las características jurídicas',
+                '4.1'=>'Certificado, folio y titularidad',
+                '4.2'=>'Identificación registral, catastral y física',
+                '4.3'=>'Propiedad horizontal y derechos vinculados',
+                '4.4'=>'Tradición, gravámenes, limitaciones y medidas cautelares',
+                '4.5'=>'Salvedades y conclusión jurídica',
+            ],
         ];
     }
 }

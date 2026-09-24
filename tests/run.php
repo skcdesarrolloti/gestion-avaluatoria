@@ -24,6 +24,7 @@ use App\Services\AppraisalSectorInput;
 use App\Services\AppraisalSectorChapterReport;
 use App\Services\AppraisalReportNoteIntegrator;
 use App\Services\AppraisalSubjectChapterReport;
+use App\Services\AppraisalLegalChapterReport;
 use App\Services\AppraisalMidasReview;
 use App\Services\AppraisalMidasSupportUploadService;
 use App\Services\AppraisalLegalInput;
@@ -572,6 +573,34 @@ Certificado de tradicion.",
         && str_contains($chapterText, 'Estructura: Concreto reforzado (bueno)')
         && str_contains($chapterText, 'NTS S 03')
         && str_contains($chapterText, 'Ley 675 de 2001'), 'entregable sujeto integra construccion areas PH obsolescencias y normas');
+    $legalChapter = (new AppraisalLegalChapterReport())->build([
+        'status' => 'Revisado por analista',
+        'data' => [
+            'matricula_inmobiliaria' => '060-187437', 'orip' => 'Cartagena',
+            'municipio' => 'Cartagena de Indias', 'departamento' => 'Bolívar',
+            'fecha_expedicion' => '2024-01-18', 'titular_actual' => 'ACPE Ecopetrol',
+            'reporte_escritura_propiedad' => 'Escritura pública 259 del 20/02/2017',
+            'codigo_catastral_actual' => '01-02-0678-0169-901', 'direccion' => 'K 13 B # 26-78',
+            'reglamento_ph' => 'Edificio 19 Proyecto Integrado Chambacú',
+            'reporte_conclusion_entregable' => 'Comercializable con salvedad registral revisada',
+        ],
+        'annotations' => [['orden' => '001', 'categoria' => 'tradicion', 'estado_juridico' => 'vigente',
+            'requiere_revision' => 'No', 'especificacion' => 'Compraventa']],
+        'alerts' => [],
+    ], [['source_filename' => 'Certificado de tradición.pdf']]);
+    $notes->saveRows('11111111111111111111111111111111', 7, '4', [[
+        'section_code' => '4.5', 'title' => 'Salvedad acordada',
+        'body' => 'El alcance jurídico corresponde a lectura registral para fines valuatorios.',
+        'source_note' => 'Certificado de tradición aportado', 'sort_order' => 1,
+    ]]);
+    $legalIntegrated = (new AppraisalReportNoteIntegrator())->apply($legalChapter,
+        $notes->byChapter('11111111111111111111111111111111', 7, '4'));
+    expect(str_contains($legalIntegrated['text'], '4. Identificación de las Características Jurídicas')
+        && str_contains($legalIntegrated['text'], 'NTS S 03')
+        && str_contains($legalIntegrated['text'], 'Decreto 1420')
+        && str_contains($legalIntegrated['text'], 'IVS 400')
+        && str_contains($legalIntegrated['text'], 'Salvedad acordada'),
+        'entregable juridico integra certificado normas y ampliaciones');
     $_POST = ['unit_attributes' => [$unitId => ['items' => ['esquinero_medianero' => ['value' => 'esquinero',
         'state' => 'bueno', 'impact' => 'positivo_medio', 'evidence' => 'visita',
         'rating' => '4', 'weight' => '3',

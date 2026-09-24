@@ -5,6 +5,7 @@ use App\Core\Http;
 use App\Core\HttpException;
 use App\Core\Session;
 use App\Models\AppraisalObsolescenceRepository;
+use App\Models\AppraisalLegalRepository;
 use App\Models\AppraisalPhRepository;
 use App\Models\AppraisalRepository;
 use App\Models\AppraisalReportNoteRepository;
@@ -14,6 +15,7 @@ use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraiserRepository;
 use App\Models\IgacTypologyRepository;
 use App\Services\AppraisalChapterOneReport;
+use App\Services\AppraisalLegalChapterReport;
 use App\Services\AppraisalSectorChapterReport;
 use App\Services\AppraisalDossierNumberer;
 use App\Services\AppraisalChapterZeroInput;
@@ -30,7 +32,7 @@ final class AppraisalController
         private ?AppraisalPhRepository $ph = null, private ?AppraisalSubjectRepository $subjects = null,
         private ?AppraisalObsolescenceRepository $obsolescence = null, private ?AppraisalDossierNumberer $dossiers = null,
         private ?AppraisalSectorRepository $sectors = null, private ?AppraisalSectorSectionRepository $sectorSections = null,
-        private ?AppraisalReportNoteRepository $reportNotes = null) {}
+        private ?AppraisalReportNoteRepository $reportNotes = null, private ?AppraisalLegalRepository $legal = null) {}
 
     public function index(): void
     {
@@ -84,8 +86,13 @@ final class AppraisalController
             $this->chapterNotes($notes, '2'), AppraisalReportNoteCatalog::noteSectionLabels('2', $this->chapterNotes($notes, '2')));
         $subjectChapter = $integrator->apply((new AppraisalSubjectChapterReport())->build($record, $subject, $units, $phProfile, $obsolescence),
             $this->chapterNotes($notes, '3'), AppraisalReportNoteCatalog::noteSectionLabels('3', $this->chapterNotes($notes, '3')));
+        $legalProfile = $this->legal?->profile($id, $this->user['id']) ?? [];
+        $legalCertificates = $this->legal?->certificates($id, $this->user['id']) ?? [];
+        $legalChapter = $integrator->apply((new AppraisalLegalChapterReport())->build($legalProfile, $legalCertificates),
+            $this->chapterNotes($notes, '4'), AppraisalReportNoteCatalog::noteSectionLabels('4', $this->chapterNotes($notes, '4')));
         view('appraisals/deliverable', ['title' => 'Entregable', 'record' => $record,
-            'phProfile' => $phProfile, 'chapterOne' => $chapterOne, 'sectorChapter' => $sectorChapter, 'subjectChapter' => $subjectChapter]);
+            'phProfile' => $phProfile, 'chapterOne' => $chapterOne, 'sectorChapter' => $sectorChapter,
+            'subjectChapter' => $subjectChapter, 'legalChapter' => $legalChapter]);
     }
 
     public function saveChapterZero(string $id): never
