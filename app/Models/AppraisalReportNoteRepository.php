@@ -27,22 +27,32 @@ final class AppraisalReportNoteRepository
 
     public function customSections(string $appraisalId, int $owner, string $chapter): array
     {
-        $query = $this->db->prepare('SELECT section_code, label FROM appraisal_report_note_sections
-            WHERE appraisal_id = ? AND owner_id = ? AND chapter_code = ? ORDER BY section_code');
-        $query->execute([$appraisalId, $owner, $chapter]);
-        $out = [];
-        foreach ($query->fetchAll() as $row) $out[(string) $row['section_code']] = (string) $row['label'];
-        return $out;
+        try {
+            $query = $this->db->prepare('SELECT section_code, label FROM appraisal_report_note_sections
+                WHERE appraisal_id = ? AND owner_id = ? AND chapter_code = ? ORDER BY section_code');
+            $query->execute([$appraisalId, $owner, $chapter]);
+            $out = [];
+            foreach ($query->fetchAll() as $row) $out[(string) $row['section_code']] = (string) $row['label'];
+            return $out;
+        } catch (\PDOException $error) {
+            if ($this->missingCustomSectionTable($error)) return [];
+            throw $error;
+        }
     }
 
     public function customSectionsByAppraisal(string $appraisalId, int $owner): array
     {
-        $query = $this->db->prepare('SELECT chapter_code, section_code, label FROM appraisal_report_note_sections
-            WHERE appraisal_id = ? AND owner_id = ? ORDER BY chapter_code, section_code');
-        $query->execute([$appraisalId, $owner]);
-        $out = [];
-        foreach ($query->fetchAll() as $row) $out[(string) $row['chapter_code']][(string) $row['section_code']] = (string) $row['label'];
-        return $out;
+        try {
+            $query = $this->db->prepare('SELECT chapter_code, section_code, label FROM appraisal_report_note_sections
+                WHERE appraisal_id = ? AND owner_id = ? ORDER BY chapter_code, section_code');
+            $query->execute([$appraisalId, $owner]);
+            $out = [];
+            foreach ($query->fetchAll() as $row) $out[(string) $row['chapter_code']][(string) $row['section_code']] = (string) $row['label'];
+            return $out;
+        } catch (\PDOException $error) {
+            if ($this->missingCustomSectionTable($error)) return [];
+            throw $error;
+        }
     }
 
     public function saveCustomSections(string $appraisalId, int $owner, string $chapter, array $rows): void
@@ -92,9 +102,14 @@ final class AppraisalReportNoteRepository
     { $this->db->prepare('DELETE FROM appraisal_report_notes WHERE id = ? AND appraisal_id = ? AND owner_id = ?')->execute([$id, $appraisalId, $owner]); }
     private function upsertSection(string $appraisalId, int $owner, string $chapter, string $section, string $label): void
     {
-        $query = $this->db->prepare('SELECT id FROM appraisal_report_note_sections
-            WHERE appraisal_id = ? AND owner_id = ? AND chapter_code = ? AND section_code = ?');
-        $query->execute([$appraisalId, $owner, $chapter, $section]);
+        try {
+            $query = $this->db->prepare('SELECT id FROM appraisal_report_note_sections
+                WHERE appraisal_id = ? AND owner_id = ? AND chapter_code = ? AND section_code = ?');
+            $query->execute([$appraisalId, $owner, $chapter, $section]);
+        } catch (\PDOException $error) {
+            if ($this->missingCustomSectionTable($error)) return;
+            throw $error;
+        }
         $id = (string) ($query->fetchColumn() ?: '');
         $now = gmdate('Y-m-d H:i:s');
         if ($id !== '') {
@@ -107,6 +122,8 @@ final class AppraisalReportNoteRepository
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
             ->execute([bin2hex(random_bytes(16)), $appraisalId, $owner, $chapter, $section, $label, $now, $now]);
     }
+    private function missingCustomSectionTable(\PDOException $error): bool
+    { return str_contains(strtolower($error->getMessage()), 'appraisal_report_note_sections'); }
     private function id(string $value): string { return preg_match('/^[a-f0-9]{32}$/', $value) ? $value : ''; }
     private function section(mixed $value, string $chapter): string
     { $text = $this->limit($value, 20); return preg_match('/^' . preg_quote($chapter, '/') . '(?:\.\d+){0,3}$/', $text) ? $text : $chapter; }

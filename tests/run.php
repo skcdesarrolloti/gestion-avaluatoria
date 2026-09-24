@@ -519,6 +519,13 @@ Certificado de tradicion.",
         && str_contains($customIntegrated['text'], '2.14 Incidencia comercial adicional')
         && str_contains($customIntegrated['text'], 'Flujo peatonal'),
         'numeral personalizado se agrega al desplegable y titula el entregable');
+    $legacyNotesDb = new PDO('sqlite::memory:', null, null, [PDO::ATTR_ERRMODE => PDO::ERRMODE_EXCEPTION, PDO::ATTR_DEFAULT_FETCH_MODE => PDO::FETCH_ASSOC]);
+    $legacyNotes = new AppraisalReportNoteRepository($legacyNotesDb);
+    $legacyNotes->saveCustomSections('11111111111111111111111111111111', 7, '2',
+        [['section_code' => '2.14', 'label' => 'Temporal']]);
+    expect($legacyNotes->customSections('11111111111111111111111111111111', 7, '2') === []
+        && $legacyNotes->customSectionsByAppraisal('11111111111111111111111111111111', 7) === [],
+        'numerales personalizados no bloquean modulos si falta migracion pendiente');
     $sectorChapter = (new AppraisalSectorChapterReport())->build([],
         ['neighborhood_name' => 'Chambacú', 'locality_name' => 'Localidad Histórica y del Caribe Norte', 'commune_ucg' => 'UCG 1', 'city_name' => 'Cartagena de Indias'],
         ['services_status' => 'completa', 'predominant_use' => 'comercial', 'urban_norm' => 'Mixto 2 institucional y comercial',
