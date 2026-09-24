@@ -86,9 +86,8 @@ $nextIndex = count($reportNoteRows);
                 <label class="label">Numeral
                     <select class="input" name="report_notes[<?= e((string) $nextIndex) ?>][section_code]"
                         x-ref="newReportNoteSection" x-effect="customReady() && ($refs.newReportNoteSection.value = customCode.trim())">
-                        <template x-if="customReady()">
-                            <option :value="customCode.trim()" x-text="customText()"></option>
-                        </template>
+                        <option value="" :value="customReady() ? customCode.trim() : ''"
+                            :disabled="!customReady()" x-text="customReady() ? customText() : 'Selecciona un numeral o crea uno arriba'"></option>
                         <?php foreach ($reportNoteSections as $code => $label): ?>
                             <option value="<?= e((string) $code) ?>"><?= e($code . ' · ' . $label) ?></option>
                         <?php endforeach; ?>
