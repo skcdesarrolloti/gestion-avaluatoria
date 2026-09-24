@@ -16,6 +16,20 @@ $textLabels = [
     'property_registry' => ['Matrícula inmobiliaria', 'Ej. 060-260018'],
     'cadastral_reference' => ['Referencia catastral', 'Ej. 01-09-0130-0016-000'],
     'registry_office' => ['Oficina de registro / círculo registral', 'Ej. Cartagena'],
+    'midas_national_cadastral_reference' => ['Número predial nacional MIDAS', 'Ej. 130010103000003810024000000000'],
+    'midas_territory' => ['Territorio leído en MIDAS', 'Ej. Barrio Zaragocilla'],
+    'midas_land_use' => ['Uso de suelo MIDAS', 'Ej. Mixto 2'],
+    'midas_urban_treatment' => ['Tratamiento MIDAS', 'Ej. Mejoramiento Integral Parcial'],
+    'midas_risk' => ['Riesgos MIDAS', 'Ej. Expansividad Moderada (100.0 %)'],
+    'midas_land_classification' => ['Clasificación del suelo MIDAS', 'Ej. Suelo urbano'],
+    'midas_dane_block_code' => ['Código manzana DANE', 'Ej. 21030101'],
+    'midas_dane_block_side' => ['Lado manzana DANE', 'Ej. B'],
+    'midas_block_number' => ['Número de manzana MIDAS', 'Ej. 381'],
+    'midas_property_number' => ['Número de predio MIDAS', 'Ej. 24'],
+    'midas_stratum_record' => ['Acta estratificación MIDAS', 'Ej. acta o soporte'],
+    'midas_stratum_atypical' => ['Atipicidad estratificación MIDAS', 'Ej. No'],
+    'midas_stratum_observation' => ['Observación estratificación MIDAS', 'Ej. observación reportada'],
+    'midas_building_name' => ['Nombre edificación MIDAS', 'Ej. nombre reportado'],
     'restrictions' => ['Restricciones / limitaciones', 'Ej. N/A'],
     'legal_urban_affectations' => ['Afectaciones jurídicas o urbanas', 'Ej. Sin afectaciones reportadas'],
     'complementary_potential_uses' => ['Usos potenciales complementarios', 'Ej. Comercial'],
@@ -31,6 +45,7 @@ $tabs = [
     'ubicacion' => ['Ubicación territorial', []],
     'referencia' => ['Referencia', ['point_reference', 'alternate_nomenclature']],
     'registro' => ['Registro y catastro', ['property_registry', 'cadastral_reference', 'registry_office', 'stratum']],
+    'midas' => ['Investigación MIDAS', []],
     'norma' => ['Norma urbana', ['urban_license', 'permitted_use', 'urban_treatment']],
     'restricciones' => ['Restricciones', ['restrictions', 'legal_urban_affectations']],
     'entorno' => ['Entorno', ['centrality', 'immediate_environment', 'road_condition']],
@@ -112,8 +127,11 @@ $tabs = [
                 una ficha inicial para completar y guardar.
             </div>
         </div>
+        <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="activeTab === 'midas'">
+            <?php require BASE_PATH . '/app/Views/appraisals/subject-midas.php'; ?>
+        </div>
         <?php foreach ($tabs as $tabKey => [$title, $keys]): ?>
-            <?php if (in_array($tabKey, ['identificacion', 'ubicacion', 'tipologias'], true)) continue; ?>
+            <?php if (in_array($tabKey, ['identificacion', 'ubicacion', 'tipologias', 'midas'], true)) continue; ?>
             <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="activeTab === '<?= e($tabKey) ?>'">
                 <h3 class="text-base font-semibold"><?= e($title) ?></h3>
                 <div class="mt-5 grid gap-5 md:grid-cols-3">

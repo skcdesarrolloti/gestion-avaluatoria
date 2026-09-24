@@ -49,8 +49,7 @@ $input = static function (string $name, string $label, string $placeholder = '',
                 <p class="mt-2 text-xs font-semibold text-teal-800" data-autosave-status>Autoguardado activo</p>
             </div>
             <div class="flex flex-wrap gap-2">
-                <button class="btn-primary" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/midas/consultar')) ?>">Consultar MIDAS</button>
-                <button class="btn-secondary" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/midas/procesar')) ?>">Procesar lectura pegada</button>
+                <a class="btn-primary" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto#midas')) ?>">Investigar en módulo 3</a>
                 <label class="inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
                     <input type="checkbox" name="midas_consulted" value="1" <?= e($checked('midas_consulted')) ?>> MIDAS consultado
                 </label>
@@ -84,10 +83,6 @@ $input = static function (string $name, string $label, string $placeholder = '',
                 </select>
             </label>
             <div class="md:col-span-3"><?php $textarea('midas_usage_result', 'Resultado leído en MIDAS · Uso del suelo', 'Transcribe el uso, área de actividad, zona, tratamiento, restricciones o mensaje No disponible.', 5); ?></div>
-            <label class="label md:col-span-3">Lectura completa copiada de MIDAS
-                <textarea class="input min-h-48" name="midas_pasted_text" rows="9" maxlength="70000" placeholder="Pega aquí el bloque de Predios o el resultado de Uso Suelo. Al procesar, el sistema separa predio para numeral 3 y reglamentación para numeral 5."></textarea>
-                <span class="mt-1 block text-xs font-medium text-slate-500">MIDAS puede tardar en cargar. Espera a que aparezca todo el cuadro antes de copiarlo y procesarlo.</span>
-            </label>
             <?php if ($value('midas_predio_raw') !== '' || $value('midas_usage_raw') !== ''): ?>
                 <div class="md:col-span-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-900">
                     Lectura guardada: <?= $value('midas_predio_raw') !== '' ? 'predio MIDAS para numeral 3' : '' ?><?= $value('midas_predio_raw') !== '' && $value('midas_usage_raw') !== '' ? ' y ' : '' ?><?= $value('midas_usage_raw') !== '' ? 'reglamentación Uso Suelo para numeral 5' : '' ?>.
@@ -134,6 +129,16 @@ $input = static function (string $name, string $label, string $placeholder = '',
                 <?php $textarea('use_complementary_text', 'Uso complementario leído en MIDAS', 'Actividades complementarias y detalle del cuadro.', 5, 70000); ?>
                 <?php $textarea('use_restricted_text', 'Uso restringido leído en MIDAS', 'Actividades restringidas y detalle del cuadro.', 5, 70000); ?>
                 <?php $textarea('use_prohibited_text', 'Uso prohibido leído en MIDAS', 'Actividades prohibidas y detalle del cuadro.', 5, 70000); ?>
+            </div>
+            <div class="md:col-span-2 grid gap-4 rounded-xl border border-amber-100 bg-amber-50 p-4">
+                <h3 class="font-semibold text-amber-950">Campos para potencial constructivo</h3>
+                <?php $textarea('norm_unit_basic_text', 'Unidad básica', 'Valores por alcobas, área mínima de unidad o condición equivalente.', 4, 70000); ?>
+                <?php $textarea('norm_free_area_text', 'Área libre', 'Área libre por tipología: unifamiliar, bifamiliar, multifamiliar u otra.', 4, 70000); ?>
+                <?php $textarea('norm_min_lot_front_text', 'Área y frente mínimos', 'AML, frente mínimo y reglas por tipología.', 4, 70000); ?>
+                <?php $textarea('norm_max_height_text', 'Altura máxima', 'Pisos o regla de altura máxima aplicable.', 3, 70000); ?>
+                <?php $textarea('norm_construction_index_text', 'Índice de construcción', 'Índice por tipología o condición normativa.', 4, 70000); ?>
+                <?php $textarea('norm_isolation_text', 'Aislamientos', 'Antejardín, retiros laterales, posteriores y demás aislamientos.', 4, 70000); ?>
+                <?php $textarea('norm_other_potential_text', 'Otros parámetros urbanísticos', 'Estacionamientos, ocupación, cesiones, observaciones o parámetros pendientes.', 4, 70000); ?>
             </div>
         </div>
     </section>

@@ -11,7 +11,7 @@ final class AppraisalSubjectCatalog
 
     public static function keys(): array
     {
-        return array_merge(self::textKeys(), array_keys(self::selects()), ['subject_reference_date', 'notes']);
+        return array_merge(self::textKeys(), array_keys(self::selects()), ['subject_reference_date', 'midas_updated_on', 'notes']);
     }
 
     public static function textKeys(): array
@@ -20,6 +20,12 @@ final class AppraisalSubjectCatalog
             'address_midas', 'address_tax', 'address_deed', 'address_other', 'adopted_address',
             'alternate_nomenclature', 'property_registry',
             'cadastral_reference', 'registry_office', 'restrictions', 'legal_urban_affectations',
+            'midas_national_cadastral_reference', 'midas_property_registry', 'midas_address',
+            'midas_cadastral_reference', 'midas_territory', 'midas_locality', 'midas_commune_ucg',
+            'midas_land_use', 'midas_urban_treatment', 'midas_risk', 'midas_land_classification', 'midas_dane_block_code', 'midas_dane_block_side',
+            'midas_block_number', 'midas_property_number', 'midas_stratum', 'midas_stratum_record',
+            'midas_stratum_atypical', 'midas_stratum_observation', 'midas_building_name',
+            'midas_land_area_m2', 'midas_built_area_m2', 'midas_predio_raw',
             'complementary_potential_uses', 'secondary_complementary_activities', 'latitude', 'longitude'];
     }
 
@@ -124,6 +130,10 @@ final class AppraisalSubjectCatalog
             'property_registry' => 'Identificador registral del sujeto. Debe permitir cotejo con certificado de tradición y soporte jurídico.',
             'cadastral_reference' => 'Identificador catastral del predio o unidad. Sirve para contrastar ubicación, área y trazabilidad física.',
             'registry_office' => 'Oficina competente donde se lleva el folio. Es clave para validar procedencia registral del sujeto.',
+            'midas_national_cadastral_reference' => 'Número predial nacional leído en MIDAS. Conserva trazabilidad aunque el informe use referencia corta.',
+            'midas_territory' => 'Territorio o barrio mostrado por MIDAS para contrastar con el maestro sectorial.',
+            'midas_land_use' => 'Uso de suelo leído en la ficha del predio MIDAS.',
+            'midas_land_classification' => 'Clasificación del suelo leída en MIDAS.',
             'urban_license' => 'Registra licencia o ausencia según soporte disponible. Ayuda a leer legalidad urbanística y estado de desarrollo.',
             'permitted_use' => 'Lectura sintética de compatibilidad entre uso observado o potencial y norma urbana aplicable.',
             'urban_treatment' => 'Tratamiento POT o categoría urbanística de referencia: desarrollo, consolidación, renovación o conservación.',

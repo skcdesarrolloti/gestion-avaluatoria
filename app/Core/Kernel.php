@@ -137,6 +137,7 @@ final class Kernel
                     new IgacTypologyRepository(), new AppraisalSubjectRepository($db), new GeoMasterRepository($db),
                     new \App\Models\AppraisalPhRepository($db), new \App\Models\AppraisalObsolescenceRepository($db),
                     new \App\Models\AppraisalReportNoteRepository($db)),
+                'subjectMidas' => new \App\Controllers\AppraisalSubjectMidasController(new AppraisalRepository($db), new AppraisalSubjectRepository($db), new \App\Models\AppraisalUrbanNormRepository($db), $user),
                 'subjectPh' => new \App\Controllers\AppraisalPhController(new AppraisalRepository($db), new \App\Models\AppraisalPhRepository($db), $user),
                 'obsolescence' => new \App\Controllers\AppraisalObsolescenceController(new AppraisalRepository($db), new \App\Models\AppraisalObsolescenceRepository($db), $user),
                 'valuations' => new ValuationController(),

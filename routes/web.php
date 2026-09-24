@@ -74,6 +74,7 @@ return [
     ['POST', '#^/avaluos/([a-f0-9]{32})/notas-entregable$#', 'reportNotes', 'save', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ficha-basica$#', 'subject', 'saveBasic', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ficha-basica/autoguardar$#', 'subject', 'autosaveBasic', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/midas/procesar$#', 'subjectMidas', 'process', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/preclasificacion$#', 'subject', 'savePreclassification', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/preclasificacion/autoguardar$#', 'subject', 'autosavePreclassification', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/unidades$#', 'subject', 'saveUnits', true],

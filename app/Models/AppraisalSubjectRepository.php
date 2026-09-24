@@ -53,14 +53,22 @@ final class AppraisalSubjectRepository
             'zone_sector' => $predio['land_use'] ?? '', 'property_registry' => $predio['property_registry'] ?? '',
             'cadastral_reference' => $predio['cadastral_reference'] ?? '', 'stratum' => $this->stratum((string) ($predio['stratum'] ?? '')),
             'current_use' => $this->useCategory((string) ($predio['land_use'] ?? '')), 'urban_treatment' => $this->treatment((string) ($predio['urban_treatment'] ?? '')),
-            'restrictions' => $this->riskRestriction((string) ($predio['risk'] ?? '')), 'legal_urban_affectations' => $this->riskAffectation((string) ($predio['risk'] ?? '')),
-            'subject_reference_date' => $this->date((string) ($predio['updated_on'] ?? ''))];
+            'restrictions' => trim((string) ($predio['risk'] ?? '')) !== '' ? 'amenaza_riesgo' : '',
+            'legal_urban_affectations' => trim((string) ($predio['risk'] ?? '')) !== '' ? 'riesgo' : '',
+            'subject_reference_date' => $this->date((string) ($predio['updated_on'] ?? '')), 'midas_updated_on' => $this->date((string) ($predio['updated_on'] ?? '')),
+            'midas_predio_raw' => $predio['_raw'] ?? ''];
+        foreach (['midas_national_cadastral_reference' => 'national_cadastral_reference', 'midas_property_registry' => 'property_registry',
+            'midas_address' => 'address', 'midas_cadastral_reference' => 'cadastral_reference', 'midas_territory' => 'territory',
+            'midas_locality' => 'locality', 'midas_commune_ucg' => 'commune_ucg', 'midas_land_use' => 'land_use',
+            'midas_urban_treatment' => 'urban_treatment', 'midas_risk' => 'risk', 'midas_land_classification' => 'land_classification',
+            'midas_dane_block_code' => 'dane_block_code', 'midas_dane_block_side' => 'dane_block_side', 'midas_block_number' => 'block_number',
+            'midas_property_number' => 'property_number', 'midas_stratum' => 'stratum', 'midas_stratum_record' => 'stratum_record',
+            'midas_stratum_atypical' => 'stratum_atypical', 'midas_stratum_observation' => 'stratum_observation', 'midas_building_name' => 'building_name',
+            'midas_land_area_m2' => 'land_area_m2', 'midas_built_area_m2' => 'built_area_m2'] as $target => $source) $data[$target] = $predio[$source] ?? '';
         foreach ($data as $key => $value) if ($value === '') unset($data[$key]);
         if ($data === []) return;
         if (($current['adopted_source'] ?? '') === '') $data['adopted_source'] = 'midas';
-        if (($current['adopted_address'] ?? '') === '' && !empty($data['address_midas'])) {
-            $data['adopted_address'] = $data['address_midas'];
-        }
+        if (($current['adopted_address'] ?? '') === '' && !empty($data['address_midas'])) $data['adopted_address'] = $data['address_midas'];
         if (!$this->exists($appraisalId, $owner)) { $this->insert($appraisalId, $owner,
             array_replace(AppraisalSubjectCatalog::defaults(), $data), gmdate('Y-m-d H:i:s')); return; }
         $set = implode(', ', array_map(static fn (string $key): string => $key . ' = ?', array_keys($data)));
@@ -69,29 +77,12 @@ final class AppraisalSubjectRepository
         $query->execute([...array_values($data), gmdate('Y-m-d H:i:s'), $appraisalId, $owner]);
     }
 
-    private function stratum(string $value): string
-    { $digits = preg_replace('/\D+/', '', $value) ?? ''; return in_array($digits, ['1','2','3','4','5','6'], true) ? $digits : ''; }
-
-    private function treatment(string $value): string
-    { $key = $this->key($value); return str_contains($key, 'mejoramiento') ? 'mejoramiento_integral' : (str_contains($key, 'conservacion') ? 'conservacion' : ''); }
-
-    private function useCategory(string $value): string
-    { $key = $this->key($value); foreach (['residencial','comercial','industrial','institucional','mixto'] as $use) if (str_contains($key, $use)) return $use; return ''; }
-
-    private function riskRestriction(string $value): string
-    { return trim($value) !== '' ? 'amenaza_riesgo' : ''; }
-
-    private function riskAffectation(string $value): string
-    { return trim($value) !== '' ? 'riesgo' : ''; }
-
-    private function date(string $value): ?string
-    { return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : null; }
-
+    private function stratum(string $value): string { $digits = preg_replace('/\D+/', '', $value) ?? ''; return in_array($digits, ['1','2','3','4','5','6'], true) ? $digits : ''; }
+    private function treatment(string $value): string { $key = $this->key($value); return str_contains($key, 'mejoramiento') ? 'mejoramiento_integral' : (str_contains($key, 'conservacion') ? 'conservacion' : ''); }
+    private function useCategory(string $value): string { $key = $this->key($value); foreach (['residencial','comercial','industrial','institucional','mixto'] as $use) if (str_contains($key, $use)) return $use; return ''; }
+    private function date(string $value): ?string { return preg_match('/^\d{4}-\d{2}-\d{2}$/', $value) ? $value : null; }
     private function key(string $value): string
-    {
-        $text = strtr(mb_strtolower(trim($value)), ['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u','ñ'=>'n']);
-        return preg_replace('/[^a-z0-9]+/', '', $text) ?? '';
-    }
+    { $text = strtr(mb_strtolower(trim($value)), ['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u','ñ'=>'n']); return preg_replace('/[^a-z0-9]+/', '', $text) ?? ''; }
 
     public function searchByNeighborhood(string $neighborhoodId, int $owner, string $excludeId = '', int $limit = 8): array
     {
@@ -138,6 +129,14 @@ final class AppraisalSubjectRepository
             'address_deed' => 220, 'address_other' => 220, 'adopted_address' => 220,
             'alternate_nomenclature' => 160, 'property_registry' => 80, 'cadastral_reference' => 120,
             'registry_office' => 120, 'restrictions' => 220, 'legal_urban_affectations' => 220,
+            'midas_national_cadastral_reference' => 120, 'midas_property_registry' => 80,
+            'midas_address' => 220, 'midas_cadastral_reference' => 120, 'midas_territory' => 160,
+            'midas_locality' => 160, 'midas_commune_ucg' => 80, 'midas_land_use' => 120,
+            'midas_urban_treatment' => 160, 'midas_risk' => 220, 'midas_land_classification' => 120, 'midas_dane_block_code' => 80, 'midas_dane_block_side' => 40,
+            'midas_block_number' => 80, 'midas_property_number' => 80, 'midas_stratum' => 20, 'midas_stratum_record' => 160,
+            'midas_stratum_atypical' => 80, 'midas_stratum_observation' => 220,
+            'midas_building_name' => 180, 'midas_land_area_m2' => 40, 'midas_built_area_m2' => 40,
+            'midas_predio_raw' => 70000,
             'complementary_potential_uses' => 160, 'secondary_complementary_activities' => 160,
             'latitude' => 40, 'longitude' => 40];
         $data = [];
@@ -153,6 +152,8 @@ final class AppraisalSubjectRepository
         }
         $date = trim((string) ($input['subject_reference_date'] ?? ''));
         $data['subject_reference_date'] = preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) ? $date : null;
+        $date = trim((string) ($input['midas_updated_on'] ?? ''));
+        $data['midas_updated_on'] = preg_match('/^\d{4}-\d{2}-\d{2}$/', $date) ? $date : null;
         $data['notes'] = mb_substr(trim((string) ($input['notes'] ?? '')), 0, 2000);
         return $data;
     }

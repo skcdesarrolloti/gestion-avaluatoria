@@ -191,6 +191,12 @@ try {
         adopted_source TEXT, adopted_address TEXT, alternate_nomenclature TEXT, horizontal_property TEXT,
         centrality TEXT, immediate_environment TEXT, stratum TEXT, property_registry TEXT,
         cadastral_reference TEXT, registry_office TEXT, urban_license TEXT, permitted_use TEXT,
+        midas_national_cadastral_reference TEXT, midas_property_registry TEXT, midas_address TEXT,
+        midas_cadastral_reference TEXT, midas_territory TEXT, midas_locality TEXT, midas_commune_ucg TEXT,
+        midas_land_use TEXT, midas_urban_treatment TEXT, midas_risk TEXT, midas_land_classification TEXT, midas_dane_block_code TEXT, midas_dane_block_side TEXT,
+        midas_block_number TEXT, midas_property_number TEXT, midas_stratum TEXT, midas_stratum_record TEXT,
+        midas_stratum_atypical TEXT, midas_stratum_observation TEXT, midas_building_name TEXT,
+        midas_land_area_m2 TEXT, midas_built_area_m2 TEXT, midas_updated_on TEXT, midas_predio_raw TEXT,
         urban_treatment TEXT, restrictions TEXT, legal_urban_affectations TEXT, road_condition TEXT,
         access_facility TEXT, transport_connectivity TEXT, loading_unloading TEXT, current_use TEXT,
         main_potential_use TEXT, complementary_potential_uses TEXT, main_complementary_activity TEXT,
@@ -241,7 +247,10 @@ try {
         midas_layers TEXT, midas_usage_result TEXT, midas_activity TEXT, midas_support_reference TEXT,
         midas_result TEXT, midas_predio_raw TEXT, midas_usage_raw TEXT, use_regulation_table TEXT,
         use_principal_text TEXT, use_compatible_text TEXT, use_complementary_text TEXT,
-        use_restricted_text TEXT, use_prohibited_text TEXT, planning_concept_number TEXT,
+        use_restricted_text TEXT, use_prohibited_text TEXT, norm_unit_basic_text TEXT,
+        norm_free_area_text TEXT, norm_min_lot_front_text TEXT, norm_max_height_text TEXT,
+        norm_construction_index_text TEXT, norm_isolation_text TEXT, norm_other_potential_text TEXT,
+        planning_concept_number TEXT,
         planning_concept_date TEXT, official_concept_scope TEXT,
         land_classification TEXT, activity_area TEXT, normative_zone TEXT, urban_treatment TEXT, current_use TEXT,
         intended_use TEXT, applicable_activity TEXT, urban_norms_applied TEXT, heritage_context TEXT,
@@ -297,6 +306,7 @@ try {
         'midas_consulted_on' => '2026-09-24', 'midas_usage_result' => 'MIDAS reporta actividad mixta.',
         'use_principal_text' => 'Comercial 2 e Institucional 3.',
         'use_restricted_text' => 'Comercial 3 e Institucional 4.',
+        'norm_max_height_text' => '4 pisos.',
         'urban_norms_applied' => 'Decreto 0977 de 2001 y cuadro de actividad mixta.',
         'use_cross_result' => 'restringido', 'conclusion' => 'Requiere validación de Planeación para uso restringido.',
     ]);
@@ -308,11 +318,14 @@ try {
         'ficha urbana conserva consulta MIDAS y normas pertinentes');
     expect(str_contains((string) $savedUrban['use_restricted_text'], 'Comercial 3'),
         'ficha urbana conserva reglamentacion MIDAS por tipo de uso');
-    $midasParsed = (new UrbanNormMidasTextParser())->parse("01 Número Predial Nacional:\n130010103000003810024000000000\n07 Uso De Suelo:\nMixto 2\n08 Tratamiento:\nMejoramiento Integral Parcial\n20 Área Terreno (M2):\n529.00\n21 Área Construida (M2):\n329.00\n22 Referencia Catastral:\n010303810024000\nUSO PRINCIPAL\nCOMERCIAL 2: venta de bienes.\nUSO COMPATIBLE\nRESIDENCIAL: vivienda.\nUSO COMPLEMENTARIO\nINSTITUCIONAL 3: universidad.\nUSO RESTRINGIDO\nCOMERCIAL 3: talleres.\nUSO PROHIBIDO\nINDUSTRIAL 3: industria pesada.");
+    expect(($savedUrban['norm_max_height_text'] ?? '') === '4 pisos.', 'ficha urbana conserva campos de potencial constructivo');
+    $midasParsed = (new UrbanNormMidasTextParser())->parse("01 Número Predial Nacional:\n130010103000003810024000000000\n07 Uso De Suelo:\nMixto 2\n08 Tratamiento:\nMejoramiento Integral Parcial\n20 Área Terreno (M2):\n529.00\n21 Área Construida (M2):\n329.00\n22 Referencia Catastral:\n010303810024000\nUSO PRINCIPAL\nCOMERCIAL 2: venta de bienes.\nUSO COMPATIBLE\nRESIDENCIAL: vivienda.\nUSO COMPLEMENTARIO\nINSTITUCIONAL 3: universidad.\nUSO RESTRINGIDO\nCOMERCIAL 3: talleres.\nUSO PROHIBIDO\nINDUSTRIAL 3: industria pesada.\nUNIDAD BÁSICA\n2 ALCOBAS 40 M2\nUSOS\nPRINCIPAL residencial\nÁREA LIBRE\nunifamiliar 1 piso\nÁREA Y FRENTE MÍNIMOS\nAML 200 M2\nALTURA MÁXIMA\n4 pisos\nÍNDICE DE CONSTRUCCIÓN\n1.2\nAISLAMIENTOS\nAntejardín 3 m");
     expect(($midasParsed['predio']['land_use'] ?? '') === 'Mixto 2'
         && ($midasParsed['predio']['land_area_m2'] ?? '') === '529.00'
-        && str_contains($midasParsed['usage']['use_restricted_text'] ?? '', 'COMERCIAL 3'),
-        'parser MIDAS separa ficha predial y reglamentacion de uso suelo');
+        && ($midasParsed['predio']['cadastral_reference'] ?? '') === '010303810024000'
+        && str_contains($midasParsed['usage']['use_restricted_text'] ?? '', 'COMERCIAL 3')
+        && str_contains($midasParsed['usage']['norm_min_lot_front_text'] ?? '', 'AML 200'),
+        'parser MIDAS separa ficha predial reglamentacion y potencial constructivo');
     expectStatus(409, fn () => $urbanProfile->save('urban-appraisal-1', 1, 0, []),
         'ficha urbana rechaza version obsoleta');
     $refId = $urbanProfile->addReference('urban-appraisal-1', 1, [

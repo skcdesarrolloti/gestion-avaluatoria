@@ -11,10 +11,10 @@ $help = $fieldHelp($key);
             <?php endforeach; ?>
         </select>
     </label>
-<?php elseif ($key === 'subject_reference_date'): ?>
-    <label class="label">Fecha de referencia del sujeto
+<?php elseif (in_array($key, ['subject_reference_date', 'midas_updated_on'], true)): ?>
+    <label class="label"><?= e($key === 'midas_updated_on' ? 'Fecha actualización MIDAS' : 'Fecha de referencia del sujeto') ?>
         <?php if ($help !== ''): ?><span class="help-dot" title="<?= e($help) ?>">?</span><?php endif; ?>
-        <input class="input" type="date" name="subject_reference_date" value="<?= e($sv($key)) ?>">
+        <input class="input" type="date" name="<?= e($key) ?>" value="<?= e($sv($key)) ?>">
     </label>
 <?php else: [$label, $placeholder] = $textLabels[$key]; ?>
     <label class="label <?= in_array($key, ['restrictions', 'legal_urban_affectations', 'address'], true) ? 'md:col-span-2' : '' ?>">

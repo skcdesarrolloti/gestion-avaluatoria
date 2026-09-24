@@ -95,6 +95,7 @@ final class AppraisalUrbanNormController
             $data['midas_consulted'] = '1'; $data['source_status'] = 'midas';
             $this->profiles->save($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $data);
             if ($predio !== []) {
+                $predio['_raw'] = $raw;
                 $this->subjects->applyMidasPredio($id, $this->user['id'], $predio);
                 $this->appraisals->applyMidasAreasToFirstUnit($id, $this->user['id'], $predio);
             }
