@@ -4,7 +4,7 @@ namespace App\Controllers;
 use App\Core\{Http, Session};
 use App\Models\{AppraisalRepository, AppraisalReportNoteRepository, AppraisalSubjectRepository, AppraisalUrbanNormRepository, UrbanNormativeRepository};
 use App\Services\{AppraisalUrbanNormMidasFields, AppraisalUrbanNormScenarioInput, MidasPredioSearch, UrbanNormCategoryAdoption, UrbanNormMidasTextParser, UrbanNormMidasUsageSearch};
-use App\Support\{AppraisalReportNoteCatalog, UrbanNormativeAcademy, UrbanNormativeScenarioCatalog};
+use App\Support\{AppraisalCatalog, AppraisalReportNoteCatalog, UrbanNormativeAcademy, UrbanNormativeScenarioCatalog};
 
 final class AppraisalUrbanNormController
 {
@@ -31,6 +31,8 @@ final class AppraisalUrbanNormController
             'urbanDocuments' => $documents,
             'urbanCategories' => $categories,
             'urbanCategoryGroups' => $this->categoryGroups($categories),
+            'urbanRouteGroups' => $this->routeGroups($categories),
+            'propertyTypeLabel' => $this->propertyTypeLabel((string) ($record['tipo_inmueble'] ?? '')),
             'academyBlocks' => UrbanNormativeAcademy::blocks(),
             'sourceOptions' => UrbanNormativeAcademy::sourceOptions(),
             'useResults' => UrbanNormativeAcademy::useResults(),
@@ -51,7 +53,7 @@ final class AppraisalUrbanNormController
         $this->appraisals->find($id, $this->user['id']);
         try {
             $this->profiles->save($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $_POST);
-            Session::flash('urban_norm_message', 'Cambios del numeral 5 guardados. La lectura MIDAS solo se actualiza con el botón Actualizar MIDAS.');
+            Session::flash('urban_norm_message', 'Cambios del numeral 5 guardados. La lectura MIDAS solo se actualiza con el botÃ³n Actualizar MIDAS.');
         } catch (\Throwable $error) { Session::flash('urban_norm_error', $error->getMessage()); }
         $target = (string) ($_POST['next'] ?? '') === 'deliverable'
             ? 'avaluos/' . $id . '/entregable'
@@ -66,12 +68,12 @@ final class AppraisalUrbanNormController
         try {
             $version = $this->profiles->save($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $_POST);
             $categorySlug = trim((string) ($_POST['category_slug'] ?? ''));
-            if ($categorySlug === '') throw new \RuntimeException('Selecciona una categoría del cuadro antes de leerlo.');
+            if ($categorySlug === '') throw new \RuntimeException('Selecciona una categorÃ­a del cuadro antes de leerlo.');
             $category = $this->library->categoryWithRules($categorySlug);
             $profile = $this->profiles->profile($id, $this->user['id']);
             $fields = (new UrbanNormCategoryAdoption())->fields($category);
             $this->profiles->save($id, $this->user['id'], $version, array_replace($profile, $fields));
-            Session::flash('urban_norm_message', 'Cuadro normativo leído y aplicado al numeral 5. Revisa la categoría y ajusta el criterio del perito si hace falta.');
+            Session::flash('urban_norm_message', 'Cuadro normativo leÃ­do y aplicado al numeral 5. Revisa la categorÃ­a y ajusta el criterio del perito si hace falta.');
         } catch (\Throwable $error) { Session::flash('urban_norm_error', $error->getMessage()); }
         Http::redirect('avaluos/' . $id . '/normatividad-urbana#uso');
     }
@@ -135,23 +137,37 @@ final class AppraisalUrbanNormController
                 $this->appraisals->applyMidasAreasToFirstUnit($id, $this->user['id'], $predio);
             }
             $msg = $predio !== [] && $usage !== []
-                ? 'Lectura MIDAS procesada: datos del predio enviados al numeral 3 y reglamentación guardada en el numeral 5.'
-                : ($predio !== [] ? 'Lectura del predio MIDAS enviada al numeral 3.' : 'Reglamentación de Uso Suelo guardada en el numeral 5.');
+                ? 'Lectura MIDAS procesada: datos del predio enviados al numeral 3 y reglamentaciÃ³n guardada en el numeral 5.'
+                : ($predio !== [] ? 'Lectura del predio MIDAS enviada al numeral 3.' : 'ReglamentaciÃ³n de Uso Suelo guardada en el numeral 5.');
             Session::flash('urban_norm_message', $msg);
         } catch (\Throwable $error) { Session::flash('urban_norm_error', $error->getMessage()); }
         Http::redirect('avaluos/' . $id . '/normatividad-urbana#midas');
     }
 
     private function tabFragment(string $tab): string
+    { return in_array($tab, ['midas', 'uso', 'escenarios', 'determinantes', 'fuentes', 'cierre'], true) ? '#' . $tab : '#midas'; }
+
+    private function routeGroups(array $categories): array
     {
-        return in_array($tab, ['midas', 'uso', 'escenarios', 'determinantes', 'fuentes', 'cierre'], true) ? '#' . $tab : '#midas';
+        $labels = ['residencial' => 'Residencial', 'institucional' => 'Institucional / dotacional',
+            'comercial' => 'Comercial', 'industrial' => 'Industrial', 'turistica' => 'Turistica / hotelera',
+            'portuaria' => 'Portuaria', 'mixta' => 'Mixta', 'rural_suburbano' => 'Rural suburbana', 'rural' => 'Rural'];
+        $groups = [];
+        foreach ($categories as $cat) {
+            $key = (string) ($cat['activity_group'] ?? '');
+            $groups[$labels[$key] ?? ($key !== '' ? $key : 'Otras rutas')][] = $cat;
+        }
+        return $groups;
     }
+
+    private function propertyTypeLabel(string $type): string
+    { $options = AppraisalCatalog::selectFields()['tipo_inmueble'][4] ?? []; return (string) ($options[$type] ?? ($type !== '' ? $type : 'No definido')); }
 
     private function categoryGroups(array $categories): array
     {
         $groups = [];
         foreach ($categories as $cat) {
-            $label = trim((string) ($cat['table_code'] ?? '') . ' · ' . (string) ($cat['table_title'] ?? ''), ' ·');
+            $label = trim((string) ($cat['table_code'] ?? '') . ' Â· ' . (string) ($cat['table_title'] ?? ''), ' Â·');
             $groups[$label === '' ? 'Otros cuadros' : $label][] = $cat;
         }
         return $groups;
