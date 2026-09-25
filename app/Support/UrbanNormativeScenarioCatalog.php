@@ -35,11 +35,11 @@ final class UrbanNormativeScenarioCatalog
     {
         return [
             'pendiente' => 'Pendiente de evaluar',
-            'viable' => 'Viable con soporte básico',
-            'condicionado' => 'Viable condicionado',
+            'viable' => 'Indicio de potencial normativo',
+            'condicionado' => 'Potencial condicionado',
             'limitado' => 'Limitado por norma o condición física',
-            'no_viable' => 'No viable',
-            'requiere_especialista' => 'Requiere arquitecto o concepto oficial',
+            'no_viable' => 'No se adopta potencial adicional',
+            'requiere_especialista' => 'Pendiente de cabida o concepto oficial',
         ];
     }
 

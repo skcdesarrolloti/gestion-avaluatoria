@@ -36,8 +36,8 @@ final class AppraisalUrbanNormChapterReport
                 $this->line('Área vendible de referencia m²', $profile['sellable_area_m2'] ?? ''),
                 $this->line('Cumplimiento básico área/frente/índice', $profile['normative_compliance_summary'] ?? ''),
                 $this->line('Condición física que incide', $profile['norm_physical_base_text'] ?? ''),
-                $this->line('Estado pericial del potencial', $profile['constructive_potential_status'] ?? ''),
-                $this->line('Conclusión del potencial', $profile['constructive_potential_notes'] ?? ''),
+                $this->line('Conclusión valuatoria del potencial normativo', $profile['constructive_potential_status'] ?? ''),
+                $this->line('Conclusión pericial del potencial', $profile['constructive_potential_notes'] ?? ''),
             ])],
             ['5.3 Escenarios POT y mayor y mejor uso', $this->paragraph([
                 $this->line('Vía normativa adoptada', $profile['adopted_normative_route_label'] ?? ''),
