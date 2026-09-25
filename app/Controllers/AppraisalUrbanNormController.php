@@ -54,7 +54,8 @@ final class AppraisalUrbanNormController
             Session::flash('urban_norm_message', 'Cambios del numeral 5 guardados. La lectura MIDAS solo se actualiza con el botón Actualizar MIDAS.');
         } catch (\Throwable $error) { Session::flash('urban_norm_error', $error->getMessage()); }
         $target = (string) ($_POST['next'] ?? '') === 'deliverable'
-            ? 'avaluos/' . $id . '/entregable' : 'avaluos/' . $id . '/normatividad-urbana';
+            ? 'avaluos/' . $id . '/entregable'
+            : 'avaluos/' . $id . '/normatividad-urbana' . $this->tabFragment((string) ($_POST['active_tab'] ?? ''));
         Http::redirect($target);
     }
 
@@ -139,6 +140,11 @@ final class AppraisalUrbanNormController
             Session::flash('urban_norm_message', $msg);
         } catch (\Throwable $error) { Session::flash('urban_norm_error', $error->getMessage()); }
         Http::redirect('avaluos/' . $id . '/normatividad-urbana#midas');
+    }
+
+    private function tabFragment(string $tab): string
+    {
+        return in_array($tab, ['midas', 'uso', 'escenarios', 'determinantes', 'fuentes', 'cierre'], true) ? '#' . $tab : '#midas';
     }
 
     private function categoryGroups(array $categories): array
