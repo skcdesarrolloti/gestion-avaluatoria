@@ -2,6 +2,15 @@
 declare(strict_types=1);
 use App\Database\Schema;
 
+if (!function_exists('valuationGlossarySlug')) {
+function valuationGlossarySlug(string $term): string
+{
+    $ascii = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', mb_strtolower($term)) ?: mb_strtolower($term);
+    $slug = trim(preg_replace('/[^a-z0-9]+/', '-', $ascii) ?? '', '-');
+    return $slug !== '' ? substr($slug, 0, 150) : substr(hash('sha256', $term), 0, 32);
+}
+}
+
 return static function (Schema $schema): void {
     $schema->db->exec("CREATE TABLE IF NOT EXISTS valuation_glossary_terms (
         slug VARCHAR(160) PRIMARY KEY,
@@ -75,12 +84,3 @@ return static function (Schema $schema): void {
         $query->execute([valuationGlossarySlug($row[0]), $row[0], $row[1], $source, ($index + 1) * 10, $now, $now]);
     }
 };
-
-if (!function_exists('valuationGlossarySlug')) {
-function valuationGlossarySlug(string $term): string
-{
-    $ascii = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', mb_strtolower($term)) ?: mb_strtolower($term);
-    $slug = trim(preg_replace('/[^a-z0-9]+/', '-', $ascii) ?? '', '-');
-    return $slug !== '' ? substr($slug, 0, 150) : substr(hash('sha256', $term), 0, 32);
-}
-}
