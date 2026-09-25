@@ -21,13 +21,14 @@ final class AppraisalUrbanNormController
         catch (\Throwable $error) { error_log('Gestion avaluatoria urbano notas ' . get_class($error)); $notes = []; }
         try { $profile = $this->profiles->profile($id, $this->user['id']); }
         catch (\Throwable $error) { error_log('Gestion avaluatoria urbano perfil ' . get_class($error)); $profile = []; }
+        try { $units = $this->appraisals->units($id, $this->user['id']); } catch (\Throwable $error) { $units = []; }
         try { $documents = $this->library->documentsWithTables(); $categories = $this->library->categories(); }
         catch (\Throwable $error) { error_log('Gestion avaluatoria urbano biblioteca ' . get_class($error)); $documents = []; $categories = []; }
         try { $references = $this->profiles->references($id, $this->user['id']); }
         catch (\Throwable $error) { $references = []; }
         view('appraisals/urban-normative', [
             'title' => 'Normatividad urbana', 'record' => $record, 'subject' => $subject,
-            'profile' => $this->prefilledProfile($profile, $subject, $record),
+            'profile' => $this->prefilledProfile($profile, $subject, $record, $units),
             'urbanDocuments' => $documents,
             'urbanCategories' => $categories,
             'urbanCategoryGroups' => $this->categoryGroups($categories),
@@ -73,9 +74,9 @@ final class AppraisalUrbanNormController
             $profile = $this->profiles->profile($id, $this->user['id']);
             $fields = (new UrbanNormCategoryAdoption())->fields($category);
             $this->profiles->save($id, $this->user['id'], $version, array_replace($profile, $fields));
-            Session::flash('urban_norm_message', 'Ruta normativa aplicada. Revisa 5.2 > Texto para informe e Índices y áreas para ver qué se cargó.');
+            Session::flash('urban_norm_message', 'Ruta normativa aplicada. Revisa 5.2 > Índices y áreas y Texto para informe para ver qué se cargó.');
         } catch (\Throwable $error) { Session::flash('urban_norm_error', $error->getMessage()); }
-        Http::redirect('avaluos/' . $id . '/normatividad-urbana#uso-informe');
+        Http::redirect('avaluos/' . $id . '/normatividad-urbana#uso-indices');
     }
 
     public function autosave(string $id): never
@@ -172,7 +173,7 @@ final class AppraisalUrbanNormController
         return $groups;
     }
 
-    private function prefilledProfile(array $profile, array $subject, array $record): array
+    private function prefilledProfile(array $profile, array $subject, array $record, array $units = []): array
     {
         $subjectReference = (string) ($subject['cadastral_reference'] ?? '');
         if ($subjectReference !== '') $profile['cadastral_reference'] = $subjectReference;
@@ -193,10 +194,16 @@ final class AppraisalUrbanNormController
         foreach (['land_area_normative_m2' => 'midas_land_area_m2', 'actual_built_area_m2' => 'midas_built_area_m2'] as $target => $source) {
             if ((string) ($profile[$target] ?? '') === '' && (string) ($subject[$source] ?? '') !== '') $profile[$target] = (string) $subject[$source];
         }
+        foreach ($this->surfaceHints($units) as $target => $source) if ((string) ($profile[$target] ?? '') === '' && $source !== '') $profile[$target] = $source;
         if ((string) ($profile['restrictions'] ?? '') === '') $profile['restrictions'] = (string) ($subject['legal_urban_affectations'] ?? '');
         return $profile;
     }
 
+    private function surfaceHints(array $units): array
+    {
+        foreach ($units as $unit) if (($unit['unit_kind'] ?? '') !== 'common') return ['land_area_normative_m2' => (string) (($unit['area_adopted_m2'] ?? '') ?: ($unit['area_midas_m2'] ?? '') ?: ($unit['area_land_m2'] ?? '')), 'actual_built_area_m2' => (string) (($unit['built_area_adopted_m2'] ?? '') ?: ($unit['built_area_midas_m2'] ?? '') ?: ($unit['area_built_m2'] ?? '')), 'lot_front_normative_m' => (string) ($unit['front_length_m'] ?? '')];
+        return [];
+    }
     private function midasReference(array $input, array $subject): string
     {
         foreach (['cadastral_reference_long', 'cadastral_reference_short', 'cadastral_reference'] as $key) {
@@ -209,4 +216,3 @@ final class AppraisalUrbanNormController
     private function digits(string $value): string
     { return preg_replace('/\D+/', '', $value) ?? ''; }
 }
-

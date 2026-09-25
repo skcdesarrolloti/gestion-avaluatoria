@@ -262,11 +262,11 @@ try {
         use_restricted_text TEXT, use_prohibited_text TEXT, norm_unit_basic_text TEXT,
         norm_free_area_text TEXT, norm_min_lot_front_text TEXT, norm_max_height_text TEXT,
         norm_construction_index_text TEXT, norm_isolation_text TEXT, norm_other_potential_text TEXT,
-        land_area_normative_m2 REAL, setback_area_percent REAL, net_land_area_m2 REAL,
+        land_area_normative_m2 REAL, lot_front_normative_m REAL, normative_modality TEXT, setback_area_percent REAL, net_land_area_m2 REAL,
         occupancy_index REAL, max_floors REAL, construction_index REAL, actual_built_area_m2 REAL,
         normative_max_built_area_m2 REAL, buildable_difference_m2 REAL, sellable_area_factor REAL,
         sellable_area_m2 REAL, norm_physical_base_text TEXT, constructive_potential_status TEXT,
-        constructive_potential_notes TEXT, normative_scenarios_json TEXT, adopted_normative_route TEXT, adopted_normative_route_label TEXT,
+        constructive_potential_notes TEXT, normative_compliance_summary TEXT, normative_scenarios_json TEXT, adopted_normative_route TEXT, adopted_normative_route_label TEXT,
         highest_best_use_reason TEXT, planning_concept_number TEXT,
         planning_concept_date TEXT, official_concept_scope TEXT,
         land_classification TEXT, activity_area TEXT, normative_zone TEXT, urban_treatment TEXT,
@@ -341,6 +341,8 @@ try {
         && str_contains($adoptedUse['norm_max_height_text'] ?? '', 'cuadro aplicable')
         && str_contains($adoptedUse['norm_other_potential_text'] ?? '', 'Compatible hasta 50%'),
         'lectura de categoria urbana llena campos definidos del numeral 5');
+    $rdMulti = \App\Support\UrbanResidentialNormCatalog::standards()['res-d']['data']['multifamiliar'];
+    expect($rdMulti['min_front_m'] === 25 && $rdMulti['min_area_m2'] === 750 && abs($rdMulti['construction_index'] - 2.4) < 0.01, 'catalogo residencial permite evaluar multifamiliar RD');
     $urbanProfile = new AppraisalUrbanNormRepository($db);
     $urbanVersion = $urbanProfile->save('urban-appraisal-1', 1, 0, [
         'document_slug' => 'pot-0977-cuadros-uso', 'table_slug' => 'pot-0977-cuadro-7-mixta',
@@ -350,12 +352,13 @@ try {
         'use_principal_text' => 'Comercial 2 e Institucional 3.',
         'use_restricted_text' => 'Comercial 3 e Institucional 4.',
         'norm_max_height_text' => '4 pisos.',
-        'land_area_normative_m2' => '370', 'setback_area_percent' => '40', 'net_land_area_m2' => '222',
+        'land_area_normative_m2' => '370', 'lot_front_normative_m' => '12', 'normative_modality' => 'multifamiliar', 'setback_area_percent' => '40', 'net_land_area_m2' => '222',
         'occupancy_index' => '0.60', 'max_floors' => '2', 'construction_index' => '1.20',
         'actual_built_area_m2' => '230', 'normative_max_built_area_m2' => '300',
         'buildable_difference_m2' => '70', 'sellable_area_factor' => '0.75', 'sellable_area_m2' => '225',
         'norm_physical_base_text' => 'Frente y topografía sin restricción relevante.',
         'constructive_potential_status' => 'viable', 'constructive_potential_notes' => 'Potencial adicional relevante.',
+        'normative_compliance_summary' => 'Multifamiliar no cumple frente mínimo de 25 m.',
         'adopted_normative_route' => 'mixto',
         'adopted_normative_route_label' => 'Mixto 2 por vocación comercial e institucional',
         'highest_best_use_reason' => 'El predio admite comparación de vías y se adopta la de mayor soporte.',
@@ -376,6 +379,8 @@ try {
     $savedUrban = $urbanProfile->profile('urban-appraisal-1', 1);
     expect($urbanVersion === 1 && $savedUrban['category_slug'] === 'mixto-2',
         'ficha urbana guarda categoria aplicada');
+    expect((string) $savedUrban['lot_front_normative_m'] === '12' || (string) $savedUrban['lot_front_normative_m'] === '12.00', 'ficha urbana guarda frente normativo');
+    expect($savedUrban['normative_modality'] === 'multifamiliar', 'ficha urbana guarda modalidad residencial evaluada');
     expect($savedUrban['midas_query_option'] === 'Uso del suelo'
         && str_contains($savedUrban['urban_norms_applied'], 'Decreto 0977'),
         'ficha urbana conserva consulta MIDAS y normas pertinentes');
@@ -1912,5 +1917,3 @@ Certificado de tradicion.",
 } finally {
     session_destroy();
 }
-
-

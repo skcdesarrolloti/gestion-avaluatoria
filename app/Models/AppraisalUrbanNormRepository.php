@@ -66,10 +66,10 @@ final class AppraisalUrbanNormRepository
             'use_principal_text', 'use_compatible_text', 'use_complementary_text', 'use_restricted_text',
             'use_prohibited_text', 'norm_unit_basic_text', 'norm_free_area_text', 'norm_min_lot_front_text',
             'norm_max_height_text', 'norm_construction_index_text', 'norm_isolation_text', 'norm_other_potential_text',
-            'land_area_normative_m2', 'setback_area_percent', 'net_land_area_m2', 'occupancy_index',
+            'land_area_normative_m2', 'lot_front_normative_m', 'normative_modality', 'setback_area_percent', 'net_land_area_m2', 'occupancy_index',
             'max_floors', 'construction_index', 'actual_built_area_m2', 'normative_max_built_area_m2',
             'buildable_difference_m2', 'sellable_area_factor', 'sellable_area_m2', 'norm_physical_base_text',
-            'constructive_potential_status', 'constructive_potential_notes',
+            'constructive_potential_status', 'constructive_potential_notes', 'normative_compliance_summary',
             'adopted_normative_route', 'adopted_normative_route_label', 'highest_best_use_reason',
             'planning_concept_number', 'official_concept_scope',
             'land_classification', 'activity_area', 'normative_zone', 'urban_treatment', 'urban_license',
@@ -86,12 +86,12 @@ final class AppraisalUrbanNormRepository
             'norm_unit_basic_text' => 70000, 'norm_free_area_text' => 70000, 'norm_min_lot_front_text' => 70000,
             'norm_max_height_text' => 70000, 'norm_construction_index_text' => 70000,
             'norm_isolation_text' => 70000, 'norm_other_potential_text' => 70000,
-            'land_area_normative_m2' => 40, 'setback_area_percent' => 40, 'net_land_area_m2' => 40,
+            'land_area_normative_m2' => 40, 'lot_front_normative_m' => 40, 'normative_modality' => 80, 'setback_area_percent' => 40, 'net_land_area_m2' => 40,
             'occupancy_index' => 40, 'max_floors' => 40, 'construction_index' => 40,
             'actual_built_area_m2' => 40, 'normative_max_built_area_m2' => 40,
             'buildable_difference_m2' => 40, 'sellable_area_factor' => 40, 'sellable_area_m2' => 40,
             'norm_physical_base_text' => 5000, 'constructive_potential_status' => 80,
-            'constructive_potential_notes' => 5000,
+            'constructive_potential_notes' => 5000, 'normative_compliance_summary' => 5000,
             'adopted_normative_route' => 80, 'adopted_normative_route_label' => 160,
             'highest_best_use_reason' => 5000, 'planning_concept_number' => 120,
             'official_concept_scope' => 5000, 'land_classification' => 120, 'activity_area' => 160,
@@ -103,7 +103,7 @@ final class AppraisalUrbanNormRepository
             'source_limitations' => 5000];
         $data = [];
         foreach ($keys as $key) $data[$key] = mb_substr(trim((string) ($input[$key] ?? '')), 0, $limits[$key]);
-        foreach (['land_area_normative_m2', 'setback_area_percent', 'net_land_area_m2', 'occupancy_index',
+        foreach (['land_area_normative_m2', 'lot_front_normative_m', 'setback_area_percent', 'net_land_area_m2', 'occupancy_index',
             'max_floors', 'construction_index', 'actual_built_area_m2', 'normative_max_built_area_m2',
             'buildable_difference_m2', 'sellable_area_factor', 'sellable_area_m2'] as $key) {
             $data[$key] = $this->decimalText($data[$key]);
@@ -181,12 +181,12 @@ final class AppraisalUrbanNormRepository
             'norm_unit_basic_text' => '', 'norm_free_area_text' => '', 'norm_min_lot_front_text' => '',
             'norm_max_height_text' => '', 'norm_construction_index_text' => '',
             'norm_isolation_text' => '', 'norm_other_potential_text' => '',
-            'land_area_normative_m2' => '', 'setback_area_percent' => '', 'net_land_area_m2' => '',
+            'land_area_normative_m2' => '', 'lot_front_normative_m' => '', 'normative_modality' => '', 'setback_area_percent' => '', 'net_land_area_m2' => '',
             'occupancy_index' => '', 'max_floors' => '', 'construction_index' => '',
             'actual_built_area_m2' => '', 'normative_max_built_area_m2' => '',
             'buildable_difference_m2' => '', 'sellable_area_factor' => '', 'sellable_area_m2' => '',
             'norm_physical_base_text' => '', 'constructive_potential_status' => '',
-            'constructive_potential_notes' => '',
+            'constructive_potential_notes' => '', 'normative_compliance_summary' => '',
             'normative_scenarios_json' => '', 'adopted_normative_route' => '',
             'adopted_normative_route_label' => '', 'highest_best_use_reason' => '',
             'planning_concept_number' => '', 'planning_concept_date' => null, 'official_concept_scope' => '',
@@ -216,4 +216,3 @@ final class AppraisalUrbanNormRepository
         return is_numeric($number) ? number_format((float) $number, 2, '.', '') : null;
     }
 }
-

@@ -15,6 +15,19 @@ $urbanIndexTip = static fn (string $text): string => '<span class="help-dot" tit
                     </ul>
                 </div>
             </div>
+            <div class="grid gap-4 rounded-xl border border-sky-100 bg-white p-4 md:grid-cols-3">
+                <label class="label">Modalidad residencial a probar <?= $urbanIndexTip('Escoge la subopción del Cuadro No. 1 que quieres verificar. No es lo mismo vivienda unifamiliar, bifamiliar o multifamiliar: cada una tiene área mínima, frente e índice propio.') ?><select class="input" name="normative_modality" x-model="modality">
+                    <option value="">Selecciona si aplica</option>
+                    <?php foreach ($residentialModeOptions as $key => $label): ?><option value="<?= e($key) ?>" <?= e($selected('normative_modality', (string) $key)) ?>><?= e($label) ?></option><?php endforeach; ?>
+                </select></label>
+                <label class="label">Frente del lote m <?= $urbanIndexTip('Viene de 3.2 si ya fue adoptado. Si no existe, mídelo o tómalo de plano, escritura, ficha catastral o levantamiento; sin frente no se puede verificar bifamiliar/multifamiliar.') ?><input class="input" type="text" name="lot_front_normative_m" x-model="front" inputmode="decimal" maxlength="40" value="<?= e($value('lot_front_normative_m')) ?>" placeholder="Ej. 12"></label>
+                <div class="rounded-xl border border-sky-100 bg-sky-50 p-3 text-sm leading-6 text-sky-950">
+                    <p class="font-semibold">Chequeo básico según cuadro</p>
+                    <p class="whitespace-pre-line" x-text="compliance()"></p>
+                    <button class="btn-secondary mt-3" type="button" @click="applyReq()">Usar índice de esta modalidad</button>
+                </div>
+                <label class="label md:col-span-3">Resumen de cumplimiento área/frente/índice <?= $urbanIndexTip('Guarda aquí la lectura que luego explica por qué una modalidad se adopta o se descarta. Ejemplo: para multifamiliar RD no cumple frente mínimo 25 m si el predio tiene 12 m.') ?><textarea class="input min-h-24" name="normative_compliance_summary" rows="3" maxlength="5000" x-model="complianceSummary" placeholder="Se puede llenar con el botón o escribir criterio del perito."></textarea></label>
+            </div>
             <div class="grid gap-4 md:grid-cols-4">
                 <label class="label">Área del terreno m² <?= $urbanIndexTip('Tómala de escritura, certificado catastral, factura predial, MIDAS, plano o del área adoptada en 3.2. Si las fuentes no coinciden, usa la más sustentable y deja la salvedad.') ?><input class="input" type="text" name="land_area_normative_m2" x-model="land" inputmode="decimal" maxlength="40" value="<?= e($value('land_area_normative_m2')) ?>" placeholder="Ej. 370"></label>
                 <label class="label">Retiros / afectaciones % <?= $urbanIndexTip('Registra la porción del terreno que no se puede aprovechar por retiro, cesión, ronda, vía, servidumbre, riesgo o afectación. Si no aplica, deja 0.') ?><input class="input" type="text" name="setback_area_percent" x-model="affect" inputmode="decimal" maxlength="40" value="<?= e($value('setback_area_percent')) ?>" placeholder="Ej. 40 o 0,40"></label>
