@@ -262,7 +262,10 @@ try {
         use_restricted_text TEXT, use_prohibited_text TEXT, norm_unit_basic_text TEXT,
         norm_free_area_text TEXT, norm_min_lot_front_text TEXT, norm_max_height_text TEXT,
         norm_construction_index_text TEXT, norm_isolation_text TEXT, norm_other_potential_text TEXT,
-        actual_built_area_m2 REAL, normative_max_built_area_m2 REAL, buildable_difference_m2 REAL,
+        land_area_normative_m2 REAL, setback_area_percent REAL, net_land_area_m2 REAL,
+        occupancy_index REAL, max_floors REAL, construction_index REAL, actual_built_area_m2 REAL,
+        normative_max_built_area_m2 REAL, buildable_difference_m2 REAL, sellable_area_factor REAL,
+        sellable_area_m2 REAL, norm_physical_base_text TEXT, constructive_potential_status TEXT,
         constructive_potential_notes TEXT, normative_scenarios_json TEXT, adopted_normative_route TEXT, adopted_normative_route_label TEXT,
         highest_best_use_reason TEXT, planning_concept_number TEXT,
         planning_concept_date TEXT, official_concept_scope TEXT,
@@ -347,8 +350,12 @@ try {
         'use_principal_text' => 'Comercial 2 e Institucional 3.',
         'use_restricted_text' => 'Comercial 3 e Institucional 4.',
         'norm_max_height_text' => '4 pisos.',
+        'land_area_normative_m2' => '370', 'setback_area_percent' => '40', 'net_land_area_m2' => '222',
+        'occupancy_index' => '0.60', 'max_floors' => '2', 'construction_index' => '1.20',
         'actual_built_area_m2' => '230', 'normative_max_built_area_m2' => '300',
-        'buildable_difference_m2' => '70', 'constructive_potential_notes' => 'Potencial adicional relevante.',
+        'buildable_difference_m2' => '70', 'sellable_area_factor' => '0.75', 'sellable_area_m2' => '225',
+        'norm_physical_base_text' => 'Frente y topografía sin restricción relevante.',
+        'constructive_potential_status' => 'viable', 'constructive_potential_notes' => 'Potencial adicional relevante.',
         'adopted_normative_route' => 'mixto',
         'adopted_normative_route_label' => 'Mixto 2 por vocación comercial e institucional',
         'highest_best_use_reason' => 'El predio admite comparación de vías y se adopta la de mayor soporte.',
@@ -380,7 +387,10 @@ try {
     expect(str_contains((string) $savedUrban['use_restricted_text'], 'Comercial 3'),
         'ficha urbana conserva reglamentacion MIDAS por tipo de uso');
     expect(($savedUrban['norm_max_height_text'] ?? '') === '4 pisos.'
-        && ($savedUrban['buildable_difference_m2'] ?? '') == 70, 'ficha urbana conserva campos de potencial constructivo');
+        && ($savedUrban['buildable_difference_m2'] ?? '') == 70
+        && ($savedUrban['construction_index'] ?? '') == 1.2
+        && ($savedUrban['sellable_area_m2'] ?? '') == 225
+        && ($savedUrban['constructive_potential_status'] ?? '') === 'viable', 'ficha urbana conserva campos de potencial constructivo');
     $midasParsed = (new UrbanNormMidasTextParser())->parse("01 Número Predial Nacional:\n130010103000003810024000000000\n07 Uso De Suelo:\nMixto 2\n08 Tratamiento:\nMejoramiento Integral Parcial\n20 Área Terreno (M2):\n529.00\n21 Área Construida (M2):\n329.00\n22 Referencia Catastral:\n010303810024000\nUSO PRINCIPAL\nCOMERCIAL 2: venta de bienes.\nUSO COMPATIBLE\nRESIDENCIAL: vivienda.\nUSO COMPLEMENTARIO\nINSTITUCIONAL 3: universidad.\nUSO RESTRINGIDO\nCOMERCIAL 3: talleres.\nUSO PROHIBIDO\nINDUSTRIAL 3: industria pesada.\nUNIDAD BÁSICA\n2 ALCOBAS 40 M2\nUSOS\nPRINCIPAL residencial\nÁREA LIBRE\nunifamiliar 1 piso\nÁREA Y FRENTE MÍNIMOS\nAML 200 M2\nALTURA MÁXIMA\n4 pisos\nÍNDICE DE CONSTRUCCIÓN\n1.2\nAISLAMIENTOS\nAntejardín 3 m");
     expect(($midasParsed['predio']['land_use'] ?? '') === 'Mixto 2'
         && ($midasParsed['predio']['land_area_m2'] ?? '') === '529.00'

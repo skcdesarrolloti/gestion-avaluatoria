@@ -61,7 +61,6 @@ final class AppraisalUrbanNormController
         Http::redirect($target);
     }
 
-
     public function applyUseCategory(string $id): never
     {
         $this->appraisals->find($id, $this->user['id']);
@@ -143,7 +142,6 @@ final class AppraisalUrbanNormController
         } catch (\Throwable $error) { Session::flash('urban_norm_error', $error->getMessage()); }
         Http::redirect('avaluos/' . $id . '/normatividad-urbana#midas');
     }
-
     private function tabFragment(string $tab): string
     { return in_array($tab, ['midas', 'uso', 'escenarios', 'determinantes', 'fuentes', 'cierre'], true) ? '#' . $tab : '#midas'; }
 
@@ -193,6 +191,9 @@ final class AppraisalUrbanNormController
         if ((string) ($profile['urban_treatment'] ?? '') === '') {
             $profile['urban_treatment'] = (string) ($subject['urban_treatment'] ?? '');
         }
+        foreach (['land_area_normative_m2' => 'midas_land_area_m2', 'actual_built_area_m2' => 'midas_built_area_m2'] as $target => $source) {
+            if ((string) ($profile[$target] ?? '') === '' && (string) ($subject[$source] ?? '') !== '') $profile[$target] = (string) $subject[$source];
+        }
         if ((string) ($profile['restrictions'] ?? '') === '') {
             $profile['restrictions'] = (string) ($subject['legal_urban_affectations'] ?? '');
         }
@@ -212,7 +213,5 @@ final class AppraisalUrbanNormController
     {
         return preg_replace('/\D+/', '', $value) ?? '';
     }
-
-
 }
 
