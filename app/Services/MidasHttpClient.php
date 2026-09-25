@@ -7,9 +7,22 @@ final class MidasHttpClient
     public function postJson(string $endpoint, array $payload): ?array
     {
         $body = json_encode($payload, JSON_THROW_ON_ERROR);
-        $response = $this->streamPost($endpoint, $body) ?? $this->curlPost($endpoint, $body);
-        $json = is_string($response) ? json_decode($response, true) : null;
-        return is_array($json) ? $json : null;
+        $last = null;
+        for ($attempt = 1; $attempt <= 4; $attempt++) {
+            $response = $this->streamPost($endpoint, $body) ?? $this->curlPost($endpoint, $body);
+            $json = is_string($response) ? json_decode($response, true) : null;
+            if (is_array($json) && !$this->isRetryableError($json)) return $json;
+            $last = $json;
+            if ($attempt < 4) usleep(250000 * $attempt);
+        }
+        return is_array($last) ? $last : null;
+    }
+
+    private function isRetryableError(array $json): bool
+    {
+        $state = mb_strtolower((string) ($json['estado'] ?? ''));
+        $message = mb_strtolower((string) ($json['mensaje'] ?? ''));
+        return $state === 'error' || str_contains($message, 'exception while reading');
     }
 
     private function streamPost(string $endpoint, string $body): ?string
