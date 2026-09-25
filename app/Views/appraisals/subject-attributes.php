@@ -2,7 +2,8 @@
 $attributeUnitLabel = static fn (array $unit): string => ($unit['unit_kind'] === 'annex' ? 'Anexo ' : 'Unidad ') . (int) $unit['unit_index'];
 $attributeUnits = array_values(array_filter($units, static fn (array $unit): bool => $unit['unit_kind'] !== 'common'));
 $attributeCatalogForUnit = static function (array $unit) use ($record): array {
-    return \App\Support\AppraisalSpecialAttributeCatalog::allGroups();
+    $type = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'] ?? ''));
+    return \App\Support\AppraisalSpecialAttributeCatalog::groups($type);
 };
 $attrValue = static function (array $unit, string $key, string $field): string {
     $data = json_decode((string) ($unit['special_attributes_json'] ?? '{}'), true);
@@ -46,7 +47,7 @@ $formatAttributeAdjustment = static function (?float $value): string {
             <p class="eyebrow">3.4 Diferenciales valuatorios del sujeto</p>
             <h2 class="mt-2 text-2xl font-semibold">Atributos y deméritos por unidad</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                Aquí se registran las condiciones diferenciales de cada unidad. Se muestran todos los atributos para que el perito seleccione los que realmente inciden en valor.
+                Aquí se registran las condiciones diferenciales de cada unidad. Se muestran todos los atributos del tipo de inmueble seleccionado para que el perito escoja los que realmente inciden en valor.
                 Pueden sumar como atributo o restar como demérito. La calificación ponderada ayuda a ubicar
                 el bien dentro del rango de mercado sin reemplazar el criterio del perito.
             </p>
