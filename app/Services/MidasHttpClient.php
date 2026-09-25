@@ -9,13 +9,21 @@ final class MidasHttpClient
         $body = json_encode($payload, JSON_THROW_ON_ERROR);
         $last = null;
         for ($attempt = 1; $attempt <= 4; $attempt++) {
-            $response = $this->streamPost($endpoint, $body) ?? $this->curlPost($endpoint, $body);
-            $json = is_string($response) ? json_decode($response, true) : null;
-            if (is_array($json) && !$this->isRetryableError($json)) return $json;
-            $last = $json;
+            foreach ([$this->streamPost(...), $this->curlPost(...)] as $transport) {
+                $json = $this->decode($transport($endpoint, $body));
+                if (is_array($json) && !$this->isRetryableError($json)) return $json;
+                if (is_array($json)) $last = $json;
+            }
             if ($attempt < 4) usleep(250000 * $attempt);
         }
         return is_array($last) ? $last : null;
+    }
+
+    private function decode(?string $response): ?array
+    {
+        if (!is_string($response) || trim($response) === '') return null;
+        $json = json_decode($response, true);
+        return is_array($json) ? $json : null;
     }
 
     private function isRetryableError(array $json): bool
