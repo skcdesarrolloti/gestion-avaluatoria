@@ -66,7 +66,7 @@ export function subjectAttributes(initialUnit = '') {
         unitLimitText(unitId) {
             this.selectionTick;
             const count = this.selectedCount(unitId);
-            return count <= 6 ? `${count} seleccionados · sugerido máximo 6` : `${count} seleccionados · depura si alguno no incide`;
+            return count <= 6 ? `${count} seleccionados · máximo 6` : `${count} seleccionados · máximo 6; revisa si todos inciden`;
         },
         unitSuggestionClass(unitId) {
             this.selectionTick;

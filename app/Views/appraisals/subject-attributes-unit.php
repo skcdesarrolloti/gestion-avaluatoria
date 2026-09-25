@@ -34,13 +34,8 @@ $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'
             <span class="rounded-full bg-white px-3 py-1"><?= e($groupLabel) ?></span>
         <?php endforeach; ?>
     </div>
-    <?php if (count($catalog) === 1): ?>
-        <p class="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-6 text-amber-900">
-            Solo aparece Base común porque esta unidad no tiene tipo de inmueble definido. Ve a 3.1 Ficha básica del sujeto, pestaña Identificación, y selecciona casa, apartamento, lote, local, oficina, bodega u otro tipo para cargar los atributos específicos.
-        </p>
-    <?php endif; ?>
     <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-950">
-        <span><strong>Selección valuatoria:</strong> revisa la lista completa del tipo de inmueble y marca solo los atributos que incidan en valor. Se sugiere trabajar máximo 6, sin bloquear casos especiales.</span>
+        <span><strong>Selección valuatoria:</strong> revisa todos los atributos disponibles y marca solo los que incidan en valor. El perito decide la selección; si supera 6, el sistema avisará que el máximo técnico sugerido es 6.</span>
         <span class="rounded-full px-3 py-1 text-xs font-semibold" :class="unitSuggestionClass('<?= e($unitId) ?>')" x-text="unitLimitText('<?= e($unitId) ?>')"></span>
     </div>
     <div class="mt-5 space-y-5">

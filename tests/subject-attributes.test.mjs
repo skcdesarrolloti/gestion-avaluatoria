@@ -66,7 +66,7 @@ test('subject attribute selector suggests six but allows more when justified', (
     component.$nextTick = callback => callback();
     component.handleAttributeChange({ target });
     assert.equal(target.checked, true);
-    assert.match(component.unitLimitText('u1'), /depura/);
+    assert.match(component.unitLimitText('u1'), /máximo 6/);
 });
 
 test('subject attribute score ignores unchecked selected controls', () => {
