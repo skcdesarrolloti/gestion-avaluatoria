@@ -3,7 +3,7 @@
         <div>
             <p class="text-sm font-semibold uppercase tracking-wide text-teal-800">Academia valuatoria</p>
             <h1 class="mt-2 text-3xl font-semibold text-slate-950">Glosario de términos valuatorios</h1>
-            <p class="mt-3 max-w-3xl text-slate-600">Consulta conceptos base y alimenta la academia con factores o definiciones que ayuden al análisis valuatorio.</p>
+            <p class="mt-3 max-w-3xl text-slate-600">Consulta conceptos base y alimenta la academia con factores o definiciones que ayuden al análisis valuatorio. El buscador revisa término, descripción y fuente.</p>
         </div>
         <div class="flex flex-wrap gap-2 text-xs font-semibold">
             <span class="rounded-full bg-slate-100 px-3 py-1 text-slate-700"><?= e((string) $stats['total']) ?> término(s)</span>
@@ -14,12 +14,15 @@
     <?php if ($glossaryError): ?><p class="rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($glossaryError) ?></p><?php endif; ?>
     <section class="grid gap-5 lg:grid-cols-[1fr_22rem]">
         <div class="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-            <form class="flex flex-col gap-3 sm:flex-row" method="get" action="<?= e(url('glosario-valuatorio')) ?>">
-                <label class="label grow">Buscar en el glosario
-                    <input class="input" type="search" name="q" value="<?= e($query) ?>" placeholder="Ej. valor, depreciación, área, mayor y mejor uso">
+            <form class="grid gap-3 md:grid-cols-[1fr_auto_auto] md:items-end" method="get" action="<?= e(url('glosario-valuatorio')) ?>">
+                <label class="label">Buscador del glosario
+                    <input class="input" type="search" name="q" value="<?= e($query) ?>" placeholder="Busca por término, definición o fuente: valor, depreciación, frente, mayor y mejor uso" autofocus>
+                    <span class="mt-1 block text-xs font-medium text-slate-500">Pensado para crecer: filtra por palabras dentro del concepto, la explicación o la fuente.</span>
                 </label>
-                <button class="btn-secondary self-end" type="submit">Buscar</button>
+                <button class="btn-secondary" type="submit">Buscar</button>
+                <?php if ($query !== ''): ?><a class="btn-secondary text-center" href="<?= e(url('glosario-valuatorio')) ?>">Limpiar</a><?php endif; ?>
             </form>
+            <p class="mt-3 text-sm font-semibold text-slate-600"><?= e((string) count($terms)) ?> resultado(s)<?= $query !== '' ? ' para “' . e($query) . '”' : ' visibles' ?>.</p>
             <div class="mt-5 grid gap-3">
                 <?php if (!$terms): ?>
                     <p class="rounded-xl bg-amber-50 p-4 text-sm text-amber-900">No hay términos que coincidan con la búsqueda.</p>
