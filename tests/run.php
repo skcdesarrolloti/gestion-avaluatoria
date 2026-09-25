@@ -343,6 +343,14 @@ try {
         'lectura de categoria urbana llena campos definidos del numeral 5');
     $rdMulti = \App\Support\UrbanResidentialNormCatalog::standards()['res-d']['data']['multifamiliar'];
     expect($rdMulti['min_front_m'] === 25 && $rdMulti['min_area_m2'] === 750 && abs($rdMulti['construction_index'] - 2.4) < 0.01, 'catalogo residencial permite evaluar multifamiliar RD');
+    $urbanControllerReflection = new \ReflectionClass(\App\Controllers\AppraisalUrbanNormController::class);
+    $surfaceHints = $urbanControllerReflection->getMethod('surfaceHints');
+    $surfaceHints->setAccessible(true);
+    $hints = $surfaceHints->invoke($urbanControllerReflection->newInstanceWithoutConstructor(), [
+        ['unit_kind' => 'annex', 'area_adopted_m2' => '10', 'built_area_adopted_m2' => '5', 'front_length_m' => '2'],
+        ['unit_kind' => 'property', 'area_adopted_m2' => '370', 'built_area_adopted_m2' => '230', 'front_length_m' => '12'],
+    ]);
+    expect($hints['land_area_normative_m2'] === '370' && $hints['actual_built_area_m2'] === '230' && $hints['lot_front_normative_m'] === '12', 'norma urbana toma superficies del predio principal antes que anexos');
     $urbanProfile = new AppraisalUrbanNormRepository($db);
     $urbanVersion = $urbanProfile->save('urban-appraisal-1', 1, 0, [
         'document_slug' => 'pot-0977-cuadros-uso', 'table_slug' => 'pot-0977-cuadro-7-mixta',

@@ -194,16 +194,15 @@ final class AppraisalUrbanNormController
         foreach (['land_area_normative_m2' => 'midas_land_area_m2', 'actual_built_area_m2' => 'midas_built_area_m2'] as $target => $source) {
             if ((string) ($profile[$target] ?? '') === '' && (string) ($subject[$source] ?? '') !== '') $profile[$target] = (string) $subject[$source];
         }
-        foreach ($this->surfaceHints($units) as $target => $source) if ((string) ($profile[$target] ?? '') === '' && $source !== '') $profile[$target] = $source;
+        foreach ($this->surfaceHints($units) as $target => $source) if ($source !== '') $profile[$target] = $source;
         if ((string) ($profile['restrictions'] ?? '') === '') $profile['restrictions'] = (string) ($subject['legal_urban_affectations'] ?? '');
         return $profile;
     }
 
     private function surfaceHints(array $units): array
-    {
-        foreach ($units as $unit) if (($unit['unit_kind'] ?? '') !== 'common') return ['land_area_normative_m2' => (string) (($unit['area_adopted_m2'] ?? '') ?: ($unit['area_midas_m2'] ?? '') ?: ($unit['area_land_m2'] ?? '')), 'actual_built_area_m2' => (string) (($unit['built_area_adopted_m2'] ?? '') ?: ($unit['built_area_midas_m2'] ?? '') ?: ($unit['area_built_m2'] ?? '')), 'lot_front_normative_m' => (string) ($unit['front_length_m'] ?? '')];
-        return [];
-    }
+    { $selected = []; foreach ($units as $unit) if (($unit['unit_kind'] ?? '') === 'property') { $selected = $unit; break; }
+        if ($selected === []) foreach ($units as $unit) if (($unit['unit_kind'] ?? '') !== 'common') { $selected = $unit; break; }
+        return $selected === [] ? [] : ['land_area_normative_m2' => (string) (($selected['area_adopted_m2'] ?? '') ?: ($selected['area_midas_m2'] ?? '') ?: ($selected['area_land_m2'] ?? '')), 'actual_built_area_m2' => (string) (($selected['built_area_adopted_m2'] ?? '') ?: ($selected['built_area_midas_m2'] ?? '') ?: ($selected['area_built_m2'] ?? '')), 'lot_front_normative_m' => (string) ($selected['front_length_m'] ?? '')]; }
     private function midasReference(array $input, array $subject): string
     {
         foreach (['cadastral_reference_long', 'cadastral_reference_short', 'cadastral_reference'] as $key) {
