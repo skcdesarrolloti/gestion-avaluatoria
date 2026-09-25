@@ -1,82 +1,64 @@
 <?php
 $scenarioValue = static fn (string $route, string $field): string => (string) ($normativeScenarios[$route][$field] ?? '');
-$scenarioSelected = static fn (string $route, string $field, string $value): string
-    => $scenarioValue($route, $field) === $value ? 'selected' : '';
-$scenarioChecked = static fn (string $route): string => !empty($normativeScenarios[$route]['enabled']) ? 'checked' : '';
-$scenarioJson = e(json_encode($normativeScenarios, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '{}');
 $scenarioTip = static fn (string $text): string => '<span class="help-dot" title="' . e($text) . '">?</span>';
-$numericScenarioFields = [
-    ['land_area_m2', 'Terreno m²', 'Área del terreno para esta ruta. Se toma de escritura, catastro, MIDAS, plano o del área adoptada en 3.2.'],
-    ['net_land_area_m2', 'Área neta m²', 'Área útil después de descontar afectaciones, cesiones, retiros o restricciones. Si no hay descuento, puede coincidir con terreno.'],
-    ['occupancy_index', 'Ocupación', 'Factor de huella permitido por norma. Ejemplo: 0,60 significa 60% del área neta en primer piso.'],
-    ['max_floors', 'Pisos', 'Altura o número de pisos permitido para esta vía. Verifica si depende de frente, tratamiento o ancho de vía.'],
-    ['construction_index', 'Índice const.', 'Factor total de construcción. Si está vacío, la pantalla orienta con ocupación por pisos. Use la fórmula real si la norma trae otra.'],
-    ['max_built_area_m2', 'Máx. construible', 'Área máxima teórica permitida. Puede llenarse manualmente si la norma ya trae un dato o una fórmula especial.'],
-    ['existing_built_area_m2', 'Construido actual', 'Área construida existente adoptada del inmueble. Sirve para comparar norma contra realidad física.'],
-    ['potential_area_m2', 'Potencial adoptado', 'Diferencia que el perito adopta como potencial adicional. Ajuste si el cálculo automático no refleja restricciones o criterio.'],
-    ['sellable_factor', 'Factor vendible', 'Factor preliminar para estimar área vendible. Úselo solo como orientación; el diseño definitivo requiere arquitecto.'],
-    ['sellable_area_m2', 'Área vendible', 'Área vendible estimada para orientar análisis residual futuro. No equivale a valor ni a cabida aprobada.'],
-];
+$residentialScenarioJson = e(json_encode(\App\Support\UrbanResidentialNormCatalog::standards(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '{}');
+$scenarioInitial = static fn (string $key): string => e(json_encode((string) ($profile[$key] ?? ''), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: "''");
 ?>
 <section id="escenarios" x-show="tab === 'escenarios'" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{
-        rows: <?= $scenarioJson ?>,
+        standards: <?= $residentialScenarioJson ?>,
+        land: <?= $scenarioInitial('land_area_normative_m2') ?>,
+        net: <?= $scenarioInitial('net_land_area_m2') ?>,
+        front: <?= $scenarioInitial('lot_front_normative_m') ?>,
+        actual: <?= $scenarioInitial('actual_built_area_m2') ?>,
+        factor: <?= $scenarioInitial('sellable_area_factor') ?>,
+        adopted: <?= $scenarioInitial('adopted_normative_route') ?>,
+        adoptedLabel: <?= $scenarioInitial('adopted_normative_route_label') ?>,
+        reason: <?= $scenarioInitial('highest_best_use_reason') ?>,
         n(v) { const x = parseFloat(String(v || '').replace(',', '.').replace(/[^0-9.-]/g, '')); return Number.isFinite(x) ? x : null },
         f(v) { return Number.isFinite(v) ? v.toFixed(2) : '' },
-        idx(k) { const r=this.rows[k]||{}, m=this.n(r.construction_index); if (m!==null) return m; const o=this.n(r.occupancy_index), p=this.n(r.max_floors); return o===null||p===null ? null : o*p },
-        max(k) { const r=this.rows[k]||{}, m=this.n(r.max_built_area_m2); if (m!==null) return m; const net=this.n(r.net_land_area_m2)||this.n(r.land_area_m2), i=this.idx(k); return net===null||i===null ? null : net*i },
-        pot(k) { const max=this.max(k), built=this.n((this.rows[k]||{}).existing_built_area_m2); return max===null||built===null ? null : Math.max(0, max-built) },
-        sell(k) { const r=this.rows[k]||{}, m=this.n(r.sellable_area_m2); if (m!==null) return m; const max=this.max(k), factor=this.n(r.sellable_factor); return max===null||factor===null ? null : max*factor }
+        baseArea() { return this.n(this.net) ?? this.n(this.land) },
+        maxBuild(rule) { const base = this.baseArea(); return base === null ? null : base * Number(rule.construction_index || 0) },
+        potential(rule) { const max = this.maxBuild(rule), actual = this.n(this.actual); return max === null || actual === null ? null : Math.max(0, max - actual) },
+        sellable(rule) { const max = this.maxBuild(rule), factor = this.n(this.factor); return max === null || factor === null ? null : max * factor },
+        areaOk(rule) { const land = this.n(this.land); return land === null ? null : land >= Number(rule.min_area_m2 || 0) },
+        frontOk(rule) { const front = this.n(this.front); return front === null ? null : front >= Number(rule.min_front_m || 0) },
+        rowStatus(rule) { const a=this.areaOk(rule), f=this.frontOk(rule); if (a === null || f === null) return 'Falta dato'; return a && f ? 'Cumple base' : 'No cumple base' },
+        rowClass(rule) { const s=this.rowStatus(rule); return s === 'Cumple base' ? 'bg-emerald-50 text-emerald-800' : (s === 'No cumple base' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-800') },
+        adopt(typeKey, type, modeKey, rule) { this.adopted = 'residencial'; this.adoptedLabel = type.label + ' · ' + rule.label; const p = this.f(this.potential(rule)); this.reason = this.rowStatus(rule) + '. Se probó ' + type.label + ' / ' + rule.label + ' con AML ' + rule.min_area_m2 + ' m², frente mínimo ' + rule.min_front_m + ' m, índice ' + rule.construction_index + '. Máximo construible estimado: ' + this.f(this.maxBuild(rule)) + ' m²; construcción actual: ' + (this.actual || 'pendiente') + ' m²; potencial orientativo: ' + (p || 'pendiente') + ' m².' },
+        missing() { const m=[]; if (this.n(this.land)===null) m.push('área de terreno'); if (this.n(this.front)===null) m.push('frente'); if (this.n(this.actual)===null) m.push('construcción actual'); return m.join(', ') }
     }">
     <div class="flex flex-wrap items-start justify-between gap-4">
-        <div><p class="eyebrow">Mayor y mejor uso</p><h2 class="mt-2 text-2xl font-semibold">Comparativo de escenarios normativos</h2>
-            <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Compara rutas residencial, institucional, comercial, mixta u otra. El cálculo orienta; la adopción exige soporte legal, físico, de mercado y económico.</p></div>
-        <span class="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-800">Decisión del perito</span>
+        <div><p class="eyebrow">Mayor y mejor uso</p><h2 class="mt-2 text-2xl font-semibold">Matriz simple de potencial constructivo</h2>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Toma los datos del predio y prueba cada alternativa residencial del cuadro. El perito solo adopta la fila que tenga soporte normativo y físico.</p></div>
+        <span class="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-800">Área + frente + índice</span>
     </div>
-    <div class="mt-6 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
-        <p class="font-semibold">Academia rápida: ¿cómo se usa esta comparación?</p>
-        <ul class="mt-2 list-disc space-y-1 pl-5">
-            <li>Active solo las rutas que la norma permita analizar: residencial, institucional, comercial, mixta u otra.</li>
-            <li>Para cada ruta diligencie fuente, cuadro, uso, índices, área máxima, construido actual y potencial.</li>
-            <li>No gana automáticamente el escenario con más metros: debe ser legal, físicamente posible, vendible en el mercado y económicamente razonable.</li>
-            <li>En apartamentos PH normalmente la norma se anexa como soporte NTS; en casas, lotes o inmuebles transformables sí puede orientar potencial y método residual.</li>
-        </ul>
+    <div class="mt-6 grid gap-3 md:grid-cols-4">
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-xs font-semibold uppercase text-slate-600">Área terreno</p><p class="mt-1 text-xl font-semibold" x-text="land || 'Pendiente'"></p></div>
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-xs font-semibold uppercase text-slate-600">Área base de cálculo</p><p class="mt-1 text-xl font-semibold" x-text="f(baseArea()) || 'Pendiente'"></p></div>
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-xs font-semibold uppercase text-slate-600">Frente</p><p class="mt-1 text-xl font-semibold" x-text="front || 'Pendiente'"></p></div>
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-xs font-semibold uppercase text-slate-600">Construcción actual</p><p class="mt-1 text-xl font-semibold" x-text="actual || 'Pendiente'"></p></div>
     </div>
-    <div class="mt-6 grid gap-4 md:grid-cols-3">
-        <label class="label">Vía normativa adoptada <?= $scenarioTip('Es la ruta que finalmente adopta el perito para el análisis. Puede ser distinta del uso actual si tiene mejor soporte de mayor y mejor uso.') ?><select class="input" name="adopted_normative_route"><option value="">Pendiente de adoptar</option>
-            <?php foreach ($normativeScenarioRoutes as $key => $route): ?><option value="<?= e($key) ?>" <?= e($selected('adopted_normative_route', (string) $key)) ?>><?= e($route['label']) ?></option><?php endforeach; ?>
-        </select></label>
-        <label class="label md:col-span-2">Etiqueta o sustento corto <?= $scenarioTip('Resumen de la decisión: por ejemplo, Institucional 3 por compatibilidad normativa y mayor potencial constructivo.') ?><input class="input" type="text" name="adopted_normative_route_label" maxlength="160" value="<?= e($value('adopted_normative_route_label')) ?>" placeholder="Ej. Institucional 3 por mayor potencial y compatibilidad"></label>
-        <div class="md:col-span-3"><?php $textarea('highest_best_use_reason', 'Justificación de mayor y mejor uso', 'Explica legalidad, posibilidad física, soporte de mercado, coherencia económica y por qué se adopta o descarta cada vía.', 4); ?></div>
-    </div>
+    <p class="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-900" x-show="missing()">Para que la matriz cierre falta: <strong x-text="missing()"></strong>. Corrige esos datos en el módulo 3.</p>
     <div class="mt-6 overflow-x-auto rounded-xl border border-slate-200">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
-            <thead class="bg-slate-50 text-left text-xs uppercase text-slate-600"><tr><th class="px-3 py-2">Ruta</th><th class="px-3 py-2">Resultado</th><th class="px-3 py-2">Máx. construible</th><th class="px-3 py-2">Actual</th><th class="px-3 py-2">Potencial</th><th class="px-3 py-2">Vendible ref.</th><th class="px-3 py-2">Estado</th></tr></thead>
+            <thead class="bg-slate-50 text-left text-xs uppercase text-slate-600"><tr><th class="px-3 py-2">Cuadro / opción</th><th class="px-3 py-2">Área mínima</th><th class="px-3 py-2">Frente mínimo</th><th class="px-3 py-2">Cumple</th><th class="px-3 py-2">Índice</th><th class="px-3 py-2">Máx. construible</th><th class="px-3 py-2">Potencial</th><th class="px-3 py-2">Área vendible ref.</th><th class="px-3 py-2">Acción</th></tr></thead>
             <tbody class="divide-y divide-slate-100 bg-white">
-            <?php foreach ($normativeScenarioRoutes as $key => $route): ?><tr x-show="rows['<?= e((string) $key) ?>']?.enabled"><td class="px-3 py-2 font-semibold"><?= e($route['label']) ?></td><td class="px-3 py-2" x-text="rows['<?= e((string) $key) ?>'].result || 'pendiente'"></td><td class="px-3 py-2" x-text="f(max('<?= e((string) $key) ?>'))"></td><td class="px-3 py-2" x-text="rows['<?= e((string) $key) ?>'].existing_built_area_m2"></td><td class="px-3 py-2 font-semibold text-teal-800" x-text="f(pot('<?= e((string) $key) ?>'))"></td><td class="px-3 py-2" x-text="f(sell('<?= e((string) $key) ?>'))"></td><td class="px-3 py-2" x-text="rows['<?= e((string) $key) ?>'].feasibility || 'pendiente'"></td></tr><?php endforeach; ?>
+                <template x-for="(type, typeKey) in standards" :key="typeKey"><template x-for="(rule, modeKey) in type.data" :key="typeKey + modeKey">
+                    <tr><td class="px-3 py-2"><strong x-text="type.label"></strong><br><span class="text-slate-600" x-text="rule.label"></span></td><td class="px-3 py-2" x-text="rule.min_area_m2 + ' m²'"></td><td class="px-3 py-2" x-text="rule.min_front_m + ' m'"></td><td class="px-3 py-2"><span class="rounded-full px-2 py-1 text-xs font-semibold" :class="rowClass(rule)" x-text="rowStatus(rule)"></span></td><td class="px-3 py-2" x-text="rule.construction_index"></td><td class="px-3 py-2 font-semibold" x-text="f(maxBuild(rule))"></td><td class="px-3 py-2 font-semibold text-teal-800" x-text="f(potential(rule))"></td><td class="px-3 py-2" x-text="f(sellable(rule))"></td><td class="px-3 py-2"><button class="btn-secondary" type="button" @click="adopt(typeKey, type, modeKey, rule)">Adoptar / comentar</button></td></tr>
+                </template></template>
             </tbody>
         </table>
     </div>
-    <div class="mt-6 grid gap-4">
-        <?php foreach ($normativeScenarioRoutes as $key => $route): ?>
-            <article class="rounded-2xl border border-slate-200 bg-slate-50 p-4">
-                <div class="flex flex-wrap items-start justify-between gap-3">
-                    <label class="inline-flex items-start gap-3 font-semibold text-slate-950"><input class="mt-1" type="checkbox" name="normative_scenarios[<?= e($key) ?>][enabled]" value="1" x-model="rows['<?= e($key) ?>'].enabled" <?= e($scenarioChecked((string) $key)) ?>><span><?= e($route['label']) ?> <?= $scenarioTip('Marca esta ruta solo si la norma permite estudiarla o si necesitas descartarla con soporte. Ejemplo: residencial, institucional, comercial o mixto.') ?><small class="mt-1 block font-normal leading-5 text-slate-600"><?= e($route['hint']) ?></small></span></label>
-                    <label class="label min-w-52">Resultado <?= $scenarioTip('Define cómo queda el uso frente a la norma: principal, compatible, complementario, restringido o prohibido. Sale del cuadro o concepto consultado.') ?><select class="input" name="normative_scenarios[<?= e($key) ?>][result]" x-model="rows['<?= e($key) ?>'].result"><?php foreach ($normativeScenarioResults as $resultKey => $label): ?><option value="<?= e($resultKey) ?>" <?= e($scenarioSelected((string) $key, 'result', (string) $resultKey)) ?>><?= e($label) ?></option><?php endforeach; ?></select></label>
-                </div>
-                <div class="mt-4 grid gap-4 md:grid-cols-3">
-                    <label class="label">Documento <?= $scenarioTip('Fuente normativa que soporta la ruta: POT, decreto, MIDAS, concepto de planeación, licencia o determinante aplicable.') ?><select class="input" name="normative_scenarios[<?= e($key) ?>][document_slug]"><option value="">Fuente si aplica</option><?php foreach ($urbanDocuments as $doc): ?><option value="<?= e($doc['slug']) ?>" <?= e($scenarioSelected((string) $key, 'document_slug', (string) $doc['slug'])) ?>><?= e($doc['title']) ?></option><?php endforeach; ?></select></label>
-                    <label class="label">Cuadro POT <?= $scenarioTip('Cuadro de reglamentación que contiene la actividad: residencial, institucional, comercial, industrial u otro. Si no existe, deje la fuente manual en observaciones.') ?><select class="input" name="normative_scenarios[<?= e($key) ?>][table_slug]"><option value="">Cuadro si aplica</option><?php foreach ($urbanDocuments as $doc): foreach (($doc['tables'] ?? []) as $table): ?><option value="<?= e($table['slug']) ?>" <?= e($scenarioSelected((string) $key, 'table_slug', (string) $table['slug'])) ?>><?= e($table['table_code'] . ' · ' . $table['title']) ?></option><?php endforeach; endforeach; ?></select></label>
-                    <label class="label">Categoría / actividad <?= $scenarioTip('Actividad exacta dentro del cuadro. Ejemplo: Residencial D, Institucional 3, Comercial 2. Es la llave para traer o copiar reglas.') ?><select class="input" name="normative_scenarios[<?= e($key) ?>][category_slug]"><option value="">Categoría si aplica</option><?php foreach ($urbanCategories as $cat): ?><option value="<?= e($cat['slug']) ?>" <?= e($scenarioSelected((string) $key, 'category_slug', (string) $cat['slug'])) ?>><?= e($cat['table_code'] . ' · ' . $cat['code'] . ' · ' . $cat['name']) ?></option><?php endforeach; ?></select></label>
-                    <label class="label">Actividad evaluada <?= $scenarioTip('Uso que usted quiere probar en esa ruta: vivienda, oficinas, IPS, educación, comercio, hotel, mixto, etc.') ?><input class="input" type="text" name="normative_scenarios[<?= e($key) ?>][activity]" maxlength="180" value="<?= e($scenarioValue((string) $key, 'activity')) ?>" placeholder="Ej. vivienda, comercio 2, institucional 3"></label>
-                    <?php foreach ($numericScenarioFields as [$field,$label,$help]): ?>
-                        <label class="label"><?= e($label) ?> <?= $scenarioTip($help) ?><input class="input" type="text" name="normative_scenarios[<?= e($key) ?>][<?= e($field) ?>]" x-model="rows['<?= e($key) ?>'].<?= e($field) ?>" inputmode="decimal" maxlength="40" value="<?= e($scenarioValue((string) $key, $field)) ?>"></label>
-                    <?php endforeach; ?>
-                    <label class="label">Estado <?= $scenarioTip('Conclusión de viabilidad: viable, limitado, descartado, requiere arquitecto o concepto. No es automático; es criterio del perito.') ?><select class="input" name="normative_scenarios[<?= e($key) ?>][feasibility]" x-model="rows['<?= e($key) ?>'].feasibility"><?php foreach ($normativeScenarioFeasibilities as $fKey => $label): ?><option value="<?= e($fKey) ?>" <?= e($scenarioSelected((string) $key, 'feasibility', (string) $fKey)) ?>><?= e($label) ?></option><?php endforeach; ?></select></label>
-                    <label class="label md:col-span-2">Parámetros relevantes <?= $scenarioTip('Copie aquí la regla que sustenta la ruta: altura, índice, frente, aislamientos, área libre, parqueaderos, retiros o restricciones.') ?><textarea class="input min-h-24" name="normative_scenarios[<?= e($key) ?>][parameters_summary]" rows="3" maxlength="5000" placeholder="Altura, índice, frente, área libre o restricciones."><?= e($scenarioValue((string) $key, 'parameters_summary')) ?></textarea></label>
-                    <label class="label md:col-span-3">Observaciones del escenario <?= $scenarioTip('Explique por qué esta ruta se adopta, se limita o se descarta. Incluya legalidad, físico, mercado y economía básica.') ?><textarea class="input min-h-24" name="normative_scenarios[<?= e($key) ?>][observations]" rows="3" maxlength="5000" placeholder="Por qué se considera, limita o descarta esta vía."><?= e($scenarioValue((string) $key, 'observations')) ?></textarea></label>
-                </div>
-            </article>
-        <?php endforeach; ?>
+    <div class="mt-6 grid gap-4 md:grid-cols-3">
+        <input type="hidden" name="adopted_normative_route" x-model="adopted">
+        <label class="label md:col-span-2">Opción adoptada o comentada <?= $scenarioTip('Se llena con el botón de la matriz. Puedes ajustar el texto si el soporte dice otra cosa.') ?><input class="input" name="adopted_normative_route_label" x-model="adoptedLabel" maxlength="160" placeholder="Selecciona una fila de la matriz"></label>
+        <label class="label">Factor vendible ref. <?= $scenarioTip('Opcional. Si lo diligencias en 5.2, aquí estima área vendible de referencia.') ?><input class="input bg-slate-50" type="text" :value="factor || 'Pendiente'" readonly></label>
+        <div class="md:col-span-3"><label class="label">Lectura pericial de mayor y mejor uso<textarea class="input min-h-32" name="highest_best_use_reason" x-model="reason" rows="4" maxlength="5000" placeholder="Adopta, limita o descarta la opción según área, frente, restricciones, mercado y soporte normativo."></textarea></label></div>
     </div>
+    <details class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <summary class="cursor-pointer font-semibold text-slate-900">Registro manual avanzado de otros usos</summary>
+        <p class="mt-2 text-sm leading-6 text-slate-600">Úsalo después para institucional, comercial, mixto u otro cuadro cuando ya tengamos cargados sus parámetros mínimos e índices.</p>
+        <textarea class="input mt-4 min-h-24" name="normative_scenarios[otro][observations]" rows="3" maxlength="5000" placeholder="Ej. probar Institucional 2 o Comercial 2 con fuente, restricciones y cálculo manual."><?= e($scenarioValue('otro', 'observations')) ?></textarea>
+    </details>
 </section>
