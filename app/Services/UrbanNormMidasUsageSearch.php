@@ -12,6 +12,8 @@ final class UrbanNormMidasUsageSearch
         if ($reference === '') throw new \InvalidArgumentException('Primero registra la referencia catastral en el bien sujeto.');
         $json = $this->request($reference);
         if (!is_array($json)) return ['ok' => false, 'message' => 'MIDAS no respondió. Usa el respaldo de pegar la lectura completa.'];
+        $error = $this->errorMessage($json);
+        if ($error !== '') return ['ok' => false, 'message' => 'MIDAS no respondió Uso Suelo: ' . $error];
         return $this->fieldsFromLandUseResponse($json, $reference);
     }
 
@@ -42,6 +44,12 @@ final class UrbanNormMidasUsageSearch
     private function request(string $reference): ?array
     {
         return (new MidasHttpClient())->postJson(self::ENDPOINT, ['criterio' => $reference]);
+    }
+
+    private function errorMessage(array $json): string
+    {
+        if (mb_strtolower((string) ($json['estado'] ?? '')) !== 'error') return '';
+        return trim((string) ($json['mensaje'] ?? 'Error reportado por MIDAS.'));
     }
 
     private function tableRows(string $html): array

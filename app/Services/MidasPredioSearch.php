@@ -12,6 +12,8 @@ final class MidasPredioSearch
         if ($reference === '') throw new \InvalidArgumentException('Primero registra la referencia catastral en Registro y catastro.');
         $json = $this->request($reference);
         if (!is_array($json)) return ['ok' => false, 'message' => 'MIDAS no respondió la ficha Predios.', 'predio' => []];
+        $error = $this->errorMessage($json);
+        if ($error !== '') return ['ok' => false, 'message' => 'MIDAS no respondió la ficha Predios: ' . $error, 'predio' => []];
         $result = $this->predioResult($json);
         $info = is_array($result['data']['INFORMACION'] ?? null) ? $result['data']['INFORMACION'] : [];
         if ($info === []) return ['ok' => false, 'message' => 'MIDAS respondió, pero no devolvió la capa Predios.', 'predio' => []];
@@ -30,6 +32,12 @@ final class MidasPredioSearch
     private function request(string $reference): ?array
     {
         return (new MidasHttpClient())->postJson(self::ENDPOINT, ['criterio' => $reference, 'layers_visible' => []]);
+    }
+
+    private function errorMessage(array $json): string
+    {
+        if (mb_strtolower((string) ($json['estado'] ?? '')) !== 'error') return '';
+        return trim((string) ($json['mensaje'] ?? 'Error reportado por MIDAS.'));
     }
 
     private function predioResult(array $json): array

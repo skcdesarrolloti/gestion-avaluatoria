@@ -4,6 +4,8 @@ namespace App\Services;
 
 final class MidasHttpClient
 {
+    private string $lastTransportError = '';
+
     public function postJson(string $endpoint, array $payload): ?array
     {
         $body = json_encode($payload, JSON_THROW_ON_ERROR);
@@ -16,14 +18,21 @@ final class MidasHttpClient
             }
             if ($attempt < 4) usleep(250000 * $attempt);
         }
-        return is_array($last) ? $last : null;
+        if (is_array($last)) return $last;
+        if ($this->lastTransportError !== '') {
+            return ['estado' => 'error', 'mensaje' => 'Sin respuesta HTTP de MIDAS desde el servidor: ' . $this->lastTransportError];
+        }
+        return null;
     }
 
     private function decode(?string $response): ?array
     {
         if (!is_string($response) || trim($response) === '') return null;
         $json = json_decode($response, true);
-        return is_array($json) ? $json : null;
+        if (is_array($json)) return $json;
+        $sample = mb_substr(trim(strip_tags($response)), 0, 140);
+        $this->lastTransportError = $sample !== '' ? 'MIDAS devolvió una respuesta no JSON: ' . $sample : 'MIDAS devolvió una respuesta no JSON.';
+        return null;
     }
 
     private function isRetryableError(array $json): bool
@@ -38,7 +47,10 @@ final class MidasHttpClient
         $context = stream_context_create(['http' => ['method' => 'POST', 'header' => $this->headerString(),
             'content' => $body, 'timeout' => 15, 'ignore_errors' => true]]);
         $response = @file_get_contents($endpoint, false, $context);
-        return is_string($response) && trim($response) !== '' ? $response : null;
+        if (is_string($response) && trim($response) !== '') return $response;
+        $error = error_get_last();
+        $this->lastTransportError = is_array($error) ? (string) ($error['message'] ?? '') : 'Sin respuesta por stream.';
+        return null;
     }
 
     private function curlPost(string $endpoint, string $body): ?string
@@ -53,7 +65,8 @@ final class MidasHttpClient
         $response = curl_exec($curl);
         $status = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
         if (!is_string($response) || trim($response) === '' || $status >= 500 || $status === 0) {
-            error_log('Gestion avaluatoria MIDAS HTTP sin respuesta status=' . $status . ' error=' . curl_error($curl));
+            $this->lastTransportError = 'cURL status=' . $status . ' error=' . curl_error($curl);
+            error_log('Gestion avaluatoria MIDAS HTTP sin respuesta ' . $this->lastTransportError);
             $response = null;
         }
         curl_close($curl);
