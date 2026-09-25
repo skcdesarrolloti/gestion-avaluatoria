@@ -310,7 +310,8 @@ try {
         VALUES ('mixto-2', 'principal', 'Institucional 3; Comercial 2.', 1, '2026-09-24 00:00:00', '2026-09-24 00:00:00'),
         ('mixto-2', 'restringido', 'Institucional 4; Comercio 3.', 4, '2026-09-24 00:00:00', '2026-09-24 00:00:00')");
     $db->exec("INSERT INTO urban_norm_parameters (category_slug, parameter_key, label, value_text, sort_order, created_at, updated_at)
-        VALUES ('mixto-2', 'altura_maxima', 'Altura máxima', 'Según el cuadro aplicable y norma específica.', 1, '2026-09-24 00:00:00', '2026-09-24 00:00:00')");
+        VALUES ('mixto-2', 'altura_maxima', 'Altura máxima', 'Según el cuadro aplicable y norma específica.', 1, '2026-09-24 00:00:00', '2026-09-24 00:00:00'),
+        ('mixto-2', 'intensidad_uso', 'Intensidad del uso', 'Compatible hasta 50% según cuadro.', 2, '2026-09-24 00:00:00', '2026-09-24 00:00:00')");
     $matcher = new UrbanNormMidasCategoryMatcher();
     expect($matcher->slug('RESIDENCIAL TIPO D RD') === 'res-d'
         && $matcher->slug('Institucional 3') === 'inst-3'
@@ -333,8 +334,9 @@ try {
     expect(($adoptedUse['use_restricted_text'] ?? '') === 'Institucional 4; Comercio 3.'
         && ($adoptedUse['document_slug'] ?? '') === 'pot-0977-cuadros-uso'
         && str_contains($adoptedUse['permitted_use'] ?? '', 'Principal')
-        && str_contains($adoptedUse['norm_max_height_text'] ?? '', 'cuadro aplicable'),
-        'lectura de categoria urbana llena campos del numeral 5');
+        && str_contains($adoptedUse['norm_max_height_text'] ?? '', 'cuadro aplicable')
+        && str_contains($adoptedUse['norm_other_potential_text'] ?? '', 'Compatible hasta 50%'),
+        'lectura de categoria urbana llena campos definidos del numeral 5');
     $urbanProfile = new AppraisalUrbanNormRepository($db);
     $urbanVersion = $urbanProfile->save('urban-appraisal-1', 1, 0, [
         'document_slug' => 'pot-0977-cuadros-uso', 'table_slug' => 'pot-0977-cuadro-7-mixta',

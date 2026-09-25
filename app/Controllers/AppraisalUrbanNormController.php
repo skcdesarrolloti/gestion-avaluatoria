@@ -30,6 +30,7 @@ final class AppraisalUrbanNormController
             'profile' => $this->prefilledProfile($profile, $subject),
             'urbanDocuments' => $documents,
             'urbanCategories' => $categories,
+            'urbanCategoryGroups' => $this->categoryGroups($categories),
             'academyBlocks' => UrbanNormativeAcademy::blocks(),
             'sourceOptions' => UrbanNormativeAcademy::sourceOptions(),
             'useResults' => UrbanNormativeAcademy::useResults(),
@@ -138,6 +139,16 @@ final class AppraisalUrbanNormController
             Session::flash('urban_norm_message', $msg);
         } catch (\Throwable $error) { Session::flash('urban_norm_error', $error->getMessage()); }
         Http::redirect('avaluos/' . $id . '/normatividad-urbana#midas');
+    }
+
+    private function categoryGroups(array $categories): array
+    {
+        $groups = [];
+        foreach ($categories as $cat) {
+            $label = trim((string) ($cat['table_code'] ?? '') . ' · ' . (string) ($cat['table_title'] ?? ''), ' ·');
+            $groups[$label === '' ? 'Otros cuadros' : $label][] = $cat;
+        }
+        return $groups;
     }
 
     private function prefilledProfile(array $profile, array $subject): array
