@@ -3,14 +3,17 @@
             <div>
                 <p class="eyebrow">Consulta MIDAS</p>
                 <h2 class="mt-2 text-2xl font-semibold">Número predial y opción Uso del suelo</h2>
-                <p class="mt-2 text-sm leading-6 text-slate-600">Lectura MIDAS por predial y opción Uso del suelo.</p>
+                <p class="mt-2 text-sm leading-6 text-slate-600">El botón consulta MIDAS con la referencia corta o larga y actualiza el Uso del suelo en este numeral.</p>
                 <p class="mt-2 text-xs font-semibold text-teal-800" data-autosave-status>Autoguardado activo</p>
             </div>
             <div class="flex flex-wrap gap-2">
-                <a class="btn-primary" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto#registro')) ?>">Consultar desde módulo 3</a>
+                <button class="btn-primary" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/midas/consultar')) ?>">
+                    Actualizar MIDAS
+                </button>
                 <label class="inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
                     <input type="checkbox" name="midas_consulted" value="1" <?= e($checked('midas_consulted')) ?>> MIDAS consultado
                 </label>
+                <a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto#registro')) ?>">Corregir referencia en módulo 3</a>
             </div>
         </div>
         <div class="mt-6 grid gap-4 md:grid-cols-3">
