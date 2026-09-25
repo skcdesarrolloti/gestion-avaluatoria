@@ -19,7 +19,11 @@
     .btn-secondary { @apply inline-flex min-h-11 items-center justify-center rounded-lg border border-slate-300 bg-white px-4 py-2 text-sm font-medium text-slate-700 hover:bg-slate-100; }
     .eyebrow { @apply text-xs font-semibold uppercase text-teal-800; letter-spacing: 0; }
     .field-error { @apply mt-1 min-h-4 text-xs text-red-800; }
-    .help-dot { @apply ml-1 inline-flex size-4 items-center justify-center rounded-full bg-blue-50 text-[11px] font-semibold text-blue-700; }
+    .help-dot { @apply relative ml-1 inline-flex size-4 items-center justify-center rounded-full bg-blue-50 text-[11px] font-semibold text-blue-700; cursor: help; vertical-align: middle; }
+    .help-dot::after { content: attr(data-tooltip); position: absolute; left: 50%; bottom: calc(100% + 0.5rem); z-index: 80; width: max-content; max-width: min(18rem, 80vw); transform: translate(-50%, 0.25rem); border-radius: 0.5rem; background: #0f172a; padding: 0.5rem 0.75rem; color: white; font-size: 0.75rem; font-weight: 500; line-height: 1.25rem; white-space: normal; text-align: left; box-shadow: 0 10px 25px rgba(15, 23, 42, 0.22); opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.12s ease, transform 0.12s ease, visibility 0.12s ease; }
+    .help-dot::before { content: ''; position: absolute; left: 50%; bottom: calc(100% + 0.2rem); z-index: 81; transform: translateX(-50%); border: 0.35rem solid transparent; border-top-color: #0f172a; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity 0.12s ease, visibility 0.12s ease; }
+    .help-dot:hover::after, .help-dot:focus-visible::after { opacity: 1; visibility: visible; transform: translate(-50%, 0); }
+    .help-dot:hover::before, .help-dot:focus-visible::before { opacity: 1; visibility: visible; }
     .app-topbar { @apply border-b px-5 py-3 text-white; background: #243136; border-color: #f19001; }
     .app-shell { @apply px-5 py-5; background: #f5f6f7; }
     .brand-frame { @apply inline-flex min-h-11 items-center gap-3 rounded-lg border px-3 py-2; border-color: #f19001; background: #202b30; }

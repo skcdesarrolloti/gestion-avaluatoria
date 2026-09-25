@@ -9,6 +9,7 @@ import { installPhPdfUpload } from './ph-pdf-upload.js';
 import { phCommonLive } from './ph-common-live.js';
 import { obsolescenceLive } from './obsolescence-live.js';
 import { installUploadProgress } from './upload-progress.js';
+import { installHelpTooltips } from './help-tooltips.js';
 
 window.Alpine = Alpine;
 Alpine.data('appraisalForm', appraisalForm);
@@ -21,4 +22,5 @@ Alpine.start();
 installModuleAutosave();
 installPhPdfUpload();
 installUploadProgress();
+installHelpTooltips();
 installFetchNavigation();
