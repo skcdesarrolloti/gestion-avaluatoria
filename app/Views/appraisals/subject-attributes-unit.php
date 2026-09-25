@@ -1,13 +1,12 @@
 <?php
 $unitId = (string) $unit['id'];
 $catalog = $unitSpecialAttributeCatalog ?? $specialAttributeCatalog;
-$firstAttributeGroup = (string) array_key_first($catalog);
 $score = $attributeScore($unit, $catalog);
 $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'] ?? ''));
 ?>
 <div class="mt-5 rounded-xl border border-slate-200 p-5" data-attribute-unit data-unit-id="<?= e($unitId) ?>"
-    x-data="{ activeAttributeGroup: '<?= e($firstAttributeGroup) ?>' }"
     x-show="activeAttributes === '<?= e($unitId) ?>'">
+    <input type="hidden" name="unit_attributes[<?= e($unitId) ?>][_present]" value="1">
     <div class="flex flex-wrap items-center justify-between gap-3">
         <h3 class="text-base font-semibold"><?= e($unit['label'] ?: $attributeUnitLabel($unit)) ?></h3>
         <div class="flex flex-wrap gap-2">
@@ -30,27 +29,18 @@ $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'
         Califica de 1 a 5: por debajo de 3 resta como demérito; por encima de 3 suma como atributo.
         El peso se coloca en medio automáticamente; cámbialo a bajo o alto solo cuando el efecto real lo justifique.
     </div>
-    <div class="mt-5 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">
-        <?php $attributeGroupNumber = 1; ?>
-        <?php foreach ($catalog as $groupKey => [$groupLabel, $attributes]): ?>
-            <button class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold" type="button"
-                @click="activeAttributeGroup = '<?= e($groupKey) ?>'"
-                :class="activeAttributeGroup === '<?= e($groupKey) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'">
-                <span class="mr-1 inline-flex size-6 items-center justify-center rounded-full bg-blue-700 text-xs text-white">
-                    <?= $attributeGroupNumber ?>
-                </span>
-                <?= e($groupLabel) ?>
-            </button>
-            <?php $attributeGroupNumber++; ?>
+    <div class="mt-5 flex flex-wrap gap-2 rounded-xl bg-slate-100 p-3 text-xs font-semibold text-slate-700">
+        <?php foreach ($catalog as [$groupLabel]): ?>
+            <span class="rounded-full bg-white px-3 py-1"><?= e($groupLabel) ?></span>
         <?php endforeach; ?>
     </div>
     <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-950">
-        <span><strong>Selección valuatoria:</strong> marca máximo 6 atributos que incidan en valor. Al seleccionar uno se abre su ficha técnica.</span>
-        <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-amber-800" x-text="unitLimitText('<?= e($unitId) ?>')"></span>
+        <span><strong>Selección valuatoria:</strong> revisa la lista completa del tipo de inmueble y marca solo los atributos que incidan en valor. Se sugiere trabajar máximo 6, sin bloquear casos especiales.</span>
+        <span class="rounded-full px-3 py-1 text-xs font-semibold" :class="unitSuggestionClass('<?= e($unitId) ?>')" x-text="unitLimitText('<?= e($unitId) ?>')"></span>
     </div>
     <div class="mt-5 space-y-5">
         <?php foreach ($catalog as $groupKey => [$groupLabel, $attributes]): ?>
-            <div class="rounded-xl border border-slate-200" x-show="activeAttributeGroup === '<?= e($groupKey) ?>'">
+            <div class="rounded-xl border border-slate-200">
                 <div class="bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800"><?= e($groupLabel) ?></div>
                 <div class="grid gap-3 p-4 lg:grid-cols-2">
                     <?php foreach ($attributes as $key => [$label, $help, $options]): ?>
@@ -59,8 +49,7 @@ $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'
                             x-data="{ enabled: <?= $enabled ? 'true' : 'false' ?> }"
                             :class="enabled ? 'ring-1 ring-blue-200' : ''">
                             <label class="flex items-start gap-3">
-                                <input class="mt-1 size-5 shrink-0" type="checkbox" data-attribute-toggle x-model="enabled"
-                                    :disabled="!enabled && selectedCount('<?= e($unitId) ?>') >= 6">
+                                <input class="mt-1 size-5 shrink-0" type="checkbox" data-attribute-toggle x-model="enabled">
                                 <span>
                                     <strong class="block text-sm text-slate-950"><?= e($label) ?></strong>
                                     <span class="mt-1 block text-xs leading-5 text-slate-500"><?= e($help) ?></span>

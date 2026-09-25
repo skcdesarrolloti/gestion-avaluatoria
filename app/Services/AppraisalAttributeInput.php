@@ -29,6 +29,7 @@ final class AppraisalAttributeInput
             $row = self::row($item);
             if (implode('', $row) !== '') $clean[$key] = $row;
         }
+        if ($clean === []) return '{}';
         return json_encode($clean, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
     }
 

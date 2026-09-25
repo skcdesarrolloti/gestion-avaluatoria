@@ -795,9 +795,16 @@ Certificado de tradicion.",
         && str_contains($attributeRows[0]['special_attributes_json'], '"rating":"4"')
         && str_contains($attributeRows[0]['special_attributes_json'], '"weight":"3"')
         && !str_contains($attributeRows[0]['special_attributes_json'], 'desconocido'), 'atributos especiales normalizados');
+    $_POST = ['unit_attributes' => [$unitId => ['_present' => '1', 'items' => []]]];
+    $emptyAttributeRows = AppraisalAttributeInput::unitAttributeData();
+    expect($emptyAttributeRows[0]['special_attributes_json'] === '{}',
+        'atributos especiales permiten limpiar una unidad sin atributos seleccionados');
     $localAttributeGroups = AppraisalSpecialAttributeCatalog::groups('local');
     $warehouseAttributeGroups = AppraisalSpecialAttributeCatalog::groups('bodega');
-    expect(isset($localAttributeGroups['local_comercial'], $warehouseAttributeGroups['bodega_industrial'])
+    $officeAttributeGroups = AppraisalSpecialAttributeCatalog::groups('Oficinas y consultorios');
+    $lotAttributeGroups = AppraisalSpecialAttributeCatalog::groups('Lote urbano');
+    expect(isset($localAttributeGroups['local_comercial'], $warehouseAttributeGroups['bodega_industrial'],
+        $officeAttributeGroups['oficina_consultorio'], $lotAttributeGroups['lote'])
         && !isset($localAttributeGroups['ph'], $warehouseAttributeGroups['ph']),
         'atributos especiales dependen del tipo de inmueble y excluyen PH');
     expect(AppraisalSpecialAttributeCatalog::labels()['vista_vivienda'] === 'Vista',

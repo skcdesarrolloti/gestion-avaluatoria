@@ -12,17 +12,32 @@ final class AppraisalSpecialAttributeCatalog
     public static function groups(string $propertyType = ''): array
     {
         $groups = self::allGroups();
-        $specific = match ($propertyType) {
-            'casa', 'apartamento', 'hotel' => ['vivienda'],
-            'local' => ['local_comercial'],
-            'oficina', 'consultorio' => ['oficina_consultorio'],
-            'bodega' => ['bodega_industrial'],
-            'lote', 'finca' => ['lote'],
+        $specific = match (self::normalizedType($propertyType)) {
+            'vivienda' => ['vivienda'],
+            'local_comercial' => ['local_comercial'],
+            'oficina_consultorio' => ['oficina_consultorio'],
+            'bodega_industrial' => ['bodega_industrial'],
+            'lote' => ['lote'],
             'edificio' => ['vivienda', 'local_comercial', 'oficina_consultorio'],
             'parqueadero' => ['parqueadero'],
             default => [],
         };
         return array_intersect_key($groups, array_flip(array_merge(['comun'], $specific)));
+    }
+
+    private static function normalizedType(string $propertyType): string
+    {
+        $text = mb_strtolower(trim($propertyType));
+        $text = strtr($text, ['á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u']);
+        if ($text === '') return '';
+        if (str_contains($text, 'parqueadero') || str_contains($text, 'garaje')) return 'parqueadero';
+        if (str_contains($text, 'lote') || str_contains($text, 'terreno') || str_contains($text, 'finca')) return 'lote';
+        if (str_contains($text, 'bodega') || str_contains($text, 'industrial') || str_contains($text, 'logistic')) return 'bodega_industrial';
+        if (str_contains($text, 'oficina') || str_contains($text, 'consultorio')) return 'oficina_consultorio';
+        if (str_contains($text, 'local') || str_contains($text, 'comerc')) return 'local_comercial';
+        if (str_contains($text, 'edificio')) return 'edificio';
+        if (str_contains($text, 'apart') || str_contains($text, 'casa') || str_contains($text, 'vivienda') || str_contains($text, 'hotel')) return 'vivienda';
+        return $text;
     }
 
     public static function allGroups(): array
@@ -34,7 +49,7 @@ final class AppraisalSpecialAttributeCatalog
                 'estado_conservacion' => ['Estado de conservación', 'Condición física observable y mantenimiento general.', self::condition()],
                 'mejoras_relevantes' => ['Mejoras relevantes', 'Adecuaciones u obras que agregan funcionalidad o valor.', self::relevance()],
                 'riesgos_afectaciones_fisicas' => ['Riesgos o afectaciones físicas', 'Humedad, inundación, remoción, deterioros o restricciones físicas observables.', self::risk()],
-                'evidencia_fotografica' => ['Evidencia fotográfica', 'Define si el diferencial requiere soporte fotográfico en 3.7.', self::evidenceNeed()],
+                'evidencia_fotografica' => ['Evidencia fotográfica', 'Atributo de soporte: indica si este diferencial debe documentarse con fotografía en 3.7.', self::evidenceNeed()],
                 'impacto_valuatorio' => ['Impacto valuatorio', 'Lectura técnica del efecto esperado en valor.', self::marketImpact()],
                 'otro_atributo_especial' => ['Otro diferencial', 'Campo de apoyo para un atributo o demérito no previsto en el catálogo.', self::other()],
             ]],

@@ -39,16 +39,7 @@ export function subjectAttributes(initialUnit = '') {
             this.refreshScores();
         },
         handleAttributeChange(event) {
-            if (event.target?.matches?.('[data-attribute-toggle]')) {
-                const unit = event.target.closest('[data-attribute-unit]');
-                const selected = unit ? unit.querySelectorAll('[data-attribute-toggle]:checked').length : 0;
-                if (event.target.checked && selected > 6) {
-                    event.target.checked = false;
-                    event.target.dispatchEvent(new Event('change', { bubbles: false }));
-                    return;
-                }
-                this.selectionTick += 1;
-            }
+            if (event.target?.matches?.('[data-attribute-toggle]')) this.selectionTick += 1;
             if (event.target?.matches?.('[data-attribute-rating]') && event.target.value) {
                 const weight = event.target.closest('[data-attribute-row]')?.querySelector('[data-attribute-weight]');
                 if (weight && !weight.value) {
@@ -74,7 +65,12 @@ export function subjectAttributes(initialUnit = '') {
         },
         unitLimitText(unitId) {
             this.selectionTick;
-            return `${this.selectedCount(unitId)} / 6 atributos seleccionados`;
+            const count = this.selectedCount(unitId);
+            return count <= 6 ? `${count} seleccionados · sugerido máximo 6` : `${count} seleccionados · depura si alguno no incide`;
+        },
+        unitSuggestionClass(unitId) {
+            this.selectionTick;
+            return this.selectedCount(unitId) > 6 ? 'bg-amber-100 text-amber-900' : 'bg-white text-amber-800';
         },
         unitScoreText(unitId) {
             const score = this.scores[unitId];
