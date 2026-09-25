@@ -2,10 +2,7 @@ const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.conte
 const flushAutosaves = () => typeof window.gaFlushAutosaves === 'function' ? window.gaFlushAutosaves() : Promise.resolve(true);
 let busyTimer = null;
 
-export function syncFormToken(body, token = csrfToken()) {
-    if (body instanceof FormData && token) body.set('_token', token);
-    return body;
-}
+export function syncFormToken(body, token = csrfToken()) { if (body instanceof FormData && token) body.set('_token', token); return body; }
 
 export function isFetchableUrl(href, currentHref = window.location.href) {
     let url; let current;
@@ -170,16 +167,18 @@ async function visit(url, { method = 'GET', body = null, replace = false, text, 
 }
 
 function scrollToTarget(hash) {
-    if (!hash) {
-        window.scrollTo({ top: 0, behavior: 'auto' });
-        return;
-    }
+    if (!hash) { window.scrollTo({ top: 0, behavior: 'auto' }); return; }
     document.getElementById(decodeURIComponent(hash.slice(1)))?.scrollIntoView();
 }
 
-function formBody(form, submitter) {
-    try { return new FormData(form, submitter); } catch { return new FormData(form); }
+function formBody(form, submitter) { try { return new FormData(form, submitter); } catch { return new FormData(form); } }
+
+export function submitAction(form, submitter = null, currentHref = window.location.href) {
+    const raw = submitter?.getAttribute?.('formaction') || form.getAttribute?.('action') || form.action || currentHref;
+    return new URL(raw, currentHref).toString();
 }
+
+export function submitMethod(form, submitter = null) { return (submitter?.getAttribute?.('formmethod') || form.getAttribute?.('method') || form.method || 'GET').toUpperCase(); }
 
 export function installFetchNavigation() {
     document.addEventListener('click', async event => {
@@ -196,16 +195,18 @@ export function installFetchNavigation() {
         if (!(form instanceof HTMLFormElement) || form.closest('[data-no-fetch]') || form.enctype === 'multipart/form-data') return;
         if (form.matches?.('[data-module-autosave]') && !event.submitter) { event.preventDefault(); return; }
         if ((form.target || '').trim() !== '') return;
-        const method = (form.method || 'GET').toUpperCase();
+        const method = submitMethod(form, event.submitter);
+        const action = submitAction(form, event.submitter);
         if (!['GET', 'POST'].includes(method)) return;
+        if (!isFetchableUrl(action)) return;
         event.preventDefault();
         if (method === 'GET') {
-            const url = new URL(form.action);
+            const url = new URL(action);
             url.search = new URLSearchParams(new FormData(form)).toString();
             visit(url.toString(), { text: 'Buscando...' });
             return;
         }
-        visit(form.action, { method, body: formBody(form, event.submitter), text: 'Procesando...' });
+        visit(action, { method, body: formBody(form, event.submitter), text: 'Procesando...' });
     });
 
     document.addEventListener('ga:loader', event => setBusy(Boolean(event.detail?.active), event.detail?.text || 'Procesando...'));

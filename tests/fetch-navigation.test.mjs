@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { installFetchNavigation, isFetchableUrl, isLoginRedirect, redirectedUrl, shouldHandleLink, syncFormToken } from '../resources/js/fetch-navigation.js';
+import { installFetchNavigation, isFetchableUrl, isLoginRedirect, redirectedUrl, shouldHandleLink, submitAction, submitMethod, syncFormToken } from '../resources/js/fetch-navigation.js';
 
 const current = 'https://example.test/public/avaluos?page=1';
 
@@ -87,6 +87,21 @@ test('normalizes one digit sector anchors after save', () => {
         redirectedUrl('https://example.test/public/avaluos/abc/sector', current, body, current),
         'https://example.test/public/avaluos/abc/sector#banco-04',
     );
+});
+
+
+
+test('uses submitter formaction and formmethod for special form buttons', () => {
+    const form = {
+        action: 'https://example.test/public/avaluos/abc/normatividad-urbana',
+        method: 'post',
+        getAttribute: name => ({ action: '/public/avaluos/abc/normatividad-urbana', method: 'post' })[name] ?? null,
+    };
+    const submitter = {
+        getAttribute: name => ({ formaction: '/public/avaluos/abc/normatividad-urbana/midas/consultar', formmethod: 'post' })[name] ?? null,
+    };
+    assert.equal(submitAction(form, submitter, current), 'https://example.test/public/avaluos/abc/normatividad-urbana/midas/consultar');
+    assert.equal(submitMethod(form, submitter), 'POST');
 });
 
 test('syncs hidden csrf field before form post', () => {
