@@ -63,7 +63,7 @@ No debes crear tablas ni pegar sentencias SQL. El programa hace esa parte.
 | `urban_norm_tables` | Cuadros normativos del documento urbano, como los cuadros de usos del Decreto 0977 de 2001 |
 | `urban_norm_use_categories` | Categorías de uso urbanístico por cuadro, grupo y orden de consulta |
 | `urban_norm_use_rules` | Reglas de uso principal, compatible, complementario, restringido y prohibido por categoría |
-| `urban_norm_parameters` | Parámetros urbanísticos futuros por categoría sin cargar el módulo con texto completo |
+| `urban_norm_parameters` | Parámetros urbanísticos por categoría; la semilla correctiva carga los parámetros residenciales visibles del Cuadro No. 1 para potencial constructivo |
 | `appraisal_urban_norm_profiles` | Ficha del capítulo 5 por avalúo, con consulta MIDAS, concepto, clasificación, uso y conclusión |
 | `appraisal_urban_norm_references` | Soportes y extractos urbanos asociados al avalúo y a la biblioteca normativa |
 
@@ -123,3 +123,4 @@ Si no hay pendientes, solo lee el registro; no ejecuta CREATE/ALTER en cada form
 - Si en producción el usuario de ejecución no tiene DDL, usa `AUTO_MIGRATE=false` y
   ejecuta el migrador con credenciales de despliegue mediante variables de entorno.
 - No se conectó esta entrega a las bases reales ni se copiaron secretos de otros proyectos.
+

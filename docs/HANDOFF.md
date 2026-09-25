@@ -105,8 +105,13 @@ del suelo, área de actividad, tratamiento, uso actual y uso pretendido, cruce f
 al cuadro de usos, restricciones, conclusión del analista y soportes.
 
 La primera semilla corresponde al PDF de cuadros de reglamentación de usos del Decreto
-0977 de 2001 entregado por el usuario. Queda listo para sumar resoluciones o actos de
-Planeación como nuevos documentos de academia urbana sin duplicar campos del avalúo.
+0977 de 2001 entregado por el usuario. Una migración correctiva vuelve a sembrar esos
+cuadros si el hosting marcó aplicada la semilla anterior sin dejar datos. La consulta
+MIDAS del capítulo 5 lee primero Predios, actualiza el numeral 3, usa la referencia del
+botón Uso Suelo y, cuando reconoce una categoría como Residencial D, Mixto 2 o
+Institucional 3, aplica el cuadro POT disponible al numeral 5. Queda listo para sumar
+resoluciones o actos de Planeación como nuevos documentos de academia urbana sin
+duplicar campos del avalúo.
 
 ## Pruebas aisladas
 
@@ -143,3 +148,4 @@ Los PDFs de IVS se cargan desde cada tarjeta internacional y se guardan en
 Los PDFs de NIIF se cargan desde cada tarjeta NIIF y se guardan en `storage/normas-niif/`.
 El menú también enumera los campos del expediente y separa soporte normativo directo,
 derivación metodológica y control operativo interno.
+

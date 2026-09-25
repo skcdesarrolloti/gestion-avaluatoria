@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, Session};
 use App\Models\{AppraisalRepository, AppraisalReportNoteRepository, AppraisalSubjectRepository, AppraisalUrbanNormRepository, UrbanNormativeRepository};
-use App\Services\{AppraisalUrbanNormScenarioInput, UrbanNormCategoryAdoption, UrbanNormMidasTextParser, UrbanNormMidasUsageSearch};
+use App\Services\{AppraisalUrbanNormMidasFields, AppraisalUrbanNormScenarioInput, MidasPredioSearch, UrbanNormCategoryAdoption, UrbanNormMidasTextParser, UrbanNormMidasUsageSearch};
 use App\Support\{AppraisalReportNoteCatalog, UrbanNormativeAcademy, UrbanNormativeScenarioCatalog};
 
 final class AppraisalUrbanNormController
@@ -88,14 +88,26 @@ final class AppraisalUrbanNormController
         try {
             $version = $this->profiles->save($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $_POST);
             $reference = $this->midasReference($_POST, $subject);
-            $result = (new UrbanNormMidasUsageSearch())->consult($reference);
-            if (!empty($result['fields'])) {
+            $predio = (new MidasPredioSearch())->consult($reference);
+            $midasFields = new AppraisalUrbanNormMidasFields($this->library);
+            $fields = [];
+            if (!empty($predio['predio'])) {
+                $this->subjects->applyMidasPredio($id, $this->user['id'], $predio['predio']);
+                $this->appraisals->applyMidasAreasToFirstUnit($id, $this->user['id'], $predio['predio']);
+                $fields = $midasFields->profileFieldsFromPredio($predio['predio']);
+                $reference = $midasFields->usageReference($predio['predio'], $reference);
+            }
+            $usage = (new UrbanNormMidasUsageSearch())->consult($reference);
+            $fields = array_replace($fields, $usage['fields'] ?? []);
+            $fields = $midasFields->withMatchedCategory($fields);
+            if ($fields !== []) {
                 $profile = $this->profiles->profile($id, $this->user['id']);
-                $fields = array_filter($result['fields'], static fn ($value): bool => trim((string) $value) !== '');
+                $fields = array_filter($fields, static fn ($value): bool => trim((string) $value) !== '');
+                $fields['midas_consulted'] = '1'; $fields['source_status'] = 'midas';
                 $this->profiles->save($id, $this->user['id'], $version, array_replace($profile, $fields));
             }
-            $key = ($result['ok'] ?? false) ? 'urban_norm_message' : 'urban_norm_error';
-            Session::flash($key, (string) ($result['message'] ?? 'Consulta MIDAS finalizada.'));
+            $ok = ($predio['ok'] ?? false) || ($usage['ok'] ?? false) || ($fields['category_slug'] ?? '') !== '';
+            Session::flash($ok ? 'urban_norm_message' : 'urban_norm_error', $midasFields->consultMessage($predio, $usage, $fields));
         } catch (\Throwable $error) { Session::flash('urban_norm_error', $error->getMessage()); }
         Http::redirect('avaluos/' . $id . '/normatividad-urbana#midas');
     }
@@ -109,7 +121,8 @@ final class AppraisalUrbanNormController
             if ($raw === '' || ($predio === [] && $usage === [])) {
                 throw new \RuntimeException('Pega la lectura completa de MIDAS antes de procesarla.');
             }
-            $data = array_replace($_POST, $usage, $this->profileFieldsFromPredio($predio));
+            $midasFields = new AppraisalUrbanNormMidasFields($this->library);
+            $data = $midasFields->withMatchedCategory(array_replace($_POST, $usage, $midasFields->profileFieldsFromPredio($predio)));
             if ($predio !== []) $data['midas_predio_raw'] = $raw;
             if ($usage !== []) $data['midas_usage_raw'] = $raw;
             $data['midas_consulted'] = '1'; $data['source_status'] = 'midas';
@@ -167,27 +180,6 @@ final class AppraisalUrbanNormController
         return preg_replace('/\D+/', '', $value) ?? '';
     }
 
-    private function profileFieldsFromPredio(array $predio): array
-    {
-        $fields = [];
-        foreach (['cadastral_reference_long' => 'national_cadastral_reference',
-            'cadastral_reference_short' => 'cadastral_reference', 'current_use' => 'land_use',
-            'land_classification' => 'land_classification', 'urban_treatment' => 'urban_treatment'] as $target => $source) {
-            if (($predio[$source] ?? '') !== '') $fields[$target] = (string) $predio[$source];
-        }
-        if (($predio['land_use'] ?? '') !== '') {
-            $fields['midas_activity'] = (string) $predio['land_use'];
-            $fields['midas_usage_result'] = $this->predioSummary($predio);
-        }
-        return $fields;
-    }
 
-    private function predioSummary(array $predio): string
-    {
-        $labels = ['land_use' => 'Uso de suelo', 'urban_treatment' => 'Tratamiento',
-            'risk' => 'Riesgos', 'land_classification' => 'Clasificación', 'updated_on' => 'Actualización'];
-        $parts = [];
-        foreach ($labels as $key => $label) if (($predio[$key] ?? '') !== '') $parts[] = $label . ': ' . $predio[$key];
-        return implode(' | ', $parts);
-    }
 }
+

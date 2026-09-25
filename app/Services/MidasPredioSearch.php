@@ -12,9 +12,12 @@ final class MidasPredioSearch
         if ($reference === '') throw new \InvalidArgumentException('Primero registra la referencia catastral en Registro y catastro.');
         $json = $this->request($reference);
         if (!is_array($json)) return ['ok' => false, 'message' => 'MIDAS no respondió la ficha Predios.', 'predio' => []];
-        $info = $this->predioInfo($json);
+        $result = $this->predioResult($json);
+        $info = is_array($result['data']['INFORMACION'] ?? null) ? $result['data']['INFORMACION'] : [];
         if ($info === []) return ['ok' => false, 'message' => 'MIDAS respondió, pero no devolvió la capa Predios.', 'predio' => []];
         $predio = $this->mapped($info);
+        $usageReference = $this->usageReference($result);
+        if ($usageReference !== '') $predio['usage_reference'] = $usageReference;
         $predio['_raw'] = $this->rawText($info);
         return ['ok' => $predio !== [], 'message' => 'Ficha Predios de MIDAS cargada en el numeral 3.', 'predio' => $predio];
     }
@@ -37,16 +40,25 @@ final class MidasPredioSearch
         return is_array($json) ? $json : null;
     }
 
-    private function predioInfo(array $json): array
+    private function predioResult(array $json): array
     {
         foreach ($json['datos'] ?? [] as $group) foreach ($group['capas'] ?? [] as $layer) {
             if ($this->key((string) ($layer['capa'] ?? '')) !== 'predios') continue;
             foreach ($layer['resultado'] ?? [] as $result) {
                 $info = $result['data']['INFORMACION'] ?? null;
-                if (is_array($info)) return $info;
+                if (is_array($info)) return is_array($result) ? $result : [];
             }
         }
         return [];
+    }
+
+    private function usageReference(array $result): string
+    {
+        foreach ($result['tools'] ?? [] as $tool) {
+            if (!is_array($tool) || $this->key((string) ($tool['type'] ?? $tool['name'] ?? '')) !== 'usosuelo') continue;
+            return preg_replace('/\D+/', '', (string) ($tool['field'] ?? '')) ?? '';
+        }
+        return '';
     }
 
     private function mapped(array $info): array
@@ -99,3 +111,4 @@ final class MidasPredioSearch
         return preg_replace('/[^a-z0-9]+/', '', $text) ?? '';
     }
 }
+

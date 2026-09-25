@@ -22,7 +22,7 @@ final class AppraisalSubjectMidasController
                 $this->subjects->applyMidasPredio($id, $this->user['id'], $predio['predio']);
                 $this->appraisals->applyMidasAreasToFirstUnit($id, $this->user['id'], $predio['predio']);
                 $urbanFields = $this->urbanFields($predio['predio']);
-                $reference = (string) (($predio['predio']['cadastral_reference'] ?? '') ?: ($predio['predio']['national_cadastral_reference'] ?? $reference));
+                $reference = (string) (($predio['predio']['usage_reference'] ?? '') ?: (($predio['predio']['cadastral_reference'] ?? '') ?: ($predio['predio']['national_cadastral_reference'] ?? $reference)));
             }
             $usage = (new UrbanNormMidasUsageSearch())->consult($reference);
             $urbanFields = array_replace($urbanFields, $usage['fields'] ?? []);
@@ -120,3 +120,4 @@ final class AppraisalSubjectMidasController
             : ($predio !== [] ? 'Lectura MIDAS del predio guardada en el numeral 3.' : 'Reglamentación de Uso Suelo enviada al numeral 5.');
     }
 }
+
