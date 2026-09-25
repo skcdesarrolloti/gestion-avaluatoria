@@ -45,7 +45,20 @@ final class UrbanNormMidasTextParser
         $out['norm_max_height_text'] = $this->section($text, 'ALTURA MÁXIMA', 'ÍNDICE DE CONSTRUCCIÓN');
         $out['norm_construction_index_text'] = $this->section($text, 'ÍNDICE DE CONSTRUCCIÓN', 'AISLAMIENTOS');
         $out['norm_isolation_text'] = $this->section($text, 'AISLAMIENTOS', null);
+        $out = array_replace($out, $this->simpleUnavailableUsage($text));
         return array_filter($out, static fn (string $v): bool => $v !== '');
+    }
+
+    private function simpleUnavailableUsage(string $text): array
+    {
+        if (!preg_match('/\bNO\s+DISPONIBLE\b/iu', $text)) return [];
+        if (!preg_match('/(?:Consulta\s+uso\s+de\s+suelo|Predio\s*:)/iu', $text)) return [];
+        $predio = $this->field($text, 'Predio');
+        if ($predio === '' && preg_match('/Predio\s*:\s*([0-9]+)/iu', $text, $match)) $predio = trim($match[1]);
+        $message = trim(preg_replace('/\s+/', ' ', $text) ?? $text);
+        return ['midas_activity' => 'NO DISPONIBLE', 'current_use' => 'NO DISPONIBLE',
+            'use_regulation_table' => 'NO DISPONIBLE', 'midas_usage_result' => $message,
+            'source_status' => 'no_disponible', 'midas_support_reference' => trim('Consulta MIDAS Uso Suelo' . ($predio !== '' ? ' predio ' . $predio : ''))];
     }
 
     private function field(string $text, string $label): string

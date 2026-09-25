@@ -382,6 +382,10 @@ try {
         && str_contains($midasParsed['usage']['use_restricted_text'] ?? '', 'COMERCIAL 3')
         && str_contains($midasParsed['usage']['norm_min_lot_front_text'] ?? '', 'AML 200'),
         'parser MIDAS separa ficha predial reglamentacion y potencial constructivo');
+    $midasUnavailable = (new UrbanNormMidasTextParser())->parse("Consulta uso de suelo\nPredio: 130010102000006780901900000000\nNO DISPONIBLE\nEste predio requiere la realización de un estudio más profundo por parte del equipo técnico de la Secretaría de Planeación Distrital.");
+    expect(($midasUnavailable['usage']['midas_activity'] ?? '') === 'NO DISPONIBLE'
+        && str_contains($midasUnavailable['usage']['midas_usage_result'] ?? '', 'estudio más profundo'),
+        'parser MIDAS acepta resultado simple de uso no disponible');
     $midasLive = (new UrbanNormMidasUsageSearch())->fieldsFromLandUseResponse(['datos' => [
         'referencia' => '<h2>PREDIO: 010303810024000</h2>',
         'encabezado' => '<h2 class="encabezado_title">MIXTO 2</h2><p>Uso mixto del suelo.</p>',
