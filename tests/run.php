@@ -46,6 +46,7 @@ use App\Services\MidasGeometry;
 use App\Services\MidasWfsLayerAnalyzer;
 use App\Services\MidasWfsLayerCatalog;
 use App\Services\MidasWfsSearch;
+use App\Services\UrbanNormCategoryAdoption;
 use App\Services\UrbanNormMidasTextParser;
 use App\Services\UrbanNormMidasUsageSearch;
 use App\Services\LegalCertificateParser;
@@ -244,6 +245,8 @@ try {
         name TEXT, activity_group TEXT, description TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE urban_norm_use_rules (id INTEGER PRIMARY KEY AUTOINCREMENT, category_slug TEXT,
         rule_type TEXT, content TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE urban_norm_parameters (id INTEGER PRIMARY KEY AUTOINCREMENT, category_slug TEXT,
+        parameter_key TEXT, label TEXT, value_text TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE appraisal_urban_norm_profiles (appraisal_id TEXT PRIMARY KEY, owner_id INTEGER,
         cadastral_reference TEXT, cadastral_reference_short TEXT, cadastral_reference_long TEXT,
         document_slug TEXT, table_slug TEXT, category_slug TEXT, source_status TEXT,
@@ -303,8 +306,15 @@ try {
         ('mixto-2', 'restringido', 'Institucional 4; Comercio 3.', 4, '2026-09-24 00:00:00', '2026-09-24 00:00:00')");
     $urbanLibrary = new UrbanNormativeRepository($db);
     expect($urbanLibrary->stats()['categories'] === 1, 'catalogo urbano cuenta categorias normativas');
-    expect($urbanLibrary->categoryWithRules('mixto-2')['rules']['restringido'] === 'Institucional 4; Comercio 3.',
-        'catalogo urbano recupera reglas de uso');
+    $mixtoRules = $urbanLibrary->categoryWithRules('mixto-2');
+    expect($mixtoRules['rules']['restringido'] === 'Institucional 4; Comercio 3.'
+        && $mixtoRules['document_slug'] === 'pot-0977-cuadros-uso',
+        'catalogo urbano recupera reglas de uso y documento fuente');
+    $adoptedUse = (new UrbanNormCategoryAdoption())->fields($mixtoRules);
+    expect(($adoptedUse['use_restricted_text'] ?? '') === 'Institucional 4; Comercio 3.'
+        && ($adoptedUse['document_slug'] ?? '') === 'pot-0977-cuadros-uso'
+        && str_contains($adoptedUse['permitted_use'] ?? '', 'Principal'),
+        'lectura de categoria urbana llena campos del numeral 5');
     $urbanProfile = new AppraisalUrbanNormRepository($db);
     $urbanVersion = $urbanProfile->save('urban-appraisal-1', 1, 0, [
         'document_slug' => 'pot-0977-cuadros-uso', 'table_slug' => 'pot-0977-cuadro-7-mixta',

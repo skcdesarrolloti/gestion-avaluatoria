@@ -1,5 +1,6 @@
     <section id="uso" x-show="tab === 'uso'" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <p class="eyebrow">Reglamentación del uso del suelo</p><h2 class="mt-2 text-2xl font-semibold">Lectura principal del POT y cuadro de usos</h2>
+        <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Selecciona documento, cuadro y categoría. Luego pulsa <strong>Leer y aplicar cuadro seleccionado</strong> para traer al formulario las reglas guardadas en la biblioteca normativa.</p>
         <div class="mt-6 grid gap-4 md:grid-cols-2">
             <label class="label">Documento normativo fuente
                 <select class="input" name="document_slug"><option value="">Selecciona fuente si aplica</option>
@@ -21,6 +22,10 @@
                     <?php foreach ($useResults as $key => $label): ?><option value="<?= e($key) ?>" <?= e($selected('use_cross_result', (string) $key)) ?>><?= e($label) ?></option><?php endforeach; ?>
                 </select>
             </label>
+            <div class="md:col-span-2 flex flex-wrap items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-950">
+                <p class="grow">La lectura se toma de la biblioteca urbana: documento, cuadro, categoría y reglas de uso. Si el PDF aún no tiene reglas estructuradas, el analista puede completar manualmente los campos.</p>
+                <button class="btn-primary" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/cuadro/aplicar')) ?>">Leer y aplicar cuadro seleccionado</button>
+            </div>
             <?php $input('land_classification', 'Clasificación del suelo', 'Urbano, expansión, rural, suburbano...'); ?>
             <?php $input('activity_area', 'Área de actividad'); ?>
             <?php $input('normative_zone', 'Zona normativa'); ?>

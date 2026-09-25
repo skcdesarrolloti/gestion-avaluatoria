@@ -49,5 +49,16 @@
                     Lectura guardada: <?= $value('midas_predio_raw') !== '' ? 'predio MIDAS para numeral 3' : '' ?><?= $value('midas_predio_raw') !== '' && $value('midas_usage_raw') !== '' ? ' y ' : '' ?><?= $value('midas_usage_raw') !== '' ? 'reglamentación Uso Suelo para numeral 5' : '' ?>.
                 </div>
             <?php endif; ?>
+            <details class="md:col-span-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <summary class="cursor-pointer text-sm font-semibold text-slate-900">Respaldo manual: pegar lectura completa de MIDAS</summary>
+                <label class="label mt-4">Texto copiado de Predios o Uso Suelo en MIDAS
+                    <textarea class="input min-h-40" name="midas_pasted_text" rows="7" maxlength="70000"
+                        placeholder="Pega aquí el bloque completo que entrega MIDAS, incluyendo Predios, Uso Suelo o el cuadro de reglamentación."></textarea>
+                    <span class="mt-1 block text-xs font-medium text-slate-500">Este respaldo procesa el texto y llena el numeral 3 y/o el numeral 5 cuando la consulta automática no devuelve todos los datos.</span>
+                </label>
+                <button class="btn-secondary mt-4" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/midas/procesar')) ?>">
+                    Procesar lectura MIDAS pegada
+                </button>
+            </details>
         </div>
     </section>

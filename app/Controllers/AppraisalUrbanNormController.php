@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, Session};
 use App\Models\{AppraisalRepository, AppraisalReportNoteRepository, AppraisalSubjectRepository, AppraisalUrbanNormRepository, UrbanNormativeRepository};
-use App\Services\{AppraisalUrbanNormScenarioInput, UrbanNormMidasTextParser, UrbanNormMidasUsageSearch};
+use App\Services\{AppraisalUrbanNormScenarioInput, UrbanNormCategoryAdoption, UrbanNormMidasTextParser, UrbanNormMidasUsageSearch};
 use App\Support\{AppraisalReportNoteCatalog, UrbanNormativeAcademy, UrbanNormativeScenarioCatalog};
 
 final class AppraisalUrbanNormController
@@ -50,11 +50,28 @@ final class AppraisalUrbanNormController
         $this->appraisals->find($id, $this->user['id']);
         try {
             $this->profiles->save($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $_POST);
-            Session::flash('urban_norm_message', 'Cambios del numeral 5 guardados. La lectura MIDAS solo se actualiza con el botón Consultar MIDAS.');
+            Session::flash('urban_norm_message', 'Cambios del numeral 5 guardados. La lectura MIDAS solo se actualiza con el botón Actualizar MIDAS.');
         } catch (\Throwable $error) { Session::flash('urban_norm_error', $error->getMessage()); }
         $target = (string) ($_POST['next'] ?? '') === 'deliverable'
             ? 'avaluos/' . $id . '/entregable' : 'avaluos/' . $id . '/normatividad-urbana';
         Http::redirect($target);
+    }
+
+
+    public function applyUseCategory(string $id): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        try {
+            $version = $this->profiles->save($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $_POST);
+            $categorySlug = trim((string) ($_POST['category_slug'] ?? ''));
+            if ($categorySlug === '') throw new \RuntimeException('Selecciona una categoría del cuadro antes de leerlo.');
+            $category = $this->library->categoryWithRules($categorySlug);
+            $profile = $this->profiles->profile($id, $this->user['id']);
+            $fields = (new UrbanNormCategoryAdoption())->fields($category);
+            $this->profiles->save($id, $this->user['id'], $version, array_replace($profile, $fields));
+            Session::flash('urban_norm_message', 'Cuadro normativo leído y aplicado al numeral 5. Revisa la categoría y ajusta el criterio del perito si hace falta.');
+        } catch (\Throwable $error) { Session::flash('urban_norm_error', $error->getMessage()); }
+        Http::redirect('avaluos/' . $id . '/normatividad-urbana#uso');
     }
 
     public function autosave(string $id): never

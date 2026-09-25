@@ -64,7 +64,7 @@ final class UrbanNormativeRepository
 
     public function categoryWithRules(string $slug): array
     {
-        $query = $this->db->prepare('SELECT c.*, t.table_code, t.title table_title, d.title document_title
+        $query = $this->db->prepare('SELECT c.*, t.table_code, t.title table_title, d.slug document_slug, d.title document_title
             FROM urban_norm_use_categories c JOIN urban_norm_tables t ON t.slug = c.table_slug
             JOIN urban_norm_documents d ON d.slug = t.document_slug WHERE c.slug = ?');
         $query->execute([$slug]);
@@ -75,6 +75,15 @@ final class UrbanNormativeRepository
         $rules->execute([$slug]);
         $category['rules'] = [];
         foreach ($rules->fetchAll() as $rule) $category['rules'][(string) $rule['rule_type']] = (string) $rule['content'];
+        $params = $this->db->prepare('SELECT parameter_key, label, value_text FROM urban_norm_parameters
+            WHERE category_slug = ? ORDER BY sort_order ASC');
+        $params->execute([$slug]);
+        $category['parameters'] = [];
+        foreach ($params->fetchAll() as $param) {
+            $category['parameters'][(string) $param['parameter_key']] = [
+                'label' => (string) $param['label'], 'value' => (string) $param['value_text'],
+            ];
+        }
         return $category;
     }
 
