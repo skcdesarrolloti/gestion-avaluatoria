@@ -2,6 +2,7 @@
 declare(strict_types=1);
 namespace App\Models;
 use App\Core\HttpException;
+use App\Services\AppraisalUrbanNormScenarioInput;
 use PDO;
 
 final class AppraisalUrbanNormRepository
@@ -69,6 +70,7 @@ final class AppraisalUrbanNormRepository
             'use_principal_text', 'use_compatible_text', 'use_complementary_text', 'use_restricted_text',
             'use_prohibited_text', 'norm_unit_basic_text', 'norm_free_area_text', 'norm_min_lot_front_text',
             'norm_max_height_text', 'norm_construction_index_text', 'norm_isolation_text', 'norm_other_potential_text',
+            'adopted_normative_route', 'adopted_normative_route_label', 'highest_best_use_reason',
             'planning_concept_number', 'official_concept_scope',
             'land_classification', 'activity_area', 'normative_zone', 'urban_treatment', 'urban_license',
             'permitted_use', 'current_use', 'intended_use', 'applicable_activity', 'urban_norms_applied', 'heritage_context',
@@ -84,7 +86,8 @@ final class AppraisalUrbanNormRepository
             'norm_unit_basic_text' => 70000, 'norm_free_area_text' => 70000, 'norm_min_lot_front_text' => 70000,
             'norm_max_height_text' => 70000, 'norm_construction_index_text' => 70000,
             'norm_isolation_text' => 70000, 'norm_other_potential_text' => 70000,
-            'planning_concept_number' => 120,
+            'adopted_normative_route' => 80, 'adopted_normative_route_label' => 160,
+            'highest_best_use_reason' => 5000, 'planning_concept_number' => 120,
             'official_concept_scope' => 5000, 'land_classification' => 120, 'activity_area' => 160,
             'normative_zone' => 160, 'urban_treatment' => 160, 'urban_license' => 220,
             'permitted_use' => 5000, 'current_use' => 160, 'intended_use' => 220, 'applicable_activity' => 160, 'urban_norms_applied' => 5000,
@@ -97,6 +100,7 @@ final class AppraisalUrbanNormRepository
         foreach (['document_slug', 'table_slug', 'category_slug'] as $key) {
             $data[$key] = $data[$key] === '' ? null : $data[$key];
         }
+        $data['normative_scenarios_json'] = AppraisalUrbanNormScenarioInput::normalize($input);
         $data['midas_consulted'] = !empty($input['midas_consulted']) ? 1 : 0;
         $data['midas_consulted_on'] = $this->date($input['midas_consulted_on'] ?? null);
         $data['planning_concept_date'] = $this->date($input['planning_concept_date'] ?? null);
@@ -156,6 +160,8 @@ final class AppraisalUrbanNormRepository
             'norm_unit_basic_text' => '', 'norm_free_area_text' => '', 'norm_min_lot_front_text' => '',
             'norm_max_height_text' => '', 'norm_construction_index_text' => '',
             'norm_isolation_text' => '', 'norm_other_potential_text' => '',
+            'normative_scenarios_json' => '', 'adopted_normative_route' => '',
+            'adopted_normative_route_label' => '', 'highest_best_use_reason' => '',
             'planning_concept_number' => '', 'planning_concept_date' => null, 'official_concept_scope' => '',
             'land_classification' => '', 'activity_area' => '', 'normative_zone' => '', 'urban_treatment' => '',
             'urban_license' => '', 'permitted_use' => '', 'current_use' => '', 'intended_use' => '',

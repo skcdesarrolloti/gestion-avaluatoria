@@ -3,8 +3,8 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, Session};
 use App\Models\{AppraisalRepository, AppraisalReportNoteRepository, AppraisalSubjectRepository, AppraisalUrbanNormRepository, UrbanNormativeRepository};
-use App\Services\{UrbanNormMidasTextParser, UrbanNormMidasUsageSearch};
-use App\Support\{AppraisalReportNoteCatalog, UrbanNormativeAcademy};
+use App\Services\{AppraisalUrbanNormScenarioInput, UrbanNormMidasTextParser, UrbanNormMidasUsageSearch};
+use App\Support\{AppraisalReportNoteCatalog, UrbanNormativeAcademy, UrbanNormativeScenarioCatalog};
 
 final class AppraisalUrbanNormController
 {
@@ -33,6 +33,9 @@ final class AppraisalUrbanNormController
             'academyBlocks' => UrbanNormativeAcademy::blocks(),
             'sourceOptions' => UrbanNormativeAcademy::sourceOptions(),
             'useResults' => UrbanNormativeAcademy::useResults(),
+            'normativeScenarioRoutes' => UrbanNormativeScenarioCatalog::routes(),
+            'normativeScenarioResults' => UrbanNormativeScenarioCatalog::results(),
+            'normativeScenarios' => AppraisalUrbanNormScenarioInput::decode($profile['normative_scenarios_json'] ?? ''),
             'references' => $references,
             'reportNotes' => $notes,
             'reportNoteSections' => AppraisalReportNoteCatalog::withNoteSections('5', $notes),

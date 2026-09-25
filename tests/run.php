@@ -254,7 +254,8 @@ try {
         use_restricted_text TEXT, use_prohibited_text TEXT, norm_unit_basic_text TEXT,
         norm_free_area_text TEXT, norm_min_lot_front_text TEXT, norm_max_height_text TEXT,
         norm_construction_index_text TEXT, norm_isolation_text TEXT, norm_other_potential_text TEXT,
-        planning_concept_number TEXT,
+        normative_scenarios_json TEXT, adopted_normative_route TEXT, adopted_normative_route_label TEXT,
+        highest_best_use_reason TEXT, planning_concept_number TEXT,
         planning_concept_date TEXT, official_concept_scope TEXT,
         land_classification TEXT, activity_area TEXT, normative_zone TEXT, urban_treatment TEXT,
         urban_license TEXT, permitted_use TEXT, current_use TEXT,
@@ -313,6 +314,14 @@ try {
         'use_principal_text' => 'Comercial 2 e Institucional 3.',
         'use_restricted_text' => 'Comercial 3 e Institucional 4.',
         'norm_max_height_text' => '4 pisos.',
+        'adopted_normative_route' => 'mixto',
+        'adopted_normative_route_label' => 'Mixto 2 por vocación comercial e institucional',
+        'highest_best_use_reason' => 'El predio admite comparación de vías y se adopta la de mayor soporte.',
+        'normative_scenarios' => ['mixto' => ['enabled' => '1', 'document_slug' => 'pot-0977-cuadros-uso',
+            'table_slug' => 'pot-0977-cuadro-7-mixta', 'category_slug' => 'mixto-2',
+            'activity' => 'Comercio 2', 'result' => 'principal',
+            'parameters_summary' => 'Altura y condiciones según cuadro aplicable.',
+            'observations' => 'Escenario adoptable según lectura MIDAS.']],
         'urban_license' => 'No reporta licencia en los soportes revisados.',
         'permitted_use' => 'Uso restringido según cruce del cuadro y la actividad consultada.',
         'urban_norms_applied' => 'Decreto 0977 de 2001 y cuadro de actividad mixta.',
@@ -328,6 +337,11 @@ try {
     expect(str_contains($savedUrban['permitted_use'], 'Uso restringido')
         && str_contains($savedUrban['legal_urban_affectations'], 'Planeación'),
         'ficha urbana conserva licencia compatibilidad y afectaciones del numeral 5');
+    $savedScenarios = json_decode((string) $savedUrban['normative_scenarios_json'], true);
+    expect(($savedScenarios['mixto']['enabled'] ?? false) === true
+        && ($savedScenarios['mixto']['result'] ?? '') === 'principal'
+        && $savedUrban['adopted_normative_route'] === 'mixto',
+        'ficha urbana conserva escenarios POT y via adoptada por mayor y mejor uso');
     expect(str_contains((string) $savedUrban['use_restricted_text'], 'Comercial 3'),
         'ficha urbana conserva reglamentacion MIDAS por tipo de uso');
     expect(($savedUrban['norm_max_height_text'] ?? '') === '4 pisos.', 'ficha urbana conserva campos de potencial constructivo');
