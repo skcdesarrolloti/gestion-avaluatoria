@@ -10,6 +10,8 @@ function scoreFromUnit(unit) {
     let count = 0;
     unit.querySelectorAll('[data-attribute-rating]').forEach((rating) => {
         const row = rating.closest('[data-attribute-row]');
+        const toggle = row?.querySelector('[data-attribute-toggle]');
+        if (rating.disabled || (toggle && !toggle.checked)) return;
         const weight = row?.querySelector('[data-attribute-weight]');
         const ratingValue = Number.parseInt(rating.value, 10);
         const weightValue = Number.parseInt(weight?.value || '', 10);
@@ -32,10 +34,21 @@ export function subjectAttributes(initialUnit = '') {
         activeAttributes: initialUnit,
         busyAttributes: false,
         scores: {},
+        selectionTick: 0,
         init() {
             this.refreshScores();
         },
         handleAttributeChange(event) {
+            if (event.target?.matches?.('[data-attribute-toggle]')) {
+                const unit = event.target.closest('[data-attribute-unit]');
+                const selected = unit ? unit.querySelectorAll('[data-attribute-toggle]:checked').length : 0;
+                if (event.target.checked && selected > 6) {
+                    event.target.checked = false;
+                    event.target.dispatchEvent(new Event('change', { bubbles: false }));
+                    return;
+                }
+                this.selectionTick += 1;
+            }
             if (event.target?.matches?.('[data-attribute-rating]') && event.target.value) {
                 const weight = event.target.closest('[data-attribute-row]')?.querySelector('[data-attribute-weight]');
                 if (weight && !weight.value) {
@@ -54,6 +67,14 @@ export function subjectAttributes(initialUnit = '') {
         },
         unitAdjustment(unitId) {
             return formatAdjustment(this.scores[unitId]?.adjustment ?? null);
+        },
+        selectedCount(unitId) {
+            const unit = this.$el.querySelector(`[data-unit-id="${unitId}"]`);
+            return unit ? unit.querySelectorAll('[data-attribute-toggle]:checked').length : 0;
+        },
+        unitLimitText(unitId) {
+            this.selectionTick;
+            return `${this.selectedCount(unitId)} / 6 atributos seleccionados`;
         },
         unitScoreText(unitId) {
             const score = this.scores[unitId];

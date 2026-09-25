@@ -44,75 +44,63 @@ $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'
             <?php $attributeGroupNumber++; ?>
         <?php endforeach; ?>
     </div>
-    <div class="mt-5">
+    <div class="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm text-amber-950">
+        <span><strong>Selección valuatoria:</strong> marca máximo 6 atributos que incidan en valor. Al seleccionar uno se abre su ficha técnica.</span>
+        <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-amber-800" x-text="unitLimitText('<?= e($unitId) ?>')"></span>
+    </div>
+    <div class="mt-5 space-y-5">
         <?php foreach ($catalog as $groupKey => [$groupLabel, $attributes]): ?>
-            <div class="overflow-x-auto rounded-xl border border-slate-200"
-                x-show="activeAttributeGroup === '<?= e($groupKey) ?>'">
+            <div class="rounded-xl border border-slate-200" x-show="activeAttributeGroup === '<?= e($groupKey) ?>'">
                 <div class="bg-slate-100 px-4 py-3 text-sm font-semibold text-slate-800"><?= e($groupLabel) ?></div>
-                <table class="table-fixed text-left text-sm" style="min-width: 91rem;">
-                    <colgroup>
-                        <col style="width: 17rem;">
-                        <col style="width: 13rem;">
-                        <col style="width: 12rem;">
-                        <col style="width: 12rem;">
-                        <col style="width: 12rem;">
-                        <col style="width: 13rem;">
-                        <col style="width: 10rem;">
-                        <col style="width: 22rem;">
-                    </colgroup>
-                    <thead class="bg-blue-900 text-xs uppercase tracking-wide text-white">
-                        <tr>
-                            <th class="px-3 py-3">Atributo / demérito</th>
-                            <th class="px-3 py-3">Valor observado</th>
-                            <th class="px-3 py-3">Impacto</th>
-                            <th class="px-3 py-3">Evidencia</th>
-                            <th class="px-3 py-3">Calificación</th>
-                            <th class="px-3 py-3">Peso</th>
-                            <th class="px-3 py-3">Observación</th>
-                        </tr>
-                    </thead>
-                    <tbody class="divide-y divide-slate-200">
-                        <?php foreach ($attributes as $key => [$label, $help, $options]): ?>
-                            <tr data-attribute-row x-data="photoUpload('<?= e($attrValue($unit, $key, 'evidence')) ?>')">
-                                <td class="px-3 py-3 align-top">
-                                    <strong class="block text-slate-950"><?= e($label) ?></strong>
-                                    <span class="mt-1 block max-w-xs text-xs leading-5 text-slate-500"><?= e($help) ?></span>
-                                </td>
-                                <td class="px-3 py-3 align-top">
-                                    <select class="input min-w-48" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][value]">
+                <div class="grid gap-3 p-4 lg:grid-cols-2">
+                    <?php foreach ($attributes as $key => [$label, $help, $options]): ?>
+                        <?php $enabled = $attrHasValue($unit, $key); ?>
+                        <div class="rounded-xl border border-slate-200 bg-white p-4" data-attribute-row
+                            x-data="{ enabled: <?= $enabled ? 'true' : 'false' ?> }"
+                            :class="enabled ? 'ring-1 ring-blue-200' : ''">
+                            <label class="flex items-start gap-3">
+                                <input class="mt-1 size-5 shrink-0" type="checkbox" data-attribute-toggle x-model="enabled"
+                                    :disabled="!enabled && selectedCount('<?= e($unitId) ?>') >= 6">
+                                <span>
+                                    <strong class="block text-sm text-slate-950"><?= e($label) ?></strong>
+                                    <span class="mt-1 block text-xs leading-5 text-slate-500"><?= e($help) ?></span>
+                                </span>
+                            </label>
+                            <div class="mt-4 grid gap-4 md:grid-cols-2" x-show="enabled" x-cloak>
+                                <label class="label md:col-span-2">Valor observado
+                                    <select class="input" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][value]" :disabled="!enabled">
                                         <?php foreach ($options as $value => $text): ?>
                                             <option value="<?= e($value) ?>" <?= $attrValue($unit, $key, 'value') === $value ? 'selected' : '' ?>><?= e($text) ?></option>
                                         <?php endforeach; ?>
                                     </select>
-                                </td>
-                                <?php foreach (['impact' => 'impact', 'evidence' => 'evidence'] as $field => $optionKey): ?>
-                                    <td class="px-3 py-3 align-top">
-                                        <select class="input min-w-40" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][<?= e($field) ?>]"
-                                            <?= $field === 'evidence' ? 'x-model="evidence"' : '' ?>>
-                                            <?php foreach ($specialAttributeOptions[$optionKey] as $value => $text): ?>
+                                </label>
+                                <?php foreach (['impact' => 'Impacto', 'evidence' => 'Evidencia'] as $field => $fieldLabel): ?>
+                                    <label class="label"><?= e($fieldLabel) ?>
+                                        <select class="input" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][<?= e($field) ?>]" :disabled="!enabled">
+                                            <?php foreach ($specialAttributeOptions[$field] as $value => $text): ?>
                                                 <option value="<?= e($value) ?>" <?= $attrValue($unit, $key, $field) === $value ? 'selected' : '' ?>><?= e($text) ?></option>
                                             <?php endforeach; ?>
                                         </select>
-                                    </td>
+                                    </label>
                                 <?php endforeach; ?>
-                                <?php foreach (['rating' => 'rating', 'weight' => 'weight'] as $field => $optionKey): ?>
-                                    <td class="px-3 py-3 align-top">
-                                        <select class="input min-w-40" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][<?= e($field) ?>]"
-                                            <?= $field === 'rating' ? 'data-attribute-rating' : 'data-attribute-weight' ?>>
-                                            <?php foreach ($specialAttributeOptions[$optionKey] as $value => $text): ?>
+                                <?php foreach (['rating' => 'Calificación', 'weight' => 'Peso'] as $field => $fieldLabel): ?>
+                                    <label class="label"><?= e($fieldLabel) ?>
+                                        <select class="input" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][<?= e($field) ?>]"
+                                            <?= $field === 'rating' ? 'data-attribute-rating' : 'data-attribute-weight' ?> :disabled="!enabled">
+                                            <?php foreach ($specialAttributeOptions[$field] as $value => $text): ?>
                                                 <option value="<?= e($value) ?>" <?= $attrValue($unit, $key, $field) === $value ? 'selected' : '' ?>><?= e($text) ?></option>
                                             <?php endforeach; ?>
                                         </select>
-                                    </td>
+                                    </label>
                                 <?php endforeach; ?>
-                                <td class="px-3 py-3 align-top">
+                                <label class="label md:col-span-2">Observación valuatoria
                                     <textarea class="input" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][notes]"
-                                        rows="3" maxlength="220" placeholder="Criterio escrito del perito."><?= e($attrValue($unit, $key, 'notes')) ?></textarea>
-                                </td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
+                                        rows="3" maxlength="220" placeholder="Criterio escrito del perito." :disabled="!enabled"><?= e($attrValue($unit, $key, 'notes')) ?></textarea>
+                                </label>
+                            </div>
+                        </div>
+                    <?php endforeach; ?>
+                </div>
             </div>
         <?php endforeach; ?>
     </div>

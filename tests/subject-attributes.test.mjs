@@ -48,3 +48,19 @@ test('subject attribute score ignores incomplete rows', () => {
     assert.equal(component.unitAdjustment('u1'), '-5%');
     assert.equal(component.unitScoreText('u1'), 'Ajuste -5% · índice 40%');
 });
+
+test('subject attribute selector limits each unit to six active attributes', () => {
+    const toggles = Array.from({ length: 7 }, () => ({ checked: true }));
+    const unit = { querySelectorAll: selector => selector === '[data-attribute-toggle]:checked' ? toggles.filter(t => t.checked) : [] };
+    const target = {
+        checked: true,
+        matches: selector => selector === '[data-attribute-toggle]',
+        closest: selector => selector === '[data-attribute-unit]' ? unit : null,
+        dispatchEvent() {},
+    };
+    const component = subjectAttributes('u1');
+    component.$el = { querySelector: () => unit, querySelectorAll: () => [] };
+    component.$nextTick = callback => callback();
+    component.handleAttributeChange({ target });
+    assert.equal(target.checked, false);
+});

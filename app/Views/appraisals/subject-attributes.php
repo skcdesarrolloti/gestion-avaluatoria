@@ -9,6 +9,12 @@ $attrValue = static function (array $unit, string $key, string $field): string {
     $data = json_decode((string) ($unit['special_attributes_json'] ?? '{}'), true);
     return is_array($data) ? (string) ($data[$key][$field] ?? '') : '';
 };
+$attrHasValue = static function (array $unit, string $key) use ($attrValue): bool {
+    foreach (['value', 'impact', 'evidence', 'rating', 'weight', 'notes'] as $field) {
+        if ($attrValue($unit, $key, $field) !== '') return true;
+    }
+    return false;
+};
 $attributeScore = static function (array $unit, array $catalog): array {
     $data = json_decode((string) ($unit['special_attributes_json'] ?? '{}'), true);
     if (!is_array($data)) return ['score' => null, 'label' => 'Sin calificación', 'count' => 0];
