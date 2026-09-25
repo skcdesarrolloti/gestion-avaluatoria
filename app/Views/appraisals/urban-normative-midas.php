@@ -21,10 +21,10 @@
             </div>
         <?php endif; ?>
         <div class="mt-6 grid gap-4 md:grid-cols-3">
-            <label class="label">Referencia catastral registrada en 3.1
+            <label class="label">Referencia catastral tomada del módulo 3
                 <input class="input bg-slate-100 text-slate-700" type="text" name="cadastral_reference"
                     value="<?= e($value('cadastral_reference')) ?>" readonly aria-readonly="true">
-                <span class="mt-1 block text-xs font-medium text-slate-500">Se actualiza desde Bien sujeto · Registro y catastro.</span>
+                <span class="mt-1 block text-xs font-medium text-slate-500">Dato informativo. Para MIDAS se usa la referencia corta normalizada sin guiones.</span>
             </label>
             <label class="label">Referencia corta para buscar en MIDAS
                 <input class="input" type="text" name="cadastral_reference_short"
@@ -41,7 +41,6 @@
             <div class="md:col-span-3 flex flex-wrap gap-2 rounded-xl border border-blue-100 bg-blue-50 p-4">
                 <a class="btn-primary" href="https://midas.cartagena.gov.co/#/home" target="_blank" rel="noopener">Abrir MIDAS</a>
                 <button class="btn-secondary" type="button" onclick="navigator.clipboard?.writeText('<?= e($midasReferenceDigits) ?>')">Copiar referencia</button>
-                <a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto#registro')) ?>">Corregir referencia en módulo 3</a>
                 <button class="btn-secondary" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/midas/consultar')) ?>">Intentar lectura automática</button>
             </div>
             <label class="label">Estado de la fuente MIDAS
