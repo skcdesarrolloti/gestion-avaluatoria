@@ -61,6 +61,15 @@ test('keeps app-route return_to hash after post redirects', () => {
     );
 });
 
+test('button return_to overrides stale response hash', () => {
+    const body = new FormData();
+    body.set('return_to', 'avaluos/abc/normatividad-urbana#uso-informe');
+    assert.equal(
+        redirectedUrl('https://example.test/public/avaluos/abc/normatividad-urbana#midas', current, body, current),
+        'https://example.test/public/avaluos/abc/normatividad-urbana#uso-informe',
+    );
+});
+
 test('keeps active sector hash after post redirects', () => {
     const body = new FormData();
     body.set('active_sector', 'banco-02');

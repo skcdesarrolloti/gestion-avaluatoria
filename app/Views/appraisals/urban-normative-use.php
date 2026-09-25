@@ -95,7 +95,9 @@ $urbanUseFromModuleOne = trim($moduleOneUseText !== '' ? $moduleOneUseText : $mo
             </label>
             <div class="md:col-span-2 flex flex-wrap items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-950">
                 <p class="grow"><strong>Cuándo oprimir este botón:</strong> después de escoger la vía normativa y su resultado. Carga el cuadro y sus parámetros; luego el perito ajusta, adopta o descarta la ruta.</p>
-                <button class="btn-primary" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/cuadro/aplicar')) ?>">Aplicar ruta probada</button>
+                <button class="btn-primary" type="submit"
+                    name="return_to" value="<?= e('avaluos/' . $record['id'] . '/normatividad-urbana#uso-informe') ?>"
+                    formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/cuadro/aplicar')) ?>">Aplicar ruta probada</button>
             </div>
             <div class="md:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
                 <p class="font-semibold text-slate-900">De dónde salen los siguientes campos</p>

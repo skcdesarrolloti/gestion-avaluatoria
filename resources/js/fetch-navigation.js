@@ -81,7 +81,7 @@ async function refreshCsrf() {
 
 export function redirectedUrl(responseUrl, fallbackUrl, body = null, currentHref = window.location.href) {
     const url = new URL(responseUrl || fallbackUrl, currentHref);
-    if (url.hash || !(body instanceof FormData)) return url.toString();
+    if (!(body instanceof FormData)) return url.toString();
     const targetSector = sectorAnchor(body.get('target_sector'));
     if (targetSector) {
         url.hash = targetSector;
