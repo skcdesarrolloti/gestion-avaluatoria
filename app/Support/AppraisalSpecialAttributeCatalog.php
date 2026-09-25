@@ -40,6 +40,30 @@ final class AppraisalSpecialAttributeCatalog
         return $text;
     }
 
+    public static function typologyTabs(): array
+    {
+        return [
+            'casa' => 'Casa', 'apartamento' => 'Apartamento', 'lote' => 'Lote',
+            'local' => 'Local', 'oficina' => 'Oficina', 'bodega' => 'Bodega',
+            'consultorio' => 'Consultorio', 'edificio' => 'Edificio', 'finca' => 'Finca',
+            'hotel' => 'Hotel / hospedaje', 'parqueadero' => 'Parqueadero',
+        ];
+    }
+
+    public static function catalogTypeKey(string $propertyType): string
+    {
+        $text = mb_strtolower(trim($propertyType));
+        $text = strtr($text, ['á' => 'a', 'é' => 'e', 'í' => 'i', 'ó' => 'o', 'ú' => 'u']);
+        foreach (array_keys(self::typologyTabs()) as $key) if ($text === $key || str_contains($text, $key)) return $key;
+        return match (self::normalizedType($propertyType)) {
+            'vivienda' => 'apartamento', 'local_comercial' => 'local',
+            'oficina_consultorio' => str_contains($text, 'consultorio') ? 'consultorio' : 'oficina',
+            'bodega_industrial' => 'bodega', 'lote' => 'lote',
+            'edificio' => 'edificio', 'parqueadero' => 'parqueadero',
+            default => 'apartamento',
+        };
+    }
+
     public static function allGroups(): array
     {
         return [

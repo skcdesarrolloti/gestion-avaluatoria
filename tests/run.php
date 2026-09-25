@@ -807,6 +807,12 @@ Certificado de tradicion.",
         $officeAttributeGroups['oficina_consultorio'], $lotAttributeGroups['lote'])
         && !isset($localAttributeGroups['ph'], $warehouseAttributeGroups['ph']),
         'atributos especiales dependen del tipo de inmueble y excluyen PH');
+    $typologyTabs = AppraisalSpecialAttributeCatalog::typologyTabs();
+    expect(count($typologyTabs) === 11
+        && ($typologyTabs['apartamento'] ?? '') === 'Apartamento'
+        && AppraisalSpecialAttributeCatalog::catalogTypeKey('Oficinas y consultorios') === 'oficina'
+        && AppraisalSpecialAttributeCatalog::catalogTypeKey('Lote urbano') === 'lote',
+        'catalogo academico de atributos conserva pestanas por tipologia');
     expect(AppraisalSpecialAttributeCatalog::labels()['vista_vivienda'] === 'Vista',
         'atributos especiales exponen nombres para evidencia fotografica');
     $_POST = ['ph' => ['ph_key' => 'NIT 900123456', 'ph_name' => 'Conjunto Prueba',
