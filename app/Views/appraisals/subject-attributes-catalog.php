@@ -9,8 +9,7 @@ $catalogCount = static fn (array $groups): int => array_sum(array_map(static fn 
         <div>
             <h3 class="text-base font-semibold text-slate-950">Catálogo completo de atributos especiales por tipología</h3>
             <p class="mt-1 max-w-4xl leading-6 text-slate-600">
-                Consulta la lista completa antes de seleccionar. La pestaña con borde verde corresponde a la tipología activa del sujeto;
-                las demás sirven como referencia académica y no se guardan desde aquí.
+                Este bloque es solo de consulta. La selección que se guarda está arriba, en la unidad activa del sujeto; aquí puedes comparar las tipologías y revisar opciones sin modificar el avalúo.
             </p>
         </div>
         <div class="flex flex-wrap gap-2">

@@ -87,7 +87,6 @@ $formatAttributeAdjustment = static function (?float $value): string {
             </div>
         </div>
     </div>
-    <?php require BASE_PATH . '/app/Views/appraisals/subject-attributes-catalog.php'; ?>
     <form class="mt-6" method="post" enctype="multipart/form-data" action="<?= e(url($subjectActionBase . '/atributos')) ?>"
         data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/atributos/autoguardar')) ?>"
         @change="handleAttributeChange($event)" @submit="busyAttributes = true">
@@ -127,4 +126,5 @@ $formatAttributeAdjustment = static function (?float $value): string {
             </div>
         <?php endif; ?>
     </form>
+    <?php require BASE_PATH . '/app/Views/appraisals/subject-attributes-catalog.php'; ?>
 </section>
