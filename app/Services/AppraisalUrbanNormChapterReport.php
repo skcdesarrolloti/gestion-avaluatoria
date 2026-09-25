@@ -73,8 +73,14 @@ final class AppraisalUrbanNormChapterReport
         $rows = AppraisalUrbanNormScenarioInput::decode($profile['normative_scenarios_json'] ?? '');
         $enabled = array_filter($rows, static fn (array $row): bool => !empty($row['enabled']));
         if ($enabled === []) return '';
-        $labels = array_map(static fn (array $row): string => trim($row['label'] . ' (' . $row['result'] . ')'), $enabled);
-        return 'Escenarios evaluados: ' . implode(', ', $labels) . '.';
+        $labels = array_map(function (array $row): string {
+            $parts = [trim($row['label'] . ' (' . $row['result'] . ')')];
+            if ($this->text($row['max_built_area_m2'] ?? '') !== '') $parts[] = 'máx. ' . $row['max_built_area_m2'] . ' m²';
+            if ($this->text($row['potential_area_m2'] ?? '') !== '') $parts[] = 'potencial ' . $row['potential_area_m2'] . ' m²';
+            if ($this->text($row['feasibility'] ?? '') !== '') $parts[] = 'estado ' . $row['feasibility'];
+            return implode(', ', $parts);
+        }, $enabled);
+        return 'Escenarios evaluados: ' . implode('; ', $labels) . '.';
     }
 
     private function paragraph(array $parts): string
@@ -83,6 +89,9 @@ final class AppraisalUrbanNormChapterReport
         return $parts ? implode("\n", $parts) : 'Pendiente de diligenciar.';
     }
 
+    private function text(mixed $value): string
+    { return trim((string) $value); }
+
     private function line(string $label, mixed $value): string
-    { $text = trim((string) $value); return $text === '' ? '' : $label . ': ' . $text . '.'; }
+    { $text = $this->text($value); return $text === '' ? '' : $label . ': ' . $text . '.'; }
 }

@@ -30,13 +30,29 @@ final class UrbanNormativeScenarioCatalog
         ];
     }
 
+
+    public static function feasibilities(): array
+    {
+        return [
+            'pendiente' => 'Pendiente de evaluar',
+            'viable' => 'Viable con soporte básico',
+            'condicionado' => 'Viable condicionado',
+            'limitado' => 'Limitado por norma o condición física',
+            'no_viable' => 'No viable',
+            'requiere_especialista' => 'Requiere arquitecto o concepto oficial',
+        ];
+    }
+
     public static function blankScenarios(): array
     {
         $blank = [];
         foreach (array_keys(self::routes()) as $key) {
             $blank[$key] = ['enabled' => false, 'document_slug' => '', 'table_slug' => '',
                 'category_slug' => '', 'activity' => '', 'result' => 'pendiente',
-                'parameters_summary' => '', 'observations' => ''];
+                'land_area_m2' => '', 'net_land_area_m2' => '', 'occupancy_index' => '', 'max_floors' => '',
+                'construction_index' => '', 'max_built_area_m2' => '', 'existing_built_area_m2' => '',
+                'potential_area_m2' => '', 'sellable_factor' => '', 'sellable_area_m2' => '',
+                'feasibility' => 'pendiente', 'parameters_summary' => '', 'observations' => ''];
         }
         return $blank;
     }

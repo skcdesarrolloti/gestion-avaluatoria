@@ -361,8 +361,11 @@ try {
         'highest_best_use_reason' => 'El predio admite comparación de vías y se adopta la de mayor soporte.',
         'normative_scenarios' => ['mixto' => ['enabled' => '1', 'document_slug' => 'pot-0977-cuadros-uso',
             'table_slug' => 'pot-0977-cuadro-7-mixta', 'category_slug' => 'mixto-2',
-            'activity' => 'Comercio 2', 'result' => 'principal',
-            'parameters_summary' => 'Altura y condiciones según cuadro aplicable.',
+            'activity' => 'Comercio 2', 'result' => 'principal', 'land_area_m2' => '370',
+            'net_land_area_m2' => '222', 'occupancy_index' => '0.70', 'max_floors' => '3',
+            'construction_index' => '2.10', 'max_built_area_m2' => '466.2', 'existing_built_area_m2' => '230',
+            'potential_area_m2' => '236.2', 'sellable_factor' => '0.75', 'sellable_area_m2' => '349.65',
+            'feasibility' => 'viable', 'parameters_summary' => 'Altura y condiciones según cuadro aplicable.',
             'observations' => 'Escenario adoptable según lectura MIDAS.']],
         'urban_license' => 'No reporta licencia en los soportes revisados.',
         'permitted_use' => 'Uso restringido según cruce del cuadro y la actividad consultada.',
@@ -382,8 +385,10 @@ try {
     $savedScenarios = json_decode((string) $savedUrban['normative_scenarios_json'], true);
     expect(($savedScenarios['mixto']['enabled'] ?? false) === true
         && ($savedScenarios['mixto']['result'] ?? '') === 'principal'
+        && ($savedScenarios['mixto']['potential_area_m2'] ?? '') === '236.20'
+        && ($savedScenarios['mixto']['feasibility'] ?? '') === 'viable'
         && $savedUrban['adopted_normative_route'] === 'mixto',
-        'ficha urbana conserva escenarios POT y via adoptada por mayor y mejor uso');
+        'ficha urbana conserva escenarios POT y comparativo de mayor y mejor uso');
     expect(str_contains((string) $savedUrban['use_restricted_text'], 'Comercial 3'),
         'ficha urbana conserva reglamentacion MIDAS por tipo de uso');
     expect(($savedUrban['norm_max_height_text'] ?? '') === '4 pisos.'
@@ -1907,4 +1912,5 @@ Certificado de tradicion.",
 } finally {
     session_destroy();
 }
+
 

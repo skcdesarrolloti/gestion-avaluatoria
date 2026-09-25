@@ -38,6 +38,7 @@ final class AppraisalUrbanNormController
             'useResults' => UrbanNormativeAcademy::useResults(),
             'normativeScenarioRoutes' => UrbanNormativeScenarioCatalog::routes(),
             'normativeScenarioResults' => UrbanNormativeScenarioCatalog::results(),
+            'normativeScenarioFeasibilities' => UrbanNormativeScenarioCatalog::feasibilities(),
             'normativeScenarios' => AppraisalUrbanNormScenarioInput::decode($profile['normative_scenarios_json'] ?? ''),
             'references' => $references,
             'reportNotes' => $notes,
