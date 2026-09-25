@@ -31,8 +31,19 @@ final class MidasHttpClient
         $json = json_decode($response, true);
         if (is_array($json)) return $json;
         $sample = mb_substr(trim(strip_tags($response)), 0, 140);
+        if ($this->isCloudflareChallenge($sample)) {
+            $this->lastTransportError = 'MIDAS activó Cloudflare para conexiones servidor-servidor.';
+            return null;
+        }
         $this->lastTransportError = $sample !== '' ? 'MIDAS devolvió una respuesta no JSON: ' . $sample : 'MIDAS devolvió una respuesta no JSON.';
         return null;
+    }
+
+    private function isCloudflareChallenge(string $sample): bool
+    {
+        $key = mb_strtolower($sample);
+        return str_contains($key, 'just a moment') || str_contains($key, 'enable javascript')
+            || str_contains($key, 'cloudflare');
     }
 
     private function isRetryableError(array $json): bool

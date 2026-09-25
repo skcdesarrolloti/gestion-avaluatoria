@@ -1,3 +1,7 @@
+    <?php
+    $midasFallbackOpen = isset($urbanError) && str_contains((string) $urbanError, 'MIDAS');
+    $midasReferenceDigits = preg_replace('/\D+/', '', $value('cadastral_reference_short') ?: $value('cadastral_reference')) ?? '';
+    ?>
     <section id="midas" x-show="tab === 'midas'" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div class="flex flex-wrap items-start justify-between gap-5">
             <div>
@@ -49,8 +53,15 @@
                     Lectura guardada: <?= $value('midas_predio_raw') !== '' ? 'predio MIDAS para numeral 3' : '' ?><?= $value('midas_predio_raw') !== '' && $value('midas_usage_raw') !== '' ? ' y ' : '' ?><?= $value('midas_usage_raw') !== '' ? 'reglamentación Uso Suelo para numeral 5' : '' ?>.
                 </div>
             <?php endif; ?>
-            <details class="md:col-span-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <details class="md:col-span-3 rounded-xl border border-slate-200 bg-slate-50 p-4" <?= $midasFallbackOpen ? 'open' : '' ?>>
                 <summary class="cursor-pointer text-sm font-semibold text-slate-900">Respaldo manual: pegar lectura completa de MIDAS</summary>
+                <?php if ($midasFallbackOpen): ?>
+                    <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+                        MIDAS bloqueó la consulta automática desde el servidor. Usa este respaldo sin salir del flujo:
+                        abre MIDAS, busca la referencia <strong><?= e($midasReferenceDigits) ?></strong>, copia la ficha Predios y/o Uso Suelo, pégala abajo y pulsa procesar.
+                        <a class="ml-1 font-semibold text-blue-800 underline" href="https://midas.cartagena.gov.co/#/home" target="_blank" rel="noopener">Abrir MIDAS</a>
+                    </div>
+                <?php endif; ?>
                 <label class="label mt-4">Texto copiado de Predios o Uso Suelo en MIDAS
                     <textarea class="input min-h-40" name="midas_pasted_text" rows="7" maxlength="70000"
                         placeholder="Pega aquí el bloque completo que entrega MIDAS, incluyendo Predios, Uso Suelo o el cuadro de reglamentación."></textarea>
