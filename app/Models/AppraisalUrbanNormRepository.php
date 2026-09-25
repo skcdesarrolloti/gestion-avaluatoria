@@ -70,6 +70,7 @@ final class AppraisalUrbanNormRepository
             'use_principal_text', 'use_compatible_text', 'use_complementary_text', 'use_restricted_text',
             'use_prohibited_text', 'norm_unit_basic_text', 'norm_free_area_text', 'norm_min_lot_front_text',
             'norm_max_height_text', 'norm_construction_index_text', 'norm_isolation_text', 'norm_other_potential_text',
+            'actual_built_area_m2', 'normative_max_built_area_m2', 'buildable_difference_m2', 'constructive_potential_notes',
             'adopted_normative_route', 'adopted_normative_route_label', 'highest_best_use_reason',
             'planning_concept_number', 'official_concept_scope',
             'land_classification', 'activity_area', 'normative_zone', 'urban_treatment', 'urban_license',
@@ -86,6 +87,8 @@ final class AppraisalUrbanNormRepository
             'norm_unit_basic_text' => 70000, 'norm_free_area_text' => 70000, 'norm_min_lot_front_text' => 70000,
             'norm_max_height_text' => 70000, 'norm_construction_index_text' => 70000,
             'norm_isolation_text' => 70000, 'norm_other_potential_text' => 70000,
+            'actual_built_area_m2' => 40, 'normative_max_built_area_m2' => 40,
+            'buildable_difference_m2' => 40, 'constructive_potential_notes' => 5000,
             'adopted_normative_route' => 80, 'adopted_normative_route_label' => 160,
             'highest_best_use_reason' => 5000, 'planning_concept_number' => 120,
             'official_concept_scope' => 5000, 'land_classification' => 120, 'activity_area' => 160,
@@ -97,6 +100,9 @@ final class AppraisalUrbanNormRepository
             'source_limitations' => 5000];
         $data = [];
         foreach ($keys as $key) $data[$key] = mb_substr(trim((string) ($input[$key] ?? '')), 0, $limits[$key]);
+        foreach (['actual_built_area_m2', 'normative_max_built_area_m2', 'buildable_difference_m2'] as $key) {
+            $data[$key] = $this->decimalText($data[$key]);
+        }
         foreach (['document_slug', 'table_slug', 'category_slug'] as $key) {
             $data[$key] = $data[$key] === '' ? null : $data[$key];
         }
@@ -160,6 +166,8 @@ final class AppraisalUrbanNormRepository
             'norm_unit_basic_text' => '', 'norm_free_area_text' => '', 'norm_min_lot_front_text' => '',
             'norm_max_height_text' => '', 'norm_construction_index_text' => '',
             'norm_isolation_text' => '', 'norm_other_potential_text' => '',
+            'actual_built_area_m2' => '', 'normative_max_built_area_m2' => '',
+            'buildable_difference_m2' => '', 'constructive_potential_notes' => '',
             'normative_scenarios_json' => '', 'adopted_normative_route' => '',
             'adopted_normative_route_label' => '', 'highest_best_use_reason' => '',
             'planning_concept_number' => '', 'planning_concept_date' => null, 'official_concept_scope' => '',
@@ -180,5 +188,13 @@ final class AppraisalUrbanNormRepository
 
     private function text(array $input, string $key, int $limit): string
     { return mb_substr(trim((string) ($input[$key] ?? '')), 0, $limit); }
+
+    private function decimalText(string $value): string
+    {
+        $text = trim($value);
+        if ($text === '') return '';
+        $number = str_replace(',', '.', preg_replace('/[^0-9,.-]/', '', $text) ?? '');
+        return is_numeric($number) ? number_format((float) $number, 2, '.', '') : '';
+    }
 }
 

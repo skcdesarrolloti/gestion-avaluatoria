@@ -43,11 +43,11 @@
                 <button class="btn-secondary" type="button" onclick="navigator.clipboard?.writeText('<?= e($midasReferenceDigits) ?>')">Copiar referencia</button>
                 <button class="btn-secondary" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/midas/consultar')) ?>">Intentar lectura automática</button>
             </div>
-            <label class="label">Estado de la fuente MIDAS
-                <select class="input" name="source_status">
-                    <?php foreach ($sourceOptions as $key => $label): ?><option value="<?= e($key) ?>" <?= e($selected('source_status', (string) $key)) ?>><?= e($label) ?></option><?php endforeach; ?>
-                </select>
-            </label>
+            <input type="hidden" name="source_status" value="<?= e($value('source_status') ?: 'pendiente') ?>">
+            <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
+                <p class="font-semibold text-slate-950">Resultado de la consulta</p>
+                <p>Marca la consulta, fecha y evidencia. Si MIDAS no responde, deja la constancia en el campo de lectura; la decisión normativa se desarrolla en 5.2 y 5.3.</p>
+            </div>
             <?php $input('midas_consulted_on', 'Fecha de consulta MIDAS', '', 'date'); ?>
             <?php $input('midas_support_reference', 'Soporte o evidencia', 'Ej. captura, PDF, capa, radicado o nota interna'); ?>
             <label class="md:col-span-3 inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
