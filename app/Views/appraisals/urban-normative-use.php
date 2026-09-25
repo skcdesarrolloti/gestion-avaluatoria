@@ -31,6 +31,11 @@ $urbanJs = static fn (string $key): string => e(json_encode($value($key), JSON_U
             req() { return this.residential?.[this.categorySlug]?.data?.[this.modality] || null },
             chk(actual, min, label, unit) { if (!min) return label + ': sin mínimo cargado'; if (actual === null) return label + ': falta dato para comparar con mínimo ' + min + ' ' + unit; return actual >= min ? label + ': cumple ' + actual + ' ' + unit + ' ≥ ' + min + ' ' + unit : label + ': no cumple ' + actual + ' ' + unit + ' < ' + min + ' ' + unit },
             compliance() { const r=this.req(); if (!r) return 'Selecciona una ruta residencial y modalidad para revisar área, frente e índice.'; return [this.chk(this.number(this.land), r.min_area_m2, 'Área del lote', 'm²'), this.chk(this.number(this.front), r.min_front_m, 'Frente del lote', 'm'), 'Índice de construcción de apoyo: ' + r.construction_index, 'Altura: ' + r.height, 'Área libre: ' + r.free_area, 'Estacionamientos: ' + r.parking].join('\n') },
+            optMax(r) { const base = this.netArea(); return base === null ? null : base * Number(r.construction_index || 0) },
+            optPot(r) { const max = this.optMax(r), actual = this.number(this.actual); return max === null || actual === null ? null : Math.max(0, max - actual) },
+            optStatus(r) { const area=this.number(this.land), front=this.number(this.front); if (area===null || front===null) return 'Falta dato'; return area >= r.min_area_m2 && front >= r.min_front_m ? 'Cumple base' : 'No cumple base' },
+            optClass(r) { const s=this.optStatus(r); return s === 'Cumple base' ? 'bg-emerald-50 text-emerald-800' : (s === 'No cumple base' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-800') },
+            adoptMode(mode, r) { this.modality = mode; this.ci = String(r.construction_index); this.maxBuilt = ''; this.complianceSummary = this.compliance(); this.usePane = 'indices' },
             applyReq() { const r=this.req(); if (!r) return; this.ci = String(r.construction_index); this.maxBuilt = ''; this.complianceSummary = this.compliance(); this.usePane = 'indices' }
         }"
         class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
@@ -72,54 +77,7 @@ $urbanJs = static fn (string $key): string => e(json_encode($value($key), JSON_U
                 <p class="mt-1">Se cargó <?= e($value('applicable_activity') ?: 'la actividad seleccionada') ?> desde <?= e($value('use_regulation_table') ?: 'el cuadro urbano seleccionado') ?>. Revísala en <strong>Texto para informe</strong>; los parámetros físicos quedan en <strong>Índices y áreas</strong>.</p>
             </div>
         <?php endif; ?>
-        <div x-show="usePane === 'decision'" class="mt-6 grid gap-4 md:grid-cols-2">
-            <div class="md:col-span-2 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
-                <p class="font-semibold">Academia rápida: ¿qué hago en esta pantalla?</p>
-                <ol class="mt-2 list-decimal space-y-1 pl-5">
-                    <li><strong>MIDAS es evidencia.</strong> Si dice “NO DISPONIBLE”, deja constancia en 5.1 y continúa manual.</li>
-                    <li><strong>Escoge la vía normativa.</strong> Residencial, institucional, comercial, mixta, etc.</li>
-                    <li><strong>Marca el resultado.</strong> Define si esa actividad es principal, compatible, complementaria, restringida o prohibida según el cuadro o concepto.</li>
-                    <li><strong>Aplica la ruta.</strong> Carga reglas para calcular índices y potencial.</li>
-                </ol>
-            </div>
-            <label class="label md:col-span-2">Vía normativa a probar <?= $urbanUseTip('Es la ruta POT que se quiere probar; puede diferir de la tipología física.') ?>
-                <select class="input" name="category_slug" x-model="categorySlug"><option value="">Selecciona la ruta: residencial, institucional, comercial, industrial, turística, portuaria o mixta</option>
-                    <?php foreach (($urbanRouteGroups ?? $urbanCategoryGroups ?? []) as $groupLabel => $cats): ?>
-                        <optgroup label="<?= e((string) $groupLabel) ?>">
-                            <?php foreach ($cats as $cat): ?><option value="<?= e($cat['slug']) ?>" <?= e($selected('category_slug', (string) $cat['slug'])) ?>><?= e($cat['code'] . ' · ' . $cat['name'] . ' · ' . $cat['table_code']) ?></option><?php endforeach; ?>
-                        </optgroup>
-                    <?php endforeach; ?>
-                </select>
-                <span class="mt-1 block text-xs font-medium text-slate-500">Puede diferir del uso actual si es legal, físicamente posible y aporta más valor.</span>
-            </label>
-            <label class="label">Resultado de la ruta <?= $urbanUseTip('Sale del cuadro o concepto y sustenta si la vía se usa o descarta.') ?>
-                <select class="input" name="use_cross_result">
-                    <?php foreach ($useResults as $key => $label): ?><option value="<?= e($key) ?>" <?= e($selected('use_cross_result', (string) $key)) ?>><?= e($label) ?></option><?php endforeach; ?>
-                </select>
-            </label>
-            <label class="label">Uso previsto del informe, traído del módulo 1 <?= $urbanUseTip('Viene del encargo; no define la norma urbana. La ruta se escoge arriba.') ?>
-                <textarea class="input min-h-24 bg-slate-50" name="intended_use" rows="3" maxlength="1200" readonly placeholder="Se toma del módulo 1"><?= e($value('intended_use') ?: $urbanUseFromModuleOne) ?></textarea>
-                <span class="mt-1 block text-xs font-medium text-slate-500">Si está mal, corrígelo en el módulo 1. Aquí solo se muestra para no perder el contexto del encargo.</span>
-            </label>
-            <div class="md:col-span-2 flex flex-wrap items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-950">
-                <p class="grow"><strong>Cuándo oprimir este botón:</strong> después de escoger vía y resultado. Carga reglas; luego ajusta, adopta o descarta.</p>
-                <button class="btn-primary" type="submit"
-                    name="return_to" value="<?= e('avaluos/' . $record['id'] . '/normatividad-urbana#uso-indices') ?>"
-                    formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/cuadro/aplicar')) ?>">Aplicar ruta probada</button>
-            </div>
-            <div class="md:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
-                <p class="font-semibold text-slate-900">De dónde salen los siguientes campos</p>
-                <p class="mt-1">Clasificación, área, tratamiento, zona y licencia salen del POT, ficha normativa, Planeación, licencia, MIDAS o cuadro cargado. Sin soporte, déjalo pendiente o explica la limitación.</p>
-            </div>
-            <?php $input('land_classification', 'Clasificación del suelo', 'Urbano, expansión, rural, suburbano...'); ?>
-            <?php $input('activity_area', 'Área de actividad'); ?>
-            <?php $input('current_use', 'Uso normativo identificado'); ?>
-            <?php $input('applicable_activity', 'Actividad específica aplicada'); ?>
-            <?php $input('normative_zone', 'Zona normativa'); ?>
-            <?php $input('urban_treatment', 'Tratamiento urbanístico'); ?>
-            <?php $input('pot_state', 'Instrumento normativo usado', 'POT vigente, plan parcial, resolución, licencia...'); ?>
-            <?php $input('urban_license', 'Licencia, acto o soporte urbanístico', 'Licencia, reconocimiento, concepto o No reporta con fuente'); ?>
-        </div>
+        <?php include __DIR__ . '/urban-normative-use-decision.php'; ?>
         <?php include __DIR__ . '/urban-normative-use-potential.php'; ?>
         <div x-show="usePane === 'informe'" class="mt-6 grid gap-4">
             <div class="rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm leading-6 text-emerald-950">Bloque para informe: norma, compatibilidad y conclusión. El valor se analiza en valoración.</div>
