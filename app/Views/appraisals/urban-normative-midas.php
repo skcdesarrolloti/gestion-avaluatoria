@@ -1,6 +1,11 @@
     <?php
     $midasFallbackOpen = isset($urbanError) && str_contains((string) $urbanError, 'MIDAS');
     $midasReferenceDigits = preg_replace('/\D+/', '', $value('cadastral_reference_short') ?: $value('cadastral_reference')) ?? '';
+    $midasRawTrace = $value('midas_usage_raw') ?: $value('midas_predio_raw');
+    $midasUsageTrace = $value('midas_usage_result') ?: $value('midas_result');
+    if ($midasUsageTrace === '' && $midasRawTrace !== '') {
+        $midasUsageTrace = mb_substr(trim(preg_replace('/\s+/', ' ', $midasRawTrace) ?? $midasRawTrace), 0, 5000);
+    }
     ?>
     <section id="midas" x-show="tab === 'midas'" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <input type="hidden" name="midas_query_option" value="<?= e($value('midas_query_option') ?: 'Uso del suelo') ?>">
@@ -53,7 +58,10 @@
             <label class="md:col-span-3 inline-flex items-center gap-2 rounded-xl bg-emerald-50 px-4 py-3 text-sm font-semibold text-emerald-800">
                 <input type="checkbox" name="midas_consulted" value="1" <?= e($checked('midas_consulted')) ?>> MIDAS fue consultado o revisado manualmente
             </label>
-            <div class="md:col-span-3"><?php $textarea('midas_usage_result', 'Lectura o resultado de MIDAS para dejar trazabilidad', 'Pega o resume lo observado: uso, área, zona, tratamiento, restricciones, o deja constancia de No disponible.', 4); ?></div>
+            <label class="label md:col-span-3">Lectura o resultado de MIDAS para dejar trazabilidad
+                <textarea class="input min-h-32" name="midas_usage_result" rows="4" maxlength="5000" placeholder="Pega o resume lo observado: uso, área, zona, tratamiento, restricciones, o deja constancia de No disponible."><?= e($midasUsageTrace) ?></textarea>
+                <span class="mt-1 block text-xs font-medium text-slate-500">Si MIDAS respondió “NO DISPONIBLE”, deja ese texto aquí; sirve como evidencia de consulta y salvedad.</span>
+            </label>
             <?php if ($value('midas_predio_raw') !== '' || $value('midas_usage_raw') !== ''): ?>
                 <div class="md:col-span-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-900">
                     Lectura guardada: <?= $value('midas_predio_raw') !== '' ? 'predio MIDAS para numeral 3' : '' ?><?= $value('midas_predio_raw') !== '' && $value('midas_usage_raw') !== '' ? ' y ' : '' ?><?= $value('midas_usage_raw') !== '' ? 'reglamentación Uso Suelo para numeral 5' : '' ?>.
@@ -63,7 +71,7 @@
                 <summary class="cursor-pointer text-sm font-semibold text-slate-900">Pegar lectura completa de MIDAS si se necesita procesar</summary>
                 <label class="label mt-4">Texto copiado de Predios o Uso Suelo en MIDAS
                     <textarea class="input min-h-40" name="midas_pasted_text" rows="7" maxlength="70000"
-                        placeholder="Pega aquí el bloque completo que entrega MIDAS, incluyendo Predios, Uso Suelo o reglamentación."></textarea>
+                        placeholder="Pega aquí el bloque completo que entrega MIDAS, incluyendo Predios, Uso Suelo o reglamentación."><?= e($midasRawTrace) ?></textarea>
                     <span class="mt-1 block text-xs font-medium text-slate-500">Este bloque es solo respaldo. Si el texto contiene datos reconocibles, puede llenar campos del numeral 3 o dejar evidencia en el numeral 5.</span>
                 </label>
                 <button class="btn-secondary mt-4" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/midas/procesar')) ?>">

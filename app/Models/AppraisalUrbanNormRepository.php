@@ -15,8 +15,7 @@ final class AppraisalUrbanNormRepository
             WHERE appraisal_id = ? AND owner_id = ?');
         $query->execute([$appraisalId, $owner]);
         $row = $query->fetch();
-        return $row ? array_replace($this->defaults($appraisalId, $owner), $row)
-            : $this->defaults($appraisalId, $owner);
+        return $row ? array_replace($this->defaults($appraisalId, $owner), $row) : $this->defaults($appraisalId, $owner);
     }
 
     public function save(string $appraisalId, int $owner, int $version, array $input): int
@@ -28,10 +27,7 @@ final class AppraisalUrbanNormRepository
         $data = $this->normalized($input);
         $now = gmdate('Y-m-d H:i:s');
         $next = $version + 1;
-        if ($version === 0 && !$this->exists($appraisalId, $owner)) {
-            $this->insert($appraisalId, $owner, $data, $next, $now);
-            return $next;
-        }
+        if ($version === 0 && !$this->exists($appraisalId, $owner)) { $this->insert($appraisalId, $owner, $data, $next, $now); return $next; }
         $this->update($appraisalId, $owner, $data, $next, $now);
         return $next;
     }
@@ -115,11 +111,21 @@ final class AppraisalUrbanNormRepository
         foreach (['document_slug', 'table_slug', 'category_slug'] as $key) {
             $data[$key] = $data[$key] === '' ? null : $data[$key];
         }
+        $pasted = mb_substr(trim((string) ($input['midas_pasted_text'] ?? '')), 0, 70000);
+        if ($pasted !== '') $this->keepPastedMidas($data, $pasted);
         $data['normative_scenarios_json'] = AppraisalUrbanNormScenarioInput::normalize($input);
         $data['midas_consulted'] = !empty($input['midas_consulted']) ? 1 : 0;
         $data['midas_consulted_on'] = $this->date($input['midas_consulted_on'] ?? null);
         $data['planning_concept_date'] = $this->date($input['planning_concept_date'] ?? null);
         return $data;
+    }
+
+    private function keepPastedMidas(array &$data, string $text): void
+    {
+        if ((string) ($data['midas_usage_raw'] ?? '') === '') $data['midas_usage_raw'] = $text;
+        if ((string) ($data['midas_usage_result'] ?? '') !== '') return;
+        $data['midas_usage_result'] = mb_substr(trim(preg_replace('/\s+/', ' ', $text) ?? $text), 0, 5000);
+        if (preg_match('/\bNO\s+DISPONIBLE\b/iu', $text)) $data['source_status'] = 'no_disponible';
     }
 
     private function referenceData(array $input): array
