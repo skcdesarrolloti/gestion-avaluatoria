@@ -41,15 +41,7 @@ final class UrbanNormMidasUsageSearch
 
     private function request(string $reference): ?array
     {
-        $payload = json_encode(['criterio' => $reference], JSON_THROW_ON_ERROR);
-        $headers = "Content-Type: application/json\r\nAccept: application/json, text/plain, */*\r\n"
-            . "Origin: https://midas.cartagena.gov.co\r\nReferer: https://midas.cartagena.gov.co/\r\n"
-            . "User-Agent: Mozilla/5.0 GestionAvaluatoria/1.0\r\n";
-        $context = stream_context_create(['http' => ['method' => 'POST', 'header' => $headers,
-            'content' => $payload, 'timeout' => 15, 'ignore_errors' => true]]);
-        $response = @file_get_contents(self::ENDPOINT, false, $context);
-        $json = is_string($response) ? json_decode($response, true) : null;
-        return is_array($json) ? $json : null;
+        return (new MidasHttpClient())->postJson(self::ENDPOINT, ['criterio' => $reference]);
     }
 
     private function tableRows(string $html): array
