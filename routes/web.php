@@ -18,6 +18,8 @@ return [
     ['GET', '#^/normas-niif$#', 'ifrs', 'index', true],
     ['GET', '#^/normatividad-urbana$#', 'urbanNorms', 'index', true],
     ['GET', '#^/tipologias-constructivas-igac$#', 'typologies', 'index', true],
+    ['GET', '#^/glosario-valuatorio$#', 'glossary', 'index', true],
+    ['POST', '#^/glosario-valuatorio$#', 'glossary', 'store', true],
     ['GET', '#^/mantenimiento/migraciones$#', 'maintenance', 'migrations', true],
     ['POST', '#^/mantenimiento/migraciones/ejecutar$#', 'maintenance', 'runMigrations', true],
     ['POST', '#^/normas-tecnicas-sectoriales/importar$#', 'standards', 'import', true],

@@ -57,6 +57,7 @@ No debes crear tablas ni pegar sentencias SQL. El programa hace esa parte.
 | `valuation_ifrs_groups` | Familias NIIF/NIC aplicables a medición contable |
 | `valuation_ifrs_standards` | Catálogo NIIF/NIC y metadatos del PDF privado |
 | `valuation_field_considerations` | Clasificación de campos del expediente como normativos, derivados u operativos |
+| `valuation_glossary_terms` | Glosario académico de conceptos y factores valuatorios con fuente y carga manual |
 | `appraisal_sector_profile_sections` | Borradores avanzados por sección sectorial dentro de cada avalúo |
 | `urban_norm_documents` | Biblioteca fuente de normatividad urbana para capítulo 5, con metadatos del documento y PDF privado |
 | `urban_norm_tables` | Cuadros normativos del documento urbano, como los cuadros de usos del Decreto 0977 de 2001 |

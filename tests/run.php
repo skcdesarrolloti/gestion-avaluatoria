@@ -71,6 +71,7 @@ use App\Models\NeighborhoodSectorRepository;
 use App\Models\AppraisalSectorSectionRepository;
 use App\Models\AppraisalSectorMidasFileRepository;
 use App\Models\SectorBankRepository;
+use App\Models\ValuationGlossaryRepository;
 use App\Models\ValuationStandardRepository;
 use App\Models\UrbanNormativeRepository;
 use App\Support\AppraisalSectorCatalog;
@@ -233,6 +234,9 @@ try {
         id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER, source_filename TEXT,
         storage_filename TEXT, mime_type TEXT, file_size_bytes INTEGER, extracted_chars INTEGER,
         analysis_status TEXT, analysis_message TEXT, file_blob BLOB, created_at TEXT)");
+    $db->exec("CREATE TABLE valuation_glossary_terms (slug TEXT PRIMARY KEY, term TEXT, definition TEXT,
+        source_note TEXT, created_by INTEGER, sort_order INTEGER, active INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("INSERT INTO valuation_glossary_terms VALUES ('valor', 'Valor', 'Precio más probable estimado.', 'NTS M 01', NULL, 10, 1, '2026-09-25 00:00:00', '2026-09-25 00:00:00')");
     $db->exec("CREATE TABLE urban_norm_documents (slug TEXT PRIMARY KEY, title TEXT, document_type TEXT,
         issuer TEXT, jurisdiction TEXT, normative_reference TEXT, issued_on TEXT, status TEXT,
         version_label TEXT, source_url TEXT, source_filename TEXT, storage_filename TEXT,
@@ -304,6 +308,13 @@ try {
     $db->exec("INSERT INTO urban_norm_use_rules (category_slug, rule_type, content, sort_order, created_at, updated_at)
         VALUES ('mixto-2', 'principal', 'Institucional 3; Comercial 2.', 1, '2026-09-24 00:00:00', '2026-09-24 00:00:00'),
         ('mixto-2', 'restringido', 'Institucional 4; Comercio 3.', 4, '2026-09-24 00:00:00', '2026-09-24 00:00:00')");
+    $glossary = new ValuationGlossaryRepository($db);
+    expect($glossary->stats()['total'] === 1 && $glossary->all('valor')[0]['term'] === 'Valor',
+        'glosario valuatorio lista conceptos sembrados');
+    $manualSlug = $glossary->create(['term' => 'Factor de esquina', 'definition' => 'Condición de exposición del predio.', 'source_note' => 'Manual'], 1);
+    expect($manualSlug === 'factor-de-esquina' && $glossary->stats()['total'] === 2
+        && str_contains($glossary->all('esquina')[0]['definition'], 'exposición'),
+        'glosario valuatorio permite carga manual de factor y descripcion');
     $urbanLibrary = new UrbanNormativeRepository($db);
     expect($urbanLibrary->stats()['categories'] === 1, 'catalogo urbano cuenta categorias normativas');
     $mixtoRules = $urbanLibrary->categoryWithRules('mixto-2');

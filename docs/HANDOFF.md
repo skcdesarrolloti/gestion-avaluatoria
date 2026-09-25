@@ -20,6 +20,7 @@ pertinentes, no como texto completo indiscriminado. Las IVS quedan en menú sepa
 Las NIIF quedan en otro menú independiente para consultas de medición contable.
 La Normatividad Urbana queda modelada como biblioteca y módulo del capítulo 5, iniciada con los cuadros de usos del Decreto 0977 de 2001, y como ficha por avalúo para MIDAS por predial, opción Uso del suelo, concepto, usos, determinantes y soportes.
 Incluye catálogo de Tipologías Constructivas IGAC con imágenes, agrupado por categoría.
+Incluye glosario valuatorio inicial basado en NTS M 01 y formulario para alimentar nuevos factores o conceptos académicos.
 Solo implementa datos iniciales, no fórmulas, aprobación ni generación de informes.
 
 ## Referencias encontradas en InversKC

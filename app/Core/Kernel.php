@@ -1,11 +1,9 @@
 <?php
 declare(strict_types=1);
 namespace App\Core;
-use App\Controllers\{AppraisalController, AppraisalLegalController, AppraisalSubjectController, AuthController, DiagnosticController, IgacTypologyController, IfrsStandardController, InternationalStandardController, LegalFrameworkController, MaintenanceController, MasterDataController, StandardController, UrbanNormativeLibraryController, ValuationController};
+use App\Controllers\{AppraisalController, AppraisalLegalController, AppraisalSubjectController, AuthController, DiagnosticController, IgacTypologyController, IfrsStandardController, ValuationGlossaryController, InternationalStandardController, LegalFrameworkController, MaintenanceController, MasterDataController, StandardController, UrbanNormativeLibraryController, ValuationController};
 use App\Database\Migrator;
-use App\Models\{AppraisalLegalRepository, AppraisalRepository, AppraisalSectorMidasFileRepository, AppraisalSubjectRepository,
-    AppraiserRepository, FuncionarioRepository, GeoMasterRepository, IgacTypologyRepository,
-    IfrsStandardRepository, InternationalStandardRepository, LegalDocumentRepository, ValuationStandardRepository};
+use App\Models\{AppraisalLegalRepository, AppraisalRepository, AppraisalSectorMidasFileRepository, AppraisalSubjectRepository, AppraiserRepository, FuncionarioRepository, GeoMasterRepository, IgacTypologyRepository, IfrsStandardRepository, InternationalStandardRepository, LegalDocumentRepository, ValuationGlossaryRepository, ValuationStandardRepository};
 use App\Services\AuthService;
 final class Kernel
 {
@@ -114,6 +112,7 @@ final class Kernel
                 'ifrs' => new IfrsStandardController(new IfrsStandardRepository($db)),
                 'urbanNorms' => new UrbanNormativeLibraryController(new \App\Models\UrbanNormativeRepository($db)),
                 'typologies' => new IgacTypologyController(new IgacTypologyRepository()),
+                'glossary' => new ValuationGlossaryController(new ValuationGlossaryRepository($db), $user),
                 'international' => new InternationalStandardController(new InternationalStandardRepository($db)),
                 'legal' => new LegalFrameworkController(new LegalDocumentRepository($db)),
                 'maintenance' => new MaintenanceController($db, $user),

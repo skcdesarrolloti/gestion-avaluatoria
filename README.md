@@ -15,6 +15,7 @@ completos de InversKC. El proyecto original permanece intacto.
 - Menú separado de Normas Internacionales de Valuación con estructura IVS y PDFs por norma.
 - Menú de Normas NIIF aplicables a medición contable, con PDFs por norma.
 - Catálogo de Tipologías Constructivas IGAC como referencia visual por categoría.
+- Glosario valuatorio con conceptos iniciales NTS M 01 y carga manual de nuevos factores o descripciones.
 - Biblioteca y módulo de Normatividad Urbana para el capítulo 5, con captura de MIDAS por predial, opción Uso del suelo, POT, cuadros de uso y determinantes.
 - Instalador y migraciones automáticas de tablas y columnas.
 - Assets locales compilados y estructura pequeña, sin dependencias PHP externas.
