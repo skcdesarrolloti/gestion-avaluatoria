@@ -192,7 +192,9 @@ try {
         address_midas TEXT, address_tax TEXT, address_deed TEXT, address_other TEXT,
         adopted_source TEXT, adopted_address TEXT, alternate_nomenclature TEXT, horizontal_property TEXT,
         centrality TEXT, immediate_environment TEXT, stratum TEXT, property_registry TEXT,
-        cadastral_reference TEXT, registry_office TEXT, urban_license TEXT, permitted_use TEXT,
+        cadastral_reference TEXT, registry_office TEXT, predial_base_value TEXT,
+        predial_destination_code TEXT, predial_destination_description TEXT, predial_rate_per_mille TEXT,
+        predial_bill_source TEXT, urban_license TEXT, permitted_use TEXT,
         midas_national_cadastral_reference TEXT, midas_property_registry TEXT, midas_address TEXT,
         midas_cadastral_reference TEXT, midas_territory TEXT, midas_locality TEXT, midas_commune_ucg TEXT,
         midas_land_use TEXT, midas_urban_treatment TEXT, midas_risk TEXT, midas_land_classification TEXT, midas_dane_block_code TEXT, midas_dane_block_side TEXT,
@@ -478,7 +480,9 @@ try {
         'Cliente histórico', 'Propietario histórico', '2026-09-18 11:00:00']);
     $subjectRepo->save(str_repeat('a', 32), 1, ['neighborhood_id' => $neighborhood['id'],
         'point_reference' => 'Zona residencial consolidada', 'horizontal_property' => 'no',
-        'centrality' => 'alta', 'current_use' => 'Residencial']);
+        'centrality' => 'alta', 'current_use' => 'Residencial', 'predial_base_value' => '$ 302.123.000',
+        'predial_destination_code' => '01', 'predial_destination_description' => 'Residencial',
+        'predial_rate_per_mille' => '6.8 x mil', 'predial_bill_source' => 'Factura No. 2200101016345721-02']);
     $subjectRepo->save(str_repeat('b', 32), 1, ['neighborhood_id' => $neighborhood['id'],
         'property_registry' => '060-179699', 'cadastral_reference' => '130010001',
         'address' => 'Calle 2', 'registry_office' => '060 - CARTAGENA']);
@@ -489,6 +493,9 @@ try {
         'busqueda por barrio encuentra avaluos relacionados');
     expect($subject['neighborhood_name'] === 'El Poblado' && $subject['locality_name'] === 'Zona urbana'
         && $subject['commune_ucg'] === 'Comuna 14', 'ficha sujeto deriva ubicacion desde barrio');
+    expect($subject['predial_base_value'] === '$ 302.123.000' && $subject['predial_destination_code'] === '01'
+        && $subject['predial_destination_description'] === 'Residencial'
+        && $subject['predial_rate_per_mille'] === '6.8 x mil', 'registro y catastro guarda base destino y tarifa predial');
     $db->prepare('UPDATE appraisal_subjects SET address = ?, address_certificate = ?, adopted_source = ?,
         adopted_address = ?, property_registry = ?, cadastral_reference = ?, stratum = ?, current_use = ?,
         urban_treatment = ?, restrictions = ?, legal_urban_affectations = ? WHERE appraisal_id = ? AND owner_id = ?')
