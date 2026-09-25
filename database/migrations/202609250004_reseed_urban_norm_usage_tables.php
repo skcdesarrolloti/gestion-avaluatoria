@@ -2,20 +2,6 @@
 declare(strict_types=1);
 use App\Database\Schema;
 
-return static function (Schema $schema): void {
-    $seed = require __DIR__ . '/202609240002_seed_decreto_0977_usage_tables.php';
-    $seed($schema);
-    $now = gmdate('Y-m-d H:i:s');
-    $rows = urbanNormResidentialParameters();
-    $slugs = array_values(array_unique(array_map(static fn (array $row): string => $row[0], $rows)));
-    $marks = implode(', ', array_fill(0, count($slugs), '?'));
-    $schema->db->prepare('DELETE FROM urban_norm_parameters WHERE category_slug IN (' . $marks . ')')->execute($slugs);
-    $query = $schema->db->prepare('INSERT INTO urban_norm_parameters
-        (category_slug, parameter_key, label, value_text, sort_order, created_at, updated_at)
-        VALUES (?, ?, ?, ?, ?, ?, ?)');
-    foreach ($rows as $row) $query->execute([$row[0], $row[1], $row[2], $row[3], $row[4], $now, $now]);
-};
-
 if (!function_exists('urbanNormResidentialParameters')) {
     function urbanNormResidentialParameters(): array
     {
@@ -52,3 +38,17 @@ if (!function_exists('urbanNormResidentialParameters')) {
         return $rows;
     }
 }
+
+return static function (Schema $schema): void {
+    $seed = require __DIR__ . '/202609240002_seed_decreto_0977_usage_tables.php';
+    $seed($schema);
+    $now = gmdate('Y-m-d H:i:s');
+    $rows = urbanNormResidentialParameters();
+    $slugs = array_values(array_unique(array_map(static fn (array $row): string => $row[0], $rows)));
+    $marks = implode(', ', array_fill(0, count($slugs), '?'));
+    $schema->db->prepare('DELETE FROM urban_norm_parameters WHERE category_slug IN (' . $marks . ')')->execute($slugs);
+    $query = $schema->db->prepare('INSERT INTO urban_norm_parameters
+        (category_slug, parameter_key, label, value_text, sort_order, created_at, updated_at)
+        VALUES (?, ?, ?, ?, ?, ?, ?)');
+    foreach ($rows as $row) $query->execute([$row[0], $row[1], $row[2], $row[3], $row[4], $now, $now]);
+};
