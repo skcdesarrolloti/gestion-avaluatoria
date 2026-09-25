@@ -100,7 +100,7 @@ final class AppraisalUrbanNormRepository
             'highest_best_use_reason' => 5000, 'planning_concept_number' => 120,
             'official_concept_scope' => 5000, 'land_classification' => 120, 'activity_area' => 160,
             'normative_zone' => 160, 'urban_treatment' => 160, 'urban_license' => 220,
-            'permitted_use' => 5000, 'current_use' => 160, 'intended_use' => 220, 'applicable_activity' => 160, 'urban_norms_applied' => 5000,
+            'permitted_use' => 5000, 'current_use' => 160, 'intended_use' => 1200, 'applicable_activity' => 160, 'urban_norms_applied' => 5000,
             'heritage_context' => 5000, 'environmental_context' => 5000, 'risk_context' => 5000,
             'use_cross_result' => 40, 'midas_result' => 5000, 'restrictions' => 5000,
             'legal_urban_affectations' => 5000, 'conclusion' => 5000, 'support_summary' => 5000, 'analyst_notes' => 5000,

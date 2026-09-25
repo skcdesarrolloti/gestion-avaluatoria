@@ -1,3 +1,11 @@
+<?php
+$urbanUseTip = static fn (string $text): string => '<span class="help-dot" title="' . e($text) . '">?</span>';
+$moduleOnePurposeOptions = \App\Support\AppraisalCatalog::selectFields()['finalidad'][4] ?? [];
+$moduleOnePurposeKey = (string) ($record['finalidad'] ?? '');
+$moduleOnePurposeLabel = (string) ($moduleOnePurposeOptions[$moduleOnePurposeKey] ?? $moduleOnePurposeKey);
+$moduleOneUseText = trim((string) ($record['intended_use'] ?? ''));
+$urbanUseFromModuleOne = trim($moduleOneUseText !== '' ? $moduleOneUseText : $moduleOnePurposeLabel);
+?>
     <section id="uso" x-show="tab === 'uso'"
         x-data="{
             usePane: 'decision',
@@ -27,13 +35,13 @@
         </div>
         <div class="mt-5 grid gap-3 md:grid-cols-3">
             <div class="rounded-xl border border-teal-100 bg-teal-50 p-4">
-                <p class="text-xs font-semibold uppercase text-teal-800">Tipo del numeral 1</p>
+                <p class="text-xs font-semibold uppercase text-teal-800">Tipo del numeral 1 <?= $urbanUseTip('Viene del módulo 1. Sirve para orientar el análisis, pero la norma urbana puede permitir rutas adicionales, sobre todo en lotes o inmuebles transformables.') ?></p>
                 <p class="mt-1 text-lg font-semibold text-teal-950"><?= e((string) ($propertyTypeLabel ?? 'No definido')) ?></p>
                 <p class="mt-1 text-xs leading-5 text-teal-900">Si está mal, se corrige en el encargo.</p>
             </div>
             <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 md:col-span-2">
                 <p class="text-xs font-semibold uppercase text-blue-800">Pregunta del numeral 5</p>
-                <p class="mt-1 text-sm leading-6 text-blue-950">¿La norma confirma el uso o permite construir más? Casa 230 m² vs norma 300 m² deja 70 m². En lote orienta mayor y mejor uso.</p>
+                <p class="mt-1 text-sm leading-6 text-blue-950">Primero se deja la norma que rige el predio. Luego se revisa si esa norma solo confirma el uso actual o si permite mayor potencial constructivo. En un lote, esta lectura orienta el mayor y mejor uso y puede preparar el método residual.</p>
             </div>
         </div>
         <nav class="mt-6 rounded-xl bg-slate-100 p-2" aria-label="Subsecciones de uso del suelo">
@@ -48,7 +56,16 @@
             </div>
         </nav>
         <div x-show="usePane === 'decision'" class="mt-6 grid gap-4 md:grid-cols-2">
-            <label class="label md:col-span-2">Vía normativa a probar
+            <div class="md:col-span-2 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+                <p class="font-semibold">Academia rápida: ¿qué hago en esta pantalla?</p>
+                <ol class="mt-2 list-decimal space-y-1 pl-5">
+                    <li><strong>Revisa MIDAS solo como evidencia.</strong> Si dice “NO DISPONIBLE”, no pasa nada: deja la constancia en 5.1 y continúa manual.</li>
+                    <li><strong>Escoge la vía normativa a probar.</strong> Es la actividad del cuadro POT que quieres revisar: residencial, institucional, comercial, mixta, etc.</li>
+                    <li><strong>Marca el resultado.</strong> Define si esa actividad es principal, compatible, complementaria, restringida o prohibida según el cuadro o concepto.</li>
+                    <li><strong>Aplica la ruta.</strong> El sistema copia al formulario las reglas del cuadro para que luego calcules índices y potencial.</li>
+                </ol>
+            </div>
+            <label class="label md:col-span-2">Vía normativa a probar <?= $urbanUseTip('Esta no es necesariamente la tipología física del inmueble. Es la ruta del POT que el perito quiere probar: residencial, institucional, comercial, industrial, turística, portuaria o mixta.') ?>
                 <select class="input" name="category_slug"><option value="">Selecciona la ruta: residencial, institucional, comercial, industrial, turística, portuaria o mixta</option>
                     <?php foreach (($urbanRouteGroups ?? $urbanCategoryGroups ?? []) as $groupLabel => $cats): ?>
                         <optgroup label="<?= e((string) $groupLabel) ?>">
@@ -56,17 +73,24 @@
                         </optgroup>
                     <?php endforeach; ?>
                 </select>
-                <span class="mt-1 block text-xs font-medium text-slate-500">Puede diferir del uso actual si es legal, posible y aporta más valor.</span>
+                <span class="mt-1 block text-xs font-medium text-slate-500">Puede diferir del uso actual si es legal, físicamente posible y aporta más valor.</span>
             </label>
-            <label class="label">Resultado de la ruta
+            <label class="label">Resultado de la ruta <?= $urbanUseTip('Sale del cuadro o concepto: principal, compatible, complementario, restringido o prohibido. Esto sustenta si la vía puede usarse o debe descartarse.') ?>
                 <select class="input" name="use_cross_result">
                     <?php foreach ($useResults as $key => $label): ?><option value="<?= e($key) ?>" <?= e($selected('use_cross_result', (string) $key)) ?>><?= e($label) ?></option><?php endforeach; ?>
                 </select>
             </label>
-            <?php $input('intended_use', 'Uso analizado o finalidad del encargo', 'Ej. vivienda, oficinas, institucional, comercio, hotel'); ?>
+            <label class="label">Uso previsto del informe, traído del módulo 1 <?= $urbanUseTip('Este dato viene del encargo valuatorio. No define por sí solo la norma urbana; solo recuerda para qué se pidió el avalúo. La ruta normativa se escoge en el campo anterior.') ?>
+                <textarea class="input min-h-24 bg-slate-50" name="intended_use" rows="3" maxlength="1200" readonly placeholder="Se toma del módulo 1"><?= e($value('intended_use') ?: $urbanUseFromModuleOne) ?></textarea>
+                <span class="mt-1 block text-xs font-medium text-slate-500">Si está mal, corrígelo en el módulo 1. Aquí solo se muestra para no perder el contexto del encargo.</span>
+            </label>
             <div class="md:col-span-2 flex flex-wrap items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-950">
-                <p class="grow">Aplica el cuadro y parámetros disponibles; luego el perito ajusta y adopta o descarta la ruta.</p>
+                <p class="grow"><strong>Cuándo oprimir este botón:</strong> después de escoger la vía normativa y su resultado. Carga el cuadro y sus parámetros; luego el perito ajusta, adopta o descarta la ruta.</p>
                 <button class="btn-primary" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/cuadro/aplicar')) ?>">Aplicar ruta probada</button>
+            </div>
+            <div class="md:col-span-2 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
+                <p class="font-semibold text-slate-900">De dónde salen los siguientes campos</p>
+                <p class="mt-1">Clasificación del suelo, área de actividad, tratamiento, zona y licencia salen del POT, ficha normativa, concepto de Planeación, licencia, MIDAS si respondió o del cuadro urbano cargado. Si no existe soporte, déjalo pendiente o explica la limitación.</p>
             </div>
             <?php $input('land_classification', 'Clasificación del suelo', 'Urbano, expansión, rural, suburbano...'); ?>
             <?php $input('activity_area', 'Área de actividad'); ?>

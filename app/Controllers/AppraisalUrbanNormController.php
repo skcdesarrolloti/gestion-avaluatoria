@@ -27,7 +27,7 @@ final class AppraisalUrbanNormController
         catch (\Throwable $error) { $references = []; }
         view('appraisals/urban-normative', [
             'title' => 'Normatividad urbana', 'record' => $record, 'subject' => $subject,
-            'profile' => $this->prefilledProfile($profile, $subject),
+            'profile' => $this->prefilledProfile($profile, $subject, $record),
             'urbanDocuments' => $documents,
             'urbanCategories' => $categories,
             'urbanCategoryGroups' => $this->categoryGroups($categories),
@@ -172,32 +172,28 @@ final class AppraisalUrbanNormController
         return $groups;
     }
 
-    private function prefilledProfile(array $profile, array $subject): array
+    private function prefilledProfile(array $profile, array $subject, array $record): array
     {
         $subjectReference = (string) ($subject['cadastral_reference'] ?? '');
-        if ($subjectReference !== '') {
-            $profile['cadastral_reference'] = $subjectReference;
-        }
+        if ($subjectReference !== '') $profile['cadastral_reference'] = $subjectReference;
         $digits = $this->digits($subjectReference);
-        if ($digits !== '' && (string) ($profile['cadastral_reference_short'] ?? '') === ''
-            && (string) ($profile['cadastral_reference_long'] ?? '') === '') {
+        if ($digits !== '' && (string) ($profile['cadastral_reference_short'] ?? '') === '' && (string) ($profile['cadastral_reference_long'] ?? '') === '') {
             $profile[mb_strlen($digits) >= 20 ? 'cadastral_reference_long' : 'cadastral_reference_short'] = $digits;
         }
-        if ((string) ($profile['midas_query_option'] ?? '') === '') {
-            $profile['midas_query_option'] = 'Uso del suelo';
+        if ((string) ($profile['midas_query_option'] ?? '') === '') $profile['midas_query_option'] = 'Uso del suelo';
+        if ((string) ($profile['current_use'] ?? '') === '') $profile['current_use'] = (string) ($subject['permitted_use'] ?? '');
+        $moduleOneUse = trim((string) ($record['intended_use'] ?? ''));
+        if ($moduleOneUse !== '') $profile['intended_use'] = $moduleOneUse;
+        elseif ((string) ($profile['intended_use'] ?? '') === '') {
+            $purposeOptions = AppraisalCatalog::selectFields()['finalidad'][4] ?? [];
+            $purposeKey = (string) ($record['finalidad'] ?? '');
+            $profile['intended_use'] = (string) ($purposeOptions[$purposeKey] ?? $purposeKey);
         }
-        if ((string) ($profile['current_use'] ?? '') === '') {
-            $profile['current_use'] = (string) ($subject['permitted_use'] ?? '');
-        }
-        if ((string) ($profile['urban_treatment'] ?? '') === '') {
-            $profile['urban_treatment'] = (string) ($subject['urban_treatment'] ?? '');
-        }
+        if ((string) ($profile['urban_treatment'] ?? '') === '') $profile['urban_treatment'] = (string) ($subject['urban_treatment'] ?? '');
         foreach (['land_area_normative_m2' => 'midas_land_area_m2', 'actual_built_area_m2' => 'midas_built_area_m2'] as $target => $source) {
             if ((string) ($profile[$target] ?? '') === '' && (string) ($subject[$source] ?? '') !== '') $profile[$target] = (string) $subject[$source];
         }
-        if ((string) ($profile['restrictions'] ?? '') === '') {
-            $profile['restrictions'] = (string) ($subject['legal_urban_affectations'] ?? '');
-        }
+        if ((string) ($profile['restrictions'] ?? '') === '') $profile['restrictions'] = (string) ($subject['legal_urban_affectations'] ?? '');
         return $profile;
     }
 
@@ -211,8 +207,6 @@ final class AppraisalUrbanNormController
     }
 
     private function digits(string $value): string
-    {
-        return preg_replace('/\D+/', '', $value) ?? '';
-    }
+    { return preg_replace('/\D+/', '', $value) ?? ''; }
 }
 
