@@ -50,6 +50,9 @@ final class AppraisalUrbanNormMidasFields
         elseif (($predio['message'] ?? '') !== '') $messages[] = (string) $predio['message'];
         if (($usage['ok'] ?? false)) $messages[] = 'Uso Suelo guardado en el numeral 5';
         elseif (($usage['message'] ?? '') !== '') $messages[] = (string) $usage['message'];
+        if (str_contains(implode(' ', $messages), 'Cloudflare')) {
+            return 'Consulta MIDAS: MIDAS bloqueó la lectura automática desde Hostinger. Usa el respaldo abierto en 5.1 para pegar la ficha Predios o Uso Suelo.';
+        }
         if (($fields['category_slug'] ?? '') !== '') $messages[] = 'cuadro POT aplicado automáticamente';
         return $messages ? 'Consulta MIDAS: ' . implode('; ', $messages) . '.' : 'MIDAS no devolvió información para guardar.';
     }

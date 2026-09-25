@@ -20,6 +20,17 @@
                 <a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto#registro')) ?>">Corregir referencia en módulo 3</a>
             </div>
         </div>
+        <?php if ($midasFallbackOpen): ?>
+            <div class="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+                <p class="font-semibold">MIDAS bloqueó la lectura automática desde Hostinger.</p>
+                <p class="mt-1">Continúa con respaldo manual: abre MIDAS, busca la referencia <strong><?= e($midasReferenceDigits) ?></strong>, copia la ficha Predios o Uso Suelo, y pégala en el bloque de abajo.</p>
+                <div class="mt-3 flex flex-wrap gap-2">
+                    <a class="btn-primary" href="https://midas.cartagena.gov.co/#/home" target="_blank" rel="noopener">Abrir MIDAS</a>
+                    <button class="btn-secondary" type="button" onclick="navigator.clipboard?.writeText('<?= e($midasReferenceDigits) ?>')">Copiar referencia</button>
+                    <a class="btn-secondary" href="#midas-paste">Ir a pegar lectura</a>
+                </div>
+            </div>
+        <?php endif; ?>
         <div class="mt-6 grid gap-4 md:grid-cols-3">
             <label class="label">Referencia catastral registrada en 3.1
                 <input class="input bg-slate-100 text-slate-700" type="text" name="cadastral_reference"
@@ -53,7 +64,7 @@
                     Lectura guardada: <?= $value('midas_predio_raw') !== '' ? 'predio MIDAS para numeral 3' : '' ?><?= $value('midas_predio_raw') !== '' && $value('midas_usage_raw') !== '' ? ' y ' : '' ?><?= $value('midas_usage_raw') !== '' ? 'reglamentación Uso Suelo para numeral 5' : '' ?>.
                 </div>
             <?php endif; ?>
-            <details class="md:col-span-3 rounded-xl border border-slate-200 bg-slate-50 p-4" <?= $midasFallbackOpen ? 'open' : '' ?>>
+            <details id="midas-paste" class="md:col-span-3 rounded-xl border border-slate-200 bg-slate-50 p-4" <?= $midasFallbackOpen ? 'open' : '' ?>>
                 <summary class="cursor-pointer text-sm font-semibold text-slate-900">Respaldo manual: pegar lectura completa de MIDAS</summary>
                 <?php if ($midasFallbackOpen): ?>
                     <div class="mt-4 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
