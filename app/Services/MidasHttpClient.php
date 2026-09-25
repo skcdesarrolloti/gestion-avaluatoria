@@ -11,7 +11,7 @@ final class MidasHttpClient
         $body = json_encode($payload, JSON_THROW_ON_ERROR);
         $last = null;
         for ($attempt = 1; $attempt <= 4; $attempt++) {
-            foreach ([$this->streamPost(...), $this->curlPost(...)] as $transport) {
+            foreach ([$this->curlPost(...), $this->streamPost(...)] as $transport) {
                 $json = $this->decode($transport($endpoint, $body));
                 if (is_array($json) && !$this->isRetryableError($json)) return $json;
                 if (is_array($json)) $last = $json;
@@ -56,12 +56,17 @@ final class MidasHttpClient
     private function curlPost(string $endpoint, string $body): ?string
     {
         if (!function_exists('curl_init')) return null;
+        $cookieFile = tempnam(sys_get_temp_dir(), 'midas_cookie_') ?: '';
+        if ($cookieFile !== '') $this->curlPreflight($endpoint, $cookieFile);
         $curl = curl_init($endpoint);
         if ($curl === false) return null;
-        curl_setopt_array($curl, [CURLOPT_POST => true, CURLOPT_POSTFIELDS => $body,
+        $options = [CURLOPT_POST => true, CURLOPT_POSTFIELDS => $body,
             CURLOPT_HTTPHEADER => $this->headers(), CURLOPT_RETURNTRANSFER => true,
             CURLOPT_CONNECTTIMEOUT => 10, CURLOPT_TIMEOUT => 20, CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4,
-            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1, CURLOPT_FOLLOWLOCATION => false]);
+            CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1, CURLOPT_FOLLOWLOCATION => false,
+            CURLOPT_ENCODING => ''];
+        if ($cookieFile !== '') $options[CURLOPT_COOKIEFILE] = $cookieFile;
+        curl_setopt_array($curl, $options);
         $response = curl_exec($curl);
         $status = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
         if (!is_string($response) || trim($response) === '' || $status >= 500 || $status === 0) {
@@ -70,7 +75,22 @@ final class MidasHttpClient
             $response = null;
         }
         curl_close($curl);
+        if ($cookieFile !== '' && is_file($cookieFile)) @unlink($cookieFile);
         return $response;
+    }
+
+    private function curlPreflight(string $endpoint, string $cookieFile): void
+    {
+        $curl = curl_init($endpoint);
+        if ($curl === false) return;
+        curl_setopt_array($curl, [CURLOPT_CUSTOMREQUEST => 'OPTIONS', CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_HTTPHEADER => ['Origin: https://midas.cartagena.gov.co',
+                'Access-Control-Request-Method: POST', 'Access-Control-Request-Headers: content-type'],
+            CURLOPT_COOKIEJAR => $cookieFile, CURLOPT_CONNECTTIMEOUT => 6, CURLOPT_TIMEOUT => 10,
+            CURLOPT_IPRESOLVE => CURL_IPRESOLVE_V4, CURLOPT_HTTP_VERSION => CURL_HTTP_VERSION_1_1,
+            CURLOPT_FOLLOWLOCATION => false, CURLOPT_ENCODING => '']);
+        curl_exec($curl);
+        curl_close($curl);
     }
 
     private function headerString(): string
