@@ -73,9 +73,9 @@ final class AppraisalUrbanNormController
             $profile = $this->profiles->profile($id, $this->user['id']);
             $fields = (new UrbanNormCategoryAdoption())->fields($category);
             $this->profiles->save($id, $this->user['id'], $version, array_replace($profile, $fields));
-            Session::flash('urban_norm_message', 'Cuadro normativo leÃ­do y aplicado al numeral 5. Revisa la categorÃ­a y ajusta el criterio del perito si hace falta.');
+            Session::flash('urban_norm_message', 'Ruta normativa aplicada. Revisa 5.2 > Texto para informe e Índices y áreas para ver qué se cargó.');
         } catch (\Throwable $error) { Session::flash('urban_norm_error', $error->getMessage()); }
-        Http::redirect('avaluos/' . $id . '/normatividad-urbana#uso');
+        Http::redirect('avaluos/' . $id . '/normatividad-urbana#uso-informe');
     }
 
     public function autosave(string $id): never

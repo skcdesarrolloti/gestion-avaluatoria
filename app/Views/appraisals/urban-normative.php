@@ -26,7 +26,12 @@ $input = static function (string $name, string $label, string $placeholder = '',
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 <?php if ($urbanMessage): ?><p class="mt-6 rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($urbanMessage) ?></p><?php endif; ?>
 <?php if ($urbanError): ?><p class="mt-6 rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($urbanError) ?></p><?php endif; ?>
-<div class="mt-7 space-y-6" x-data="{ tab: ((location.hash || '#midas').slice(1) === 'pot' ? 'uso' : (location.hash || '#midas').slice(1)) }">
+<div class="mt-7 space-y-6" x-data="{
+    tab: (() => {
+        const base = ((location.hash || '#midas').slice(1).split('-')[0]);
+        return base === 'pot' ? 'uso' : (['midas','uso','escenarios','determinantes','fuentes','cierre'].includes(base) ? base : 'midas');
+    })()
+}">
 <nav class="rounded-xl bg-slate-200/70 p-2" aria-label="Submenú normatividad urbana">
     <div class="flex gap-2 overflow-x-auto">
         <?php foreach ([['midas','5.1 MIDAS'],['uso','5.2 Uso del suelo'],['escenarios','5.3 Escenarios POT'],['determinantes','5.4 Determinantes'],['fuentes','5.5 Soportes'],['cierre','5.6 Cierre']] as [$key, $label]): ?>

@@ -8,7 +8,10 @@ $urbanUseFromModuleOne = trim($moduleOneUseText !== '' ? $moduleOneUseText : $mo
 ?>
     <section id="uso" x-show="tab === 'uso'"
         x-data="{
-            usePane: 'decision',
+            usePane: (() => {
+                const pane = (location.hash || '').slice(1).replace(/^uso-/, '');
+                return ['decision','indices','potencial','informe','catalogo'].includes(pane) ? pane : 'decision';
+            })(),
             land: '<?= e($value('land_area_normative_m2')) ?>', affect: '<?= e($value('setback_area_percent')) ?>', net: '<?= e($value('net_land_area_m2')) ?>',
             occ: '<?= e($value('occupancy_index')) ?>', floors: '<?= e($value('max_floors')) ?>', ci: '<?= e($value('construction_index')) ?>',
             maxBuilt: '<?= e($value('normative_max_built_area_m2')) ?>', actual: '<?= e($value('actual_built_area_m2')) ?>',
@@ -49,12 +52,18 @@ $urbanUseFromModuleOne = trim($moduleOneUseText !== '' ? $moduleOneUseText : $mo
                 <?php foreach ([['decision','1. Norma que rige'],['indices','2. Índices y áreas'],['potencial','3. Lectura pericial'],['informe','4. Texto para informe'],['catalogo','Catálogo']] as [$key, $label]): ?>
                     <button class="inline-flex min-h-10 shrink-0 items-center rounded-lg px-4 py-2 text-sm font-semibold" type="button"
                         :class="usePane === '<?= e($key) ?>' ? 'bg-teal-700 text-white shadow-sm' : 'bg-white text-teal-800 hover:bg-teal-50'"
-                        @click="usePane = '<?= e($key) ?>'">
+                        @click="usePane = '<?= e($key) ?>'; history.replaceState(null, '', '<?= e($key === 'decision' ? '#uso' : '#uso-' . $key) ?>')">
                         <?= e($label) ?>
                     </button>
                 <?php endforeach; ?>
             </div>
         </nav>
+        <?php if ($value('use_regulation_table') !== '' || $value('applicable_activity') !== '' || $value('permitted_use') !== ''): ?>
+            <div class="mt-4 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm leading-6 text-emerald-950">
+                <p class="font-semibold">Ruta aplicada al numeral 5</p>
+                <p class="mt-1">Se cargó <?= e($value('applicable_activity') ?: 'la actividad seleccionada') ?> desde <?= e($value('use_regulation_table') ?: 'el cuadro urbano seleccionado') ?>. Revísala en <strong>Texto para informe</strong>; los parámetros físicos quedan en <strong>Índices y áreas</strong>.</p>
+            </div>
+        <?php endif; ?>
         <div x-show="usePane === 'decision'" class="mt-6 grid gap-4 md:grid-cols-2">
             <div class="md:col-span-2 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
                 <p class="font-semibold">Academia rápida: ¿qué hago en esta pantalla?</p>
