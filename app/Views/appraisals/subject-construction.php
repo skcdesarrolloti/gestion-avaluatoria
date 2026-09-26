@@ -100,7 +100,7 @@ $typologyUsefulLife = static function (array $unit) use ($typologyLookup): strin
 };
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
-    x-data="{ activeConstruction: '<?= e($constructionUnits[0]['id'] ?? '') ?>', busyConstruction: false }">
+    x-data="{ activeConstruction: '<?= e($constructionUnits[0]['id'] ?? '') ?>' }">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">3.3 Datos de la construcción</p>
@@ -115,7 +115,7 @@ $typologyUsefulLife = static function (array $unit) use ($typologyLookup): strin
     <?php $academyModule = '3.3'; require BASE_PATH . '/app/Views/appraisals/subject-normative-academy.php'; ?>
     <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/construcciones')) ?>"
         data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/construcciones/autoguardar')) ?>"
-        @submit="busyConstruction = true">
+        data-save-in-place>
         <?= csrf_field() ?>
         <?php if (!$constructionUnits): ?>
             <p class="rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-600">
@@ -136,12 +136,13 @@ $typologyUsefulLife = static function (array $unit) use ($typologyLookup): strin
             <?php require BASE_PATH . '/app/Views/appraisals/subject-construction-unit.php'; ?>
         <?php endforeach; ?>
         <?php if ($constructionUnits): ?>
-            <div class="mt-5 flex justify-end">
-                <p class="mr-auto self-center text-xs font-semibold text-slate-500" data-autosave-status>
+            <div class="mt-5 rounded-xl border border-emerald-100 bg-emerald-50 p-4">
+                <p class="text-sm font-semibold text-emerald-900" data-autosave-status>
                     Autoguardado activo
                 </p>
-                <button class="btn-primary" type="submit" :disabled="busyConstruction"
-                    x-text="busyConstruction ? 'Guardando...' : 'Guardar construcción'">Guardar construcción</button>
+                <p class="mt-1 text-xs leading-5 text-emerald-800">
+                    Cada cambio en construcción, conservación y resultado se guarda automáticamente sin salir de la pestaña actual.
+                </p>
             </div>
         <?php endif; ?>
     </form>

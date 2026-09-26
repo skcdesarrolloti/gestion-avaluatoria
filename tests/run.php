@@ -974,6 +974,10 @@ Certificado de tradicion.",
         && $constructionRows[0]['functional_bathrooms_count'] === '2.50'
         && $constructionRows[0]['functional_parking_spaces_count'] === 1
         && $constructionRows[0]['functional_finish_quality'] === 'bueno', 'variables funcionales por tipologia normalizadas');
+    $constructionView = (string) file_get_contents(BASE_PATH . '/app/Views/appraisals/subject-construction.php');
+    expect(str_contains($constructionView, 'data-save-in-place')
+        && !str_contains($constructionView, 'Guardar construcción'),
+        'construccion usa autoguardado sin boton submit que cambie de pestana');
     $cv = static fn (array $row, string $key): string => (string) ($row[$key] ?? '');
     $baseUnitId = $unitId;
     $baseUnit = $unit ?? [];
