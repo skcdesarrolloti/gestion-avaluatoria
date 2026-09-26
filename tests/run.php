@@ -465,10 +465,11 @@ try {
             'use_compatible_text' => 'COMERCIAL 1, INDUSTRIAL 1',
             'land_area_normative_m2' => '529,00',
             'actual_built_area_m2' => '329,00',
-            'occupancy_index' => '60%',
+            'occupancy_index' => '',
             'max_floors' => '2',
             'construction_index' => '1,20',
-            'norm_other_potential_text' => 'Área de ocupación hasta un 60% del área del lote.',
+            'norm_free_area_text' => 'Área libre mínima del 40% del lote.',
+            'norm_other_potential_text' => '',
         ],
     ]));
     $manualUrban = $urbanProfile->profile('urban-appraisal-1', 1);
@@ -484,8 +485,17 @@ try {
         && ($midasParsed['predio']['cadastral_reference'] ?? '') === '010303810024000'
         && str_contains($midasParsed['usage']['use_restricted_text'] ?? '', 'COMERCIAL 3')
         && str_contains($midasParsed['usage']['norm_min_lot_front_text'] ?? '', 'AML 200')
-        && ($midasParsed['usage']['occupancy_index'] ?? '') === '0.6',
+        && ($midasParsed['usage']['occupancy_index'] ?? '') === '0.6'
+        && ($midasParsed['usage']['max_floors'] ?? '') === '4'
+        && ($midasParsed['usage']['construction_index'] ?? '') === '1.2',
         'parser MIDAS separa ficha predial reglamentacion ocupacion y potencial constructivo');
+    $midasFreeArea = (new UrbanNormMidasTextParser())->parse("ÁREA LIBRE\nMínimo 40% del lote\nÁREA Y FRENTE MÍNIMOS\nAML 200 m2\nALTURA MÁXIMA\n3 pisos\nÍNDICE DE CONSTRUCCIÓN\n1.5\nAISLAMIENTOS\nPosterior");
+    expect(($midasFreeArea['usage']['occupancy_index'] ?? '') === '0.6'
+        && str_contains($midasFreeArea['usage']['norm_other_potential_text'] ?? '', 'area libre'),
+        'parser MIDAS calcula ocupacion desde area libre cuando no viene indice directo');
+    $midasNoFreeRate = (new UrbanNormMidasTextParser())->parse("ÁREA LIBRE\nUnifamiliar 1 piso\nÁREA Y FRENTE MÍNIMOS\nAML 200 m2");
+    expect(($midasNoFreeRate['usage']['occupancy_index'] ?? '') === '',
+        'parser MIDAS no confunde pisos con porcentaje de area libre');
     $midasUnavailable = (new UrbanNormMidasTextParser())->parse("Consulta uso de suelo\nPredio: 130010102000006780901900000000\nNO DISPONIBLE\nEste predio requiere la realización de un estudio más profundo por parte del equipo técnico de la Secretaría de Planeación Distrital.");
     expect(($midasUnavailable['usage']['midas_activity'] ?? '') === 'NO DISPONIBLE'
         && str_contains($midasUnavailable['usage']['midas_usage_result'] ?? '', 'estudio más profundo'),

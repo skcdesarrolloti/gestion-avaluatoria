@@ -47,25 +47,55 @@ $renderMidas = static function (string $key, array $meta) use ($sv, $fieldHelp):
 <div id="midas" class="mt-8 rounded-2xl border border-blue-100 bg-blue-50/60 p-5">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">Consulta MIDAS vinculada a Registro y catastro</p>
-            <h3 class="mt-2 text-base font-semibold">Predios para el numeral 3 y Uso Suelo para el numeral 5</h3>
+            <p class="eyebrow">MIDAS centralizado desde el numeral 3</p>
+            <h3 class="mt-2 text-base font-semibold">Pegar una sola lectura para alimentar 3 y 5</h3>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-700">
-                El botón usa la referencia catastral registrada, la envía a MIDAS sin separadores, guarda la ficha Predios en este numeral
-                y remite la reglamentación de Uso Suelo al capítulo 5. Servicios públicos, vías y movilidad se revisan en sus pestañas
-                propias con soporte de campo o fuente vigente.
+                Abre MIDAS, busca la referencia del inmueble y pega aquí Predios y Uso Suelo como salen en pantalla.
+                Lo predial queda en el numeral 3; la reglamentación, usos e índices se envían al numeral 5.
             </p>
         </div>
         <div class="flex flex-wrap gap-3">
-            <button class="btn-primary" type="submit" formaction="<?= e(url($subjectActionBase . '/midas/consultar')) ?>">
-                Consultar MIDAS automáticamente
+            <a class="btn-primary" target="_blank" rel="noopener" href="https://midas.cartagena.gov.co/#/home">Abrir MIDAS manual</a>
+            <button class="btn-secondary" type="submit" formaction="<?= e(url($subjectActionBase . '/midas/consultar')) ?>">
+                Intentar automático si responde
             </button>
-            <a class="btn-secondary" target="_blank" rel="noopener" href="https://midas.cartagena.gov.co/#/home">Abrir MIDAS manual</a>
+        </div>
+    </div>
+    <div class="mt-5 grid gap-4 lg:grid-cols-[1fr_1.05fr]">
+        <div class="rounded-xl border border-teal-100 bg-white p-4">
+            <p class="text-sm font-semibold text-teal-950">Orden recomendado para copiar</p>
+            <ol class="mt-2 list-decimal space-y-1 pl-5 text-sm leading-6 text-teal-900">
+                <li>Ficha <strong>Predios</strong>: número predial, matrícula, dirección, territorio, uso, tratamiento, riesgos y áreas.</li>
+                <li><strong>Uso Suelo</strong>: principal, compatible, complementario, restringido y prohibido.</li>
+                <li>Parámetros: área libre, área y frente mínimos, altura, índice de construcción, aislamientos y observaciones.</li>
+            </ol>
+        </div>
+        <div class="rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+            <p class="font-semibold">Ocupación</p>
+            <p class="mt-1">Si MIDAS no entrega índice de ocupación, el sistema lo calcula desde área libre; si solo existen pisos e índice de construcción, lo deja como estimación técnica revisable.</p>
+        </div>
+    </div>
+    <div class="mt-4 rounded-xl border border-slate-200 bg-white p-4">
+        <label class="label">Lectura completa copiada de MIDAS
+            <textarea class="input min-h-52" name="midas_pasted_text" rows="10" maxlength="70000"
+                placeholder="Pega aquí Predios y Uso Suelo completos, en el mismo orden de MIDAS."></textarea>
+            <span class="mt-1 block text-xs font-medium text-slate-500">
+                Este pegado reparte automáticamente: datos prediales al numeral 3 y norma urbana al numeral 5.
+            </span>
+        </label>
+        <div class="mt-4 flex flex-wrap gap-3">
+            <button class="btn-primary" type="submit" formaction="<?= e(url($subjectActionBase . '/midas/procesar')) ?>">
+                Procesar y repartir a numerales 3 y 5
+            </button>
+            <a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana#uso')) ?>">
+                Revisar numeral 5
+            </a>
         </div>
     </div>
     <p class="mt-3 text-xs font-semibold text-amber-800">
         Los códigos DANE se conservan solo como trazabilidad catastral; si están rezagados, prevalece la verificación actual del predio.
     </p>
-    <details class="mt-5 rounded-xl border border-slate-200 bg-white p-4" open>
+    <details class="mt-5 rounded-xl border border-slate-200 bg-white p-4">
         <summary class="cursor-pointer text-sm font-semibold text-slate-900">Campos MIDAS guardados para el inmueble</summary>
         <div class="mt-5 space-y-5">
             <?php foreach ($midasGroups as $title => $fields): ?>
@@ -79,22 +109,7 @@ $renderMidas = static function (string $key, array $meta) use ($sv, $fieldHelp):
         </div>
     </details>
     <details class="mt-4 rounded-xl border border-slate-200 bg-white p-4">
-        <summary class="cursor-pointer text-sm font-semibold text-slate-900">Respaldo manual y trazabilidad completa</summary>
-        <label class="label mt-4">Lectura completa copiada de MIDAS
-            <textarea class="input min-h-40" name="midas_pasted_text" rows="7" maxlength="70000"
-                placeholder="Pega el bloque Predios, Uso Suelo o el cuadro de reglamentación cuando MIDAS no responda automáticamente."></textarea>
-            <span class="mt-1 block text-xs font-medium text-slate-500">
-                Respaldo manual: actualiza esta ficha y también envía Uso Suelo al numeral 5 cuando el texto pegado lo contiene.
-            </span>
-        </label>
-        <div class="mt-4 flex flex-wrap gap-3">
-            <button class="btn-secondary" type="submit" formaction="<?= e(url($subjectActionBase . '/midas/procesar')) ?>">
-                Procesar lectura MIDAS pegada
-            </button>
-            <a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana#pot')) ?>">
-                Ver depósito normativo del numeral 5
-            </a>
-        </div>
+        <summary class="cursor-pointer text-sm font-semibold text-slate-900">Trazabilidad predial guardada</summary>
         <label class="label mt-5">Lectura predial MIDAS guardada
             <textarea class="input min-h-32" name="midas_predio_raw" rows="5" maxlength="70000"
                 placeholder="Aquí queda la trazabilidad del bloque Predios procesado."><?= e($sv('midas_predio_raw')) ?></textarea>

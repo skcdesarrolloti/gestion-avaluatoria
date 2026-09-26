@@ -89,7 +89,7 @@
                     <button class="btn-primary" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/midas/procesar')) ?>">
                         Procesar lectura MIDAS pegada
                     </button>
-                    <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">No tienes que diligenciar campo por campo si puedes copiar el bloque completo.</span>
+                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Si ya pegaste todo en el numeral 3, esta pantalla es solo revisión y complemento.</span>
                 </div>
             </div>
             <input type="hidden" name="source_status" value="<?= e($value('source_status') ?: 'pendiente') ?>">
@@ -127,14 +127,14 @@
                     <?php $manualField('norm_free_area_text', 'ÁREA LIBRE', 'Pega área libre, retiros o aislamientos libres.', 3); ?>
                     <?php $manualField('norm_min_lot_front_text', 'ÁREA Y FRENTE MÍNIMOS', 'Pega AML, frente mínimo y condición de lote.', 3); ?>
                     <?php $manualField('norm_max_height_text', 'ALTURA MÁXIMA', 'Pega altura o pisos permitidos.', 3); ?>
-                    <?php $manualInput('occupancy_index', 'ÍNDICE DE OCUPACIÓN', 'Ej. 0,60 o 60%'); ?>
-                    <?php $manualInput('max_floors', 'Número de pisos para estimar ocupación × pisos', 'Ej. 2'); ?>
+                    <?php $manualInput('occupancy_index', 'ÍNDICE DE OCUPACIÓN CALCULADO / REVISADO', 'Opcional: 0,60 o 60% si ya lo calculaste'); ?>
+                    <?php $manualInput('max_floors', 'Número de pisos para estimar IC ÷ pisos', 'Ej. 2'); ?>
                     <?php $manualInput('construction_index', 'ÍNDICE DE CONSTRUCCIÓN', 'Ej. 1,20'); ?>
                     <?php $manualField('norm_construction_index_text', 'TEXTO ÍNDICE / ÁREA CONSTRUIBLE', 'Pega el texto completo del índice de construcción o fórmula.', 3); ?>
                     <div class="md:col-span-2"><?php $manualField('norm_isolation_text', 'AISLAMIENTOS / ESTACIONAMIENTOS / OBSERVACIONES', 'Pega aislamientos, estacionamientos y demás reglas útiles para el análisis.', 4); ?></div>
                     <div class="md:col-span-2"><?php $manualField('norm_other_potential_text', 'ÍNDICE O ÁREA DE OCUPACIÓN EN TEXTO', 'Si el cuadro habla de área de ocupación, plataforma, índice de ocupación o condiciones especiales, pégalo aquí.', 4); ?></div>
                 </div>
-                <p class="mt-3 rounded-xl bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">Estos campos alimentan 5.2 y 5.3 al guardar. La matriz de potencial usa área del terreno, índice de ocupación, pisos e índice de construcción cuando existan.</p>
+                <p class="mt-3 rounded-xl bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">Estos campos alimentan 5.2 y 5.3 al guardar. Si no existe índice de ocupación explícito, se calcula desde área libre; si solo hay índice de construcción y pisos, se estima como IC ÷ pisos y queda revisable.</p>
             </details>
         </div>
     </section>

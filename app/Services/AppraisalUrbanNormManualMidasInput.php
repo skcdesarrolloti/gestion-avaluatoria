@@ -4,17 +4,27 @@ namespace App\Services;
 
 final class AppraisalUrbanNormManualMidasInput
 {
+    private UrbanOccupancyIndexEstimator $occupancy;
+
+    public function __construct()
+    {
+        $this->occupancy = new UrbanOccupancyIndexEstimator();
+    }
+
     public function apply(array &$data, mixed $manual, array $limits): void
     {
         if (!is_array($manual)) return;
         foreach ($this->keys() as $key) {
             $value = mb_substr(trim((string) ($manual[$key] ?? '')), 0, $limits[$key] ?? 5000);
-            if ($key === 'occupancy_index') $value = $this->ratioText($value);
             if ($value !== '') $data[$key] = $value;
         }
-        if (($data['norm_other_potential_text'] ?? '') !== '' && ($data['occupancy_index'] ?? '') === '') {
-            $data['occupancy_index'] = $this->ratioText($data['norm_other_potential_text']);
-        }
+        [$ratio, $source] = $this->occupancy->fromTexts((string) ($data['norm_free_area_text'] ?? ''),
+            (string) ($data['occupancy_index'] ?: ($data['norm_other_potential_text'] ?? '')),
+            (string) ($data['construction_index'] ?: ($data['norm_construction_index_text'] ?? '')),
+            (string) ($data['max_floors'] ?: ($data['norm_max_height_text'] ?? '')));
+        if ($ratio !== '') $data['occupancy_index'] = $ratio;
+        if ($source !== '') $data['norm_other_potential_text'] = trim((string) ($data['norm_other_potential_text'] ?? '')
+            . "\n\nÍndice de ocupación " . $source . ': ' . $ratio);
     }
 
     private function keys(): array
@@ -27,11 +37,4 @@ final class AppraisalUrbanNormManualMidasInput
             'lot_front_normative_m', 'occupancy_index', 'max_floors', 'construction_index'];
     }
 
-    private function ratioText(string $value): string
-    {
-        if (!preg_match('/([0-9]+(?:[,.][0-9]+)?)\s*%?/u', $value, $match)) return '';
-        $number = (float) str_replace(',', '.', $match[1]);
-        if ($number > 1) $number /= 100;
-        return rtrim(rtrim(number_format($number, 4, '.', ''), '0'), '.');
-    }
 }

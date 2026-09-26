@@ -4,6 +4,13 @@ namespace App\Services;
 
 final class UrbanNormMidasTextParser
 {
+    private UrbanOccupancyIndexEstimator $occupancy;
+
+    public function __construct()
+    {
+        $this->occupancy = new UrbanOccupancyIndexEstimator();
+    }
+
     public function parse(string $text): array
     {
         $text = $this->clean($text);
@@ -44,12 +51,17 @@ final class UrbanNormMidasTextParser
         $out['norm_min_lot_front_text'] = $this->sectionAny($text, ['AREA Y FRENTE MÍNIMOS', 'ÁREA Y FRENTE MÍNIMOS'], ['ALTURA MÁXIMA']);
         $out['norm_max_height_text'] = $this->section($text, 'ALTURA MÁXIMA', 'ÍNDICE DE CONSTRUCCIÓN');
         $out['norm_construction_index_text'] = $this->section($text, 'ÍNDICE DE CONSTRUCCIÓN', 'AISLAMIENTOS');
+        $out['max_floors'] = $this->numberText($out['norm_max_height_text']);
+        $out['construction_index'] = $this->numberText($out['norm_construction_index_text']);
         $occupancy = $this->sectionAny($text, ['ÍNDICE DE OCUPACIÓN', 'INDICE DE OCUPACION', 'ÁREA DE OCUPACIÓN', 'AREA DE OCUPACION'],
             ['ALTURA MÁXIMA', 'ÍNDICE DE CONSTRUCCIÓN', 'INDICE DE CONSTRUCCION', 'AISLAMIENTOS', 'ESTACIONAMIENTOS']);
-        if ($occupancy !== '') {
-            $out['occupancy_index'] = $this->ratio($occupancy);
-            $out['norm_other_potential_text'] = trim("Índice / área de ocupación:\n" . $occupancy);
-        }
+        [$ratio, $source] = $this->occupancy->fromTexts($out['norm_free_area_text'], $occupancy,
+            $out['norm_construction_index_text'], $out['norm_max_height_text']);
+        if ($ratio !== '') $out['occupancy_index'] = $ratio;
+        if ($occupancy !== '' || $source !== '') $out['norm_other_potential_text'] = trim(
+            ($occupancy !== '' ? "Área / índice de ocupación:\n" . $occupancy . "\n\n" : '')
+            . ($source !== '' ? 'Índice de ocupación ' . $source . ($ratio !== '' ? ': ' . $ratio : '') : '')
+        );
         $out['norm_isolation_text'] = $this->section($text, 'AISLAMIENTOS', null);
         $out = array_replace($out, $this->simpleUnavailableUsage($text));
         return array_filter($out, static fn (string $v): bool => $v !== '');
@@ -98,11 +110,9 @@ final class UrbanNormMidasTextParser
         return trim($text);
     }
 
-    private function ratio(string $text): string
+    private function numberText(string $text): string
     {
-        if (!preg_match('/([0-9]+(?:[,.][0-9]+)?)\s*%?/u', $text, $match)) return '';
-        $number = (float) str_replace(',', '.', $match[1]);
-        if ($number > 1) $number /= 100;
-        return rtrim(rtrim(number_format($number, 4, '.', ''), '0'), '.');
+        $number = $this->occupancy->number($text);
+        return $number === null ? '' : rtrim(rtrim(number_format($number, 4, '.', ''), '0'), '.');
     }
 }
