@@ -17,7 +17,12 @@
             $parts[] = $fmt($state) . '×' . $fmt($weight);
         }
         $score = isset($group['score']) ? (float) $group['score'] : ($weights > 0 ? $sum / $weights : 0.0);
-        return ['score' => $score, 'state' => (string) (($group['state'] ?? '') ?: $stateFromScore($score)), 'formula' => $parts ? '(' . implode(' + ', $parts) . ') / ' . $fmt($weights) : 'Pendiente'];
+        return [
+            'score' => $score,
+            'state' => (string) (($group['state'] ?? '') ?: $stateFromScore($score)),
+            'formula' => $parts ? '(' . implode(' + ', $parts) . ') / ' . $fmt($weights) : 'Pendiente',
+            'weight_sum' => $weights,
+        ];
     };
     ?>
     <div class="grid gap-4 md:grid-cols-3">
@@ -38,7 +43,7 @@
         <div class="overflow-x-auto rounded-xl border border-slate-200">
             <table class="min-w-full text-left text-sm">
                 <thead class="bg-slate-100 text-xs uppercase text-slate-600">
-                    <tr><th class="p-3">Grupo</th><th class="p-3">Factores</th><th class="p-3">Índice</th><th class="p-3">Peso global</th><th class="p-3">Estado</th><th class="p-3">Conclusión principal</th></tr>
+                    <tr><th class="p-3">Grupo</th><th class="p-3">Factores</th><th class="p-3">Índice del grupo</th><th class="p-3">Peso del grupo en el global</th><th class="p-3">Estado</th><th class="p-3">Conclusión principal</th></tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200">
                     <?php foreach ($savedGroups as $group): ?>
@@ -49,7 +54,7 @@
                             <td class="p-3"><?= e($calc['score'] > 0 ? number_format((float) $calc['score'], 2, ',', '') : 'Pendiente') ?></td>
                             <td class="p-3"><?= e(number_format((float) ($group['weight'] ?? 1), 2, ',', '')) ?></td>
                             <td class="p-3"><?= e(\App\Support\AppraisalConservationCatalog::stateLabel($calc['state'])) ?></td>
-                            <td class="p-3">El grupo se obtiene con promedio ponderado de sus factores aplicables. Fórmula: <?= e($calc['formula']) ?> = <?= e($calc['score'] > 0 ? number_format((float) $calc['score'], 2, ',', '') : 'pendiente') ?>.</td>
+                            <td class="p-3">El índice del grupo usa los pesos de sus factores. El peso <?= e(number_format((float) ($group['weight'] ?? 1), 2, ',', '')) ?> solo se usa después para el estado global. Fórmula del grupo: <?= e($calc['formula']) ?> = <?= e($calc['score'] > 0 ? number_format((float) $calc['score'], 2, ',', '') : 'pendiente') ?>.</td>
                         </tr>
                         <?php require BASE_PATH . '/app/Views/appraisals/subject-construction-conservation-group-detail.php'; ?>
                     <?php endforeach; ?>
@@ -61,7 +66,7 @@
         <div class="overflow-x-auto rounded-xl border border-slate-200">
             <table class="min-w-full text-left text-sm">
                 <thead class="bg-slate-100 text-xs uppercase text-slate-600">
-                    <tr><th class="p-3">Factor</th><th class="p-3">Grupo</th><th class="p-3">Calificación usada</th><th class="p-3">Peso</th><th class="p-3">Lectura del factor</th></tr>
+                    <tr><th class="p-3">Factor</th><th class="p-3">Grupo</th><th class="p-3">Calificación usada</th><th class="p-3">Peso del factor</th><th class="p-3">Lectura del factor</th></tr>
                 </thead>
                 <tbody class="divide-y divide-slate-200">
                 <?php foreach ($conservationItems as $item): ?>
@@ -82,7 +87,7 @@
         </div>
     <?php endif; ?>
     <div class="rounded-xl border border-indigo-100 bg-indigo-50 p-4 text-sm leading-6 text-indigo-950">
-        <strong>Método de cálculo:</strong> el estado sugerido del factor nace de hallazgo observable, funcionalidad e intervención aparente. Luego se calcula índice del grupo = suma(estado del factor × peso del factor) / suma(pesos). Pesos del factor: crítica 1,50; alta 1,25; media 1,00; baja 0,75. El global pondera grupos: estructura 2,00; instalaciones 1,50; envolvente 1,25; acabados y espacios funcionales 1,00; condiciones ambientales 0,75. Índice global actual: <strong><?= e(isset($conservationResult['score_global']) ? number_format((float) $conservationResult['score_global'], 2, ',', '') : 'pendiente') ?></strong>. Esta es una metodología interna de apoyo basada en la escala IGAC; el analista puede adoptar otro estado si lo justifica.
+        <strong>Método de cálculo:</strong> hay dos pesos distintos. <strong>Peso del factor</strong> calcula el índice de cada grupo: crítica 1,50; alta 1,25; media 1,00; baja 0,75. <strong>Peso del grupo en el global</strong> se usa después para el resultado general: estructura 2,00; instalaciones 1,50; envolvente 1,25; acabados y espacios funcionales 1,00; condiciones ambientales 0,75. Índice global actual: <strong><?= e(isset($conservationResult['score_global']) ? number_format((float) $conservationResult['score_global'], 2, ',', '') : 'pendiente') ?></strong>. Esta es una metodología interna de apoyo basada en la escala IGAC; el analista puede adoptar otro estado si lo justifica.
     </div>
     <div class="overflow-x-auto rounded-xl border border-amber-100 bg-amber-50/40">
         <table class="min-w-full text-left text-sm">

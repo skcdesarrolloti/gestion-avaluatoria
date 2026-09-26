@@ -134,7 +134,7 @@ export function conservationSummaryText(panel) {
         });
     });
     lines.push('');
-    lines.push(`Método de cálculo: el estado sugerido del factor nace de hallazgo observable, funcionalidad e intervención aparente. El grupo usa índice técnico = suma(estado del factor x peso del factor) / suma(pesos). El global pondera grupos, dando mayor peso a estructura e instalaciones por su incidencia en vida útil, seguridad y reparabilidad. Índice global: ${globalScore}. Es una regla interna de apoyo basada en la escala IGAC; el analista puede adoptar otro estado si lo justifica.`);
+    lines.push(`Método de cálculo: el factor tiene un peso interno para calcular su grupo. El global usa un segundo peso por grupo, dando mayor peso a estructura e instalaciones por su incidencia en vida útil, seguridad y reparabilidad. Índice global: ${globalScore}. Es una regla interna de apoyo basada en la escala IGAC; el analista puede adoptar otro estado si lo justifica.`);
     lines.push('');
     lines.push('Lectura técnica por grupo');
     allGroups.forEach((info, key) => {

@@ -5,7 +5,7 @@
             <div class="overflow-x-auto">
                 <table class="min-w-full text-left text-xs">
                     <thead class="bg-slate-50 text-slate-600">
-                        <tr><th class="p-2">Factor</th><th class="p-2">Estado usado</th><th class="p-2">Peso</th><th class="p-2">Aporte</th><th class="p-2">Lectura</th></tr>
+                        <tr><th class="p-2">Factor</th><th class="p-2">Estado usado</th><th class="p-2">Peso del factor</th><th class="p-2">Aporte al grupo</th><th class="p-2">Lectura</th></tr>
                     </thead>
                     <tbody class="divide-y divide-slate-100">
                         <?php foreach (($group['items'] ?? []) as $item): ?>
@@ -28,7 +28,7 @@
                 </table>
             </div>
             <p class="mt-2 text-xs leading-5 text-slate-600">
-                Índice del grupo = suma de aportes / suma de pesos. Resultado: <?= e($calc['formula']) ?> = <?= e($calc['score'] > 0 ? number_format((float) $calc['score'], 2, ',', '') : 'pendiente') ?>, que se redondea al estado IGAC más cercano.
+                Índice del grupo = suma de aportes / suma de pesos de los factores. La suma de pesos de este grupo es <?= e($fmt((float) ($calc['weight_sum'] ?? 0))) ?>; no es el peso del grupo en el cálculo global. Resultado: <?= e($calc['formula']) ?> = <?= e($calc['score'] > 0 ? number_format((float) $calc['score'], 2, ',', '') : 'pendiente') ?>, que se redondea al estado IGAC más cercano.
             </p>
         </div>
     </td>

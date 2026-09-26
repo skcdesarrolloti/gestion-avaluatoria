@@ -23,7 +23,7 @@ final class AppraisalConservationReportWriter
             foreach ($group['items'] as $item) $lines[] = self::factorDetail($group, $item);
         }
         $lines[] = '';
-        $lines[] = 'Método de cálculo: el estado sugerido de cada factor nace de hallazgo observable, funcionalidad e intervención aparente. El grupo se calcula con índice técnico = suma(estado del factor x peso del factor) / suma(pesos). El estado global pondera los grupos, dando mayor peso a estructura e instalaciones por su incidencia en vida útil, seguridad y reparabilidad. Es una regla interna de apoyo basada en la escala IGAC; el analista puede adoptar otro estado si lo justifica.';
+        $lines[] = 'Método de cálculo: el estado sugerido de cada factor nace de hallazgo observable, funcionalidad e intervención aparente. El grupo se calcula con índice técnico = suma(estado del factor x peso del factor) / suma(pesos de factores). El estado global usa un segundo peso: el peso del grupo en el global, dando mayor peso a estructura e instalaciones por su incidencia en vida útil, seguridad y reparabilidad. Es una regla interna de apoyo basada en la escala IGAC; el analista puede adoptar otro estado si lo justifica.';
         $lines[] = '';
         $lines[] = 'Lectura técnica por grupo';
         foreach (AppraisalConservationCatalog::groups() as $catalogGroup) {
@@ -41,7 +41,7 @@ final class AppraisalConservationReportWriter
 
     public static function groupConclusion(array $group): string
     {
-        $parts = ['se asigna ' . self::stateText($group['state']) . ' al grupo a partir de ' . count($group['items']) . ' factor(es), con índice técnico ponderado ' . self::scoreText((float) ($group['score'] ?? 0)) . ' y peso global ' . self::scoreText((float) ($group['weight'] ?? 1)) . '.'];
+        $parts = ['se asigna ' . self::stateText($group['state']) . ' al grupo a partir de ' . count($group['items']) . ' factor(es), con índice técnico ponderado ' . self::scoreText((float) ($group['score'] ?? 0)) . '. El peso del grupo en el cálculo global es ' . self::scoreText((float) ($group['weight'] ?? 1)) . '.'];
         foreach ($group['items'] as $item) {
             $line = $item['subcomponent_label'] . ': Hallazgo observado: ' . self::observedFinding($item) . '. ';
             $line .= 'Interpretación técnica: ' . self::interpretationFor($item) . '. ';
