@@ -49,14 +49,33 @@
     routeStatus(row) {
         const area=this.number(this.land), front=this.number(this.front);
         const minArea=this.number(row.rule.min_area_m2), minFront=this.number(row.rule.min_front_m);
-        if (minArea === null && minFront === null && this.number(row.rule.construction_index) === null && this.number(row.rule.occupancy_index) === null) return 'Manual';
-        if ((minArea !== null && area === null) || (minFront !== null && front === null)) return 'Falta dato';
-        if ((minArea !== null && area < minArea) || (minFront !== null && front < minFront)) return 'No cumple base';
-        return 'Cumple base';
+        if (minArea === null && minFront === null && this.number(row.rule.construction_index) === null && this.number(row.rule.occupancy_index) === null) return 'Requiere revisión';
+        if ((minArea !== null && area === null) || (minFront !== null && front === null)) return 'Requiere dato';
+        if ((minArea !== null && area < minArea) || (minFront !== null && front < minFront)) return 'No cumple';
+        return 'Cumple';
     },
     routeStatusClass(row) {
         const s=this.routeStatus(row);
-        return s === 'Cumple base' ? 'bg-emerald-50 text-emerald-800' : (s === 'No cumple base' ? 'bg-red-50 text-red-700' : (s === 'Manual' ? 'bg-blue-50 text-blue-800' : 'bg-amber-50 text-amber-800'));
+        return s === 'Cumple' ? 'bg-emerald-50 text-emerald-800' : (s === 'No cumple' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-800');
+    },
+    routeDecisionClass(row) {
+        const s=this.routeStatus(row);
+        return s === 'Cumple' ? 'border-emerald-200 bg-emerald-50 text-emerald-950' : (s === 'No cumple' ? 'border-red-200 bg-red-50 text-red-950' : 'border-amber-200 bg-amber-50 text-amber-950');
+    },
+    routeFailures(row) {
+        const fails=[], area=this.number(this.land), front=this.number(this.front);
+        const minArea=this.number(row.rule.min_area_m2), minFront=this.number(row.rule.min_front_m);
+        if (minArea !== null && area !== null && area < minArea) fails.push('área mínima ' + minArea + ' m², predio ' + this.fmt(area) + ' m²');
+        if (minFront !== null && front !== null && front < minFront) fails.push('frente mínimo ' + minFront + ' m, predio ' + this.fmt(front) + ' m');
+        if ((minArea !== null && area === null) || (minFront !== null && front === null)) fails.push('faltan datos de área o frente para cerrar cumplimiento');
+        return fails;
+    },
+    routeSelectionText(row) {
+        const label=this.typeLabel(row.route.type) + ' · ' + row.route.label + ' · ' + row.rule.label;
+        const status=this.routeStatus(row), max=this.fmt(this.routeMaxBuild(row)), pot=this.fmt(this.routePotential(row));
+        if (status === 'No cumple') return 'No cumple: no se adopta como potencial constructivo porque ' + this.routeFailures(row).join(' y ') + '. Puede quedar solo como soporte u observación.';
+        if (status === 'Cumple') return 'Cumple: puede seleccionarse como escenario de potencial constructivo para ' + label + ', con construible ' + (max || 'pendiente') + ' m² y potencial ' + (pot || 'pendiente') + ' m², sujeto a observaciones de norma, mercado y soporte.';
+        return status + ': no debe seleccionarse sin completar soporte. Revise mínimos, índice, altura, retiros y concepto aplicable.';
     },
     routeBaseArea() { return this.netArea() ?? this.number(this.land) },
     routeIndex(row) { return this.number(row.rule.construction_index) ?? this.buildIndex() },

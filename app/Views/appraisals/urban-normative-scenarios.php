@@ -38,14 +38,21 @@ $scenarioInitial = static fn (string $key): string => e(json_encode((string) ($p
             if (!this.canCalculate(row)) return 'Condicionado';
             const a=this.areaOk(row), f=this.frontOk(row);
             if (a === undefined || f === undefined) return 'Falta dato';
-            return (a !== false && f !== false) ? 'Cumple base' : 'No cumple base';
+            return (a !== false && f !== false) ? 'Cumple' : 'No cumple';
         },
-        rowClass(row) { const s=this.rowStatus(row); return s === 'Cumple base' ? 'bg-emerald-50 text-emerald-800' : (s === 'No cumple base' ? 'bg-red-50 text-red-700' : (s === 'Condicionado' ? 'bg-blue-50 text-blue-800' : 'bg-amber-50 text-amber-800')) },
+        rowClass(row) { const s=this.rowStatus(row); return s === 'Cumple' ? 'bg-emerald-50 text-emerald-800' : (s === 'No cumple' ? 'bg-red-50 text-red-700' : (s === 'Condicionado' ? 'bg-blue-50 text-blue-800' : 'bg-amber-50 text-amber-800')) },
+        rowFailures(row) {
+            const fails=[], area=this.n(this.land), front=this.n(this.front), minArea=this.n(row.rule.min_area_m2), minFront=this.n(row.rule.min_front_m);
+            if (minArea !== null && area !== null && area < minArea) fails.push('área mínima ' + minArea + ' m², predio ' + this.f(area) + ' m²');
+            if (minFront !== null && front !== null && front < minFront) fails.push('frente mínimo ' + minFront + ' m, predio ' + this.f(front) + ' m');
+            return fails.join(' y ');
+        },
         adopt(row) {
             this.adopted = row.route.type + ':' + row.route.slug + ':' + row.key;
             this.adoptedLabel = this.typeLabel(row.route.type) + ' · ' + row.route.label + ' · ' + row.rule.label;
             const status = this.rowStatus(row), max = this.f(this.maxBuild(row)), pot = this.f(this.potential(row));
-            this.reason = status + '. Se revisa ' + this.adoptedLabel + ' (' + row.route.table + '). AML ' + (row.rule.min_area_m2 || 'condicionado') + ', frente ' + (row.rule.min_front_m || 'condicionado') + ', indice ' + (row.rule.construction_index || 'pendiente de cabida') + '. Maximo construible orientativo: ' + (max || 'pendiente') + ' m²; potencial frente a construccion actual: ' + (pot || 'pendiente') + ' m². Area libre / condicion: ' + (row.rule.free_area || 'sin nota');
+            const base = 'Se revisa ' + this.adoptedLabel + ' (' + row.route.table + '). AML ' + (row.rule.min_area_m2 || 'condicionado') + ', frente ' + (row.rule.min_front_m || 'condicionado') + ', indice ' + (row.rule.construction_index || 'pendiente de cabida') + '. Maximo construible orientativo: ' + (max || 'pendiente') + ' m²; potencial frente a construccion actual: ' + (pot || 'pendiente') + ' m². Area libre / condicion: ' + (row.rule.free_area || 'sin nota');
+            this.reason = status === 'No cumple' ? 'No cumple. No se adopta como potencial constructivo porque ' + (this.rowFailures(row) || 'no supera la base normativa') + '. ' + base : status + '. ' + base;
         },
         missing() { const m=[]; if (this.n(this.land)===null) m.push('area de terreno'); if (this.n(this.front)===null) m.push('frente'); if (this.n(this.actual)===null) m.push('construccion actual'); return m.join(', ') }
     }">

@@ -37,6 +37,7 @@ $matrixRoutes = $potentialRoutes ?? [];
                         <th class="px-3 py-2">Dato del predio</th>
                         <th class="px-3 py-2">Cálculo</th>
                         <th class="px-3 py-2">Estado</th>
+                        <th class="px-3 py-2">Lectura para seleccionar</th>
                     </tr>
                 </thead>
                 <tbody class="divide-y divide-slate-100">
@@ -59,6 +60,7 @@ $matrixRoutes = $potentialRoutes ?? [];
                             </td>
                             <td class="px-3 py-2 text-xs font-semibold leading-5 text-slate-900" x-text="isLot ? routeCalcSummary(row) : 'No obligatorio para inmueble construido; dejar como soporte normativo.'"></td>
                             <td class="px-3 py-2"><span class="rounded-full px-2 py-1 text-xs font-semibold" :class="routeStatusClass(row)" x-text="routeStatus(row)"></span></td>
+                            <td class="max-w-sm px-3 py-2 text-xs leading-5 text-slate-700" x-text="routeSelectionText(row)"></td>
                         </tr>
                     </template>
                 </tbody>
@@ -70,6 +72,11 @@ $matrixRoutes = $potentialRoutes ?? [];
                     <strong x-text="typeLabel(route.type) + ': ' + route.label"></strong>
                     <span x-text="' · ' + route.table"></span>
                 </div>
+                <template x-for="row in currentRouteOptions(route)" :key="'decision-' + row.key">
+                    <div class="rounded-lg border p-3 text-sm font-semibold leading-6" :class="routeDecisionClass(row)">
+                        <span x-text="routeSelectionText(row)"></span>
+                    </div>
+                </template>
                 <div class="overflow-x-auto rounded-lg border border-slate-200 bg-white">
                     <table class="min-w-full divide-y divide-slate-200 text-sm">
                         <thead class="bg-slate-100 text-left text-xs uppercase text-slate-600">
@@ -93,6 +100,7 @@ $matrixRoutes = $potentialRoutes ?? [];
                                     ['Área libre', row.rule.free_area || 'Manual', netArea() ? fmt(netArea()) + ' m² base neta' : 'Pendiente', 'Afecta ocupación y cabida'],
                                     ['Aislamientos', row.rule.isolation || 'Manual', 'Ver soporte MIDAS/POT', 'Puede limitar el cálculo'],
                                     ['Estacionamientos', row.rule.parking || 'Manual', 'Ver producto y áreas', 'Puede cambiar área útil/vendible'],
+                                    ['Decisión de selección', routeStatus(row), typeLabel(row.route.type), routeSelectionText(row)],
                                     ['Alcance y salvedad', row.rule.scope || 'Sin nota adicional', 'Criterio del analista', 'Documentar si falta soporte']
                                 ]">
                                     <tr>
