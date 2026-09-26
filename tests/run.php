@@ -278,7 +278,8 @@ try {
         use_restricted_text TEXT, use_prohibited_text TEXT, norm_unit_basic_text TEXT,
         norm_free_area_text TEXT, norm_min_lot_front_text TEXT, norm_max_height_text TEXT,
         norm_construction_index_text TEXT, norm_isolation_text TEXT, norm_other_potential_text TEXT,
-        land_area_normative_m2 REAL, lot_front_normative_m REAL, normative_modality TEXT, setback_area_percent REAL, net_land_area_m2 REAL,
+        land_area_normative_m2 REAL, lot_front_normative_m REAL, lot_depth_normative_m REAL, normative_modality TEXT,
+        setback_area_percent REAL, setback_front_m REAL, setback_rear_m REAL, setback_left_m REAL, setback_right_m REAL, net_land_area_m2 REAL,
         occupancy_index REAL, max_floors REAL, construction_index REAL, actual_built_area_m2 REAL,
         normative_max_built_area_m2 REAL, buildable_difference_m2 REAL, sellable_area_factor REAL,
         sellable_area_m2 REAL, norm_physical_base_text TEXT, constructive_potential_status TEXT,
@@ -411,7 +412,10 @@ try {
         'use_principal_text' => 'Comercial 2 e Institucional 3.',
         'use_restricted_text' => 'Comercial 3 e Institucional 4.',
         'norm_max_height_text' => '4 pisos.',
-        'land_area_normative_m2' => '370', 'lot_front_normative_m' => '12', 'normative_modality' => 'multifamiliar', 'setback_area_percent' => '40', 'net_land_area_m2' => '222',
+        'land_area_normative_m2' => '370', 'lot_front_normative_m' => '12', 'lot_depth_normative_m' => '30.83',
+        'normative_modality' => 'multifamiliar', 'setback_area_percent' => '40',
+        'setback_front_m' => '3', 'setback_rear_m' => '4', 'setback_left_m' => '0', 'setback_right_m' => '0',
+        'net_land_area_m2' => '222',
         'occupancy_index' => '0.60', 'max_floors' => '2', 'construction_index' => '1.20',
         'actual_built_area_m2' => '230', 'normative_max_built_area_m2' => '300',
         'buildable_difference_m2' => '70', 'sellable_area_factor' => '0.75', 'sellable_area_m2' => '225',
@@ -439,6 +443,8 @@ try {
     expect($urbanVersion === 1 && $savedUrban['category_slug'] === 'mixto-2',
         'ficha urbana guarda categoria aplicada');
     expect((string) $savedUrban['lot_front_normative_m'] === '12' || (string) $savedUrban['lot_front_normative_m'] === '12.00', 'ficha urbana guarda frente normativo');
+    expect((float) $savedUrban['lot_depth_normative_m'] === 30.83 && (float) $savedUrban['setback_front_m'] === 3.0,
+        'ficha urbana guarda geometria y retiros basicos del lote');
     expect($savedUrban['normative_modality'] === 'multifamiliar', 'ficha urbana guarda modalidad residencial evaluada');
     expect($savedUrban['midas_query_option'] === 'Uso del suelo'
         && str_contains($savedUrban['urban_norms_applied'], 'Decreto 0977'),
