@@ -19,6 +19,16 @@ final class AppraisalConservationCatalog
     public static function groups(): array { return self::all()['groups'] ?? []; }
     public static function states(): array { return self::all()['states'] ?? []; }
     public static function interventions(): array { return self::all()['interventions'] ?? []; }
+    public static function functionalities(): array
+    {
+        return [
+            '' => ['label' => 'No verificada', 'scope' => 'No se adopta lectura funcional; debe completarse o sustentarse con observación.'],
+            'normal' => ['label' => 'Normal', 'scope' => 'El elemento cumple su función observable sin restricciones relevantes para el uso ordinario.'],
+            'observaciones' => ['label' => 'Funcional con observaciones', 'scope' => 'El elemento presta servicio, pero presenta detalles que deben describirse y pueden incidir en mantenimiento.'],
+            'limitada' => ['label' => 'Limitada', 'scope' => 'El elemento conserva uso parcial o condicionado; afecta comodidad, operación o desempeño del inmueble.'],
+            'no_funcional' => ['label' => 'No funcional', 'scope' => 'El elemento no presta el servicio esperado o requiere intervención para recuperar su uso.'],
+        ];
+    }
     public static function version(): string { return (string) (self::all()['version'] ?? ''); }
     public static function algorithmVersion(): string { return (string) (self::all()['algorithm_version'] ?? ''); }
     public static function technicalReference(): string { return (string) (self::all()['technical_reference'] ?? ''); }

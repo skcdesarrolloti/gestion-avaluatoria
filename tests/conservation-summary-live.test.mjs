@@ -54,6 +54,8 @@ test('conservation summary is generated from filled component data', () => {
 
     const text = conservationSummaryText(panel);
     assert.match(text, /Cuadro resumen del estado de conservación/);
+    assert.match(text, /Detalle de calificación por factor/);
+    assert.match(text, /Método de cálculo/);
     assert.match(text, /Lectura técnica por grupo/);
     assert.match(text, /Sistema portante/);
     assert.match(text, /Hallazgo observado:/);

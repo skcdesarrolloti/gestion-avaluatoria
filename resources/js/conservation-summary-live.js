@@ -1,3 +1,5 @@
+import { refreshConservationFieldDefinitions } from './conservation-field-definitions.js';
+
 function field(container, name) {
     return container.querySelector(`[name$="[${name}]"]`);
 }
@@ -12,31 +14,6 @@ function selectText(node, includeEmpty = false) {
 
 function inputText(node) {
     return typeof node?.value === 'string' ? node.value.trim() : '';
-}
-
-function stateDefinitions(panel) {
-    try {
-        const parsed = JSON.parse(panel?.dataset?.conservationStateDefinitions || '[]');
-        return Array.isArray(parsed) ? parsed : [];
-    } catch {
-        return [];
-    }
-}
-
-function stateDefinitionText(states, value) {
-    if (!value) return 'Selecciona un estado para ver el criterio técnico que sustentará la valoración.';
-    const state = states.find(item => String(item.value || '') === String(value));
-    if (!state) return 'No hay definición técnica cargada para este estado.';
-    return `${state.value} - ${state.label}: ${state.criterion} ${state.intervention} ${state.use}`.trim();
-}
-
-function refreshStateDefinitions(panel) {
-    const states = stateDefinitions(panel);
-    panel.querySelectorAll('[data-conservation-subcomponent]').forEach(component => {
-        const select = field(component, 'state_adopted');
-        const target = component.querySelector('[data-conservation-state-definition]');
-        if (target) target.textContent = stateDefinitionText(states, select?.value || '');
-    });
 }
 
 function stateWeight(text) {
@@ -62,7 +39,7 @@ function interpretationFor(item) {
 }
 
 function groupConclusion(group) {
-    const parts = [`se asigna ${group.state || 'estado pendiente'} al grupo.`];
+    const parts = [`se asigna ${group.state || 'estado pendiente'} al grupo a partir de ${group.items.length} factor(es); se toma la mayor calificación numérica aplicable.`];
     group.items.forEach(item => {
         let line = `${item.label}: Hallazgo observado: ${findingFor(item)}. `;
         line += `Interpretación técnica: ${interpretationFor(item)}. `;
@@ -123,10 +100,19 @@ export function conservationSummaryText(panel) {
     allGroups.forEach((info, key) => {
         const group = groups.get(key);
         lines.push(group
-            ? `${info.label} | ${group.state || 'pendiente'} | ${shortConclusion(group)}`
+            ? `${info.label} (${group.items.length} factor(es)) | ${group.state || 'pendiente'} | ${shortConclusion(group)}`
             : `${info.label} | No diligenciado | Sin conclusión automática por falta de selección.`);
     });
     lines.push(`Estado global | ${global} | Conclusión derivada de los grupos diligenciados.`);
+    lines.push('');
+    lines.push('Detalle de calificación por factor');
+    groups.forEach(group => {
+        group.items.forEach(item => {
+            lines.push(`${group.label} - ${item.label} | ${item.state || 'pendiente'} | ${findingFor(item)} | ${item.state ? 'Entra al cálculo del grupo.' : 'Pendiente de estado para cálculo.'}`);
+        });
+    });
+    lines.push('');
+    lines.push('Método de cálculo: cada factor aporta su estado adoptado; si no se adopta manualmente, el sistema propone uno desde hallazgo e intervención. El estado del grupo es la mayor calificación numérica entre sus factores aplicables. El estado global es la mayor calificación numérica entre grupos, salvo adopción manual justificada.');
     lines.push('');
     lines.push('Lectura técnica por grupo');
     allGroups.forEach((info, key) => {
@@ -177,7 +163,7 @@ function panelFor(target) {
 
 function refreshAll(root = document) {
     root.querySelectorAll?.('[data-conservation-panel]').forEach(panel => {
-        refreshStateDefinitions(panel);
+        refreshConservationFieldDefinitions(panel);
         updatePanel(panel);
     });
 }
@@ -194,7 +180,7 @@ export function installConservationSummaryLive(root = document) {
     root.addEventListener('change', event => {
         const panel = panelFor(event.target);
         if (panel) {
-            refreshStateDefinitions(panel);
+            refreshConservationFieldDefinitions(panel);
             updatePanel(panel);
         }
     });

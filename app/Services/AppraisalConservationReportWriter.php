@@ -13,10 +13,17 @@ final class AppraisalConservationReportWriter
             $gid = (string) ($catalogGroup['id'] ?? '');
             $group = $groups[$gid] ?? null;
             $lines[] = $group
-                ? $group['label'] . ' | ' . self::stateText($group['state']) . ' | ' . self::shortConclusion($group)
+                ? $group['label'] . ' (' . count($group['items']) . ' factor(es)) | ' . self::stateText($group['state']) . ' | ' . self::shortConclusion($group)
                 : (string) ($catalogGroup['label'] ?? '') . ' | No diligenciado | Sin conclusión automática por falta de selección.';
         }
         $lines[] = 'Estado global | ' . self::stateText($adopted ?: $proposed) . ' | ' . self::globalShortConclusion($groups, $critical);
+        $lines[] = '';
+        $lines[] = 'Detalle de calificación por factor';
+        foreach ($groups as $group) {
+            foreach ($group['items'] as $item) $lines[] = self::factorDetail($group, $item);
+        }
+        $lines[] = '';
+        $lines[] = 'Método de cálculo: cada factor aporta su estado adoptado; si no se adopta manualmente, el sistema propone uno desde hallazgo e intervención. El estado del grupo es la mayor calificación numérica entre sus factores aplicables. El estado global es la mayor calificación numérica entre grupos, salvo adopción manual justificada.';
         $lines[] = '';
         $lines[] = 'Lectura técnica por grupo';
         foreach (AppraisalConservationCatalog::groups() as $catalogGroup) {
@@ -34,7 +41,7 @@ final class AppraisalConservationReportWriter
 
     public static function groupConclusion(array $group): string
     {
-        $parts = ['se asigna ' . self::stateText($group['state']) . ' al grupo.'];
+        $parts = ['se asigna ' . self::stateText($group['state']) . ' al grupo a partir de ' . count($group['items']) . ' factor(es); se toma la mayor calificación numérica aplicable.'];
         foreach ($group['items'] as $item) {
             $line = $item['subcomponent_label'] . ': Hallazgo observado: ' . self::observedFinding($item) . '. ';
             $line .= 'Interpretación técnica: ' . self::interpretationFor($item) . '. ';
@@ -44,6 +51,13 @@ final class AppraisalConservationReportWriter
             $parts[] = $line;
         }
         return implode(' ', $parts);
+    }
+
+    private static function factorDetail(array $group, array $item): string
+    {
+        $state = self::stateText($item['state_adopted'] ?: $item['state_proposed']);
+        return $group['label'] . ' - ' . $item['subcomponent_label'] . ' | ' . $state . ' | '
+            . self::observedFinding($item) . ' | Entra al cálculo del grupo; el grupo adopta el mayor estado numérico de sus factores aplicables.';
     }
 
     private static function globalConclusion(array $groups, string $proposed, string $adopted, array $critical, string $confidence, string $justification): string
