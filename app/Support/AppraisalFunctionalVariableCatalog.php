@@ -23,10 +23,10 @@ final class AppraisalFunctionalVariableCatalog
     {
         $guide = self::guideFor($type);
         return array_filter([
-            'Funcionales directos (3.3)' => self::factorLabelsFor($type),
-            'Superficie, norma y localización' => $guide['surface'] ?? [],
-            'Atributos diferenciales' => $guide['special'] ?? [],
-            'PH, copropiedad o soporte común' => $guide['ph'] ?? [],
+            'Numeral 3.3 - Funcionales directos' => self::factorLabelsFor($type),
+            'Numerales 3.2 y 5 - Superficie, norma y localización' => $guide['surface'] ?? [],
+            'Numeral 3.4 - Atributos diferenciales' => $guide['special'] ?? [],
+            'Numeral 3.5 - PH, copropiedad o soporte común' => $guide['ph'] ?? [],
         ]);
     }
 

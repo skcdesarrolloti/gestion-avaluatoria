@@ -8,7 +8,12 @@ $typeLabel = $label('tipo_inmueble', (string) ($record['tipo_inmueble'] ?? '')) 
 $subtypeLabel = $label('subtipo_funcional', (string) ($record['subtipo_funcional'] ?? ''));
 $destinyLabel = $label('destinacion', (string) ($record['destinacion'] ?? ''));
 $phLabel = $label('regimen_ph', (string) ($record['regimen_ph'] ?? ''));
-$chips = array_filter([$typeLabel, $subtypeLabel, $destinyLabel, $phLabel]);
+$chips = array_filter([
+    'Tipo: ' . $typeLabel,
+    $subtypeLabel !== '' ? 'Subtipo: ' . $subtypeLabel : '',
+    $destinyLabel !== '' ? 'Destinación: ' . $destinyLabel : '',
+    $phLabel !== '' ? 'PH: ' . $phLabel : '',
+]);
 ?>
 <div class="mt-4 rounded-2xl border border-amber-200 bg-amber-50 px-5 py-4 text-sm leading-6 text-amber-950">
     <div class="flex flex-wrap items-center justify-between gap-3">
