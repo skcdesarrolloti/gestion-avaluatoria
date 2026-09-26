@@ -949,6 +949,32 @@ Certificado de tradicion.",
         $officeAttributeGroups['oficina_consultorio'], $lotAttributeGroups['lote'])
         && !isset($localAttributeGroups['ph'], $warehouseAttributeGroups['ph']),
         'atributos especiales dependen del tipo de inmueble y excluyen PH');
+    $consultingAttributeGroups = AppraisalSpecialAttributeCatalog::groups('consultorio');
+    $hotelAttributeGroups = AppraisalSpecialAttributeCatalog::groups('hotel');
+    $farmAttributeGroups = AppraisalSpecialAttributeCatalog::groups('finca');
+    $buildingAttributeGroups = AppraisalSpecialAttributeCatalog::groups('edificio');
+    $parkingAttributeGroups = AppraisalSpecialAttributeCatalog::groups('parqueadero');
+    $apartmentAttributeGroups = AppraisalSpecialAttributeCatalog::groups('apartamento');
+    expect(isset($consultingAttributeGroups['consultorio_salud'][1]['sala_espera'],
+        $consultingAttributeGroups['consultorio_salud'][1]['accesibilidad_consultorio'],
+        $consultingAttributeGroups['consultorio_salud'][1]['acabados_sanitarios'])
+        && isset($hotelAttributeGroups['hotel_hospedaje'][1]['cocina_restaurante'],
+            $hotelAttributeGroups['hotel_hospedaje'][1]['ocupacion_operacion'],
+            $hotelAttributeGroups['hotel_hospedaje'][1]['planta_electrica_hotel'],
+            $hotelAttributeGroups['hotel_hospedaje'][1]['seguridad_hotel'])
+        && isset($farmAttributeGroups['finca_rural'][1]['disponibilidad_agua'],
+            $farmAttributeGroups['finca_rural'][1]['anexos_productivos'])
+        && isset($buildingAttributeGroups['edificio_integral'][1]['area_rentable'],
+            $buildingAttributeGroups['edificio_integral'][1]['equipos_especiales'],
+            $buildingAttributeGroups['edificio_integral'][1]['servicios_comunes_edificio'])
+        && isset($parkingAttributeGroups['parqueadero'][1]['relacion_juridica_parqueadero'])
+        && isset($apartmentAttributeGroups['vivienda'][1]['amenidades_conjunto'],
+            $apartmentAttributeGroups['vivienda'][1]['planta_electrica_vivienda'],
+            $apartmentAttributeGroups['vivienda'][1]['relacion_juridica_parqueadero_vivienda'])
+        && isset($localAttributeGroups['local_comercial'][1]['banos_local'],
+            $officeAttributeGroups['oficina_consultorio'][1]['banos_oficina'],
+            $officeAttributeGroups['oficina_consultorio'][1]['salas_servicios_comunes_oficina']),
+        'atributos especiales cubren factores diferenciales por cada tipologia');
     $typologyTabs = AppraisalSpecialAttributeCatalog::typologyTabs();
     expect(count($typologyTabs) === 11
         && ($typologyTabs['apartamento'] ?? '') === 'Apartamento'
