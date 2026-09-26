@@ -28,11 +28,12 @@ final class AppraisalConservationNarrator
             if ($item['state_adopted'] !== '') $flat[$id] = $item['state_adopted'];
         }
         $result = self::result($items, $summary, $actorId);
+        $approved = self::text($summary['approved_text'] ?? '', 8000);
         return [
             'legacy_json' => json_encode($flat, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
             'result_json' => json_encode($result, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
             'generated_text' => $result['generated_text'],
-            'approved_text' => self::text($summary['approved_text'] ?? '', 8000),
+            'approved_text' => $approved !== '' ? $approved : $result['generated_text'],
         ];
     }
 

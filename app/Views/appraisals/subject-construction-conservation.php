@@ -15,9 +15,14 @@ $legacyState = static function (string $subId) use ($jsonValue, $unit): string {
 };
 $savedGroups = is_array($conservationResult['groups'] ?? null) ? $conservationResult['groups'] : [];
 $firstConservationGroup = (string) ($conservationGroups[0]['id'] ?? 'resultado');
+$approvedConservationText = trim((string) ($unit['conservation_approved_text'] ?? ''));
+$generatedConservationText = trim((string) ($unit['conservation_generated_text'] ?? ''));
+$summaryConservationText = $approvedConservationText !== '' ? $approvedConservationText : $generatedConservationText;
+$summaryConservationIsAuto = $approvedConservationText === '' || ($generatedConservationText !== '' && $approvedConservationText === $generatedConservationText);
 ?>
 <div class="mt-5 space-y-5" x-show="activeConstructionDetail === 'conservacion'"
-    x-data="{ activeConservation: '<?= e($firstConservationGroup) ?>' }">
+    x-data="{ activeConservation: '<?= e($firstConservationGroup) ?>' }"
+    data-conservation-panel>
     <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
         <div class="flex flex-wrap items-start justify-between gap-3">
             <p><strong>Referencia técnica:</strong>
@@ -51,7 +56,7 @@ $firstConservationGroup = (string) ($conservationGroups[0]['id'] ?? 'resultado')
                 $subId = (string) $sub['id'];
                 $stateValue = $conservationValue($subId, 'state_adopted') ?: $legacyState($subId);
                 ?>
-                <div class="rounded-xl border border-slate-200 bg-white p-4">
+                <div class="rounded-xl border border-slate-200 bg-white p-4" data-conservation-subcomponent data-conservation-group="<?= e((string) $group['label']) ?>" data-conservation-label="<?= e((string) $sub['label']) ?>">
                     <div class="flex flex-wrap items-start justify-between gap-3">
                         <div><h5 class="font-semibold text-slate-950"><?= e((string) $sub['label']) ?></h5>
                             <p class="mt-1 max-w-3xl text-xs leading-5 text-slate-600"><?= e((string) $sub['object']) ?></p></div>
@@ -142,8 +147,11 @@ $firstConservationGroup = (string) ($conservationGroups[0]['id'] ?? 'resultado')
             </div>
         <?php endif; ?>
         <label class="label">Texto aprobado para Entregable
-            <textarea class="input min-h-40" rows="7" maxlength="8000" name="unit_constructions[<?= e($unitId) ?>][conservation_summary][approved_text]" placeholder="Guarda para generar el texto automático; luego puedes aprobarlo o ajustarlo."><?= e((string) ($unit['conservation_approved_text'] ?? $unit['conservation_generated_text'] ?? '')) ?></textarea>
+            <textarea class="input min-h-40" rows="7" maxlength="8000" name="unit_constructions[<?= e($unitId) ?>][conservation_summary][approved_text]" data-conservation-approved data-conservation-auto="<?= $summaryConservationIsAuto ? '1' : '0' ?>" data-conservation-last-generated="<?= e($generatedConservationText) ?>" placeholder="El sistema propondrá el texto al diligenciar; puedes ajustarlo antes del entregable."><?= e($summaryConservationText) ?></textarea>
         </label>
-        <button class="btn-secondary" type="submit">Regenerar texto con el nuevo estado</button>
+        <div class="flex flex-wrap items-center gap-3">
+            <button class="btn-secondary" type="button" data-conservation-regenerate>Regenerar texto con el nuevo estado</button>
+            <p class="text-xs text-slate-600" data-conservation-summary-status>El texto se guarda con el autoguardado. Si lo editas manualmente, no se sobrescribe sin pulsar regenerar.</p>
+        </div>
     </section>
 </div>

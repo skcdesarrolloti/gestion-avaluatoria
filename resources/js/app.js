@@ -10,6 +10,7 @@ import { phCommonLive } from './ph-common-live.js';
 import { obsolescenceLive } from './obsolescence-live.js';
 import { installUploadProgress } from './upload-progress.js';
 import { installHelpTooltips } from './help-tooltips.js';
+import { installConservationSummaryLive } from './conservation-summary-live.js';
 
 window.Alpine = Alpine;
 Alpine.data('appraisalForm', appraisalForm);
@@ -23,4 +24,5 @@ installModuleAutosave();
 installPhPdfUpload();
 installUploadProgress();
 installHelpTooltips();
+installConservationSummaryLive();
 installFetchNavigation();
