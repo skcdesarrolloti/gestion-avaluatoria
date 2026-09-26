@@ -63,7 +63,11 @@ $tabs = [
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{
-        activeTab: ['identificacion','tipologias','ubicacion','registro','fuentes','referencia','entorno','acceso','usos','servicios','cierre'].includes(location.hash.slice(1)) ? location.hash.slice(1) : 'identificacion',
+        activeTab: (() => {
+            const hash = location.hash.slice(1);
+            if (hash === 'midas') return 'registro';
+            return ['identificacion','tipologias','ubicacion','registro','fuentes','referencia','entorno','acceso','usos','servicios','cierre'].includes(hash) ? hash : 'identificacion';
+        })(),
         busy: false,
         typologyHint: <?= e(json_encode($field('igac_typology_hint'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         igacCategory: <?= e(json_encode($field('igac_category'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
@@ -92,7 +96,12 @@ $tabs = [
                 Misma lógica base de InversKC, organizada en subpestañas para diligenciar sin perderse.
             </p>
         </div>
-        <a class="btn-secondary" href="<?= e(url('maestros')) ?>">Abrir maestros</a>
+        <div class="flex flex-wrap gap-3">
+            <button class="btn-primary" type="button" @click="activeTab = 'registro'; history.replaceState(null, '', '#midas'); setTimeout(() => document.getElementById('midas')?.scrollIntoView({behavior: 'smooth', block: 'start'}), 50)">
+                Ir a MIDAS
+            </button>
+            <a class="btn-secondary" href="<?= e(url('maestros')) ?>">Abrir maestros</a>
+        </div>
     </div>
     <?php $academyModule = '3.1'; require BASE_PATH . '/app/Views/appraisals/subject-normative-academy.php'; ?>
     <?php if ($subjectMessage): ?><p class="mt-5 rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($subjectMessage) ?></p><?php endif; ?>
