@@ -75,6 +75,8 @@ final class AppraisalController
     }
 
     public function sector(string $id): void { view('appraisals/sector', ['title' => 'Sector y entorno', 'record' => $this->appraisals->find($id, $this->user['id'])]); }
+    public function economicAspect(string $id): void { view('appraisals/economic-aspect', ['title' => 'Aspecto económico', 'record' => $this->appraisals->find($id, $this->user['id'])]); }
+    public function restrictiveConditions(string $id): void { view('appraisals/restrictive-conditions', ['title' => 'Condiciones restrictivas', 'record' => $this->appraisals->find($id, $this->user['id'])]); }
     public function deliverable(string $id): void
     {
         $record = $this->appraisals->find($id, $this->user['id']);
