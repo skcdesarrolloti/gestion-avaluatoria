@@ -14,10 +14,6 @@ function inputText(node) {
     return typeof node?.value === 'string' ? node.value.trim() : '';
 }
 
-function sentence(label, value) {
-    return value ? `${label}: ${value}.` : '';
-}
-
 function stateWeight(text) {
     const match = text.match(/^(\d+(?:[.,]\d+)?)/);
     return match ? Number.parseFloat(match[1].replace(',', '.')) : 0;
@@ -27,12 +23,50 @@ function worstState(states) {
     return states.reduce((worst, state) => stateWeight(state) > stateWeight(worst) ? state : worst, '');
 }
 
+function findingFor(item) {
+    return item.finding || item.notes || 'sin hallazgo específico registrado';
+}
+
+function interpretationFor(item) {
+    const parts = [];
+    if (item.finding) parts.push('el hallazgo seleccionado sustenta la calificación adoptada');
+    if (item.functionality) parts.push(`funcionalidad ${item.functionality}`);
+    if (item.intervention) parts.push(`intervención aparente ${item.intervention}`);
+    if (!parts.length) return 'sin interpretación automática adicional por ausencia de hallazgo, funcionalidad o intervención seleccionada';
+    return parts.join('; ');
+}
+
+function groupConclusion(group) {
+    const parts = [`se asigna ${group.state || 'estado pendiente'} al grupo.`];
+    group.items.forEach(item => {
+        let line = `${item.label}: Hallazgo observado: ${findingFor(item)}. `;
+        line += `Interpretación técnica: ${interpretationFor(item)}. `;
+        line += `Estado asignado: ${item.state || 'pendiente'}.`;
+        if (item.notes) line += ` Observación del analista: ${item.notes.replace(/[.]+$/, '')}.`;
+        if (item.evidence) line += ` Evidencia: ${item.evidence.replace(/[.]+$/, '')}.`;
+        parts.push(line);
+    });
+    return parts.join(' ');
+}
+
+function shortConclusion(group) {
+    const worst = group.items.reduce((selected, item) => stateWeight(item.state) > stateWeight(selected?.state || '') ? item : selected, null);
+    if (!worst) return 'Sin conclusión automática.';
+    const finding = findingFor(worst);
+    return finding !== 'sin hallazgo específico registrado'
+        ? `${worst.label}: ${finding}`
+        : 'Componentes diligenciados sin hallazgo negativo específico.';
+}
+
 export function conservationSummaryText(panel) {
-    const rows = [];
     const states = [];
     const groups = new Map();
+    const allGroups = new Map();
 
     panel.querySelectorAll('[data-conservation-subcomponent]').forEach(component => {
+        const groupKey = component.dataset.conservationGroup || 'Conservación';
+        const groupNumber = component.dataset.conservationGroupNumber || '';
+        allGroups.set(groupKey, { number: groupNumber, label: groupKey });
         const applicability = selectText(field(component, 'applicability'), true) || 'Aplica';
         if (applicability.toLowerCase() === 'no aplica') return;
         const material = selectText(field(component, 'material'));
@@ -46,40 +80,42 @@ export function conservationSummaryText(panel) {
             || applicability.toLowerCase() !== 'aplica';
         if (!hasData) return;
 
-        const group = component.dataset.conservationGroup || 'Conservación';
         const label = component.dataset.conservationLabel || 'Elemento';
-        const parts = [
-            sentence('Aplicabilidad', applicability),
-            sentence('Tipo/material', material),
-            sentence('Hallazgo observable', finding),
-            sentence('Funcionalidad', functionality),
-            sentence('Intervención aparente', intervention),
-            sentence('Estado adoptado', adopted),
-            sentence('Observación técnica', notes),
-            sentence('Evidencia', evidence),
-        ].filter(Boolean).join(' ');
-        rows.push(`${group}: ${label}. ${parts}`);
+        if (!groups.has(groupKey)) groups.set(groupKey, { number: groupNumber, label: groupKey, state: '', items: [] });
+        const item = { label, material, finding, functionality, intervention, state: adopted, notes, evidence };
+        groups.get(groupKey).items.push(item);
         if (adopted) states.push(adopted);
-        groups.set(group, adopted || groups.get(group) || '');
+        groups.get(groupKey).state = worstState([groups.get(groupKey).state, adopted]);
     });
 
-    if (!rows.length) return '';
+    if (![...groups.values()].some(group => group.items.length)) return '';
 
     const adoptedGlobal = selectText(panel.querySelector('[name$="[conservation_summary][global_adopted]"]'));
     const justification = inputText(panel.querySelector('[name$="[conservation_summary][change_justification]"]'));
     const global = adoptedGlobal || worstState(states) || 'pendiente de adopción';
-    const groupText = [...groups.entries()]
-        .map(([group, state]) => `${group}: ${state || 'pendiente'}`)
-        .join('; ');
 
-    const lines = [
-        `Texto automático de conservación: se diligenciaron ${rows.length} componente(s) con información verificable para el numeral 7.`,
-        ...rows,
-        `Resumen por grupo: ${groupText}.`,
-        `Resultado global adoptado/propuesto: ${global}.`,
-    ];
-    if (justification) lines.push(`Justificación del analista: ${justification.replace(/[.]+$/, '')}.`);
-    lines.push('Base técnica: Resolución IGAC 941 de 2026, IN-GCT-PC03-01 V2 e IN-GCT-PC01-06 V1. Este texto documenta condición observable y criterio del analista; no reemplaza diagnóstico especializado.');
+    const lines = ['Cuadro resumen del estado de conservación', 'Grupo | Estado | Principal conclusión'];
+    allGroups.forEach((info, key) => {
+        const group = groups.get(key);
+        lines.push(group
+            ? `${info.label} | ${group.state || 'pendiente'} | ${shortConclusion(group)}`
+            : `${info.label} | No diligenciado | Sin conclusión automática por falta de selección.`);
+    });
+    lines.push(`Estado global | ${global} | Conclusión derivada de los grupos diligenciados.`);
+    lines.push('');
+    lines.push('Lectura técnica por grupo');
+    allGroups.forEach((info, key) => {
+        const group = groups.get(key);
+        const heading = `${info.number} ${info.label}`.trim();
+        lines.push(`${heading}: ${group ? groupConclusion(group) : 'no se registraron selecciones para este grupo; por tanto, no se emite calificación automática.'}`);
+    });
+    lines.push('');
+    let conclusion = `Conclusión global: del análisis integral de los componentes constructivos diligenciados se concluye que la unidad presenta un Estado de Conservación ${global}.`;
+    conclusion += ' La decisión se fundamenta en los hallazgos observados, la interpretación técnica registrada para cada grupo y la escala de estados de conservación utilizada por el IGAC.';
+    conclusion += ' Las condiciones críticas solo se afirman cuando el analista las haya seleccionado o descrito expresamente en observaciones o evidencia.';
+    if (justification) conclusion += ` Justificación del analista: ${justification.replace(/[.]+$/, '')}.`;
+    lines.push(conclusion);
+    lines.push('Base técnica: Resolución IGAC 941 de 2026, IN-GCT-PC03-01 V2 e IN-GCT-PC01-06 V1. La calificación documenta condición observable y criterio valuatorio; no sustituye diagnóstico especializado.');
     return lines.join('\n');
 }
 

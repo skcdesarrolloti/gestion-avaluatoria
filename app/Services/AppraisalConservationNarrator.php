@@ -12,6 +12,7 @@ final class AppraisalConservationNarrator
             $raw = is_array($postedItems[$id] ?? null) ? $postedItems[$id] : [];
             $item = [
                 'group_id' => (string) ($group['id'] ?? ''), 'group_label' => (string) ($group['label'] ?? ''),
+                'group_number' => (string) ($group['number'] ?? ''),
                 'subcomponent_id' => $id, 'subcomponent_label' => (string) ($sub['label'] ?? ''),
                 'applicability' => self::select($raw['applicability'] ?? 'aplica'),
                 'material' => self::text($raw['material'] ?? '', 160),
@@ -54,7 +55,7 @@ final class AppraisalConservationNarrator
             $state = self::proposedState($item);
             $states[] = $state;
             $gid = $item['group_id'];
-            $groups[$gid] ??= ['label' => $item['group_label'], 'items' => [], 'state' => ''];
+            $groups[$gid] ??= ['id' => $gid, 'number' => $item['group_number'], 'label' => $item['group_label'], 'items' => [], 'state' => ''];
             $item['state_proposed'] = $state;
             $groups[$gid]['items'][] = $item;
             if ($item['critical']) $critical[] = $item['subcomponent_label'] . ': ' . $item['finding'];
@@ -110,47 +111,18 @@ final class AppraisalConservationNarrator
 
     private static function generatedText(array $groups, string $proposed, string $adopted, array $critical, string $confidence, string $justification): string
     {
-        if (!$groups) return 'El estado de conservación queda pendiente de inspección por componentes.';
-        $lines = [];
-        foreach ($groups as $group) $lines[] = $group['conclusion'];
-        $lines[] = 'Resumen del estado de conservación por grupo:';
-        foreach ($groups as $group) $lines[] = $group['label'] . ' | ' . self::stateText($group['state']) . ' | ' . self::shortConclusion($group);
-        $global = 'Conclusión global: el sistema propone ' . self::stateText($proposed ?: $adopted)
-            . ' y se adopta ' . self::stateText($adopted ?: $proposed) . '. Nivel de verificación: ' . $confidence . '.';
-        if ($critical) $global .= ' Hallazgos críticos: ' . implode('; ', array_slice($critical, 0, 4)) . '.';
-        if ($justification !== '') $global .= ' Justificación del avaluador: ' . rtrim($justification, '.') . '.';
-        $lines[] = $global;
-        $lines[] = 'Base técnica: ' . AppraisalConservationCatalog::technicalReference() . ' Los catálogos de hallazgos, intervención y reglas de consolidación son una herramienta interna de trazabilidad y no sustituyen diagnóstico especializado.';
-        return implode("\n", $lines);
+        return AppraisalConservationReportWriter::build($groups, $proposed, $adopted, $critical, $confidence, $justification);
     }
 
     private static function groupConclusion(array $group): string
     {
-        $items = $group['items']; $names = array_column($items, 'subcomponent_label');
-        $findings = array_values(array_filter(array_map(static fn (array $i): string => $i['finding'], $items)));
-        $interventions = array_values(array_filter(array_map(static fn (array $i): string => $i['intervention'], $items)));
-        $text = $group['label'] . ': se evaluaron ' . implode(', ', array_slice($names, 0, 5)) . '.';
-        if ($findings) $text .= ' Hallazgos relevantes: ' . implode('; ', array_slice($findings, 0, 4)) . '.';
-        if ($interventions) $text .= ' Intervención predominante registrada: nivel ' . self::dominant($interventions) . '.';
-        return $text . ' Estado del grupo: ' . self::stateText($group['state']) . '.';
-    }
-
-    private static function shortConclusion(array $group): string
-    {
-        foreach ($group['items'] as $item) if ($item['finding'] !== '') return $item['finding'];
-        return 'Sin hallazgo relevante registrado';
+        return AppraisalConservationReportWriter::groupConclusion($group);
     }
 
     private static function worstState(array $states): string
     {
         $values = array_values(array_filter(array_map(static fn ($v): float => (float) $v, $states), static fn (float $v): bool => $v > 0));
         return $values ? rtrim(rtrim(number_format(max($values), 1, '.', ''), '0'), '.') : '';
-    }
-
-    private static function dominant(array $values): string
-    {
-        $counts = array_count_values($values); arsort($counts);
-        return (string) array_key_first($counts);
     }
 
     private static function stateText(string $state): string { return $state !== '' ? AppraisalConservationCatalog::stateLabel($state) : 'pendiente'; }

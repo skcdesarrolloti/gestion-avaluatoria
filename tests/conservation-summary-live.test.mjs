@@ -32,6 +32,7 @@ test('conservation summary is generated from filled component data', () => {
             if (selector !== '[data-conservation-subcomponent]') return [];
             return [component({
                 conservationGroup: 'Estructura',
+                conservationGroupNumber: '7.1',
                 conservationLabel: 'Sistema portante',
             }, {
                 applicability: new FakeSelect('aplica', 'Aplica'),
@@ -52,8 +53,11 @@ test('conservation summary is generated from filled component data', () => {
     };
 
     const text = conservationSummaryText(panel);
+    assert.match(text, /Cuadro resumen del estado de conservación/);
+    assert.match(text, /Lectura técnica por grupo/);
     assert.match(text, /Sistema portante/);
-    assert.match(text, /Concreto reforzado/);
-    assert.match(text, /Estado adoptado: 1 - Optimo/);
-    assert.match(text, /Resultado global adoptado\/propuesto: 1 - Optimo/);
+    assert.match(text, /Hallazgo observado:/);
+    assert.match(text, /Interpretación técnica:/);
+    assert.match(text, /Estado asignado: 1 - Optimo/);
+    assert.match(text, /Conclusión global:/);
 });

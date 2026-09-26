@@ -961,6 +961,9 @@ Certificado de tradicion.",
         && str_contains($constructionRows[0]['construction_conservation_json'], 'sistema_portante')
         && str_contains($constructionRows[0]['conservation_result_json'], 'catalog_version')
         && str_contains($constructionRows[0]['conservation_generated_text'], 'Conclusión global')
+        && str_contains($constructionRows[0]['conservation_generated_text'], 'Cuadro resumen del estado de conservación')
+        && str_contains($constructionRows[0]['conservation_generated_text'], 'Hallazgo observado')
+        && str_contains($constructionRows[0]['conservation_generated_text'], 'Interpretación técnica')
         && $constructionRows[0]['conservation_approved_text'] === 'La estructura se conserva en buen estado observable.',
         'construccion por unidad y conservacion 7.7 normalizadas');
     expect($constructionRows[0]['functional_bedrooms_count'] === 3

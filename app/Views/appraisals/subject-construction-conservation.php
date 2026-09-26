@@ -56,7 +56,7 @@ $summaryConservationIsAuto = $approvedConservationText === '' || ($generatedCons
                 $subId = (string) $sub['id'];
                 $stateValue = $conservationValue($subId, 'state_adopted') ?: $legacyState($subId);
                 ?>
-                <div class="rounded-xl border border-slate-200 bg-white p-4" data-conservation-subcomponent data-conservation-group="<?= e((string) $group['label']) ?>" data-conservation-label="<?= e((string) $sub['label']) ?>">
+                <div class="rounded-xl border border-slate-200 bg-white p-4" data-conservation-subcomponent data-conservation-group="<?= e((string) $group['label']) ?>" data-conservation-group-number="<?= e((string) $group['number']) ?>" data-conservation-label="<?= e((string) $sub['label']) ?>">
                     <div class="flex flex-wrap items-start justify-between gap-3">
                         <div><h5 class="font-semibold text-slate-950"><?= e((string) $sub['label']) ?></h5>
                             <p class="mt-1 max-w-3xl text-xs leading-5 text-slate-600"><?= e((string) $sub['object']) ?></p></div>
