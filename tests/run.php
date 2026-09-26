@@ -109,6 +109,13 @@ try {
     $lotGuide = $searchGuide->build(['tipo_inmueble' => 'lote', 'tipo_negocio' => 'venta'], [], [], []);
     $lotCriteria = mb_strtolower(implode(' ', array_merge($lotGuide['criteria'], $lotGuide['avoid'])));
     expect(str_contains($lotCriteria, 'lotes') && str_contains($lotCriteria, 'habitaciones'), 'metodologia guia lote sin variables de vivienda como criterio');
+    $lotFactors = implode(' ', array_merge(...array_values($lotGuide['factor_groups'])));
+    expect(str_contains($lotFactors, 'Frente') && !str_contains($lotFactors, 'Baños')
+        && !str_contains($lotFactors, 'Habitaciones'), 'matriz lote prioriza suelo y excluye vivienda');
+    $officeGuide = $searchGuide->build(['tipo_inmueble' => 'oficina', 'tipo_negocio' => 'venta'], [], [], []);
+    $officeFactors = implode(' ', array_merge(...array_values($officeGuide['factor_groups'])));
+    expect(str_contains($officeFactors, 'Imagen corporativa') && str_contains($officeFactors, 'Baños')
+        && !str_contains($officeFactors, 'Habitaciones'), 'matriz oficina excluye vivienda y conserva factores corporativos');
     $apartmentGuide = $searchGuide->build(['tipo_inmueble' => 'apartamento', 'regimen_ph' => 'si'], [], [], ['ph_name' => 'Edificio prueba']);
     expect(str_contains(mb_strtolower(implode(' ', $apartmentGuide['criteria'])), 'planta electrica')
         || str_contains(mb_strtolower(implode(' ', $apartmentGuide['criteria'])), 'planta eléctrica'), 'metodologia incorpora PH en apartamentos');
@@ -847,6 +854,15 @@ Certificado de tradicion.",
     expect(str_contains($warehouseFunctionalHtml, 'Muelles / puntos de cargue')
         && str_contains($warehouseFunctionalHtml, 'Altura libre')
         && !str_contains($warehouseFunctionalHtml, 'Habitaciones'), 'bodega muestra variables logisticas y excluye vivienda');
+    $unitId = 'unit-lot';
+    $unit = ['id' => $unitId, 'property_type' => 'lote'];
+    $record = ['tipo_inmueble' => 'lote'];
+    ob_start();
+    require BASE_PATH . '/app/Views/appraisals/subject-construction-functional.php';
+    $lotFunctionalHtml = ob_get_clean();
+    expect(str_contains($lotFunctionalHtml, 'Área de terreno')
+        && !str_contains($lotFunctionalHtml, 'Habitaciones')
+        && !str_contains($lotFunctionalHtml, 'Baños'), 'lote muestra factores de suelo sin variables residenciales');
     $unitId = $baseUnitId;
     $unit = $baseUnit;
     $record = $baseRecord;

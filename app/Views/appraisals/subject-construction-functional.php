@@ -2,18 +2,32 @@
 $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'] ?? ''));
 $functionalFields = \App\Support\AppraisalFunctionalVariableCatalog::fieldsFor($unitType);
 $functionalLabels = \App\Support\AppraisalFunctionalVariableCatalog::factorLabelsFor($unitType);
+$functionalGuide = \App\Support\AppraisalFunctionalVariableCatalog::guideFor($unitType);
+$functionalGroups = \App\Support\AppraisalFunctionalVariableCatalog::factorGroupsFor($unitType);
 $selectValue = static fn (string $key, string $value): string => $cv($unit, $key) === $value ? 'selected' : '';
 ?>
 <div class="mt-5 space-y-5" x-show="activeConstructionDetail === 'funcionales'">
     <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
-        Estas variables se filtran por tipo de inmueble para buscar comparables equivalentes.
-        Si necesitas otro factor, acláralo en notas y lo incorporamos a la matriz de esa tipología.
+        <strong><?= e($functionalGuide['title'] ?? 'Tipología pendiente') ?>:</strong>
+        <?= e($functionalGuide['summary'] ?? 'Define la tipología para activar los factores pertinentes.') ?>
     </div>
     <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
         <p class="text-xs font-semibold uppercase text-slate-500">Factores activos para esta tipología</p>
         <p class="mt-2 text-sm font-semibold leading-6 text-slate-800">
             <?= e($functionalLabels ? implode(' · ', $functionalLabels) : 'Sin factores funcionales activos') ?>
         </p>
+    </div>
+    <div class="grid gap-3 lg:grid-cols-4">
+        <?php foreach ($functionalGroups as $group => $items): ?>
+            <div class="rounded-xl border border-slate-200 bg-white p-4">
+                <p class="text-xs font-semibold uppercase text-slate-500"><?= e($group) ?></p>
+                <ul class="mt-2 space-y-1 text-sm leading-5 text-slate-700">
+                    <?php foreach ($items as $item): ?>
+                        <li>- <?= e($item) ?></li>
+                    <?php endforeach; ?>
+                </ul>
+            </div>
+        <?php endforeach; ?>
     </div>
     <div class="grid gap-5 md:grid-cols-3">
         <?php foreach ($functionalFields as $key => $definition): ?>

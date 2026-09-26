@@ -1,6 +1,7 @@
 <?php
 $currentStep = 'metodologia';
 $captured = $guide['captured'] ?? [];
+$factorGroups = $guide['factor_groups'] ?? [];
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
@@ -45,6 +46,25 @@ $captured = $guide['captured'] ?? [];
         <strong>Lectura técnica:</strong> los comparables deben parecerse primero en tipología, uso, localización,
         derecho, fecha y unidad de comparación. Las diferencias inevitables se documentan para homologación.
     </div>
+
+    <?php if ($factorGroups !== []): ?>
+        <div class="mt-6">
+            <p class="eyebrow">Matriz por tipología</p>
+            <h2 class="mt-2 text-2xl font-semibold">Factores que deben orientar la búsqueda</h2>
+            <div class="mt-4 grid gap-3 lg:grid-cols-4">
+                <?php foreach ($factorGroups as $group => $items): ?>
+                    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+                        <p class="text-xs font-semibold uppercase text-slate-500"><?= e($group) ?></p>
+                        <ul class="mt-2 space-y-1 text-sm leading-5 text-slate-700">
+                            <?php foreach ($items as $item): ?>
+                                <li>- <?= e($item) ?></li>
+                            <?php endforeach; ?>
+                        </ul>
+                    </div>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
 
     <div class="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div class="rounded-xl border border-slate-200 bg-white">

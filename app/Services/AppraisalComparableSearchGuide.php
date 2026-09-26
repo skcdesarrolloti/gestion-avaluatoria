@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Support\AppraisalCatalog;
+use App\Support\AppraisalFunctionalVariableCatalog;
 
 final class AppraisalComparableSearchGuide
 {
@@ -17,6 +18,7 @@ final class AppraisalComparableSearchGuide
             'criteria' => $profile['criteria'],
             'avoid' => $profile['avoid'],
             'homologation' => $profile['homologation'],
+            'factor_groups' => AppraisalFunctionalVariableCatalog::factorGroupsFor($type),
             'captured' => $this->captured($record, $subject, $units, $phProfile),
         ];
     }
@@ -53,11 +55,23 @@ final class AppraisalComparableSearchGuide
                 'avoid' => ['No asumir como anexo un parqueadero asignado sin matrícula independiente; dejarlo como atributo del sujeto o de la PH.'],
                 'homologation' => ['Distinguir parqueadero privado, comunal, asignado o de uso exclusivo antes de comparar precios unitarios.'],
             ],
-            'local', 'oficina', 'consultorio' => [
-                'criteria' => ['Inmuebles comerciales con ubicación, visibilidad, acceso, frente, vitrina o piso comparable.',
-                    'Área útil, área de apoyo, parqueaderos, PH, estado, acabados y flujo peatonal o vehicular semejantes.'],
-                'avoid' => ['No mezclar locales a la calle con oficinas interiores sin ajuste por exposición comercial.'],
-                'homologation' => ['Documentar diferencias por vitrina, esquina, centro comercial, piso alto, ascensor y administración.'],
+            'local' => [
+                'criteria' => ['Locales con ubicación comercial, frente, vitrina, visibilidad y flujo semejantes.',
+                    'Área útil, baño privado o común, parqueaderos, cargue liviano, estado y acabados comparables.'],
+                'avoid' => ['No mezclar locales a la calle con locales interiores o centros comerciales sin ajustar exposición y flujo.'],
+                'homologation' => ['Documentar diferencias por esquina, vitrina, centro comercial, administración, zona de comidas o corredor.'],
+            ],
+            'oficina' => [
+                'criteria' => ['Oficinas con área privada o eficiente, piso, edificio, acceso, parqueaderos y soporte común semejantes.',
+                    'Edificios corporativos con ascensor, seguridad, administración, planta eléctrica y estado comparable.'],
+                'avoid' => ['No usar habitaciones como variable de oficina ni mezclar con locales comerciales por simple cercanía.'],
+                'homologation' => ['Ajustar por piso, vista, imagen corporativa, eficiencia de área, parqueadero y calidad del edificio.'],
+            ],
+            'consultorio' => [
+                'criteria' => ['Consultorios con área, edificio, acceso de usuarios, salas o soporte de espera y parqueaderos semejantes.',
+                    'Priorizar inmuebles de servicios profesionales o salud cuando el mercado los trate de forma diferenciada.'],
+                'avoid' => ['No asumir equivalencia automática con oficinas si cambian habilitación, flujo de pacientes o servicios comunes.'],
+                'homologation' => ['Explicar diferencias por recepción, ascensor, baños, accesibilidad, parqueaderos y administración.'],
             ],
             'bodega' => [
                 'criteria' => ['Bodegas con altura libre, área operativa, muelles, patios, acceso de carga y uso industrial comparable.',
@@ -65,11 +79,17 @@ final class AppraisalComparableSearchGuide
                 'avoid' => ['No comparar con locales u oficinas si la renta o precio depende de logística, altura o operación industrial.'],
                 'homologation' => ['Ajustar por altura, resistencia de piso, muelles, maniobrabilidad, zonas francas o restricciones de uso.'],
             ],
-            'edificio', 'hotel' => [
+            'edificio' => [
                 'criteria' => ['Activos integrales con unidad económica, uso predominante, ocupación y escala comparable.',
                     'Área construida, niveles, estado, renta potencial, servicios, accesos y componentes complementarios semejantes.'],
                 'avoid' => ['No descomponer sin control un edificio en unidades aisladas si el mercado lo negocia como activo integral.'],
                 'homologation' => ['Precisar si se compara por m2 construido, renta, habitación, unidad rentable o potencial de reconversión.'],
+            ],
+            'hotel' => [
+                'criteria' => ['Hoteles u hospedajes con escala, habitaciones, zonas comunes, operación y ubicación turística semejantes.',
+                    'Comparar servicios, parqueaderos, recepción, cocina/restaurante, estado, equipos y capacidad operativa.'],
+                'avoid' => ['No compararlo como vivienda si el mercado reconoce una unidad económica de hospedaje.'],
+                'homologation' => ['Precisar si se compara por m2 construido, habitación, renta operativa o potencial de reconversión.'],
             ],
             'parqueadero' => [
                 'criteria' => ['Parqueaderos con relación jurídica equivalente: matrícula independiente, uso exclusivo, asignado o comunal.',
