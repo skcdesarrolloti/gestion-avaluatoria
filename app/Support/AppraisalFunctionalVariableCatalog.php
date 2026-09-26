@@ -25,11 +25,12 @@ final class AppraisalFunctionalVariableCatalog
         $direct = self::factorLabelsFor($type);
         $surface = $guide['surface'] ?? [];
         $special = self::specialAttributeLabelsFor($type) ?: ($guide['special'] ?? []);
+        $seen = [];
         return array_filter([
-            'Numeral 3.3 - Funcionales directos' => self::uniqueLabels($direct),
-            'Numerales 3.2 y 5 - Superficie, norma y localización' => self::uniqueLabels($surface),
-            'Numeral 3.4 - Atributos diferenciales' => self::uniqueLabels($special),
-            'Numeral 3.5 - PH, copropiedad o soporte común' => $guide['ph'] ?? [],
+            'Numeral 3.3 - Funcionales directos' => self::uniqueLabels($direct, $seen),
+            'Numerales 3.2 y 5 - Superficie, norma y localización' => self::uniqueLabels($surface, $seen),
+            'Numeral 3.4 - Atributos diferenciales' => self::uniqueLabels($special, $seen),
+            'Numeral 3.5 - PH, copropiedad o soporte común' => self::uniqueLabels($guide['ph'] ?? [], $seen),
         ]);
     }
 
@@ -184,9 +185,8 @@ final class AppraisalFunctionalVariableCatalog
         return compact('title', 'summary', 'surface', 'special', 'ph');
     }
 
-    private static function uniqueLabels(array $labels): array
+    private static function uniqueLabels(array $labels, array &$seen = []): array
     {
-        $seen = [];
         $unique = [];
         foreach ($labels as $label) {
             $label = trim((string) $label);

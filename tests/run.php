@@ -872,6 +872,12 @@ Certificado de tradicion.",
         $localFunctionalAttributeGroups['local_comercial'][1] ?? []);
     expect($localSpecialLabels === array_values(array_unique($localCatalogLabels)),
         'matriz local 3.3 toma atributos diferenciales desde el mismo catalogo de 3.4');
+    $localFactorGroups = \App\Support\AppraisalFunctionalVariableCatalog::factorGroupsFor('local');
+    $normalizedLocalLabels = array_map(static fn (string $label): string => trim(preg_replace('/[^a-z0-9]+/', ' ',
+        preg_replace('/\([^)]*\)/', '', strtolower(iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $label) ?: $label))) ?? ''),
+        array_merge(...array_values($localFactorGroups)));
+    expect(count($normalizedLocalLabels) === count(array_unique($normalizedLocalLabels)),
+        'matriz local no repite factores entre cuadros');
     $unitId = 'unit-lot';
     $unit = ['id' => $unitId, 'property_type' => 'lote'];
     $record = ['tipo_inmueble' => 'lote'];
