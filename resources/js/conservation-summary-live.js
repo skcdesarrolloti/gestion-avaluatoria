@@ -14,6 +14,31 @@ function inputText(node) {
     return typeof node?.value === 'string' ? node.value.trim() : '';
 }
 
+function stateDefinitions(panel) {
+    try {
+        const parsed = JSON.parse(panel?.dataset?.conservationStateDefinitions || '[]');
+        return Array.isArray(parsed) ? parsed : [];
+    } catch {
+        return [];
+    }
+}
+
+function stateDefinitionText(states, value) {
+    if (!value) return 'Selecciona un estado para ver el criterio técnico que sustentará la valoración.';
+    const state = states.find(item => String(item.value || '') === String(value));
+    if (!state) return 'No hay definición técnica cargada para este estado.';
+    return `${state.value} - ${state.label}: ${state.criterion} ${state.intervention} ${state.use}`.trim();
+}
+
+function refreshStateDefinitions(panel) {
+    const states = stateDefinitions(panel);
+    panel.querySelectorAll('[data-conservation-subcomponent]').forEach(component => {
+        const select = field(component, 'state_adopted');
+        const target = component.querySelector('[data-conservation-state-definition]');
+        if (target) target.textContent = stateDefinitionText(states, select?.value || '');
+    });
+}
+
 function stateWeight(text) {
     const match = text.match(/^(\d+(?:[.,]\d+)?)/);
     return match ? Number.parseFloat(match[1].replace(',', '.')) : 0;
@@ -151,7 +176,10 @@ function panelFor(target) {
 }
 
 function refreshAll(root = document) {
-    root.querySelectorAll?.('[data-conservation-panel]').forEach(panel => updatePanel(panel));
+    root.querySelectorAll?.('[data-conservation-panel]').forEach(panel => {
+        refreshStateDefinitions(panel);
+        updatePanel(panel);
+    });
 }
 
 export function installConservationSummaryLive(root = document) {
@@ -165,7 +193,10 @@ export function installConservationSummaryLive(root = document) {
     });
     root.addEventListener('change', event => {
         const panel = panelFor(event.target);
-        if (panel) updatePanel(panel);
+        if (panel) {
+            refreshStateDefinitions(panel);
+            updatePanel(panel);
+        }
     });
     root.addEventListener('click', event => {
         const button = event.target.closest?.('[data-conservation-regenerate]');

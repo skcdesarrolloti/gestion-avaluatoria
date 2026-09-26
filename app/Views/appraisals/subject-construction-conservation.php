@@ -2,6 +2,17 @@
 $conservationGroups = \App\Support\AppraisalConservationCatalog::groups();
 $conservationStates = \App\Support\AppraisalConservationCatalog::states();
 $conservationInterventions = \App\Support\AppraisalConservationCatalog::interventions();
+$stateDefinition = static function (string $value) use ($conservationStates): array {
+    foreach ($conservationStates as $state) {
+        if ((string) ($state['value'] ?? '') === $value) return $state;
+    }
+    return [];
+};
+$stateDefinitionText = static function (array $state): string {
+    if (!$state) return 'Selecciona un estado para ver el criterio técnico que sustentará la valoración.';
+    return trim(($state['value'] ?? '') . ' - ' . ($state['label'] ?? '') . ': '
+        . ($state['criterion'] ?? '') . ' ' . ($state['intervention'] ?? '') . ' ' . ($state['use'] ?? ''));
+};
 $conservationResult = json_decode((string) ($unit['conservation_result_json'] ?? '{}'), true);
 $conservationResult = is_array($conservationResult) ? $conservationResult : [];
 $conservationItems = is_array($conservationResult['items'] ?? null) ? $conservationResult['items'] : [];
@@ -22,6 +33,7 @@ $summaryConservationIsAuto = $approvedConservationText === '' || ($generatedCons
 ?>
 <div class="mt-5 space-y-5" x-show="activeConstructionDetail === 'conservacion'"
     x-data="{ activeConservation: '<?= e($firstConservationGroup) ?>' }"
+    data-conservation-state-definitions='<?= e(json_encode($conservationStates, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS | JSON_THROW_ON_ERROR)) ?>'
     data-conservation-panel>
     <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
         <div class="flex flex-wrap items-start justify-between gap-3">
@@ -112,6 +124,9 @@ $summaryConservationIsAuto = $approvedConservationText === '' || ($generatedCons
                                     <option value="<?= e($value) ?>" <?= $stateValue === $value ? 'selected' : '' ?>><?= e($value . ' - ' . (string) ($state['label'] ?? '')) ?></option>
                                 <?php endforeach; ?>
                             </select>
+                            <span class="mt-2 block rounded-md border border-amber-100 bg-amber-50 p-3 text-xs leading-5 text-amber-950" data-conservation-state-definition>
+                                <?= e($stateDefinitionText($stateDefinition($stateValue))) ?>
+                            </span>
                         </label>
                         <label class="label md:col-span-2">Observación técnica
                             <textarea class="input min-h-20" rows="2" maxlength="600" name="unit_constructions[<?= e($unitId) ?>][conservation_items][<?= e($subId) ?>][notes]" placeholder="Describe extensión, localización, causa aparente o salvedad."><?= e($conservationValue($subId, 'notes')) ?></textarea>
@@ -146,6 +161,22 @@ $summaryConservationIsAuto = $approvedConservationText === '' || ($generatedCons
                 </table>
             </div>
         <?php endif; ?>
+        <div class="overflow-x-auto rounded-xl border border-amber-100 bg-amber-50/40">
+            <table class="min-w-full text-left text-sm">
+                <thead class="bg-amber-100/70 text-xs uppercase text-amber-900">
+                    <tr><th class="p-3">Estado</th><th class="p-3">Criterio conceptual</th><th class="p-3">Contexto de uso</th></tr>
+                </thead>
+                <tbody class="divide-y divide-amber-100 bg-white/80">
+                    <?php foreach ($conservationStates as $state): ?>
+                        <tr>
+                            <td class="p-3 font-semibold text-slate-950"><?= e((string) ($state['value'] ?? '') . ' - ' . (string) ($state['label'] ?? '')) ?></td>
+                            <td class="p-3"><?= e((string) ($state['criterion'] ?? '')) ?></td>
+                            <td class="p-3"><?= e(trim((string) ($state['intervention'] ?? '') . ' ' . (string) ($state['use'] ?? ''))) ?></td>
+                        </tr>
+                    <?php endforeach; ?>
+                </tbody>
+            </table>
+        </div>
         <label class="label">Texto aprobado para Entregable
             <textarea class="input min-h-40" rows="7" maxlength="8000" name="unit_constructions[<?= e($unitId) ?>][conservation_summary][approved_text]" data-conservation-approved data-conservation-auto="<?= $summaryConservationIsAuto ? '1' : '0' ?>" data-conservation-last-generated="<?= e($generatedConservationText) ?>" placeholder="El sistema propondrá el texto al diligenciar; puedes ajustarlo antes del entregable."><?= e($summaryConservationText) ?></textarea>
         </label>
