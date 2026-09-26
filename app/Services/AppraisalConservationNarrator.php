@@ -14,6 +14,8 @@ final class AppraisalConservationNarrator
                 'group_id' => (string) ($group['id'] ?? ''), 'group_label' => (string) ($group['label'] ?? ''),
                 'group_number' => (string) ($group['number'] ?? ''),
                 'subcomponent_id' => $id, 'subcomponent_label' => (string) ($sub['label'] ?? ''),
+                'criticality' => (string) ($sub['criticality'] ?? ''),
+                'weight' => self::weightFor((string) ($sub['criticality'] ?? '')),
                 'applicability' => self::select($raw['applicability'] ?? 'aplica'),
                 'material' => self::text($raw['material'] ?? '', 160),
                 'finding' => self::text($raw['finding'] ?? '', 220),
@@ -47,26 +49,33 @@ final class AppraisalConservationNarrator
 
     private static function result(array $items, array $summary, ?int $actorId): array
     {
-        $groups = []; $critical = []; $verified = 0; $applicable = 0; $states = [];
+        $groups = []; $critical = []; $verified = 0; $applicable = 0;
         foreach ($items as $item) {
             if ($item['applicability'] === 'no_aplica') continue;
             $applicable++;
             if ($item['applicability'] !== 'no_verificable') $verified++;
-            $state = self::proposedState($item);
-            $states[] = $state;
+            $item += self::factorMetrics($item);
+            $state = self::stateFromScore((float) $item['factor_score']);
             $gid = $item['group_id'];
-            $groups[$gid] ??= ['id' => $gid, 'number' => $item['group_number'], 'label' => $item['group_label'], 'items' => [], 'state' => ''];
+            $groups[$gid] ??= [
+                'id' => $gid, 'number' => $item['group_number'], 'label' => $item['group_label'],
+                'weight' => self::groupWeightFor($gid), 'items' => [], 'state' => ''
+            ];
             $item['state_proposed'] = $state;
             $groups[$gid]['items'][] = $item;
             if ($item['critical']) $critical[] = $item['subcomponent_label'] . ': ' . $item['finding'];
         }
         foreach ($groups as &$group) {
-            $groupStates = array_map(static fn (array $item): string => $item['state_adopted'] ?: $item['state_proposed'], $group['items']);
-            $group['state'] = self::worstState($groupStates);
+            $score = self::weightedScore($group['items']);
+            $group['score'] = $score['score'];
+            $group['weight_total'] = $score['weight_total'];
+            $group['weighted_sum'] = $score['weighted_sum'];
+            $group['state'] = self::stateFromScore($score['score']);
             $group['conclusion'] = self::groupConclusion($group);
         }
         unset($group);
-        $proposed = self::worstState($states) ?: '';
+        $globalScore = self::globalScore($groups);
+        $proposed = self::stateFromScore($globalScore['score']);
         $adopted = self::state($summary['global_adopted'] ?? '') ?: $proposed;
         $justification = self::text($summary['change_justification'] ?? '', 1200);
         $confidence = $applicable === 0 ? 'Baja' : (($verified / $applicable) >= 0.8 ? 'Alta' : (($verified / $applicable) >= 0.5 ? 'Media' : 'Baja'));
@@ -74,6 +83,8 @@ final class AppraisalConservationNarrator
         return [
             'items' => $items, 'groups' => array_values($groups), 'critical_findings' => $critical,
             'state_global_proposed' => $proposed, 'state_global_adopted' => $adopted,
+            'score_global' => $globalScore['score'], 'weight_total' => $globalScore['weight_total'],
+            'weighted_sum' => $globalScore['weighted_sum'],
             'change_justification' => $justification, 'confidence' => $confidence,
             'verified_count' => $verified, 'applicable_count' => $applicable,
             'generated_text' => $generated, 'generated_at' => gmdate('Y-m-d H:i:s'),
@@ -99,14 +110,23 @@ final class AppraisalConservationNarrator
         return compact('severity', 'critical', 'guide', 'interventionSeverity');
     }
 
-    private static function proposedState(array $item): string
+    private static function factorMetrics(array $item): array
     {
-        if ($item['state_adopted'] !== '') return $item['state_adopted'];
-        if ($item['applicability'] === 'no_aplica' || $item['applicability'] === 'no_verificable') return '';
-        $severity = max((int) $item['severity'], (int) $item['interventionSeverity']);
-        if ($item['critical'] && $severity >= 4) return '4.5';
-        if ($item['critical']) return '3.5';
-        return ['2', '2.5', '3', '3.5', '4', '4.5'][$severity] ?? '2';
+        if ($item['applicability'] === 'no_aplica' || $item['applicability'] === 'no_verificable') {
+            return ['finding_state' => '', 'intervention_state' => '', 'functionality_floor' => '', 'factor_score' => 0.0];
+        }
+        $finding = self::severityScore((int) $item['severity']);
+        $intervention = self::severityScore((int) $item['interventionSeverity']);
+        $floor = self::functionalityFloor($item['functionality']);
+        $score = max($finding, $intervention, $floor);
+        if ($item['critical'] && $score < 3.5) $score = 3.5;
+        if ($item['critical'] && (int) $item['severity'] >= 4) $score = max($score, 4.5);
+        return [
+            'finding_state' => self::stateFromScore($finding),
+            'intervention_state' => self::stateFromScore($intervention),
+            'functionality_floor' => $floor > 0 ? self::stateFromScore($floor) : '',
+            'factor_score' => (float) self::stateFromScore($score),
+        ];
     }
 
     private static function generatedText(array $groups, string $proposed, string $adopted, array $critical, string $confidence, string $justification): string
@@ -119,10 +139,60 @@ final class AppraisalConservationNarrator
         return AppraisalConservationReportWriter::groupConclusion($group);
     }
 
-    private static function worstState(array $states): string
+    private static function weightedScore(array $items): array
     {
-        $values = array_values(array_filter(array_map(static fn ($v): float => (float) $v, $states), static fn (float $v): bool => $v > 0));
-        return $values ? rtrim(rtrim(number_format(max($values), 1, '.', ''), '0'), '.') : '';
+        $sum = 0.0; $weights = 0.0;
+        foreach ($items as $item) {
+            $state = (float) ($item['state_adopted'] ?: $item['state_proposed'] ?: 0);
+            if ($state <= 0) continue;
+            $weight = (float) ($item['weight'] ?? 1);
+            $sum += $state * $weight;
+            $weights += $weight;
+        }
+        return ['score' => $weights > 0 ? $sum / $weights : 0.0, 'weighted_sum' => $sum, 'weight_total' => $weights];
+    }
+
+    private static function globalScore(array $groups): array
+    {
+        $sum = 0.0; $weights = 0.0;
+        foreach ($groups as $group) {
+            $score = (float) ($group['score'] ?? 0);
+            if ($score <= 0) continue;
+            $weight = (float) ($group['weight'] ?? 1);
+            $sum += $score * $weight;
+            $weights += $weight;
+        }
+        return ['score' => $weights > 0 ? $sum / $weights : 0.0, 'weighted_sum' => $sum, 'weight_total' => $weights];
+    }
+
+    private static function severityScore(int $severity): float
+    {
+        return [0 => 2.0, 1 => 2.5, 2 => 3.0, 3 => 3.5, 4 => 4.0, 5 => 4.5][$severity] ?? 2.0;
+    }
+
+    private static function functionalityFloor(string $functionality): float
+    {
+        return ['normal' => 2.0, 'observaciones' => 2.5, 'limitada' => 3.0, 'no_funcional' => 4.0][$functionality] ?? 0.0;
+    }
+
+    private static function stateFromScore(float $score): string
+    {
+        if ($score <= 0) return '';
+        $rounded = max(1.0, min(5.0, round($score * 2) / 2));
+        return rtrim(rtrim(number_format($rounded, 1, '.', ''), '0'), '.');
+    }
+
+    private static function weightFor(string $criticality): float
+    {
+        return ['Crítica' => 1.5, 'Alta' => 1.25, 'Media' => 1.0, 'Baja' => 0.75][$criticality] ?? 1.0;
+    }
+
+    private static function groupWeightFor(string $groupId): float
+    {
+        return [
+            'estructura' => 2.0, 'instalaciones' => 1.5, 'envolvente' => 1.25,
+            'acabados' => 1.0, 'espacios_funcionales' => 1.0, 'condiciones_ambientales' => 0.75,
+        ][$groupId] ?? 1.0;
     }
 
     private static function stateText(string $state): string { return $state !== '' ? AppraisalConservationCatalog::stateLabel($state) : 'pendiente'; }

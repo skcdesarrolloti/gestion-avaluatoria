@@ -4,7 +4,9 @@ $stateValue = $conservationValue($subId, 'state_adopted') ?: $legacyState($subId
 ?>
 <div class="rounded-xl border border-slate-200 bg-white p-4" data-conservation-subcomponent
     data-conservation-group="<?= e((string) $group['label']) ?>"
+    data-conservation-group-id="<?= e((string) $group['id']) ?>"
     data-conservation-group-number="<?= e((string) $group['number']) ?>"
+    data-conservation-criticality="<?= e((string) $sub['criticality']) ?>"
     data-conservation-label="<?= e((string) $sub['label']) ?>">
     <div class="flex flex-wrap items-start justify-between gap-3">
         <div>
@@ -67,6 +69,9 @@ $stateValue = $conservationValue($subId, 'state_adopted') ?: $legacyState($subId
             </select>
             <span class="mt-2 block rounded-md border border-amber-100 bg-amber-50 p-3 text-xs leading-5 text-amber-950" data-conservation-state-definition><?= e($stateDefinitionText($stateDefinition($stateValue))) ?></span>
         </label>
+        <div class="rounded-md border border-slate-200 bg-slate-50 p-3 text-xs leading-5 text-slate-700 md:col-span-3">
+            <strong>Lectura asistida:</strong> el hallazgo observable da la base; la funcionalidad fija un piso de coherencia; la intervención aparente sirve como contraste técnico. El estado adoptado por el analista prevalece y queda sustentado con observación y evidencia.
+        </div>
         <label class="label md:col-span-2">Observación técnica
             <textarea class="input min-h-20" rows="2" maxlength="600" name="unit_constructions[<?= e($unitId) ?>][conservation_items][<?= e($subId) ?>][notes]" placeholder="Describe extensión, localización, causa aparente o salvedad."><?= e($conservationValue($subId, 'notes')) ?></textarea>
         </label>

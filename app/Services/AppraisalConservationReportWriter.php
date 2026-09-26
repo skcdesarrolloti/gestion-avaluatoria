@@ -23,7 +23,7 @@ final class AppraisalConservationReportWriter
             foreach ($group['items'] as $item) $lines[] = self::factorDetail($group, $item);
         }
         $lines[] = '';
-        $lines[] = 'Método de cálculo: cada factor aporta su estado adoptado; si no se adopta manualmente, el sistema propone uno desde hallazgo e intervención. El estado del grupo es la mayor calificación numérica entre sus factores aplicables. El estado global es la mayor calificación numérica entre grupos, salvo adopción manual justificada.';
+        $lines[] = 'Método de cálculo: el estado sugerido de cada factor nace de hallazgo observable, funcionalidad e intervención aparente. El grupo se calcula con índice técnico = suma(estado del factor x peso del factor) / suma(pesos). El estado global pondera los grupos, dando mayor peso a estructura e instalaciones por su incidencia en vida útil, seguridad y reparabilidad. Es una regla interna de apoyo basada en la escala IGAC; el analista puede adoptar otro estado si lo justifica.';
         $lines[] = '';
         $lines[] = 'Lectura técnica por grupo';
         foreach (AppraisalConservationCatalog::groups() as $catalogGroup) {
@@ -41,7 +41,7 @@ final class AppraisalConservationReportWriter
 
     public static function groupConclusion(array $group): string
     {
-        $parts = ['se asigna ' . self::stateText($group['state']) . ' al grupo a partir de ' . count($group['items']) . ' factor(es); se toma la mayor calificación numérica aplicable.'];
+        $parts = ['se asigna ' . self::stateText($group['state']) . ' al grupo a partir de ' . count($group['items']) . ' factor(es), con índice técnico ponderado ' . self::scoreText((float) ($group['score'] ?? 0)) . ' y peso global ' . self::scoreText((float) ($group['weight'] ?? 1)) . '.'];
         foreach ($group['items'] as $item) {
             $line = $item['subcomponent_label'] . ': Hallazgo observado: ' . self::observedFinding($item) . '. ';
             $line .= 'Interpretación técnica: ' . self::interpretationFor($item) . '. ';
@@ -57,7 +57,10 @@ final class AppraisalConservationReportWriter
     {
         $state = self::stateText($item['state_adopted'] ?: $item['state_proposed']);
         return $group['label'] . ' - ' . $item['subcomponent_label'] . ' | ' . $state . ' | '
-            . self::observedFinding($item) . ' | Entra al cálculo del grupo; el grupo adopta el mayor estado numérico de sus factores aplicables.';
+            . 'hallazgo base ' . self::stateText((string) ($item['finding_state'] ?? '')) . ', funcionalidad piso '
+            . self::stateText((string) ($item['functionality_floor'] ?? '')) . ', intervención referencia '
+            . self::stateText((string) ($item['intervention_state'] ?? '')) . ' | Peso '
+            . self::scoreText((float) ($item['weight'] ?? 1)) . '; aporta estado x peso al índice ponderado del grupo.';
     }
 
     private static function globalConclusion(array $groups, string $proposed, string $adopted, array $critical, string $confidence, string $justification): string
@@ -129,5 +132,10 @@ final class AppraisalConservationReportWriter
     private static function stateText(string $state): string
     {
         return $state !== '' ? AppraisalConservationCatalog::stateLabel($state) : 'pendiente';
+    }
+
+    private static function scoreText(float $score): string
+    {
+        return rtrim(rtrim(number_format($score, 2, ',', ''), '0'), ',');
     }
 }

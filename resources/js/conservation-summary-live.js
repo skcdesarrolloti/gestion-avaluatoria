@@ -1,8 +1,6 @@
 import { refreshConservationFieldDefinitions } from './conservation-field-definitions.js';
 
-function field(container, name) {
-    return container.querySelector(`[name$="[${name}]"]`);
-}
+function field(container, name) { return container.querySelector(`[name$="[${name}]"]`); }
 
 function selectText(node, includeEmpty = false) {
     if (!(node instanceof HTMLSelectElement)) return '';
@@ -12,22 +10,38 @@ function selectText(node, includeEmpty = false) {
     return option.textContent.trim();
 }
 
-function inputText(node) {
-    return typeof node?.value === 'string' ? node.value.trim() : '';
-}
+function inputText(node) { return typeof node?.value === 'string' ? node.value.trim() : ''; }
 
 function stateWeight(text) {
     const match = text.match(/^(\d+(?:[.,]\d+)?)/);
     return match ? Number.parseFloat(match[1].replace(',', '.')) : 0;
 }
 
-function worstState(states) {
-    return states.reduce((worst, state) => stateWeight(state) > stateWeight(worst) ? state : worst, '');
+function factorWeight(criticality) { return { Crítica: 1.5, Alta: 1.25, Media: 1, Baja: 0.75 }[criticality] ?? 1; }
+
+function groupWeight(id) {
+    const weights = { estructura: 2, instalaciones: 1.5, envolvente: 1.25, acabados: 1, espacios_funcionales: 1, condiciones_ambientales: 0.75 };
+    return weights[id] ?? 1;
 }
 
-function findingFor(item) {
-    return item.finding || item.notes || 'sin hallazgo específico registrado';
+function stateFromScore(score) {
+    if (!score) return '';
+    const rounded = Math.max(1, Math.min(5, Math.round(score * 2) / 2));
+    return Number.isInteger(rounded) ? String(rounded) : rounded.toFixed(1);
 }
+
+function weightedScore(items) {
+    const total = items.reduce((acc, item) => {
+        const state = stateWeight(item.state);
+        if (!state) return acc;
+        acc.sum += state * item.weight;
+        acc.weight += item.weight;
+        return acc;
+    }, { sum: 0, weight: 0 });
+    return total.weight ? total.sum / total.weight : 0;
+}
+
+function findingFor(item) { return item.finding || item.notes || 'sin hallazgo específico registrado'; }
 
 function interpretationFor(item) {
     const parts = [];
@@ -39,7 +53,8 @@ function interpretationFor(item) {
 }
 
 function groupConclusion(group) {
-    const parts = [`se asigna ${group.state || 'estado pendiente'} al grupo a partir de ${group.items.length} factor(es); se toma la mayor calificación numérica aplicable.`];
+    const score = group.score ? group.score.toFixed(2).replace('.', ',') : 'pendiente';
+    const parts = [`se asigna ${group.state || 'estado pendiente'} al grupo a partir de ${group.items.length} factor(es), con índice técnico ponderado ${score}.`];
     group.items.forEach(item => {
         let line = `${item.label}: Hallazgo observado: ${findingFor(item)}. `;
         line += `Interpretación técnica: ${interpretationFor(item)}. `;
@@ -61,14 +76,14 @@ function shortConclusion(group) {
 }
 
 export function conservationSummaryText(panel) {
-    const states = [];
     const groups = new Map();
     const allGroups = new Map();
 
     panel.querySelectorAll('[data-conservation-subcomponent]').forEach(component => {
         const groupKey = component.dataset.conservationGroup || 'Conservación';
+        const groupId = component.dataset.conservationGroupId || groupKey;
         const groupNumber = component.dataset.conservationGroupNumber || '';
-        allGroups.set(groupKey, { number: groupNumber, label: groupKey });
+        allGroups.set(groupKey, { id: groupId, number: groupNumber, label: groupKey });
         const applicability = selectText(field(component, 'applicability'), true) || 'Aplica';
         if (applicability.toLowerCase() === 'no aplica') return;
         const material = selectText(field(component, 'material'));
@@ -83,18 +98,25 @@ export function conservationSummaryText(panel) {
         if (!hasData) return;
 
         const label = component.dataset.conservationLabel || 'Elemento';
-        if (!groups.has(groupKey)) groups.set(groupKey, { number: groupNumber, label: groupKey, state: '', items: [] });
-        const item = { label, material, finding, functionality, intervention, state: adopted, notes, evidence };
+        if (!groups.has(groupKey)) groups.set(groupKey, { id: groupId, number: groupNumber, label: groupKey, state: '', score: 0, items: [] });
+        const item = {
+            label, material, finding, functionality, intervention, state: adopted, notes, evidence,
+            weight: factorWeight(component.dataset.conservationCriticality || ''),
+        };
         groups.get(groupKey).items.push(item);
-        if (adopted) states.push(adopted);
-        groups.get(groupKey).state = worstState([groups.get(groupKey).state, adopted]);
     });
 
     if (![...groups.values()].some(group => group.items.length)) return '';
+    groups.forEach(group => {
+        group.score = weightedScore(group.items);
+        group.state = stateFromScore(group.score);
+    });
 
     const adoptedGlobal = selectText(panel.querySelector('[name$="[conservation_summary][global_adopted]"]'));
     const justification = inputText(panel.querySelector('[name$="[conservation_summary][change_justification]"]'));
-    const global = adoptedGlobal || worstState(states) || 'pendiente de adopción';
+    const globalRaw = weightedScore([...groups.values()].map(group => ({ state: String(group.score || ''), weight: groupWeight(group.id) })));
+    const global = adoptedGlobal || stateFromScore(globalRaw) || 'pendiente de adopción';
+    const globalScore = globalRaw ? globalRaw.toFixed(2).replace('.', ',') : 'pendiente';
 
     const lines = ['Cuadro resumen del estado de conservación', 'Grupo | Estado | Principal conclusión'];
     allGroups.forEach((info, key) => {
@@ -108,11 +130,11 @@ export function conservationSummaryText(panel) {
     lines.push('Detalle de calificación por factor');
     groups.forEach(group => {
         group.items.forEach(item => {
-            lines.push(`${group.label} - ${item.label} | ${item.state || 'pendiente'} | ${findingFor(item)} | ${item.state ? 'Entra al cálculo del grupo.' : 'Pendiente de estado para cálculo.'}`);
+            lines.push(`${group.label} - ${item.label} | ${item.state || 'pendiente'} | ${findingFor(item)} | peso ${String(item.weight).replace('.', ',')}; aporta estado x peso al índice del grupo.`);
         });
     });
     lines.push('');
-    lines.push('Método de cálculo: cada factor aporta su estado adoptado; si no se adopta manualmente, el sistema propone uno desde hallazgo e intervención. El estado del grupo es la mayor calificación numérica entre sus factores aplicables. El estado global es la mayor calificación numérica entre grupos, salvo adopción manual justificada.');
+    lines.push(`Método de cálculo: el estado sugerido del factor nace de hallazgo observable, funcionalidad e intervención aparente. El grupo usa índice técnico = suma(estado del factor x peso del factor) / suma(pesos). El global pondera grupos, dando mayor peso a estructura e instalaciones por su incidencia en vida útil, seguridad y reparabilidad. Índice global: ${globalScore}. Es una regla interna de apoyo basada en la escala IGAC; el analista puede adoptar otro estado si lo justifica.`);
     lines.push('');
     lines.push('Lectura técnica por grupo');
     allGroups.forEach((info, key) => {
@@ -157,14 +179,11 @@ function updatePanel(panel, force = false, dispatch = true) {
     }
 }
 
-function panelFor(target) {
-    return target?.closest?.('[data-conservation-panel]') ?? null;
-}
+function panelFor(target) { return target?.closest?.('[data-conservation-panel]') ?? null; }
 
 function refreshAll(root = document) {
     root.querySelectorAll?.('[data-conservation-panel]').forEach(panel => {
-        refreshConservationFieldDefinitions(panel);
-        updatePanel(panel);
+        refreshConservationFieldDefinitions(panel); updatePanel(panel);
     });
 }
 
@@ -179,10 +198,7 @@ export function installConservationSummaryLive(root = document) {
     });
     root.addEventListener('change', event => {
         const panel = panelFor(event.target);
-        if (panel) {
-            refreshConservationFieldDefinitions(panel);
-            updatePanel(panel);
-        }
+        if (panel) { refreshConservationFieldDefinitions(panel); updatePanel(panel); }
     });
     root.addEventListener('click', event => {
         const button = event.target.closest?.('[data-conservation-regenerate]');
