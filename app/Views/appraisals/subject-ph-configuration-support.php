@@ -21,6 +21,8 @@ $units = $technicalValue('numero_unidades');
 $offices = $technicalValue('numero_oficinas');
 $premises = $technicalValue('numero_locales');
 $parking = $technicalValue('numero_parqueaderos');
+$subjectParkingRelation = $technicalValue('parqueadero_relacion_sujeto');
+$subjectParkingId = $technicalValue('parqueadero_identificacion_sujeto');
 $deposits = $technicalValue('numero_depositos');
 $buildings = $technicalValue('numero_edificios');
 $floors = $technicalValue('numero_pisos');
@@ -43,6 +45,7 @@ $configRows = [
     ['Número de oficinas', $configShort($offices) ?: 'Sin número de oficinas', $offices !== '' ? 'ok' : 'warn', 'Completar si la PH tiene componente corporativo o de consultorios.'],
     ['Número de locales', $configShort($premises) ?: 'Sin número de locales', $premises !== '' ? 'ok' : 'warn', 'Completar si existen locales comerciales o atención al público.'],
     ['Número de parqueaderos', $configShort($parking) ?: 'Sin número de parqueaderos', $parking !== '' ? 'ok' : 'warn', 'Precisar privados, visitantes o comunales si el soporte lo permite.'],
+    ['Parqueadero del bien sujeto', $configShort(trim($subjectParkingRelation . ' ' . $subjectParkingId)) ?: 'Sin relación de parqueadero del sujeto', ($subjectParkingRelation !== '' || $subjectParkingId !== '') ? 'ok' : 'warn', 'Separar anexo con matrícula independiente de parqueadero asignado o de uso exclusivo.'],
     ['Número de depósitos', $configShort($deposits) ?: 'Sin número de depósitos', $deposits !== '' ? 'ok' : 'warn', 'Completar si existen depósitos, cuartos útiles o bodegajes menores.'],
     ['Bloques, torres, edificios o naves', $configShort($buildings) ?: 'Sin bloques o edificios', $buildings !== '' ? 'ok' : 'warn', 'Describir la organización física de la copropiedad.'],
     ['Número de pisos o niveles', $configShort($floors) ?: 'Sin número de pisos', $floors !== '' ? 'ok' : 'warn', 'Registrar pisos, niveles o plantas principales.'],

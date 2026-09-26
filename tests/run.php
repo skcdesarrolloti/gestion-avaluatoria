@@ -910,10 +910,15 @@ Certificado de tradicion.",
     $_POST = ['ph' => ['ph_key' => 'NIT 900123456', 'ph_name' => 'Conjunto Prueba',
         'common_areas' => ['porteria' => ['status' => 'ok', 'notes' => 'Acceso controlado'],
             'inventado' => ['status' => 'risk', 'notes' => 'No debe pasar']],
+        'technical' => ['alcance_planta_electrica' => 'Cubre zonas comunes y ascensores.',
+            'parqueadero_relacion_sujeto' => 'Asignado por reglamento, sin matrícula independiente.',
+            'parqueadero_identificacion_sujeto' => 'Parqueadero 12'],
         'documents' => ['paquete_zip' => ['status' => 'warn', 'notes' => 'Pendiente de carga masiva']]]];
     $phData = AppraisalPhInput::data();
     expect($phData['ph_key'] === 'NIT 900123456'
         && ($phData['common_areas']['porteria']['status'] ?? '') === 'ok'
+        && ($phData['technical']['alcance_planta_electrica'] ?? '') === 'Cubre zonas comunes y ascensores.'
+        && str_contains((string) ($phData['technical']['parqueadero_relacion_sujeto'] ?? ''), 'Asignado')
         && !isset($phData['common_areas']['inventado']), 'propiedad horizontal normaliza checklist');
     $_POST = ['ph' => ['ph_name' => 'Edificio Llave Nombre']];
     expect(AppraisalPhInput::data()['ph_key'] === 'Edificio Llave Nombre',
@@ -1073,7 +1078,8 @@ Certificado de tradicion.",
         && str_contains((string) ($phQuantityAnalysis['core']['report_text'] ?? ''), 'parqueaderos: 120 parqueaderos'),
         'entregable PH integra configuracion cargada');
     $phCommonRich = (new AppraisalPhReportBuilder())->build(['ph_name' => 'PH Dotado'],
-        ['numero_ascensores' => '6 ascensores'],
+        ['numero_ascensores' => '6 ascensores', 'alcance_planta_electrica' => 'cobertura parcial para ascensores y zonas comunes',
+            'parqueadero_relacion_sujeto' => 'parqueadero asignado sin matrícula independiente', 'parqueadero_identificacion_sujeto' => 'Parqueadero 12'],
         ['terreno_estructura' => ['status' => 'ok', 'notes' => 'Reglamento'],
             'red_incendio' => ['status' => 'ok', 'notes' => 'Reglamento'],
             'planta_electrica' => ['status' => 'ok', 'notes' => 'Visita'],
@@ -1085,6 +1091,8 @@ Certificado de tradicion.",
         && str_contains($richCommonText, 'soporte operativo y técnico')
         && str_contains($richCommonText, 'bienes comunes no esenciales y amenidades')
         && str_contains($richCommonText, 'planta eléctrica favorece continuidad operativa')
+        && str_contains($richCommonText, 'cobertura parcial para ascensores y zonas comunes')
+        && str_contains($richCommonText, 'parqueadero asignado sin matrícula independiente')
         && str_contains($richCommonText, 'las salas comunes o coworking agregan flexibilidad de uso'),
         'entregable PH resalta bienes comunes y amenidades con incidencia');
     $sourceRef = (new \App\Services\AppraisalPhSourceReference())->fromText('Contenidos en ESCRITURA Nro 2593 de fecha 29-12-2001 en NOTARIA 61 de BOGOTA');

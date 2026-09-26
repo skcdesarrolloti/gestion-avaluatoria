@@ -26,7 +26,8 @@ final class AppraisalPhDeliverableTextBuilder
         $facts = $this->values(['número de pisos' => 'numero_pisos', 'sótanos' => 'numero_sotanos',
             'ascensores' => 'numero_ascensores', 'edad aproximada' => 'edad_aproximada_ph',
             'uso o destinación dominante' => 'uso_dominante', 'unidades privadas' => 'numero_unidades',
-            'parqueaderos' => 'numero_parqueaderos'], $technical, $typology);
+            'parqueaderos' => 'numero_parqueaderos', 'relación del parqueadero del bien sujeto' => 'parqueadero_relacion_sujeto',
+            'identificación del parqueadero' => 'parqueadero_identificacion_sujeto'], $technical, $typology);
         $text = $facts ? 'La configuración documental útil para el avalúo registra ' . implode('; ', $facts) . '.' : '';
         $distribution = $this->clean($technical['organizacion_interna'] ?? '', 420);
         if ($distribution !== '') $text .= ($text !== '' ? ' ' : '') . 'La distribución funcional depurada indica: ' . $distribution . '.';
@@ -142,7 +143,10 @@ final class AppraisalPhDeliverableTextBuilder
             if ($this->hasCommon($common, 'control_acceso_pesado')) $parts[] = 'el control de acceso pesado reduce fricción operativa';
             if ($this->hasCommon($common, 'vias_internas')) $parts[] = 'las vías internas fortalecen movilidad y segregación de flujos';
         }
-        if ($this->hasCommon($common, 'planta_electrica')) $parts[] = 'la planta eléctrica favorece continuidad operativa';
+        if ($this->hasCommon($common, 'planta_electrica')) {
+            $scope = $this->clean($technical['alcance_planta_electrica'] ?? '', 180);
+            $parts[] = 'la planta eléctrica favorece continuidad operativa' . ($scope !== '' ? ', con alcance registrado: ' . $scope : '');
+        }
         if ($this->hasCommon($common, 'red_incendio')) $parts[] = 'la red contra incendio aporta seguridad y cumplimiento operativo';
         if ($this->hasCommon($common, 'cctv_control') || $this->hasCommon($common, 'vigilancia')) $parts[] = 'el control y vigilancia refuerzan percepción de seguridad';
         if ($this->multipleElevators($technical) || $this->hasCommon($common, 'ascensores')) $parts[] = 'la presencia de ascensores mejora accesibilidad y circulación vertical';
