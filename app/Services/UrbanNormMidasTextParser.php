@@ -14,7 +14,8 @@ final class UrbanNormMidasTextParser
     public function parse(string $text): array
     {
         $text = $this->clean($text);
-        return ['predio' => $this->predio($text), 'usage' => $this->usage($text), 'raw' => $text];
+        return ['predio' => $this->predio($text), 'usage' => $this->usage($text),
+            'unmapped' => (new UrbanNormMidasUnmappedExtractor())->from($text), 'raw' => $text];
     }
 
     private function predio(string $text): array

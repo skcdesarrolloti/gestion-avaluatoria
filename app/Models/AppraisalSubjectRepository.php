@@ -130,7 +130,7 @@ final class AppraisalSubjectRepository
             'midas_block_number' => 80, 'midas_property_number' => 80, 'midas_stratum' => 20, 'midas_stratum_record' => 160,
             'midas_stratum_atypical' => 80, 'midas_stratum_observation' => 220,
             'midas_building_name' => 180, 'midas_land_area_m2' => 40, 'midas_built_area_m2' => 40,
-            'midas_predio_raw' => 70000,
+            'midas_predio_raw' => 70000, 'midas_unmapped_notes' => 12000,
             'complementary_potential_uses' => 160, 'secondary_complementary_activities' => 160,
             'latitude' => 40, 'longitude' => 40];
         $data = [];
@@ -171,6 +171,15 @@ final class AppraisalSubjectRepository
         }
         if ($data['city_id'] !== '') $this->applyCity($data);
         elseif ($data['department_id'] !== '') $this->applyDepartment($data);
+    }
+
+    public function saveMidasUnmapped(string $appraisalId, int $owner, string $notes): void
+    {
+        $notes = mb_substr(trim($notes), 0, 12000); $now = gmdate('Y-m-d H:i:s');
+        if (!$this->exists($appraisalId, $owner)) { $this->insert($appraisalId, $owner,
+            array_replace(AppraisalSubjectCatalog::defaults(), ['midas_unmapped_notes' => $notes]), $now); return; }
+        $this->db->prepare('UPDATE appraisal_subjects SET midas_unmapped_notes = ?,
+            updated_at = ? WHERE appraisal_id = ? AND owner_id = ?')->execute([$notes, $now, $appraisalId, $owner]);
     }
 
     private function applyCity(array &$data): void

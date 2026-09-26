@@ -39,6 +39,7 @@ final class AppraisalSubjectMidasController
         try {
             $parsed = (new UrbanNormMidasTextParser())->parse((string) ($_POST['midas_pasted_text'] ?? ''));
             $predio = $parsed['predio']; $usage = $parsed['usage']; $raw = (string) $parsed['raw'];
+            $unmapped = $parsed['unmapped'] ?? [];
             if ($raw === '' || ($predio === [] && $usage === [])) throw new \RuntimeException('Pega la lectura completa de MIDAS antes de procesarla.');
             if ($predio !== []) {
                 $predio['_raw'] = $raw;
@@ -46,8 +47,16 @@ final class AppraisalSubjectMidasController
                 $this->appraisals->applyMidasAreasToFirstUnit($id, $this->user['id'], $predio);
             }
             if ($usage !== [] || $predio !== []) $this->saveUrban($id, $predio, $usage, $raw);
-            Session::flash('subject_message', $this->message($predio, $usage));
-        } catch (\Throwable $error) { Session::flash('subject_error', $error->getMessage()); }
+            $this->subjects->saveMidasUnmapped($id, $this->user['id'], $this->unmappedText($unmapped));
+            $message = $this->message($predio, $usage, $unmapped);
+            if (Http::wantsJson()) Http::json(['ok' => true, 'message' => $message,
+                'updated' => ['subject' => $this->updatedSubject($predio), 'urban' => $this->updatedUrban($usage, $predio)],
+                'unmapped' => $unmapped]);
+            Session::flash('subject_message', $message);
+        } catch (\Throwable $error) {
+            if (Http::wantsJson()) Http::json(['ok' => false, 'message' => $error->getMessage()], 422);
+            Session::flash('subject_error', $error->getMessage());
+        }
         Http::redirect('avaluos/' . $id . '/bien-sujeto#registro');
     }
 
@@ -113,11 +122,66 @@ final class AppraisalSubjectMidasController
         return implode(' | ', $parts);
     }
 
-    private function message(array $predio, array $usage): string
+    private function message(array $predio, array $usage, array $unmapped = []): string
     {
-        return $predio !== [] && $usage !== []
+        $message = $predio !== [] && $usage !== []
             ? 'Lectura MIDAS procesada desde el numeral 3: ficha del predio actualizada y reglamentación enviada al numeral 5.'
             : ($predio !== [] ? 'Lectura MIDAS del predio guardada en el numeral 3.' : 'Reglamentación de Uso Suelo enviada al numeral 5.');
+        if ($unmapped !== []) $message .= ' Quedaron ' . count($unmapped) . ' dato(s) en el registro de no actualizados para revisión del analista.';
+        return $message;
+    }
+
+    private function updatedSubject(array $predio): array
+    {
+        return ['label' => 'Numeral 3', 'count' => count($this->fields($predio, [
+            'national_cadastral_reference' => 'Número predial nacional',
+            'property_registry' => 'Matrícula inmobiliaria', 'address' => 'Dirección MIDAS',
+            'territory' => 'Territorio / barrio', 'locality' => 'Localidad',
+            'commune_ucg' => 'UCG', 'land_use' => 'Uso de suelo', 'urban_treatment' => 'Tratamiento',
+            'risk' => 'Riesgos', 'land_classification' => 'Clasificación del suelo',
+            'land_area_m2' => 'Área de terreno', 'built_area_m2' => 'Área construida',
+            'updated_on' => 'Fecha de actualización',
+        ])), 'fields' => $this->fields($predio, [
+            'national_cadastral_reference' => 'Número predial nacional',
+            'property_registry' => 'Matrícula inmobiliaria', 'address' => 'Dirección MIDAS',
+            'territory' => 'Territorio / barrio', 'locality' => 'Localidad',
+            'commune_ucg' => 'UCG', 'land_use' => 'Uso de suelo', 'urban_treatment' => 'Tratamiento',
+            'risk' => 'Riesgos', 'land_classification' => 'Clasificación del suelo',
+            'land_area_m2' => 'Área de terreno', 'built_area_m2' => 'Área construida',
+            'updated_on' => 'Fecha de actualización',
+        ])];
+    }
+
+    private function updatedUrban(array $usage, array $predio): array
+    {
+        $fields = $this->fields(array_replace($predio, $usage), [
+            'use_principal_text' => 'Uso principal', 'use_compatible_text' => 'Uso compatible',
+            'use_complementary_text' => 'Uso complementario', 'use_restricted_text' => 'Uso restringido',
+            'use_prohibited_text' => 'Uso prohibido', 'norm_unit_basic_text' => 'Unidad básica',
+            'norm_free_area_text' => 'Área libre', 'norm_min_lot_front_text' => 'Área y frente mínimos',
+            'norm_max_height_text' => 'Altura máxima', 'norm_construction_index_text' => 'Índice de construcción',
+            'occupancy_index' => 'Índice de ocupación calculado', 'norm_isolation_text' => 'Aislamientos',
+            'land_use' => 'Uso de suelo base', 'urban_treatment' => 'Tratamiento base',
+        ]);
+        return ['label' => 'Numeral 5', 'count' => count($fields), 'fields' => $fields];
+    }
+
+    private function fields(array $data, array $labels): array
+    {
+        $out = [];
+        foreach ($labels as $key => $label) {
+            $value = trim((string) ($data[$key] ?? ''));
+            if ($value !== '') $out[] = ['label' => $label, 'value' => mb_substr($value, 0, 220)];
+        }
+        return $out;
+    }
+
+    private function unmappedText(array $items): string
+    {
+        if ($items === []) return '';
+        return implode("\n\n", array_map(static fn (array $item): string => trim(
+            (string) ($item['section'] ?? 'Dato MIDAS') . ' - ' . (string) ($item['label'] ?? '')
+            . ":\n" . (string) ($item['value'] ?? '')), $items));
     }
 }
 

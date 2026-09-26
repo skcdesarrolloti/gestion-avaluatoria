@@ -4,15 +4,10 @@ namespace App\Support;
 
 final class AppraisalSubjectCatalog
 {
-    public static function defaults(): array
-    {
-        return array_fill_keys(self::keys(), '');
-    }
+    public static function defaults(): array { return array_fill_keys(self::keys(), ''); }
 
     public static function keys(): array
-    {
-        return array_merge(self::textKeys(), array_keys(self::selects()), ['subject_reference_date', 'midas_updated_on', 'notes']);
-    }
+    { return array_merge(self::textKeys(), array_keys(self::selects()), ['subject_reference_date', 'midas_updated_on', 'notes']); }
 
     public static function textKeys(): array
     {
@@ -27,7 +22,7 @@ final class AppraisalSubjectCatalog
             'midas_land_use', 'midas_urban_treatment', 'midas_risk', 'midas_land_classification', 'midas_dane_block_code', 'midas_dane_block_side',
             'midas_block_number', 'midas_property_number', 'midas_stratum', 'midas_stratum_record',
             'midas_stratum_atypical', 'midas_stratum_observation', 'midas_building_name',
-            'midas_land_area_m2', 'midas_built_area_m2', 'midas_predio_raw',
+            'midas_land_area_m2', 'midas_built_area_m2', 'midas_predio_raw', 'midas_unmapped_notes',
             'complementary_potential_uses', 'secondary_complementary_activities', 'latitude', 'longitude'];
     }
 
@@ -117,7 +112,7 @@ final class AppraisalSubjectCatalog
             'zone_sector' => 'Categoría amplia del emplazamiento: residencial, comercial, mixto, industrial, turístico o periférico.',
             'subject_title' => 'Nombre corto con el que el analista reconoce el sujeto: apartamento, local, bodega, lote, casa o identificación interna.',
             'point_reference' => 'Ayuda a ubicar el inmueble en campo: esquina, frente a parque, sobre vía principal, cerca a equipamientos o hitos urbanos.',
-            'address' => 'Dirección real del sujeto. Si no tiene nomenclatura formal, describe la ubicación útil para visita y cotejo catastral.',
+            'address' => 'Dirección real del sujeto; si no tiene nomenclatura formal, describe ubicación útil.',
             'address_certificate' => 'Dirección reportada en el certificado de tradición. Se conserva como fuente aunque no sea la dirección adoptada.',
             'address_midas' => 'Dirección tomada de MIDAS u otra consulta catastral o distrital equivalente.',
             'address_tax' => 'Dirección tomada del impuesto predial o liquidación oficial disponible.',
@@ -141,6 +136,7 @@ final class AppraisalSubjectCatalog
             'midas_territory' => 'Territorio o barrio mostrado por MIDAS para contrastar con el maestro sectorial.',
             'midas_land_use' => 'Uso de suelo leído en la ficha del predio MIDAS.',
             'midas_land_classification' => 'Clasificación del suelo leída en MIDAS.',
+            'midas_unmapped_notes' => 'Datos MIDAS sin campo automático para decisión técnica.',
             'urban_license' => 'Registra licencia o ausencia según soporte disponible. Ayuda a leer legalidad urbanística y estado de desarrollo.',
             'permitted_use' => 'Lectura sintética de compatibilidad entre uso observado o potencial y norma urbana aplicable.',
             'urban_treatment' => 'Tratamiento POT o categoría urbanística de referencia: desarrollo, consolidación, renovación o conservación.',

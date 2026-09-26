@@ -219,6 +219,7 @@ try {
         midas_block_number TEXT, midas_property_number TEXT, midas_stratum TEXT, midas_stratum_record TEXT,
         midas_stratum_atypical TEXT, midas_stratum_observation TEXT, midas_building_name TEXT,
         midas_land_area_m2 TEXT, midas_built_area_m2 TEXT, midas_updated_on TEXT, midas_predio_raw TEXT,
+        midas_unmapped_notes TEXT,
         urban_treatment TEXT, restrictions TEXT, legal_urban_affectations TEXT, road_condition TEXT,
         access_facility TEXT, transport_connectivity TEXT, loading_unloading TEXT, current_use TEXT,
         main_potential_use TEXT, complementary_potential_uses TEXT, main_complementary_activity TEXT,
@@ -496,6 +497,10 @@ try {
     $midasNoFreeRate = (new UrbanNormMidasTextParser())->parse("ÁREA LIBRE\nUnifamiliar 1 piso\nÁREA Y FRENTE MÍNIMOS\nAML 200 m2");
     expect(($midasNoFreeRate['usage']['occupancy_index'] ?? '') === '',
         'parser MIDAS no confunde pisos con porcentaje de area libre');
+    $midasPending = (new UrbanNormMidasTextParser())->parse("ÍNDICE DE CONSTRUCCIÓN\n1.2\nESTACIONAMIENTOS\nUn cupo por vivienda\nAISLAMIENTOS\nPosterior");
+    expect(($midasPending['unmapped'][0]['label'] ?? '') === 'ESTACIONAMIENTOS'
+        && str_contains($midasPending['unmapped'][0]['value'] ?? '', 'Un cupo'),
+        'parser MIDAS registra secciones sin campo automatico');
     $midasUnavailable = (new UrbanNormMidasTextParser())->parse("Consulta uso de suelo\nPredio: 130010102000006780901900000000\nNO DISPONIBLE\nEste predio requiere la realización de un estudio más profundo por parte del equipo técnico de la Secretaría de Planeación Distrital.");
     expect(($midasUnavailable['usage']['midas_activity'] ?? '') === 'NO DISPONIBLE'
         && str_contains($midasUnavailable['usage']['midas_usage_result'] ?? '', 'estudio más profundo'),
