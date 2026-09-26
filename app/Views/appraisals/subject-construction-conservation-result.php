@@ -1,4 +1,25 @@
 <section class="space-y-4" x-show="activeConservation === 'resultado'">
+    <?php
+    $fmt = static fn (float $value): string => rtrim(rtrim(number_format($value, 2, ',', ''), '0'), ',');
+    $stateFromScore = static function (float $score): string {
+        if ($score <= 0) return '';
+        $rounded = max(1.0, min(5.0, round($score * 2) / 2));
+        return rtrim(rtrim(number_format($rounded, 1, '.', ''), '0'), '.');
+    };
+    $groupCalc = static function (array $group) use ($fmt, $stateFromScore): array {
+        $sum = 0.0; $weights = 0.0; $parts = [];
+        foreach (($group['items'] ?? []) as $item) {
+            if (($item['applicability'] ?? '') === 'no_aplica') continue;
+            $state = (float) (($item['state_adopted'] ?? '') ?: ($item['state_proposed'] ?? 0));
+            $weight = (float) ($item['weight'] ?? 1);
+            if ($state <= 0) continue;
+            $sum += $state * $weight; $weights += $weight;
+            $parts[] = $fmt($state) . '×' . $fmt($weight);
+        }
+        $score = isset($group['score']) ? (float) $group['score'] : ($weights > 0 ? $sum / $weights : 0.0);
+        return ['score' => $score, 'state' => (string) (($group['state'] ?? '') ?: $stateFromScore($score)), 'formula' => $parts ? '(' . implode(' + ', $parts) . ') / ' . $fmt($weights) : 'Pendiente'];
+    };
+    ?>
     <div class="grid gap-4 md:grid-cols-3">
         <label class="label">Estado global adoptado
             <select class="input" name="unit_constructions[<?= e($unitId) ?>][conservation_summary][global_adopted]">
@@ -21,14 +42,16 @@
                 </thead>
                 <tbody class="divide-y divide-slate-200">
                     <?php foreach ($savedGroups as $group): ?>
+                        <?php $calc = $groupCalc($group); ?>
                         <tr>
                             <td class="p-3 font-semibold"><?= e((string) ($group['label'] ?? '')) ?></td>
                             <td class="p-3"><?= e(count($group['items'] ?? [])) ?></td>
-                            <td class="p-3"><?= e(isset($group['score']) ? number_format((float) $group['score'], 2, ',', '') : 'Pendiente') ?></td>
+                            <td class="p-3"><?= e($calc['score'] > 0 ? number_format((float) $calc['score'], 2, ',', '') : 'Pendiente') ?></td>
                             <td class="p-3"><?= e(number_format((float) ($group['weight'] ?? 1), 2, ',', '')) ?></td>
-                            <td class="p-3"><?= e(\App\Support\AppraisalConservationCatalog::stateLabel((string) ($group['state'] ?? ''))) ?></td>
-                            <td class="p-3"><?= e((string) ($group['conclusion'] ?? '')) ?></td>
+                            <td class="p-3"><?= e(\App\Support\AppraisalConservationCatalog::stateLabel($calc['state'])) ?></td>
+                            <td class="p-3">El grupo se obtiene con promedio ponderado de sus factores aplicables. Fórmula: <?= e($calc['formula']) ?> = <?= e($calc['score'] > 0 ? number_format((float) $calc['score'], 2, ',', '') : 'pendiente') ?>.</td>
                         </tr>
+                        <?php require BASE_PATH . '/app/Views/appraisals/subject-construction-conservation-group-detail.php'; ?>
                     <?php endforeach; ?>
                 </tbody>
             </table>
