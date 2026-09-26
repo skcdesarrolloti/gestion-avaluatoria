@@ -29,11 +29,11 @@
     netArea() { const manual = this.number(this.net); if (manual !== null) return manual; const land = this.number(this.land), r = this.rate(this.affect); return land === null ? null : Math.max(0, land - (land * (r || 0))) },
     buildIndex() { const manual = this.number(this.ci); if (manual !== null) return manual; const o = this.occupancyRatio(), f = this.number(this.floors); return o === null || f === null ? null : o * f },
     maxBuild() {
-        const manual = this.number(this.maxBuilt); if (manual !== null) return manual;
         const index = this.number(this.ci), base = this.netArea();
         if (base !== null && index !== null) return base * index;
         const footprint = this.occupancyArea(), floors = this.number(this.floors);
-        return footprint === null || floors === null ? null : footprint * floors;
+        if (footprint !== null && floors !== null) return footprint * floors;
+        return this.number(this.maxBuilt);
     },
     potential() { const max = this.maxBuild(), actual = this.number(this.actual); return max === null || actual === null ? null : Math.max(0, max - actual) },
     sellableArea() { const manual = this.number(this.sellable); if (manual !== null) return manual; const max = this.maxBuild(), factor = this.number(this.sellFactor); return max === null || factor === null ? null : max * factor },
