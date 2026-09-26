@@ -20,8 +20,12 @@ $firstConservationGroup = (string) ($conservationGroups[0]['id'] ?? 'resultado')
     x-data="{ activeConservation: '<?= e($firstConservationGroup) ?>' }">
     <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
         <div class="flex flex-wrap items-start justify-between gap-3">
-            <p><strong>Referencia técnica:</strong> <?= e(\App\Support\AppraisalConservationCatalog::technicalReference()) ?></p>
-            <a class="btn-secondary bg-white" target="_blank" rel="noopener" href="<?= e(url('marco-juridico-valuatorio')) ?>">Ver soporte normativo</a>
+            <p><strong>Referencia técnica:</strong>
+                <a class="font-semibold underline decoration-blue-300 underline-offset-4" href="<?= e(\App\Support\IgacDocumentLibrary::urlFor('resolucion-igac-941-2026')) ?>">Resolución IGAC 941 de 2026</a>
+                · <a class="font-semibold underline decoration-blue-300 underline-offset-4" href="<?= e(\App\Support\IgacDocumentLibrary::urlFor('in-gct-pc03-01-v2')) ?>">IN-GCT-PC03-01 V2</a>
+                · <a class="font-semibold underline decoration-blue-300 underline-offset-4" href="<?= e(\App\Support\IgacDocumentLibrary::urlFor('in-gct-pc01-06-v1')) ?>">IN-GCT-PC01-06 V1</a>.
+            </p>
+            <a class="btn-secondary bg-white" href="<?= e(url('igac?documentos=conservacion')) ?>">Ver biblioteca IGAC</a>
         </div>
         <p class="mt-2 text-blue-900">Califica condición física observable, hallazgos, funcionalidad e intervención. Este numeral no calcula edad, vida útil, Ross-Heidecke ni depreciación.</p>
     </div>

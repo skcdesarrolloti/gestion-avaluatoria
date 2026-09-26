@@ -7,6 +7,14 @@ use PDO;
 
 final class LegalDocumentRepository
 {
+    private const IGAC_RECTOR_SLUGS = [
+        'b1-03-resolucion-igac-941-2026',
+        'b2-03-resolucion-igac-941-2026',
+        'b4-05-resolucion-igac-941-2026',
+        'b5-06-resolucion-igac-941-2026',
+        'b6-02-resolucion-igac-941-2026',
+    ];
+
     public function __construct(private PDO $db) {}
 
     public static function storageDir(): string { return LegalFileStorage::dir(); }
@@ -21,6 +29,7 @@ final class LegalDocumentRepository
             d.file_size_bytes, d.imported_at, d.pdf_blob IS NOT NULL AS has_blob, d.sort_order document_sort
             FROM valuation_legal_categories c
             LEFT JOIN valuation_legal_documents d ON d.category_code = c.code
+                AND d.slug NOT IN ('" . implode("','", self::IGAC_RECTOR_SLUGS) . "')
             ORDER BY c.sort_order ASC, d.sort_order ASC")->fetchAll();
         $categories = [];
         foreach ($rows as $row) {

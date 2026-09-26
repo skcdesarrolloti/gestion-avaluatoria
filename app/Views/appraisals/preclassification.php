@@ -8,7 +8,7 @@
                     Cada unidad podrá tener su propia tipología constructiva.
                 </p>
             </div>
-            <a class="btn-secondary" href="<?= e(url('tipologias-constructivas-igac')) ?>">Ver tipologías IGAC</a>
+            <a class="btn-secondary" href="<?= e(url('igac')) ?>">Ver biblioteca IGAC</a>
         </div>
         <?php if ($preclassMessage): ?>
             <p class="mt-5 rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($preclassMessage) ?></p>

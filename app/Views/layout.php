@@ -24,7 +24,7 @@ $tabs = [
     ['label' => 'Normas Internacionales', 'href' => url('normas-internacionales-valuacion'), 'active' => $isActive('/normas-internacionales-valuacion')],
     ['label' => 'Normas NIIF', 'href' => url('normas-niif'), 'active' => $isActive('/normas-niif')],
     ['label' => 'Normatividad Urbana', 'href' => url('normatividad-urbana'), 'active' => $isActive('/normatividad-urbana')],
-    ['label' => 'Tipologías Constructivas IGAC', 'href' => url('tipologias-constructivas-igac'), 'active' => $isActive('/tipologias-constructivas-igac')],
+    ['label' => 'IGAC', 'href' => url('igac'), 'active' => $isActive('/igac') || $isActive('/tipologias-constructivas-igac')],
     ['label' => 'Glosario valuatorio', 'href' => url('glosario-valuatorio'), 'active' => $isActive('/glosario-valuatorio')],
 ];
 if ($maintenanceEnabled) {
@@ -61,7 +61,7 @@ if ($maintenanceEnabled) {
                     <a class="app-action app-action-blue" href="<?= e(url('normas-internacionales-valuacion')) ?>">Internacionales</a>
                     <a class="app-action app-action-teal" href="<?= e(url('normas-niif')) ?>">NIIF</a>
                     <a class="app-action app-action-teal" href="<?= e(url('normatividad-urbana')) ?>">Normatividad urbana</a>
-                    <a class="app-action app-action-teal" href="<?= e(url('tipologias-constructivas-igac')) ?>">Tipologías IGAC</a>
+                    <a class="app-action app-action-teal" href="<?= e(url('igac')) ?>">IGAC</a>
                     <a class="app-action app-action-blue" href="<?= e(url('glosario-valuatorio')) ?>">Glosario</a>
                     <?php if ($maintenanceEnabled): ?>
                         <a class="app-action app-action-blue" href="<?= e(url('mantenimiento/migraciones')) ?>">Migraciones</a>

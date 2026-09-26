@@ -61,7 +61,7 @@ $dynamicOptions = [
         <?= csrf_field() ?>
         <?php if (!$surfaceUnits): ?>
             <p class="rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-600">
-                Primero define cuántas unidades o anexos tiene el predio en la subpestaña Tipologías IGAC.
+                Primero define cuántas unidades o anexos tiene el predio desde la Biblioteca IGAC.
             </p>
         <?php else: ?>
             <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist">

@@ -78,6 +78,7 @@ use App\Models\ValuationStandardRepository;
 use App\Models\UrbanNormativeRepository;
 use App\Support\AppraisalSectorCatalog;
 use App\Support\AppraisalSectorFieldGuidance;
+use App\Support\IgacDocumentLibrary;
 use App\Support\AppraisalLegalCatalog;
 use App\Support\AppraisalLegalView;
 use App\Support\AppraisalSpecialAttributeCatalog;
@@ -830,6 +831,17 @@ try {
     expect(count($igac->byCategory('RESIDENCIALES')) === 23, 'tipologias IGAC agrupadas por categoria');
     expect(count($igac->optionsByCategory()['ANEXOS']) === 136, 'selector IGAC filtra tipologias por categoria');
     expect(($igac->optionsByCategory()['RESIDENCIALES'][0]['image'] ?? '') !== '', 'selector IGAC incluye imagen de referencia');
+    expect(IgacDocumentLibrary::find('resolucion-igac-941-2026') !== null, 'biblioteca IGAC centraliza resolucion 941');
+    expect(count(IgacDocumentLibrary::documents('conservacion')) === 2, 'biblioteca IGAC filtra documentos de conservacion');
+    $db->exec("INSERT OR REPLACE INTO valuation_legal_documents
+        (slug, category_code, document_code, title, document_type, status, source_reference, summary,
+        sort_order, created_at, updated_at)
+        VALUES ('b1-03-resolucion-igac-941-2026', '1', 'B1-03', 'Resolución IGAC 941 de 2026',
+        'Resolución', 'vigente', 'Bibliografía B1', 'Duplicado rector', 103,
+        '2026-09-15 00:00:00', '2026-09-15 00:00:00')");
+    $legalTitles = implode(' ', array_map(static fn (array $category): string =>
+        implode(' ', array_column($category['documents'], 'title')), (new LegalDocumentRepository($db))->categoriesWithDocuments()));
+    expect(!str_contains($legalTitles, 'Resolución IGAC 941 de 2026'), 'marco juridico no duplica rector IGAC 941');
     $unitId = str_repeat('b', 32);
     $_POST = ['units' => [$unitId => ['label' => 'Unidad 1', 'default_label' => 'Unidad 1']]];
     expectStatus(422, fn () => AppraisalChapterZeroInput::unitData([], []), 'nombre generico de unidad rechazado');

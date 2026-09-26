@@ -119,7 +119,7 @@ $typologyUsefulLife = static function (array $unit) use ($typologyLookup): strin
         <?= csrf_field() ?>
         <?php if (!$constructionUnits): ?>
             <p class="rounded-xl border border-dashed border-slate-300 p-5 text-sm text-slate-600">
-                Primero define las unidades o anexos del predio en Tipologías IGAC.
+                Primero define las unidades o anexos del predio desde la Biblioteca IGAC.
             </p>
         <?php else: ?>
             <div class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2">

@@ -17,6 +17,8 @@ return [
     ['GET', '#^/normas-internacionales-valuacion$#', 'international', 'index', true],
     ['GET', '#^/normas-niif$#', 'ifrs', 'index', true],
     ['GET', '#^/normatividad-urbana$#', 'urbanNorms', 'index', true],
+    ['GET', '#^/igac$#', 'typologies', 'index', true],
+    ['GET', '#^/igac/documento/([a-z0-9-]+)$#', 'typologies', 'document', true],
     ['GET', '#^/tipologias-constructivas-igac$#', 'typologies', 'index', true],
     ['GET', '#^/glosario-valuatorio$#', 'glossary', 'index', true],
     ['POST', '#^/glosario-valuatorio$#', 'glossary', 'store', true],
