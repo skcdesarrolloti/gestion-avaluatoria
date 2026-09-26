@@ -24,6 +24,9 @@
       "archivo_nombre": "R 0941 - 2026 SE FIJAN LOS METODOS Y LAS CONDICIONES DE ELABORACION Y PRESENTACION DE AVALUOS.pdf",
       "fuente_oficial": "https://www.igac.gov.co/node/53595",
       "descripcion_corta": "Marco rector IGAC para métodos, condiciones, presentación y soporte de avalúos.",
+      "uso_practico": "Sirve para verificar que el avalúo esté sustentado en el marco rector vigente: alcance, método aplicable, condiciones mínimas, trazabilidad y presentación del informe.",
+      "cuando_consultarlo": "Consúltala al definir metodología, revisar suficiencia del soporte técnico, cerrar salvedades o justificar criterios generales ante el cliente.",
+      "criterio_vigencia": "Registro marcado como vigente en la biblioteca. Debe revisarse nuevamente si el IGAC publica una resolución posterior que modifique métodos o condiciones de presentación.",
       "temas_relacionados": ["avalúos", "marco valuatorio", "métodos", "presentación de informes"],
       "modulos_que_lo_utilizan": ["Expediente", "Bien sujeto", "Conservación", "Metodología valuatoria", "Entregable"]
     },
@@ -41,6 +44,9 @@
       "archivo_nombre": "Anexo_Final_Resolucion_IGAC_941_2026.pdf",
       "fuente_oficial": "https://www.igac.gov.co/node/53595",
       "descripcion_corta": "Soporte técnico asociado a la Resolución IGAC 941 de 2026 para estructurar criterios y sustentación del informe.",
+      "uso_practico": "Sirve para aterrizar la resolución en criterios técnicos aplicables al informe: soportes, estructura de análisis, evidencia y consistencia de la sustentación.",
+      "cuando_consultarlo": "Consúltalo cuando el analista necesite explicar cómo se aplicó el método, qué información soporta el resultado o qué salvedades deben quedar expresas.",
+      "criterio_vigencia": "Registro marcado como vigente mientras corresponda al anexo técnico asociado a la Resolución IGAC 941 de 2026.",
       "temas_relacionados": ["anexo técnico", "sustentación", "métodos", "criterios de informe"],
       "modulos_que_lo_utilizan": ["Expediente", "Metodología valuatoria", "Entregable"]
     },
@@ -58,6 +64,9 @@
       "archivo_nombre": "IN-GCT-PC01-06 V1 Identificacion Predial.pdf",
       "fuente_oficial": "https://www.igac.gov.co/transparencia-y-acceso-a-la-informacion-publica/informacion-de-la-entidad/listado-maestro-de-documentos/identificacion-predial",
       "descripcion_corta": "Referencia de reconocimiento predial útil para identificación, construcciones, materiales, estructura, acabados y calificación convencional.",
+      "uso_practico": "Sirve para orientar la captura de datos del bien sujeto: identificación predial, reconocimiento de construcciones, materiales, estructura, acabados y condiciones observables.",
+      "cuando_consultarlo": "Consúltalo durante la visita, al revisar datos básicos del inmueble o cuando se necesite sustentar la descripción física adoptada.",
+      "criterio_vigencia": "Registro marcado como vigente según la versión cargada en la biblioteca. Si el IGAC sustituye el instructivo, debe conservarse esta versión como histórica y cargarse la nueva.",
       "temas_relacionados": ["identificación predial", "construcciones", "materiales", "estructura", "acabados"],
       "modulos_que_lo_utilizan": ["Bien sujeto", "Conservación", "Tipologías", "Registro fotográfico"]
     },
@@ -75,6 +84,9 @@
       "archivo_nombre": "IN-GCT-PC01-07 V1 Tipologias Constructivas.pdf",
       "fuente_oficial": "https://www.igac.gov.co/transparencia-y-acceso-a-la-informacion-publica/informacion-de-la-entidad/listado-maestro-de-documentos/tipologias-constructivas",
       "descripcion_corta": "Caracterización de tipologías constructivas convencionales y soporte visual del catálogo utilizado por la herramienta.",
+      "uso_practico": "Sirve para contrastar la construcción inspeccionada con tipologías convencionales, vida útil de referencia, especificaciones y denominación técnica.",
+      "cuando_consultarlo": "Consúltalo al clasificar unidades, revisar vida útil, describir materiales predominantes o justificar una tipología constructiva adoptada.",
+      "criterio_vigencia": "Registro marcado como vigente para consulta operativa del catálogo de tipologías convencionales.",
       "temas_relacionados": ["tipologías constructivas", "catálogo", "vida útil", "especificaciones"],
       "modulos_que_lo_utilizan": ["Bien sujeto", "Construcciones", "Conservación", "Metodología valuatoria"]
     },
@@ -92,6 +104,9 @@
       "archivo_nombre": "IN-GCT-PC01-08 V1 Tipologias no Convencionales.pdf",
       "fuente_oficial": "https://www.igac.gov.co/transparencia-y-acceso-a-la-informacion-publica/informacion-de-la-entidad/listado-maestro-de-documentos/tipologias-no-convencionales",
       "descripcion_corta": "Referencia para construcciones especiales o no convencionales que no encajan en el catálogo convencional.",
+      "uso_practico": "Sirve para clasificar anexos, construcciones especiales o elementos no convencionales cuando la unidad no encaja en una tipología tradicional.",
+      "cuando_consultarlo": "Consúltalo al encontrar piscinas, tanques, corrales, cerramientos, estructuras especiales, urbanismos u otros anexos con tratamiento particular.",
+      "criterio_vigencia": "Registro marcado como vigente para consulta de tipologías no convencionales y anexos.",
       "temas_relacionados": ["tipologías no convencionales", "construcciones especiales", "anexos", "soporte técnico"],
       "modulos_que_lo_utilizan": ["Bien sujeto", "Construcciones", "Diferenciales valuatorios"]
     },
@@ -109,6 +124,9 @@
       "archivo_nombre": "IN-GCT-PC03-01 V2 Elaboracion del Estudio de ZHFYG.pdf",
       "fuente_oficial": "https://www.igac.gov.co/node/10873",
       "descripcion_corta": "Soporte para lectura de variables físicas, conservación, ubicación y análisis futuro de ZHF/ZHG.",
+      "uso_practico": "Sirve como referencia para interpretar variables físicas y geoeconómicas: conservación, ubicación, entorno, calidad constructiva y lectura territorial del inmueble.",
+      "cuando_consultarlo": "Consúltalo al sustentar conservación, condiciones del sector, zonas homogéneas, variables físicas o diferenciales de localización.",
+      "criterio_vigencia": "Registro marcado como vigente para ZHF/ZHG. Si se usa fuera de catastro, debe citarse como referencia técnica y no como sustituto de análisis valuatorio propio.",
       "temas_relacionados": ["conservación", "zonas homogéneas", "ubicación", "variables físicas", "calidad constructiva"],
       "modulos_que_lo_utilizan": ["Conservación", "Sector y entorno", "Metodología valuatoria", "Calidad constructiva"]
     },
@@ -126,6 +144,9 @@
       "archivo_nombre": "FO-GCT-PC01-16 V3 Usos y Calificacion de Unidades de Construccion.docx",
       "fuente_oficial": "https://www.igac.gov.co/transparencia-y-acceso-a-la-informacion-publica/informacion-de-la-entidad/listado-maestro-de-documentos/usos-y-calificacion-de-unidades-de-construccion",
       "descripcion_corta": "Formato vigente para usos y calificación de unidades de construcción; sirve como soporte de captura y revisión.",
+      "uso_practico": "Sirve para revisar usos y calificación de unidades de construcción, especialmente cuando el analista necesita ordenar captura, verificación y soporte de la unidad.",
+      "cuando_consultarlo": "Consúltalo al revisar calificación de construcciones, uso de unidad, conservación, captura de campo o consistencia del entregable.",
+      "criterio_vigencia": "Registro marcado como vigente para el formato FO-GCT-PC01-16 V3. Las versiones anteriores deben quedar históricas si se cargan después.",
       "temas_relacionados": ["usos", "calificación", "unidades de construcción", "formato"],
       "modulos_que_lo_utilizan": ["Bien sujeto", "Conservación", "Construcciones", "Entregable"]
     }

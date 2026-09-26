@@ -56,6 +56,7 @@ $documentStats = $documentStats ?? ['documents' => 0, 'topics' => 0];
             <?php
             $term = mb_strtolower(implode(' ', [
                 $document['codigo'], $document['nombre'], $document['tipo_documento'], $document['version'],
+                $document['uso_practico'] ?? '', $document['cuando_consultarlo'] ?? '', $document['criterio_vigencia'] ?? '',
                 implode(' ', $document['categoria_igac']), implode(' ', $document['temas_relacionados']),
                 implode(' ', $document['modulos_que_lo_utilizan']),
             ]));
@@ -67,26 +68,34 @@ $documentStats = $documentStats ?? ['documents' => 0, 'topics' => 0];
                         <p class="text-anywhere text-sm font-semibold text-teal-800"><?= e((string) $document['codigo']) ?></p>
                         <h2 class="text-anywhere mt-1 text-base font-semibold text-slate-950"><?= e((string) $document['nombre']) ?></h2>
                     </div>
-                    <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"><?= e((string) $document['tipo_documento']) ?></span>
+                    <div class="flex flex-wrap gap-2">
+                        <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"><?= e((string) $document['tipo_documento']) ?></span>
+                        <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700"><?= e((string) $document['estado']) ?></span>
+                    </div>
                 </div>
                 <p class="mt-3 text-sm leading-6 text-slate-600"><?= e((string) $document['descripcion_corta']) ?></p>
+                <div class="mt-4 rounded-md border border-teal-100 bg-teal-50/70 p-3">
+                    <p class="text-xs font-semibold uppercase text-teal-800">Para qué es útil</p>
+                    <p class="mt-1 text-sm leading-6 text-slate-700"><?= e((string) ($document['uso_practico'] ?? $document['descripcion_corta'])) ?></p>
+                </div>
                 <dl class="mt-4 grid gap-3 text-sm sm:grid-cols-3">
                     <div><dt class="text-xs font-semibold uppercase text-slate-500">Versión</dt><dd><?= e((string) $document['version']) ?></dd></div>
                     <div><dt class="text-xs font-semibold uppercase text-slate-500">Vigencia</dt><dd><?= e((string) $document['fecha_vigencia']) ?></dd></div>
                     <div><dt class="text-xs font-semibold uppercase text-slate-500">Estado</dt><dd><?= e((string) $document['estado']) ?></dd></div>
                 </dl>
+                <p class="mt-3 text-xs leading-5 text-slate-500">
+                    <span class="font-semibold text-slate-700">Consulta recomendada:</span>
+                    <?= e((string) ($document['cuando_consultarlo'] ?? 'Consúltalo cuando el módulo requiera soporte técnico de este documento.')) ?>
+                </p>
                 <div class="mt-4 flex flex-wrap gap-2">
                     <?php foreach ($document['temas_relacionados'] as $topic): ?>
                         <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-700"><?= e((string) $topic) ?></span>
                     <?php endforeach; ?>
                 </div>
                 <div class="mt-4 flex flex-wrap gap-3">
-                    <a class="btn-primary" href="<?= e(url('igac/documento/' . rawurlencode((string) $document['id']))) ?>">Abrir ficha</a>
+                    <a class="btn-primary" href="<?= e(url('igac/documento/' . rawurlencode((string) $document['id']))) ?>">Consultar referencia</a>
                     <?php if ((string) ($document['archivo_descarga'] ?? '') !== ''): ?>
-                        <a class="btn-secondary" href="<?= e(url('igac/documento/' . rawurlencode((string) $document['id']) . '/descargar')) ?>" data-no-fetch>Descargar</a>
-                    <?php endif; ?>
-                    <?php if ((string) $document['fuente_oficial'] !== ''): ?>
-                        <a class="btn-secondary" href="<?= e((string) $document['fuente_oficial']) ?>" target="_blank" rel="noopener" data-no-fetch>Ficha oficial</a>
+                        <a class="btn-secondary" href="<?= e(url('igac/documento/' . rawurlencode((string) $document['id']) . '/descargar')) ?>" data-no-fetch>Descargar documento</a>
                     <?php endif; ?>
                 </div>
             </article>

@@ -835,6 +835,10 @@ try {
     expect($igacResolution !== null, 'biblioteca IGAC centraliza resolucion 941');
     expect(str_ends_with((string) ($igacResolution['archivo_descarga'] ?? ''), '.pdf'),
         'biblioteca IGAC conserva descarga directa de resolucion 941');
+    expect(str_contains((string) ($igacResolution['uso_practico'] ?? ''), 'marco rector vigente'),
+        'biblioteca IGAC explica para que es util cada documento');
+    expect(str_contains((string) ($igacResolution['criterio_vigencia'] ?? ''), 'vigente'),
+        'biblioteca IGAC conserva lectura de vigencia operativa');
     expect(count(IgacDocumentLibrary::documents('conservacion')) === 2, 'biblioteca IGAC filtra documentos de conservacion');
     $db->exec("INSERT OR REPLACE INTO valuation_legal_documents
         (slug, category_code, document_code, title, document_type, status, source_reference, summary,

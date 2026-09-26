@@ -11,6 +11,26 @@
             <span class="rounded-full bg-emerald-50 px-4 py-2 text-sm font-semibold text-emerald-700"><?= e((string) ($document['estado'] ?? '')) ?></span>
         </div>
         <p class="mt-5 max-w-4xl text-sm leading-6 text-slate-600"><?= e((string) ($document['descripcion_corta'] ?? '')) ?></p>
+        <div class="mt-6 grid gap-4 lg:grid-cols-[1.2fr_0.8fr]">
+            <section class="rounded-lg border border-teal-100 bg-teal-50/70 p-4">
+                <h2 class="text-sm font-semibold uppercase text-teal-800">Para qué es útil</h2>
+                <p class="mt-2 text-sm leading-6 text-slate-700">
+                    <?= e((string) ($document['uso_practico'] ?? $document['descripcion_corta'] ?? 'Referencia documental para soporte técnico del avalúo.')) ?>
+                </p>
+            </section>
+            <section class="rounded-lg border border-emerald-100 bg-emerald-50/70 p-4">
+                <h2 class="text-sm font-semibold uppercase text-emerald-800">Vigencia operativa</h2>
+                <p class="mt-2 text-sm leading-6 text-slate-700">
+                    <?= e((string) ($document['criterio_vigencia'] ?? 'Documento disponible como referencia vigente en la biblioteca IGAC.')) ?>
+                </p>
+            </section>
+        </div>
+        <section class="mt-4 rounded-lg border border-slate-200 p-4">
+            <h2 class="text-sm font-semibold uppercase text-slate-500">Cuándo consultarlo</h2>
+            <p class="mt-2 text-sm leading-6 text-slate-700">
+                <?= e((string) ($document['cuando_consultarlo'] ?? 'Consúltalo cuando el módulo requiera soporte técnico de este documento.')) ?>
+            </p>
+        </section>
         <dl class="mt-6 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
             <div class="rounded-lg bg-slate-50 p-4"><dt class="text-xs font-semibold uppercase text-slate-500">Código</dt><dd class="mt-1 text-sm font-semibold"><?= e((string) ($document['codigo'] ?? '')) ?></dd></div>
             <div class="rounded-lg bg-slate-50 p-4"><dt class="text-xs font-semibold uppercase text-slate-500">Versión</dt><dd class="mt-1 text-sm font-semibold"><?= e((string) ($document['version'] ?? '')) ?></dd></div>
@@ -37,14 +57,14 @@
         </div>
         <div class="mt-6 flex flex-wrap gap-3">
             <?php if ((string) ($document['archivo_descarga'] ?? '') !== ''): ?>
-                <a class="btn-primary" href="<?= e(url('igac/documento/' . rawurlencode((string) $document['id']) . '/descargar')) ?>" data-no-fetch>Descargar archivo</a>
-            <?php endif; ?>
-            <?php if ((string) ($document['fuente_oficial'] ?? '') !== ''): ?>
-                <a class="btn-secondary" href="<?= e((string) $document['fuente_oficial']) ?>" target="_blank" rel="noopener" data-no-fetch>Ver ficha oficial IGAC</a>
+                <a class="btn-primary" href="<?= e(url('igac/documento/' . rawurlencode((string) $document['id']) . '/descargar')) ?>" data-no-fetch>Descargar documento</a>
             <?php endif; ?>
             <?php if ((string) ($document['archivo'] ?? '') !== ''): ?>
                 <a class="btn-secondary" href="<?= e((string) $document['archivo']) ?>" download data-no-fetch>Descargar archivo local</a>
             <?php endif; ?>
         </div>
+        <p class="mt-4 text-xs leading-5 text-slate-500">
+            Fuente registrada: IGAC. La biblioteca conserva la trazabilidad oficial internamente y evita duplicar el mismo documento por módulo.
+        </p>
     </article>
 </section>
