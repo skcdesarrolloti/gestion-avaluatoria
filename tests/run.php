@@ -459,13 +459,33 @@ try {
         && ($savedUrban['construction_index'] ?? '') == 1.2
         && ($savedUrban['sellable_area_m2'] ?? '') == 225
         && ($savedUrban['constructive_potential_status'] ?? '') === 'viable', 'ficha urbana conserva campos de potencial constructivo');
-    $midasParsed = (new UrbanNormMidasTextParser())->parse("01 Número Predial Nacional:\n130010103000003810024000000000\n07 Uso De Suelo:\nMixto 2\n08 Tratamiento:\nMejoramiento Integral Parcial\n20 Área Terreno (M2):\n529.00\n21 Área Construida (M2):\n329.00\n22 Referencia Catastral:\n010303810024000\nUSO PRINCIPAL\nCOMERCIAL 2: venta de bienes.\nUSO COMPATIBLE\nRESIDENCIAL: vivienda.\nUSO COMPLEMENTARIO\nINSTITUCIONAL 3: universidad.\nUSO RESTRINGIDO\nCOMERCIAL 3: talleres.\nUSO PROHIBIDO\nINDUSTRIAL 3: industria pesada.\nUNIDAD BÁSICA\n2 ALCOBAS 40 M2\nUSOS\nPRINCIPAL residencial\nÁREA LIBRE\nunifamiliar 1 piso\nÁREA Y FRENTE MÍNIMOS\nAML 200 M2\nALTURA MÁXIMA\n4 pisos\nÍNDICE DE CONSTRUCCIÓN\n1.2\nAISLAMIENTOS\nAntejardín 3 m");
+    $manualVersion = $urbanProfile->save('urban-appraisal-1', 1, (int) $savedUrban['version'], array_replace($savedUrban, [
+        'midas_manual' => [
+            'use_principal_text' => 'COMERCIAL 2',
+            'use_compatible_text' => 'COMERCIAL 1, INDUSTRIAL 1',
+            'land_area_normative_m2' => '529,00',
+            'actual_built_area_m2' => '329,00',
+            'occupancy_index' => '60%',
+            'max_floors' => '2',
+            'construction_index' => '1,20',
+            'norm_other_potential_text' => 'Área de ocupación hasta un 60% del área del lote.',
+        ],
+    ]));
+    $manualUrban = $urbanProfile->profile('urban-appraisal-1', 1);
+    expect($manualVersion === (int) $savedUrban['version'] + 1
+        && str_contains($manualUrban['use_compatible_text'], 'INDUSTRIAL 1')
+        && (float) $manualUrban['land_area_normative_m2'] === 529.0
+        && (float) $manualUrban['occupancy_index'] === 0.60
+        && (float) $manualUrban['construction_index'] === 1.20,
+        'ficha urbana guarda transcripcion manual MIDAS en orden y normaliza indices');
+    $midasParsed = (new UrbanNormMidasTextParser())->parse("01 Número Predial Nacional:\n130010103000003810024000000000\n07 Uso De Suelo:\nMixto 2\n08 Tratamiento:\nMejoramiento Integral Parcial\n20 Área Terreno (M2):\n529.00\n21 Área Construida (M2):\n329.00\n22 Referencia Catastral:\n010303810024000\nUSO PRINCIPAL\nCOMERCIAL 2: venta de bienes.\nUSO COMPATIBLE\nRESIDENCIAL: vivienda.\nUSO COMPLEMENTARIO\nINSTITUCIONAL 3: universidad.\nUSO RESTRINGIDO\nCOMERCIAL 3: talleres.\nUSO PROHIBIDO\nINDUSTRIAL 3: industria pesada.\nUNIDAD BÁSICA\n2 ALCOBAS 40 M2\nUSOS\nPRINCIPAL residencial\nÁREA LIBRE\nunifamiliar 1 piso\nÁREA Y FRENTE MÍNIMOS\nAML 200 M2\nALTURA MÁXIMA\n4 pisos\nÁREA DE OCUPACIÓN\nHasta un 60% del área del lote\nÍNDICE DE CONSTRUCCIÓN\n1.2\nAISLAMIENTOS\nAntejardín 3 m");
     expect(($midasParsed['predio']['land_use'] ?? '') === 'Mixto 2'
         && ($midasParsed['predio']['land_area_m2'] ?? '') === '529.00'
         && ($midasParsed['predio']['cadastral_reference'] ?? '') === '010303810024000'
         && str_contains($midasParsed['usage']['use_restricted_text'] ?? '', 'COMERCIAL 3')
-        && str_contains($midasParsed['usage']['norm_min_lot_front_text'] ?? '', 'AML 200'),
-        'parser MIDAS separa ficha predial reglamentacion y potencial constructivo');
+        && str_contains($midasParsed['usage']['norm_min_lot_front_text'] ?? '', 'AML 200')
+        && ($midasParsed['usage']['occupancy_index'] ?? '') === '0.6',
+        'parser MIDAS separa ficha predial reglamentacion ocupacion y potencial constructivo');
     $midasUnavailable = (new UrbanNormMidasTextParser())->parse("Consulta uso de suelo\nPredio: 130010102000006780901900000000\nNO DISPONIBLE\nEste predio requiere la realización de un estudio más profundo por parte del equipo técnico de la Secretaría de Planeación Distrital.");
     expect(($midasUnavailable['usage']['midas_activity'] ?? '') === 'NO DISPONIBLE'
         && str_contains($midasUnavailable['usage']['midas_usage_result'] ?? '', 'estudio más profundo'),

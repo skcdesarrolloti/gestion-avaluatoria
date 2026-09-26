@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace App\Models;
 use App\Core\HttpException;
-use App\Services\AppraisalUrbanNormScenarioInput;
+use App\Services\{AppraisalUrbanNormManualMidasInput, AppraisalUrbanNormScenarioInput};
 use PDO;
 
 final class AppraisalUrbanNormRepository
@@ -103,6 +103,7 @@ final class AppraisalUrbanNormRepository
             'source_limitations' => 5000];
         $data = [];
         foreach ($keys as $key) $data[$key] = mb_substr(trim((string) ($input[$key] ?? '')), 0, $limits[$key]);
+        (new AppraisalUrbanNormManualMidasInput())->apply($data, $input['midas_manual'] ?? [], $limits);
         foreach (['land_area_normative_m2', 'lot_front_normative_m', 'setback_area_percent', 'net_land_area_m2', 'occupancy_index',
             'max_floors', 'construction_index', 'actual_built_area_m2', 'normative_max_built_area_m2',
             'buildable_difference_m2', 'sellable_area_factor', 'sellable_area_m2'] as $key) {
