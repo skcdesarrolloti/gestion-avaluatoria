@@ -358,6 +358,41 @@ try {
         'lectura de categoria urbana llena campos definidos del numeral 5');
     $rdMulti = \App\Support\UrbanResidentialNormCatalog::standards()['res-d']['data']['multifamiliar'];
     expect($rdMulti['min_front_m'] === 25 && $rdMulti['min_area_m2'] === 750 && abs($rdMulti['construction_index'] - 2.4) < 0.01, 'catalogo residencial permite evaluar multifamiliar RD');
+    $potRoutes = \App\Support\UrbanNormPotentialCatalog::routesForProfile([
+        'category_slug' => 'mixto-2',
+        'use_principal_text' => 'Institucional 3; Comercial 2.',
+        'use_compatible_text' => 'Comercial 1; Industrial 1; Residencial.',
+        'use_restricted_text' => 'Comercial 3.',
+    ]);
+    $potKeys = array_map(static fn (array $row): string => $row['type'] . ':' . $row['slug'], $potRoutes);
+    expect(in_array('principal:com-2', $potKeys, true)
+        && in_array('principal:inst-3', $potKeys, true)
+        && in_array('compatible:com-1', $potKeys, true)
+        && in_array('compatible:ind-1', $potKeys, true)
+        && !in_array('principal:com-3', $potKeys, true)
+        && !in_array('compatible:com-3', $potKeys, true), 'matriz POT usa solo principal y compatible para escenarios');
+    $com2Route = array_values(array_filter($potRoutes, static fn (array $row): bool => $row['slug'] === 'com-2'))[0];
+    expect(($com2Route['options']['general']['min_area_m2'] ?? null) === 250
+        && ($com2Route['options']['general']['min_front_m'] ?? null) === 10
+        && abs(($com2Route['options']['general']['construction_index'] ?? 0) - 1.0) < 0.01,
+        'catalogo POT permite calcular potencial para Comercial 2');
+    $ind1Route = array_values(array_filter($potRoutes, static fn (array $row): bool => $row['slug'] === 'ind-1'))[0];
+    expect(($ind1Route['options']['general']['min_area_m2'] ?? null) === 600
+        && ($ind1Route['options']['general']['min_front_m'] ?? null) === 20
+        && abs(($ind1Route['options']['general']['construction_index'] ?? 0) - 1.3) < 0.01,
+        'catalogo POT permite calcular potencial para Industrial 1 compatible');
+    $joinedUseRoutes = \App\Support\UrbanNormPotentialCatalog::routesForProfile([
+        'category_slug' => 'ind-2',
+        'use_principal_text' => 'Industrial 2.',
+        'use_compatible_text' => 'Industrial 1; Comercial 1, 2 y 3; Portuario 1 y 2.',
+    ]);
+    $joinedUseKeys = array_map(static fn (array $row): string => $row['type'] . ':' . $row['slug'], $joinedUseRoutes);
+    expect(in_array('compatible:com-1', $joinedUseKeys, true)
+        && in_array('compatible:com-2', $joinedUseKeys, true)
+        && in_array('compatible:com-3', $joinedUseKeys, true)
+        && in_array('compatible:port-1', $joinedUseKeys, true)
+        && in_array('compatible:port-2', $joinedUseKeys, true),
+        'matriz POT interpreta grupos tipo Comercial 1, 2 y 3 sin perder factores');
     $urbanControllerReflection = new \ReflectionClass(\App\Controllers\AppraisalUrbanNormController::class);
     $surfaceHints = $urbanControllerReflection->getMethod('surfaceHints');
     $surfaceHints->setAccessible(true);
