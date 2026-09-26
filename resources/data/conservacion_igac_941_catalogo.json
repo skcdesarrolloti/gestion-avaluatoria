@@ -1,0 +1,2689 @@
+{
+  "version": "conservacion-igac-941-revision-2026-09-26",
+  "algorithm_version": "conservacion-v1",
+  "source_workbook": "Modelo_Estado_Conservacion_IGAC_941_Revision.xlsx",
+  "technical_reference": "Resolución IGAC 941 de 2026 · IN-GCT-PC03-01 V2 · IN-GCT-PC01-06 V1.",
+  "states": [
+    {
+      "value": "1",
+      "label": "Óptimo",
+      "criterion": "Construcción nueva o recién restaurada; estructura y acabados sin deterioro observable.",
+      "intervention": "No requiere intervención.",
+      "use": "Estado extremo superior; usar solo cuando la evidencia sea consistente en todos los componentes relevantes.",
+      "source": "IGAC IN-GCT-PC03-01 V2, Tabla 20"
+    },
+    {
+      "value": "1.5",
+      "label": "Muy bueno",
+      "criterion": "Construcción reciente o restaurada, con desgaste mínimo y mantenimiento preventivo.",
+      "intervention": "Mantenimiento mínimo / preventivo.",
+      "use": "Pequeños defectos superficiales sin pérdida funcional.",
+      "source": "IGAC IN-GCT-PC03-01 V2, Tabla 20"
+    },
+    {
+      "value": "2",
+      "label": "Bueno",
+      "criterion": "No es nueva, pero conserva buen desempeño en estructura y acabados, sin deterioro relevante.",
+      "intervention": "Intervenciones menores y puntuales.",
+      "use": "Condición normal de una construcción bien mantenida.",
+      "source": "IGAC IN-GCT-PC03-01 V2, Tabla 20"
+    },
+    {
+      "value": "2.5",
+      "label": "Intermedio",
+      "criterion": "Condiciones funcionales aceptables, con deterioro leve por uso y tiempo.",
+      "intervention": "Mantenimiento y mejoras de poca importancia.",
+      "use": "Admite fisuras de asentamiento y desgaste leve sin pérdida importante de funcionalidad.",
+      "source": "IGAC IN-GCT-PC03-01 V2, Tabla 20"
+    },
+    {
+      "value": "3",
+      "label": "Regular",
+      "criterion": "Deterioro moderado y evidente, subsanable, sin comprometer riesgo general.",
+      "intervention": "Mantenimiento correctivo / reparaciones sencillas.",
+      "use": "Puede involucrar acabados, algunos elementos estructurales y redes.",
+      "source": "IGAC IN-GCT-PC03-01 V2, Tabla 20"
+    },
+    {
+      "value": "3.5",
+      "label": "Deficiente",
+      "criterion": "Deterioro alto en acabados, redes y/o elementos constructivos; aparecen humedades, sustituciones parciales o elementos incompletos.",
+      "intervention": "Reparaciones relevantes.",
+      "use": "Exige mayor soporte fotográfico y descripción de las fallas.",
+      "source": "IGAC IN-GCT-PC03-01 V2, Tabla 20"
+    },
+    {
+      "value": "4",
+      "label": "Malo",
+      "criterion": "Alto grado de deterioro general, sin mantenimiento, desperfectos visibles; requiere reparaciones importantes.",
+      "intervention": "Reparaciones importantes y necesarias.",
+      "use": "No implica necesariamente riesgo de desplome.",
+      "source": "IGAC IN-GCT-PC03-01 V2, Tabla 20"
+    },
+    {
+      "value": "4.5",
+      "label": "Muy malo",
+      "criterion": "Condición precaria, problemas estructurales y posible riesgo de colapso; prácticamente inhabitable.",
+      "intervention": "Reparaciones prioritarias / sustituciones estructurales.",
+      "use": "Debe activar advertencia de revisión especializada.",
+      "source": "IGAC IN-GCT-PC03-01 V2, Tabla 20"
+    },
+    {
+      "value": "5",
+      "label": "Demolición / Ruinoso",
+      "criterion": "Condición extrema en la que la edificación ha perdido funcionalidad y su recuperación no resulta razonable bajo el criterio de conservación.",
+      "intervention": "Demolición / reposición.",
+      "use": "Estado límite. Requiere evidencia y justificación expresa.",
+      "source": "IGAC IN-GCT-PC03-01 V2"
+    }
+  ],
+  "groups": [
+    {
+      "id": "estructura",
+      "label": "Estructura",
+      "number": "7.1",
+      "subcomponents": [
+        {
+          "id": "sistema_portante",
+          "label": "Sistema portante",
+          "object": "Sistema resistente principal: pórticos, muros estructurales, columnas, vigas, entramados.",
+          "criticality": "Crítica",
+          "applies": "Sí",
+          "technical_basis": "IGAC: estructura / armazón + práctica de inspección valuatoria",
+          "observation": "No confundir con diagnóstico estructural especializado."
+        },
+        {
+          "id": "muros",
+          "label": "Muros",
+          "object": "Muros estructurales y no estructurales, mamposterías, divisiones y cerramientos.",
+          "criticality": "Alta",
+          "applies": "Sí",
+          "technical_basis": "IGAC: muros / estructura",
+          "observation": "Registrar grietas, fisuras, humedad y deformaciones."
+        }
+      ]
+    },
+    {
+      "id": "envolvente",
+      "label": "Envolvente",
+      "number": "7.2",
+      "subcomponents": [
+        {
+          "id": "fachada",
+          "label": "Fachada",
+          "object": "Acabado exterior, cerramiento y presentación visible.",
+          "criticality": "Media",
+          "applies": "Sí",
+          "technical_basis": "IGAC: acabados principales / fachada",
+          "observation": "Diferenciar calidad del acabado y estado de conservación."
+        },
+        {
+          "id": "cubierta",
+          "label": "Cubierta",
+          "object": "Sistema superior de protección e impermeabilización.",
+          "criticality": "Alta",
+          "applies": "Sí",
+          "technical_basis": "IGAC: cubierta / estructura",
+          "observation": "Filtraciones y deformaciones incrementan criticidad."
+        },
+        {
+          "id": "ventanas",
+          "label": "Ventanas",
+          "object": "Marcos, vidrios, sellos, herrajes y funcionamiento.",
+          "criticality": "Media",
+          "applies": "Sí",
+          "technical_basis": "IGAC: tipologías constructivas + inspección interna",
+          "observation": "Verificar cierres, corrosión, filtraciones y roturas."
+        },
+        {
+          "id": "puertas",
+          "label": "Puertas",
+          "object": "Hojas, marcos, herrajes, cierres y seguridad.",
+          "criticality": "Media",
+          "applies": "Sí",
+          "technical_basis": "IGAC: tipologías constructivas + inspección interna",
+          "observation": "Separar desgaste estético de pérdida funcional."
+        }
+      ]
+    },
+    {
+      "id": "acabados",
+      "label": "Acabados",
+      "number": "7.3",
+      "subcomponents": [
+        {
+          "id": "pisos",
+          "label": "Pisos",
+          "object": "Revestimientos de piso y su integridad.",
+          "criticality": "Media",
+          "applies": "Sí",
+          "technical_basis": "IGAC: pisos / acabados principales",
+          "observation": "Identificar piezas sueltas, rotas, desniveles y desgaste."
+        },
+        {
+          "id": "paredes",
+          "label": "Paredes",
+          "object": "Pañetes, estucos, pinturas, revestimientos y enchapes.",
+          "criticality": "Media",
+          "applies": "Sí",
+          "technical_basis": "IGAC: cubrimiento de muros",
+          "observation": "Humedad y desprendimientos deben individualizarse."
+        },
+        {
+          "id": "cielos_rasos",
+          "label": "Cielos rasos",
+          "object": "Acabado inferior de cubiertas o entrepisos.",
+          "criticality": "Media",
+          "applies": "Condicional",
+          "technical_basis": "IGAC: tipologías constructivas + inspección interna",
+          "observation": "Permitir N/A si no existe."
+        },
+        {
+          "id": "acabados_generales",
+          "label": "Acabados generales",
+          "object": "Nivel de terminaciones, uniformidad y desgaste general.",
+          "criticality": "Media",
+          "applies": "Sí",
+          "technical_basis": "IGAC: acabados principales",
+          "observation": "No duplicar daños ya contabilizados; funciona como visión integradora."
+        }
+      ]
+    },
+    {
+      "id": "espacios_funcionales",
+      "label": "Espacios funcionales",
+      "number": "7.4",
+      "subcomponents": [
+        {
+          "id": "banos",
+          "label": "Baños",
+          "object": "Aparatos, enchapes, mobiliario, griferías e instalaciones visibles.",
+          "criticality": "Media",
+          "applies": "Condicional",
+          "technical_basis": "IGAC: baño",
+          "observation": "Permitir N/A cuando la unidad carezca de baño."
+        },
+        {
+          "id": "cocina",
+          "label": "Cocina",
+          "object": "Mesones, mobiliario, enchapes, griferías e instalaciones visibles.",
+          "criticality": "Media",
+          "applies": "Condicional",
+          "technical_basis": "IGAC: cocina",
+          "observation": "Permitir N/A según uso/tipología."
+        },
+        {
+          "id": "dependencias",
+          "label": "Dependencias",
+          "object": "Distribución, funcionalidad y estado de espacios interiores.",
+          "criticality": "Baja",
+          "applies": "Sí",
+          "technical_basis": "Metodología interna complementaria",
+          "observation": "No confundir funcionalidad/distribución con conservación física."
+        }
+      ]
+    },
+    {
+      "id": "condiciones_ambientales",
+      "label": "Condiciones ambientales",
+      "number": "7.5",
+      "subcomponents": [
+        {
+          "id": "iluminacion",
+          "label": "Iluminación",
+          "object": "Condiciones naturales y artificiales observables.",
+          "criticality": "Baja",
+          "applies": "Sí",
+          "technical_basis": "Metodología interna complementaria",
+          "observation": "Principalmente descriptiva; no debe dominar el estado físico global."
+        },
+        {
+          "id": "ventilacion",
+          "label": "Ventilación",
+          "object": "Condiciones naturales o mecánicas de ventilación.",
+          "criticality": "Baja",
+          "applies": "Sí",
+          "technical_basis": "Metodología interna complementaria",
+          "observation": "Relacionar con humedad, salubridad y desempeño."
+        }
+      ]
+    },
+    {
+      "id": "instalaciones",
+      "label": "Instalaciones",
+      "number": "7.6",
+      "subcomponents": [
+        {
+          "id": "electrica",
+          "label": "Eléctrica",
+          "object": "Tableros, protecciones, canalizaciones, cableado y aparatos visibles.",
+          "criticality": "Alta",
+          "applies": "Sí",
+          "technical_basis": "Inspección valuatoria + condición funcional",
+          "observation": "No reemplaza certificación RETIE ni peritaje eléctrico."
+        },
+        {
+          "id": "hidrosanitaria",
+          "label": "Hidrosanitaria",
+          "object": "Redes visibles, aparatos, fugas, presión, desagües y humedades asociadas.",
+          "criticality": "Alta",
+          "applies": "Sí",
+          "technical_basis": "IGAC: redes / estado + inspección interna",
+          "observation": "Fugas y fallas activas elevan la severidad."
+        },
+        {
+          "id": "gas",
+          "label": "Gas",
+          "object": "Red visible, medidores, ventilaciones y condición aparente.",
+          "criticality": "Alta",
+          "applies": "Condicional",
+          "technical_basis": "Inspección valuatoria complementaria",
+          "observation": "No reemplaza certificación de instalación de gas."
+        },
+        {
+          "id": "climatizacion",
+          "label": "Climatización",
+          "object": "Equipos y sistemas de acondicionamiento cuando formen parte relevante del inmueble.",
+          "criticality": "Media",
+          "applies": "Condicional",
+          "technical_basis": "Metodología interna complementaria",
+          "observation": "Distinguir equipos removibles de instalaciones fijas."
+        },
+        {
+          "id": "especiales",
+          "label": "Especiales",
+          "object": "Ascensores, bombas, incendio, voz/datos, seguridad, automatización u otros.",
+          "criticality": "Alta",
+          "applies": "Condicional",
+          "technical_basis": "Metodología interna complementaria",
+          "observation": "Seleccionar según tipología y uso."
+        }
+      ]
+    }
+  ],
+  "materials": {
+    "sistema_portante": [
+      {
+        "field": "Tipo / material",
+        "option": "Concreto reforzado",
+        "order": 1,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: armazón/estructura + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Mampostería estructural",
+        "order": 2,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: armazón/estructura + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Mampostería confinada",
+        "order": 3,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: armazón/estructura + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Estructura metálica",
+        "order": 4,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: armazón/estructura + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Madera",
+        "order": 5,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: armazón/estructura + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Prefabricado",
+        "order": 6,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: armazón/estructura + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Sistema mixto",
+        "order": 7,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: armazón/estructura + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Adobe / tapia / bahareque",
+        "order": 8,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: armazón/estructura + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Otro",
+        "order": 9,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: armazón/estructura + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "No verificable",
+        "order": 10,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: armazón/estructura + ampliación interna"
+      }
+    ],
+    "muros": [
+      {
+        "field": "Tipo / material",
+        "option": "Bloque de concreto",
+        "order": 1,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: muros + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Ladrillo cerámico",
+        "order": 2,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: muros + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Concreto",
+        "order": 3,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: muros + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Mampostería estructural",
+        "order": 4,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: muros + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Mampostería confinada",
+        "order": 5,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: muros + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Prefabricado",
+        "order": 6,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: muros + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Drywall / sistema liviano",
+        "order": 7,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: muros + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Madera",
+        "order": 8,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: muros + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Adobe / tapia / bahareque",
+        "order": 9,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: muros + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Mixto",
+        "order": 10,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: muros + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Otro",
+        "order": 11,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: muros + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "No verificable",
+        "order": 12,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: muros + ampliación interna"
+      }
+    ],
+    "fachada": [
+      {
+        "field": "Material / acabado",
+        "option": "Pañete y pintura",
+        "order": 1,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: fachada + ampliación interna"
+      },
+      {
+        "field": "Material / acabado",
+        "option": "Ladrillo a la vista",
+        "order": 2,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: fachada + ampliación interna"
+      },
+      {
+        "field": "Material / acabado",
+        "option": "Concreto a la vista",
+        "order": 3,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: fachada + ampliación interna"
+      },
+      {
+        "field": "Material / acabado",
+        "option": "Cerámica / enchape",
+        "order": 4,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: fachada + ampliación interna"
+      },
+      {
+        "field": "Material / acabado",
+        "option": "Piedra natural",
+        "order": 5,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: fachada + ampliación interna"
+      },
+      {
+        "field": "Material / acabado",
+        "option": "Mármol / acabado pétreo fino",
+        "order": 6,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: fachada + ampliación interna"
+      },
+      {
+        "field": "Material / acabado",
+        "option": "Vidrio / muro cortina",
+        "order": 7,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: fachada + ampliación interna"
+      },
+      {
+        "field": "Material / acabado",
+        "option": "Panel metálico / ACM",
+        "order": 8,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: fachada + ampliación interna"
+      },
+      {
+        "field": "Material / acabado",
+        "option": "Madera",
+        "order": 9,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: fachada + ampliación interna"
+      },
+      {
+        "field": "Material / acabado",
+        "option": "Mixta",
+        "order": 10,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: fachada + ampliación interna"
+      },
+      {
+        "field": "Material / acabado",
+        "option": "Otro",
+        "order": 11,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: fachada + ampliación interna"
+      },
+      {
+        "field": "Material / acabado",
+        "option": "No verificable",
+        "order": 12,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: fachada + ampliación interna"
+      }
+    ],
+    "cubierta": [
+      {
+        "field": "Tipo / material",
+        "option": "Placa de concreto",
+        "order": 1,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubierta + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Teja de fibrocemento",
+        "order": 2,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubierta + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Teja metálica",
+        "order": 3,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubierta + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Teja termoacústica",
+        "order": 4,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubierta + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Teja de barro",
+        "order": 5,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubierta + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Teja asfáltica",
+        "order": 6,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubierta + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Policarbonato",
+        "order": 7,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubierta + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Membrana / impermeabilización sobre placa",
+        "order": 8,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubierta + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Madera + teja",
+        "order": 9,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubierta + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Mixta",
+        "order": 10,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubierta + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Otro",
+        "order": 11,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubierta + ampliación interna"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "No verificable",
+        "order": 12,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubierta + ampliación interna"
+      }
+    ],
+    "ventanas": [
+      {
+        "field": "Tipo / material",
+        "option": "Aluminio y vidrio",
+        "order": 1,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "PVC y vidrio",
+        "order": 2,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Madera y vidrio",
+        "order": 3,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Metálica",
+        "order": 4,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Vidrio templado",
+        "order": 5,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Muro cortina",
+        "order": 6,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Celosía",
+        "order": 7,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Mixta",
+        "order": 8,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Otro",
+        "order": 9,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "No verificable",
+        "order": 10,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      }
+    ],
+    "puertas": [
+      {
+        "field": "Tipo / material",
+        "option": "Madera maciza",
+        "order": 1,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Madera entamborada",
+        "order": 2,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Metálica",
+        "order": 3,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Aluminio y vidrio",
+        "order": 4,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Vidrio templado",
+        "order": 5,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "PVC",
+        "order": 6,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Seguridad / blindada",
+        "order": 7,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Enrollable",
+        "order": 8,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Mixta",
+        "order": 9,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Otro",
+        "order": 10,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "No verificable",
+        "order": 11,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      }
+    ],
+    "pisos": [
+      {
+        "field": "Material",
+        "option": "Tierra / afirmado",
+        "order": 1,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: pisos + ampliación interna"
+      },
+      {
+        "field": "Material",
+        "option": "Cemento",
+        "order": 2,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: pisos + ampliación interna"
+      },
+      {
+        "field": "Material",
+        "option": "Baldosa de cemento",
+        "order": 3,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: pisos + ampliación interna"
+      },
+      {
+        "field": "Material",
+        "option": "Cerámica",
+        "order": 4,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: pisos + ampliación interna"
+      },
+      {
+        "field": "Material",
+        "option": "Porcelanato",
+        "order": 5,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: pisos + ampliación interna"
+      },
+      {
+        "field": "Material",
+        "option": "Granito",
+        "order": 6,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: pisos + ampliación interna"
+      },
+      {
+        "field": "Material",
+        "option": "Mármol / piedra natural",
+        "order": 7,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: pisos + ampliación interna"
+      },
+      {
+        "field": "Material",
+        "option": "Madera / parquet",
+        "order": 8,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: pisos + ampliación interna"
+      },
+      {
+        "field": "Material",
+        "option": "Laminado",
+        "order": 9,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: pisos + ampliación interna"
+      },
+      {
+        "field": "Material",
+        "option": "Vinílico / SPC",
+        "order": 10,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: pisos + ampliación interna"
+      },
+      {
+        "field": "Material",
+        "option": "Alfombra",
+        "order": 11,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: pisos + ampliación interna"
+      },
+      {
+        "field": "Material",
+        "option": "Epóxico / industrial",
+        "order": 12,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: pisos + ampliación interna"
+      },
+      {
+        "field": "Material",
+        "option": "Otro",
+        "order": 13,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: pisos + ampliación interna"
+      },
+      {
+        "field": "Material",
+        "option": "No verificable",
+        "order": 14,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: pisos + ampliación interna"
+      }
+    ],
+    "paredes": [
+      {
+        "field": "Material / revestimiento",
+        "option": "Sin acabado",
+        "order": 1,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubrimiento de muros + ampliación interna"
+      },
+      {
+        "field": "Material / revestimiento",
+        "option": "Pañete",
+        "order": 2,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubrimiento de muros + ampliación interna"
+      },
+      {
+        "field": "Material / revestimiento",
+        "option": "Estuco y pintura",
+        "order": 3,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubrimiento de muros + ampliación interna"
+      },
+      {
+        "field": "Material / revestimiento",
+        "option": "Cerámica",
+        "order": 4,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubrimiento de muros + ampliación interna"
+      },
+      {
+        "field": "Material / revestimiento",
+        "option": "Porcelanato",
+        "order": 5,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubrimiento de muros + ampliación interna"
+      },
+      {
+        "field": "Material / revestimiento",
+        "option": "Piedra natural",
+        "order": 6,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubrimiento de muros + ampliación interna"
+      },
+      {
+        "field": "Material / revestimiento",
+        "option": "Mármol",
+        "order": 7,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubrimiento de muros + ampliación interna"
+      },
+      {
+        "field": "Material / revestimiento",
+        "option": "Madera",
+        "order": 8,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubrimiento de muros + ampliación interna"
+      },
+      {
+        "field": "Material / revestimiento",
+        "option": "Papel / revestimiento decorativo",
+        "order": 9,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubrimiento de muros + ampliación interna"
+      },
+      {
+        "field": "Material / revestimiento",
+        "option": "Panel / sistema liviano",
+        "order": 10,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubrimiento de muros + ampliación interna"
+      },
+      {
+        "field": "Material / revestimiento",
+        "option": "Mixto",
+        "order": 11,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubrimiento de muros + ampliación interna"
+      },
+      {
+        "field": "Material / revestimiento",
+        "option": "Otro",
+        "order": 12,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubrimiento de muros + ampliación interna"
+      },
+      {
+        "field": "Material / revestimiento",
+        "option": "No verificable",
+        "order": 13,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cubrimiento de muros + ampliación interna"
+      }
+    ],
+    "cielos_rasos": [
+      {
+        "field": "Tipo / material",
+        "option": "Sin cielo raso",
+        "order": 1,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Pañete sobre placa",
+        "order": 2,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Drywall / yeso",
+        "order": 3,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "PVC",
+        "order": 4,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Fibrocemento",
+        "order": 5,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Madera",
+        "order": 6,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Metálico",
+        "order": 7,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Acústico modular",
+        "order": 8,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Tensado / especial",
+        "order": 9,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "Otro",
+        "order": 10,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      },
+      {
+        "field": "Tipo / material",
+        "option": "No verificable",
+        "order": 11,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-07 + catálogo interno"
+      }
+    ],
+    "acabados_generales": [
+      {
+        "field": "Nivel observado",
+        "option": "Básico",
+        "order": 1,
+        "applicability": "General",
+        "source": "IGAC: acabados principales; escala operativa interna"
+      },
+      {
+        "field": "Nivel observado",
+        "option": "Económico",
+        "order": 2,
+        "applicability": "General",
+        "source": "IGAC: acabados principales; escala operativa interna"
+      },
+      {
+        "field": "Nivel observado",
+        "option": "Estándar",
+        "order": 3,
+        "applicability": "General",
+        "source": "IGAC: acabados principales; escala operativa interna"
+      },
+      {
+        "field": "Nivel observado",
+        "option": "Medio",
+        "order": 4,
+        "applicability": "General",
+        "source": "IGAC: acabados principales; escala operativa interna"
+      },
+      {
+        "field": "Nivel observado",
+        "option": "Bueno",
+        "order": 5,
+        "applicability": "General",
+        "source": "IGAC: acabados principales; escala operativa interna"
+      },
+      {
+        "field": "Nivel observado",
+        "option": "Alto",
+        "order": 6,
+        "applicability": "General",
+        "source": "IGAC: acabados principales; escala operativa interna"
+      },
+      {
+        "field": "Nivel observado",
+        "option": "Lujoso",
+        "order": 7,
+        "applicability": "General",
+        "source": "IGAC: acabados principales; escala operativa interna"
+      },
+      {
+        "field": "Nivel observado",
+        "option": "Especializado",
+        "order": 8,
+        "applicability": "General",
+        "source": "IGAC: acabados principales; escala operativa interna"
+      },
+      {
+        "field": "Nivel observado",
+        "option": "Heterogéneo / mixto",
+        "order": 9,
+        "applicability": "General",
+        "source": "IGAC: acabados principales; escala operativa interna"
+      },
+      {
+        "field": "Nivel observado",
+        "option": "No verificable",
+        "order": 10,
+        "applicability": "General",
+        "source": "IGAC: acabados principales; escala operativa interna"
+      }
+    ],
+    "banos": [
+      {
+        "field": "Configuración",
+        "option": "Sin baño",
+        "order": 1,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: baño + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "Básico",
+        "order": 2,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: baño + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "Sencillo",
+        "order": 3,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: baño + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "Estándar",
+        "order": 4,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: baño + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "Bueno",
+        "order": 5,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: baño + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "Alto",
+        "order": 6,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: baño + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "Lujoso",
+        "order": 7,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: baño + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "Especial / accesible",
+        "order": 8,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: baño + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "No verificable",
+        "order": 9,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: baño + escala operativa interna"
+      }
+    ],
+    "cocina": [
+      {
+        "field": "Configuración",
+        "option": "Sin cocina",
+        "order": 1,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cocina + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "Básica",
+        "order": 2,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cocina + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "Sencilla",
+        "order": 3,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cocina + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "Estándar",
+        "order": 4,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cocina + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "Integral",
+        "order": 5,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cocina + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "Buena",
+        "order": 6,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cocina + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "Alta",
+        "order": 7,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cocina + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "Lujosa",
+        "order": 8,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cocina + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "Industrial / especializada",
+        "order": 9,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cocina + escala operativa interna"
+      },
+      {
+        "field": "Configuración",
+        "option": "No verificable",
+        "order": 10,
+        "applicability": "General",
+        "source": "IGAC IN-GCT-PC01-06: cocina + escala operativa interna"
+      }
+    ],
+    "dependencias": [
+      {
+        "field": "Configuración",
+        "option": "Distribución abierta",
+        "order": 1,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Configuración",
+        "option": "Distribución convencional",
+        "order": 2,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Configuración",
+        "option": "Distribución compartimentada",
+        "order": 3,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Configuración",
+        "option": "Distribución especializada",
+        "order": 4,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Configuración",
+        "option": "Flexible / modular",
+        "order": 5,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Configuración",
+        "option": "Inadecuada para el uso actual",
+        "order": 6,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Configuración",
+        "option": "Otro",
+        "order": 7,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Configuración",
+        "option": "No verificable",
+        "order": 8,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      }
+    ],
+    "iluminacion": [
+      {
+        "field": "Condición",
+        "option": "Natural predominante",
+        "order": 1,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Condición",
+        "option": "Natural y artificial equilibrada",
+        "order": 2,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Condición",
+        "option": "Artificial predominante",
+        "order": 3,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Condición",
+        "option": "Insuficiente",
+        "order": 4,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Condición",
+        "option": "Excesiva / deslumbramiento",
+        "order": 5,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Condición",
+        "option": "Especializada",
+        "order": 6,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Condición",
+        "option": "No verificable",
+        "order": 7,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      }
+    ],
+    "ventilacion": [
+      {
+        "field": "Condición",
+        "option": "Natural cruzada",
+        "order": 1,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Condición",
+        "option": "Natural simple",
+        "order": 2,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Condición",
+        "option": "Mecánica",
+        "order": 3,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Condición",
+        "option": "Mixta",
+        "order": 4,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Condición",
+        "option": "Insuficiente",
+        "order": 5,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Condición",
+        "option": "Especializada",
+        "order": 6,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      },
+      {
+        "field": "Condición",
+        "option": "No verificable",
+        "order": 7,
+        "applicability": "General",
+        "source": "Metodología interna complementaria"
+      }
+    ],
+    "electrica": [
+      {
+        "field": "Configuración visible",
+        "option": "Canalización empotrada",
+        "order": 1,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Configuración visible",
+        "option": "Canalización expuesta técnica",
+        "order": 2,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Configuración visible",
+        "option": "Mixta",
+        "order": 3,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Configuración visible",
+        "option": "Provisional / improvisada",
+        "order": 4,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Configuración visible",
+        "option": "Industrial / especializada",
+        "order": 5,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Configuración visible",
+        "option": "No verificable",
+        "order": 6,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      }
+    ],
+    "hidrosanitaria": [
+      {
+        "field": "Configuración visible",
+        "option": "Empotrada",
+        "order": 1,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Configuración visible",
+        "option": "Expuesta técnica",
+        "order": 2,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Configuración visible",
+        "option": "Mixta",
+        "order": 3,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Configuración visible",
+        "option": "Antigua / parcialmente sustituida",
+        "order": 4,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Configuración visible",
+        "option": "Industrial / especializada",
+        "order": 5,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Configuración visible",
+        "option": "No verificable",
+        "order": 6,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      }
+    ],
+    "gas": [
+      {
+        "field": "Configuración visible",
+        "option": "Red interna certificable aparente",
+        "order": 1,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Configuración visible",
+        "option": "Red externa visible",
+        "order": 2,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Configuración visible",
+        "option": "GLP con instalación fija",
+        "order": 3,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Configuración visible",
+        "option": "Sin instalación",
+        "order": 4,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Configuración visible",
+        "option": "No verificable",
+        "order": 5,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      }
+    ],
+    "climatizacion": [
+      {
+        "field": "Sistema",
+        "option": "Sin sistema fijo",
+        "order": 1,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "Mini-split / expansión directa",
+        "order": 2,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "Sistema central",
+        "order": 3,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "VRF / VRV",
+        "order": 4,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "Chiller",
+        "order": 5,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "Ventilación mecánica",
+        "order": 6,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "Sistema mixto",
+        "order": 7,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "Otro",
+        "order": 8,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "No verificable",
+        "order": 9,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      }
+    ],
+    "especiales": [
+      {
+        "field": "Sistema",
+        "option": "Ascensores",
+        "order": 1,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "Bombas",
+        "order": 2,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "Red contra incendio",
+        "order": 3,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "Detección y alarma",
+        "order": 4,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "CCTV / seguridad",
+        "order": 5,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "Control de acceso",
+        "order": 6,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "Voz y datos",
+        "order": 7,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "Automatización / BMS",
+        "order": 8,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "Planta eléctrica",
+        "order": 9,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "UPS",
+        "order": 10,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "Solar fotovoltaico",
+        "order": 11,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "Otro",
+        "order": 12,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "No aplica",
+        "order": 13,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      },
+      {
+        "field": "Sistema",
+        "option": "No verificable",
+        "order": 14,
+        "applicability": "General",
+        "source": "Catálogo interno de inspección aparente"
+      }
+    ]
+  },
+  "findings": {
+    "sistema_portante": [
+      {
+        "finding": "Sin lesiones visibles",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Sin intervención",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Fisuras superficiales sin patrón estructural aparente",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Monitoreo / reparación superficial",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Fisuras localizadas recurrentes",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Revisión y reparación localizada",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Grietas relevantes / patrón estructural aparente",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Revisión especializada",
+        "critical": true,
+        "state_guide": "3.5–4.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Deformación visible de elementos",
+        "severity": 4,
+        "impact": "Muy alto",
+        "suggested_action": "Revisión estructural prioritaria",
+        "critical": true,
+        "state_guide": "4.0–4.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Corrosión visible / acero expuesto",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Diagnóstico y reparación especializada",
+        "critical": true,
+        "state_guide": "3.5–4.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Desprendimiento de concreto / pérdida de sección",
+        "severity": 4,
+        "impact": "Muy alto",
+        "suggested_action": "Intervención prioritaria",
+        "critical": true,
+        "state_guide": "4.0–4.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Reparaciones o refuerzos estructurales visibles",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Documentar causa y alcance",
+        "critical": false,
+        "state_guide": "2.5–3.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Riesgo aparente de inestabilidad / colapso",
+        "severity": 4,
+        "impact": "Crítico",
+        "suggested_action": "Suspender conclusión simple y recomendar especialista",
+        "critical": true,
+        "state_guide": "4.5–5.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "muros": [
+      {
+        "finding": "Sin deterioro visible",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Sin intervención",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Fisuras de acabado",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Resane / pintura",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Fisuras en mampostería",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Reparación localizada / revisión",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Grietas generalizadas",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Diagnóstico y reparación",
+        "critical": true,
+        "state_guide": "3.5–4.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Humedad localizada",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Corregir causa y acabado",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Humedad generalizada / salitre",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Intervención relevante",
+        "critical": false,
+        "state_guide": "3.0–3.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Desprendimiento de pañete/revestimiento",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Reposición parcial",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Deformación / desplome aparente",
+        "severity": 4,
+        "impact": "Muy alto",
+        "suggested_action": "Revisión especializada prioritaria",
+        "critical": true,
+        "state_guide": "4.0–4.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "fachada": [
+      {
+        "finding": "Buen aspecto y protección, sin deterioro",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Rutina normal",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Pérdida leve de pintura / suciedad / envejecimiento",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Mantenimiento estético",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Fisuras, sellos deteriorados o desprendimientos localizados",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Reparación localizada",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Humedad / desprendimientos generalizados",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Rehabilitación parcial",
+        "critical": false,
+        "state_guide": "3.0–3.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Elementos sueltos con riesgo",
+        "severity": 4,
+        "impact": "Crítico",
+        "suggested_action": "Aseguramiento e intervención inmediata",
+        "critical": true,
+        "state_guide": "4.0–4.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "cubierta": [
+      {
+        "finding": "Sin filtraciones ni daños visibles",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Rutina normal",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Desgaste superficial / mantenimiento pendiente",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Mantenimiento preventivo",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Filtración localizada / impermeabilización puntual deteriorada",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Reparación localizada",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Filtraciones múltiples / piezas rotas / corrosión relevante",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Reparación parcial importante",
+        "critical": false,
+        "state_guide": "3.0–3.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Deformación / falla de apoyo / riesgo de desprendimiento",
+        "severity": 4,
+        "impact": "Crítico",
+        "suggested_action": "Intervención prioritaria / especialista",
+        "critical": true,
+        "state_guide": "4.0–4.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "ventanas": [
+      {
+        "finding": "Funcionamiento normal, sellos y vidrios íntegros",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Sin intervención",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Herrajes/sellos con desgaste menor",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Ajuste / mantenimiento",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Dificultad de cierre, corrosión o filtración localizada",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Reparación / sustitución parcial",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Vidrios rotos / marcos deformados / filtración generalizada",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Sustitución relevante",
+        "critical": false,
+        "state_guide": "3.0–3.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "puertas": [
+      {
+        "finding": "Funcionamiento normal y buen ajuste",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Sin intervención",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Desgaste superficial / herrajes menores",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Mantenimiento",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Desalineación / deterioro localizado / cerradura deficiente",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Reparación parcial",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Pérdida funcional / pudrición / corrosión severa",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Sustitución",
+        "critical": false,
+        "state_guide": "3.0–3.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "pisos": [
+      {
+        "finding": "Íntegros, uniformes y funcionales",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Sin intervención",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Desgaste superficial normal",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Mantenimiento",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Piezas fisuradas / juntas abiertas / desgaste localizado",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Reposición parcial",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Piezas sueltas / desniveles / pérdida extensa del acabado",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Reposición relevante",
+        "critical": false,
+        "state_guide": "3.0–3.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Hundimiento / levantamiento con riesgo de uso",
+        "severity": 4,
+        "impact": "Crítico",
+        "suggested_action": "Reparación prioritaria y revisar causa",
+        "critical": true,
+        "state_guide": "3.5–4.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "paredes": [
+      {
+        "finding": "Acabado íntegro",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Sin intervención",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Suciedad / pérdida leve de pintura",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Pintura / mantenimiento",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Fisuras superficiales / desprendimiento localizado",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Resane / reposición puntual",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Humedad, desprendimiento o deterioro generalizado",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Intervención relevante",
+        "critical": false,
+        "state_guide": "3.0–3.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "cielos_rasos": [
+      {
+        "finding": "Íntegro, nivelado y sin manchas",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Sin intervención",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Manchas / fisuras leves",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Mantenimiento",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Paneles deteriorados / humedad localizada",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Reposición parcial",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Desprendimiento / humedad generalizada / riesgo de caída",
+        "severity": 4,
+        "impact": "Crítico",
+        "suggested_action": "Intervención prioritaria",
+        "critical": true,
+        "state_guide": "3.5–4.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "acabados_generales": [
+      {
+        "finding": "Homogéneos y bien mantenidos",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Sin intervención",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Desgaste normal homogéneo",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Mantenimiento rutinario",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Deterioros localizados en varios ambientes",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Mantenimiento correctivo",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Deterioro generalizado / acabados incompletos",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Renovación parcial o relevante",
+        "critical": false,
+        "state_guide": "3.0–3.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "banos": [
+      {
+        "finding": "Aparatos, griferías, enchapes y muebles funcionales",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Sin intervención",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Desgaste estético / sellos menores",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Mantenimiento",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Griferías o accesorios defectuosos / enchape localizado deteriorado",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Reparación parcial",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Fugas / aparatos fuera de servicio / humedad relevante",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Reparación relevante",
+        "critical": false,
+        "state_guide": "3.0–3.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Inutilizable / daño generalizado",
+        "severity": 4,
+        "impact": "Muy alto",
+        "suggested_action": "Reposición / rehabilitación",
+        "critical": false,
+        "state_guide": "4.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "cocina": [
+      {
+        "finding": "Mobiliario, mesón, grifería y acabados funcionales",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Sin intervención",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Desgaste estético leve",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Mantenimiento",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Herrajes / mesón / muebles con daños localizados",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Reparación parcial",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Humedad / muebles deteriorados / grifería o redes defectuosas",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Rehabilitación parcial",
+        "critical": false,
+        "state_guide": "3.0–3.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Pérdida funcional generalizada",
+        "severity": 4,
+        "impact": "Muy alto",
+        "suggested_action": "Reposición significativa",
+        "critical": false,
+        "state_guide": "4.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "dependencias": [
+      {
+        "finding": "Espacios funcionales, utilizables y sin deterioro relevante",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Sin intervención",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Desgaste menor sin afectar uso",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Mantenimiento",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Deterioros localizados que limitan parcialmente el uso",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Ajustes / reparación",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Áreas inutilizables por deterioro físico",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Rehabilitación relevante",
+        "critical": false,
+        "state_guide": "3.0–4.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "iluminacion": [
+      {
+        "finding": "Adecuada para el uso",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Sin intervención",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Mejorable pero funcional",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Ajustes menores",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Insuficiente con impacto funcional",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Mejora de iluminación",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Deficiente por deterioro o fallas de instalaciones",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Intervención correctiva",
+        "critical": false,
+        "state_guide": "3.0–3.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "ventilacion": [
+      {
+        "finding": "Adecuada para el uso",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Sin intervención",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Limitada pero funcional",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Mejora menor",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Insuficiente con humedad/condensación asociada",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Mejora de ventilación y corrección de causa",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Deficiente con afectación de salubridad/acabados",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Intervención relevante",
+        "critical": false,
+        "state_guide": "3.0–3.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "electrica": [
+      {
+        "finding": "Funcionamiento aparente normal, sin deterioros visibles",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Mantenimiento rutinario",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Aparatos / tapas / puntos con desgaste menor",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Mantenimiento",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Improvisaciones localizadas / protecciones incompletas",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Corrección técnica",
+        "critical": true,
+        "state_guide": "2.5–3.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Cableado expuesto no técnico / sobrecalentamiento / daños visibles",
+        "severity": 4,
+        "impact": "Crítico",
+        "suggested_action": "Revisión eléctrica prioritaria",
+        "critical": true,
+        "state_guide": "4.0–4.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Tablero o red evidentemente obsoleta / deteriorada",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Actualización / reparación relevante",
+        "critical": true,
+        "state_guide": "3.0–4.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "hidrosanitaria": [
+      {
+        "finding": "Sin fugas ni deficiencias visibles",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Mantenimiento rutinario",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Desgaste menor de aparatos / sellos",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Mantenimiento",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Fuga localizada / desagüe lento",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Reparación puntual",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Fugas recurrentes / humedad asociada / fallas de desagüe",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Reparación relevante",
+        "critical": false,
+        "state_guide": "3.0–3.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Red fuera de servicio / daño generalizado",
+        "severity": 4,
+        "impact": "Muy alto",
+        "suggested_action": "Reposición significativa",
+        "critical": true,
+        "state_guide": "4.0–4.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "gas": [
+      {
+        "finding": "Sin deterioro visible",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Control rutinario",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Elementos con desgaste aparente sin fuga observable",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Revisión preventiva",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Instalación improvisada / ventilación insuficiente / corrosión",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Revisión especializada",
+        "critical": true,
+        "state_guide": "3.5–4.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Olor/fuga aparente o condición insegura",
+        "severity": 4,
+        "impact": "Crítico",
+        "suggested_action": "Atención inmediata por técnico competente",
+        "critical": true,
+        "state_guide": "4.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "climatizacion": [
+      {
+        "finding": "Sistema funcional y mantenido",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Mantenimiento rutinario",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Desgaste / ruido / rendimiento menor",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Mantenimiento",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Equipos parcialmente fuera de servicio",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Reparación parcial",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Sistema mayormente inoperante / deteriorado",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Rehabilitación / sustitución",
+        "critical": false,
+        "state_guide": "3.0–4.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ],
+    "especiales": [
+      {
+        "finding": "Sistema funcional y con mantenimiento aparente",
+        "severity": 0,
+        "impact": "Nulo",
+        "suggested_action": "Mantenimiento rutinario",
+        "critical": false,
+        "state_guide": "1.5–2.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Defectos menores sin pérdida de servicio",
+        "severity": 1,
+        "impact": "Bajo",
+        "suggested_action": "Mantenimiento",
+        "critical": false,
+        "state_guide": "2.0–2.5",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Fallas parciales / componentes obsoletos",
+        "severity": 2,
+        "impact": "Medio",
+        "suggested_action": "Reparación / actualización",
+        "critical": false,
+        "state_guide": "2.5–3.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      },
+      {
+        "finding": "Sistema crítico fuera de servicio",
+        "severity": 3,
+        "impact": "Alto",
+        "suggested_action": "Intervención especializada",
+        "critical": true,
+        "state_guide": "3.5–4.0",
+        "nature": "Operacionalización interna; debe interpretarse junto con la guía de estados IGAC, no como equivalencia normativa automática."
+      }
+    ]
+  },
+  "interventions": [
+    {
+      "level": 0,
+      "label": "Ninguna",
+      "description": "No se evidencia necesidad de trabajos adicionales.",
+      "examples": "Elemento nuevo/restaurado o totalmente funcional.",
+      "severity": 0,
+      "state_relation": "1.0–1.5"
+    },
+    {
+      "level": 1,
+      "label": "Preventiva",
+      "description": "Labores rutinarias para conservar el desempeño.",
+      "examples": "Limpieza, lubricación, retoques, sellado menor.",
+      "severity": 1,
+      "state_relation": "1.5–2.0"
+    },
+    {
+      "level": 2,
+      "label": "Menor / puntual",
+      "description": "Correcciones localizadas que no alteran sustancialmente el elemento.",
+      "examples": "Resane, pintura localizada, cambio de herraje, sellos.",
+      "severity": 1,
+      "state_relation": "2.0–2.5"
+    },
+    {
+      "level": 3,
+      "label": "Correctiva sencilla",
+      "description": "Reparaciones visibles y subsanables sin rehabilitación mayor.",
+      "examples": "Reposición parcial de acabados, arreglo de fuga puntual.",
+      "severity": 2,
+      "state_relation": "2.5–3.0"
+    },
+    {
+      "level": 4,
+      "label": "Relevante",
+      "description": "Reparaciones de alcance importante o sustituciones parciales.",
+      "examples": "Impermeabilización amplia, renovación parcial de redes.",
+      "severity": 3,
+      "state_relation": "3.0–3.5"
+    },
+    {
+      "level": 5,
+      "label": "Importante / necesaria",
+      "description": "Intervenciones extensas para recuperar funcionalidad.",
+      "examples": "Reposición importante de cubierta, redes o acabados.",
+      "severity": 4,
+      "state_relation": "4.0"
+    },
+    {
+      "level": 6,
+      "label": "Prioritaria / estructural",
+      "description": "Intervención inmediata o especializada por condición crítica.",
+      "examples": "Refuerzo, sustitución estructural, riesgo de colapso.",
+      "severity": 5,
+      "state_relation": "4.5–5.0"
+    }
+  ],
+  "sources": [
+    "Resolución IGAC 941 de 2026",
+    "IN-GCT-PC03-01 V2",
+    "IN-GCT-PC01-06 V1",
+    "IN-GCT-PC01-07 V1",
+    "FO-GCT-PC01-16 V3"
+  ]
+}

@@ -851,6 +851,15 @@ try {
         'built_area_adopted_m2' => '85,25', 'construction_year' => '2010',
         'functional_bedrooms_count' => '3', 'functional_bathrooms_count' => '2,5',
         'functional_parking_spaces_count' => '1', 'functional_finish_quality' => 'bueno',
+        'conservation_items' => ['sistema_portante' => [
+            'applicability' => 'aplica', 'material' => 'Concreto reforzado',
+            'finding' => 'Fisuras superficiales sin patrón estructural aparente',
+            'functionality' => 'normal', 'intervention' => '2',
+            'state_adopted' => '2', 'notes' => 'Fisuras superficiales localizadas.',
+            'evidence' => 'Foto 1',
+        ]],
+        'conservation_summary' => ['global_adopted' => '2',
+            'approved_text' => 'La estructura se conserva en buen estado observable.'],
         'conservation' => ['estructura' => 'B'], 'services' => ['energia' => 'si'],
         'specifics' => ['estructura' => 'Concreto']]]];
     $chapterOneReport = (new AppraisalChapterOneReport())->build([
@@ -934,7 +943,11 @@ Certificado de tradicion.",
         && str_contains($sectorChapter['text'], 'NTS I 01'), 'entregable sectorial respeta contenido del capitulo 2 del word');
     $constructionRows = AppraisalChapterZeroInput::unitConstructionData();
     expect($constructionRows[0]['built_area_adopted_m2'] === '85.25'
-        && str_contains($constructionRows[0]['construction_conservation_json'], 'estructura'), 'construccion por unidad normalizada');
+        && str_contains($constructionRows[0]['construction_conservation_json'], 'sistema_portante')
+        && str_contains($constructionRows[0]['conservation_result_json'], 'catalog_version')
+        && str_contains($constructionRows[0]['conservation_generated_text'], 'Conclusión global')
+        && $constructionRows[0]['conservation_approved_text'] === 'La estructura se conserva en buen estado observable.',
+        'construccion por unidad y conservacion 7.7 normalizadas');
     expect($constructionRows[0]['functional_bedrooms_count'] === 3
         && $constructionRows[0]['functional_bathrooms_count'] === '2.50'
         && $constructionRows[0]['functional_parking_spaces_count'] === 1
@@ -1012,6 +1025,8 @@ Certificado de tradicion.",
             'functional_view' => 'exterior', 'functional_finish_quality' => 'bueno',
             'construction_specifics_json' => '{"material_estructura":"Concreto reforzado","material_pisos":"Baldosas ceramicas"}',
             'construction_conservation_json' => '{"estructura":"B","pisos":"B"}',
+            'conservation_generated_text' => "Estructura: se evaluaron Sistema portante. Estado del grupo: 2 Bueno.\nConclusión global: el sistema propone 2 Bueno y se adopta 2 Bueno.",
+            'conservation_approved_text' => 'La unidad presenta conservación buena según inspección de estructura y acabados.',
         ]],
         ['report_text' => 'La copropiedad aporta ascensores, recepcion, seguridad y administracion comun.'],
         ['summary_text' => 'No presenta obsolescencia fisica, funcional ni externa material.']
@@ -1027,7 +1042,7 @@ Certificado de tradicion.",
         && str_contains($chapterText, 'baños: 1') && str_contains($chapterText, 'celdas de parqueo: 1')
         && str_contains($chapterText, 'vista: exterior') && str_contains($chapterText, 'acabados: bueno')
         && str_contains($chapterText, 'escritura') && str_contains($chapterText, '33,42')
-        && str_contains($chapterText, 'Estructura: Concreto reforzado (bueno)')
+        && str_contains($chapterText, 'La unidad presenta conservación buena')
         && str_contains($chapterText, 'NTS S 03')
         && str_contains($chapterText, 'Ley 675 de 2001'), 'entregable sujeto integra construccion areas PH obsolescencias y normas');
     $legalChapter = (new AppraisalLegalChapterReport())->build([

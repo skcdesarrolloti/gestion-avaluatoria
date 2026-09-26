@@ -92,10 +92,10 @@ final class AppraisalSubjectController
     { $this->appraisals->find($id, $this->user['id']); $this->appraisals->saveUnitSurfaces($id, $this->user['id'], AppraisalChapterZeroInput::unitSurfaceData()); $this->savedJson(); }
 
     public function saveConstructions(string $id): never
-    { $this->saveSubjectData($id, fn () => $this->appraisals->saveUnitConstructions($id, $this->user['id'], AppraisalChapterZeroInput::unitConstructionData()), 'Datos de construcción guardados correctamente.', '#construccion'); }
+    { $this->saveSubjectData($id, fn () => $this->appraisals->saveUnitConstructions($id, $this->user['id'], AppraisalChapterZeroInput::unitConstructionData($this->user['id'])), 'Datos de construcción guardados correctamente.', '#construccion'); }
 
     public function autosaveConstructions(string $id): never
-    { $this->appraisals->find($id, $this->user['id']); $this->appraisals->saveUnitConstructions($id, $this->user['id'], AppraisalChapterZeroInput::unitConstructionData()); $this->savedJson(); }
+    { $this->appraisals->find($id, $this->user['id']); $this->appraisals->saveUnitConstructions($id, $this->user['id'], AppraisalChapterZeroInput::unitConstructionData($this->user['id'])); $this->savedJson(); }
 
     public function saveAttributes(string $id): never
     { $this->saveSubjectData($id, fn () => $this->saveAttributesAndPhotos($id), 'Atributos especiales guardados correctamente.', '#atributos'); }

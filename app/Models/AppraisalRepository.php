@@ -156,7 +156,7 @@ final class AppraisalRepository
             'functional_loading_bays_count', 'functional_clear_height_m', 'functional_office_area_m2',
             'functional_access_type', 'functional_view', 'functional_finish_quality', 'functional_notes', 'construction_state',
             'construction_progress_percent', 'construction_integrity_percent', 'construction_conservation_json',
-            'construction_general_aspects', 'construction_specifics_json',
+            'conservation_result_json', 'conservation_generated_text', 'conservation_approved_text', 'construction_general_aspects', 'construction_specifics_json',
             'construction_report_text'];
         $query = $this->unitUpdate($fields);
         foreach ($units as $unit) {

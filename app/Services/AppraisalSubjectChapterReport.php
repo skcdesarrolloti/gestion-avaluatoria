@@ -96,6 +96,8 @@ final class AppraisalSubjectChapterReport
         $labels = ['estructura'=>'Estructura','fachada'=>'Fachada','cubierta'=>'Cubierta','dependencias'=>'Dependencias','iluminacion'=>'Iluminación','ventilacion'=>'Ventilación','acabados'=>'Acabados','pisos'=>'Pisos','paredes'=>'Paredes','cielorraso'=>'Cielo raso','puertas'=>'Puertas','ventanas'=>'Ventanas','banos'=>'Baños','cocina'=>'Cocina','instalaciones'=>'Instalaciones','cerramiento'=>'Cerramiento','porton'=>'Portón','equipos'=>'Equipos'];
         $state = ['B'=>'bueno','R'=>'regular','M'=>'malo','NA'=>'no aplica']; $rows = [];
         foreach ($this->privateUnits($units) as $unit) {
+            $conservationText = AppraisalConservationNarrator::textForReport($unit);
+            if ($conservationText !== '') { $rows[] = $this->unitName($unit) . ":\n" . $conservationText; continue; }
             $specifics = $this->json($unit['construction_specifics_json'] ?? '{}'); $conservation = $this->json($unit['construction_conservation_json'] ?? '{}'); $items = [];
             foreach ($labels as $key => $label) { $material = $this->text($specifics['material_' . $key] ?? $specifics[$key] ?? ''); $status = $this->text($conservation[$key] ?? ''); if ($material !== '' || $status !== '') $items[] = $label . ': ' . ($material ?: 'material por confirmar') . ($status !== '' ? ' (' . ($state[$status] ?? $status) . ')' : ''); }
             $rows[] = $this->unitName($unit) . ($items ? ': ' . implode('; ', $items) . '.' : ': materiales y estado pendientes de completar o verificar en visita.');
