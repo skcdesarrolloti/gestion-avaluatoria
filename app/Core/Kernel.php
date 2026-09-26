@@ -132,6 +132,7 @@ final class Kernel
                     new AppraisalLegalRepository($db), new AppraisalSubjectRepository($db), $user, new \App\Models\AppraisalReportNoteRepository($db)),
                 'urbanNormative' => new \App\Controllers\AppraisalUrbanNormController(new AppraisalRepository($db),
                     new \App\Models\AppraisalUrbanNormRepository($db), new \App\Models\UrbanNormativeRepository($db), new AppraisalSubjectRepository($db), $user, new \App\Models\AppraisalReportNoteRepository($db)),
+                'valuationMethodology' => new \App\Controllers\AppraisalValuationMethodologyController(new AppraisalRepository($db), new AppraisalSubjectRepository($db), new \App\Models\AppraisalPhRepository($db), new \App\Services\AppraisalComparableSearchGuide(), $user),
                 'subject' => new AppraisalSubjectController(new AppraisalRepository($db), $user,
                     new IgacTypologyRepository(), new AppraisalSubjectRepository($db), new GeoMasterRepository($db),
                     new \App\Models\AppraisalPhRepository($db), new \App\Models\AppraisalObsolescenceRepository($db),

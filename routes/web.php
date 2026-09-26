@@ -73,6 +73,7 @@ return [
     ['POST', '#^/avaluos/([a-f0-9]{32})/normatividad-urbana/midas/procesar$#', 'urbanNormative', 'processMidasText', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/normatividad-urbana/cuadro/aplicar$#', 'urbanNormative', 'applyUseCategory', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/normatividad-urbana/autoguardar$#', 'urbanNormative', 'autosave', true],
+    ['GET', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria$#', 'valuationMethodology', 'show', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/entregable$#', 'appraisals', 'deliverable', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/notas-entregable$#', 'reportNotes', 'save', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ficha-basica$#', 'subject', 'saveBasic', true],

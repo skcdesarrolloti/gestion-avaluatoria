@@ -24,6 +24,7 @@ use App\Services\AppraisalSectorInput;
 use App\Services\AppraisalSectorChapterReport;
 use App\Services\AppraisalReportNoteIntegrator;
 use App\Services\AppraisalSubjectChapterReport;
+use App\Services\AppraisalComparableSearchGuide;
 use App\Services\AppraisalLegalChapterReport;
 use App\Services\AppraisalMidasReview;
 use App\Services\AppraisalMidasSupportUploadService;
@@ -104,6 +105,13 @@ try {
     expectStatus(422, fn () => AppraisalValidator::validate(array_replace($data, [
         'tipo_inmueble' => 'edificio', 'subtipo_funcional' => 'lote_urbano',
     ])), 'subtipo incompatible rechazado');
+    $searchGuide = new AppraisalComparableSearchGuide();
+    $lotGuide = $searchGuide->build(['tipo_inmueble' => 'lote', 'tipo_negocio' => 'venta'], [], [], []);
+    $lotCriteria = mb_strtolower(implode(' ', array_merge($lotGuide['criteria'], $lotGuide['avoid'])));
+    expect(str_contains($lotCriteria, 'lotes') && str_contains($lotCriteria, 'habitaciones'), 'metodologia guia lote sin variables de vivienda como criterio');
+    $apartmentGuide = $searchGuide->build(['tipo_inmueble' => 'apartamento', 'regimen_ph' => 'si'], [], [], ['ph_name' => 'Edificio prueba']);
+    expect(str_contains(mb_strtolower(implode(' ', $apartmentGuide['criteria'])), 'planta electrica')
+        || str_contains(mb_strtolower(implode(' ', $apartmentGuide['criteria'])), 'planta eléctrica'), 'metodologia incorpora PH en apartamentos');
     $chapterOneViewRecord = array_replace(\App\Support\AppraisalCatalog::defaults(), [
         'titulo' => 'Informe de avalúo', 'tipo' => 'comercial', 'tipo_derecho' => 'dominio_pleno',
         'finalidad' => 'negociacion', 'intended_use' => 'Negociación',
