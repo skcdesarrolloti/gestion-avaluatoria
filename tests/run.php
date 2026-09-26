@@ -825,8 +825,33 @@ Certificado de tradicion.",
         && $constructionRows[0]['functional_bathrooms_count'] === '2.50'
         && $constructionRows[0]['functional_parking_spaces_count'] === 1
         && $constructionRows[0]['functional_finish_quality'] === 'bueno', 'variables funcionales por tipologia normalizadas');
+    $cv = static fn (array $row, string $key): string => (string) ($row[$key] ?? '');
+    $baseUnitId = $unitId;
+    $baseUnit = $unit ?? [];
+    $baseRecord = $record ?? [];
+    $unitId = 'unit-office';
+    $unit = ['id' => $unitId, 'property_type' => 'oficina'];
+    $record = ['tipo_inmueble' => 'oficina'];
+    ob_start();
+    require BASE_PATH . '/app/Views/appraisals/subject-construction-functional.php';
+    $officeFunctionalHtml = ob_get_clean();
+    expect(!str_contains($officeFunctionalHtml, 'Habitaciones')
+        && str_contains($officeFunctionalHtml, 'Baños')
+        && !str_contains($officeFunctionalHtml, 'Muelles / puntos de cargue'), 'oficina muestra solo variables funcionales propias');
+    $unitId = 'unit-warehouse';
+    $unit = ['id' => $unitId, 'property_type' => 'bodega'];
+    $record = ['tipo_inmueble' => 'bodega'];
+    ob_start();
+    require BASE_PATH . '/app/Views/appraisals/subject-construction-functional.php';
+    $warehouseFunctionalHtml = ob_get_clean();
+    expect(str_contains($warehouseFunctionalHtml, 'Muelles / puntos de cargue')
+        && str_contains($warehouseFunctionalHtml, 'Altura libre')
+        && !str_contains($warehouseFunctionalHtml, 'Habitaciones'), 'bodega muestra variables logisticas y excluye vivienda');
+    $unitId = $baseUnitId;
+    $unit = $baseUnit;
+    $record = $baseRecord;
     $chapterReport = (new AppraisalSubjectChapterReport())->build(
-        ['titulo' => 'Avaluo oficina 206', 'destinacion' => 'oficina'],
+        ['titulo' => 'Avaluo oficina 206', 'destinacion' => 'oficina', 'tipo_inmueble' => 'oficina'],
         ['subject_title' => 'Oficina 206 y Parqueadero 60', 'adopted_address' => 'Edificio 19 Chambacu',
             'city_name' => 'Cartagena de Indias', 'property_registry' => '040-243371', 'cadastral_reference' => '01-02-0678-0169-901'],
         [[
@@ -836,7 +861,7 @@ Certificado de tradicion.",
             'built_area_adopted_m2' => '33.42', 'built_area_adopted_source' => 'deed',
             'construction_floors' => '1', 'construction_age_years' => '25', 'construction_remaining_life_years' => '74',
             'construction_rentable_units' => '1', 'construction_state' => 'completa',
-            'functional_bathrooms_count' => '1', 'functional_parking_spaces_count' => '1',
+            'functional_bedrooms_count' => '4', 'functional_bathrooms_count' => '1', 'functional_parking_spaces_count' => '1',
             'functional_view' => 'exterior', 'functional_finish_quality' => 'bueno',
             'construction_specifics_json' => '{"material_estructura":"Concreto reforzado","material_pisos":"Baldosas ceramicas"}',
             'construction_conservation_json' => '{"estructura":"B","pisos":"B"}',
@@ -851,6 +876,7 @@ Certificado de tradicion.",
         && str_contains($chapterText, '3.3.4 Áreas construidas')
         && str_contains($chapterText, '3.4 Diferenciales valuatorios')
         && str_contains($chapterText, 'Oficina 206: niveles: 1')
+        && !str_contains($chapterText, 'habitaciones: 4')
         && str_contains($chapterText, 'baños: 1') && str_contains($chapterText, 'celdas de parqueo: 1')
         && str_contains($chapterText, 'vista: exterior') && str_contains($chapterText, 'acabados: bueno')
         && str_contains($chapterText, 'escritura') && str_contains($chapterText, '33,42')

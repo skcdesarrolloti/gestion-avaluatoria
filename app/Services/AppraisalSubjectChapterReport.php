@@ -13,7 +13,7 @@ final class AppraisalSubjectChapterReport
             ['3.2 Terreno, superficies y linderos', $this->surface($units)],
             ['3.3 Descripción de las construcciones y mejoras', $this->constructionDescription($units)],
             ['3.3.1 Construcciones y descripción documental', $this->constructionLegal($units)],
-            ['3.3.2 Aspectos generales de la construcción', $this->constructionGeneral($units)],
+            ['3.3.2 Aspectos generales de la construcción', $this->constructionGeneral($record, $units)],
             ['3.3.3 Materiales de construcción y estado de conservación', $this->materials($units)],
             ['3.3.4 Áreas construidas', $this->builtAreas($units)],
             ['3.4 Diferenciales valuatorios del sujeto', $this->differentials($units)],
@@ -86,9 +86,9 @@ final class AppraisalSubjectChapterReport
         return $rows ? implode("\n", $rows) : 'La descripción documental por unidad queda pendiente de diligenciamiento.';
     }
 
-    private function constructionGeneral(array $units): string
+    private function constructionGeneral(array $record, array $units): string
     {
-        return (new AppraisalSubjectConstructionNarrator())->general($units);
+        return (new AppraisalSubjectConstructionNarrator())->general($units, (string) ($record['tipo_inmueble'] ?? ''));
     }
 
     private function materials(array $units): string

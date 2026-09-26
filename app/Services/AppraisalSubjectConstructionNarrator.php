@@ -2,13 +2,15 @@
 declare(strict_types=1);
 namespace App\Services;
 
+use App\Support\AppraisalFunctionalVariableCatalog;
+
 final class AppraisalSubjectConstructionNarrator
 {
-    public function general(array $units): string
+    public function general(array $units, string $recordType = ''): string
     {
         $rows = [];
         foreach ($this->privateUnits($units) as $unit) {
-            $facts = $this->facts($unit);
+            $facts = $this->facts($unit, $recordType);
             if ($this->text($unit['construction_state'] ?? '') !== '') $facts[] = 'estado de obra: ' . $this->label($unit['construction_state']);
             if ($this->text($unit['functional_notes'] ?? '') !== '') $facts[] = 'notas funcionales: ' . $this->text($unit['functional_notes']);
             $rows[] = $this->unitName($unit) . ($facts ? ': ' . implode('; ', $facts) . '.' : ': aspectos generales pendientes de completar.');
@@ -16,10 +18,11 @@ final class AppraisalSubjectConstructionNarrator
         return $rows ? implode("\n", $rows) : 'No se han definido unidades constructivas para describir aspectos generales.';
     }
 
-    private function facts(array $unit): array
+    private function facts(array $unit, string $recordType): array
     {
         $facts = [];
         foreach ($this->fields() as [$key, $label, $format]) {
+            if (str_starts_with($key, 'functional_') && !$this->functionalFieldApplies($unit, $recordType, $key)) continue;
             if ($this->text($unit[$key] ?? '') === '') continue;
             $facts[] = $label . ': ' . $this->format($unit[$key], $format);
         }
@@ -61,6 +64,12 @@ final class AppraisalSubjectConstructionNarrator
     private function privateUnits(array $units): array
     {
         return array_values(array_filter($units, static fn (array $u): bool => ($u['unit_kind'] ?? '') !== 'common'));
+    }
+
+    private function functionalFieldApplies(array $unit, string $recordType, string $key): bool
+    {
+        $type = $this->first($unit['property_type'] ?? '', $recordType);
+        return in_array($key, AppraisalFunctionalVariableCatalog::profile($type), true);
     }
 
     private function unitName(array $unit): string
