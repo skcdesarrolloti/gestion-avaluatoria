@@ -22,12 +22,27 @@ final class AppraisalFunctionalVariableCatalog
     public static function factorGroupsFor(string $type): array
     {
         $guide = self::guideFor($type);
+        $direct = self::factorLabelsFor($type);
+        $surface = $guide['surface'] ?? [];
+        $special = self::specialAttributeLabelsFor($type) ?: ($guide['special'] ?? []);
         return array_filter([
-            'Numeral 3.3 - Funcionales directos' => self::factorLabelsFor($type),
-            'Numerales 3.2 y 5 - Superficie, norma y localización' => $guide['surface'] ?? [],
-            'Numeral 3.4 - Atributos diferenciales' => $guide['special'] ?? [],
+            'Numeral 3.3 - Funcionales directos' => self::uniqueLabels($direct),
+            'Numerales 3.2 y 5 - Superficie, norma y localización' => self::uniqueLabels($surface),
+            'Numeral 3.4 - Atributos diferenciales' => self::uniqueLabels($special),
             'Numeral 3.5 - PH, copropiedad o soporte común' => $guide['ph'] ?? [],
         ]);
+    }
+
+    public static function specialAttributeLabelsFor(string $type): array
+    {
+        $labels = [];
+        foreach (AppraisalSpecialAttributeCatalog::groups($type) as $key => $group) {
+            if ($key === 'comun') continue;
+            foreach (($group[1] ?? []) as $attribute) {
+                $labels[] = (string) ($attribute[0] ?? '');
+            }
+        }
+        return self::uniqueLabels($labels);
     }
 
     public static function profile(string $type): array
@@ -167,5 +182,28 @@ final class AppraisalFunctionalVariableCatalog
     private static function guide(string $title, string $summary, array $surface, array $special, array $ph): array
     {
         return compact('title', 'summary', 'surface', 'special', 'ph');
+    }
+
+    private static function uniqueLabels(array $labels): array
+    {
+        $seen = [];
+        $unique = [];
+        foreach ($labels as $label) {
+            $label = trim((string) $label);
+            if ($label === '') continue;
+            $key = self::normalizedLabel($label);
+            if (isset($seen[$key])) continue;
+            $seen[$key] = true;
+            $unique[] = $label;
+        }
+        return $unique;
+    }
+
+    private static function normalizedLabel(string $label): string
+    {
+        $plain = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', mb_strtolower($label)) ?: mb_strtolower($label);
+        $plain = preg_replace('/\([^)]*\)/', '', $plain) ?? $plain;
+        $plain = preg_replace('/[^a-z0-9]+/', ' ', $plain) ?? $plain;
+        return trim($plain);
     }
 }

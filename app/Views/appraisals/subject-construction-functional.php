@@ -1,7 +1,6 @@
 <?php
 $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'] ?? ''));
 $functionalFields = \App\Support\AppraisalFunctionalVariableCatalog::fieldsFor($unitType);
-$functionalLabels = \App\Support\AppraisalFunctionalVariableCatalog::factorLabelsFor($unitType);
 $functionalGuide = \App\Support\AppraisalFunctionalVariableCatalog::guideFor($unitType);
 $functionalGroups = \App\Support\AppraisalFunctionalVariableCatalog::factorGroupsFor($unitType);
 $selectValue = static fn (string $key, string $value): string => $cv($unit, $key) === $value ? 'selected' : '';
@@ -10,12 +9,6 @@ $selectValue = static fn (string $key, string $value): string => $cv($unit, $key
     <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
         <strong><?= e($functionalGuide['title'] ?? 'Tipología pendiente') ?>:</strong>
         <?= e($functionalGuide['summary'] ?? 'Define la tipología para activar los factores pertinentes.') ?>
-    </div>
-    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-        <p class="text-xs font-semibold uppercase text-slate-500">Factores activos para esta tipología</p>
-        <p class="mt-2 text-sm font-semibold leading-6 text-slate-800">
-            <?= e($functionalLabels ? implode(' · ', $functionalLabels) : 'Sin factores funcionales activos') ?>
-        </p>
     </div>
     <div class="grid gap-3 lg:grid-cols-4">
         <?php foreach ($functionalGroups as $group => $items): ?>

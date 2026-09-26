@@ -854,6 +854,24 @@ Certificado de tradicion.",
     expect(str_contains($warehouseFunctionalHtml, 'Muelles / puntos de cargue')
         && str_contains($warehouseFunctionalHtml, 'Altura libre')
         && !str_contains($warehouseFunctionalHtml, 'Habitaciones'), 'bodega muestra variables logisticas y excluye vivienda');
+    $unitId = 'unit-local';
+    $unit = ['id' => $unitId, 'property_type' => 'local'];
+    $record = ['tipo_inmueble' => 'local'];
+    ob_start();
+    require BASE_PATH . '/app/Views/appraisals/subject-construction-functional.php';
+    $localFunctionalHtml = ob_get_clean();
+    expect(str_contains($localFunctionalHtml, 'Vitrina')
+        && str_contains($localFunctionalHtml, 'Esquinero o medianero')
+        && str_contains($localFunctionalHtml, 'Bahía de cargue/descargue')
+        && !str_contains($localFunctionalHtml, 'Vitrina o exposición')
+        && !str_contains($localFunctionalHtml, 'Factores activos para esta tipología'),
+        'local alinea matriz funcional con nombres reales del numeral 3.4 sin resumen duplicado');
+    $localSpecialLabels = \App\Support\AppraisalFunctionalVariableCatalog::specialAttributeLabelsFor('local');
+    $localFunctionalAttributeGroups = AppraisalSpecialAttributeCatalog::groups('local');
+    $localCatalogLabels = array_map(static fn (array $attribute): string => $attribute[0],
+        $localFunctionalAttributeGroups['local_comercial'][1] ?? []);
+    expect($localSpecialLabels === array_values(array_unique($localCatalogLabels)),
+        'matriz local 3.3 toma atributos diferenciales desde el mismo catalogo de 3.4');
     $unitId = 'unit-lot';
     $unit = ['id' => $unitId, 'property_type' => 'lote'];
     $record = ['tipo_inmueble' => 'lote'];
