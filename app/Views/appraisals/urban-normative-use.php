@@ -7,6 +7,8 @@ $moduleOneUseText = trim((string) ($record['intended_use'] ?? ''));
 $urbanUseFromModuleOne = trim($moduleOneUseText !== '' ? $moduleOneUseText : $moduleOnePurposeLabel);
 $residentialNormJson = e(json_encode(\App\Support\UrbanResidentialNormCatalog::standards(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '{}');
 $residentialModeOptions = \App\Support\UrbanResidentialNormCatalog::modalities();
+$potentialRoutes = \App\Support\UrbanNormPotentialCatalog::routesForProfile($profile);
+$potentialRoutesJson = e(json_encode($potentialRoutes, JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '[]');
 $urbanJs = static fn (string $key): string => e(json_encode($value($key), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: "''");
 $propertyTypeKey = (string) ($record['tipo_inmueble'] ?? '');
 $propertyTypeText = mb_strtolower($propertyTypeKey . ' ' . (string) ($propertyTypeLabel ?? ''));
@@ -20,6 +22,7 @@ $isLotSubjectJson = $isLotSubject ? 'true' : 'false';
                 return ['decision','indices','potencial','informe','catalogo'].includes(pane) ? pane : 'decision';
             })(),
             categorySlug: <?= $urbanJs('category_slug') ?>, modality: <?= $urbanJs('normative_modality') ?>, residential: <?= $residentialNormJson ?>,
+            routes: <?= $potentialRoutesJson ?>, routeMatrixTab: 'resumen',
             land: <?= $urbanJs('land_area_normative_m2') ?>, front: <?= $urbanJs('lot_front_normative_m') ?>, affect: <?= $urbanJs('setback_area_percent') ?>, net: <?= $urbanJs('net_land_area_m2') ?>,
             occ: <?= $urbanJs('occupancy_index') ?>, floors: <?= $urbanJs('max_floors') ?>, ci: <?= $urbanJs('construction_index') ?>,
             maxBuilt: <?= $urbanJs('normative_max_built_area_m2') ?>, actual: <?= $urbanJs('actual_built_area_m2') ?>,
@@ -34,6 +37,36 @@ $isLotSubjectJson = $isLotSubject ? 'true' : 'false';
             potential() { const max = this.maxBuild(), actual = this.number(this.actual); return max === null || actual === null ? null : Math.max(0, max - actual) },
             sellableArea() { const manual = this.number(this.sellable); if (manual !== null) return manual; const max = this.maxBuild(), factor = this.number(this.sellFactor); return max === null || factor === null ? null : max * factor },
             req() { return this.residential?.[this.categorySlug]?.data?.[this.modality] || null },
+            routeKey(route) { return route.type + ':' + route.slug },
+            routeOptions() {
+                const out = [];
+                for (const route of this.routes) for (const [key, rule] of Object.entries(route.options || {})) out.push({route, key, rule});
+                return out;
+            },
+            currentRouteOptions(route) { return this.routeOptions().filter((row) => this.routeKey(row.route) === this.routeKey(route)) },
+            typeLabel(type) { return type === 'principal' ? 'Principal' : 'Compatible' },
+            routeStatus(row) {
+                const area=this.number(this.land), front=this.number(this.front);
+                const minArea=this.number(row.rule.min_area_m2), minFront=this.number(row.rule.min_front_m);
+                if (minArea === null && minFront === null && this.number(row.rule.construction_index) === null && this.number(row.rule.occupancy_index) === null) return 'Manual';
+                if ((minArea !== null && area === null) || (minFront !== null && front === null)) return 'Falta dato';
+                if ((minArea !== null && area < minArea) || (minFront !== null && front < minFront)) return 'No cumple base';
+                return 'Cumple base';
+            },
+            routeStatusClass(row) {
+                const s=this.routeStatus(row);
+                return s === 'Cumple base' ? 'bg-emerald-50 text-emerald-800' : (s === 'No cumple base' ? 'bg-red-50 text-red-700' : (s === 'Manual' ? 'bg-blue-50 text-blue-800' : 'bg-amber-50 text-amber-800'));
+            },
+            routeBaseArea() { return this.netArea() ?? this.number(this.land) },
+            routeIndex(row) { return this.number(row.rule.construction_index) ?? this.buildIndex() },
+            routeMaxBuild(row) { const base=this.routeBaseArea(), index=this.routeIndex(row); return base === null || index === null ? null : base * index },
+            routePotential(row) { const max=this.routeMaxBuild(row), actual=this.number(this.actual); return max === null || actual === null ? null : Math.max(0, max - actual) },
+            routeOccupation(row) { const occ=this.number(row.rule.occupancy_index); if (occ !== null) return occ; const index=this.number(row.rule.construction_index), floors=this.number(this.floors); return index === null || floors === null || floors === 0 ? null : index / floors },
+            routeOccupationArea(row) { const base=this.routeBaseArea(), occ=this.routeOccupation(row); return base === null || occ === null ? null : base * occ },
+            routeCalcSummary(row) {
+                const max=this.fmt(this.routeMaxBuild(row)), occ=this.fmt(this.routeOccupationArea(row)), pot=this.fmt(this.routePotential(row));
+                return 'Ocupación: ' + (occ || 'manual') + ' m² · Construible: ' + (max || 'manual') + ' m² · Potencial: ' + (pot || 'manual') + ' m²';
+            },
             chk(actual, min, label, unit) { if (!min) return label + ': sin mínimo cargado'; if (actual === null) return label + ': falta dato para comparar con mínimo ' + min + ' ' + unit; return actual >= min ? label + ': cumple ' + actual + ' ' + unit + ' ≥ ' + min + ' ' + unit : label + ': no cumple ' + actual + ' ' + unit + ' < ' + min + ' ' + unit },
             compliance() { const r=this.req(); if (!r) return 'Selecciona una ruta residencial y modalidad para revisar área, frente e índice.'; return [this.chk(this.number(this.land), r.min_area_m2, 'Área del lote', 'm²'), this.chk(this.number(this.front), r.min_front_m, 'Frente del lote', 'm'), 'Índice de construcción de apoyo: ' + r.construction_index, 'Altura: ' + r.height, 'Área libre: ' + r.free_area, 'Estacionamientos: ' + r.parking].join('\n') },
             optMax(r) { const base = this.netArea(); return base === null ? null : base * Number(r.construction_index || 0) },
@@ -57,6 +90,7 @@ $isLotSubjectJson = $isLotSubject ? 'true' : 'false';
         <div class="mt-5">
             <?php require __DIR__ . '/urban-normative-use-table.php'; ?>
         </div>
+        <?php require __DIR__ . '/urban-normative-route-matrix.php'; ?>
         <div class="mt-5 grid gap-3 md:grid-cols-3">
             <div class="rounded-xl border border-teal-100 bg-teal-50 p-4">
                 <p class="text-xs font-semibold uppercase text-teal-800">Tipo del numeral 1 <?= $urbanUseTip('Viene del módulo 1. Orienta, pero la norma puede permitir rutas adicionales.') ?></p>

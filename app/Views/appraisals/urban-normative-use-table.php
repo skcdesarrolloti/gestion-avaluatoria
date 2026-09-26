@@ -8,6 +8,10 @@ $urbanUseRows = [
 ];
 $hasUrbanUseTable = false;
 foreach ($urbanUseRows as $row) if (trim((string) $value($row[1])) !== '') $hasUrbanUseTable = true;
+$urbanUseExcerpt = static function (string $text): string {
+    $clean = trim(preg_replace('/\s+/u', ' ', $text) ?? $text);
+    return mb_strlen($clean) > 240 ? mb_substr($clean, 0, 240) . '...' : $clean;
+};
 ?>
 <section class="rounded-xl border border-blue-200 bg-white p-4">
     <div class="flex flex-wrap items-start justify-between gap-3">
@@ -26,8 +30,19 @@ foreach ($urbanUseRows as $row) if (trim((string) $value($row[1])) !== '') $hasU
                     <?php foreach ($urbanUseRows as [$label, $key, $class]): ?>
                         <tr class="border-b border-blue-100 last:border-0">
                             <th class="w-44 align-top <?= e($class) ?> px-3 py-3 text-left font-semibold"><?= e($label) ?></th>
-                            <td class="whitespace-pre-wrap px-3 py-3 leading-6 text-slate-800">
-                                <?= e(trim((string) $value($key)) ?: 'Pendiente de pegar desde MIDAS') ?>
+                            <?php $fullText = trim((string) $value($key)); ?>
+                            <td class="px-3 py-3 leading-6 text-slate-800">
+                                <?php if ($fullText !== ''): ?>
+                                    <p><?= e($urbanUseExcerpt($fullText)) ?></p>
+                                    <?php if (mb_strlen($fullText) > 240): ?>
+                                        <details class="mt-2 rounded-lg border border-slate-200 bg-slate-50 p-2">
+                                            <summary class="cursor-pointer text-xs font-semibold text-blue-800">Ver texto completo</summary>
+                                            <p class="mt-2 whitespace-pre-wrap text-xs leading-5 text-slate-700"><?= e($fullText) ?></p>
+                                        </details>
+                                    <?php endif; ?>
+                                <?php else: ?>
+                                    <span class="text-slate-500">Pendiente de pegar desde MIDAS</span>
+                                <?php endif; ?>
                             </td>
                         </tr>
                     <?php endforeach; ?>

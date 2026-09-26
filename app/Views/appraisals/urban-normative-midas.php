@@ -111,8 +111,8 @@
                     Lectura guardada: <?= $value('midas_predio_raw') !== '' ? 'predio MIDAS para numeral 3' : '' ?><?= $value('midas_predio_raw') !== '' && $value('midas_usage_raw') !== '' ? ' y ' : '' ?><?= $value('midas_usage_raw') !== '' ? 'reglamentación Uso Suelo para numeral 5' : '' ?>.
                 </div>
             <?php endif; ?>
-            <details class="md:col-span-3 rounded-xl border border-slate-200 bg-slate-50 p-4" open>
-                <summary class="cursor-pointer text-sm font-semibold text-slate-900">Transcripción rápida en el mismo orden de MIDAS Uso Suelo</summary>
+            <details class="md:col-span-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
+                <summary class="cursor-pointer text-sm font-semibold text-slate-900">Transcripción manual avanzada en el mismo orden de MIDAS Uso Suelo</summary>
                 <div class="mt-4 grid gap-4 md:grid-cols-2">
                     <?php $manualInput('use_regulation_table', 'Cuadro de reglamentación de usos del suelo', 'Ej. Cuadro No. 7 - Actividad mixta'); ?>
                     <?php $manualInput('land_area_normative_m2', '20 Área Terreno (M2)', 'Ej. 529.00'); ?>
