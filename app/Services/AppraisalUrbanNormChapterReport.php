@@ -17,7 +17,13 @@ final class AppraisalUrbanNormChapterReport
                 $this->line('Fecha de consulta', $profile['midas_consulted_on'] ?? ''),
                 $this->line('Resultado leído en MIDAS', $profile['midas_usage_result'] ?? ($profile['midas_result'] ?? '')),
             ])],
-            ['5.2 Reglamentación, índices y potencial básico', $this->paragraph([
+            ['5.2 Reglamentación de usos, índices y potencial cuando aplica', $this->paragraph([
+                $this->line('Cuadro o fuente aplicada', $profile['use_regulation_table'] ?? ''),
+                $this->line('Uso principal', $profile['use_principal_text'] ?? ''),
+                $this->line('Uso compatible', $profile['use_compatible_text'] ?? ''),
+                $this->line('Uso complementario', $profile['use_complementary_text'] ?? ''),
+                $this->line('Uso restringido', $profile['use_restricted_text'] ?? ''),
+                $this->line('Uso prohibido', $profile['use_prohibited_text'] ?? ''),
                 $this->line('Estado del instrumento', $profile['pot_state'] ?? ''),
                 $this->line('Clasificación del suelo', $profile['land_classification'] ?? ''),
                 $this->line('Área de actividad', $profile['activity_area'] ?? ''),

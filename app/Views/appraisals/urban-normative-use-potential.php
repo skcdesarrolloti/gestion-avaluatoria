@@ -1,7 +1,11 @@
 <?php
 $urbanIndexTip = static fn (string $text): string => '<span class="help-dot" title="' . e($text) . '">?</span>';
 ?>
-        <div x-show="usePane === 'indices'" class="mt-6 grid gap-4 rounded-xl border border-amber-100 bg-amber-50 p-4">
+        <div x-show="usePane === 'indices' && !isLot" class="mt-6 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
+            <p class="font-semibold">Para esta tipología no es obligatorio calcular índice de ocupación ni índice de construcción.</p>
+            <p class="mt-1">Conserva el cuadro completo de usos de MIDAS y deja conclusión urbanística. Si el analista identifica un potencial especial, puede cambiar la tipología o documentarlo manualmente en observaciones.</p>
+        </div>
+        <div x-show="usePane === 'indices' && isLot" class="mt-6 grid gap-4 rounded-xl border border-amber-100 bg-amber-50 p-4">
             <div class="grid gap-4 lg:grid-cols-[1fr_1.1fr]">
                 <div><h3 class="font-semibold text-amber-950">Índices y áreas</h3><p class="mt-1 text-sm leading-6 text-amber-900">Aquí se organiza lo básico para saber si la norma solo se anexa al avalúo o si puede cambiar el enfoque del análisis. No reemplaza diseño arquitectónico, cabida ni licencia.</p></div>
                 <div class="rounded-xl border border-amber-200 bg-white p-4 text-sm leading-6 text-amber-950">
@@ -42,8 +46,13 @@ $urbanIndexTip = static fn (string $text): string => '<span class="help-dot" tit
                 <label class="label">Potencial adicional m² <?= $urbanIndexTip('Construcción proyectada menos construcción actual. Si es positivo, hay indicio de potencial; si es cero, negativo o condicionado, explícalo.') ?><input class="input bg-slate-50" type="text" name="buildable_difference_m2" :value="fmt(potential()) || '<?= e($value('buildable_difference_m2')) ?>'" readonly placeholder="Proyectada - actual"></label>
                 <label class="label md:col-span-4">Frente, fondo, forma, topografía o restricción que afecte el cálculo <?= $urbanIndexTip('Use este campo para explicar lo que puede limitar el número: frente insuficiente, forma irregular, pendiente, servidumbre, afectación, retiro, cesión, redes, riesgo o acceso.') ?><textarea class="input min-h-24" name="norm_physical_base_text" rows="3" maxlength="5000" placeholder="Solo lo que incide: frente insuficiente, forma irregular, pendiente, servidumbre, cesión, afectación o restricción."><?= e($value('norm_physical_base_text')) ?></textarea></label>
             </div>
+            <?php require __DIR__ . '/urban-normative-lot-factor-table.php'; ?>
         </div>
-        <div x-show="usePane === 'potencial'" class="mt-6 grid gap-4 rounded-xl border border-blue-100 bg-blue-50 p-4">
+        <div x-show="usePane === 'potencial' && !isLot" class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
+            <p class="font-semibold text-slate-950">Lectura pericial sin cálculo de lote</p>
+            <p class="mt-1">Para inmueble construido, deja el uso del suelo y las restricciones en el texto del informe. Usa esta sección solo si quieres documentar una salvedad especial.</p>
+        </div>
+        <div x-show="usePane === 'potencial' && isLot" class="mt-6 grid gap-4 rounded-xl border border-blue-100 bg-blue-50 p-4">
             <div class="grid gap-4 lg:grid-cols-[1fr_1.1fr]"><div><h3 class="font-semibold text-blue-950">Criterio pericial del potencial</h3><p class="mt-1 text-sm leading-6 text-blue-900">Aquí no se califica un proyecto. El perito solo deja si la norma sustenta potencial adicional, si está condicionado o si se anexa únicamente como soporte NTS.</p></div><div class="rounded-xl border border-blue-200 bg-white p-4 text-sm leading-6 text-blue-950"><p class="font-semibold">Cómo leerlo</p><p class="mt-1">Compare norma contra terreno, frente y construcción actual. Si faltan soportes o el predio no cumple una condición mínima, no adopte potencial adicional; deje la norma y la salvedad para el informe.</p></div></div>
             <label class="label">Conclusión valuatoria del potencial normativo <?= $urbanIndexTip('Seleccione el criterio del avalúo, no la viabilidad de un proyecto. Sirve para decidir si el potencial se adopta, queda condicionado o solo se deja como soporte normativo.') ?><select class="input" name="constructive_potential_status">
                 <?php foreach ([''=>'Selecciona conclusión si aplica','viable'=>'Indicio de potencial normativo','limitado'=>'Potencial condicionado por área, frente o restricción','no_viable'=>'No se adopta potencial adicional con la información disponible','requiere_arquitecto'=>'Pendiente de cabida o soporte técnico para adoptar potencial','requiere_concepto'=>'Pendiente de concepto oficial'] as $key => $label): ?><option value="<?= e($key) ?>" <?= e($selected('constructive_potential_status', (string) $key)) ?>><?= e($label) ?></option><?php endforeach; ?>

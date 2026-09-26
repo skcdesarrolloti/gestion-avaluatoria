@@ -8,6 +8,10 @@ $urbanUseFromModuleOne = trim($moduleOneUseText !== '' ? $moduleOneUseText : $mo
 $residentialNormJson = e(json_encode(\App\Support\UrbanResidentialNormCatalog::standards(), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: '{}');
 $residentialModeOptions = \App\Support\UrbanResidentialNormCatalog::modalities();
 $urbanJs = static fn (string $key): string => e(json_encode($value($key), JSON_UNESCAPED_UNICODE | JSON_UNESCAPED_SLASHES) ?: "''");
+$propertyTypeKey = (string) ($record['tipo_inmueble'] ?? '');
+$propertyTypeText = mb_strtolower($propertyTypeKey . ' ' . (string) ($propertyTypeLabel ?? ''));
+$isLotSubject = str_contains($propertyTypeText, 'lote') || str_contains($propertyTypeText, 'terreno');
+$isLotSubjectJson = $isLotSubject ? 'true' : 'false';
 ?>
     <section id="uso" x-show="tab === 'uso'"
         x-data="{
@@ -20,6 +24,7 @@ $urbanJs = static fn (string $key): string => e(json_encode($value($key), JSON_U
             occ: <?= $urbanJs('occupancy_index') ?>, floors: <?= $urbanJs('max_floors') ?>, ci: <?= $urbanJs('construction_index') ?>,
             maxBuilt: <?= $urbanJs('normative_max_built_area_m2') ?>, actual: <?= $urbanJs('actual_built_area_m2') ?>,
             sellFactor: <?= $urbanJs('sellable_area_factor') ?>, sellable: <?= $urbanJs('sellable_area_m2') ?>, complianceSummary: <?= $urbanJs('normative_compliance_summary') ?>,
+            isLot: <?= $isLotSubjectJson ?>,
             number(v) { const n = parseFloat(String(v || '').replace(',', '.').replace(/[^0-9.-]/g, '')); return Number.isFinite(n) ? n : null },
             rate(v) { const n = this.number(v); return n === null ? null : (n > 1 ? n / 100 : n) },
             fmt(n) { return Number.isFinite(n) ? n.toFixed(2) : '' },
@@ -44,20 +49,23 @@ $urbanJs = static fn (string $key): string => e(json_encode($value($key), JSON_U
         <div class="flex flex-wrap items-start justify-between gap-4">
             <div>
                 <p class="eyebrow">Reglamentación y potencial urbano</p>
-                <h2 class="mt-2 text-2xl font-semibold">Norma, índices y potencial</h2>
-                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Sustenta NTS e índices básicos; no reemplaza cabida ni valor.</p>
+                <h2 class="mt-2 text-2xl font-semibold">Norma, usos y potencial según tipología</h2>
+                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Primero conserva el cuadro completo de uso del suelo. El cálculo de ocupación, construcción y mayor aprovechamiento se usa principalmente para lotes o terrenos.</p>
             </div>
             <span class="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-800">Criterio del perito</span>
+        </div>
+        <div class="mt-5">
+            <?php require __DIR__ . '/urban-normative-use-table.php'; ?>
         </div>
         <div class="mt-5 grid gap-3 md:grid-cols-3">
             <div class="rounded-xl border border-teal-100 bg-teal-50 p-4">
                 <p class="text-xs font-semibold uppercase text-teal-800">Tipo del numeral 1 <?= $urbanUseTip('Viene del módulo 1. Orienta, pero la norma puede permitir rutas adicionales.') ?></p>
                 <p class="mt-1 text-lg font-semibold text-teal-950"><?= e((string) ($propertyTypeLabel ?? 'No definido')) ?></p>
-                <p class="mt-1 text-xs leading-5 text-teal-900">Si está mal, se corrige en el encargo.</p>
+                <p class="mt-1 text-xs leading-5 text-teal-900"><?= $isLotSubject ? 'Activa análisis de potencial constructivo de lote.' : 'Se conserva como soporte de uso; los índices no son obligatorios para esta tipología.' ?></p>
             </div>
             <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 md:col-span-2">
                 <p class="text-xs font-semibold uppercase text-blue-800">Pregunta del numeral 5</p>
-                <p class="mt-1 text-sm leading-6 text-blue-950">Define la norma que rige y si solo confirma el uso actual o permite más potencial. En lotes orienta mayor y mejor uso y futuro residual.</p>
+                <p class="mt-1 text-sm leading-6 text-blue-950"><?= $isLotSubject ? 'Para lote se revisan principal y compatible con área, frente, índice de ocupación, índice de construcción, altura y área vendible de referencia.' : 'Para inmueble construido se pega completo el uso del suelo y se incorpora al informe; el analista solo calcula potencial si existe una razón técnica específica.' ?></p>
             </div>
         </div>
         <nav class="mt-6 rounded-xl bg-slate-100 p-2" aria-label="Subsecciones de uso del suelo">
@@ -81,6 +89,7 @@ $urbanJs = static fn (string $key): string => e(json_encode($value($key), JSON_U
         <?php include __DIR__ . '/urban-normative-use-potential.php'; ?>
         <div x-show="usePane === 'informe'" class="mt-6 grid gap-4">
             <div class="rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm leading-6 text-emerald-950">Bloque para informe: norma, compatibilidad y conclusión. El valor se analiza en valoración.</div>
+            <?php require __DIR__ . '/urban-normative-use-table.php'; ?>
             <?php $input('use_regulation_table', 'Cuadro y fuente aplicados', 'Se llena al aplicar la ruta normativa'); ?>
             <?php $textarea('permitted_use', 'Uso permitido / compatibilidad sustentada', 'Principal, compatible, complementario, restringido o prohibido, con fuente.', 4); ?>
             <?php $textarea('urban_norms_applied', 'Normas urbanísticas pertinentes aplicadas', 'POT, Decreto 0977, Decreto 1077, Ley 388, resolución, plan parcial, licencia o acto aplicable.', 4); ?>
