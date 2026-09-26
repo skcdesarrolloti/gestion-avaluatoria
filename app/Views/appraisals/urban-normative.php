@@ -44,7 +44,7 @@ $input = static function (string $name, string $label, string $placeholder = '',
 <form class="space-y-6" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana')) ?>" data-module-autosave data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/autoguardar')) ?>">
     <?= csrf_field() ?>
     <input type="hidden" name="version" value="<?= e((string) ($profile['version'] ?? 0)) ?>">
-    <input type="hidden" name="active_tab" :value="tab">
+    <input type="hidden" name="active_tab" x-ref="activeTab" :value="tab" x-effect="$el.value = tab">
     <?php require BASE_PATH . '/app/Views/appraisals/urban-normative-midas.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/urban-normative-use.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/urban-normative-scenarios.php'; ?>

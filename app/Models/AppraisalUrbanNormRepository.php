@@ -106,7 +106,7 @@ final class AppraisalUrbanNormRepository
             'source_limitations' => 5000];
         $data = [];
         foreach ($keys as $key) $data[$key] = mb_substr(trim((string) ($input[$key] ?? '')), 0, $limits[$key]);
-        $adoptMidasNumbers = !isset($input['active_tab']) || in_array(trim((string) $input['active_tab']), ['', 'midas'], true);
+        $adoptMidasNumbers = trim((string) ($input['active_tab'] ?? '')) === 'midas';
         (new AppraisalUrbanNormManualMidasInput())->apply($data, $input['midas_manual'] ?? [], $limits, $adoptMidasNumbers);
         foreach (['land_area_normative_m2', 'lot_front_normative_m', 'lot_depth_normative_m',
             'setback_area_percent', 'setback_front_m', 'setback_rear_m', 'setback_left_m', 'setback_right_m', 'net_land_area_m2', 'occupancy_index',

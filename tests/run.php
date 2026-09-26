@@ -467,6 +467,7 @@ try {
         && ($savedUrban['sellable_area_m2'] ?? '') == 225
         && ($savedUrban['constructive_potential_status'] ?? '') === 'viable', 'ficha urbana conserva campos de potencial constructivo');
     $manualVersion = $urbanProfile->save('urban-appraisal-1', 1, (int) $savedUrban['version'], array_replace($savedUrban, [
+        'active_tab' => 'midas',
         'midas_manual' => [
             'use_principal_text' => 'COMERCIAL 2',
             'use_compatible_text' => 'COMERCIAL 1, INDUSTRIAL 1',
@@ -502,6 +503,20 @@ try {
         && ($useUrban['occupancy_index'] ?? null) === null
         && ($useUrban['construction_index'] ?? null) === null,
         'ficha urbana no reinyecta indices MIDAS al guardar desde uso');
+    $emptyTabVersion = $urbanProfile->save('urban-appraisal-1', 1, (int) $useUrban['version'], array_replace($useUrban, [
+        'active_tab' => '',
+        'occupancy_index' => '',
+        'construction_index' => '',
+        'midas_manual' => [
+            'occupancy_index' => '1,20',
+            'construction_index' => '2,40',
+        ],
+    ]));
+    $emptyTabUrban = $urbanProfile->profile('urban-appraisal-1', 1);
+    expect($emptyTabVersion === (int) $useUrban['version'] + 1
+        && ($emptyTabUrban['occupancy_index'] ?? null) === null
+        && ($emptyTabUrban['construction_index'] ?? null) === null,
+        'ficha urbana no adopta indices MIDAS cuando la pestana llega vacia');
     $midasParsed = (new UrbanNormMidasTextParser())->parse("01 Número Predial Nacional:\n130010103000003810024000000000\n07 Uso De Suelo:\nMixto 2\n08 Tratamiento:\nMejoramiento Integral Parcial\n20 Área Terreno (M2):\n529.00\n21 Área Construida (M2):\n329.00\n22 Referencia Catastral:\n010303810024000\nUSO PRINCIPAL\nCOMERCIAL 2: venta de bienes.\nUSO COMPATIBLE\nRESIDENCIAL: vivienda.\nUSO COMPLEMENTARIO\nINSTITUCIONAL 3: universidad.\nUSO RESTRINGIDO\nCOMERCIAL 3: talleres.\nUSO PROHIBIDO\nINDUSTRIAL 3: industria pesada.\nUNIDAD BÁSICA\n2 ALCOBAS 40 M2\nUSOS\nPRINCIPAL residencial\nÁREA LIBRE\nunifamiliar 1 piso\nÁREA Y FRENTE MÍNIMOS\nAML 200 M2\nALTURA MÁXIMA\n4 pisos\nÁREA DE OCUPACIÓN\nHasta un 60% del área del lote\nÍNDICE DE CONSTRUCCIÓN\n1.2\nAISLAMIENTOS\nAntejardín 3 m");
     expect(($midasParsed['predio']['land_use'] ?? '') === 'Mixto 2'
         && ($midasParsed['predio']['land_area_m2'] ?? '') === '529.00'
