@@ -145,6 +145,10 @@ final class AppraisalChapterZeroInput
                 'built_area_adopted_source' => self::selectValue($unit['built_area_adopted_source'] ?? ''),
                 'construction_year' => self::yearOrNull($unit['construction_year'] ?? null),
                 'construction_age_years' => self::smallIntOrNull($unit['construction_age_years'] ?? null),
+                'functional_bedrooms_count' => self::smallIntOrNull($unit['functional_bedrooms_count'] ?? null), 'functional_bathrooms_count' => self::decimalOrNull($unit['functional_bathrooms_count'] ?? null),
+                'functional_service_room_bathroom' => self::selectValue($unit['functional_service_room_bathroom'] ?? ''), 'functional_parking_spaces_count' => self::smallIntOrNull($unit['functional_parking_spaces_count'] ?? null),
+                'functional_loading_bays_count' => self::smallIntOrNull($unit['functional_loading_bays_count'] ?? null), 'functional_clear_height_m' => self::decimalOrNull($unit['functional_clear_height_m'] ?? null), 'functional_office_area_m2' => self::decimalOrNull($unit['functional_office_area_m2'] ?? null),
+                'functional_access_type' => self::selectValue($unit['functional_access_type'] ?? ''), 'functional_view' => self::selectValue($unit['functional_view'] ?? ''), 'functional_finish_quality' => self::selectValue($unit['functional_finish_quality'] ?? ''), 'functional_notes' => self::shortText($unit['functional_notes'] ?? ''),
                 'construction_state' => self::selectValue($unit['construction_state'] ?? ''),
                 'construction_progress_percent' => self::percentOrNull($unit['construction_progress_percent'] ?? null),
                 'construction_integrity_percent' => self::percentOrNull($unit['construction_integrity_percent'] ?? null),
@@ -191,9 +195,7 @@ final class AppraisalChapterZeroInput
     }
 
     private static function shortText(mixed $value): string { return mb_substr(trim((string) $value), 0, 1000); }
-
     private static function selectValue(mixed $value): string { return mb_substr(trim((string) $value), 0, 60); }
-
     private static function smallIntOrNull(mixed $value): ?int
     {
         $value = trim((string) $value);
@@ -204,9 +206,7 @@ final class AppraisalChapterZeroInput
     }
 
     private static function yearOrNull(mixed $value): ?int { $value = trim((string) $value); if ($value === '') return null; $year = filter_var($value, FILTER_VALIDATE_INT); if ($year === false || $year < 1800 || $year > (int) date('Y')) throw new HttpException(422, 'El año de construcción no es válido.'); return $year; }
-
     private static function percentOrNull(mixed $value): ?string { $decimal = self::decimalOrNull($value); if ($decimal !== null && ((float) $decimal < 0 || (float) $decimal > 100)) throw new HttpException(422, 'Los porcentajes deben estar entre 0 y 100.'); return $decimal; }
-
     private static function jsonMap(mixed $values): string
     {
         if (!is_array($values)) return '{}';

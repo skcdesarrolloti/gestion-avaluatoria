@@ -88,14 +88,7 @@ final class AppraisalSubjectChapterReport
 
     private function constructionGeneral(array $units): string
     {
-        $rows = [];
-        foreach ($this->privateUnits($units) as $unit) {
-            $facts = [];
-            foreach ([['construction_floors','niveles'], ['construction_basements','sótanos'], ['construction_age_years','edad aproximada'], ['construction_useful_life_years','vida útil'], ['construction_remaining_life_years','vida útil remanente'], ['construction_rentable_units','unidades rentables']] as [$key,$label]) if ($this->text($unit[$key] ?? '') !== '') $facts[] = $label . ': ' . $this->text($unit[$key]);
-            if ($this->text($unit['construction_state'] ?? '') !== '') $facts[] = 'estado de obra: ' . $this->label($unit['construction_state']);
-            $rows[] = $this->unitName($unit) . ($facts ? ': ' . implode('; ', $facts) . '.' : ': aspectos generales pendientes de completar.');
-        }
-        return $rows ? implode("\n", $rows) : 'No se han definido unidades constructivas para describir aspectos generales.';
+        return (new AppraisalSubjectConstructionNarrator())->general($units);
     }
 
     private function materials(array $units): string

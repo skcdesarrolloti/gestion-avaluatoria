@@ -727,6 +727,8 @@ try {
     expectStatus(422, fn () => AppraisalChapterZeroInput::unitSurfaceData(), 'superficie negativa rechazada');
     $_POST = ['unit_constructions' => [$unitId => ['construction_type' => 'casa',
         'built_area_adopted_m2' => '85,25', 'construction_year' => '2010',
+        'functional_bedrooms_count' => '3', 'functional_bathrooms_count' => '2,5',
+        'functional_parking_spaces_count' => '1', 'functional_finish_quality' => 'bueno',
         'conservation' => ['estructura' => 'B'], 'services' => ['energia' => 'si'],
         'specifics' => ['estructura' => 'Concreto']]]];
     $chapterOneReport = (new AppraisalChapterOneReport())->build([
@@ -811,6 +813,10 @@ Certificado de tradicion.",
     $constructionRows = AppraisalChapterZeroInput::unitConstructionData();
     expect($constructionRows[0]['built_area_adopted_m2'] === '85.25'
         && str_contains($constructionRows[0]['construction_conservation_json'], 'estructura'), 'construccion por unidad normalizada');
+    expect($constructionRows[0]['functional_bedrooms_count'] === 3
+        && $constructionRows[0]['functional_bathrooms_count'] === '2.50'
+        && $constructionRows[0]['functional_parking_spaces_count'] === 1
+        && $constructionRows[0]['functional_finish_quality'] === 'bueno', 'variables funcionales por tipologia normalizadas');
     $chapterReport = (new AppraisalSubjectChapterReport())->build(
         ['titulo' => 'Avaluo oficina 206', 'destinacion' => 'oficina'],
         ['subject_title' => 'Oficina 206 y Parqueadero 60', 'adopted_address' => 'Edificio 19 Chambacu',
@@ -822,6 +828,8 @@ Certificado de tradicion.",
             'built_area_adopted_m2' => '33.42', 'built_area_adopted_source' => 'deed',
             'construction_floors' => '1', 'construction_age_years' => '25', 'construction_remaining_life_years' => '74',
             'construction_rentable_units' => '1', 'construction_state' => 'completa',
+            'functional_bathrooms_count' => '1', 'functional_parking_spaces_count' => '1',
+            'functional_view' => 'exterior', 'functional_finish_quality' => 'bueno',
             'construction_specifics_json' => '{"material_estructura":"Concreto reforzado","material_pisos":"Baldosas ceramicas"}',
             'construction_conservation_json' => '{"estructura":"B","pisos":"B"}',
         ]],
@@ -835,6 +843,8 @@ Certificado de tradicion.",
         && str_contains($chapterText, '3.3.4 Áreas construidas')
         && str_contains($chapterText, '3.4 Diferenciales valuatorios')
         && str_contains($chapterText, 'Oficina 206: niveles: 1')
+        && str_contains($chapterText, 'baños: 1') && str_contains($chapterText, 'celdas de parqueo: 1')
+        && str_contains($chapterText, 'vista: exterior') && str_contains($chapterText, 'acabados: bueno')
         && str_contains($chapterText, 'escritura') && str_contains($chapterText, '33,42')
         && str_contains($chapterText, 'Estructura: Concreto reforzado (bueno)')
         && str_contains($chapterText, 'NTS S 03')

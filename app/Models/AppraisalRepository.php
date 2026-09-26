@@ -151,7 +151,10 @@ final class AppraisalRepository
             'built_area_deed_m2', 'built_area_certificate_m2', 'built_area_other_m2', 'built_area_adopted_m2',
             'built_area_adopted_source', 'construction_year', 'construction_age_years',
             'construction_apparent_age_years', 'construction_useful_life_years',
-            'construction_remaining_life_years', 'construction_rentable_units', 'construction_state',
+            'construction_remaining_life_years', 'construction_rentable_units', 'functional_bedrooms_count',
+            'functional_bathrooms_count', 'functional_service_room_bathroom', 'functional_parking_spaces_count',
+            'functional_loading_bays_count', 'functional_clear_height_m', 'functional_office_area_m2',
+            'functional_access_type', 'functional_view', 'functional_finish_quality', 'functional_notes', 'construction_state',
             'construction_progress_percent', 'construction_integrity_percent', 'construction_conservation_json',
             'construction_general_aspects', 'construction_specifics_json',
             'construction_report_text'];
@@ -171,13 +174,11 @@ final class AppraisalRepository
 
     private function unitUpdate(array $fields): \PDOStatement
     { $set = implode(', ', array_map(static fn (string $field): string => $field . ' = ?', $fields)); return $this->db->prepare('UPDATE appraisal_units SET ' . $set . ', updated_at = ? WHERE id = ? AND appraisal_id = ? AND owner_id = ?'); }
-
     public function ensureUnits(string $id, int $owner, int $propertyCount, int $annexCount): void
     {
         for ($i = 1; $i <= $propertyCount; $i++) $this->ensureUnit($id, $owner, 'property', $i, 'Unidad ' . $i);
         for ($i = 1; $i <= $annexCount; $i++) $this->ensureUnit($id, $owner, 'annex', $i, 'Anexo ' . $i);
     }
-
     private function ensureUnit(string $id, int $owner, string $kind, int $index, string $label): void
     {
         $now = gmdate('Y-m-d H:i:s');
@@ -186,7 +187,6 @@ final class AppraisalRepository
             VALUES (?, ?, ?, ?, ?, ?, ?, ?)');
         $query->execute([bin2hex(random_bytes(16)), $id, $owner, $kind, $index, $label, $now, $now]);
     }
-
     public function addPhoto(string $id, int $owner, array $photo): void
     {
         $now = gmdate('Y-m-d H:i:s');

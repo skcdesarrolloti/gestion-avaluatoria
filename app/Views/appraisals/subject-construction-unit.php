@@ -97,6 +97,7 @@ $builtAreaFields = [
         </div>
     </div>
     <?php require BASE_PATH . '/app/Views/appraisals/subject-construction-life.php'; ?>
+    <?php require BASE_PATH . '/app/Views/appraisals/subject-construction-functional.php'; ?>
     <div class="mt-5 grid gap-5 md:grid-cols-3" x-show="activeConstructionDetail === 'estado'">
         <label class="label">Estado de la construcción
             <select class="input" name="unit_constructions[<?= e($unitId) ?>][construction_state]">
