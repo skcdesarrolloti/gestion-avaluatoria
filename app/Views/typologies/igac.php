@@ -82,8 +82,11 @@ $documentStats = $documentStats ?? ['documents' => 0, 'topics' => 0];
                 </div>
                 <div class="mt-4 flex flex-wrap gap-3">
                     <a class="btn-primary" href="<?= e(url('igac/documento/' . rawurlencode((string) $document['id']))) ?>">Abrir ficha</a>
+                    <?php if ((string) ($document['archivo_descarga'] ?? '') !== ''): ?>
+                        <a class="btn-secondary" href="<?= e(url('igac/documento/' . rawurlencode((string) $document['id']) . '/descargar')) ?>" data-no-fetch>Descargar</a>
+                    <?php endif; ?>
                     <?php if ((string) $document['fuente_oficial'] !== ''): ?>
-                        <a class="btn-secondary" href="<?= e((string) $document['fuente_oficial']) ?>" target="_blank" rel="noopener" data-no-fetch>Fuente oficial</a>
+                        <a class="btn-secondary" href="<?= e((string) $document['fuente_oficial']) ?>" target="_blank" rel="noopener" data-no-fetch>Ficha oficial</a>
                     <?php endif; ?>
                 </div>
             </article>

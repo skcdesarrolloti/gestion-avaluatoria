@@ -831,7 +831,10 @@ try {
     expect(count($igac->byCategory('RESIDENCIALES')) === 23, 'tipologias IGAC agrupadas por categoria');
     expect(count($igac->optionsByCategory()['ANEXOS']) === 136, 'selector IGAC filtra tipologias por categoria');
     expect(($igac->optionsByCategory()['RESIDENCIALES'][0]['image'] ?? '') !== '', 'selector IGAC incluye imagen de referencia');
-    expect(IgacDocumentLibrary::find('resolucion-igac-941-2026') !== null, 'biblioteca IGAC centraliza resolucion 941');
+    $igacResolution = IgacDocumentLibrary::find('resolucion-igac-941-2026');
+    expect($igacResolution !== null, 'biblioteca IGAC centraliza resolucion 941');
+    expect(str_ends_with((string) ($igacResolution['archivo_descarga'] ?? ''), '.pdf'),
+        'biblioteca IGAC conserva descarga directa de resolucion 941');
     expect(count(IgacDocumentLibrary::documents('conservacion')) === 2, 'biblioteca IGAC filtra documentos de conservacion');
     $db->exec("INSERT OR REPLACE INTO valuation_legal_documents
         (slug, category_code, document_code, title, document_type, status, source_reference, summary,

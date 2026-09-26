@@ -36,11 +36,14 @@
             </section>
         </div>
         <div class="mt-6 flex flex-wrap gap-3">
+            <?php if ((string) ($document['archivo_descarga'] ?? '') !== ''): ?>
+                <a class="btn-primary" href="<?= e(url('igac/documento/' . rawurlencode((string) $document['id']) . '/descargar')) ?>" data-no-fetch>Descargar archivo</a>
+            <?php endif; ?>
             <?php if ((string) ($document['fuente_oficial'] ?? '') !== ''): ?>
-                <a class="btn-primary" href="<?= e((string) $document['fuente_oficial']) ?>" target="_blank" rel="noopener" data-no-fetch>Ver fuente oficial</a>
+                <a class="btn-secondary" href="<?= e((string) $document['fuente_oficial']) ?>" target="_blank" rel="noopener" data-no-fetch>Ver ficha oficial IGAC</a>
             <?php endif; ?>
             <?php if ((string) ($document['archivo'] ?? '') !== ''): ?>
-                <a class="btn-secondary" href="<?= e((string) $document['archivo']) ?>" target="_blank" rel="noopener" data-no-fetch>Visualizar / descargar archivo</a>
+                <a class="btn-secondary" href="<?= e((string) $document['archivo']) ?>" download data-no-fetch>Descargar archivo local</a>
             <?php endif; ?>
         </div>
     </article>
