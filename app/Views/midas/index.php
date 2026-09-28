@@ -16,8 +16,8 @@ $formatDate = static function ($value): string {
             <p class="text-sm font-semibold uppercase tracking-wide text-teal-800">Biblioteca cartográfica</p>
             <h1 class="mt-2 text-3xl font-semibold text-slate-950">MIDAS</h1>
             <p class="mt-3 max-w-3xl text-slate-600">
-                Guarda una sola vez las descargas comunes de MIDAS: POT, división política,
-                servicios, movilidad, equipamientos, riesgos y soportes cartográficos.
+                Guarda una sola vez las descargas comunes de MIDAS: circulares urbanísticas,
+                POT, división política, servicios, movilidad, equipamientos, riesgos y soportes cartográficos.
                 Los avalúos solo anexan evidencias particulares del caso.
             </p>
         </div>
@@ -66,7 +66,7 @@ $formatDate = static function ($value): string {
                     </select>
                 </label>
                 <label class="label">Código o referencia
-                    <input class="input mt-2" name="document_code" maxlength="120" placeholder="Ej. POT-2001-CUADRO-USOS">
+                    <input class="input mt-2" name="document_code" maxlength="120" placeholder="Ej. CIRC-ALTILLO o POT-2001-USOS">
                 </label>
                 <label class="label md:col-span-2">Nombre del documento
                     <input class="input mt-2" name="title" maxlength="240" placeholder="Ej. Descarga MIDAS Localidades Histórica y del Caribe">
@@ -84,10 +84,10 @@ $formatDate = static function ($value): string {
                 </label>
                 <label class="label md:col-span-2">Para qué es útil
                     <textarea class="input mt-2 min-h-20" name="practical_use" maxlength="700"
-                        placeholder="Ej. Sirve para respaldar delimitación territorial, tratamiento urbano o capas de riesgo."></textarea>
+                        placeholder="Ej. Sustenta parqueaderos, altura, uso del suelo, riesgos o delimitación territorial."></textarea>
                 </label>
                 <label class="label md:col-span-2">Dónde se consulta
-                    <input class="input mt-2" name="applies_to" maxlength="240" placeholder="Ej. Capítulo 2, numeral 5, soportes cartográficos">
+                    <input class="input mt-2" name="applies_to" maxlength="240" placeholder="Ej. Numeral 5, numeral 6, numeral 7 o módulo futuro 9">
                 </label>
                 <div class="md:col-span-2 flex justify-end"><button class="btn-primary" type="submit">Subir a Biblioteca MIDAS</button></div>
             </form>

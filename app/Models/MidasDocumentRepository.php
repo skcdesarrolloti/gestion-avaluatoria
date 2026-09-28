@@ -15,6 +15,7 @@ final class MidasDocumentRepository
         return [
             'Barrios / división política' => 'Límites, localidades, barrios y UCG.',
             'POT / ordenamiento territorial' => 'POT, usos, tratamientos y reglamentación urbana.',
+            'Circulares urbanísticas' => 'Criterios de Planeación sobre altura, parqueaderos, altillos y reglas complementarias.',
             'Servicios públicos' => 'Cobertura de acueducto, alcantarillado, gas, energía, aseo o alumbrado.',
             'Transporte y movilidad' => 'Vías, transporte masivo, rutas, paraderos y conectividad.',
             'Equipamiento urbano' => 'Educación, salud, cultura, deporte y espacio público.',

@@ -84,8 +84,9 @@ cuando el encargo tenga finalidad financiera, valor razonable, deterioro o revel
 históricos o de soporte académico y registrar desde qué módulos pueden citarse. El
 PDF se guarda una vez y la relación funcional se conserva en metadatos JSON.
 `midas_documents` separa los insumos cartográficos comunes de MIDAS de los soportes
-particulares del avalúo. Los documentos generales se cargan una vez en el menú MIDAS;
-el numeral 2 conserva solo la evidencia específica de barrio, predio o consulta.
+particulares del avalúo. Los documentos generales se cargan una vez en el menú MIDAS:
+circulares urbanísticas, división política, POT, servicios, movilidad, equipamientos
+y riesgos. El numeral 2 conserva solo la evidencia específica de barrio, predio o consulta.
 
 Normatividad Urbana queda separada en biblioteca y ficha del avalúo. La biblioteca
 conserva el documento fuente y solo organiza cuadros, categorías, reglas y parámetros

@@ -21,7 +21,8 @@ Las NIIF quedan en otro menú independiente para consultas de medición contable
 La Normatividad Urbana queda modelada como biblioteca y módulo del capítulo 5, iniciada con los cuadros de usos del Decreto 0977 de 2001, y como ficha por avalúo para MIDAS por predial, opción Uso del suelo, concepto, usos, determinantes y soportes.
 Incluye catálogo de Tipologías Constructivas IGAC con imágenes, agrupado por categoría.
 Incluye Biblioteca MIDAS como menú propio junto a IGAC, para alojar descargas comunes
-de capas sin mezclarlas con Maestros ni repetirlas por avalúo.
+de capas, circulares urbanísticas y soportes reutilizables sin mezclarlas con Maestros
+ni repetirlas por avalúo.
 Incluye en Maestros una biblioteca documental maestra para subir soportes normativos
 faltantes, clasificarlos por destino lógico y relacionarlos con módulos sin duplicar
 el PDF. Sirve como entrada administrativa previa a integrar una norma a una biblioteca

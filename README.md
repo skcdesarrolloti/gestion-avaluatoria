@@ -92,8 +92,10 @@ Los documentos cargados desde Maestros usan `storage/documentos-maestros/` o
 faltantes o soportes de academia; cada ficha indica destino, vigencia, utilidad, temas
 y módulos que la pueden citar sin guardar copias por módulo.
 La Biblioteca MIDAS usa `storage/biblioteca-midas/` o `MIDAS_LIBRARY_STORAGE_DIR`.
-Guarda PDF, CSV, JSON, GeoJSON o ZIP comunes descargados de MIDAS, detecta duplicados
-por código o nombre de archivo y evita que el numeral 2 duplique documentos generales.
+Guarda PDF, CSV, JSON, GeoJSON o ZIP comunes descargados de MIDAS, incluyendo circulares
+urbanísticas, división política, POT, servicios, movilidad, equipamientos y riesgos.
+Detecta duplicados por código o nombre de archivo y evita que el numeral 2 duplique
+documentos generales.
 El numeral 3.5 lee PDF digitales, escaneados y mixtos página por página en el navegador,
 con PDF.js y Tesseract locales, sin clave de IA ni servicios externos. Envía el original
 junto con el texto por página, conserva el resultado en BD y prellena campos vacíos con
