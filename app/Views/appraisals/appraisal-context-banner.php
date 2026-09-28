@@ -26,6 +26,9 @@ $chips = array_filter([
                 <?php endforeach; ?>
             </div>
         </div>
-        <a class="rounded-full bg-white px-3 py-1 text-xs font-bold text-amber-800" href="<?= e(url('avaluos/' . $record['id'] . '/expediente')) ?>">Ver módulo 1</a>
+        <div class="flex flex-wrap gap-2">
+            <a class="rounded-full bg-white px-3 py-1 text-xs font-bold text-amber-800" href="<?= e(url('avaluos/' . $record['id'] . '/ampliaciones-entregable')) ?>">Ampliaciones</a>
+            <a class="rounded-full bg-white px-3 py-1 text-xs font-bold text-amber-800" href="<?= e(url('avaluos/' . $record['id'] . '/expediente')) ?>">Ver módulo 1</a>
+        </div>
     </div>
 </div>
