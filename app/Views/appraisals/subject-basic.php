@@ -49,7 +49,7 @@ $tabs = [
         'address_deed', 'address_other', 'adopted_source', 'adopted_address']],
     'ubicacion' => ['Ubicación territorial', []],
     'referencia' => ['Referencia', ['point_reference', 'alternate_nomenclature']],
-    'registro' => ['Registro y catastro', ['property_registry', 'cadastral_reference', 'registry_office', 'stratum',
+    'registro' => ['Registro, catastro y MIDAS', ['property_registry', 'cadastral_reference', 'registry_office', 'stratum',
         'predial_base_value', 'predial_destination_code', 'predial_destination_description',
         'predial_rate_per_mille', 'predial_bill_source']],
     'entorno' => ['Entorno', ['centrality', 'immediate_environment', 'road_condition']],
@@ -98,7 +98,7 @@ $tabs = [
         </div>
         <div class="flex flex-wrap gap-3">
             <button class="btn-primary" type="button" @click="activeTab = 'registro'; history.replaceState(null, '', '#midas'); setTimeout(() => document.getElementById('midas')?.scrollIntoView({behavior: 'smooth', block: 'start'}), 50)">
-                Ir a MIDAS
+                Pegar lectura MIDAS
             </button>
             <a class="btn-secondary" href="<?= e(url('maestros')) ?>">Abrir maestros</a>
         </div>
@@ -132,6 +132,18 @@ $tabs = [
             <h3 class="text-base font-semibold">Ubicación territorial</h3>
             <div class="mt-5 grid gap-5 md:grid-cols-3">
                 <?php require BASE_PATH . '/app/Views/appraisals/subject-location-fields.php'; ?>
+            </div>
+            <div class="mt-5 rounded-xl border border-teal-100 bg-teal-50 p-4 text-sm leading-6 text-teal-950">
+                <div class="flex flex-wrap items-center justify-between gap-3">
+                    <p>
+                        <strong>Estos datos pueden venir de MIDAS.</strong>
+                        Pega la ficha Predios en Registro, catastro y MIDAS; el sistema actualiza esta ubicación
+                        y envía Uso Suelo al numeral 5.
+                    </p>
+                    <button class="btn-primary" type="button" @click="activeTab = 'registro'; history.replaceState(null, '', '#midas'); setTimeout(() => document.getElementById('midas')?.scrollIntoView({behavior: 'smooth', block: 'start'}), 50)">
+                        Ir a MIDAS del numeral 3
+                    </button>
+                </div>
             </div>
             <div class="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
                 <strong>Barrio / microsector es la llave sectorial.</strong>
