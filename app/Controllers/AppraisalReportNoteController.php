@@ -3,10 +3,31 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, Session};
 use App\Models\{AppraisalRepository, AppraisalReportNoteRepository};
+use App\Support\AppraisalReportNoteCatalog;
 
 final class AppraisalReportNoteController
 {
     public function __construct(private AppraisalRepository $appraisals, private AppraisalReportNoteRepository $notes, private array $user) {}
+
+    public function show(string $id): void
+    {
+        $record = $this->appraisals->find($id, $this->user['id']);
+        $chapters = [];
+        foreach (['1', '2', '3', '4', '5'] as $chapter) {
+            $rows = $this->notes->byChapter($id, $this->user['id'], $chapter);
+            $chapters[$chapter] = [
+                'notes' => $rows,
+                'sections' => AppraisalReportNoteCatalog::withNoteSections($chapter, $rows),
+            ];
+        }
+        view('appraisals/report-notes-central', [
+            'title' => 'Ampliaciones del entregable',
+            'record' => $record,
+            'chapters' => $chapters,
+            'message' => Session::pullFlash('report_note_message'),
+            'error' => Session::pullFlash('report_note_error'),
+        ]);
+    }
 
     public function save(string $id): never
     {
@@ -44,8 +65,7 @@ final class AppraisalReportNoteController
     private function returnTo(string $id, string $chapter): string
     {
         $target = (string) ($_POST['return_to'] ?? '');
-        $allowed = ['1' => 'expediente', '2' => 'sector', '3' => 'bien-sujeto', '4' => 'juridicas', '5' => 'normatividad-urbana'];
-        $path = 'avaluos/' . $id . '/' . ($allowed[$chapter] ?? 'entregable');
+        $path = 'avaluos/' . $id . '/ampliaciones-entregable#capitulo-' . $chapter;
         return preg_match('#^avaluos/' . preg_quote($id, '#') . '/[a-z0-9-]+(?:\#[a-z0-9_-]+)?$#', $target) ? $target : $path;
     }
 }

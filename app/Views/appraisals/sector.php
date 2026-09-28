@@ -210,4 +210,3 @@ $sectorFormId = 'sector-form';
             @click="prepareSectorSave()" x-text="advanceLabel()">Guardar y pasar</button>
     </div>
 </section>
-<?php require BASE_PATH . '/app/Views/appraisals/report-extra-notes.php'; ?>

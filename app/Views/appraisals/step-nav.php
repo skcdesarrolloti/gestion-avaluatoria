@@ -9,6 +9,7 @@ $steps = [
     ['key' => 'economico', 'label' => '6 · Aspecto económico', 'href' => url('avaluos/' . $record['id'] . '/aspecto-economico')],
     ['key' => 'restrictivas', 'label' => '7 · Condiciones restrictivas', 'href' => url('avaluos/' . $record['id'] . '/condiciones-restrictivas')],
     ['key' => 'metodologia', 'label' => '8 · Metodología valuatoria', 'href' => url('avaluos/' . $record['id'] . '/metodologia-valuatoria')],
+    ['key' => 'ampliaciones', 'label' => 'Ampliaciones', 'href' => url('avaluos/' . $record['id'] . '/ampliaciones-entregable')],
     ['key' => 'entregable', 'label' => 'Entregable', 'href' => url('avaluos/' . $record['id'] . '/entregable')],
 ];
 ?>

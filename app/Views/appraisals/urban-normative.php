@@ -77,4 +77,3 @@ $input = static function (string $name, string $label, string $placeholder = '',
     </div>
 </form>
 </div>
-<?php require BASE_PATH . '/app/Views/appraisals/report-extra-notes.php'; ?>

@@ -215,5 +215,4 @@ $trafficCounts = \App\Support\AppraisalLegalView::trafficCounts($annotations);
         <button class="btn-primary" type="submit" name="next" value="deliverable">Guardar y pasar a Entregable</button>
     </div>
 </form>
-<?php require BASE_PATH . '/app/Views/appraisals/report-extra-notes.php'; ?>
 <script type="module" src="<?= e(asset_url('assets/legal-certificate-reader.js')) ?>"></script>

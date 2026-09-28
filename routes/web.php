@@ -81,6 +81,7 @@ return [
     ['GET', '#^/avaluos/([a-f0-9]{32})/aspecto-economico$#', 'appraisals', 'economicAspect', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/condiciones-restrictivas$#', 'appraisals', 'restrictiveConditions', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria$#', 'valuationMethodology', 'show', true],
+    ['GET', '#^/avaluos/([a-f0-9]{32})/ampliaciones-entregable$#', 'reportNotes', 'show', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/entregable$#', 'appraisals', 'deliverable', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/notas-entregable$#', 'reportNotes', 'save', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ficha-basica$#', 'subject', 'saveBasic', true],

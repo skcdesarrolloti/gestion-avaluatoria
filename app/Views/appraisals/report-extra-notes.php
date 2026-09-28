@@ -4,6 +4,7 @@ $reportNoteChapter = (string) ($reportNoteChapter ?? '1');
 $reportNoteSections = is_array($reportNoteSections ?? null) ? $reportNoteSections : [];
 $reportNoteReturn = (string) ($reportNoteReturn ?? ('avaluos/' . $record['id']));
 $nextIndex = count($reportNoteRows);
+$hideReportNoteFlash = (bool) ($reportNoteHideFlash ?? false);
 ?>
 <section class="mt-8 rounded-2xl border border-indigo-100 bg-indigo-50 p-6 shadow-sm sm:p-8"
     x-data="{customCode: '', customLabel: '', chapter: '<?= e($reportNoteChapter) ?>',
@@ -20,10 +21,10 @@ $nextIndex = count($reportNoteRows);
         </div>
         <span class="rounded-full bg-white px-3 py-1 text-sm font-semibold text-indigo-800">Capítulo <?= e($reportNoteChapter) ?></span>
     </div>
-    <?php if ($msg = \App\Core\Session::pullFlash('report_note_message')): ?>
+    <?php if (!$hideReportNoteFlash && ($msg = \App\Core\Session::pullFlash('report_note_message'))): ?>
         <p class="mt-4 rounded-xl bg-emerald-100 p-3 text-sm font-semibold text-emerald-800"><?= e($msg) ?></p>
     <?php endif; ?>
-    <?php if ($err = \App\Core\Session::pullFlash('report_note_error')): ?>
+    <?php if (!$hideReportNoteFlash && ($err = \App\Core\Session::pullFlash('report_note_error'))): ?>
         <p class="mt-4 rounded-xl bg-red-100 p-3 text-sm font-semibold text-red-800"><?= e($err) ?></p>
     <?php endif; ?>
     <form class="mt-5 grid gap-4" method="post" action="<?= e(url('avaluos/' . $record['id'] . '/notas-entregable')) ?>">

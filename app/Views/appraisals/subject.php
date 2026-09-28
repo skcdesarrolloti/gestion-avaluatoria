@@ -110,4 +110,3 @@ $safeSubjectPartial = static function (string $path, string $label, array $conte
         <?php $safeSubjectPartial('subject-photos.php', '3.7 Registro fotográfico', get_defined_vars()); ?>
     </div>
 </div>
-<?php $safeSubjectPartial('report-extra-notes.php', 'Ampliaciones del entregable', get_defined_vars()); ?>
