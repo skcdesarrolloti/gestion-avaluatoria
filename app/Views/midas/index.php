@@ -2,6 +2,16 @@
 $documents = is_array($documents ?? null) ? $documents : [];
 $groups = is_array($groups ?? null) ? $groups : [];
 $storage = is_array($storage ?? null) ? $storage : [];
+$targets = [
+    'Barrios / división política' => 'Numeral 2: sector, delimitación y fuente base. Numeral 3: localidad, barrio y UCG.',
+    'POT / ordenamiento territorial' => 'Numeral 5: uso del suelo, tratamiento, clasificación y determinantes.',
+    'Circulares urbanísticas' => 'Numeral 5 y futuro potencial: altura, parqueaderos, altillos y salvedades normativas.',
+    'Servicios públicos' => 'Numeral 2: cobertura y calidad del entorno; numeral 7 si hay limitaciones.',
+    'Transporte y movilidad' => 'Numeral 2: accesibilidad; numeral 6: dinámica económica y mercado objetivo.',
+    'Equipamiento urbano' => 'Numerales 2 y 6: salud, educación, comercio, seguridad y servicios de soporte.',
+    'Ambiente y riesgos' => 'Numeral 7: inundación, licuación, amenazas y condiciones restrictivas.',
+    'Otro soporte MIDAS' => 'Se usa solo si el analista define qué campo o numeral sustenta.',
+];
 $formatBytes = static fn ($bytes): string => number_format(((int) $bytes) / 1024, 1, ',', '.') . ' KB';
 $formatDate = static function ($value): string {
     try {
@@ -42,6 +52,9 @@ $formatDate = static function ($value): string {
                     <div class="rounded-lg bg-white/70 p-3">
                         <p class="font-semibold text-blue-950"><?= e((string) $group) ?></p>
                         <p class="mt-1 leading-5 text-blue-900"><?= e((string) $description) ?></p>
+                        <p class="mt-2 text-xs font-semibold leading-5 text-blue-800">
+                            Nutre expediente: <?= e($targets[(string) $group] ?? 'Pendiente de clasificar por el analista.') ?>
+                        </p>
                     </div>
                 <?php endforeach; ?>
             </div>
