@@ -16,6 +16,8 @@ $today = new DateTimeImmutable('today', new DateTimeZone('America/Bogota'));
     <?php if ($message): ?><div class="rounded-xl border border-emerald-50 bg-emerald-50 p-4 text-sm font-medium text-emerald-700"><?= e($message) ?></div><?php endif; ?>
     <?php if ($error): ?><div class="rounded-xl border border-red-50 bg-red-50 p-4 text-sm font-medium text-red-700"><?= e($error) ?></div><?php endif; ?>
 
+    <?php require BASE_PATH . '/app/Views/masters/document-library.php'; ?>
+
     <section id="crear-perito" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div class="grid gap-5 lg:grid-cols-[1fr_22rem]">
             <div>

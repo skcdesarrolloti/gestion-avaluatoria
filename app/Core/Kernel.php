@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace App\Core;
 use App\Controllers\{AppraisalController, AppraisalLegalController, AppraisalSubjectController, AuthController, DiagnosticController, IgacTypologyController, IfrsStandardController, ValuationGlossaryController, InternationalStandardController, LegalFrameworkController, MaintenanceController, MasterDataController, StandardController, UrbanNormativeLibraryController, ValuationController};
 use App\Database\Migrator;
-use App\Models\{AppraisalLegalRepository, AppraisalRepository, AppraisalSectorMidasFileRepository, AppraisalSubjectRepository, AppraiserRepository, FuncionarioRepository, GeoMasterRepository, IgacTypologyRepository, IfrsStandardRepository, InternationalStandardRepository, LegalDocumentRepository, ValuationGlossaryRepository, ValuationStandardRepository};
+use App\Models\{AppraisalLegalRepository, AppraisalRepository, AppraisalSectorMidasFileRepository, AppraisalSubjectRepository, AppraiserRepository, FuncionarioRepository, GeoMasterRepository, IgacTypologyRepository, IfrsStandardRepository, InternationalStandardRepository, LegalDocumentRepository, MasterDocumentRepository, ValuationGlossaryRepository, ValuationStandardRepository};
 use App\Services\AuthService;
 final class Kernel
 {
@@ -54,6 +54,11 @@ final class Kernel
                         'message' => 'La carga superó el límite post_max_size de PHP. Sube menos archivos por lote o aumenta el límite en el hosting.',
                     ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
                     Http::redirect($route);
+                }
+                if ($controller === 'masters' && $action === 'createDocument'
+                    && $this->uploadLikelyExceededPostLimit()) {
+                    Session::flash('masters_error', 'La carga superó el límite post_max_size de PHP. Sube un PDF menor o aumenta el límite en el hosting.');
+                    Http::redirect('maestros#biblioteca-documental');
                 }
                 if ($controller === 'subjectPh' && $action === 'upload' && $this->uploadLikelyExceededPostLimit()) { Session::flash('ph_error', 'La carga superó el límite post_max_size de PHP. Sube menos soportes por lote o comprímelos en un ZIP menor.'); Http::redirect('avaluos/' . (string) ($matches[1] ?? '') . '/bien-sujeto#ph'); }
                 try {
@@ -116,7 +121,7 @@ final class Kernel
                 'international' => new InternationalStandardController(new InternationalStandardRepository($db)),
                 'legal' => new LegalFrameworkController(new LegalDocumentRepository($db)),
                 'maintenance' => new MaintenanceController($db, $user),
-                'masters' => new MasterDataController(new AppraiserRepository($db)),
+                'masters' => new MasterDataController(new AppraiserRepository($db), new MasterDocumentRepository($db)),
                 'standards' => new StandardController(new ValuationStandardRepository($db)),
                 'reportNotes' => new \App\Controllers\AppraisalReportNoteController(
                     new AppraisalRepository($db), new \App\Models\AppraisalReportNoteRepository($db), $user),
@@ -177,10 +182,7 @@ final class Kernel
             default => $bytes,
         };
     }
-    private function authService(): AuthService
-    {
-        return new AuthService(new FuncionarioRepository(Database::connection('auth')));
-    }
+    private function authService(): AuthService { return new AuthService(new FuncionarioRepository(Database::connection('auth'))); }
     private function loginInfrastructureError(\Throwable $error): void
     {
         error_log('Gestion avaluatoria login auth ' . get_class($error) . ' code=' . $error->getCode()
@@ -212,8 +214,5 @@ final class Kernel
         return 'No se pudo verificar el acceso. Revisa la conexión de funcionarios.';
     }
     private function loginData(): array
-    {
-        return ['title' => 'Iniciar sesión', 'error' => Session::pullFlash('login_error'),
-            'username' => Session::pullFlash('login_username')];
-    }
+    { return ['title' => 'Iniciar sesión', 'error' => Session::pullFlash('login_error'), 'username' => Session::pullFlash('login_username')]; }
 }

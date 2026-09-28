@@ -11,6 +11,8 @@ return [
     ['GET', '#^/maestros$#', 'masters', 'index', true],
     ['POST', '#^/maestros/peritos$#', 'masters', 'createAppraiser', true],
     ['GET', '#^/maestros/peritos/([a-f0-9]{32})/raa$#', 'masters', 'raaFile', true],
+    ['POST', '#^/maestros/documentos$#', 'masters', 'createDocument', true],
+    ['GET', '#^/maestros/documentos/([a-f0-9]{32})/archivo$#', 'masters', 'documentFile', true],
     ['GET', '#^/$#', 'appraisals', 'index', true],
     ['GET', '#^/normas-tecnicas-sectoriales$#', 'standards', 'index', true],
     ['GET', '#^/marco-juridico-valuatorio$#', 'legal', 'index', true],

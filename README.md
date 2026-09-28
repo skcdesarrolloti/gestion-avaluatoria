@@ -15,6 +15,8 @@ completos de InversKC. El proyecto original permanece intacto.
 - Menú separado de Normas Internacionales de Valuación con estructura IVS y PDFs por norma.
 - Menú de Normas NIIF aplicables a medición contable, con PDFs por norma.
 - Catálogo de Tipologías Constructivas IGAC como referencia visual por categoría.
+- Biblioteca documental maestra en Maestros para cargar soportes normativos nuevos,
+  clasificarlos por destino y relacionarlos con módulos sin duplicar el PDF.
 - Glosario valuatorio con conceptos iniciales NTS M 01 y carga manual de nuevos factores o descripciones.
 - Biblioteca y módulo de Normatividad Urbana para el capítulo 5, con captura de MIDAS por predial, opción Uso del suelo, POT, cuadros de uso y determinantes.
 - Instalador y migraciones automáticas de tablas y columnas.
@@ -83,6 +85,10 @@ Las Normas Internacionales de Valuación guardan sus PDFs en
 de la IVS correspondiente.
 Las Normas NIIF guardan sus PDFs en `storage/normas-niif/`; sirven como referencia
 contable y ayudan a distinguir campos normativos, metodológicos y operativos.
+Los documentos cargados desde Maestros usan `storage/documentos-maestros/` o
+`MASTER_DOCUMENT_STORAGE_DIR`. Esa biblioteca es una entrada central para documentos
+faltantes o soportes de academia; cada ficha indica destino, vigencia, utilidad, temas
+y módulos que la pueden citar sin guardar copias por módulo.
 El numeral 3.5 lee PDF digitales, escaneados y mixtos página por página en el navegador,
 con PDF.js y Tesseract locales, sin clave de IA ni servicios externos. Envía el original
 junto con el texto por página, conserva el resultado en BD y prellena campos vacíos con
@@ -138,7 +144,8 @@ tests/               Pruebas aisladas
 - Las carpetas privadas de PDFs quedan dentro de `storage/` y Git solo conserva su
   `.gitkeep`: no versiona los PDFs. No uses un despliegue que elimine archivos
   privados existentes dentro de `storage/`. Marco Jurídico mantiene un respaldo en BD
-  de los PDFs cargados; Normas Técnicas, IVS y NIIF siguen dependiendo de su carpeta.
+  de los PDFs cargados; Normas Técnicas, IVS, NIIF y documentos maestros conservan
+  archivo privado y, cuando aplica, respaldo interno en BD.
 - Ejecuta `php bin/console.php migrate` durante el despliegue; con `AUTO_MIGRATE=true`
   el primer acceso autenticado también aplica pendientes. Migraciones costosas deben
   ejecutarse antes de abrir tráfico. La base inicial no borra tablas ni datos.
