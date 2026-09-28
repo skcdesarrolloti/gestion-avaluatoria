@@ -88,7 +88,8 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                     </p>
                     <p class="mt-2 rounded-lg bg-blue-50 px-3 py-2 text-sm text-blue-950">
                         Los PDF se leen completos, página por página, con OCR local en el navegador cuando hace falta.
-                        Mantén esta pestaña abierta. No se requiere una clave de IA para esta lectura.
+                        Mantén esta pestaña abierta; el sistema mantiene viva la sesión durante lecturas largas.
+                        No se requiere una clave de IA para esta lectura.
                         Los datos no acreditados quedan pendientes; las menciones del reglamento requieren revisión.
                     </p>
                 </div>

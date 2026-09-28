@@ -4,6 +4,24 @@ const readerRevision = typeof __PH_READER_REVISION__ === 'string' ? __PH_READER_
 const prepared = new WeakMap();
 const running = new Set();
 
+async function refreshSecurityToken() {
+    const response = await fetch(window.location.href, {
+        headers: { Accept: 'text/html', 'X-Requested-With': 'ph-ocr-keepalive' },
+        credentials: 'same-origin',
+    });
+    const html = await response.text();
+    const next = new DOMParser().parseFromString(html, 'text/html');
+    const fresh = next.querySelector('meta[name="csrf-token"]')?.content;
+    const current = document.querySelector('meta[name="csrf-token"]');
+    if (fresh && current) current.setAttribute('content', fresh);
+    return Boolean(fresh);
+}
+
+function keepSessionAlive() {
+    const id = window.setInterval(() => { refreshSecurityToken().catch(() => {}); }, 120000);
+    return () => window.clearInterval(id);
+}
+
 function progress(form, percent, message) {
     form.querySelector('[data-upload-progress-panel]')?.classList.remove('hidden');
     const bar = form.querySelector('[data-upload-progress-bar]');
@@ -22,8 +40,10 @@ async function prepare(event) {
     event.preventDefault(); event.stopImmediatePropagation();
     if (running.has(form)) return;
     running.add(form);
+    const stopKeepAlive = keepSessionAlive();
     const controls = [...form.querySelectorAll('button, input[type=file], select')];
     try {
+        await refreshSecurityToken();
         if (window.gaFlushAutosaves && !await window.gaFlushAutosaves()) {
             throw new Error('Guarda los cambios pendientes de la ficha antes de analizar el soporte.');
         }
@@ -41,6 +61,7 @@ async function prepare(event) {
         if (window.gaFlushAutosaves && !await window.gaFlushAutosaves()) {
             throw new Error('Hay cambios sin guardar. Reintenta cuando la ficha confirme el guardado.');
         }
+        await refreshSecurityToken();
         form.dataset.phPdfReady = '1';
         controls.forEach(node => { node.disabled = false; });
         progress(form, 88, 'Lectura preparada. Guardando soporte y sugerencias…');
@@ -48,7 +69,7 @@ async function prepare(event) {
     } catch (error) {
         progress(form, 0, `Lectura no completada: ${error.message} Puedes reintentar.`);
         controls.forEach(node => { node.disabled = false; });
-    } finally { running.delete(form); }
+    } finally { stopKeepAlive(); running.delete(form); }
 }
 
 export function installPhPdfUpload() {
