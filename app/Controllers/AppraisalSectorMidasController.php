@@ -70,6 +70,20 @@ final class AppraisalSectorMidasController
         exit;
     }
 
+    public function deleteSupport(string $id, string $fileId): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        try {
+            $file = $this->midasFiles->delete($fileId, $id, $this->user['id']);
+            $path = AppraisalSectorMidasFileRepository::path((string) $file['storage_filename']);
+            if (is_file($path)) @unlink($path);
+            Session::flash('sector_midas_file_message', 'Soporte MIDAS eliminado: ' . $file['source_filename'] . '.');
+        } catch (\Throwable $error) {
+            Session::flash('sector_midas_file_error', $error->getMessage());
+        }
+        Http::redirect('avaluos/' . $id . '/sector#midas-centro');
+    }
+
     public function apply(string $id): never
     {
         $this->appraisals->find($id, $this->user['id']);

@@ -157,55 +157,6 @@ $midasTabs = [
         </div>
     </div>
 
-    <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="midasTab === 'descargas'">
-        <div class="grid gap-4 lg:grid-cols-[0.85fr_1fr]">
-            <div class="rounded-xl border border-blue-100 bg-blue-50 p-4">
-                <p class="text-sm font-semibold text-blue-950">Descargas de MIDAS</p>
-                <ol class="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-blue-950">
-                    <li>Activa la capa en MIDAS.</li>
-                    <li>Entra a Descargas y baja PDF, CSV, JSON, GeoJSON o ZIP.</li>
-                    <li>Sube el archivo aquí como soporte del avalúo.</li>
-                </ol>
-            </div>
-            <form class="grid gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-2"
-                method="post" enctype="multipart/form-data"
-                action="<?= e(url('avaluos/' . $record['id'] . '/sector/midas/archivos')) ?>">
-                <?= csrf_field() ?>
-                <label class="label">Grupo de capa
-                    <select class="input mt-2" name="layer_group" required>
-                        <?php foreach ($midasLayerGroups as $group): ?><option value="<?= e($group) ?>"><?= e($group) ?></option><?php endforeach; ?>
-                    </select>
-                </label>
-                <label class="label">Archivo descargado
-                    <input class="input mt-2" type="file" name="midas_support[]" accept=".pdf,.csv,.json,.geojson,.zip" required>
-                    <span class="mt-1 block text-xs font-normal text-slate-500">Máximo 25 MB.</span>
-                </label>
-                <label class="label md:col-span-2">Nota de lectura
-                    <textarea class="input mt-2 min-h-24" name="notes" placeholder="Ej. Capa de transporte revisada; rutas cercanas al barrio."></textarea>
-                </label>
-                <div class="md:col-span-2 flex justify-end"><button class="btn-primary min-h-11" type="submit">Subir soporte MIDAS</button></div>
-            </form>
-        </div>
-        <?php if ($midasFiles): ?>
-            <div class="mt-5 overflow-x-auto rounded-xl border border-slate-200">
-                <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
-                    <thead class="bg-slate-50 text-xs uppercase text-slate-500"><tr><th class="px-4 py-3">Grupo</th><th class="px-4 py-3">Archivo</th><th class="px-4 py-3">Fecha</th></tr></thead>
-                    <tbody class="divide-y divide-slate-100 bg-white">
-                        <?php foreach ($midasFiles as $file): ?>
-                            <tr>
-                                <td class="px-4 py-3 font-semibold text-slate-800"><?= e($file['layer_group']) ?></td>
-                                <td class="px-4 py-3">
-                                    <a class="font-semibold text-blue-800 underline" href="<?= e(url('avaluos/' . $record['id'] . '/sector/midas/archivos/' . $file['id'])) ?>"><?= e($file['source_filename']) ?></a>
-                                    <span class="block text-xs text-slate-500"><?= e($formatMidasBytes($file['file_size_bytes'])) ?></span>
-                                    <?php if (!empty($file['notes'])): ?><span class="block text-xs text-slate-600"><?= e($file['notes']) ?></span><?php endif; ?>
-                                </td>
-                                <td class="px-4 py-3 text-slate-600"><?= e($formatMidasDate($file['created_at'])) ?></td>
-                            </tr>
-                        <?php endforeach; ?>
-                    </tbody>
-                </table>
-            </div>
-        <?php endif; ?>
-    </div>
+    <?php require BASE_PATH . '/app/Views/appraisals/sector-midas-downloads.php'; ?>
 </div>
 <?php require BASE_PATH . '/app/Views/appraisals/midas-updater-script.php'; ?>

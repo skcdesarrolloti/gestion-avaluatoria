@@ -13,6 +13,9 @@ final class AppraisalMidasSupportUploadService
         if ((int) $file['error'] !== UPLOAD_ERR_OK) {
             throw new \RuntimeException("$name " . AppraisalMidasFileStorage::uploadErrorMessage((int) $file['error']));
         }
+        if ($repo->findDuplicate($appraisalId, $owner, $name)) {
+            throw new \RuntimeException('Ese soporte MIDAS ya existe: ' . $name . '.');
+        }
         $info = AppraisalMidasFileStorage::inspect((string) $file['tmp_name'], $name);
         $fileId = bin2hex(random_bytes(16));
         $storageName = 'midas-' . $appraisalId . '-' . $fileId . '.' . $info['extension'];

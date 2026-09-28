@@ -2137,8 +2137,26 @@ Certificado de tradicion.",
     $storedMidasFiles = $midasFiles->forAppraisal(str_repeat('f', 32), 1);
     expect(count($storedMidasFiles) === 1 && $storedMidasFiles[0]['id'] === $uploadedMidas['id']
         && $storedMidasFiles[0]['file_available'] === true, 'soporte MIDAS queda asociado al avaluo');
-    unlink(AppraisalSectorMidasFileRepository::path($storedMidasFiles[0]['storage_filename']));
-    rmdir($midasDir);
+    $tmpMidasDuplicate = tempnam(sys_get_temp_dir(), 'ga_midas_pdf_');
+    file_put_contents($tmpMidasDuplicate, "%PDF-1.4\n%midas duplicado\n");
+    $duplicateRejected = false;
+    try {
+        (new AppraisalMidasSupportUploadService())->store(
+            uploadFixture('pdf_descargas_division_politica_barrios.pdf', $tmpMidasDuplicate),
+            str_repeat('f', 32), 1, $neighborhoodId, $midasFiles, 'Barrios / división política', 'Capa repetida');
+    } catch (RuntimeException $exception) {
+        $duplicateRejected = str_contains($exception->getMessage(), 'ya existe');
+    }
+    expect($duplicateRejected, 'soporte MIDAS duplicado informa que ya existe');
+    @unlink($tmpMidasDuplicate);
+    $deletedMidas = $midasFiles->delete($uploadedMidas['id'], str_repeat('f', 32), 1);
+    unlink(AppraisalSectorMidasFileRepository::path($deletedMidas['storage_filename']));
+    expect($deletedMidas['id'] === $uploadedMidas['id']
+        && $midasFiles->forAppraisal(str_repeat('f', 32), 1) === [], 'soporte MIDAS se puede eliminar');
+    foreach (glob($midasDir . '/*') ?: [] as $leftoverMidasFile) {
+        @unlink($leftoverMidasFile);
+    }
+    @rmdir($midasDir);
     putenv('APPRAISAL_MIDAS_STORAGE_DIR');
     $photoRecordId = str_repeat('c', 32);
     $photoUnitId = str_repeat('d', 32);

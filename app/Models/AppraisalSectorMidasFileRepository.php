@@ -30,6 +30,15 @@ final class AppraisalSectorMidasFileRepository
             $file['notes'], $file['file_blob'], $now]);
     }
 
+    public function findDuplicate(string $appraisalId, int $owner, string $sourceFilename): ?array
+    {
+        $query = $this->db->prepare('SELECT * FROM appraisal_sector_midas_files
+            WHERE appraisal_id = ? AND owner_id = ? AND source_filename = ? ORDER BY created_at DESC LIMIT 1');
+        $query->execute([$appraisalId, $owner, $sourceFilename]);
+        $row = $query->fetch();
+        return is_array($row) ? $row : null;
+    }
+
     public function find(string $id, string $appraisalId, int $owner): array
     {
         $query = $this->db->prepare('SELECT * FROM appraisal_sector_midas_files
@@ -38,6 +47,15 @@ final class AppraisalSectorMidasFileRepository
         $row = $query->fetch();
         if (!$row) throw new HttpException(404, 'No se encontró el soporte MIDAS.');
         return $row;
+    }
+
+    public function delete(string $id, string $appraisalId, int $owner): array
+    {
+        $file = $this->find($id, $appraisalId, $owner);
+        $query = $this->db->prepare('DELETE FROM appraisal_sector_midas_files
+            WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
+        $query->execute([$id, $appraisalId, $owner]);
+        return $file;
     }
 
     public static function path(string $filename): string { return AppraisalMidasFileStorage::path($filename); }
