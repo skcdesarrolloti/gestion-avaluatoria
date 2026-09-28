@@ -55,7 +55,7 @@ final class AppraisalUrbanNormController
         $this->appraisals->find($id, $this->user['id']);
         try {
             $this->profiles->save($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $_POST);
-            Session::flash('urban_norm_message', 'Cambios del numeral 5 guardados. La lectura MIDAS solo se actualiza con el botÃ³n Actualizar MIDAS.');
+            Session::flash('urban_norm_message', 'Cambios del numeral 5 guardados. La lectura MIDAS se trabaja principalmente con copiar y pegar; la lectura automática es opcional si responde.');
         } catch (\Throwable $error) { Session::flash('urban_norm_error', $error->getMessage()); }
         $target = (string) ($_POST['next'] ?? '') === 'deliverable'
             ? 'avaluos/' . $id . '/entregable'

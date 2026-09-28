@@ -28,16 +28,16 @@
         <div class="flex flex-wrap items-start justify-between gap-5">
             <div>
                 <p class="eyebrow">Soporte MIDAS</p>
-                <h2 class="mt-2 text-2xl font-semibold">Referencia y evidencia de consulta</h2>
-                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">Esta sección no define el uso ni el potencial del inmueble. Solo deja trazabilidad de que se consultó MIDAS o de que la fuente no respondió. El análisis valuatorio se desarrolla en 5.2 y 5.3.</p>
+                <h2 class="mt-2 text-2xl font-semibold">Copiar, pegar y procesar lectura MIDAS</h2>
+                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">El flujo principal es manual asistido: abrir MIDAS, copiar Predios y Uso del suelo en el mismo orden de pantalla, pegar aquí y procesar. La lectura automática queda como apoyo opcional porque MIDAS no siempre devuelve datos.</p>
                 <p class="mt-2 text-xs font-semibold text-teal-800" data-autosave-status>Autoguardado activo</p>
             </div>
-            <span class="rounded-full bg-slate-100 px-3 py-1 text-sm font-semibold text-slate-700">Soporte, no decisión</span>
+            <span class="rounded-full bg-teal-50 px-3 py-1 text-sm font-semibold text-teal-800">Manual primero</span>
         </div>
         <?php if ($midasFallbackOpen): ?>
             <div class="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
-                <p class="font-semibold">MIDAS bloqueó la lectura automática desde Hostinger.</p>
-                <p class="mt-1">Usa el respaldo manual: abre MIDAS, busca la referencia <strong><?= e($midasReferenceDigits) ?></strong> y pega abajo la lectura o deja constancia de que no respondió.</p>
+                <p class="font-semibold">MIDAS no permitió lectura automática.</p>
+                <p class="mt-1">Esto es normal. El flujo seguro es manual asistido: abre MIDAS, busca la referencia <strong><?= e($midasReferenceDigits) ?></strong>, copia la lectura como aparece y pégala abajo.</p>
             </div>
         <?php endif; ?>
         <div class="mt-6 grid gap-4 md:grid-cols-3">
@@ -52,26 +52,30 @@
                     placeholder="Ej. 010206780169901">
                 <span class="mt-1 block text-xs font-medium text-amber-700">Solo números, sin guiones ni espacios.</span>
             </label>
-            <label class="label">Referencia larga si MIDAS la devuelve
+            <label class="label">Referencia larga si aparece en MIDAS
                 <input class="input" type="text" name="cadastral_reference_long"
                     value="<?= e($value('cadastral_reference_long')) ?>" inputmode="numeric" maxlength="120"
                     placeholder="Referencia predial nacional">
-                <span class="mt-1 block text-xs font-medium text-slate-500">Campo de respaldo cuando MIDAS informa referencia nacional.</span>
+                <span class="mt-1 block text-xs font-medium text-slate-500">Campo de respaldo cuando MIDAS muestra referencia predial nacional.</span>
             </label>
-            <div class="md:col-span-3 flex flex-wrap gap-2 rounded-xl border border-blue-100 bg-blue-50 p-4">
-                <a class="btn-primary" href="https://midas.cartagena.gov.co/#/home" target="_blank" rel="noopener">Abrir MIDAS en otra pestaña</a>
-                <button class="btn-secondary" type="button" onclick="navigator.clipboard?.writeText('<?= e($midasReferenceDigits) ?>')">Copiar referencia</button>
-                <button class="btn-secondary" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/midas/consultar')) ?>">Intentar automático si responde</button>
+            <div class="md:col-span-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
+                <div class="flex flex-wrap gap-2">
+                    <a class="btn-primary" href="https://midas.cartagena.gov.co/#/home" target="_blank" rel="noopener">Abrir MIDAS en otra pestaña</a>
+                    <button class="btn-secondary" type="button" onclick="navigator.clipboard?.writeText('<?= e($midasReferenceDigits) ?>')">Copiar referencia</button>
+                    <button class="btn-secondary" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/midas/consultar')) ?>">Intentar lectura automática opcional</button>
+                </div>
+                <p class="mt-3 text-xs font-semibold leading-5 text-blue-900">La lectura automática se conserva como posibilidad, pero no es la fuente principal. Si falla o no devuelve datos, no afecta el flujo: copia y pega la lectura de MIDAS abajo.</p>
             </div>
             <div class="md:col-span-3 rounded-2xl border border-teal-100 bg-teal-50 p-4">
                 <div class="grid gap-4 lg:grid-cols-[0.95fr_1.05fr]">
                     <div>
-                        <p class="text-sm font-semibold text-teal-950">Flujo recomendado</p>
+                        <p class="text-sm font-semibold text-teal-950">Flujo principal recomendado</p>
                         <ol class="mt-2 list-decimal space-y-1 pl-5 text-sm leading-6 text-teal-900">
                             <li>Abre MIDAS y busca la referencia copiada.</li>
                             <li>Primero copia la ficha <strong>Predios</strong> completa si está disponible.</li>
                             <li>Luego entra a <strong>Uso del suelo</strong> y copia el cuadro completo: principal, compatible, complementario, restringido y prohibido.</li>
-                            <li>Pega todo abajo y pulsa <strong>Procesar lectura MIDAS pegada</strong>.</li>
+                            <li>No reordenes ni limpies el texto: pégalo como MIDAS lo muestra.</li>
+                            <li>Pega todo abajo y pulsa <strong>Procesar lectura copiada de MIDAS</strong>.</li>
                         </ol>
                     </div>
                     <div class="rounded-xl border border-teal-200 bg-white p-3">
@@ -81,21 +85,21 @@
                 </div>
             </div>
             <div class="md:col-span-3 rounded-2xl border border-slate-200 bg-white p-4">
-                <label class="label">Pega aquí el bloque completo copiado de MIDAS, sin reordenarlo
+                <label class="label">Lectura completa copiada de MIDAS en el mismo orden de pantalla
                     <textarea class="input min-h-52" name="midas_pasted_text" rows="10" maxlength="70000"
-                        placeholder="Pega aquí Predios y/o Uso Suelo tal como MIDAS lo muestra. El sistema intentará separar áreas, uso, tratamiento, principal, compatible, índices y restricciones."><?= e($midasRawTrace) ?></textarea>
+                        placeholder="Pega aquí Predios y/o Uso Suelo tal como MIDAS lo muestra, sin reordenar. El sistema intentará separar áreas, uso, tratamiento, principal, compatible, índices y restricciones."><?= e($midasRawTrace) ?></textarea>
                 </label>
                 <div class="mt-4 flex flex-wrap gap-3">
                     <button class="btn-primary" type="submit" formaction="<?= e(url('avaluos/' . $record['id'] . '/normatividad-urbana/midas/procesar')) ?>">
-                        Procesar lectura MIDAS pegada
+                        Procesar lectura copiada de MIDAS
                     </button>
-                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Si ya pegaste todo en el numeral 3, esta pantalla es solo revisión y complemento.</span>
+                <span class="inline-flex items-center rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-700">Este es el camino principal. Si ya pegaste todo en el numeral 3, aquí queda revisión y complemento.</span>
                 </div>
             </div>
             <input type="hidden" name="source_status" value="<?= e($value('source_status') ?: 'pendiente') ?>">
             <div class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6 text-slate-700">
-                <p class="font-semibold text-slate-950">Resultado de la consulta</p>
-                <p>Marca la consulta, fecha y evidencia. Si MIDAS no responde, deja la constancia en el campo de lectura; la decisión normativa se desarrolla en 5.2 y 5.3.</p>
+                <p class="font-semibold text-slate-950">Resultado guardado de MIDAS</p>
+                <p>Marca fecha y evidencia. Si MIDAS no responde, deja la constancia en el campo de lectura; la decisión normativa se desarrolla en 5.2 y 5.3.</p>
             </div>
             <?php $input('midas_consulted_on', 'Fecha de consulta MIDAS', '', 'date'); ?>
             <?php $input('midas_support_reference', 'Soporte o evidencia', 'Ej. captura, PDF, capa, radicado o nota interna'); ?>
