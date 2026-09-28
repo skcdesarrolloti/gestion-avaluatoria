@@ -53,6 +53,7 @@ $sectorFormId = 'sector-form';
 
 <section class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{
+        midasTab: 'barrio',
         neighborhoods: <?= e($neighborhoodsJson) ?>,
         query: <?= e(json_encode($neighborhoodLabel, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         selectedId: <?= e(json_encode((string) ($subject['neighborhood_id'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
@@ -85,11 +86,11 @@ $sectorFormId = 'sector-form';
     }">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">Banco barrial</p>
-            <h2 class="mt-2 text-2xl font-semibold">Buscar y cargar barrio</h2>
+            <p class="eyebrow">MIDAS · punto de partida</p>
+            <h2 class="mt-2 text-2xl font-semibold">Barrio, predio y capas de soporte</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                Busca el barrio del avalúo. Si ya existe ficha sectorial, se carga completa; si no existe,
-                se prepara una generación inicial para completar y guardar.
+                Primero consulta MIDAS. La lectura por barrio soporta el capítulo 2; la lectura por predio
+                alimenta identificación predial en el 3 y norma urbana en el 5.
             </p>
         </div>
         <?php if ($bankUpdatedAtText): ?>
@@ -98,56 +99,6 @@ $sectorFormId = 'sector-form';
             </span>
         <?php endif; ?>
     </div>
-    <div class="mt-5 grid gap-4 xl:grid-cols-2">
-        <form class="rounded-xl border border-slate-200 bg-slate-50 p-4" method="post" @submit="syncSelection()"
-            action="<?= e(url('avaluos/' . $record['id'] . '/sector/barrio')) ?>">
-            <?= csrf_field() ?>
-            <input type="hidden" name="neighborhood_id" :value="selectedId">
-            <p class="text-xs font-semibold uppercase text-teal-800">Paso 1</p>
-            <label class="label mt-2">Cargar barrio / microsector
-                <input class="input mt-2" type="search" name="neighborhood_query" x-model="query"
-                    @input="selectedId = ''; syncSelection()" @blur="syncSelection()"
-                    placeholder="Busca por nombre del barrio, localidad o comuna">
-                <span class="mt-2 block text-xs font-normal text-slate-500" x-show="query.trim() === ''">
-                    Escribe el barrio o microsector para ver coincidencias.
-                </span>
-                <span class="mt-2 block text-xs font-normal text-emerald-700" x-show="selectedId">
-                    Barrio listo para cargar.
-                </span>
-                <span class="mt-2 block text-xs font-normal text-amber-700" x-show="query.trim() !== '' && !selectedId && filtered.length > 1">
-                    Hay varias coincidencias; selecciona una tarjeta.
-                </span>
-            </label>
-            <button class="btn-primary mt-4 min-h-11" type="submit">1. Cargar ficha del barrio</button>
-            <div class="mt-4 grid gap-2 sm:grid-cols-2" x-show="filtered.length">
-                <template x-for="item in filtered" :key="item.id">
-                    <button type="button" class="min-h-11 rounded-lg border px-3 py-2 text-left text-sm"
-                        @click="choose(item)"
-                        :class="selectedId === item.id ? 'border-blue-700 bg-blue-50 text-blue-900' : 'border-slate-200 bg-white text-slate-700 hover:bg-white'">
-                        <span class="font-semibold" x-text="item.name"></span>
-                        <span class="block text-xs text-slate-500" x-text="[item.locality_name, item.commune_ucg].filter(Boolean).join(' · ')"></span>
-                    </button>
-                </template>
-            </div>
-        </form>
-        <div class="rounded-xl border border-blue-100 bg-blue-50 p-4">
-            <p class="text-xs font-semibold uppercase text-blue-900">Paso 2</p>
-            <h3 class="mt-2 text-lg font-semibold text-slate-900">Entrar al centro MIDAS</h3>
-            <p class="mt-2 text-sm leading-6 text-blue-950">
-                Después de cargar el barrio, usa el centro MIDAS para revisar capas, intentar lectura automática,
-                pegar la lectura completa y alojar descargas del visor.
-            </p>
-            <?php if ($neighborhoodLabel === ''): ?>
-                <button class="btn-secondary mt-4 min-h-11" type="button" disabled>2. Centro MIDAS</button>
-            <?php else: ?>
-                <a class="btn-secondary mt-4 inline-flex min-h-11 items-center" href="#midas-centro">2. Centro MIDAS</a>
-            <?php endif; ?>
-            <p class="mt-3 text-xs font-semibold <?= $neighborhoodLabel === '' ? 'text-amber-700' : 'text-blue-900' ?>">
-                <?= e($neighborhoodLabel === '' ? 'Primero carga un barrio para activar este paso.' : 'Barrio activo: ' . $neighborhoodLabel) ?>
-            </p>
-        </div>
-    </div>
-    <?php require BASE_PATH . '/app/Views/appraisals/sector-neighborhood-history.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/sector-midas-support.php'; ?>
 </section>
 <?php require BASE_PATH . '/app/Views/appraisals/sector-midas-review.php'; ?>

@@ -46,7 +46,7 @@ final class AppraisalSectorMidasController
         } catch (\Throwable $error) {
             Session::flash('sector_midas_file_error', $error->getMessage());
         }
-        Http::redirect('avaluos/' . $id . '/sector#midas-soportes');
+        Http::redirect('avaluos/' . $id . '/sector#midas-centro');
     }
 
     public function supportFile(string $id, string $fileId): never
