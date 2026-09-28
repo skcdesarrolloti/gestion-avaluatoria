@@ -73,30 +73,49 @@ $groupInfoJson = json_encode($groupInfo, JSON_UNESCAPED_UNICODE | JSON_HEX_APOS 
         <span class="rounded-full bg-blue-100 px-3 py-1 text-xs font-bold text-blue-800" x-text="globalLabel()">Resultado global: <?= e($globalLevel) ?></span>
     </div>
 
-    <?php require BASE_PATH . '/app/Views/appraisals/subject-obsolescence-academy.php'; ?>
-
-    <div class="mt-6 grid gap-4 xl:grid-cols-[1fr_1fr]">
-        <label class="label rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-950">Texto editable para el Entregable<textarea class="input mt-2 min-h-36 bg-white" rows="5" name="summary_text" x-model="summaryText" placeholder="Texto profesional de obsolescencias para incorporar al informe"><?= e($summary) ?></textarea><span class="mt-1 block text-xs font-normal text-emerald-800">Este es el texto que se guarda. Puedes usar el sugerido y luego ajustarlo.</span></label>
-        <div class="rounded-xl border border-emerald-100 bg-white p-4 text-sm leading-6 text-slate-700"><div class="flex flex-wrap items-center justify-between gap-3"><p class="font-semibold text-emerald-900">Resultado sugerido para el entregable</p><button type="button" class="rounded-lg bg-emerald-100 px-3 py-2 text-xs font-bold text-emerald-800" @click="summaryText = deliverableText()">Usar este texto</button></div><p class="mt-2 whitespace-pre-wrap" x-text="deliverableText()"><?= e($generated) ?></p></div>
+    <div class="mt-5 grid gap-2 rounded-xl bg-slate-100 p-2 md:grid-cols-3" aria-label="Subsecciones de obsolescencias">
+        <button type="button" class="rounded-lg px-4 py-3 text-left text-sm font-semibold" @click="activeObsPanel='normas'" :class="activeObsPanel === 'normas' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'">
+            <span class="block">Normas y sustento</span><span class="text-xs font-normal">Marco técnico aplicable</span>
+        </button>
+        <button type="button" class="rounded-lg px-4 py-3 text-left text-sm font-semibold" @click="activeObsPanel='calificacion'" :class="activeObsPanel === 'calificacion' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'">
+            <span class="block">Calificación</span><span class="text-xs font-normal">Física, funcional y externa</span>
+        </button>
+        <button type="button" class="rounded-lg px-4 py-3 text-left text-sm font-semibold" @click="activeObsPanel='resultado'" :class="activeObsPanel === 'resultado' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'">
+            <span class="block">Resultado</span><span class="text-xs font-normal" x-text="globalLabel()">Conclusión para informe</span>
+        </button>
     </div>
 
-    <div class="mt-5 rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6">
-        <h3 class="font-semibold text-slate-900">Matriz de control para construir el Entregable</h3>
-        <div class="mt-3 overflow-x-auto"><table class="w-full min-w-[54rem] text-left text-sm"><thead class="text-xs uppercase text-slate-500"><tr><th class="py-2 pr-3">Campo</th><th class="py-2 pr-3">Lectura</th><th class="py-2 pr-3">Estado</th><th class="py-2">Qué hacer</th></tr></thead><tbody class="divide-y divide-slate-100">
-            <tr><td class="py-2 pr-3 font-semibold">Texto editable</td><td class="py-2 pr-3">Texto para informe</td><td class="py-2 pr-3"><?= $pill('ok') ?></td><td class="py-2 text-slate-600">Ajustar con el criterio del analista.</td></tr>
-            <?php foreach ($groups as $groupKey => [$code, $title]): ?>
-                <tr><td class="py-2 pr-3 font-semibold"><?= e($title) ?></td><td class="py-2 pr-3" x-text="groupSummary('<?= e($code) ?>', '<?= e((string) $groupKey) ?>')"><?= e($code . ' · ' . $metrics[(string) $groupKey]['level'] . ' · ' . count($metrics[(string) $groupKey]['findings']) . ' hallazgos') ?></td><td class="py-2 pr-3"><span class="rounded-full px-3 py-1 text-xs font-bold" :class="stateClass('<?= e((string) $groupKey) ?>')" x-text="stateText('<?= e((string) $groupKey) ?>')"><?= e($metrics[(string) $groupKey]['missing'] > 0 ? 'Revisar' : ($metrics[(string) $groupKey]['applicable'] > 0 ? 'Completo' : 'Opcional')) ?></span></td><td class="py-2 text-slate-600" x-text="actionText('<?= e((string) $groupKey) ?>')"><?= e($metrics[(string) $groupKey]['missing'] > 0 ? 'Agregar soporte breve en hallazgos relevantes o críticos.' : ($metrics[(string) $groupKey]['applicable'] > 0 ? 'Listo para lectura.' : 'Pendiente; marque 0 si ya revisó y no encontró hallazgos.')) ?></td></tr>
-            <?php endforeach; ?>
-            <tr><td class="py-2 pr-3 font-semibold">Incidencia económica</td><td class="py-2 pr-3"><?= e($short((string) ($obs['quantification_text'] ?? '')) ?: 'Sin efecto económico definido') ?></td><td class="py-2 pr-3"><?= $pill(trim((string) ($obs['quantification_text'] ?? '')) !== '' ? 'ok' : 'warn') ?></td><td class="py-2 text-slate-600">Definir si no hay efecto material o si se cuantifica aparte.</td></tr>
-        </tbody></table></div>
-    </div>
+    <section x-show="activeObsPanel === 'normas'" x-cloak>
+        <?php require BASE_PATH . '/app/Views/appraisals/subject-obsolescence-academy.php'; ?>
+    </section>
 
-    <div class="mt-5 grid gap-2 rounded-xl bg-slate-100 p-2 lg:grid-cols-3"><?php foreach ($groups as $groupKey => [$code, $title]): ?><button type="button" class="min-h-16 rounded-lg px-4 py-3 text-left text-sm font-semibold" @click="activeObs='<?= e((string) $groupKey) ?>'" :class="activeObs === '<?= e((string) $groupKey) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'"><span class="block"><?= e($code . ' · ' . $title) ?></span><span class="mt-1 inline-flex rounded-full bg-white/80 px-2 py-1 text-xs text-slate-700" x-text="groupTabResult('<?= e((string) $groupKey) ?>')"><?= e($metrics[(string) $groupKey]['level']) ?></span></button><?php endforeach; ?></div>
+    <section x-show="activeObsPanel === 'calificacion'" x-cloak>
+        <div class="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
+            <strong>Ruta de trabajo:</strong> califica cada factor, escribe soporte si el hallazgo es relevante o crítico, y luego pasa a Resultado para revisar la redacción del entregable.
+        </div>
+        <div class="mt-5 grid gap-2 rounded-xl bg-slate-100 p-2 lg:grid-cols-3"><?php foreach ($groups as $groupKey => [$code, $title]): ?><button type="button" class="min-h-16 rounded-lg px-4 py-3 text-left text-sm font-semibold" @click="activeObs='<?= e((string) $groupKey) ?>'" :class="activeObs === '<?= e((string) $groupKey) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70'"><span class="block"><?= e($code . ' · ' . $title) ?></span><span class="mt-1 inline-flex rounded-full bg-white/80 px-2 py-1 text-xs text-slate-700" x-text="groupTabResult('<?= e((string) $groupKey) ?>')"><?= e($metrics[(string) $groupKey]['level']) ?></span></button><?php endforeach; ?></div>
+        <?php foreach ($groups as $groupKey => [$code, $title, $metaLabel, $metaOptions, $items]): ?>
+            <?php require BASE_PATH . '/app/Views/appraisals/subject-obsolescence-group.php'; ?>
+        <?php endforeach; ?>
+    </section>
 
-    <?php foreach ($groups as $groupKey => [$code, $title, $metaLabel, $metaOptions, $items]): ?>
-        <?php require BASE_PATH . '/app/Views/appraisals/subject-obsolescence-group.php'; ?>
-    <?php endforeach; ?>
-
-    <div class="mt-5 grid gap-4 lg:grid-cols-3"><label class="label">Diagnóstico técnico<textarea class="input min-h-20" rows="3" name="diagnosis_text" placeholder="Ejemplo: revisada la condición física, funcional y externa, no se evidencian hallazgos materiales."><?= e((string) ($obs['diagnosis_text'] ?? '')) ?></textarea></label><label class="label">Incidencia económica<textarea class="input min-h-20" rows="3" name="quantification_text" placeholder="Ejemplo: sin efecto material observado; no se aplica descuento por obsolescencia."><?= e((string) ($obs['quantification_text'] ?? '')) ?></textarea></label><label class="label">Fundamento técnico<textarea class="input min-h-20" rows="3" name="normative_text" placeholder="Ejemplo: revisión técnica, visita, soportes documentales, mercado y metodología del informe."><?= e((string) ($obs['normative_text'] ?? '')) ?></textarea></label></div>
-    <div class="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950"><strong>Regla práctica:</strong> si todo está bien, marque los factores revisados como “0 · Sin hallazgo”, use el texto de “si está bien” y deje la incidencia económica como “sin efecto material observado”.</div><div class="mt-6 flex justify-end"><button class="btn-primary" type="submit">Guardar obsolescencias</button></div>
+    <section x-show="activeObsPanel === 'resultado'" x-cloak>
+        <div class="mt-6 grid gap-4 xl:grid-cols-[1fr_1fr]">
+            <label class="label rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-emerald-950">Texto editable para el Entregable<textarea class="input mt-2 min-h-36 bg-white" rows="5" name="summary_text" x-model="summaryText" placeholder="Texto profesional de obsolescencias para incorporar al informe"><?= e($summary) ?></textarea><span class="mt-1 block text-xs font-normal text-emerald-800">Este es el texto que se guarda. Puedes usar el sugerido y luego ajustarlo.</span></label>
+            <div class="rounded-xl border border-emerald-100 bg-white p-4 text-sm leading-6 text-slate-700"><div class="flex flex-wrap items-center justify-between gap-3"><p class="font-semibold text-emerald-900">Resultado sugerido para el entregable</p><button type="button" class="rounded-lg bg-emerald-100 px-3 py-2 text-xs font-bold text-emerald-800" @click="summaryText = deliverableText()">Usar este texto</button></div><p class="mt-2 whitespace-pre-wrap" x-text="deliverableText()"><?= e($generated) ?></p></div>
+        </div>
+        <div class="mt-5 rounded-xl border border-slate-200 bg-white p-4 text-sm leading-6">
+            <h3 class="font-semibold text-slate-900">Matriz de control para construir el Entregable</h3>
+            <div class="mt-3 overflow-x-auto"><table class="w-full min-w-[54rem] text-left text-sm"><thead class="text-xs uppercase text-slate-500"><tr><th class="py-2 pr-3">Campo</th><th class="py-2 pr-3">Lectura</th><th class="py-2 pr-3">Estado</th><th class="py-2">Qué hacer</th></tr></thead><tbody class="divide-y divide-slate-100">
+                <tr><td class="py-2 pr-3 font-semibold">Texto editable</td><td class="py-2 pr-3">Texto para informe</td><td class="py-2 pr-3"><?= $pill('ok') ?></td><td class="py-2 text-slate-600">Ajustar con el criterio del analista.</td></tr>
+                <?php foreach ($groups as $groupKey => [$code, $title]): ?>
+                    <tr><td class="py-2 pr-3 font-semibold"><?= e($title) ?></td><td class="py-2 pr-3" x-text="groupSummary('<?= e($code) ?>', '<?= e((string) $groupKey) ?>')"><?= e($code . ' · ' . $metrics[(string) $groupKey]['level'] . ' · ' . count($metrics[(string) $groupKey]['findings']) . ' hallazgos') ?></td><td class="py-2 pr-3"><span class="rounded-full px-3 py-1 text-xs font-bold" :class="stateClass('<?= e((string) $groupKey) ?>')" x-text="stateText('<?= e((string) $groupKey) ?>')"><?= e($metrics[(string) $groupKey]['missing'] > 0 ? 'Revisar' : ($metrics[(string) $groupKey]['applicable'] > 0 ? 'Completo' : 'Opcional')) ?></span></td><td class="py-2 text-slate-600" x-text="actionText('<?= e((string) $groupKey) ?>')"><?= e($metrics[(string) $groupKey]['missing'] > 0 ? 'Agregar soporte breve en hallazgos relevantes o críticos.' : ($metrics[(string) $groupKey]['applicable'] > 0 ? 'Listo para lectura.' : 'Pendiente; marque 0 si ya revisó y no encontró hallazgos.')) ?></td></tr>
+                <?php endforeach; ?>
+                <tr><td class="py-2 pr-3 font-semibold">Incidencia económica</td><td class="py-2 pr-3"><?= e($short((string) ($obs['quantification_text'] ?? '')) ?: 'Sin efecto económico definido') ?></td><td class="py-2 pr-3"><?= $pill(trim((string) ($obs['quantification_text'] ?? '')) !== '' ? 'ok' : 'warn') ?></td><td class="py-2 text-slate-600">Definir si no hay efecto material o si se cuantifica aparte.</td></tr>
+            </tbody></table></div>
+        </div>
+        <div class="mt-5 grid gap-4 lg:grid-cols-3"><label class="label">Diagnóstico técnico<textarea class="input min-h-20" rows="3" name="diagnosis_text" placeholder="Ejemplo: revisada la condición física, funcional y externa, no se evidencian hallazgos materiales."><?= e((string) ($obs['diagnosis_text'] ?? '')) ?></textarea></label><label class="label">Incidencia económica<textarea class="input min-h-20" rows="3" name="quantification_text" placeholder="Ejemplo: sin efecto material observado; no se aplica descuento por obsolescencia."><?= e((string) ($obs['quantification_text'] ?? '')) ?></textarea></label><label class="label">Fundamento técnico<textarea class="input min-h-20" rows="3" name="normative_text" placeholder="Ejemplo: revisión técnica, visita, soportes documentales, mercado y metodología del informe."><?= e((string) ($obs['normative_text'] ?? '')) ?></textarea></label></div>
+        <div class="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950"><strong>Regla práctica:</strong> si todo está bien, marque los factores revisados como “0 · Sin hallazgo”, use el texto de “si está bien” y deje la incidencia económica como “sin efecto material observado”.</div>
+    </section>
+    <div class="mt-6 flex justify-end"><button class="btn-primary" type="submit">Guardar obsolescencias</button></div>
 </form>

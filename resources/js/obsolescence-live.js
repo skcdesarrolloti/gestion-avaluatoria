@@ -1,6 +1,7 @@
 export function obsolescenceLive() {
   return {
     activeObs: 'fisica',
+    activeObsPanel: 'normas',
     allScores: {},
     allEvidence: {},
     scoreHelp: {},
