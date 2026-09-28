@@ -58,6 +58,7 @@ No debes crear tablas ni pegar sentencias SQL. El programa hace esa parte.
 | `valuation_ifrs_standards` | Catálogo NIIF/NIC y metadatos del PDF privado |
 | `valuation_field_considerations` | Clasificación de campos del expediente como normativos, derivados u operativos |
 | `master_documents` | Fichas documentales subidas desde Maestros, con destino lógico, utilidad, módulos relacionados, PDF privado y respaldo interno |
+| `midas_documents` | Biblioteca global de descargas comunes de MIDAS, con grupo de capa, utilidad, archivo privado y respaldo interno |
 | `valuation_glossary_terms` | Glosario académico de conceptos y factores valuatorios con fuente y carga manual |
 | `appraisal_sector_profile_sections` | Borradores avanzados por sección sectorial dentro de cada avalúo |
 | `urban_norm_documents` | Biblioteca fuente de normatividad urbana para capítulo 5, con metadatos del documento y PDF privado |
@@ -82,6 +83,9 @@ cuando el encargo tenga finalidad financiera, valor razonable, deterioro o revel
 `master_documents` no reemplaza esas bibliotecas: permite alojar documentos faltantes,
 históricos o de soporte académico y registrar desde qué módulos pueden citarse. El
 PDF se guarda una vez y la relación funcional se conserva en metadatos JSON.
+`midas_documents` separa los insumos cartográficos comunes de MIDAS de los soportes
+particulares del avalúo. Los documentos generales se cargan una vez en el menú MIDAS;
+el numeral 2 conserva solo la evidencia específica de barrio, predio o consulta.
 
 Normatividad Urbana queda separada en biblioteca y ficha del avalúo. La biblioteca
 conserva el documento fuente y solo organiza cuadros, categorías, reglas y parámetros

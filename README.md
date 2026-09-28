@@ -15,6 +15,8 @@ completos de InversKC. El proyecto original permanece intacto.
 - Menú separado de Normas Internacionales de Valuación con estructura IVS y PDFs por norma.
 - Menú de Normas NIIF aplicables a medición contable, con PDFs por norma.
 - Catálogo de Tipologías Constructivas IGAC como referencia visual por categoría.
+- Biblioteca MIDAS en menú independiente para cargar descargas comunes de capas y
+  consultarlas sin duplicar soportes por cada avalúo.
 - Biblioteca documental maestra en Maestros para cargar soportes normativos nuevos,
   clasificarlos por destino y relacionarlos con módulos sin duplicar el PDF.
 - Glosario valuatorio con conceptos iniciales NTS M 01 y carga manual de nuevos factores o descripciones.
@@ -89,6 +91,9 @@ Los documentos cargados desde Maestros usan `storage/documentos-maestros/` o
 `MASTER_DOCUMENT_STORAGE_DIR`. Esa biblioteca es una entrada central para documentos
 faltantes o soportes de academia; cada ficha indica destino, vigencia, utilidad, temas
 y módulos que la pueden citar sin guardar copias por módulo.
+La Biblioteca MIDAS usa `storage/biblioteca-midas/` o `MIDAS_LIBRARY_STORAGE_DIR`.
+Guarda PDF, CSV, JSON, GeoJSON o ZIP comunes descargados de MIDAS, detecta duplicados
+por código o nombre de archivo y evita que el numeral 2 duplique documentos generales.
 El numeral 3.5 lee PDF digitales, escaneados y mixtos página por página en el navegador,
 con PDF.js y Tesseract locales, sin clave de IA ni servicios externos. Envía el original
 junto con el texto por página, conserva el resultado en BD y prellena campos vacíos con

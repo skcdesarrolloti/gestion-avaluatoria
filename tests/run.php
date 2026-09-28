@@ -41,6 +41,7 @@ use App\Services\IfrsStandardFileImportService;
 use App\Services\InternationalStandardFileImportService;
 use App\Services\LegalDocumentFileImportService;
 use App\Services\LegalDocumentImportService;
+use App\Services\MidasDocumentUploadService;
 use App\Services\MidasLayerPlan;
 use App\Services\MidasPredioSearch;
 use App\Services\MidasGeometry;
@@ -73,6 +74,7 @@ use App\Models\NeighborhoodSectorRepository;
 use App\Models\AppraisalSectorSectionRepository;
 use App\Models\AppraisalSectorMidasFileRepository;
 use App\Models\SectorBankRepository;
+use App\Models\MidasDocumentRepository;
 use App\Models\ValuationGlossaryRepository;
 use App\Models\ValuationStandardRepository;
 use App\Models\UrbanNormativeRepository;
@@ -254,6 +256,10 @@ try {
         analysis_status TEXT, analysis_message TEXT, file_blob BLOB, created_at TEXT)");
     $db->exec("CREATE TABLE valuation_glossary_terms (slug TEXT PRIMARY KEY, term TEXT, definition TEXT,
         source_note TEXT, created_by INTEGER, sort_order INTEGER, active INTEGER, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE midas_documents (id TEXT PRIMARY KEY, slug TEXT UNIQUE, layer_group TEXT,
+        document_code TEXT UNIQUE, title TEXT, status TEXT, practical_use TEXT, applies_to TEXT,
+        source_filename TEXT UNIQUE, storage_filename TEXT, mime_type TEXT, file_size_bytes INTEGER,
+        file_blob BLOB, created_by TEXT, created_at TEXT, updated_at TEXT)");
     $db->exec("INSERT INTO valuation_glossary_terms VALUES ('valor', 'Valor', 'Precio más probable estimado.', 'NTS M 01', NULL, 10, 1, '2026-09-25 00:00:00', '2026-09-25 00:00:00')");
     $db->exec("CREATE TABLE urban_norm_documents (slug TEXT PRIMARY KEY, title TEXT, document_type TEXT,
         issuer TEXT, jurisdiction TEXT, normative_reference TEXT, issued_on TEXT, status TEXT,
@@ -346,6 +352,42 @@ try {
     expect($manualSlug === 'factor-de-esquina' && $glossary->stats()['total'] === 2
         && str_contains($glossary->all('esquina')[0]['definition'], 'exposición'),
         'glosario valuatorio permite carga manual de factor y descripcion');
+    $midasLibraryDir = sys_get_temp_dir() . '/ga_midas_library_' . bin2hex(random_bytes(4));
+    putenv('MIDAS_LIBRARY_STORAGE_DIR=' . $midasLibraryDir);
+    $tmpMidasLibraryPdf = tempnam(sys_get_temp_dir(), 'ga_midas_lib_');
+    file_put_contents($tmpMidasLibraryPdf, "%PDF-1.4\n%midas biblioteca\n");
+    $midasLibrary = new MidasDocumentRepository($db);
+    $midasDoc = (new MidasDocumentUploadService($midasLibrary))->upload([
+        'layer_group' => 'POT / ordenamiento territorial',
+        'document_code' => 'POT-COMUN-MIDAS',
+        'title' => 'POT común MIDAS',
+        'practical_use' => 'Soporte urbano reutilizable.',
+        'applies_to' => 'Capítulo 2 y numeral 5',
+    ], ['name' => 'pot-comun-midas.pdf', 'tmp_name' => $tmpMidasLibraryPdf,
+        'error' => UPLOAD_ERR_OK], ['name' => 'Analista']);
+    $storedMidasDocs = $midasLibrary->latest();
+    expect(count($storedMidasDocs) === 1 && $storedMidasDocs[0]['id'] === $midasDoc['id']
+        && $storedMidasDocs[0]['has_file'] === true, 'biblioteca MIDAS guarda documento comun');
+    $tmpMidasLibraryDuplicate = tempnam(sys_get_temp_dir(), 'ga_midas_lib_');
+    file_put_contents($tmpMidasLibraryDuplicate, "%PDF-1.4\n%midas duplicado\n");
+    $midasDuplicateRejected = false;
+    try {
+        (new MidasDocumentUploadService($midasLibrary))->upload([
+            'layer_group' => 'POT / ordenamiento territorial',
+            'document_code' => 'POT-COMUN-MIDAS',
+            'title' => 'POT común MIDAS duplicado',
+        ], ['name' => 'pot-comun-midas.pdf', 'tmp_name' => $tmpMidasLibraryDuplicate,
+            'error' => UPLOAD_ERR_OK], ['name' => 'Analista']);
+    } catch (RuntimeException $exception) {
+        $midasDuplicateRejected = str_contains($exception->getMessage(), 'Ya existe');
+    }
+    expect($midasDuplicateRejected, 'biblioteca MIDAS informa ya existe en duplicados');
+    @unlink($tmpMidasLibraryDuplicate);
+    $deletedMidasDoc = $midasLibrary->delete($midasDoc['id']);
+    @unlink((string) $deletedMidasDoc['file_path']);
+    expect($midasLibrary->latest() === [], 'biblioteca MIDAS permite eliminar documento');
+    @rmdir($midasLibraryDir);
+    putenv('MIDAS_LIBRARY_STORAGE_DIR');
     $urbanLibrary = new UrbanNormativeRepository($db);
     expect($urbanLibrary->stats()['categories'] === 1, 'catalogo urbano cuenta categorias normativas');
     $mixtoRules = $urbanLibrary->categoryWithRules('mixto-2');

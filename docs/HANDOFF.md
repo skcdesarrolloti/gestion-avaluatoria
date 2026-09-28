@@ -20,6 +20,8 @@ pertinentes, no como texto completo indiscriminado. Las IVS quedan en menú sepa
 Las NIIF quedan en otro menú independiente para consultas de medición contable.
 La Normatividad Urbana queda modelada como biblioteca y módulo del capítulo 5, iniciada con los cuadros de usos del Decreto 0977 de 2001, y como ficha por avalúo para MIDAS por predial, opción Uso del suelo, concepto, usos, determinantes y soportes.
 Incluye catálogo de Tipologías Constructivas IGAC con imágenes, agrupado por categoría.
+Incluye Biblioteca MIDAS como menú propio junto a IGAC, para alojar descargas comunes
+de capas sin mezclarlas con Maestros ni repetirlas por avalúo.
 Incluye en Maestros una biblioteca documental maestra para subir soportes normativos
 faltantes, clasificarlos por destino lógico y relacionarlos con módulos sin duplicar
 el PDF. Sirve como entrada administrativa previa a integrar una norma a una biblioteca
@@ -153,6 +155,9 @@ Los PDFs de NIIF se cargan desde cada tarjeta NIIF y se guardan en `storage/norm
 Los documentos maestros se cargan desde Maestros y se guardan en
 `storage/documentos-maestros/`, con respaldo interno y metadatos de destino, vigencia,
 utilidad, temas y módulos que los citan.
+Los documentos MIDAS comunes se cargan desde el menú MIDAS y se guardan en
+`storage/biblioteca-midas/`, con respaldo interno, grupo de capa y utilidad práctica.
+Los soportes MIDAS del numeral 2 quedan reservados para evidencias específicas del caso.
 El menú también enumera los campos del expediente y separa soporte normativo directo,
 derivación metodológica y control operativo interno.
 

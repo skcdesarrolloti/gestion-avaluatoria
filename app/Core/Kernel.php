@@ -1,9 +1,9 @@
 <?php
 declare(strict_types=1);
 namespace App\Core;
-use App\Controllers\{AppraisalController, AppraisalLegalController, AppraisalSubjectController, AuthController, DiagnosticController, IgacTypologyController, IfrsStandardController, ValuationGlossaryController, InternationalStandardController, LegalFrameworkController, MaintenanceController, MasterDataController, StandardController, UrbanNormativeLibraryController, ValuationController};
+use App\Controllers\{AppraisalController, AppraisalLegalController, AppraisalSubjectController, AuthController, DiagnosticController, IgacTypologyController, IfrsStandardController, MidasLibraryController, ValuationGlossaryController, InternationalStandardController, LegalFrameworkController, MaintenanceController, MasterDataController, StandardController, UrbanNormativeLibraryController, ValuationController};
 use App\Database\Migrator;
-use App\Models\{AppraisalLegalRepository, AppraisalRepository, AppraisalSectorMidasFileRepository, AppraisalSubjectRepository, AppraiserRepository, FuncionarioRepository, GeoMasterRepository, IgacTypologyRepository, IfrsStandardRepository, InternationalStandardRepository, LegalDocumentRepository, MasterDocumentRepository, ValuationGlossaryRepository, ValuationStandardRepository};
+use App\Models\{AppraisalLegalRepository, AppraisalRepository, AppraisalSectorMidasFileRepository, AppraisalSubjectRepository, AppraiserRepository, FuncionarioRepository, GeoMasterRepository, IgacTypologyRepository, IfrsStandardRepository, InternationalStandardRepository, LegalDocumentRepository, MasterDocumentRepository, MidasDocumentRepository, ValuationGlossaryRepository, ValuationStandardRepository};
 use App\Services\AuthService;
 final class Kernel
 {
@@ -55,11 +55,8 @@ final class Kernel
                     ], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR));
                     Http::redirect($route);
                 }
-                if ($controller === 'masters' && $action === 'createDocument'
-                    && $this->uploadLikelyExceededPostLimit()) {
-                    Session::flash('masters_error', 'La carga superó el límite post_max_size de PHP. Sube un PDF menor o aumenta el límite en el hosting.');
-                    Http::redirect('maestros#biblioteca-documental');
-                }
+                if ($controller === 'masters' && $action === 'createDocument' && $this->uploadLikelyExceededPostLimit()) { Session::flash('masters_error', 'La carga superó el límite post_max_size de PHP. Sube un PDF menor o aumenta el límite en el hosting.'); Http::redirect('maestros#biblioteca-documental'); }
+                if ($controller === 'midas' && $action === 'upload' && $this->uploadLikelyExceededPostLimit()) { Session::flash('midas_error', 'La carga superó el límite post_max_size de PHP. Sube un archivo MIDAS menor o aumenta el límite en el hosting.'); Http::redirect('midas#biblioteca-midas'); }
                 if ($controller === 'subjectPh' && $action === 'upload' && $this->uploadLikelyExceededPostLimit()) { Session::flash('ph_error', 'La carga superó el límite post_max_size de PHP. Sube menos soportes por lote o comprímelos en un ZIP menor.'); Http::redirect('avaluos/' . (string) ($matches[1] ?? '') . '/bien-sujeto#ph'); }
                 try {
                     Session::csrf();
@@ -117,6 +114,7 @@ final class Kernel
                 'ifrs' => new IfrsStandardController(new IfrsStandardRepository($db)),
                 'urbanNorms' => new UrbanNormativeLibraryController(new \App\Models\UrbanNormativeRepository($db)),
                 'typologies' => new IgacTypologyController(new IgacTypologyRepository()),
+                'midas' => new MidasLibraryController(new MidasDocumentRepository($db), $user),
                 'glossary' => new ValuationGlossaryController(new ValuationGlossaryRepository($db), $user),
                 'international' => new InternationalStandardController(new InternationalStandardRepository($db)),
                 'legal' => new LegalFrameworkController(new LegalDocumentRepository($db)),

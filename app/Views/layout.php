@@ -25,6 +25,7 @@ $tabs = [
     ['label' => 'Normas NIIF', 'href' => url('normas-niif'), 'active' => $isActive('/normas-niif')],
     ['label' => 'Normatividad Urbana', 'href' => url('normatividad-urbana'), 'active' => $isActive('/normatividad-urbana')],
     ['label' => 'IGAC', 'href' => url('igac'), 'active' => $isActive('/igac') || $isActive('/tipologias-constructivas-igac')],
+    ['label' => 'MIDAS', 'href' => url('midas'), 'active' => $isActive('/midas')],
     ['label' => 'Glosario valuatorio', 'href' => url('glosario-valuatorio'), 'active' => $isActive('/glosario-valuatorio')],
 ];
 if ($maintenanceEnabled) {
@@ -62,6 +63,7 @@ if ($maintenanceEnabled) {
                     <a class="app-action app-action-teal" href="<?= e(url('normas-niif')) ?>">NIIF</a>
                     <a class="app-action app-action-teal" href="<?= e(url('normatividad-urbana')) ?>">Normatividad urbana</a>
                     <a class="app-action app-action-teal" href="<?= e(url('igac')) ?>">IGAC</a>
+                    <a class="app-action app-action-teal" href="<?= e(url('midas')) ?>">MIDAS</a>
                     <a class="app-action app-action-blue" href="<?= e(url('glosario-valuatorio')) ?>">Glosario</a>
                     <?php if ($maintenanceEnabled): ?>
                         <a class="app-action app-action-blue" href="<?= e(url('mantenimiento/migraciones')) ?>">Migraciones</a>

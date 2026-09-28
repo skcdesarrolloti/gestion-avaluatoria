@@ -19,7 +19,7 @@ $midasTabs = [
     'barrio' => 'Barrio y capas',
     'predio' => 'Predio y uso del suelo',
     'academia' => 'Academia de capas',
-    'descargas' => 'Descargas',
+    'descargas' => 'Soportes del avalúo',
 ];
 ?>
 <div id="midas-centro" class="mt-6">

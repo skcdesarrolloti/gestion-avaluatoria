@@ -26,12 +26,13 @@ $midasLayerHelp = [
 <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="midasTab === 'descargas'">
     <div class="grid gap-4 lg:grid-cols-[0.85fr_1fr]">
         <div class="rounded-xl border border-blue-100 bg-blue-50 p-4">
-            <p class="text-sm font-semibold text-blue-950">Descargas de MIDAS</p>
+            <p class="text-sm font-semibold text-blue-950">Soportes MIDAS del avalúo</p>
             <ol class="mt-3 list-decimal space-y-2 pl-5 text-sm leading-6 text-blue-950">
-                <li>Activa la capa en MIDAS.</li>
-                <li>Entra a Descargas y baja PDF, CSV, JSON, GeoJSON o ZIP.</li>
-                <li>Sube el archivo aquí como soporte del avalúo.</li>
+                <li>Los documentos comunes se guardan una sola vez en Biblioteca MIDAS.</li>
+                <li>Sube aquí solo la evidencia específica del barrio, predio o consulta del caso.</li>
+                <li>Si el soporte ya está en la biblioteca, consúltalo allí y cita su referencia.</li>
             </ol>
+            <a class="btn-secondary mt-4 inline-flex bg-white" href="<?= e(url('midas')) ?>">Ver Biblioteca MIDAS</a>
         </div>
         <form class="grid gap-4 rounded-xl border border-slate-200 bg-slate-50 p-4 md:grid-cols-2"
             method="post" enctype="multipart/form-data"
@@ -48,7 +49,7 @@ $midasLayerHelp = [
                 <span class="mt-1 block text-xs font-normal text-slate-500">Máximo 25 MB.</span>
             </label>
             <label class="label md:col-span-2">Nota de lectura
-                <textarea class="input mt-2 min-h-24" name="notes" placeholder="Ej. Capa de transporte revisada; rutas cercanas al barrio."></textarea>
+                <textarea class="input mt-2 min-h-24" name="notes" placeholder="Ej. Consulta del barrio Bocagrande; capa de transporte revisada para este avalúo."></textarea>
             </label>
             <div class="md:col-span-2 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
                 <p><strong>Contiene:</strong> <span x-text="help[group]?.contiene"></span></p>
