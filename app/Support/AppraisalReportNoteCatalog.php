@@ -73,7 +73,7 @@ final class AppraisalReportNoteCatalog
                 '5'=>'Normatividad urbana',
                 '5.1'=>'Consulta MIDAS y referencia predial',
                 '5.2'=>'Reglamentación del uso del suelo',
-                '5.3'=>'Escenarios POT y mayor y mejor uso',
+                '5.3'=>'Edificabilidad y factibilidad normativa',
                 '5.4'=>'Determinantes, restricciones y conceptos',
                 '5.5'=>'Soportes, archivos y normas',
                 '5.6'=>'Conclusión urbanística adoptada',

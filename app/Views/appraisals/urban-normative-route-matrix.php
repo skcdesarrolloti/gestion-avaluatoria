@@ -13,12 +13,12 @@ $matrixRoutes = $potentialRoutes ?? [];
     <div class="flex flex-wrap items-start justify-between gap-3">
         <div>
             <p class="text-xs font-semibold uppercase text-teal-800">Matriz normativa por uso</p>
-            <h3 class="mt-1 font-semibold text-slate-950">Factores, norma y cálculo en formato de hoja</h3>
+            <h3 class="mt-1 font-semibold text-slate-950">Factores y parámetros normativos en formato de hoja</h3>
             <p class="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
-                Se toma lo que MIDAS dejó como <strong>principal</strong>, <strong>compatible</strong> y <strong>complementario</strong>. Restringido y prohibido quedan como soporte o alerta, no como potencial adoptable.
+                Se toma lo que MIDAS dejó como <strong>principal</strong>, <strong>compatible</strong> y <strong>complementario</strong>. Restringido y prohibido quedan como soporte o alerta. La cabida y los cálculos se dejan para el módulo 8.
             </p>
         </div>
-        <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700" x-text="isLot ? 'Cálculo para lote' : 'Soporte para inmueble construido'"></span>
+        <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700" x-text="isLot ? 'Lectura de edificabilidad' : 'Soporte para inmueble construido'"></span>
     </div>
     <?php if ($matrixRoutes !== []): ?>
         <nav class="mt-4 flex gap-2 overflow-x-auto rounded-lg bg-white p-2" aria-label="Pestañas de matriz normativa">
@@ -39,7 +39,7 @@ $matrixRoutes = $potentialRoutes ?? [];
                         <th class="px-3 py-2">Opción normativa</th>
                         <th class="px-3 py-2">Base exigida</th>
                         <th class="px-3 py-2">Dato del predio</th>
-                        <th class="px-3 py-2">Cálculo</th>
+                        <th class="px-3 py-2">Parámetros</th>
                         <th class="px-3 py-2">Estado</th>
                         <th class="px-3 py-2">Lectura para seleccionar</th>
                     </tr>
@@ -88,22 +88,22 @@ $matrixRoutes = $potentialRoutes ?? [];
                                 <th class="px-3 py-2">Factor</th>
                                 <th class="px-3 py-2">Lo que dice la norma</th>
                                 <th class="px-3 py-2">Dato / revisión</th>
-                                <th class="px-3 py-2">Cálculo o decisión</th>
+                                <th class="px-3 py-2">Alcance en numeral 5</th>
                             </tr>
                         </thead>
                         <tbody class="divide-y divide-slate-100">
                             <template x-for="row in currentRouteOptions(route)" :key="row.key">
                                 <template x-for="factor in [
                                     ['Opción del cuadro', row.rule.label, row.route.table, typeLabel(row.route.type)],
-                                    ['Área mínima de lote', row.rule.min_area_m2 ? row.rule.min_area_m2 + ' m²' : 'No expresa cálculo automático', land || 'Pendiente', routeStatus(row)],
-                                    ['Frente mínimo', row.rule.min_front_m ? row.rule.min_front_m + ' m' : 'No expresa cálculo automático', front || 'Pendiente', routeStatus(row)],
-                                    ['Retiros y huella', row.rule.isolation || row.rule.free_area || 'Manual según cuadro', isLot ? (fmt(geometryFootprint()) || 'Pendiente') + ' m²' : 'No obligatorio', 'Huella = (frente - laterales) x (fondo - frontal - posterior)'],
-                                    ['Índice de ocupación', row.rule.occupancy_index ? row.rule.occupancy_index : 'Calculado desde huella si no viene expreso', isLot ? (fmt(routeOccupation(row)) || 'Pendiente') : 'No obligatorio', 'IO = huella ocupable / área de terreno'],
-                                    ['Índice de construcción', row.rule.construction_index || 'Cabida o revisión manual', ci || 'Pendiente', isLot ? (fmt(routeMaxBuild(row)) || 'Pendiente') + ' m² construibles' : 'No obligatorio'],
-                                    ['Altura', row.rule.height || 'Manual', floors || 'Pendiente', 'Revisar si depende de vía, frente o autoridad'],
-                                    ['Área libre', row.rule.free_area || 'Manual', netArea() ? fmt(netArea()) + ' m² base neta' : 'Pendiente', 'Afecta ocupación y cabida'],
-                                    ['Aislamientos', row.rule.isolation || 'Manual', 'Ver soporte MIDAS/POT', 'Puede limitar el cálculo'],
-                                    ['Estacionamientos', row.rule.parking || 'Manual', 'Ver producto y áreas', 'Puede cambiar área útil/vendible'],
+                                    ['Área mínima de lote', row.rule.min_area_m2 ? row.rule.min_area_m2 + ' m²' : 'No expresa mínimo automático', land || 'Pendiente', routeStatus(row)],
+                                    ['Frente mínimo', row.rule.min_front_m ? row.rule.min_front_m + ' m' : 'No expresa mínimo automático', front || 'Pendiente', routeStatus(row)],
+                                    ['Retiros, aislamientos y área libre', row.rule.isolation || row.rule.free_area || 'Manual según cuadro', 'Ver soporte MIDAS/POT', 'Condición de edificabilidad; cálculo en módulo 8'],
+                                    ['Índice de ocupación', row.rule.occupancy_index || 'No expresa índice directo', occ || 'Pendiente/manual', 'Dato normativo; no se calcula aquí'],
+                                    ['Índice de construcción', row.rule.construction_index || 'No expresa índice directo', ci || 'Pendiente/manual', 'Dato normativo; cabida en módulo 8'],
+                                    ['Altura', row.rule.height || 'Manual', floors || 'Pendiente/manual', 'Revisar si depende de vía, frente o autoridad'],
+                                    ['Área libre', row.rule.free_area || 'Manual', 'Ver soporte MIDAS/POT', 'Condición descriptiva de ocupación'],
+                                    ['Aislamientos', row.rule.isolation || 'Manual', 'Ver soporte MIDAS/POT', 'Puede limitar la factibilidad'],
+                                    ['Estacionamientos', row.rule.parking || 'Manual', 'Ver producto y áreas', 'Puede incidir en cabida del módulo 8'],
                                     ['Decisión de selección', routeStatus(row), typeLabel(row.route.type), routeSelectionText(row)],
                                     ['Alcance y salvedad', row.rule.scope || 'Sin nota adicional', 'Criterio del analista', 'Documentar si falta soporte']
                                 ]">

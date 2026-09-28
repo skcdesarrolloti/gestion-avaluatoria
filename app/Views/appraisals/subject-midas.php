@@ -100,7 +100,7 @@ $renderMidas = static function (string $key, array $meta) use ($sv, $fieldHelp):
                     1. Actualizando numeral 3: identificación predial, áreas y trazabilidad.
                 </li>
                 <li :class="['urban','done'].includes(step) ? 'font-semibold text-teal-800' : ''">
-                    2. Actualizando numeral 5: usos, reglamentación, índices y potencial normativo.
+                    2. Actualizando numeral 5: usos, reglamentación y parámetros de edificabilidad.
                 </li>
                 <li :class="step === 'done' ? 'font-semibold text-teal-800' : ''">
                     3. Registrando datos no actualizados para decisión del analista.

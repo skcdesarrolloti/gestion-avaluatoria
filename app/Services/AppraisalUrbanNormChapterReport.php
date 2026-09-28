@@ -17,7 +17,7 @@ final class AppraisalUrbanNormChapterReport
                 $this->line('Fecha de consulta', $profile['midas_consulted_on'] ?? ''),
                 $this->line('Resultado leído en MIDAS', $profile['midas_usage_result'] ?? ($profile['midas_result'] ?? '')),
             ])],
-            ['5.2 Reglamentación de usos, índices y potencial cuando aplica', $this->paragraph([
+            ['5.2 Reglamentación de usos y parámetros de edificabilidad', $this->paragraph([
                 $this->line('Cuadro o fuente aplicada', $profile['use_regulation_table'] ?? ''),
                 $this->line('Uso principal', $profile['use_principal_text'] ?? ''),
                 $this->line('Uso compatible', $profile['use_compatible_text'] ?? ''),
@@ -36,18 +36,14 @@ final class AppraisalUrbanNormChapterReport
                 $this->line('Índice de ocupación', $profile['occupancy_index'] ?? ''),
                 $this->line('Altura máxima pisos', $profile['max_floors'] ?? ''),
                 $this->line('Índice de construcción', $profile['construction_index'] ?? ''),
-                $this->line('Área máxima construible m²', $profile['normative_max_built_area_m2'] ?? ''),
-                $this->line('Área construida actual m²', $profile['actual_built_area_m2'] ?? ''),
-                $this->line('Potencial adicional m²', $profile['buildable_difference_m2'] ?? ''),
-                $this->line('Área vendible de referencia m²', $profile['sellable_area_m2'] ?? ''),
-                $this->line('Cumplimiento básico área/frente/índice', $profile['normative_compliance_summary'] ?? ''),
+                $this->line('Cumplimiento básico área/frente/parámetros', $profile['normative_compliance_summary'] ?? ''),
                 $this->line('Condición física que incide', $profile['norm_physical_base_text'] ?? ''),
-                $this->line('Conclusión valuatoria del potencial normativo', $profile['constructive_potential_status'] ?? ''),
-                $this->line('Conclusión pericial del potencial', $profile['constructive_potential_notes'] ?? ''),
+                $this->line('Conclusión urbanística de factibilidad', $profile['constructive_potential_status'] ?? ''),
+                $this->line('Conclusión pericial de factibilidad', $profile['constructive_potential_notes'] ?? ''),
             ])],
-            ['5.3 Escenarios POT y mayor y mejor uso', $this->paragraph([
+            ['5.3 Edificabilidad y factibilidad normativa', $this->paragraph([
                 $this->line('Vía normativa adoptada', $profile['adopted_normative_route_label'] ?? ''),
-                $this->line('Justificación de mayor y mejor uso', $profile['highest_best_use_reason'] ?? ''),
+                $this->line('Lectura pericial de factibilidad normativa', $profile['highest_best_use_reason'] ?? ''),
                 $this->scenarioSummary($profile),
                 $this->line('Uso actual identificado', $profile['current_use'] ?? ''),
                 $this->line('Uso pretendido', $profile['intended_use'] ?? ''),
@@ -84,12 +80,11 @@ final class AppraisalUrbanNormChapterReport
         if ($enabled === []) return '';
         $labels = array_map(function (array $row): string {
             $parts = [trim($row['label'] . ' (' . $row['result'] . ')')];
-            if ($this->text($row['max_built_area_m2'] ?? '') !== '') $parts[] = 'máx. ' . $row['max_built_area_m2'] . ' m²';
-            if ($this->text($row['potential_area_m2'] ?? '') !== '') $parts[] = 'potencial ' . $row['potential_area_m2'] . ' m²';
             if ($this->text($row['feasibility'] ?? '') !== '') $parts[] = 'estado ' . $row['feasibility'];
+            if ($this->text($row['parameters_summary'] ?? '') !== '') $parts[] = 'parámetros ' . $row['parameters_summary'];
             return implode(', ', $parts);
         }, $enabled);
-        return 'Escenarios evaluados: ' . implode('; ', $labels) . '.';
+        return 'Opciones normativas documentadas: ' . implode('; ', $labels) . '.';
     }
 
     private function paragraph(array $parts): string

@@ -75,11 +75,11 @@
     },
     routeSelectionText(row) {
         const label=this.typeLabel(row.route.type) + ' · ' + row.route.label + ' · ' + row.rule.label;
-        const status=this.routeStatus(row), max=this.fmt(this.routeMaxBuild(row)), pot=this.fmt(this.routePotential(row));
-        if (status === 'No cumple') return 'No cumple: no se adopta como potencial constructivo porque ' + this.routeFailures(row).join(' y ') + '. Puede quedar solo como soporte u observación.';
-        if (status === 'Cumple' && row.route.type === 'complementario') return 'Cumple base como uso complementario: puede revisarse como escenario preliminar, con construible ' + (max || 'pendiente') + ' m² y potencial ' + (pot || 'pendiente') + ' m². Requiere justificar que el complementario incide en el mayor y mejor uso.';
-        if (status === 'Cumple') return 'Cumple: puede seleccionarse como escenario de potencial constructivo para ' + label + ', con construible ' + (max || 'pendiente') + ' m² y potencial ' + (pot || 'pendiente') + ' m², sujeto a observaciones de norma, mercado y soporte.';
-        return status + ': no debe seleccionarse sin completar soporte. Revise mínimos, índice, altura, retiros y concepto aplicable.';
+        const status=this.routeStatus(row);
+        if (status === 'No cumple') return 'No cumple: la factibilidad normativa queda limitada porque ' + this.routeFailures(row).join(' y ') + '. Puede dejarse como soporte u observación, sin trasladarlo como edificabilidad factible.';
+        if (status === 'Cumple' && row.route.type === 'complementario') return 'Cumple base como uso complementario: puede documentarse como alternativa factible, siempre justificando que el complementario tiene incidencia real en el predio.';
+        if (status === 'Cumple') return 'Cumple base: puede documentarse como factibilidad normativa para ' + label + ', sujeto a revisión de aislamientos, altura, retiros, afectaciones y concepto aplicable.';
+        return status + ': no debe cerrarse sin completar soporte. Revise mínimos, índice, altura, retiros, afectaciones y concepto aplicable.';
     },
     routeBaseArea() { return this.netArea() ?? this.number(this.land) },
     routeIndex(row) { return this.number(row.rule.construction_index) ?? this.buildIndex() },
@@ -88,13 +88,11 @@
     routeOccupation(row) { const occ=this.number(row.rule.occupancy_index); if (occ !== null) return occ; const index=this.number(row.rule.construction_index), floors=this.number(this.floors); if (index !== null && floors !== null && floors !== 0) return index / floors; return this.occupancyRatio() },
     routeOccupationArea(row) { const base=this.routeBaseArea(), occ=this.routeOccupation(row); if (base !== null && occ !== null) return base * occ; return this.occupancyArea() },
     routeCalcSummary(row) {
-        const max=this.fmt(this.routeMaxBuild(row)), occ=this.fmt(this.routeOccupationArea(row)), io=this.fmt(this.routeOccupation(row)), pot=this.fmt(this.routePotential(row));
-        return 'Huella: ' + (occ || 'manual') + ' m² · IO: ' + (io || 'manual') + ' · Construible: ' + (max || 'manual') + ' m² · Potencial: ' + (pot || 'manual') + ' m²';
+        const io=this.fmt(this.routeOccupation(row));
+        return 'Parámetros: ocupación ' + (row.rule.occupancy_index || io || 'manual') + ' · IC ' + (row.rule.construction_index || 'manual') + ' · altura ' + (row.rule.height || 'manual') + ' · retiros/área libre según cuadro';
     },
     chk(actual, min, label, unit) { if (!min) return label + ': sin mínimo cargado'; if (actual === null) return label + ': falta dato para comparar con mínimo ' + min + ' ' + unit; return actual >= min ? label + ': cumple ' + actual + ' ' + unit + ' ≥ ' + min + ' ' + unit : label + ': no cumple ' + actual + ' ' + unit + ' < ' + min + ' ' + unit },
-    compliance() { const r=this.req(); if (!r) return 'Selecciona una ruta residencial y modalidad para revisar área, frente e índice.'; return [this.chk(this.number(this.land), r.min_area_m2, 'Área del lote', 'm²'), this.chk(this.number(this.front), r.min_front_m, 'Frente del lote', 'm'), 'Índice de construcción de apoyo: ' + r.construction_index, 'Altura: ' + r.height, 'Área libre: ' + r.free_area, 'Estacionamientos: ' + r.parking].join('\n') },
-    optMax(r) { const base = this.netArea(); return base === null ? null : base * Number(r.construction_index || 0) },
-    optPot(r) { const max = this.optMax(r), actual = this.number(this.actual); return max === null || actual === null ? null : Math.max(0, max - actual) },
+    compliance() { const r=this.req(); if (!r) return 'Selecciona una ruta residencial y modalidad para revisar área, frente y parámetros normativos.'; return [this.chk(this.number(this.land), r.min_area_m2, 'Área del lote', 'm²'), this.chk(this.number(this.front), r.min_front_m, 'Frente del lote', 'm'), 'Índice normativo informado: ' + r.construction_index, 'Altura: ' + r.height, 'Área libre: ' + r.free_area, 'Estacionamientos: ' + r.parking].join('\n') },
     optStatus(r) { const area=this.number(this.land), front=this.number(this.front); if (area===null || front===null) return 'Falta dato'; return area >= r.min_area_m2 && front >= r.min_front_m ? 'Cumple base' : 'No cumple base' },
     optClass(r) { const s=this.optStatus(r); return s === 'Cumple base' ? 'bg-emerald-50 text-emerald-800' : (s === 'No cumple base' ? 'bg-red-50 text-red-700' : 'bg-amber-50 text-amber-800') },
     adoptMode(mode, r) { this.modality = mode; this.ci = String(r.construction_index); this.maxBuilt = ''; this.complianceSummary = this.compliance(); this.usePane = 'indices' },

@@ -1,5 +1,5 @@
         <div x-show="usePane === 'decision'" class="mt-6 grid gap-4 md:grid-cols-2">
-            <div class="md:col-span-2 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm leading-6 text-amber-950"><strong>Uso simple:</strong> escoge la vía normativa. Si es residencial, abajo aparece el cuadro de opciones constructivas para decidir con área, frente e índice.</div>
+            <div class="md:col-span-2 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm leading-6 text-amber-950"><strong>Uso simple:</strong> escoge la vía normativa. Si es residencial, abajo aparece el cuadro de opciones para revisar área, frente y parámetros de edificabilidad.</div>
             <label class="label md:col-span-2">Vía normativa a probar <?= $urbanUseTip('Es la ruta POT que se quiere probar; puede diferir de la tipología física.') ?>
                 <select class="input" name="category_slug" x-model="categorySlug"><option value="">Selecciona la ruta: residencial, institucional, comercial, industrial, turística, portuaria o mixta</option>
                     <?php foreach (($urbanRouteGroups ?? $urbanCategoryGroups ?? []) as $groupLabel => $cats): ?>
@@ -8,15 +8,15 @@
                         </optgroup>
                     <?php endforeach; ?>
                 </select>
-                <span class="mt-1 block text-xs font-medium text-slate-500">Puede diferir del uso actual si es legal, físicamente posible y aporta más valor.</span>
+                <span class="mt-1 block text-xs font-medium text-slate-500">Puede diferir del uso actual si es legal y físicamente posible. La valoración económica se desarrolla fuera de este numeral.</span>
             </label>
             <div class="md:col-span-2 overflow-x-auto rounded-xl border border-slate-200" x-show="residential[categorySlug]">
                 <table class="min-w-full divide-y divide-slate-200 text-sm">
-                    <thead class="bg-slate-50 text-left text-xs uppercase text-slate-600"><tr><th class="px-3 py-2">Opción</th><th class="px-3 py-2">Área mín.</th><th class="px-3 py-2">Frente mín.</th><th class="px-3 py-2">Cumple</th><th class="px-3 py-2">Índice</th><th class="px-3 py-2">Máx.</th><th class="px-3 py-2">Potencial</th><th class="px-3 py-2">Acción</th></tr></thead>
-                    <tbody class="divide-y divide-slate-100 bg-white"><template x-for="(rule, mode) in residential[categorySlug]?.data || {}" :key="mode"><tr><td class="px-3 py-2 font-semibold" x-text="rule.label"></td><td class="px-3 py-2" x-text="rule.min_area_m2 + ' m²'"></td><td class="px-3 py-2" x-text="rule.min_front_m + ' m'"></td><td class="px-3 py-2"><span class="rounded-full px-2 py-1 text-xs font-semibold" :class="optClass(rule)" x-text="optStatus(rule)"></span></td><td class="px-3 py-2" x-text="rule.construction_index"></td><td class="px-3 py-2" x-text="fmt(optMax(rule))"></td><td class="px-3 py-2 font-semibold text-teal-800" x-text="fmt(optPot(rule))"></td><td class="px-3 py-2"><button class="btn-secondary" type="button" @click="adoptMode(mode, rule)">Usar</button></td></tr></template></tbody>
+                    <thead class="bg-slate-50 text-left text-xs uppercase text-slate-600"><tr><th class="px-3 py-2">Opción</th><th class="px-3 py-2">Área mín.</th><th class="px-3 py-2">Frente mín.</th><th class="px-3 py-2">Cumple</th><th class="px-3 py-2">Índice</th><th class="px-3 py-2">Altura</th><th class="px-3 py-2">Área libre</th><th class="px-3 py-2">Acción</th></tr></thead>
+                    <tbody class="divide-y divide-slate-100 bg-white"><template x-for="(rule, mode) in residential[categorySlug]?.data || {}" :key="mode"><tr><td class="px-3 py-2 font-semibold" x-text="rule.label"></td><td class="px-3 py-2" x-text="rule.min_area_m2 + ' m²'"></td><td class="px-3 py-2" x-text="rule.min_front_m + ' m'"></td><td class="px-3 py-2"><span class="rounded-full px-2 py-1 text-xs font-semibold" :class="optClass(rule)" x-text="optStatus(rule)"></span></td><td class="px-3 py-2" x-text="rule.construction_index || 'Manual'"></td><td class="px-3 py-2" x-text="rule.height || 'Manual'"></td><td class="px-3 py-2" x-text="rule.free_area || 'Manual'"></td><td class="px-3 py-2"><button class="btn-secondary" type="button" @click="adoptMode(mode, rule)">Usar</button></td></tr></template></tbody>
                 </table>
             </div>
-            <p class="md:col-span-2 rounded-xl bg-slate-50 p-3 text-sm text-slate-700" x-show="categorySlug && !residential[categorySlug]">Esta ruta aún no tiene índices estructurados para cálculo automático. Déjala como soporte normativo y registra el análisis manual o concepto oficial.</p>
+            <p class="md:col-span-2 rounded-xl bg-slate-50 p-3 text-sm text-slate-700" x-show="categorySlug && !residential[categorySlug]">Esta ruta aún no tiene parámetros estructurados para lectura automática. Déjala como soporte normativo y registra el análisis manual o concepto oficial.</p>
             <label class="label">Resultado de la ruta <?= $urbanUseTip('Sale del cuadro o concepto y sustenta si la vía se usa o descarta.') ?>
                 <select class="input" name="use_cross_result">
                     <?php foreach ($useResults as $key => $label): ?><option value="<?= e($key) ?>" <?= e($selected('use_cross_result', (string) $key)) ?>><?= e($label) ?></option><?php endforeach; ?>

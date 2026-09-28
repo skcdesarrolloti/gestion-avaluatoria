@@ -34,7 +34,7 @@ $input = static function (string $name, string $label, string $placeholder = '',
 }">
 <nav class="rounded-xl bg-slate-200/70 p-2" aria-label="Submenú normatividad urbana">
     <div class="flex gap-2 overflow-x-auto">
-        <?php foreach ([['midas','5.1 MIDAS'],['uso','5.2 Uso del suelo'],['escenarios','5.3 Escenarios POT'],['determinantes','5.4 Determinantes'],['fuentes','5.5 Soportes'],['cierre','5.6 Cierre']] as [$key, $label]): ?>
+        <?php foreach ([['midas','5.1 MIDAS'],['uso','5.2 Uso del suelo'],['escenarios','5.3 Edificabilidad'],['determinantes','5.4 Determinantes'],['fuentes','5.5 Soportes'],['cierre','5.6 Cierre']] as [$key, $label]): ?>
             <button class="inline-flex min-h-11 shrink-0 items-center rounded-lg px-4 py-2 text-sm font-semibold"
                 :class="tab === '<?= e($key) ?>' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:bg-blue-50'"
                 type="button" @click="tab = '<?= e($key) ?>'; history.replaceState(null, '', '#<?= e($key) ?>')"><?= e($label) ?></button>

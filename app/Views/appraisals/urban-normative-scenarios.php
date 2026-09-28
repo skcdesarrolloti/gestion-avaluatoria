@@ -29,19 +29,15 @@ $scenarioInitial = static fn (string $key): string => e(json_encode((string) ($p
             return out;
         },
         hasRows() { return this.rows().length > 0 },
-        canCalculate(row) { return this.n(row.rule.construction_index) !== null },
-        maxBuild(row) { const base = this.baseArea(), index = this.n(row.rule.construction_index); return base === null || index === null ? null : base * index },
-        potential(row) { const max = this.maxBuild(row), actual = this.n(this.actual); return max === null || actual === null ? null : Math.max(0, max - actual) },
-        sellable(row) { const max = this.maxBuild(row), factor = this.n(this.factor); return max === null || factor === null ? null : max * factor },
         areaOk(row) { const min = this.n(row.rule.min_area_m2), land = this.n(this.land); if (min === null) return null; return land === null ? undefined : land >= min },
         frontOk(row) { const min = this.n(row.rule.min_front_m), front = this.n(this.front); if (min === null) return null; return front === null ? undefined : front >= min },
         rowStatus(row) {
-            if (!this.canCalculate(row)) return 'Condicionado';
             const a=this.areaOk(row), f=this.frontOk(row);
             if (a === undefined || f === undefined) return 'Falta dato';
-            return (a !== false && f !== false) ? 'Cumple' : 'No cumple';
+            if (a === null && f === null) return 'Revisión normativa';
+            return (a !== false && f !== false) ? 'Cumple base' : 'No cumple';
         },
-        rowClass(row) { const s=this.rowStatus(row); return s === 'Cumple' ? 'bg-emerald-50 text-emerald-800' : (s === 'No cumple' ? 'bg-red-50 text-red-700' : (s === 'Condicionado' ? 'bg-blue-50 text-blue-800' : 'bg-amber-50 text-amber-800')) },
+        rowClass(row) { const s=this.rowStatus(row); return s === 'Cumple base' ? 'bg-emerald-50 text-emerald-800' : (s === 'No cumple' ? 'bg-red-50 text-red-700' : (s === 'Revisión normativa' ? 'bg-blue-50 text-blue-800' : 'bg-amber-50 text-amber-800')) },
         rowFailures(row) {
             const fails=[], area=this.n(this.land), front=this.n(this.front), minArea=this.n(row.rule.min_area_m2), minFront=this.n(row.rule.min_front_m);
             if (minArea !== null && area !== null && area < minArea) fails.push('área mínima ' + minArea + ' m², predio ' + this.f(area) + ' m²');
@@ -51,32 +47,32 @@ $scenarioInitial = static fn (string $key): string => e(json_encode((string) ($p
         adopt(row) {
             this.adopted = row.route.type + ':' + row.route.slug + ':' + row.key;
             this.adoptedLabel = this.typeLabel(row.route.type) + ' · ' + row.route.label + ' · ' + row.rule.label;
-            const status = this.rowStatus(row), max = this.f(this.maxBuild(row)), pot = this.f(this.potential(row));
-            const extra = row.route.type === 'complementario' ? ' Al tratarse de uso complementario, su adopcion exige justificar incidencia real en el mayor y mejor uso.' : '';
-            const base = 'Se revisa ' + this.adoptedLabel + ' (' + row.route.table + '). AML ' + (row.rule.min_area_m2 || 'condicionado') + ', frente ' + (row.rule.min_front_m || 'condicionado') + ', indice ' + (row.rule.construction_index || 'pendiente de cabida') + '. Maximo construible orientativo: ' + (max || 'pendiente') + ' m²; potencial frente a construccion actual: ' + (pot || 'pendiente') + ' m². Area libre / condicion: ' + (row.rule.free_area || 'sin nota') + '.' + extra;
-            this.reason = status === 'No cumple' ? 'No cumple. No se adopta como potencial constructivo porque ' + (this.rowFailures(row) || 'no supera la base normativa') + '. ' + base : status + '. ' + base;
+            const status = this.rowStatus(row);
+            const extra = row.route.type === 'complementario' ? ' Al tratarse de uso complementario, exige justificar su relación funcional con el uso principal y con la factibilidad del predio.' : '';
+            const base = 'Se documenta ' + this.adoptedLabel + ' (' + row.route.table + '). AML ' + (row.rule.min_area_m2 || 'condicionado') + ', frente ' + (row.rule.min_front_m || 'condicionado') + ', indice/edificabilidad ' + (row.rule.construction_index || 'pendiente o no expreso') + ', altura ' + (row.rule.height || 'segun cuadro o concepto') + ', area libre/condicion: ' + (row.rule.free_area || 'sin nota') + '.' + extra;
+            this.reason = status === 'No cumple' ? 'No cumple la base normativa porque ' + (this.rowFailures(row) || 'no supera la revisión mínima') + '. ' + base + ' La cuantificación, si procede, se desarrolla en el módulo 8.' : status + '. ' + base + ' La cuantificación, si procede, se desarrolla en el módulo 8.';
         },
-        missing() { const m=[]; if (this.n(this.land)===null) m.push('area de terreno'); if (this.n(this.front)===null) m.push('frente'); if (this.n(this.actual)===null) m.push('construccion actual'); return m.join(', ') }
+        missing() { const m=[]; if (this.n(this.land)===null) m.push('area de terreno'); if (this.n(this.front)===null) m.push('frente'); return m.join(', ') }
     }">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">Mayor y mejor uso</p>
-            <h2 class="mt-2 text-2xl font-semibold">Matriz POT por principal, compatible y complementario</h2>
-            <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">La matriz toma los usos <strong>principal</strong>, <strong>compatible</strong> y <strong>complementario</strong> cargados desde MIDAS o el cuadro POT. Restringidos y prohibidos quedan como soporte o alerta, no como potencial adoptable.</p>
+            <p class="eyebrow">Edificabilidad normativa</p>
+            <h2 class="mt-2 text-2xl font-semibold">Factibilidad POT por principal, compatible y complementario</h2>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">La matriz toma los usos <strong>principal</strong>, <strong>compatible</strong> y <strong>complementario</strong> cargados desde MIDAS o el cuadro POT. Aquí solo se documenta factibilidad urbanística; la cuantificación se desarrolla en el módulo 8.</p>
         </div>
         <span class="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-800">Decreto 0977 de 2001</span>
     </div>
     <div class="mt-6 grid gap-3 md:grid-cols-4">
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-xs font-semibold uppercase text-slate-600">Área terreno</p><p class="mt-1 text-xl font-semibold" x-text="land || 'Pendiente'"></p></div>
-        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-xs font-semibold uppercase text-slate-600">Área base cálculo</p><p class="mt-1 text-xl font-semibold" x-text="f(baseArea()) || 'Pendiente'"></p></div>
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-xs font-semibold uppercase text-slate-600">Área normativa base</p><p class="mt-1 text-xl font-semibold" x-text="f(baseArea()) || 'Pendiente'"></p></div>
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-xs font-semibold uppercase text-slate-600">Frente</p><p class="mt-1 text-xl font-semibold" x-text="front || 'Pendiente'"></p></div>
-        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-xs font-semibold uppercase text-slate-600">Construcción actual</p><p class="mt-1 text-xl font-semibold" x-text="actual || 'Pendiente'"></p></div>
+        <div class="rounded-xl border border-slate-200 bg-slate-50 p-4"><p class="text-xs font-semibold uppercase text-slate-600">Alcance</p><p class="mt-1 text-sm font-semibold leading-6">Sin cálculo de cabida</p></div>
     </div>
     <p class="mt-3 rounded-xl bg-amber-50 p-3 text-sm text-amber-900" x-show="missing()">Para que la matriz cierre falta: <strong x-text="missing()"></strong>. Corrige esos datos en el módulo 3.</p>
     <div class="mt-6 overflow-x-auto rounded-xl border border-slate-200" x-show="hasRows()">
         <table class="min-w-full divide-y divide-slate-200 text-sm">
             <thead class="bg-slate-50 text-left text-xs uppercase text-slate-600">
-                <tr><th class="px-3 py-2">Uso</th><th class="px-3 py-2">Cuadro / opción</th><th class="px-3 py-2">Área mínima</th><th class="px-3 py-2">Frente</th><th class="px-3 py-2">Cumple</th><th class="px-3 py-2">Índice</th><th class="px-3 py-2">Altura / área libre</th><th class="px-3 py-2">Máx. construible</th><th class="px-3 py-2">Potencial</th><th class="px-3 py-2">Área vendible ref.</th><th class="px-3 py-2">Acción</th></tr>
+                <tr><th class="px-3 py-2">Uso</th><th class="px-3 py-2">Cuadro / opción</th><th class="px-3 py-2">Área mínima</th><th class="px-3 py-2">Frente</th><th class="px-3 py-2">Lectura</th><th class="px-3 py-2">Índice / ocupación</th><th class="px-3 py-2">Altura / área libre</th><th class="px-3 py-2">Aislamientos</th><th class="px-3 py-2">Estacionamientos</th><th class="px-3 py-2">Acción</th></tr>
             </thead>
             <tbody class="divide-y divide-slate-100 bg-white">
                 <template x-for="row in rows()" :key="row.route.type + '-' + row.route.slug + '-' + row.key">
@@ -86,12 +82,11 @@ $scenarioInitial = static fn (string $key): string => e(json_encode((string) ($p
                         <td class="px-3 py-2" x-text="row.rule.min_area_m2 ? row.rule.min_area_m2 + ' m²' : 'Condicionado'"></td>
                         <td class="px-3 py-2" x-text="row.rule.min_front_m ? row.rule.min_front_m + ' m' : 'Condicionado'"></td>
                         <td class="px-3 py-2"><span class="rounded-full px-2 py-1 text-xs font-semibold" :class="rowClass(row)" x-text="rowStatus(row)"></span></td>
-                        <td class="px-3 py-2" x-text="row.rule.construction_index || 'Cabida'"></td>
+                        <td class="px-3 py-2" x-text="row.rule.construction_index || row.rule.occupancy_index || 'Manual / no expreso'"></td>
                         <td class="px-3 py-2 max-w-xs text-xs leading-5 text-slate-700"><span x-text="row.rule.height || ''"></span><br><span x-text="row.rule.free_area || ''"></span></td>
-                        <td class="px-3 py-2 font-semibold" x-text="f(maxBuild(row)) || 'Pendiente'"></td>
-                        <td class="px-3 py-2 font-semibold text-teal-800" x-text="f(potential(row)) || 'Pendiente'"></td>
-                        <td class="px-3 py-2" x-text="f(sellable(row)) || 'Pendiente'"></td>
-                        <td class="px-3 py-2"><button class="btn-secondary" type="button" @click="adopt(row)">Adoptar / comentar</button></td>
+                        <td class="px-3 py-2 max-w-xs text-xs leading-5 text-slate-700" x-text="row.rule.isolation || 'Manual / verificar soporte'"></td>
+                        <td class="px-3 py-2 max-w-xs text-xs leading-5 text-slate-700" x-text="row.rule.parking || 'Manual / verificar soporte'"></td>
+                        <td class="px-3 py-2"><button class="btn-secondary" type="button" @click="adopt(row)">Documentar</button></td>
                     </tr>
                 </template>
             </tbody>
@@ -99,17 +94,16 @@ $scenarioInitial = static fn (string $key): string => e(json_encode((string) ($p
     </div>
     <div class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950" x-show="!hasRows()">
         <p class="font-semibold">Aún no hay principal, compatible o complementario listo para matriz.</p>
-        <p class="mt-1">Carga MIDAS Uso Suelo o aplica una categoría del Decreto 0977 en 5.2. La matriz no usa restringidos ni prohibidos para calcular potencial.</p>
+        <p class="mt-1">Carga MIDAS Uso Suelo o aplica una categoría del Decreto 0977 en 5.2. La matriz no usa restringidos ni prohibidos como factibilidad favorable.</p>
     </div>
     <div class="mt-6 grid gap-4 md:grid-cols-3">
         <input type="hidden" name="adopted_normative_route" x-model="adopted">
-        <label class="label md:col-span-2">Opción adoptada o comentada <?= $scenarioTip('Se llena con el botón de la matriz. Puedes ajustar el texto si el soporte dice otra cosa.') ?><input class="input" name="adopted_normative_route_label" x-model="adoptedLabel" maxlength="160" placeholder="Selecciona una fila de la matriz"></label>
-        <label class="label">Factor vendible ref. <?= $scenarioTip('Opcional. Si lo diligencias en 5.2, aquí estima área vendible de referencia.') ?><input class="input bg-slate-50" type="text" :value="factor || 'Pendiente'" readonly></label>
-        <div class="md:col-span-3"><label class="label">Lectura pericial de mayor y mejor uso<textarea class="input min-h-32" name="highest_best_use_reason" x-model="reason" rows="4" maxlength="5000" placeholder="Adopta, limita o descarta la opción según área, frente, restricciones, mercado y soporte normativo."></textarea></label></div>
+        <label class="label md:col-span-3">Opción documentada o comentada <?= $scenarioTip('Se llena con el botón de la matriz. Puedes ajustar el texto si el soporte dice otra cosa.') ?><input class="input" name="adopted_normative_route_label" x-model="adoptedLabel" maxlength="160" placeholder="Selecciona una fila de la matriz"></label>
+        <div class="md:col-span-3"><label class="label">Lectura pericial de factibilidad normativa<textarea class="input min-h-32" name="highest_best_use_reason" x-model="reason" rows="4" maxlength="5000" placeholder="Describe si la opción es factible, condicionada o descartada por área, frente, retiros, altura, afectaciones o soporte normativo. No cuantifiques cabida aquí."></textarea></label></div>
     </div>
     <details class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
         <summary class="cursor-pointer font-semibold text-slate-900">Registro manual avanzado de otros usos</summary>
-        <p class="mt-2 text-sm leading-6 text-slate-600">Úsalo para dejar una salvedad o una cabida técnica externa. La matriz automática propone escenarios desde principal, compatible y complementario reconocido.</p>
-        <textarea class="input mt-4 min-h-24" name="normative_scenarios[otro][observations]" rows="3" maxlength="5000" placeholder="Ej. concepto de Planeación, cabida arquitectónica, licencia o instrumento especial."><?= e($scenarioValue('otro', 'observations')) ?></textarea>
+        <p class="mt-2 text-sm leading-6 text-slate-600">Úsalo para dejar una salvedad normativa externa. La matriz propone lecturas desde principal, compatible y complementario reconocido.</p>
+        <textarea class="input mt-4 min-h-24" name="normative_scenarios[otro][observations]" rows="3" maxlength="5000" placeholder="Ej. concepto de Planeación, licencia, plan parcial, instrumento especial o limitación normativa."><?= e($scenarioValue('otro', 'observations')) ?></textarea>
     </details>
 </section>
