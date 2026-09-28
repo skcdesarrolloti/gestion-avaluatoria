@@ -368,6 +368,18 @@ try {
     $storedMidasDocs = $midasLibrary->latest();
     expect(count($storedMidasDocs) === 1 && $storedMidasDocs[0]['id'] === $midasDoc['id']
         && $storedMidasDocs[0]['has_file'] === true, 'biblioteca MIDAS guarda documento comun');
+    $tmpMidasLargePdf = tempnam(sys_get_temp_dir(), 'ga_midas_lib_');
+    file_put_contents($tmpMidasLargePdf, "%PDF-1.4\n" . str_repeat('midas grande ', 90000));
+    $largeMidasDoc = (new MidasDocumentUploadService($midasLibrary))->upload([
+        'layer_group' => 'Circulares urbanísticas', 'document_code' => 'CIRC-GRANDE-MIDAS',
+        'title' => 'Circular grande MIDAS',
+    ], ['name' => 'circular-grande-midas.pdf', 'tmp_name' => $tmpMidasLargePdf,
+        'error' => UPLOAD_ERR_OK], ['name' => 'Analista']);
+    expect($largeMidasDoc['file_blob'] === null
+        && is_file(\App\Services\MidasDocumentStorage::path((string) $largeMidasDoc['storage_filename'])),
+        'biblioteca MIDAS conserva archivos grandes en disco sin forzar blob');
+    $deletedLargeMidasDoc = $midasLibrary->delete($largeMidasDoc['id']);
+    @unlink((string) $deletedLargeMidasDoc['file_path']);
     $tmpMidasLibraryDuplicate = tempnam(sys_get_temp_dir(), 'ga_midas_lib_');
     file_put_contents($tmpMidasLibraryDuplicate, "%PDF-1.4\n%midas duplicado\n");
     $midasDuplicateRejected = false;

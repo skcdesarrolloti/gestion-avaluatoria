@@ -6,6 +6,8 @@ use App\Models\MidasDocumentRepository;
 
 final class MidasDocumentUploadService
 {
+    private const MAX_DB_BACKUP_BYTES = 1048576;
+
     public function __construct(private MidasDocumentRepository $documents) {}
 
     public function uploadMany(array $input, array $files, array $user): array
@@ -45,9 +47,10 @@ final class MidasDocumentUploadService
         $info = MidasDocumentStorage::inspect((string) $file['tmp_name'], $name);
         $id = bin2hex(random_bytes(16));
         $storageName = 'midas-biblioteca-' . $id . '.' . $info['extension'];
-        $bytes = MidasDocumentStorage::storeUploaded((string) $file['tmp_name'], MidasDocumentStorage::path($storageName));
-        $blob = file_get_contents(MidasDocumentStorage::path($storageName));
-        if (!is_string($blob)) throw new \RuntimeException('No se pudo conservar el respaldo del documento MIDAS.');
+        $storedPath = MidasDocumentStorage::path($storageName);
+        $bytes = MidasDocumentStorage::storeUploaded((string) $file['tmp_name'], $storedPath);
+        $blob = $bytes <= self::MAX_DB_BACKUP_BYTES ? file_get_contents($storedPath) : null;
+        if ($blob !== null && !is_string($blob)) throw new \RuntimeException('No se pudo conservar el respaldo del documento MIDAS.');
         $data = ['id' => $id, 'slug' => $this->documents->uniqueSlug($this->slug($code . ' ' . $title)),
             'layer_group' => $group, 'document_code' => $code, 'title' => $title,
             'status' => $this->status((string) ($input['status'] ?? 'vigente')),

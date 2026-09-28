@@ -56,7 +56,7 @@ final class Kernel
                     Http::redirect($route);
                 }
                 if ($controller === 'masters' && $action === 'createDocument' && $this->uploadLikelyExceededPostLimit()) { Session::flash('masters_error', 'La carga superó el límite post_max_size de PHP. Sube un PDF menor o aumenta el límite en el hosting.'); Http::redirect('maestros#biblioteca-documental'); }
-                if ($controller === 'midas' && $action === 'upload' && $this->uploadLikelyExceededPostLimit()) { Session::flash('midas_error', 'La carga superó el límite post_max_size de PHP. Sube un archivo MIDAS menor o aumenta el límite en el hosting.'); Http::redirect('midas#biblioteca-midas'); }
+                if ($controller === 'midas' && $action === 'upload' && $this->uploadLikelyExceededPostLimit()) { Session::flash('midas_error', 'La carga superó post_max_size: reduce el lote MIDAS, sube menos archivos o aumenta el límite del hosting.'); Http::redirect('midas#biblioteca-midas'); }
                 if ($controller === 'subjectPh' && $action === 'upload' && $this->uploadLikelyExceededPostLimit()) { Session::flash('ph_error', 'La carga superó el límite post_max_size de PHP. Sube menos soportes por lote o comprímelos en un ZIP menor.'); Http::redirect('avaluos/' . (string) ($matches[1] ?? '') . '/bien-sujeto#ph'); }
                 try {
                     Session::csrf();

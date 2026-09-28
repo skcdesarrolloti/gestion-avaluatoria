@@ -19,6 +19,7 @@ $formatDate = static function ($value): string {
             ->setTimezone(new DateTimeZone('America/Bogota'))->format('d/m/Y H:i');
     } catch (Throwable) { return (string) $value; }
 };
+$limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
 ?>
 <section id="biblioteca-midas" class="space-y-7" x-data="{ query: '' }">
     <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
@@ -64,7 +65,7 @@ $formatDate = static function ($value): string {
             <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                     <h2 class="text-lg font-semibold text-slate-950">Subir documento MIDAS común</h2>
-                    <p class="mt-1 text-sm text-slate-600">Puedes subir hasta 20 archivos por carga. Si alguno ya existe, se omite sin duplicarlo.</p>
+                    <p class="mt-1 text-sm text-slate-600">Puedes subir por lotes. Si alguno ya existe, se omite sin duplicarlo.</p>
                 </div>
                 <span class="rounded-full <?= !empty($storage['writable']) ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700' ?> px-3 py-1 text-xs font-semibold">
                     <?= !empty($storage['writable']) ? 'Almacenamiento activo' : 'Revisar almacenamiento' ?>
@@ -95,8 +96,17 @@ $formatDate = static function ($value): string {
                 </label>
                 <label class="label">Archivo descargado
                     <input class="input mt-2" type="file" name="midas_file[]" accept=".pdf,.csv,.json,.geojson,.zip" multiple required>
-                    <span class="mt-1 block text-xs font-normal text-slate-500">PDF, CSV, JSON, GeoJSON o ZIP. Máximo 25 MB por archivo y 20 archivos por carga.</span>
+                    <span class="mt-1 block text-xs font-normal text-slate-500">
+                        PDF, CSV, JSON, GeoJSON o ZIP. Máximo interno 25 MB por archivo; el lote también respeta post_max_size.
+                    </span>
                 </label>
+                <div class="rounded-lg bg-slate-50 p-3 text-xs leading-5 text-slate-600 md:col-span-2">
+                    <span class="font-semibold text-slate-700">Límites del servidor:</span>
+                    archivo <?= e((string) ($limits['upload_max_filesize'] ?? '')) ?>,
+                    lote <?= e((string) ($limits['post_max_size'] ?? '')) ?>,
+                    cantidad <?= e((string) ($limits['max_file_uploads'] ?? '')) ?>.
+                    Si son varios PDF pesados, súbelos en lotes pequeños.
+                </div>
                 <label class="label md:col-span-2">Para qué es útil
                     <textarea class="input mt-2 min-h-20" name="practical_use" maxlength="700"
                         placeholder="Ej. Sustenta parqueaderos, altura, uso del suelo, riesgos o delimitación territorial."></textarea>

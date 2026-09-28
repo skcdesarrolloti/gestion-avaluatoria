@@ -95,7 +95,8 @@ La Biblioteca MIDAS usa `storage/biblioteca-midas/` o `MIDAS_LIBRARY_STORAGE_DIR
 Guarda PDF, CSV, JSON, GeoJSON o ZIP comunes descargados de MIDAS, incluyendo circulares
 urbanísticas, división política, POT, servicios, movilidad, equipamientos y riesgos.
 Detecta duplicados por código o nombre de archivo y evita que el numeral 2 duplique
-documentos generales. Permite cargar hasta 20 archivos por lote en una misma categoría.
+documentos generales. Permite cargar hasta 20 archivos por lote en una misma categoría,
+respetando además el `post_max_size` total configurado en PHP.
 El numeral 3.5 lee PDF digitales, escaneados y mixtos página por página en el navegador,
 con PDF.js y Tesseract locales, sin clave de IA ni servicios externos. Envía el original
 junto con el texto por página, conserva el resultado en BD y prellena campos vacíos con

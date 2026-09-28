@@ -5,6 +5,7 @@ namespace App\Models;
 use App\Core\HttpException;
 use App\Services\MidasDocumentStorage;
 use PDO;
+use PDOException;
 
 final class MidasDocumentRepository
 {
@@ -49,6 +50,17 @@ final class MidasDocumentRepository
     }
 
     public function store(array $data): void
+    {
+        try {
+            $this->insert($data);
+        } catch (PDOException $exception) {
+            if (($data['file_blob'] ?? null) === null) throw $exception;
+            $data['file_blob'] = null;
+            $this->insert($data);
+        }
+    }
+
+    private function insert(array $data): void
     {
         $sql = 'INSERT INTO midas_documents
             (id, slug, layer_group, document_code, title, status, practical_use, applies_to,
