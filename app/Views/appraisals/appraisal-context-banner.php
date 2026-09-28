@@ -3,11 +3,11 @@ $expedienteNumber = trim((string) ($record['expediente_number'] ?? ''));
 $expedienteLabel = $expedienteNumber !== '' ? $expedienteNumber : 'Pendiente de asignar';
 $title = trim((string) ($record['titulo'] ?? ''));
 $selects = \App\Support\AppraisalCatalog::selectFields();
-$label = static fn (string $field, string $value): string => (string) ($selects[$field][4][$value] ?? '');
-$typeLabel = $label('tipo_inmueble', (string) ($record['tipo_inmueble'] ?? '')) ?: 'Tipo de inmueble pendiente';
-$subtypeLabel = $label('subtipo_funcional', (string) ($record['subtipo_funcional'] ?? ''));
-$destinyLabel = $label('destinacion', (string) ($record['destinacion'] ?? ''));
-$phLabel = $label('regimen_ph', (string) ($record['regimen_ph'] ?? ''));
+$contextLabel = static fn (string $field, string $value): string => (string) ($selects[$field][4][$value] ?? '');
+$typeLabel = $contextLabel('tipo_inmueble', (string) ($record['tipo_inmueble'] ?? '')) ?: 'Tipo de inmueble pendiente';
+$subtypeLabel = $contextLabel('subtipo_funcional', (string) ($record['subtipo_funcional'] ?? ''));
+$destinyLabel = $contextLabel('destinacion', (string) ($record['destinacion'] ?? ''));
+$phLabel = $contextLabel('regimen_ph', (string) ($record['regimen_ph'] ?? ''));
 $chips = array_filter([
     'Tipo: ' . $typeLabel,
     $subtypeLabel !== '' ? 'Subtipo: ' . $subtypeLabel : '',
