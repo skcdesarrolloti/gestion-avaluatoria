@@ -41,7 +41,7 @@ $urbanUseExcerpt = static function (string $text): string {
                                         </details>
                                     <?php endif; ?>
                                 <?php else: ?>
-                                    <span class="text-slate-500">Pendiente de pegar desde MIDAS</span>
+                                    <span class="text-slate-500">Pendiente de procesar desde MIDAS</span>
                                 <?php endif; ?>
                             </td>
                         </tr>
@@ -51,7 +51,7 @@ $urbanUseExcerpt = static function (string $text): string {
         </div>
     <?php else: ?>
         <p class="mt-4 rounded-lg bg-amber-50 p-3 text-sm font-semibold leading-6 text-amber-900">
-            Pega el bloque completo de Uso del suelo desde el numeral 3 o en 5.1. Este cuadro debe quedar visible antes de cerrar el capítulo 5.
+            Procesa la lectura completa de MIDAS desde el numeral 2. Este cuadro debe quedar visible antes de cerrar el capítulo 5.
         </p>
     <?php endif; ?>
 </section>

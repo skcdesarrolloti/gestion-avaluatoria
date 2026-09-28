@@ -97,9 +97,9 @@ $tabs = [
             </p>
         </div>
         <div class="flex flex-wrap gap-3">
-            <button class="btn-primary" type="button" @click="activeTab = 'registro'; history.replaceState(null, '', '#midas'); setTimeout(() => document.getElementById('midas')?.scrollIntoView({behavior: 'smooth', block: 'start'}), 50)">
-                Pegar lectura MIDAS
-            </button>
+            <a class="btn-primary" href="<?= e(url('avaluos/' . $record['id'] . '/sector#midas-centro')) ?>">
+                Ir a MIDAS numeral 2
+            </a>
             <a class="btn-secondary" href="<?= e(url('maestros')) ?>">Abrir maestros</a>
         </div>
     </div>
@@ -137,12 +137,12 @@ $tabs = [
                 <div class="flex flex-wrap items-center justify-between gap-3">
                     <p>
                         <strong>Estos datos pueden venir de MIDAS.</strong>
-                        Pega la ficha Predios en Registro, catastro y MIDAS; el sistema actualiza esta ubicación
-                        y envía Uso Suelo al numeral 5.
+                        La lectura principal se procesa en el numeral 2; el sistema actualiza esta ubicación
+                        y envía Uso Suelo al numeral 5 sin repetir la captura.
                     </p>
-                    <button class="btn-primary" type="button" @click="activeTab = 'registro'; history.replaceState(null, '', '#midas'); setTimeout(() => document.getElementById('midas')?.scrollIntoView({behavior: 'smooth', block: 'start'}), 50)">
-                        Ir a MIDAS del numeral 3
-                    </button>
+                    <a class="btn-primary" href="<?= e(url('avaluos/' . $record['id'] . '/sector#midas-centro')) ?>">
+                        Ir a MIDAS del numeral 2
+                    </a>
                 </div>
             </div>
             <div class="mt-5 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">

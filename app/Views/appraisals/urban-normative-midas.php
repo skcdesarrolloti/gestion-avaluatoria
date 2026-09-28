@@ -24,8 +24,8 @@
         <div class="flex flex-wrap items-start justify-between gap-5">
             <div>
                 <p class="eyebrow">Soporte MIDAS</p>
-                <h2 class="mt-2 text-2xl font-semibold">Lectura MIDAS recibida desde el numeral 3</h2>
-                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">La captura principal de MIDAS se hace en 3.1 Registro y catastro. Al procesarla allí, los datos prediales quedan en el numeral 3 y la reglamentación de uso del suelo llega a este numeral 5 para revisión urbana.</p>
+                <h2 class="mt-2 text-2xl font-semibold">Lectura MIDAS recibida desde el numeral 2</h2>
+                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">La captura principal de MIDAS se hace en el numeral 2. Al procesarla allí, los datos prediales quedan en el numeral 3 y la reglamentación de uso del suelo llega a este numeral 5 para revisión urbana.</p>
                 <p class="mt-2 text-xs font-semibold text-teal-800" data-autosave-status>Autoguardado activo</p>
             </div>
             <span class="rounded-full bg-teal-50 px-3 py-1 text-sm font-semibold text-teal-800">Revisión urbana</span>
@@ -33,7 +33,7 @@
         <?php if ($midasFallbackOpen): ?>
             <div class="mt-5 rounded-2xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
                 <p class="font-semibold">MIDAS no permitió lectura automática.</p>
-                <p class="mt-1">Esto es normal. El flujo seguro es manual asistido desde el numeral 3: abre MIDAS, busca la referencia <strong><?= e($midasReferenceDigits) ?></strong>, copia Predios y Uso Suelo y procesa la lectura desde Registro y catastro.</p>
+                <p class="mt-1">Esto es normal. El flujo seguro es manual asistido desde el numeral 2: abre MIDAS, busca la referencia <strong><?= e($midasReferenceDigits) ?></strong>, copia Predios y Uso Suelo y procesa la lectura en el centro MIDAS.</p>
             </div>
         <?php endif; ?>
         <div class="mt-6 grid gap-4 md:grid-cols-3">
@@ -56,7 +56,7 @@
             </label>
             <div class="md:col-span-3 rounded-xl border border-blue-100 bg-blue-50 p-4">
                 <div class="flex flex-wrap gap-2">
-                    <a class="btn-primary" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto#midas')) ?>">Ir a MIDAS del numeral 3</a>
+                    <a class="btn-primary" href="<?= e(url('avaluos/' . $record['id'] . '/sector#midas-centro')) ?>">Ir a MIDAS del numeral 2</a>
                     <a class="btn-secondary" href="https://midas.cartagena.gov.co/#/home" target="_blank" rel="noopener">Abrir MIDAS externo</a>
                     <button class="btn-secondary" type="button" onclick="navigator.clipboard?.writeText('<?= e($midasReferenceDigits) ?>')">Copiar referencia</button>
                 </div>
@@ -90,7 +90,7 @@
             </label>
             <?php if ($value('midas_predio_raw') !== '' || $value('midas_usage_raw') !== ''): ?>
                 <div class="md:col-span-3 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm text-emerald-900">
-                    Lectura guardada: <?= $value('midas_predio_raw') !== '' ? 'predio MIDAS para numeral 3' : '' ?><?= $value('midas_predio_raw') !== '' && $value('midas_usage_raw') !== '' ? ' y ' : '' ?><?= $value('midas_usage_raw') !== '' ? 'reglamentación Uso Suelo para numeral 5' : '' ?>.
+                    Lectura guardada: <?= $value('midas_predio_raw') !== '' ? 'predio MIDAS recibido desde el 2 para numeral 3' : '' ?><?= $value('midas_predio_raw') !== '' && $value('midas_usage_raw') !== '' ? ' y ' : '' ?><?= $value('midas_usage_raw') !== '' ? 'reglamentación Uso Suelo recibida desde el 2 para numeral 5' : '' ?>.
                 </div>
             <?php endif; ?>
             <details class="md:col-span-3 rounded-xl border border-slate-200 bg-slate-50 p-4">
@@ -116,7 +116,7 @@
                     <div class="md:col-span-2"><?php $manualField('norm_isolation_text', 'AISLAMIENTOS / ESTACIONAMIENTOS / OBSERVACIONES', 'Registra aislamientos, estacionamientos y demás reglas útiles para el análisis.', 4); ?></div>
                     <div class="md:col-span-2"><?php $manualField('norm_other_potential_text', 'ÍNDICE O ÁREA DE OCUPACIÓN EN TEXTO', 'Si el cuadro habla de área de ocupación, plataforma, índice de ocupación o condiciones especiales, regístralo aquí.', 4); ?></div>
                 </div>
-                <p class="mt-3 rounded-xl bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">Usa esta sección solo para completar o corregir datos urbanos puntuales. La lectura completa de MIDAS se procesa desde el numeral 3; la conversión cuantitativa queda para el módulo 8.</p>
+                <p class="mt-3 rounded-xl bg-amber-50 p-3 text-xs font-semibold leading-5 text-amber-900">Usa esta sección solo para completar o corregir datos urbanos puntuales. La lectura completa de MIDAS se procesa desde el numeral 2; la conversión cuantitativa queda para el módulo 8.</p>
             </details>
         </div>
     </section>

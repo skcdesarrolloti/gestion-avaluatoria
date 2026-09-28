@@ -122,7 +122,7 @@ $matrixRoutes = $potentialRoutes ?? [];
         <?php endforeach; ?>
     <?php else: ?>
         <p class="mt-4 rounded-lg bg-amber-50 p-3 text-sm font-semibold leading-6 text-amber-900">
-            Aún no hay uso principal, compatible o complementario reconocido. Pega el bloque de MIDAS en 5.1 o adopta un cuadro para que aparezcan las pestañas por uso.
+            Aún no hay uso principal, compatible o complementario reconocido. Procesa la lectura de MIDAS desde el numeral 2 o adopta un cuadro para que aparezcan las pestañas por uso.
         </p>
     <?php endif; ?>
 </section>

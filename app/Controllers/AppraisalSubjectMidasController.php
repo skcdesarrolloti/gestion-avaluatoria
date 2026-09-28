@@ -28,9 +28,9 @@ final class AppraisalSubjectMidasController
             $urbanFields = array_replace($urbanFields, $usage['fields'] ?? []);
             if ($urbanFields !== []) $this->saveUrbanFields($id, $urbanFields);
             $ok = ($predio['ok'] ?? false) || ($usage['ok'] ?? false);
-            Session::flash($ok ? 'subject_message' : 'subject_error', $this->consultMessage($predio, $usage));
-        } catch (\Throwable $error) { Session::flash('subject_error', $error->getMessage()); }
-        Http::redirect('avaluos/' . $id . '/bien-sujeto#registro');
+            $this->flash($id, $ok ? 'message' : 'error', $this->consultMessage($predio, $usage));
+        } catch (\Throwable $error) { $this->flash($id, 'error', $error->getMessage()); }
+        Http::redirect($this->returnTo($id, 'avaluos/' . $id . '/bien-sujeto#registro'));
     }
 
     public function process(string $id): never
@@ -52,12 +52,12 @@ final class AppraisalSubjectMidasController
             if (Http::wantsJson()) Http::json(['ok' => true, 'message' => $message,
                 'updated' => ['subject' => $this->updatedSubject($predio), 'urban' => $this->updatedUrban($usage, $predio)],
                 'unmapped' => $unmapped]);
-            Session::flash('subject_message', $message);
+            $this->flash($id, 'message', $message);
         } catch (\Throwable $error) {
             if (Http::wantsJson()) Http::json(['ok' => false, 'message' => $error->getMessage()], 422);
-            Session::flash('subject_error', $error->getMessage());
+            $this->flash($id, 'error', $error->getMessage());
         }
-        Http::redirect('avaluos/' . $id . '/bien-sujeto#registro');
+        Http::redirect($this->returnTo($id, 'avaluos/' . $id . '/bien-sujeto#registro'));
     }
 
     private function consultMessage(array $predio, array $usage): string
@@ -125,10 +125,24 @@ final class AppraisalSubjectMidasController
     private function message(array $predio, array $usage, array $unmapped = []): string
     {
         $message = $predio !== [] && $usage !== []
-            ? 'Lectura MIDAS procesada desde el numeral 3: ficha del predio actualizada y reglamentación enviada al numeral 5.'
+            ? 'Lectura MIDAS procesada desde el numeral 2: ficha del predio actualizada en el 3 y reglamentación enviada al numeral 5.'
             : ($predio !== [] ? 'Lectura MIDAS del predio guardada en el numeral 3.' : 'Reglamentación de Uso Suelo enviada al numeral 5.');
         if ($unmapped !== []) $message .= ' Quedaron ' . count($unmapped) . ' dato(s) en el registro de no actualizados para revisión del analista.';
         return $message;
+    }
+
+    private function flash(string $id, string $type, string $message): void
+    {
+        $prefix = str_starts_with($this->returnTo($id, ''), 'avaluos/' . $id . '/sector')
+            ? 'sector_' : 'subject_';
+        Session::flash($prefix . $type, $message);
+    }
+
+    private function returnTo(string $id, string $default): string
+    {
+        $target = trim((string) ($_POST['return_to'] ?? ''));
+        return preg_match('#^avaluos/' . preg_quote($id, '#') . '/(sector|bien-sujeto|normatividad-urbana)(?:\#[a-z0-9_-]+)?$#', $target)
+            ? $target : $default;
     }
 
     private function updatedSubject(array $predio): array

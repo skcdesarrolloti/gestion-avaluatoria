@@ -132,15 +132,15 @@ $sectorFormId = 'sector-form';
         </form>
         <div class="rounded-xl border border-blue-100 bg-blue-50 p-4">
             <p class="text-xs font-semibold uppercase text-blue-900">Paso 2</p>
-            <h3 class="mt-2 text-lg font-semibold text-slate-900">Consultar MIDAS para este barrio</h3>
+            <h3 class="mt-2 text-lg font-semibold text-slate-900">Entrar al centro MIDAS</h3>
             <p class="mt-2 text-sm leading-6 text-blue-950">
-                Ejecuta este paso después de cargar el barrio. El sistema prepara datos sugeridos,
-                muestra qué encontró y te deja aplicar solo los campos vacíos.
+                Después de cargar el barrio, usa el centro MIDAS para revisar capas, intentar lectura automática,
+                pegar la lectura completa y alojar descargas del visor.
             </p>
             <?php if ($neighborhoodLabel === ''): ?>
-                <button class="btn-secondary mt-4 min-h-11" type="button" disabled>2. Consultar MIDAS</button>
+                <button class="btn-secondary mt-4 min-h-11" type="button" disabled>2. Centro MIDAS</button>
             <?php else: ?>
-                <a class="btn-secondary mt-4 inline-flex min-h-11 items-center" href="<?= e(url('avaluos/' . $record['id'] . '/sector/midas/consultar')) ?>">2. Consultar MIDAS</a>
+                <a class="btn-secondary mt-4 inline-flex min-h-11 items-center" href="#midas-centro">2. Centro MIDAS</a>
             <?php endif; ?>
             <p class="mt-3 text-xs font-semibold <?= $neighborhoodLabel === '' ? 'text-amber-700' : 'text-blue-900' ?>">
                 <?= e($neighborhoodLabel === '' ? 'Primero carga un barrio para activar este paso.' : 'Barrio activo: ' . $neighborhoodLabel) ?>
