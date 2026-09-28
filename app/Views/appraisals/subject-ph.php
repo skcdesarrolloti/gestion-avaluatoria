@@ -107,8 +107,13 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                         <?php endforeach; ?>
                     </select></label>
                     <label class="label">Reglamento y soportes de propiedad horizontal
-                    <input class="input" type="file" name="ph_document[]" multiple
-                        accept=".zip,.rar,.pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.tif,.tiff" aria-describedby="ph-upload-help">
+                        <span class="mt-2 flex min-h-11 flex-wrap items-center gap-3 rounded-xl border border-slate-300 bg-white p-2">
+                            <span class="btn-secondary min-h-10">Seleccionar archivos</span>
+                            <span class="text-sm font-normal text-slate-600" data-ph-file-summary>Sin archivos seleccionados</span>
+                        </span>
+                    <input class="sr-only" type="file" name="ph_document[]" multiple
+                        accept=".zip,.rar,.pdf,.docx,.txt,.jpg,.jpeg,.png,.webp,.tif,.tiff" aria-describedby="ph-upload-help"
+                        onchange="this.closest('label').querySelector('[data-ph-file-summary]').textContent = this.files.length ? Array.from(this.files).slice(0, 3).map(file => file.name).join(', ') + (this.files.length > 3 ? ' +' + (this.files.length - 3) : '') : 'Sin archivos seleccionados'">
                     </label><p id="ph-upload-help" class="text-xs text-slate-600">PDF digital o escaneado. Para lectura completa de PDFs dentro de ZIP/RAR, descomprime y selecciona los PDF directamente.</p>
                     <button class="btn-primary" type="submit">Leer soporte PH</button>
                     <?php require BASE_PATH . '/app/Views/appraisals/upload-progress.php'; ?>
