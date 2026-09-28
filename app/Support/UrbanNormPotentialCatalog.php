@@ -82,7 +82,7 @@ final class UrbanNormPotentialCatalog
     {
         $standards = self::standards();
         $routes = [];
-        foreach (['principal' => 'use_principal_text', 'compatible' => 'use_compatible_text'] as $type => $field) {
+        foreach (['principal' => 'use_principal_text', 'compatible' => 'use_compatible_text', 'complementario' => 'use_complementary_text'] as $type => $field) {
             foreach (self::slugsFromText((string) ($profile[$field] ?? ''), (string) ($profile['category_slug'] ?? '')) as $slug) {
                 if (!isset($standards[$slug])) continue;
                 $routes[$type . ':' . $slug] = ['type' => $type, 'slug' => $slug] + $standards[$slug];

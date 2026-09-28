@@ -1,6 +1,10 @@
 <?php
 $routeTabLabel = static function (array $route): string {
-    $type = ($route['type'] ?? '') === 'principal' ? 'Principal' : 'Compatible';
+    $type = match ((string) ($route['type'] ?? '')) {
+        'principal' => 'Principal',
+        'complementario' => 'Complementario',
+        default => 'Compatible',
+    };
     return $type . ' · ' . (string) ($route['label'] ?? '');
 };
 $matrixRoutes = $potentialRoutes ?? [];
@@ -11,7 +15,7 @@ $matrixRoutes = $potentialRoutes ?? [];
             <p class="text-xs font-semibold uppercase text-teal-800">Matriz normativa por uso</p>
             <h3 class="mt-1 font-semibold text-slate-950">Factores, norma y cálculo en formato de hoja</h3>
             <p class="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
-                Se toma solo lo que MIDAS dejó como <strong>principal</strong> y <strong>compatible</strong>. Complementario, restringido y prohibido quedan como soporte del cuadro, no como potencial adoptable automático.
+                Se toma lo que MIDAS dejó como <strong>principal</strong>, <strong>compatible</strong> y <strong>complementario</strong>. Restringido y prohibido quedan como soporte o alerta, no como potencial adoptable.
             </p>
         </div>
         <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-slate-700" x-text="isLot ? 'Cálculo para lote' : 'Soporte para inmueble construido'"></span>
@@ -43,7 +47,7 @@ $matrixRoutes = $potentialRoutes ?? [];
                 <tbody class="divide-y divide-slate-100">
                     <template x-for="row in routeOptions()" :key="row.route.type + ':' + row.route.slug + ':' + row.key">
                         <tr>
-                            <td class="px-3 py-2"><span class="rounded-full px-2 py-1 text-xs font-semibold" :class="row.route.type === 'principal' ? 'bg-teal-50 text-teal-800' : 'bg-blue-50 text-blue-800'" x-text="typeLabel(row.route.type)"></span></td>
+                            <td class="px-3 py-2"><span class="rounded-full px-2 py-1 text-xs font-semibold" :class="routeTypeClass(row.route.type)" x-text="typeLabel(row.route.type)"></span></td>
                             <td class="px-3 py-2">
                                 <strong x-text="row.route.label"></strong><br>
                                 <span class="text-xs text-slate-600" x-text="row.route.table + ' · ' + row.rule.label"></span>
@@ -118,7 +122,7 @@ $matrixRoutes = $potentialRoutes ?? [];
         <?php endforeach; ?>
     <?php else: ?>
         <p class="mt-4 rounded-lg bg-amber-50 p-3 text-sm font-semibold leading-6 text-amber-900">
-            Aún no hay uso principal o compatible reconocido. Pega el bloque de MIDAS en 5.1 o adopta un cuadro para que aparezcan las pestañas por uso.
+            Aún no hay uso principal, compatible o complementario reconocido. Pega el bloque de MIDAS en 5.1 o adopta un cuadro para que aparezcan las pestañas por uso.
         </p>
     <?php endif; ?>
 </section>

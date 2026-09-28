@@ -21,7 +21,8 @@ $scenarioInitial = static fn (string $key): string => e(json_encode((string) ($p
         n(v) { const x = parseFloat(String(v || '').replace(',', '.').replace(/[^0-9.-]/g, '')); return Number.isFinite(x) ? x : null },
         f(v) { return Number.isFinite(v) ? v.toFixed(2) : '' },
         baseArea() { return this.n(this.net) ?? this.n(this.land) },
-        typeLabel(type) { return type === 'principal' ? 'Principal' : 'Compatible' },
+        typeLabel(type) { return type === 'principal' ? 'Principal' : (type === 'complementario' ? 'Complementario' : 'Compatible') },
+        typeClass(type) { return type === 'principal' ? 'bg-teal-50 text-teal-800' : (type === 'complementario' ? 'bg-amber-50 text-amber-800' : 'bg-blue-50 text-blue-800') },
         rows() {
             const out = [];
             for (const route of this.routes) for (const [key, rule] of Object.entries(route.options || {})) out.push({route, key, rule});
@@ -51,7 +52,8 @@ $scenarioInitial = static fn (string $key): string => e(json_encode((string) ($p
             this.adopted = row.route.type + ':' + row.route.slug + ':' + row.key;
             this.adoptedLabel = this.typeLabel(row.route.type) + ' · ' + row.route.label + ' · ' + row.rule.label;
             const status = this.rowStatus(row), max = this.f(this.maxBuild(row)), pot = this.f(this.potential(row));
-            const base = 'Se revisa ' + this.adoptedLabel + ' (' + row.route.table + '). AML ' + (row.rule.min_area_m2 || 'condicionado') + ', frente ' + (row.rule.min_front_m || 'condicionado') + ', indice ' + (row.rule.construction_index || 'pendiente de cabida') + '. Maximo construible orientativo: ' + (max || 'pendiente') + ' m²; potencial frente a construccion actual: ' + (pot || 'pendiente') + ' m². Area libre / condicion: ' + (row.rule.free_area || 'sin nota');
+            const extra = row.route.type === 'complementario' ? ' Al tratarse de uso complementario, su adopcion exige justificar incidencia real en el mayor y mejor uso.' : '';
+            const base = 'Se revisa ' + this.adoptedLabel + ' (' + row.route.table + '). AML ' + (row.rule.min_area_m2 || 'condicionado') + ', frente ' + (row.rule.min_front_m || 'condicionado') + ', indice ' + (row.rule.construction_index || 'pendiente de cabida') + '. Maximo construible orientativo: ' + (max || 'pendiente') + ' m²; potencial frente a construccion actual: ' + (pot || 'pendiente') + ' m². Area libre / condicion: ' + (row.rule.free_area || 'sin nota') + '.' + extra;
             this.reason = status === 'No cumple' ? 'No cumple. No se adopta como potencial constructivo porque ' + (this.rowFailures(row) || 'no supera la base normativa') + '. ' + base : status + '. ' + base;
         },
         missing() { const m=[]; if (this.n(this.land)===null) m.push('area de terreno'); if (this.n(this.front)===null) m.push('frente'); if (this.n(this.actual)===null) m.push('construccion actual'); return m.join(', ') }
@@ -59,8 +61,8 @@ $scenarioInitial = static fn (string $key): string => e(json_encode((string) ($p
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Mayor y mejor uso</p>
-            <h2 class="mt-2 text-2xl font-semibold">Matriz POT principal y compatible</h2>
-            <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">La matriz toma los usos <strong>principal</strong> y <strong>compatible</strong> cargados desde MIDAS o el cuadro POT. Complementarios, restringidos y prohibidos quedan como soporte, no como potencial adoptable automático.</p>
+            <h2 class="mt-2 text-2xl font-semibold">Matriz POT por principal, compatible y complementario</h2>
+            <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">La matriz toma los usos <strong>principal</strong>, <strong>compatible</strong> y <strong>complementario</strong> cargados desde MIDAS o el cuadro POT. Restringidos y prohibidos quedan como soporte o alerta, no como potencial adoptable.</p>
         </div>
         <span class="rounded-full bg-amber-50 px-3 py-1 text-sm font-semibold text-amber-800">Decreto 0977 de 2001</span>
     </div>
@@ -79,7 +81,7 @@ $scenarioInitial = static fn (string $key): string => e(json_encode((string) ($p
             <tbody class="divide-y divide-slate-100 bg-white">
                 <template x-for="row in rows()" :key="row.route.type + '-' + row.route.slug + '-' + row.key">
                     <tr>
-                        <td class="px-3 py-2"><span class="rounded-full px-2 py-1 text-xs font-semibold" :class="row.route.type === 'principal' ? 'bg-teal-50 text-teal-800' : 'bg-blue-50 text-blue-800'" x-text="typeLabel(row.route.type)"></span></td>
+                        <td class="px-3 py-2"><span class="rounded-full px-2 py-1 text-xs font-semibold" :class="typeClass(row.route.type)" x-text="typeLabel(row.route.type)"></span></td>
                         <td class="px-3 py-2"><strong x-text="row.route.label"></strong><br><span class="text-slate-600" x-text="row.route.table + ' · ' + row.rule.label"></span></td>
                         <td class="px-3 py-2" x-text="row.rule.min_area_m2 ? row.rule.min_area_m2 + ' m²' : 'Condicionado'"></td>
                         <td class="px-3 py-2" x-text="row.rule.min_front_m ? row.rule.min_front_m + ' m' : 'Condicionado'"></td>
@@ -96,8 +98,8 @@ $scenarioInitial = static fn (string $key): string => e(json_encode((string) ($p
         </table>
     </div>
     <div class="mt-6 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm leading-6 text-amber-950" x-show="!hasRows()">
-        <p class="font-semibold">Aún no hay principal o compatible listo para matriz.</p>
-        <p class="mt-1">Carga MIDAS Uso Suelo o aplica una categoría del Decreto 0977 en 5.2. La matriz no usa complementarios, restringidos ni prohibidos para calcular potencial.</p>
+        <p class="font-semibold">Aún no hay principal, compatible o complementario listo para matriz.</p>
+        <p class="mt-1">Carga MIDAS Uso Suelo o aplica una categoría del Decreto 0977 en 5.2. La matriz no usa restringidos ni prohibidos para calcular potencial.</p>
     </div>
     <div class="mt-6 grid gap-4 md:grid-cols-3">
         <input type="hidden" name="adopted_normative_route" x-model="adopted">
@@ -107,7 +109,7 @@ $scenarioInitial = static fn (string $key): string => e(json_encode((string) ($p
     </div>
     <details class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
         <summary class="cursor-pointer font-semibold text-slate-900">Registro manual avanzado de otros usos</summary>
-        <p class="mt-2 text-sm leading-6 text-slate-600">Úsalo para dejar una salvedad o una cabida técnica externa. La matriz automática solo propone escenarios desde principal y compatible.</p>
+        <p class="mt-2 text-sm leading-6 text-slate-600">Úsalo para dejar una salvedad o una cabida técnica externa. La matriz automática propone escenarios desde principal, compatible y complementario reconocido.</p>
         <textarea class="input mt-4 min-h-24" name="normative_scenarios[otro][observations]" rows="3" maxlength="5000" placeholder="Ej. concepto de Planeación, cabida arquitectónica, licencia o instrumento especial."><?= e($scenarioValue('otro', 'observations')) ?></textarea>
     </details>
 </section>

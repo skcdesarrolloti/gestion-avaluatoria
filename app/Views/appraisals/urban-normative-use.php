@@ -40,7 +40,7 @@ $isLotSubjectJson = $isLotSubject ? 'true' : 'false';
             </div>
             <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 md:col-span-2">
                 <p class="text-xs font-semibold uppercase text-blue-800">Pregunta del numeral 5</p>
-                <p class="mt-1 text-sm leading-6 text-blue-950"><?= $isLotSubject ? 'Para lote se revisan principal y compatible con área, frente, índice de ocupación, índice de construcción, altura y área vendible de referencia.' : 'Para inmueble construido se pega completo el uso del suelo y se incorpora al informe; el analista solo calcula potencial si existe una razón técnica específica.' ?></p>
+                <p class="mt-1 text-sm leading-6 text-blue-950"><?= $isLotSubject ? 'Para lote se revisan principal, compatible y complementario con área, frente, índice de ocupación, índice de construcción, altura y área vendible de referencia.' : 'Para inmueble construido se pega completo el uso del suelo y se incorpora al informe; el analista solo calcula potencial si existe una razón técnica específica.' ?></p>
             </div>
         </div>
         <nav class="mt-6 rounded-xl bg-slate-100 p-2" aria-label="Subsecciones de uso del suelo">

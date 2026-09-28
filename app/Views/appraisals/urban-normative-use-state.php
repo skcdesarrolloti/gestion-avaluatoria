@@ -45,7 +45,10 @@
         return out;
     },
     currentRouteOptions(route) { return this.routeOptions().filter((row) => this.routeKey(row.route) === this.routeKey(route)) },
-    typeLabel(type) { return type === 'principal' ? 'Principal' : 'Compatible' },
+    typeLabel(type) { return type === 'principal' ? 'Principal' : (type === 'complementario' ? 'Complementario' : 'Compatible') },
+    routeTypeClass(type) {
+        return type === 'principal' ? 'bg-teal-50 text-teal-800' : (type === 'complementario' ? 'bg-amber-50 text-amber-800' : 'bg-blue-50 text-blue-800');
+    },
     routeStatus(row) {
         const area=this.number(this.land), front=this.number(this.front);
         const minArea=this.number(row.rule.min_area_m2), minFront=this.number(row.rule.min_front_m);
@@ -74,6 +77,7 @@
         const label=this.typeLabel(row.route.type) + ' · ' + row.route.label + ' · ' + row.rule.label;
         const status=this.routeStatus(row), max=this.fmt(this.routeMaxBuild(row)), pot=this.fmt(this.routePotential(row));
         if (status === 'No cumple') return 'No cumple: no se adopta como potencial constructivo porque ' + this.routeFailures(row).join(' y ') + '. Puede quedar solo como soporte u observación.';
+        if (status === 'Cumple' && row.route.type === 'complementario') return 'Cumple base como uso complementario: puede revisarse como escenario preliminar, con construible ' + (max || 'pendiente') + ' m² y potencial ' + (pot || 'pendiente') + ' m². Requiere justificar que el complementario incide en el mayor y mejor uso.';
         if (status === 'Cumple') return 'Cumple: puede seleccionarse como escenario de potencial constructivo para ' + label + ', con construible ' + (max || 'pendiente') + ' m² y potencial ' + (pot || 'pendiente') + ' m², sujeto a observaciones de norma, mercado y soporte.';
         return status + ': no debe seleccionarse sin completar soporte. Revise mínimos, índice, altura, retiros y concepto aplicable.';
     },
