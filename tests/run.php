@@ -386,6 +386,24 @@ try {
     $deletedMidasDoc = $midasLibrary->delete($midasDoc['id']);
     @unlink((string) $deletedMidasDoc['file_path']);
     expect($midasLibrary->latest() === [], 'biblioteca MIDAS permite eliminar documento');
+    $batchA = tempnam(sys_get_temp_dir(), 'ga_midas_lib_'); $batchB = tempnam(sys_get_temp_dir(), 'ga_midas_lib_');
+    $batchC = tempnam(sys_get_temp_dir(), 'ga_midas_lib_');
+    file_put_contents($batchA, "%PDF-1.4\n%midas lote a\n"); file_put_contents($batchB, "%PDF-1.4\n%midas lote b\n");
+    file_put_contents($batchC, "%PDF-1.4\n%midas lote c\n");
+    $batchResult = (new MidasDocumentUploadService($midasLibrary))->uploadMany([
+        'layer_group' => 'Barrios / división política',
+        'practical_use' => 'Nutre localidad y UCG.',
+        'applies_to' => 'Numeral 2 y 3',
+    ], ['name' => ['localidades.pdf', 'ucg.pdf'], 'tmp_name' => [$batchA, $batchB],
+        'error' => [UPLOAD_ERR_OK, UPLOAD_ERR_OK]], ['name' => 'Analista']);
+    expect(count($batchResult['stored']) === 2 && $midasLibrary->latest()[0]['layer_group'] === 'Barrios / división política',
+        'biblioteca MIDAS permite carga multiple');
+    $batchDuplicate = (new MidasDocumentUploadService($midasLibrary))->uploadMany([
+        'layer_group' => 'Barrios / división política',
+    ], ['name' => ['localidades.pdf'], 'tmp_name' => [$batchC], 'error' => [UPLOAD_ERR_OK]], ['name' => 'Analista']);
+    expect(count($batchDuplicate['stored']) === 0 && count($batchDuplicate['skipped']) === 1,
+        'biblioteca MIDAS omite duplicados en carga multiple');
+    foreach ($midasLibrary->latest() as $doc) { $deleted = $midasLibrary->delete($doc['id']); @unlink((string) $deleted['file_path']); }
     @rmdir($midasLibraryDir);
     putenv('MIDAS_LIBRARY_STORAGE_DIR');
     $urbanLibrary = new UrbanNormativeRepository($db);

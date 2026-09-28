@@ -64,7 +64,7 @@ $formatDate = static function ($value): string {
             <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                     <h2 class="text-lg font-semibold text-slate-950">Subir documento MIDAS común</h2>
-                    <p class="mt-1 text-sm text-slate-600">El sistema avisa “ya existe” si coincide el código o el nombre del archivo.</p>
+                    <p class="mt-1 text-sm text-slate-600">Puedes subir hasta 20 archivos por carga. Si alguno ya existe, se omite sin duplicarlo.</p>
                 </div>
                 <span class="rounded-full <?= !empty($storage['writable']) ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700' ?> px-3 py-1 text-xs font-semibold">
                     <?= !empty($storage['writable']) ? 'Almacenamiento activo' : 'Revisar almacenamiento' ?>
@@ -80,9 +80,11 @@ $formatDate = static function ($value): string {
                 </label>
                 <label class="label">Código o referencia
                     <input class="input mt-2" name="document_code" maxlength="120" placeholder="Ej. CIRC-ALTILLO o POT-2001-USOS">
+                    <span class="mt-1 block text-xs font-normal text-slate-500">En carga múltiple puedes dejarlo vacío; se toma del nombre de cada archivo.</span>
                 </label>
                 <label class="label md:col-span-2">Nombre del documento
                     <input class="input mt-2" name="title" maxlength="240" placeholder="Ej. Descarga MIDAS Localidades Histórica y del Caribe">
+                    <span class="mt-1 block text-xs font-normal text-slate-500">Si subes varios, deja este campo vacío para nombrarlos uno por uno con el archivo.</span>
                 </label>
                 <label class="label">Estado
                     <select class="input mt-2" name="status">
@@ -92,8 +94,8 @@ $formatDate = static function ($value): string {
                     </select>
                 </label>
                 <label class="label">Archivo descargado
-                    <input class="input mt-2" type="file" name="midas_file" accept=".pdf,.csv,.json,.geojson,.zip" required>
-                    <span class="mt-1 block text-xs font-normal text-slate-500">PDF, CSV, JSON, GeoJSON o ZIP. Máximo 25 MB.</span>
+                    <input class="input mt-2" type="file" name="midas_file[]" accept=".pdf,.csv,.json,.geojson,.zip" multiple required>
+                    <span class="mt-1 block text-xs font-normal text-slate-500">PDF, CSV, JSON, GeoJSON o ZIP. Máximo 25 MB por archivo y 20 archivos por carga.</span>
                 </label>
                 <label class="label md:col-span-2">Para qué es útil
                     <textarea class="input mt-2 min-h-20" name="practical_use" maxlength="700"

@@ -25,9 +25,11 @@ final class MidasLibraryController
     public function upload(): never
     {
         try {
-            $data = (new MidasDocumentUploadService($this->documents))
-                ->upload($_POST, $_FILES['midas_file'] ?? [], $this->user);
-            Session::flash('midas_message', 'Documento MIDAS cargado: ' . $data['title'] . '.');
+            $result = (new MidasDocumentUploadService($this->documents))
+                ->uploadMany($_POST, $_FILES['midas_file'] ?? [], $this->user);
+            $message = count($result['stored']) . ' documento(s) MIDAS cargado(s).';
+            if ($result['skipped']) $message .= ' ' . count($result['skipped']) . ' ya existía(n) y se omitieron.';
+            Session::flash('midas_message', $message);
         } catch (\Throwable $error) {
             Session::flash('midas_error', $error->getMessage());
         }

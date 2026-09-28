@@ -22,7 +22,7 @@ La Normatividad Urbana queda modelada como biblioteca y módulo del capítulo 5,
 Incluye catálogo de Tipologías Constructivas IGAC con imágenes, agrupado por categoría.
 Incluye Biblioteca MIDAS como menú propio junto a IGAC, para alojar descargas comunes
 de capas, circulares urbanísticas y soportes reutilizables sin mezclarlas con Maestros
-ni repetirlas por avalúo.
+ni repetirlas por avalúo. La carga permite hasta 20 archivos por lote y omite duplicados.
 Incluye en Maestros una biblioteca documental maestra para subir soportes normativos
 faltantes, clasificarlos por destino lógico y relacionarlos con módulos sin duplicar
 el PDF. Sirve como entrada administrativa previa a integrar una norma a una biblioteca

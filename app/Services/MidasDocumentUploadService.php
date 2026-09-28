@@ -8,6 +8,23 @@ final class MidasDocumentUploadService
 {
     public function __construct(private MidasDocumentRepository $documents) {}
 
+    public function uploadMany(array $input, array $files, array $user): array
+    {
+        $items = $this->normalizeFiles($files);
+        if ($items === []) throw new \RuntimeException('Selecciona al menos un documento MIDAS.');
+        if (count($items) > 20) throw new \RuntimeException('Puedes subir máximo 20 documentos MIDAS por carga.');
+        $stored = []; $skipped = [];
+        foreach ($items as $file) {
+            try {
+                $stored[] = $this->upload($this->inputForFile($input, $file, count($items) > 1), $file, $user);
+            } catch (\RuntimeException $error) {
+                if (!str_contains($error->getMessage(), 'Ya existe')) throw $error;
+                $skipped[] = $error->getMessage();
+            }
+        }
+        return ['stored' => $stored, 'skipped' => $skipped];
+    }
+
     public function upload(array $input, array $file, array $user): array
     {
         $name = $this->cleanName((string) ($file['name'] ?? ''));
@@ -41,6 +58,26 @@ final class MidasDocumentUploadService
             'created_by' => $this->text($user['name'] ?? '', 120), 'now' => gmdate('Y-m-d H:i:s')];
         $this->documents->store($data);
         return $data;
+    }
+
+    private function normalizeFiles(array $files): array
+    {
+        if (!is_array($files['name'] ?? null)) return ($files['name'] ?? '') !== '' ? [$files] : [];
+        $items = [];
+        foreach ($files['name'] as $i => $name) {
+            $items[] = ['name' => $name, 'type' => $files['type'][$i] ?? '', 'tmp_name' => $files['tmp_name'][$i] ?? '',
+                'error' => $files['error'][$i] ?? UPLOAD_ERR_NO_FILE, 'size' => $files['size'][$i] ?? 0];
+        }
+        return array_values(array_filter($items, fn (array $file): bool => (string) ($file['name'] ?? '') !== ''));
+    }
+
+    private function inputForFile(array $input, array $file, bool $batch): array
+    {
+        if (!$batch) return $input;
+        $base = pathinfo($this->cleanName((string) ($file['name'] ?? '')), PATHINFO_FILENAME) ?: 'Documento MIDAS';
+        if ($this->text($input['title'] ?? '', 240) === '') $input['title'] = $base;
+        if ($this->text($input['document_code'] ?? '', 120) === '') $input['document_code'] = $base;
+        return $input;
     }
 
     private function cleanName(string $name): string
