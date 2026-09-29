@@ -43,6 +43,7 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional',
         data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/expediente/autoguardar')) ?>"
         x-data="{
             busy: false, active: window.location.hash === '#identificacion' || (window.location.hash === '' && <?= $hasDossierNumber ? 'true' : 'false' ?>) ? 'identificacion' : 'configuracion',
+            chapterOneTab: 'solicitud',
             notes: <?= e(json_encode($initial['notes'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             subtypeByProperty: <?= e(json_encode(AppraisalCatalog::subtypesByPropertyType(), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             selectedPropertyType: <?= e(json_encode($field('tipo_inmueble'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
@@ -68,7 +69,7 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional',
                     <p class="eyebrow">Expediente valuatorio</p>
                     <h2 class="mt-2 text-2xl font-semibold">Configuración e identificación del encargo</h2>
                 </div>
-                <div class="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-800">1.1 / 1.2</div>
+                <div class="rounded-full bg-blue-50 px-3 py-1 text-sm font-semibold text-blue-800">1.1 - 1.11</div>
             </div>
             <?php require BASE_PATH . '/app/Views/appraisals/chapter-one-academy.php'; ?>
             <nav class="mt-6 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Subsecciones del expediente">
@@ -77,7 +78,7 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional',
                     @click="setActive('configuracion')">1.1 Configuración</button>
                 <button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
                     :class="active === 'identificacion' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800'"
-                    @click="setActive('identificacion')">1.2 Identificación del encargo</button>
+                    @click="setActive('identificacion')">1.2 - 1.11 Identificación</button>
             </nav>
 
             <div class="mt-6 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950"
