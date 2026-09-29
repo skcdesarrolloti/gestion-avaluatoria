@@ -36,6 +36,7 @@ final class MidasDocumentUploadService
         }
         $groups = MidasDocumentRepository::groups();
         $group = MidasDocumentRepository::canonicalGroup($this->text($input['layer_group'] ?? '', 120));
+        $group = $this->groupForFile($group, $name);
         if (!isset($groups[$group])) throw new \InvalidArgumentException('Selecciona el grupo de capa MIDAS.');
         $title = $this->text($input['title'] ?? '', 240);
         if ($title === '') $title = pathinfo($name, PATHINFO_FILENAME) ?: 'Documento MIDAS';
@@ -96,6 +97,32 @@ final class MidasDocumentUploadService
     private function status(string $status): string
     {
         return in_array($status, ['vigente', 'historico', 'reemplazado'], true) ? $status : 'vigente';
+    }
+
+    private function groupForFile(string $selected, string $name): string
+    {
+        $plain = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', $name) ?: $name;
+        $plain = strtolower($plain);
+        return match (true) {
+            str_contains($plain, 'comunas_ucg'),
+            str_contains($plain, 'unidad_comunera'),
+            str_contains($plain, 'unidades_comuneras'),
+            preg_match('/(^|[^a-z])ucg[0-9_ -]*/', $plain) === 1 => 'Unidades comuneras de gobierno',
+            str_contains($plain, 'localidad') || str_contains($plain, 'localidades') => 'Localidades',
+            str_contains($plain, 'barrio') || str_contains($plain, 'barrios') => 'Barrios / división política',
+            str_contains($plain, 'circular') => 'Circulares MIDAS',
+            str_contains($plain, 'servicio') => 'Servicios públicos',
+            str_contains($plain, 'transporte') || str_contains($plain, 'movilidad') => 'Transporte y movilidad',
+            str_contains($plain, 'equipamiento') => 'Equipamiento urbano',
+            str_contains($plain, 'educacion') => 'Educación',
+            str_contains($plain, 'salud') => 'Salud',
+            str_contains($plain, 'seguridad') => 'Seguridad',
+            str_contains($plain, 'cultura') => 'Cultura',
+            str_contains($plain, 'cambio_climatico') || str_contains($plain, 'climatico') => 'Cambio climático',
+            str_contains($plain, 'riesgo') || str_contains($plain, 'amenaza') => 'Ambiente y riesgos',
+            str_contains($plain, 'uso_suelo') || str_contains($plain, 'tratamiento') => 'Uso del suelo y tratamientos',
+            default => $selected,
+        };
     }
 
     private function slug(string $value): string

@@ -406,15 +406,24 @@ try {
         'layer_group' => 'Barrios / división política',
         'practical_use' => 'Nutre localidad y UCG.',
         'applies_to' => 'Numeral 2 y 3',
-    ], ['name' => ['localidades.pdf', 'ucg.pdf'], 'tmp_name' => [$batchA, $batchB],
+    ], ['name' => ['barrios-lote-a.pdf', 'barrios-lote-b.pdf'], 'tmp_name' => [$batchA, $batchB],
         'error' => [UPLOAD_ERR_OK, UPLOAD_ERR_OK]], ['name' => 'Analista']);
     expect(count($batchResult['stored']) === 2 && $midasLibrary->latest()[0]['layer_group'] === 'Barrios / división política',
         'biblioteca MIDAS permite carga multiple');
     $batchDuplicate = (new MidasDocumentUploadService($midasLibrary))->uploadMany([
         'layer_group' => 'Barrios / división política',
-    ], ['name' => ['localidades.pdf'], 'tmp_name' => [$batchC], 'error' => [UPLOAD_ERR_OK]], ['name' => 'Analista']);
+    ], ['name' => ['barrios-lote-a.pdf'], 'tmp_name' => [$batchC], 'error' => [UPLOAD_ERR_OK]], ['name' => 'Analista']);
     expect(count($batchDuplicate['stored']) === 0 && count($batchDuplicate['skipped']) === 1,
         'biblioteca MIDAS omite duplicados en carga multiple');
+    $ucgNamed = tempnam(sys_get_temp_dir(), 'ga_midas_lib_');
+    file_put_contents($ucgNamed, "%PDF-1.4\n%midas ucg\n");
+    $ucgResult = (new MidasDocumentUploadService($midasLibrary))->uploadMany([
+        'layer_group' => 'Localidades',
+    ], ['name' => ['pdf_descargas_division_politica_comunas_ucg13.pdf'], 'tmp_name' => [$ucgNamed],
+        'error' => [UPLOAD_ERR_OK]], ['name' => 'Analista']);
+    expect(count($ucgResult['stored']) === 1
+        && $ucgResult['stored'][0]['layer_group'] === 'Unidades comuneras de gobierno',
+        'biblioteca MIDAS reclasifica archivos UCG por nombre');
     foreach ($midasLibrary->latest() as $doc) { $deleted = $midasLibrary->delete($doc['id']); @unlink((string) $deleted['file_path']); }
     @rmdir($midasLibraryDir);
     putenv('MIDAS_LIBRARY_STORAGE_DIR');

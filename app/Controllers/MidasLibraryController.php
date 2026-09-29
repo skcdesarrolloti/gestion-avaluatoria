@@ -35,16 +35,20 @@ final class MidasLibraryController
 
     public function upload(): never
     {
+        $selectedGroup = MidasDocumentRepository::canonicalGroup((string) ($_POST['layer_group'] ?? ''));
         try {
             $result = (new MidasDocumentUploadService($this->documents))
                 ->uploadMany($_POST, $_FILES['midas_file'] ?? [], $this->user);
             $message = count($result['stored']) . ' documento(s) MIDAS cargado(s).';
             if ($result['skipped']) $message .= ' ' . count($result['skipped']) . ' ya existía(n) y se omitieron.';
             Session::flash('midas_message', $message);
+            if ($result['stored']) $selectedGroup = (string) ($result['stored'][0]['layer_group'] ?? $selectedGroup);
         } catch (\Throwable $error) {
             Session::flash('midas_error', $error->getMessage());
         }
-        Http::redirect('midas#biblioteca-midas');
+        $groups = MidasDocumentRepository::groups();
+        $target = isset($groups[$selectedGroup]) ? '?grupo=' . rawurlencode($selectedGroup) : '';
+        Http::redirect('midas' . $target . '#biblioteca-midas');
     }
 
     public function file(string $id): never

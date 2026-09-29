@@ -77,7 +77,11 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
                 <?= csrf_field() ?>
                 <label class="label">Grupo de capa
                     <select class="input mt-2" name="layer_group" required>
-                        <?php foreach (array_keys($groups) as $group): ?><option value="<?= e((string) $group) ?>"><?= e((string) $group) ?></option><?php endforeach; ?>
+                        <?php foreach (array_keys($groups) as $group): ?>
+                            <option value="<?= e((string) $group) ?>" <?= (string) $group === $activeGroup ? 'selected' : '' ?>>
+                                <?= e((string) $group) ?>
+                            </option>
+                        <?php endforeach; ?>
                     </select>
                 </label>
                 <label class="label">Código o referencia
