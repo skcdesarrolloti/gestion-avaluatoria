@@ -114,7 +114,7 @@ final class AppraisalController
             $this->chapterNotes($notes, '5'), AppraisalReportNoteCatalog::noteSectionLabels('5', $this->chapterNotes($notes, '5')));
         $economicChapter = $this->narrativeReport($id, '6', AppraisalEconomicCatalog::sections(), AppraisalEconomicCatalog::defaults(), $notes, $midasDocuments);
         $restrictiveChapter = $this->narrativeReport($id, '7', AppraisalRestrictiveConditionsCatalog::sections(), AppraisalRestrictiveConditionsCatalog::defaults(), $notes, $midasDocuments);
-        $methodologyChapter = $integrator->apply((new AppraisalMethodologyChapterReport())->build($record, $subject),
+        $methodologyChapter = $integrator->apply((new AppraisalMethodologyChapterReport())->build($record, $subject, $units),
             $this->chapterNotes($notes, '8'), AppraisalReportNoteCatalog::noteSectionLabels('8', $this->chapterNotes($notes, '8')));
         view('appraisals/deliverable', ['title' => 'Entregable', 'record' => $record,
             'phProfile' => $phProfile, 'chapterOne' => $chapterOne, 'sectorChapter' => $sectorChapter,

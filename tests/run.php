@@ -178,6 +178,21 @@ try {
     ]);
     expect(str_contains((string) ($methodologyNiifIncome['sections'][2][1] ?? ''), 'antecedente económico del activo'),
         'numeral 8.2 usa activo cuando el encargo es NIIF');
+    $methodologyUnits = (new AppraisalMethodologyChapterReport())->build(
+        ['tipo_inmueble' => 'oficina', 'tipo_negocio' => 'venta', 'igac_property_units_count' => 1, 'igac_annex_units_count' => 2],
+        [],
+        [
+            ['unit_kind' => 'property', 'unit_index' => 1, 'label' => 'Oficina 206', 'property_type' => 'oficina'],
+            ['unit_kind' => 'annex', 'unit_index' => 1, 'label' => 'Parqueadero No. 60', 'property_type' => 'parqueadero'],
+            ['unit_kind' => 'annex', 'unit_index' => 2, 'label' => 'Depósito No. 12', 'property_type' => 'deposito'],
+        ]
+    );
+    $methodologyUnitsText = (string) ($methodologyUnits['sections'][2][1] ?? '');
+    expect(str_contains($methodologyUnitsText, 'Oficina 206')
+        && str_contains($methodologyUnitsText, 'Parqueadero No. 60')
+        && str_contains($methodologyUnitsText, 'Depósito No. 12')
+        && str_contains($methodologyUnitsText, 'no mezclar unidades principales, anexos'),
+        'numeral 8.2 incorpora composicion y nombres del numeral 3.1');
     $methodologyNiif = (new AppraisalMethodologyChapterReport())->build(['aplica_niif' => 'si', 'base_valor' => 'razonable']);
     expect(str_contains((string) ($methodologyNiif['decision']['niif_note'] ?? ''), 'NIIF'), 'numeral 8.2 agrega nota NIIF cuando aplica');
     $chapterOneViewRecord = array_replace(\App\Support\AppraisalCatalog::defaults(), [

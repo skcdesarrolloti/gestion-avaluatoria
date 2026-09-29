@@ -39,6 +39,7 @@ foreach ($visibleUnits as $unit) $labelMap[$unit['id']] = $labelInput($unit);
     </div>
     <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/unidades')) ?>"
         data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/unidades/autoguardar')) ?>"
+        data-autosave-topic="<?= e('appraisal:' . $record['id'] . ':subject-units') ?>"
         x-data="{ busy: false }" @submit="busy = true">
         <?= csrf_field() ?>
         <?php if (!$visibleUnits): ?>

@@ -12,7 +12,8 @@ function broadcast(detail) {
 function handle(detail) {
     if (!detail?.topic) return;
     document.querySelectorAll('[data-refresh-on-save-topic]').forEach(node => {
-        if (node.dataset.refreshOnSaveTopic !== detail.topic) return;
+        const topics = node.dataset.refreshOnSaveTopic.split(',').map(topic => topic.trim());
+        if (!topics.includes(detail.topic)) return;
         if (node.dataset.refreshing === '1') return;
         node.dataset.refreshing = '1';
         node.querySelector('[data-refresh-message]')?.classList.remove('hidden');

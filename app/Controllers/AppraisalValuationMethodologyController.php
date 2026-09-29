@@ -20,7 +20,7 @@ final class AppraisalValuationMethodologyController
         $subject = $this->subjects->find($id, $this->user['id']);
         $units = $this->appraisals->units($id, $this->user['id']);
         $phProfile = $this->ph->profile($id, $this->user['id']);
-        $methodologyChapter = (new AppraisalMethodologyChapterReport())->build($record, $subject);
+        $methodologyChapter = (new AppraisalMethodologyChapterReport())->build($record, $subject, $units);
         view('appraisals/valuation-methodology', ['title' => 'Metodología valuatoria',
             'record' => $record, 'subject' => $subject, 'units' => $units, 'phProfile' => $phProfile,
             'methodologyChapter' => $methodologyChapter,
