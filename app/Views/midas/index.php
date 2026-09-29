@@ -8,7 +8,6 @@ $activeDocuments = array_values(array_filter($documents, static fn (array $doc):
 $targets = [
     'Localidades' => 'Numeral 2: sector y fuente territorial. Numeral 3: localidad del predio.',
     'Unidades comuneras de gobierno' => 'Numeral 2: contexto urbano. Numeral 3: UCG del inmueble.',
-    'Barrios / división política' => 'Numeral 2: barrio o sector, delimitación y fuente territorial. Numeral 3: localidad, barrio y UCG.',
     'Uso del suelo y tratamientos' => 'Numeral 5: lectura MIDAS del predio, actividad, usos permitidos, tratamiento y conclusión urbana.',
     'Circulares MIDAS' => 'Numeral 5 y futuro módulo 9: criterios complementarios de Planeación.',
     'Circulares urbanísticas' => 'Numeral 5 y futuro potencial: altura, parqueaderos, altillos y salvedades normativas.',
@@ -24,7 +23,7 @@ $targets = [
     'Otro soporte MIDAS' => 'Se usa solo si el analista define qué campo o numeral sustenta.',
 ];
 $sections = [
-    'Base territorial' => ['Localidades', 'Unidades comuneras de gobierno', 'Barrios / división política'],
+    'Base territorial' => ['Localidades', 'Unidades comuneras de gobierno'],
     'Norma urbana' => ['Uso del suelo y tratamientos', 'Circulares MIDAS'],
     'Entorno y restricciones' => ['Servicios públicos', 'Transporte y movilidad', 'Equipamiento urbano', 'Educación', 'Salud', 'Seguridad', 'Cultura', 'Ambiente y riesgos', 'Cambio climático', 'Otro soporte MIDAS'],
 ];
@@ -46,6 +45,7 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
                 Guarda una sola vez las descargas comunes de MIDAS: circulares urbanísticas, división política,
                 servicios, movilidad, equipamientos, riesgos y soportes cartográficos.
                 El POT base se conserva en Normatividad Urbana; aquí solo van capas MIDAS o evidencias reutilizables.
+                El barrio no aparece como descarga común: se documenta como consulta específica del avalúo.
             </p>
         </div>
         <label class="block min-w-full text-sm font-medium text-slate-700 lg:min-w-80">

@@ -109,7 +109,7 @@ final class MidasDocumentUploadService
             str_contains($plain, 'unidades_comuneras'),
             preg_match('/(^|[^a-z])ucg[0-9_ -]*/', $plain) === 1 => 'Unidades comuneras de gobierno',
             str_contains($plain, 'localidad') || str_contains($plain, 'localidades') => 'Localidades',
-            str_contains($plain, 'barrio') || str_contains($plain, 'barrios') => 'Barrios / división política',
+            str_contains($plain, 'barrio') || str_contains($plain, 'barrios') => 'Otro soporte MIDAS',
             str_contains($plain, 'circular') => 'Circulares MIDAS',
             str_contains($plain, 'servicio') => 'Servicios públicos',
             str_contains($plain, 'transporte') || str_contains($plain, 'movilidad') => 'Transporte y movilidad',

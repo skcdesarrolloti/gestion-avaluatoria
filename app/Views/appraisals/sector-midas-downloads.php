@@ -6,9 +6,6 @@ $midasLayerHelp = [
     'Unidades comuneras de gobierno' => ['contiene' => 'UCG urbanas y rurales descargadas desde MIDAS.',
         'sirve' => 'Precisar la unidad comunera de gobierno donde se ubica el barrio o predio.',
         'utilidad' => 'Útil para sectorización, trazabilidad territorial y campos de ubicación del expediente.'],
-    'Barrios / división política' => ['contiene' => 'Barrios, límites de barrio, localidades relacionadas y UCG del sector.',
-        'sirve' => 'Ubicar el barrio del avalúo, confirmar el sector de trabajo y soportar la delimitación territorial.',
-        'utilidad' => 'Muy útil para iniciar el capítulo 2 y evitar confundir barrio, localidad o UCG.'],
     'Uso del suelo y tratamientos' => ['contiene' => 'Capas específicas de uso, tratamiento, actividad y clasificación urbanística.',
         'sirve' => 'Registrar la lectura práctica de MIDAS del predio sin volver a cargar el POT base.',
         'utilidad' => 'Esencial para el numeral 5; el POT completo se consulta en Normatividad Urbana.'],
@@ -58,6 +55,7 @@ $midasLayerHelp = [
                 <li>Los documentos comunes se guardan una sola vez en Biblioteca MIDAS.</li>
                 <li>Sube aquí solo la evidencia específica del barrio, predio o consulta del caso.</li>
                 <li>Si el soporte ya está en la biblioteca, consúltalo allí y cita su referencia.</li>
+                <li>Barrios no tiene descarga común visible; usa la consulta del mapa o predio como soporte del caso.</li>
             </ol>
             <a class="btn-secondary mt-4 inline-flex bg-white" href="<?= e(url('midas')) ?>">Ver Biblioteca MIDAS</a>
         </div>

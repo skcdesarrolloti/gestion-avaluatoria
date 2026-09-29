@@ -16,7 +16,6 @@ final class MidasDocumentRepository
         return [
             'Localidades' => 'Ruta MIDAS: Descargas > División política > Localidades.',
             'Unidades comuneras de gobierno' => 'Ruta MIDAS: Descargas > División política > Unidades comuneras de gobierno.',
-            'Barrios / división política' => 'Ruta MIDAS: Descargas > División política > Barrios o límites territoriales.',
             'Uso del suelo y tratamientos' => 'Ruta MIDAS: consulta predial o capas de uso/tratamiento; no reemplaza el POT base.',
             'Circulares MIDAS' => 'Ruta MIDAS o Planeación: circulares urbanísticas descargables.',
             'Servicios públicos' => 'Ruta MIDAS: Descargas > Servicios públicos.',
@@ -37,6 +36,7 @@ final class MidasDocumentRepository
         return match ($group) {
             'Circulares urbanísticas', 'Circulares Midas' => 'Circulares MIDAS',
             'POT / ordenamiento territorial' => 'Uso del suelo y tratamientos',
+            'Barrios / división política' => 'Otro soporte MIDAS',
             default => $group,
         };
     }

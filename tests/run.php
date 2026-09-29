@@ -403,16 +403,16 @@ try {
     file_put_contents($batchA, "%PDF-1.4\n%midas lote a\n"); file_put_contents($batchB, "%PDF-1.4\n%midas lote b\n");
     file_put_contents($batchC, "%PDF-1.4\n%midas lote c\n");
     $batchResult = (new MidasDocumentUploadService($midasLibrary))->uploadMany([
-        'layer_group' => 'Barrios / división política',
+        'layer_group' => 'Localidades',
         'practical_use' => 'Nutre localidad y UCG.',
         'applies_to' => 'Numeral 2 y 3',
-    ], ['name' => ['barrios-lote-a.pdf', 'barrios-lote-b.pdf'], 'tmp_name' => [$batchA, $batchB],
+    ], ['name' => ['localidad-lote-a.pdf', 'localidad-lote-b.pdf'], 'tmp_name' => [$batchA, $batchB],
         'error' => [UPLOAD_ERR_OK, UPLOAD_ERR_OK]], ['name' => 'Analista']);
-    expect(count($batchResult['stored']) === 2 && $midasLibrary->latest()[0]['layer_group'] === 'Barrios / división política',
+    expect(count($batchResult['stored']) === 2 && $midasLibrary->latest()[0]['layer_group'] === 'Localidades',
         'biblioteca MIDAS permite carga multiple');
     $batchDuplicate = (new MidasDocumentUploadService($midasLibrary))->uploadMany([
-        'layer_group' => 'Barrios / división política',
-    ], ['name' => ['barrios-lote-a.pdf'], 'tmp_name' => [$batchC], 'error' => [UPLOAD_ERR_OK]], ['name' => 'Analista']);
+        'layer_group' => 'Localidades',
+    ], ['name' => ['localidad-lote-a.pdf'], 'tmp_name' => [$batchC], 'error' => [UPLOAD_ERR_OK]], ['name' => 'Analista']);
     expect(count($batchDuplicate['stored']) === 0 && count($batchDuplicate['skipped']) === 1,
         'biblioteca MIDAS omite duplicados en carga multiple');
     $ucgNamed = tempnam(sys_get_temp_dir(), 'ga_midas_lib_');
