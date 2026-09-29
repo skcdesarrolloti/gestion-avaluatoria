@@ -209,6 +209,23 @@ try {
         && str_contains($chapterOneViewHtml, 'Localización y dirección del inmueble')
         && str_contains($chapterOneViewHtml, 'Checklist documental')
         && str_contains($chapterOneViewHtml, 'Documentos aportados o insumos'), 'numeral 1.2 renderiza despues de selectores');
+    $record = array_replace(\App\Support\AppraisalCatalog::defaults(), [
+        'id' => str_repeat('a', 32), 'version' => 1, 'igac_property_units_count' => 1, 'igac_annex_units_count' => 2,
+    ]);
+    $field = static fn (string $name): string => (string) ($record[$name] ?? '');
+    $selected = static fn (string $name, string $value): string => $field($name) === $value ? 'selected' : '';
+    $count = static fn (string $name): int => max(0, (int) ($record[$name] ?? 0));
+    $appraisers = [['id' => 'perito-1', 'code' => '01', 'full_name' => 'Nassif Abuita Nassar']];
+    $selectedAppraiser = static fn (string $value): string => $value === 'perito-1' ? 'selected' : '';
+    ob_start();
+    require BASE_PATH . '/app/Views/appraisals/chapter-zero-configuration-fields.php';
+    $configurationViewHtml = ob_get_clean();
+    expect(str_contains($configurationViewHtml, 'Perito y expediente')
+        && str_contains($configurationViewHtml, 'Negocio y tipología')
+        && str_contains($configurationViewHtml, 'Renta')
+        && str_contains($configurationViewHtml, 'NIIF y PH')
+        && str_contains($configurationViewHtml, 'En 3.1 nombras cada una'),
+        'numeral 1.1 renderiza subpestanas de configuracion');
     $_POST = ['intended_use' => str_repeat('uso ', 80), 'source_documents_selected' => ['escritura_publica', 'mapa_localizacion', 'invalido'],
         'income_producing' => 'si', 'rent_amount' => '3.500.000,50', 'ph_admin_fee_amount' => '850.000',
         'rent_period' => 'mensual', 'rent_charges_vat' => 'si'];
