@@ -23,7 +23,8 @@ final class AppraisalUnitDefinitionInput
             if (!in_array($treatment, AppraisalUnitValuationTreatmentCatalog::allowed(), true)) {
                 $treatment = AppraisalUnitValuationTreatmentCatalog::defaultFor($match[1], $constructionType);
             }
-            $igacCategory = mb_substr(trim((string) ($unit['igac_category'] ?? '')), 0, 40);
+            $igacCategory = AppraisalConstructionTypeCatalog::igacCategoryFor($constructionType)
+                ?: mb_substr(trim((string) ($unit['igac_category'] ?? '')), 0, 40);
             $rows[] = [
                 'unit_kind' => $match[1],
                 'unit_index' => (int) $match[2],
@@ -31,7 +32,7 @@ final class AppraisalUnitDefinitionInput
                 'property_type' => $propertyType,
                 'construction_type' => $constructionType,
                 'valuation_treatment' => $treatment,
-                'igac_category' => $match[1] === 'annex' ? 'ANEXOS' : $igacCategory,
+                'igac_category' => $igacCategory,
                 'igac_typology_hint' => mb_substr(trim((string) ($unit['igac_typology_hint'] ?? '')), 0, 190),
                 'notes' => mb_substr(trim((string) ($unit['notes'] ?? '')), 0, 2000),
             ];

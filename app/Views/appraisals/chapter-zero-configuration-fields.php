@@ -21,7 +21,8 @@ $treatmentValue = static function (array $unit): string {
         ?: \App\Support\AppraisalUnitValuationTreatmentCatalog::defaultFor((string) ($unit['unit_kind'] ?? ''), (string) ($unit['construction_type'] ?? '')));
 };
 $igacCategoryValue = static fn (array $unit): string =>
-    ($unit['unit_kind'] ?? '') === 'annex' ? 'ANEXOS' : (string) ($unit['igac_category'] ?? '');
+    \App\Support\AppraisalConstructionTypeCatalog::igacCategoryFor((string) ($unit['construction_type'] ?? ''))
+        ?: (($unit['unit_kind'] ?? '') === 'annex' ? 'ANEXOS' : (string) ($unit['igac_category'] ?? ''));
 $igacOptionsFor = static fn (string $category): array => $igacTypologiesByCategory[$category] ?? [];
 $igacSearchPlaceholder = static fn (array $unit): string =>
     ($unit['unit_kind'] ?? '') === 'annex' ? 'Buscar anexo IGAC: piscina, depósito, kiosco...' : 'Buscar tipología IGAC de la unidad principal';
@@ -105,8 +106,18 @@ $igacSearchPlaceholder = static fn (array $unit): string =>
                     <?php $key = ($unit['unit_kind'] === 'annex' ? 'annex' : 'property') . '-' . (int) $unit['unit_index']; ?>
                     <?php $igacCategory = $igacCategoryValue($unit); ?>
                     <article class="grid gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4 md:grid-cols-2"
-                        x-data="{ igacCategory: <?= e(json_encode($igacCategory, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
-                            igacHint: <?= e(json_encode((string) ($unit['igac_typology_hint'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?> }">
+                        x-data="{
+                            unitKind: <?= e(json_encode((string) ($unit['unit_kind'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+                            constructionType: <?= e(json_encode((string) ($unit['construction_type'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+                            igacCategory: <?= e(json_encode($igacCategory, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+                            igacHint: <?= e(json_encode((string) ($unit['igac_typology_hint'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+                            syncIgacFromConstruction() {
+                                const next = constructionIgacCategories[this.constructionType] || (this.unitKind === 'annex' ? 'ANEXOS' : '')
+                                if (next && next !== this.igacCategory) this.igacCategory = next
+                                if (!(typologies[this.igacCategory] || []).some(item => item.value === this.igacHint)) this.igacHint = ''
+                            }
+                        }"
+                        x-init="syncIgacFromConstruction()">
                         <label class="label">Nombre del componente
                             <input class="input" name="config_units[<?= e($key) ?>][label]" maxlength="120"
                                 value="<?= e($unitDisplay($unit)) ?>" placeholder="Ej. Casa principal, Piscina, Parqueadero 1">
@@ -123,6 +134,16 @@ $igacSearchPlaceholder = static fn (array $unit): string =>
                         <?php else: ?>
                             <input type="hidden" name="config_units[<?= e($key) ?>][property_type]" value="">
                         <?php endif; ?>
+                        <label class="label"><?= ($unit['unit_kind'] ?? '') === 'annex' ? 'Tipo de anexo o mejora' : 'Tipo de construcción' ?>
+                            <select class="input" name="config_units[<?= e($key) ?>][construction_type]" x-model="constructionType"
+                                @change="syncIgacFromConstruction()">
+                                <?php foreach ($constructionTypes as $value => $text): ?>
+                                    <option value="<?= e($value) ?>" <?= (string) ($unit['construction_type'] ?? '') === $value ? 'selected' : '' ?>>
+                                        <?= e($text) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
                         <?php if (($unit['unit_kind'] ?? '') === 'property'): ?>
                             <label class="label">Buscador IGAC para unidad principal
                                 <select class="input" name="config_units[<?= e($key) ?>][igac_category]" x-model="igacCategory"
@@ -134,10 +155,10 @@ $igacSearchPlaceholder = static fn (array $unit): string =>
                                 </select>
                             </label>
                         <?php else: ?>
-                            <input type="hidden" name="config_units[<?= e($key) ?>][igac_category]" value="ANEXOS">
+                            <input type="hidden" name="config_units[<?= e($key) ?>][igac_category]" value="<?= e($igacCategory) ?>" :value="igacCategory">
                             <div class="rounded-lg border border-teal-100 bg-teal-50 p-3 text-sm text-teal-950">
                                 <strong class="block text-xs uppercase text-teal-800">Buscador IGAC para anexos</strong>
-                                Usa la categoría ANEXOS del catálogo IGAC; allí están piscinas, depósitos, kioscos, ramadas y otros componentes.
+                                El tipo elegido arriba define la categoría IGAC y filtra las tipologías disponibles.
                             </div>
                         <?php endif; ?>
                         <label class="label">Tipología IGAC de apoyo
@@ -157,15 +178,6 @@ $igacSearchPlaceholder = static fn (array $unit): string =>
                                 <span x-text="(typologies[igacCategory] || []).length"></span>
                                 referencia(s) IGAC disponibles para esta búsqueda.
                             </span>
-                        </label>
-                        <label class="label"><?= ($unit['unit_kind'] ?? '') === 'annex' ? 'Tipo de anexo o mejora' : 'Tipo de construcción' ?>
-                            <select class="input" name="config_units[<?= e($key) ?>][construction_type]">
-                                <?php foreach ($constructionTypes as $value => $text): ?>
-                                    <option value="<?= e($value) ?>" <?= (string) ($unit['construction_type'] ?? '') === $value ? 'selected' : '' ?>>
-                                        <?= e($text) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
                         </label>
                         <label class="label">Tratamiento en el avalúo
                             <select class="input" name="config_units[<?= e($key) ?>][valuation_treatment]">

@@ -47,6 +47,7 @@ $currentStep = 'expediente';
             notes: <?= e(json_encode($initial['notes'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             subtypeByProperty: <?= e(json_encode(AppraisalCatalog::subtypesByPropertyType(), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             typologies: <?= e(json_encode($igacTypologiesByCategory ?? [], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+            constructionIgacCategories: <?= e(json_encode(\App\Support\AppraisalConstructionTypeCatalog::igacCategories(), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             selectedPropertyType: <?= e(json_encode($field('tipo_inmueble'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             selectedSubtype: <?= e(json_encode($field('subtipo_funcional'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             propertyUnits: <?= e((string) $count('igac_property_units_count')) ?>,

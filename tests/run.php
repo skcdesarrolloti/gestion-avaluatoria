@@ -288,6 +288,9 @@ try {
         && str_contains($configurationViewHtml, 'Integrado al inmueble principal')
         && str_contains($configurationViewHtml, 'Piscina'),
         'numeral 1.1 renderiza subpestanas de configuracion');
+    expect(strpos($configurationViewHtml, 'config_units[annex-1][construction_type]')
+        < strpos($configurationViewHtml, 'config_units[annex-1][igac_typology_hint]'),
+        'numeral 1.1 pide tipo de anexo antes de filtrar tipologia IGAC');
     $unitDefinitionRows = AppraisalUnitDefinitionInput::rows(['annex-1' => [
         'label' => 'Piscina recreativa', 'property_type' => 'bogus',
         'construction_type' => 'piscina', 'valuation_treatment' => 'bogus',
@@ -302,6 +305,11 @@ try {
         && $unitDefinitionRows[0]['property_type'] === ''
         && strlen($unitDefinitionRows[0]['notes']) === 2000,
         'definicion temprana 1.1 normaliza unidades y anexos');
+    $houseAnnexRows = AppraisalUnitDefinitionInput::rows(['annex-1' => [
+        'label' => 'Casa auxiliar', 'construction_type' => 'casa', 'igac_category' => 'ANEXOS',
+    ]]);
+    expect($houseAnnexRows[0]['igac_category'] === 'RESIDENCIALES',
+        'definicion temprana filtra casa hacia tipologias IGAC residenciales');
     $_POST = ['intended_use' => str_repeat('uso ', 80), 'source_documents_selected' => ['escritura_publica', 'mapa_localizacion', 'invalido'],
         'income_producing' => 'si', 'rent_amount' => '3.500.000,50', 'ph_admin_fee_amount' => '850.000',
         'rent_period' => 'mensual', 'rent_charges_vat' => 'si'];

@@ -33,4 +33,32 @@ final class AppraisalConstructionTypeCatalog
     {
         return array_keys(self::types());
     }
+
+    public static function igacCategories(): array
+    {
+        return [
+            'galpon' => 'INDUSTRIALES',
+            'bodega' => 'INDUSTRIALES',
+            'casa' => 'RESIDENCIALES',
+            'apartamento' => 'RESIDENCIALES',
+            'local' => 'COMERCIALES',
+            'oficina' => 'COMERCIALES',
+            'deposito' => 'ANEXOS',
+            'kiosco' => 'ANEXOS',
+            'ramada' => 'ANEXOS',
+            'mezanine' => 'ANEXOS',
+            'cubierta' => 'ANEXOS',
+            'cerramiento' => 'ANEXOS',
+            'muro' => 'ANEXOS',
+            'porton' => 'ANEXOS',
+            'placa' => 'ANEXOS',
+            'parqueo' => 'ANEXOS',
+            'piscina' => 'ANEXOS',
+        ];
+    }
+
+    public static function igacCategoryFor(string $type): string
+    {
+        return self::igacCategories()[$type] ?? '';
+    }
 }
