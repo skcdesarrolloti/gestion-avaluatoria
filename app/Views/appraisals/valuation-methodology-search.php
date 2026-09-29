@@ -1,13 +1,21 @@
 <?php
 $portalFields = is_array($guide['portal_fields'] ?? null) ? $guide['portal_fields'] : [];
 $portalFilters = is_array($guide['portal_filters'] ?? null) ? $guide['portal_filters'] : [];
+$nextStep = is_array($methodologyDecision['next_step'] ?? null) ? $methodologyDecision['next_step'] : ['8.3 Desarrollo del método', ''];
+$formulaFamilies = [
+    ['Mercado', 'Valor unitario = precio depurado / unidad de comparación; luego promedio, mediana, desviación, coeficiente de variación, rango y ajustes de homologación.'],
+    ['Renta', 'Ingreso neto = canon bruto menos vacancia, administración no recuperable y gastos; valor = ingreso neto anual / tasa, o flujo descontado si aplica.'],
+    ['Residual', 'Valor del suelo = ingresos esperados del producto menos costos directos, indirectos, financieros, utilidad, tiempos y riesgos del desarrollo.'],
+    ['Costo', 'Valor = terreno + costo de reposición nuevo menos depreciación física, funcional y económica, con soporte de cantidades y precios.'],
+];
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
     <div class="mb-6">
-        <p class="eyebrow">Preparación para portales</p>
-        <h2 class="mt-2 text-2xl font-semibold">Qué buscar antes de capturar comparables</h2>
+        <p class="eyebrow">8.3 Desarrollo operativo del método</p>
+        <h2 class="mt-2 text-2xl font-semibold"><?= e((string) ($nextStep[0] ?? 'Búsqueda y preparación técnica')) ?></h2>
         <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            El método elegido se convierte aquí en filtros y atributos verificables para salir a portales, llamadas o bases propias.
+            Este bloque inicia después de decidir el método en 8.2. Si el método es mercado, prepara comparables;
+            si es renta, residual o costo, prepara los insumos y fórmulas propias antes del análisis.
         </p>
     </div>
     <div class="grid gap-4 lg:grid-cols-3">
@@ -26,6 +34,13 @@ $portalFilters = is_array($guide['portal_filters'] ?? null) ? $guide['portal_fil
             <h3 class="mt-2 text-xl font-semibold"><?= e($guide['right_label'] ?: 'Derecho pendiente') ?></h3>
             <p class="mt-2 text-sm leading-6 text-slate-600">Si cambia el derecho jurídico, la muestra requiere observación antes de homologarse.</p>
         </div>
+    </div>
+
+    <div class="mt-6 rounded-xl border border-emerald-100 bg-emerald-50 p-4 text-sm leading-6 text-emerald-950">
+        <strong>Regla de flujo:</strong>
+        <?= e((string) ($nextStep[1] ?? 'Define primero los insumos del método seleccionado.')) ?>
+        No se deben mezclar comparables, rentas, costos o residuales sin dejar claro cuál es el método principal
+        y cuál opera solo como contraste.
     </div>
 
     <div class="mt-6 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
@@ -70,6 +85,22 @@ $portalFilters = is_array($guide['portal_filters'] ?? null) ? $guide['portal_fil
             </div>
         </div>
     <?php endif; ?>
+
+    <div class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <p class="text-xs font-bold uppercase text-slate-500">Fórmulas a confirmar antes de automatizar</p>
+        <div class="mt-3 grid gap-3 lg:grid-cols-4">
+            <?php foreach ($formulaFamilies as $family): ?>
+                <article class="rounded-lg border border-slate-200 bg-white p-3 text-sm leading-5">
+                    <h3 class="font-semibold text-slate-950"><?= e($family[0]) ?></h3>
+                    <p class="mt-2 text-slate-600"><?= e($family[1]) ?></p>
+                </article>
+            <?php endforeach; ?>
+        </div>
+        <p class="mt-3 text-xs leading-5 text-slate-500">
+            Estas fórmulas son el mapa de trabajo. La regla exacta, factores de ajuste y umbrales estadísticos
+            deben aprobarse antes de que el sistema calcule valores de forma automática.
+        </p>
+    </div>
 
     <div class="mt-6 grid gap-6 xl:grid-cols-[1.1fr_0.9fr]">
         <div class="rounded-xl border border-slate-200 bg-white">

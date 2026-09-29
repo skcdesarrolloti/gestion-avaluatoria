@@ -16,7 +16,7 @@ $methodologyDecisionRows = is_array($methodologyDecision['rows'] ?? null) ? $met
         <h1 class="mt-2 text-3xl font-semibold">Marco académico y selección metodológica</h1>
         <p class="mt-3 max-w-3xl text-slate-600">
             Primero se ambienta al lector con la academia normativa vigente. Después se desarrolla el método
-            seleccionado para el caso y la búsqueda de información comparable.
+            seleccionado para el caso; la búsqueda de comparables o insumos queda en el desarrollo del 8.3.
         </p>
     </div>
     <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-800">Numeral 8</span>
@@ -32,6 +32,9 @@ $methodologyDecisionRows = is_array($methodologyDecision['rows'] ?? null) ? $met
             <button type="button" class="min-h-11 shrink-0 rounded-xl px-4 py-2 text-sm font-semibold"
                 :class="methodologyTab === '82' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
                 @click="methodologyTab = '82'">8.2 Matriz y método</button>
+            <button type="button" class="min-h-11 shrink-0 rounded-xl px-4 py-2 text-sm font-semibold"
+                :class="methodologyTab === '83' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
+                @click="methodologyTab = '83'">8.3 Desarrollo operativo</button>
         </div>
     </div>
 
@@ -71,6 +74,9 @@ $methodologyDecisionRows = is_array($methodologyDecision['rows'] ?? null) ? $met
 
 <div x-show="methodologyTab === '82'" class="mt-6 space-y-8">
 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-decision.php'; ?>
+</div>
+
+<div x-show="methodologyTab === '83'" class="mt-6 space-y-8">
 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search.php'; ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
     <div class="flex flex-wrap items-start justify-between gap-4">

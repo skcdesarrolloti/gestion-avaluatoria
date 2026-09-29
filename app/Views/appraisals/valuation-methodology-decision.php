@@ -1,6 +1,7 @@
 <?php
 $configItems = is_array($methodologyDecision['configuration'] ?? null) ? $methodologyDecision['configuration'] : [];
 $workflowItems = is_array($methodologyDecision['workflow'] ?? null) ? $methodologyDecision['workflow'] : [];
+$nextStep = is_array($methodologyDecision['next_step'] ?? null) ? $methodologyDecision['next_step'] : ['8.3 Desarrollo del método', ''];
 $deliverable82 = trim((string) ($methodologyChapterData['sections'][2][1] ?? ''));
 ?>
 <section class="rounded-2xl border border-emerald-100 bg-emerald-50 p-6 shadow-sm sm:p-8">
@@ -9,12 +10,19 @@ $deliverable82 = trim((string) ($methodologyChapterData['sections'][2][1] ?? '')
             <p class="eyebrow">8.2 Selección metodológica</p>
             <h2 class="mt-2 text-2xl font-semibold text-emerald-950">Camino recomendado</h2>
             <p class="mt-2 text-sm leading-6 text-emerald-900">
-                Primero se revisa la configuración del expediente; después se adopta el método y se prepara la búsqueda.
+                Primero se revisa la configuración del expediente y se adopta el método. La captura de muestras o insumos continúa en 8.3.
             </p>
             <div class="mt-5 rounded-xl border border-white/80 bg-white p-5">
                 <p class="text-xs font-bold uppercase text-emerald-700">Método recomendado</p>
                 <h3 class="mt-2 text-2xl font-semibold text-slate-950"><?= e((string) ($methodologyDecision['recommended_method'] ?? 'Pendiente')) ?></h3>
                 <p class="mt-3 text-sm leading-6 text-slate-700"><?= e((string) ($methodologyDecision['reason'] ?? 'Completa la matriz para obtener una recomendación.')) ?></p>
+                <div class="mt-4 rounded-lg bg-emerald-50 p-3 text-sm leading-5 text-emerald-950">
+                    <strong><?= e((string) ($nextStep[0] ?? '8.3 Desarrollo del método')) ?>:</strong>
+                    <?= e((string) ($nextStep[1] ?? '')) ?>
+                </div>
+                <button type="button" class="btn-primary mt-4 min-h-11" @click="methodologyTab = '83'">
+                    Ir al desarrollo 8.3
+                </button>
             </div>
         </div>
         <div class="grid gap-3 sm:grid-cols-2">

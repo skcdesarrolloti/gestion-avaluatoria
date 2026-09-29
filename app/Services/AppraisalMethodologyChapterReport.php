@@ -120,6 +120,7 @@ final class AppraisalMethodologyChapterReport
             'reason' => $reason,
             'configuration' => $this->configuration($record),
             'workflow' => $this->workflow(),
+            'next_step' => $this->nextStep($method),
             'rows' => $this->decisionRows($record, $method),
             'niif_note' => $this->niifNote($niif, $base),
             'special_template' => $this->specialTemplate($isDeposit && $ph === 'si'),
@@ -148,9 +149,18 @@ final class AppraisalMethodologyChapterReport
         return [
             ['Revisión de configuración', 'Confirmar negocio, tipología, derecho, PH, estructura y base de valor.'],
             ['Selección metodológica', 'Adoptar el método que mejor represente cómo el mercado forma precio para este activo.'],
-            ['Preparación de búsqueda', 'Traducir la configuración a filtros y características comparables para portales.'],
-            ['Desarrollo posterior', 'Capturar muestras, depurarlas, homologarlas y cerrar el análisis en los subnumerales siguientes.'],
+            ['Ruta del numeral 8.3', 'Abrir la captura operativa propia del método: mercado, renta, residual o costo.'],
+            ['Desarrollo posterior', 'Capturar insumos, depurarlos, calcularlos y cerrar el análisis en los subnumerales siguientes.'],
         ];
+    }
+
+    private function nextStep(string $method): array
+    {
+        $key = mb_strtolower($method);
+        if (str_contains($key, 'renta')) return ['8.3 Renta y capitalización', 'Preparar cánones, vacancia, gastos, ingreso neto, tasa y soporte de ocupación.'];
+        if (str_contains($key, 'residual')) return ['8.3 Técnica residual', 'Preparar norma urbana, producto vendible, ingresos proyectados, costos, utilidad y tiempos.'];
+        if (str_contains($key, 'costo') || str_contains($key, 'reposición')) return ['8.3 Costo de reposición', 'Preparar terreno, costos directos e indirectos, depreciación física, funcional y económica.'];
+        return ['8.3 Comparables de mercado', 'Preparar filtros, variables, atributos y fuentes para capturar muestras comparables.'];
     }
 
     private function decisionRows(array $record, string $method): array
@@ -176,8 +186,10 @@ final class AppraisalMethodologyChapterReport
             . 'y sin perder de vista la finalidad del encargo, la base de valor, el derecho objeto de '
             . 'valuación, las restricciones jurídicas o físicas del activo y la información disponible, '
             . 'la matriz metodológica orienta la aplicación de ' . $method . '. ' . $decision['reason'];
-        $text .= ' En consecuencia, la búsqueda y depuración de información debe concentrarse en activos comparables por localización, uso, tipología, unidad de comparación, fecha, estado, área, condiciones de PH cuando aplique y soportes verificables. Las diferencias relevantes se documentarán para la homologación posterior, antes de adoptar el valor conclusivo.';
-        $text .= ' Esta selección no constituye todavía el cálculo del valor; define el camino técnico para recolectar muestras, depurarlas, analizarlas y desarrollar el método en los subnumerales siguientes.';
+        $next = is_array($decision['next_step'] ?? null) ? $decision['next_step'] : ['8.3 Desarrollo del método', ''];
+        $text .= ' Esta selección no constituye todavía el cálculo del valor; define el camino técnico que se desarrollará en '
+            . (string) ($next[0] ?? '8.3') . '. Allí se recolectan los insumos propios del método, se depuran las fuentes, '
+            . 'se aplican las fórmulas y se documentan las diferencias relevantes antes de adoptar el valor conclusivo.';
         if ((string) ($decision['niif_note'] ?? '') !== '') $text .= "\n\n" . $decision['niif_note'];
         if ((string) ($decision['special_template'] ?? '') !== '') $text .= "\n\n" . $decision['special_template'];
         return $text;
