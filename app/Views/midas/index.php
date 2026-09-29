@@ -95,12 +95,8 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
                     </select>
                 </label>
                 <label class="label">Archivo descargado
-                    <span class="mt-2 flex min-h-11 flex-wrap items-center gap-3 rounded-xl border border-slate-300 bg-white p-2">
-                        <span class="btn-secondary min-h-10">Seleccionar archivos MIDAS</span>
-                        <span class="text-sm font-normal text-slate-600" data-midas-file-summary>Sin archivos seleccionados</span>
-                    </span>
-                    <input class="sr-only" type="file" name="midas_file[]" accept=".pdf,.csv,.json,.geojson,.zip" multiple required
-                        onchange="this.closest('label').querySelector('[data-midas-file-summary]').textContent = this.files.length ? Array.from(this.files).slice(0, 3).map(file => file.name).join(', ') + (this.files.length > 3 ? ' +' + (this.files.length - 3) : '') : 'Sin archivos seleccionados'">
+                    <input class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700"
+                        type="file" name="midas_file[]" accept=".pdf,.csv,.json,.geojson,.zip" multiple required>
                     <span class="mt-1 block text-xs font-normal text-slate-500">
                         PDF, CSV, JSON, GeoJSON o ZIP. Máximo interno 25 MB por archivo; el lote también respeta post_max_size.
                     </span>

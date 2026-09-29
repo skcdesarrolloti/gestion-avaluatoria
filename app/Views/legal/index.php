@@ -126,12 +126,8 @@ $maxFiles = max(0, (int) ($limits['max_file_uploads'] ?? 0));
                                 <?= csrf_field() ?>
                                 <label class="block text-xs font-semibold uppercase text-slate-500">
                                     PDF de <?= e($document['document_code']) ?>
-                                    <span class="mt-2 flex min-h-11 flex-wrap items-center gap-3 rounded-xl border border-slate-300 bg-white p-2 normal-case">
-                                        <span class="btn-secondary min-h-10">Seleccionar PDF</span>
-                                        <span class="text-sm font-normal text-slate-600" data-legal-file-summary>Sin archivo seleccionado</span>
-                                    </span>
-                                    <input class="sr-only" type="file" name="legal_file[]" accept="application/pdf,.pdf" required
-                                        onchange="this.closest('label').querySelector('[data-legal-file-summary]').textContent = this.files.length ? this.files[0].name : 'Sin archivo seleccionado'">
+                                    <input class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700"
+                                        type="file" name="legal_file[]" accept="application/pdf,.pdf" required>
                                 </label>
                                 <button class="btn-primary w-full" type="submit" :disabled="busy"
                                     x-text="busy ? 'Importando…' : '<?= $document['has_file'] ? 'Reemplazar PDF' : 'Importar PDF' ?>'">
