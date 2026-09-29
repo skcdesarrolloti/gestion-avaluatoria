@@ -137,6 +137,21 @@ try {
         && str_contains($methodologyText, 'IVS')
         && str_contains($methodologyText, 'NIIF')
         && str_contains($methodologyText, 'NTS'), 'numeral 8.1 incorpora 941 IVS NIIF NTS y deja 620 como antecedente');
+    $methodologyApartment = (new AppraisalMethodologyChapterReport())->build([
+        'tipo_inmueble' => 'apartamento', 'tipo_negocio' => 'venta', 'regimen_ph' => 'si',
+        'estructura_metodo' => 'area_privada', 'base_valor' => 'mercado',
+    ]);
+    expect(($methodologyApartment['decision']['recommended_method'] ?? '') === 'Comparación o mercado'
+        && str_contains((string) ($methodologyApartment['decision']['rows'][0][2] ?? ''), 'NTS M 01'),
+        'numeral 8.2 matriz usa soporte de 1.1 y recomienda mercado para apartamento PH');
+    $methodologyHouse = (new AppraisalMethodologyChapterReport())->build(['tipo_inmueble' => 'casa', 'tipo_negocio' => 'venta']);
+    expect(str_contains((string) ($methodologyHouse['decision']['recommended_method'] ?? ''), 'reposición'), 'numeral 8.2 casa orienta mercado y reposicion');
+    $methodologyLot = (new AppraisalMethodologyChapterReport())->build(['tipo_inmueble' => 'lote', 'tipo_negocio' => 'venta']);
+    expect(str_contains((string) ($methodologyLot['decision']['recommended_method'] ?? ''), 'residual'), 'numeral 8.2 lote orienta residual');
+    $methodologyRent = (new AppraisalMethodologyChapterReport())->build(['tipo_inmueble' => 'local', 'tipo_negocio' => 'arriendo']);
+    expect(str_contains((string) ($methodologyRent['decision']['recommended_method'] ?? ''), 'Renta'), 'numeral 8.2 arriendo orienta renta');
+    $methodologyNiif = (new AppraisalMethodologyChapterReport())->build(['aplica_niif' => 'si', 'base_valor' => 'razonable']);
+    expect(str_contains((string) ($methodologyNiif['decision']['niif_note'] ?? ''), 'NIIF'), 'numeral 8.2 agrega nota NIIF cuando aplica');
     $chapterOneViewRecord = array_replace(\App\Support\AppraisalCatalog::defaults(), [
         'titulo' => 'Informe de avalúo', 'tipo' => 'comercial', 'tipo_derecho' => 'dominio_pleno',
         'finalidad' => 'negociacion', 'intended_use' => 'Negociación',
