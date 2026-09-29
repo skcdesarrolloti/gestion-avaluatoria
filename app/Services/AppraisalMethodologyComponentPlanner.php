@@ -32,13 +32,17 @@ final class AppraisalMethodologyComponentPlanner
     private function component(array $record, array $unit): array
     {
         $label = $this->unitLabel($unit);
-        $text = mb_strtolower($label . ' ' . ($unit['property_type'] ?? '') . ' ' . ($unit['igac_typology_hint'] ?? '') . ' ' . ($unit['notes'] ?? ''));
+        $constructionType = (string) ($unit['construction_type'] ?? '');
+        $text = mb_strtolower($label . ' ' . ($unit['property_type'] ?? '') . ' ' . $constructionType
+            . ' ' . ($unit['igac_typology_hint'] ?? '') . ' ' . ($unit['notes'] ?? ''));
         $type = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'] ?? ''));
         $business = (string) ($record['tipo_negocio'] ?? '');
         $base = (string) ($record['base_valor'] ?? '');
         $incomeProducing = (string) ($record['income_producing'] ?? '');
         $isAnnex = ($unit['unit_kind'] ?? '') === 'annex';
-        $isImprovement = $this->hasAny($text, ['piscina', 'kiosco', 'ramada', 'cerramiento', 'tanque', 'cancha', 'mejora']);
+        $isImprovement = in_array($constructionType, ['piscina', 'kiosco', 'ramada', 'cerramiento', 'muro',
+            'porton', 'placa', 'parqueo', 'cubierta', 'otro'], true)
+            || $this->hasAny($text, ['piscina', 'kiosco', 'ramada', 'cerramiento', 'tanque', 'cancha', 'mejora']);
         if ($business === 'arriendo' || $base === 'renta') {
             return $this->pack($unit, $label, 'Renta o capitalización de ingresos', 'Renta',
                 'Canon, administración, IVA, vacancia, gastos no recuperables, ingreso neto y tasa.',

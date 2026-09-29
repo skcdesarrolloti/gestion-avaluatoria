@@ -7,6 +7,12 @@ $configTabs = [
     'niif' => 'NIIF y PH',
     'notas' => 'Notas',
 ];
+$unitDefinitionUnits = array_values(array_filter($units ?? [], static fn (array $unit): bool => ($unit['unit_kind'] ?? '') !== 'common'));
+$constructionTypes = \App\Support\AppraisalConstructionTypeCatalog::types();
+$unitDisplay = static function (array $unit): string {
+    $fallback = ($unit['unit_kind'] ?? '') === 'annex' ? 'Anexo ' : 'Unidad ';
+    return trim((string) ($unit['label'] ?? '')) ?: $fallback . (int) ($unit['unit_index'] ?? 0);
+};
 ?>
 <nav class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Bloques del numeral 1.1">
     <?php foreach ($configTabs as $key => $label): ?>
@@ -16,7 +22,7 @@ $configTabs = [
     <?php endforeach; ?>
 </nav>
 <div class="mt-4 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
-    Diligencia un bloque a la vez. Esta configuración alimenta el numeral 8.2 y prepara las unidades que luego nombras en 3.1.
+    Diligencia un bloque a la vez. Esta configuración crea y describe las unidades desde 1.1; los numerales 3 y 8 la toman como base.
 </div>
 
 <div class="mt-5 grid gap-5 md:grid-cols-2" x-show="configTab === 'expediente'">
@@ -50,7 +56,7 @@ $configTabs = [
         <input class="input" type="number" name="igac_property_units_count" min="0" max="50"
             x-model.number="propertyUnits" placeholder="Ej. 3">
         <span class="mt-1 block text-xs leading-5 text-slate-500">
-            Casa + 2 apartamentos = 3. Cada unidad se nombrará y clasificará en 3.1.
+            Casa + 2 apartamentos = 3. Después de guardar, cada unidad se nombra y clasifica aquí mismo.
         </span>
     </label>
     <label class="label">Anexos existentes
@@ -63,9 +69,60 @@ $configTabs = [
     <?php $name = 'estructura_metodo'; require BASE_PATH . '/app/Views/appraisals/chapter-zero-select-field.php'; ?>
     <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950 md:col-span-2">
         Se prepararán <strong x-text="propertyUnits || 0"></strong> unidad(es) principal(es)
-        y <strong x-text="annexUnits || 0"></strong> anexo(s). En 3.1 nombras cada una,
-        eliges su tipo de inmueble y desde ahí se alimentan superficies, construcción,
-        diferenciales, fotos y PH cuando aplique.
+        y <strong x-text="annexUnits || 0"></strong> anexo(s). Guarda este bloque para crear los campos
+        y describirlos aquí mismo; 3.1, 3.3 y 8 tomarán esta definición como punto de partida.
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-white p-4 md:col-span-2">
+        <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+                <p class="eyebrow">Definición temprana de unidades y anexos</p>
+                <h3 class="mt-2 text-lg font-semibold text-slate-950">Qué compone el predio</h3>
+                <p class="mt-2 text-sm leading-6 text-slate-600">
+                    Esta información alimenta la descripción del numeral 3 y la ruta metodológica del numeral 8.
+                </p>
+            </div>
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"><?= count($unitDefinitionUnits) ?> creado(s)</span>
+        </div>
+        <?php if ($unitDefinitionUnits === []): ?>
+            <p class="mt-4 rounded-lg border border-dashed border-slate-300 p-4 text-sm text-slate-600">
+                Define las cantidades de unidades y anexos, guarda el expediente, y aquí aparecerán los campos para describirlos.
+            </p>
+        <?php else: ?>
+            <div class="mt-4 grid gap-4">
+                <?php foreach ($unitDefinitionUnits as $unit): ?>
+                    <?php $key = ($unit['unit_kind'] === 'annex' ? 'annex' : 'property') . '-' . (int) $unit['unit_index']; ?>
+                    <article class="grid gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4 md:grid-cols-2">
+                        <label class="label">Nombre del componente
+                            <input class="input" name="config_units[<?= e($key) ?>][label]" maxlength="120"
+                                value="<?= e($unitDisplay($unit)) ?>" placeholder="Ej. Casa principal, Piscina, Parqueadero 1">
+                        </label>
+                        <label class="label">Tipo de inmueble
+                            <select class="input" name="config_units[<?= e($key) ?>][property_type]">
+                                <option value="">Usar tipo general del avalúo</option>
+                                <?php foreach (($catalog['selects']['tipo_inmueble'][4] ?? []) as $value => $text): ?>
+                                    <option value="<?= e((string) $value) ?>" <?= (string) ($unit['property_type'] ?? '') === (string) $value ? 'selected' : '' ?>>
+                                        <?= e((string) $text) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
+                        <label class="label">Tipo de construcción o anexo
+                            <select class="input" name="config_units[<?= e($key) ?>][construction_type]">
+                                <?php foreach ($constructionTypes as $value => $text): ?>
+                                    <option value="<?= e($value) ?>" <?= (string) ($unit['construction_type'] ?? '') === $value ? 'selected' : '' ?>>
+                                        <?= e($text) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                            </select>
+                        </label>
+                        <label class="label">Descripción base
+                            <input class="input" name="config_units[<?= e($key) ?>][notes]" maxlength="2000"
+                                value="<?= e((string) ($unit['notes'] ?? '')) ?>" placeholder="Uso, independencia, restricciones o relación con el predio">
+                        </label>
+                    </article>
+                <?php endforeach; ?>
+            </div>
+        <?php endif; ?>
     </div>
 </div>
 

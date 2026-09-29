@@ -12,11 +12,7 @@ $constructionTabs = ['basicos' => ['1', 'Datos básicos'], 'pisos' => ['2', 'Pis
     'area' => ['3', 'Área construida'], 'vetustez' => ['4', 'Vetustez y vida útil'],
     'funcionales' => ['5', 'Variables funcionales'], 'estado' => ['6', 'Estado de obra'],
     'conservacion' => ['7', 'Conservación']];
-$constructionTypes = ['' => 'Selecciona tipo', 'galpon' => 'Galpón / nave industrial', 'bodega' => 'Bodega',
-    'casa' => 'Casa', 'apartamento' => 'Apartamento', 'local' => 'Local comercial', 'oficina' => 'Oficina',
-    'deposito' => 'Depósito / cuarto útil', 'mezanine' => 'Mezanine', 'cubierta' => 'Cubierta / techo',
-    'cerramiento' => 'Cerramiento', 'muro' => 'Muro perimetral', 'porton' => 'Portón / acceso vehicular',
-    'placa' => 'Placa de concreto', 'parqueo' => 'Parqueo', 'piscina' => 'Piscina', 'otro' => 'Otro'];
+$constructionTypes = \App\Support\AppraisalConstructionTypeCatalog::types();
 $measureUnits = ['m2' => 'm² · área', 'ml' => 'ml · longitud', 'm3' => 'm³ · volumen', 'und' => 'Unidad'];
 $areaSources = ['manual' => 'Manual', 'midas' => 'MIDAS', 'tax' => 'Impuesto predial',
     'deed' => 'Escritura', 'certificate' => 'Certificado de Tradición', 'other' => 'Otra fuente'];

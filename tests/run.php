@@ -27,6 +27,7 @@ use App\Services\AppraisalSubjectChapterReport;
 use App\Services\AppraisalComparableSearchGuide;
 use App\Services\AppraisalComparableInput;
 use App\Services\AppraisalMethodologyChapterReport;
+use App\Services\AppraisalUnitDefinitionInput;
 use App\Services\AppraisalLegalChapterReport;
 use App\Services\AppraisalNarrativeChapterInput;
 use App\Services\AppraisalNarrativeChapterReport;
@@ -226,6 +227,14 @@ try {
         'numeral 8.3 agrega subruta de renta por unidad si produce ingresos');
     $methodologyNiif = (new AppraisalMethodologyChapterReport())->build(['aplica_niif' => 'si', 'base_valor' => 'razonable']);
     expect(str_contains((string) ($methodologyNiif['decision']['niif_note'] ?? ''), 'NIIF'), 'numeral 8.2 agrega nota NIIF cuando aplica');
+    $methodologyPoolFromType = (new AppraisalMethodologyChapterReport())->build([
+        'tipo_inmueble' => 'apartamento', 'tipo_negocio' => 'venta',
+    ], [], [[
+        'id' => 'a1', 'unit_kind' => 'annex', 'unit_index' => 1,
+        'label' => 'Anexo 1', 'property_type' => '', 'construction_type' => 'piscina',
+    ]]);
+    expect(($methodologyPoolFromType['decision']['components'][0]['route'] ?? '') === 'Reposición',
+        'numeral 8.2 toma piscina definida en 1.1 como reposicion');
     $chapterOneViewRecord = array_replace(\App\Support\AppraisalCatalog::defaults(), [
         'titulo' => 'Informe de avalúo', 'tipo' => 'comercial', 'tipo_derecho' => 'dominio_pleno',
         'finalidad' => 'negociacion', 'intended_use' => 'Negociación',
@@ -248,6 +257,13 @@ try {
     $count = static fn (string $name): int => max(0, (int) ($record[$name] ?? 0));
     $appraisers = [['id' => 'perito-1', 'code' => '01', 'full_name' => 'Nassif Abuita Nassar']];
     $selectedAppraiser = static fn (string $value): string => $value === 'perito-1' ? 'selected' : '';
+    $catalog = ['selects' => \App\Support\AppraisalCatalog::selectFields()];
+    $units = [
+        ['unit_kind' => 'property', 'unit_index' => 1, 'label' => 'Apartamento 301',
+            'property_type' => 'apartamento', 'construction_type' => 'apartamento', 'notes' => ''],
+        ['unit_kind' => 'annex', 'unit_index' => 1, 'label' => 'Piscina',
+            'property_type' => '', 'construction_type' => 'piscina', 'notes' => 'Anexo recreativo'],
+    ];
     ob_start();
     require BASE_PATH . '/app/Views/appraisals/chapter-zero-configuration-fields.php';
     $configurationViewHtml = ob_get_clean();
@@ -255,8 +271,19 @@ try {
         && str_contains($configurationViewHtml, 'Negocio y tipología')
         && str_contains($configurationViewHtml, 'Renta')
         && str_contains($configurationViewHtml, 'NIIF y PH')
-        && str_contains($configurationViewHtml, 'En 3.1 nombras cada una'),
+        && str_contains($configurationViewHtml, 'Definición temprana de unidades y anexos')
+        && str_contains($configurationViewHtml, 'config_units[property-1][label]')
+        && str_contains($configurationViewHtml, 'Piscina'),
         'numeral 1.1 renderiza subpestanas de configuracion');
+    $unitDefinitionRows = AppraisalUnitDefinitionInput::rows(['annex-1' => [
+        'label' => 'Piscina recreativa', 'property_type' => 'bogus',
+        'construction_type' => 'piscina', 'notes' => str_repeat('x', 2100),
+    ]]);
+    expect($unitDefinitionRows[0]['unit_kind'] === 'annex'
+        && $unitDefinitionRows[0]['construction_type'] === 'piscina'
+        && $unitDefinitionRows[0]['property_type'] === ''
+        && strlen($unitDefinitionRows[0]['notes']) === 2000,
+        'definicion temprana 1.1 normaliza unidades y anexos');
     $_POST = ['intended_use' => str_repeat('uso ', 80), 'source_documents_selected' => ['escritura_publica', 'mapa_localizacion', 'invalido'],
         'income_producing' => 'si', 'rent_amount' => '3.500.000,50', 'ph_admin_fee_amount' => '850.000',
         'rent_period' => 'mensual', 'rent_charges_vat' => 'si'];

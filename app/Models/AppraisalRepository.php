@@ -123,6 +123,9 @@ final class AppraisalRepository
         }
     }
 
+    public function saveUnitDefinitionsByKey(string $id, int $owner, array $units): void
+    { if ($units === []) return; $now = gmdate('Y-m-d H:i:s'); $query = $this->db->prepare('UPDATE appraisal_units SET label = ?, property_type = ?, construction_type = ?, notes = ?, updated_at = ? WHERE appraisal_id = ? AND owner_id = ? AND unit_kind = ? AND unit_index = ?'); foreach ($units as $unit) { $label = (string) ($unit['label'] ?: (($unit['unit_kind'] === 'annex' ? 'Anexo ' : 'Unidad ') . (int) $unit['unit_index'])); $query->execute([$label, $unit['property_type'], $unit['construction_type'], $unit['notes'], $now, $id, $owner, $unit['unit_kind'], $unit['unit_index']]); } }
+
     public function saveUnitSurfaces(string $id, int $owner, array $units): void
     {
         $now = gmdate('Y-m-d H:i:s');
@@ -174,10 +177,7 @@ final class AppraisalRepository
     private function unitUpdate(array $fields): \PDOStatement
     { $set = implode(', ', array_map(static fn (string $field): string => $field . ' = ?', $fields)); return $this->db->prepare('UPDATE appraisal_units SET ' . $set . ', updated_at = ? WHERE id = ? AND appraisal_id = ? AND owner_id = ?'); }
     public function ensureUnits(string $id, int $owner, int $propertyCount, int $annexCount): void
-    {
-        for ($i = 1; $i <= $propertyCount; $i++) $this->ensureUnit($id, $owner, 'property', $i, 'Unidad ' . $i);
-        for ($i = 1; $i <= $annexCount; $i++) $this->ensureUnit($id, $owner, 'annex', $i, 'Anexo ' . $i);
-    }
+    { for ($i = 1; $i <= $propertyCount; $i++) $this->ensureUnit($id, $owner, 'property', $i, 'Unidad ' . $i); for ($i = 1; $i <= $annexCount; $i++) $this->ensureUnit($id, $owner, 'annex', $i, 'Anexo ' . $i); }
     private function ensureUnit(string $id, int $owner, string $kind, int $index, string $label): void
     {
         $now = gmdate('Y-m-d H:i:s');

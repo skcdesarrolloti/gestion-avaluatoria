@@ -1,0 +1,32 @@
+<?php
+declare(strict_types=1);
+namespace App\Services;
+
+use App\Support\AppraisalCatalog;
+use App\Support\AppraisalConstructionTypeCatalog;
+
+final class AppraisalUnitDefinitionInput
+{
+    public static function rows(array $posted): array
+    {
+        if (!is_array($posted)) return [];
+        $rows = [];
+        foreach ($posted as $key => $unit) {
+            if (!is_string($key) || !is_array($unit)) continue;
+            if (!preg_match('/^(property|annex)-([1-9][0-9]*)$/', $key, $match)) continue;
+            $propertyType = trim((string) ($unit['property_type'] ?? ''));
+            if (!in_array($propertyType, AppraisalCatalog::allowedValues('tipo_inmueble'), true)) $propertyType = '';
+            $constructionType = trim((string) ($unit['construction_type'] ?? ''));
+            if (!in_array($constructionType, AppraisalConstructionTypeCatalog::allowed(), true)) $constructionType = '';
+            $rows[] = [
+                'unit_kind' => $match[1],
+                'unit_index' => (int) $match[2],
+                'label' => mb_substr(trim((string) ($unit['label'] ?? '')), 0, 120),
+                'property_type' => $propertyType,
+                'construction_type' => $constructionType,
+                'notes' => mb_substr(trim((string) ($unit['notes'] ?? '')), 0, 2000),
+            ];
+        }
+        return $rows;
+    }
+}

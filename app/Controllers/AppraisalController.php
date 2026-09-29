@@ -25,6 +25,7 @@ use App\Services\AppraisalMidasIncorporation;
 use App\Services\AppraisalMidasMapSupport;
 use App\Services\AppraisalDossierNumberer;
 use App\Services\AppraisalChapterZeroInput;
+use App\Services\AppraisalUnitDefinitionInput;
 use App\Services\AppraisalSubjectChapterReport;
 use App\Services\AppraisalUrbanNormChapterReport;
 use App\Services\AppraisalNarrativeChapterReport;
@@ -68,11 +69,11 @@ final class AppraisalController
 
     public function chapterZero(string $id): void
     {
-        $record = $this->appraisals->find($id, $this->user['id']);
-        $dossierSearch = trim((string) ($_GET['expediente_q'] ?? ''));
-        $reportNotes = $this->reportNotes?->byChapter($id, $this->user['id'], '1') ?? [];
+        $record = $this->appraisals->find($id, $this->user['id']); $units = $this->appraisals->units($id, $this->user['id']);
+        $dossierSearch = trim((string) ($_GET['expediente_q'] ?? '')); $reportNotes = $this->reportNotes?->byChapter($id, $this->user['id'], '1') ?? [];
         view('appraisals/chapter-zero', ['title' => 'Expediente valuatorio', 'record' => $record,
-            'appraisers' => $this->appraisers->eligibleForAssignment(),
+            'appraisers' => $this->appraisers->eligibleForAssignment(), 'units' => $units,
+            'igacCategories' => $this->typologies->categories(), 'igacTypologiesByCategory' => $this->typologies->optionsByCategory(),
             'dossierSearch' => $dossierSearch,
             'dossierRows' => array_slice($this->appraisals->recent($this->user['id'], 1, $dossierSearch, true), 0, 12),
             'reportNotes' => $reportNotes,
@@ -131,6 +132,8 @@ final class AppraisalController
             $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
                 $this->igacCodes(), $this->appraiserIds());
             $this->appraisals->saveChapterZero($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $data);
+            $this->appraisals->saveUnitDefinitionsByKey($id, $this->user['id'],
+                AppraisalUnitDefinitionInput::rows($_POST['config_units'] ?? []));
             $dossier = $this->createDossierIfRequested($id);
             Session::flash('chapter_zero_message', $dossier ? 'Expediente ' . $dossier . ' creado correctamente.' : 'Expediente guardado correctamente.');
             Http::redirect($this->chapterZeroRedirect($id));
@@ -145,6 +148,8 @@ final class AppraisalController
             $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
                 $this->igacCodes(), $this->appraiserIds());
             $result = $this->appraisals->saveChapterZero($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $data);
+            $this->appraisals->saveUnitDefinitionsByKey($id, $this->user['id'],
+                AppraisalUnitDefinitionInput::rows($_POST['config_units'] ?? []));
             $dossier = $this->createDossierIfRequested($id);
             Http::json(['ok' => true, 'expediente_number' => $dossier] + $result);
         } catch (\Throwable $error) {

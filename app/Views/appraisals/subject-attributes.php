@@ -67,7 +67,7 @@ $formatAttributeAdjustment = static function (?float $value): string {
         <div class="mt-3 grid gap-4 lg:grid-cols-3 xl:grid-cols-5">
             <div>
                 <strong class="block">Dónde nace cada unidad</strong>
-                <span>En el numeral 1 defines cuántas unidades principales y anexos existen. En 3.1 nombras cada una y eliges su tipo de inmueble.</span>
+                <span>En el numeral 1.1 defines, nombras y clasificas las unidades y anexos. En 3.1 se revisan y amplían sus datos técnicos.</span>
             </div>
             <div>
                 <strong class="block">Índice técnico</strong>
