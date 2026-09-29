@@ -2,20 +2,22 @@
 declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, Session};
-use App\Models\{AppraisalNarrativeChapterRepository, AppraisalRepository};
-use App\Services\AppraisalNarrativeChapterInput;
+use App\Models\{AppraisalNarrativeChapterRepository, AppraisalRepository, MidasDocumentRepository};
+use App\Services\{AppraisalNarrativeChapterInput, AppraisalNarrativeMidasSupport};
 use App\Support\{AppraisalEconomicCatalog, AppraisalRestrictiveConditionsCatalog};
 
 final class AppraisalNarrativeController
 {
     public function __construct(private AppraisalRepository $appraisals,
-        private AppraisalNarrativeChapterRepository $chapters, private array $user) {}
+        private AppraisalNarrativeChapterRepository $chapters, private array $user,
+        private ?MidasDocumentRepository $midasDocuments = null) {}
 
     public function economicAspect(string $id): void
     {
         $this->show($id, 'appraisals/economic-aspect', [
             'economicSections' => AppraisalEconomicCatalog::sections(),
             'economicProfile' => $this->chapters->profile($id, $this->user['id'], '6', AppraisalEconomicCatalog::defaults()),
+            'midasNarrativeSupport' => $this->midasSupport('6'),
             'economicMessage' => Session::pullFlash('economic_message'),
             'economicError' => Session::pullFlash('economic_error'),
         ], 'Aspecto económico');
@@ -26,6 +28,7 @@ final class AppraisalNarrativeController
         $this->show($id, 'appraisals/restrictive-conditions', [
             'restrictiveSections' => AppraisalRestrictiveConditionsCatalog::sections(),
             'restrictiveProfile' => $this->chapters->profile($id, $this->user['id'], '7', AppraisalRestrictiveConditionsCatalog::defaults()),
+            'midasNarrativeSupport' => $this->midasSupport('7'),
             'restrictiveMessage' => Session::pullFlash('restrictive_message'),
             'restrictiveError' => Session::pullFlash('restrictive_error'),
         ], 'Condiciones restrictivas');
@@ -62,5 +65,10 @@ final class AppraisalNarrativeController
     {
         $this->appraisals->find($id, $this->user['id']);
         $this->chapters->save($id, $this->user['id'], $chapter, AppraisalNarrativeChapterInput::data($sections, $_POST));
+    }
+
+    private function midasSupport(string $chapter): array
+    {
+        return (new AppraisalNarrativeMidasSupport())->forChapter($chapter, $this->midasDocuments?->latest() ?? []);
     }
 }

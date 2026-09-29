@@ -10,6 +10,7 @@ $narrative = [
     'autosave' => url('avaluos/' . $record['id'] . '/aspecto-economico/autoguardar'),
     'sections' => $economicSections ?? [],
     'data' => $economicProfile ?? [],
+    'midasSupport' => $midasNarrativeSupport ?? [],
     'message' => $economicMessage ?? '',
     'error' => $economicError ?? '',
 ];

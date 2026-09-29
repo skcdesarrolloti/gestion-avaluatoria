@@ -12,13 +12,13 @@ final class AppraisalRestrictiveConditionsCatalog
                 self::select('soil_incidence', 'Incidencia observada', self::incidence()),
                 self::text('soil_text', 'Texto para el entregable',
                     'Registra estabilidad aparente, necesidad de estudio geotécnico, riesgo de inundación, deslizamiento o licuación si está soportado.',
-                    'Aunque el nivel de estabilidad y otras características del suelo solo se pueden determinar a través de un estudio geotécnico, la presencia de edificaciones sin problemas en su estructura indica que el suelo no presenta problemas aparentes de inestabilidad. De acuerdo con los planos de riesgos de la ciudad, se debe verificar si el predio se encuentra o no en zona inundable o susceptible a deslizamientos de tierra.'),
+                    'Aunque el nivel de estabilidad y otras características del suelo solo se pueden determinar a través de un estudio geotécnico, la presencia de edificaciones sin problemas en su estructura indica que el suelo no presenta problemas aparentes de inestabilidad. De acuerdo con los planos de riesgos y los soportes de Cambio climático de MIDAS, se debe verificar si el predio se encuentra o no en zona inundable o susceptible a deslizamientos de tierra.'),
             ]),
             self::section('7.2', 'Impacto ambiental y salubridad', [
                 self::select('environmental_incidence', 'Incidencia observada', self::incidence()),
                 self::text('environmental_text', 'Texto para el entregable',
                     'Describe ruido, tráfico, residuos, aglomeraciones, salubridad o impactos ambientales verificables.',
-                    'El sector donde se localiza el inmueble objeto de medición presenta una dinámica urbana que debe revisarse frente a tráfico, aglomeraciones, salubridad, ruido u otras condiciones ambientales observables. Cuando aplique, se debe dejar expresa la afectación principal y su relación con el uso del inmueble.'),
+                    'El sector donde se localiza el inmueble objeto de medición presenta una dinámica urbana que debe revisarse frente a tráfico, aglomeraciones, salubridad, ruido, vulnerabilidad climática u otras condiciones ambientales observables. Cuando aplique, se debe dejar expresa la afectación principal y su relación con el uso del inmueble, apoyándose en Cambio climático MIDAS si el soporte es pertinente.'),
             ]),
             self::section('7.3', 'Servidumbres, cesiones y afectaciones viales', [
                 self::select('easement_incidence', 'Incidencia observada', self::incidence()),

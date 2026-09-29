@@ -38,8 +38,8 @@ final class AppraisalEconomicCatalog
                     'Describe actividades visibles, anclas sectoriales y relación con el uso actual o potencial del inmueble.',
                     true, 2200, 'En el sector donde se ubica el predio objeto del avalúo, y tal como se mencionó anteriormente, predominan los negocios pertenecientes al sector salud, sin perjuicio de otros usos o actividades complementarias que deban verificarse en campo.'),
                 self::text('economic_midas_support', 'Soporte MIDAS útil para revisar',
-                    'Usa las descargas realmente disponibles: Localidades y UCG ubican el sector; Educación puede sustentar equipamientos; Cambio climático alimenta más el numeral 7 que la actividad económica.',
-                    false, 900, 'Revisar Biblioteca MIDAS: Localidades, Unidades comuneras de gobierno, Educación y Cambio climático. Para actividad económica, MIDAS sirve como contexto territorial y de equipamientos; la intensidad comercial, institucional o de salud debe confirmarse con visita, mercado y soportes del caso.'),
+                    'Usa las descargas realmente disponibles: Educación sustenta equipamientos institucionales públicos y privados; Localidades y UCG ubican el sector; Cambio climático alimenta más el numeral 7.',
+                    false, 900, 'Revisar Biblioteca MIDAS: Educación debe tenerse en cuenta para identificar colegios oficiales y privados como equipamientos institucionales del sector. Esto puede sustentar actividad institucional o educativa secundaria/complementaria, pero la intensidad económica se confirma con visita, mercado y soportes del caso.'),
             ]),
             self::section('6.5', 'Mercado objetivo', [
                 self::text('target_market_text', 'Texto para el entregable',

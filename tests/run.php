@@ -28,6 +28,7 @@ use App\Services\AppraisalComparableSearchGuide;
 use App\Services\AppraisalLegalChapterReport;
 use App\Services\AppraisalNarrativeChapterInput;
 use App\Services\AppraisalNarrativeChapterReport;
+use App\Services\AppraisalNarrativeMidasSupport;
 use App\Services\AppraisalMidasReview;
 use App\Services\AppraisalMidasSupportUploadService;
 use App\Services\AppraisalLegalInput;
@@ -852,6 +853,38 @@ try {
     expect(str_contains(AppraisalEconomicCatalog::sections()[3]['fields'][3]['prefill'] ?? '', 'corredores')
         && AppraisalEconomicCatalog::defaults()['economic_activity_text'] === '',
         'numeral 6 expone textos guia editables sin copiarlos al entregable antes de guardar');
+    $midasNarrativeSupport = new AppraisalNarrativeMidasSupport();
+    $economicMidasSupport = $midasNarrativeSupport->forChapter('6', [[
+        'id' => str_repeat('1', 32), 'layer_group' => 'Educación', 'title' => 'Colegios MIDAS',
+        'source_filename' => 'educacion_colegios_2022.xlsx', 'practical_use' => 'Equipamientos educativos.',
+        'applies_to' => 'Numeral 6',
+    ]]);
+    expect(count($economicMidasSupport['items']) === 1
+        && str_contains($economicMidasSupport['findings'][0] ?? '', 'oficiales y privados')
+        && str_contains(AppraisalEconomicCatalog::sections()[3]['fields'][5]['prefill'] ?? '', 'colegios oficiales y privados'),
+        'numeral 6 vincula Educacion MIDAS como soporte institucional publico y privado');
+    if (class_exists(ZipArchive::class)) {
+        $educationXlsx = tempnam(sys_get_temp_dir(), 'ga_edu_midas_');
+        $zip = new ZipArchive();
+        $zip->open($educationXlsx, ZipArchive::OVERWRITE);
+        $zip->addFromString('xl/sharedStrings.xml',
+            '<sst><si><t>NOMBRE INSTITUCIONAL</t></si><si><t>SECTOR</t></si><si><t>LOCALIDAD</t></si>'
+            . '<si><t>COLEGIO OFICIAL</t></si><si><t>OFICIAL</t></si><si><t>INDUSTRIAL Y DE LA BAHIA</t></si>'
+            . '<si><t>COLEGIO PRIVADO</t></si><si><t>PRIVADO</t></si><si><t>HISTORICA Y CARIBE NORTE</t></si></sst>');
+        $zip->addFromString('xl/worksheets/sheet1.xml',
+            '<worksheet><sheetData><row r="1"><c r="A1" t="s"><v>0</v></c><c r="B1" t="s"><v>1</v></c><c r="D1" t="s"><v>2</v></c></row>'
+            . '<row r="2"><c r="A2" t="s"><v>3</v></c><c r="B2" t="s"><v>4</v></c><c r="D2" t="s"><v>5</v></c></row>'
+            . '<row r="3"><c r="A3" t="s"><v>6</v></c><c r="B3" t="s"><v>7</v></c><c r="D3" t="s"><v>8</v></c></row></sheetData></worksheet>');
+        $zip->close();
+        $parsedEducation = $midasNarrativeSupport->forChapter('6', [[
+            'id' => str_repeat('2', 32), 'layer_group' => 'Educación', 'title' => 'Colegios',
+            'source_filename' => 'educacion.xlsx', 'file_path' => $educationXlsx,
+        ]]);
+        expect(str_contains(implode(' ', $parsedEducation['findings']), 'Oficial 1')
+            && str_contains(implode(' ', $parsedEducation['findings']), 'Privado 1'),
+            'soporte narrativo MIDAS lee colegios oficiales y privados desde Excel');
+        @unlink($educationXlsx);
+    }
     $restrictiveData = AppraisalNarrativeChapterInput::data(AppraisalRestrictiveConditionsCatalog::sections(), [
         'soil_incidence' => 'no_incide',
         'soil_text' => 'No se evidencian problemas de estabilidad; requiere soporte si cambia la condición.',
@@ -867,6 +900,14 @@ try {
         && str_contains(AppraisalRestrictiveConditionsCatalog::sections()[6]['fields'][1]['prefill'] ?? '', 'No se evidenciaron')
         && str_contains(AppraisalReportNoteCatalog::sections('7')['7.7'] ?? '', 'Problemas jurídicos'),
         'numeral 7 guarda restricciones y expone secciones para ampliaciones');
+    $restrictiveMidasSupport = $midasNarrativeSupport->forChapter('7', [[
+        'id' => str_repeat('3', 32), 'layer_group' => 'Cambio climático', 'title' => 'Plan adaptación',
+        'source_filename' => 'pdf_descargas_cambio_climatico_plan_adaptacion.pdf',
+    ]]);
+    expect(count($restrictiveMidasSupport['items']) === 1
+        && str_contains($restrictiveMidasSupport['findings'][0] ?? '', 'Cambio climático MIDAS')
+        && str_contains(AppraisalRestrictiveConditionsCatalog::sections()[0]['fields'][1]['prefill'] ?? '', 'Cambio climático'),
+        'numeral 7 vincula Cambio climatico MIDAS a riesgos y salvedades ambientales');
     $db->prepare('UPDATE appraisal_subjects SET address = ?, address_certificate = ?, adopted_source = ?,
         adopted_address = ?, property_registry = ?, cadastral_reference = ?, stratum = ?, current_use = ?,
         urban_treatment = ?, restrictions = ?, legal_urban_affectations = ? WHERE appraisal_id = ? AND owner_id = ?')

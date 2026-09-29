@@ -10,6 +10,7 @@ $narrative = [
     'autosave' => url('avaluos/' . $record['id'] . '/condiciones-restrictivas/autoguardar'),
     'sections' => $restrictiveSections ?? [],
     'data' => $restrictiveProfile ?? [],
+    'midasSupport' => $midasNarrativeSupport ?? [],
     'message' => $restrictiveMessage ?? '',
     'error' => $restrictiveError ?? '',
 ];
