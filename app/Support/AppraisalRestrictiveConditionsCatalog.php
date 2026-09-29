@@ -19,6 +19,9 @@ final class AppraisalRestrictiveConditionsCatalog
                 self::text('environmental_text', 'Texto para el entregable',
                     'Describe ruido, tráfico, residuos, aglomeraciones, salubridad o impactos ambientales verificables.',
                     'El sector donde se localiza el inmueble objeto de medición presenta una dinámica urbana que debe revisarse frente a tráfico, aglomeraciones, salubridad, ruido, vulnerabilidad climática u otras condiciones ambientales observables. Cuando aplique, se debe dejar expresa la afectación principal y su relación con el uso del inmueble, apoyándose en Cambio climático MIDAS si el soporte es pertinente.'),
+                self::text('climate_midas_text', 'Cambio climático y soporte MIDAS',
+                    'Usa este texto cuando el soporte MIDAS sea general y no haya una afectación predial directa. Si el mapa o la visita muestran amenaza concreta, ajusta la conclusión.',
+                    'Los soportes de Cambio climático disponibles en MIDAS, como lineamientos de adaptación, estudios institucionales y el Plan 4C, se toman como contexto territorial para revisar amenazas ambientales, vulnerabilidad urbana, inundación, drenaje pluvial, erosión costera o aumento del nivel del mar cuando resulten aplicables. Para el inmueble objeto del avalúo no se adopta una afectación climática específica salvo que la cartografía del predio, la visita técnica o un soporte puntual demuestre incidencia directa. En ausencia de evidencia específica, este soporte se deja como contexto y salvedad de revisión.'),
             ]),
             self::section('7.3', 'Servidumbres, cesiones y afectaciones viales', [
                 self::select('easement_incidence', 'Incidencia observada', self::incidence()),

@@ -899,6 +899,7 @@ try {
     expect(str_contains($restrictiveReport['text'], '7.1 Problemas de estabilidad')
         && str_contains($restrictiveReport['text'], 'No se evidencian problemas')
         && str_contains(AppraisalRestrictiveConditionsCatalog::sections()[6]['fields'][1]['prefill'] ?? '', 'No se evidenciaron')
+        && str_contains(AppraisalRestrictiveConditionsCatalog::sections()[1]['fields'][2]['prefill'] ?? '', 'contexto territorial')
         && str_contains(AppraisalReportNoteCatalog::sections('7')['7.7'] ?? '', 'Problemas jurídicos'),
         'numeral 7 guarda restricciones y expone secciones para ampliaciones');
     $restrictiveMidasSupport = $midasNarrativeSupport->forChapter('7', [[
