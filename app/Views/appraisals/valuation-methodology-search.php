@@ -1,6 +1,10 @@
 <?php
 $portalFields = is_array($guide['portal_fields'] ?? null) ? $guide['portal_fields'] : [];
 $portalFilters = is_array($guide['portal_filters'] ?? null) ? $guide['portal_filters'] : [];
+$sourceSearch = is_array($guide['source_search'] ?? null) ? $guide['source_search'] : [];
+$portalSources = is_array($sourceSearch['portal_sources'] ?? null) ? $sourceSearch['portal_sources'] : [];
+$officialSources = is_array($sourceSearch['official_sources'] ?? null) ? $sourceSearch['official_sources'] : [];
+$captureProtocol = is_array($sourceSearch['capture_protocol'] ?? null) ? $sourceSearch['capture_protocol'] : [];
 $adjustments = is_array($guide['adjustments'] ?? null) ? $guide['adjustments'] : (is_array($guide['homologation'] ?? null) ? $guide['homologation'] : []);
 $nextStep = is_array($methodologyDecision['next_step'] ?? null) ? $methodologyDecision['next_step'] : ['8.3 Desarrollo del método', ''];
 $formulaFamilies = [
@@ -43,6 +47,57 @@ $formulaFamilies = [
         No se deben mezclar comparables, rentas, costos o residuales sin dejar claro cuál es el método principal
         y cuál opera solo como contraste.
     </div>
+
+    <?php if ($sourceSearch !== []): ?>
+        <div class="mt-6 rounded-xl border border-blue-100 bg-blue-50 p-4">
+            <p class="text-xs font-bold uppercase text-blue-800">Buscador 8.3 asistido por el bien sujeto</p>
+            <h3 class="mt-2 text-xl font-semibold text-blue-950">Consulta base para portales y fuentes oficiales</h3>
+            <p class="mt-2 text-sm leading-6 text-blue-950">
+                La consulta se arma con operación, tipología, barrio, localidad y ciudad del inmueble. No adopta
+                resultados automáticamente; prepara la búsqueda para que el analista capture muestras verificables.
+            </p>
+            <div class="mt-4 rounded-lg bg-white p-3 font-mono text-sm font-semibold text-slate-900">
+                <?= e((string) ($sourceSearch['query'] ?? '')) ?>
+            </div>
+            <div class="mt-4 grid gap-4 xl:grid-cols-2">
+                <div>
+                    <p class="text-xs font-bold uppercase text-blue-800">Portales inmobiliarios</p>
+                    <div class="mt-3 grid gap-3">
+                        <?php foreach ($portalSources as $source): ?>
+                            <a class="rounded-lg border border-blue-100 bg-white p-3 text-sm leading-5 hover:border-blue-300"
+                                target="_blank" rel="noopener" href="<?= e((string) ($source['url'] ?? '#')) ?>">
+                                <span class="block text-xs font-bold uppercase text-blue-700"><?= e((string) ($source['kind'] ?? 'Fuente')) ?></span>
+                                <span class="mt-1 block font-semibold text-slate-950"><?= e((string) ($source['label'] ?? 'Fuente')) ?></span>
+                                <span class="mt-1 block text-xs text-slate-600"><?= e((string) ($source['instruction'] ?? '')) ?></span>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+                <div>
+                    <p class="text-xs font-bold uppercase text-blue-800">Ciudad y fuentes oficiales</p>
+                    <div class="mt-3 grid gap-3">
+                        <?php foreach ($officialSources as $source): ?>
+                            <a class="rounded-lg border border-blue-100 bg-white p-3 text-sm leading-5 hover:border-blue-300"
+                                target="_blank" rel="noopener" href="<?= e((string) ($source['url'] ?? '#')) ?>">
+                                <span class="block text-xs font-bold uppercase text-blue-700"><?= e((string) ($source['kind'] ?? 'Fuente')) ?></span>
+                                <span class="mt-1 block font-semibold text-slate-950"><?= e((string) ($source['label'] ?? 'Fuente oficial')) ?></span>
+                                <span class="mt-1 block text-xs text-slate-600"><?= e((string) ($source['instruction'] ?? '')) ?></span>
+                            </a>
+                        <?php endforeach; ?>
+                    </div>
+                </div>
+            </div>
+            <?php if ($captureProtocol !== []): ?>
+                <ol class="mt-4 grid gap-2 text-sm leading-6 text-blue-950 lg:grid-cols-2">
+                    <?php foreach ($captureProtocol as $index => $step): ?>
+                        <li class="rounded-lg bg-white/80 p-3">
+                            <strong><?= e((string) ($index + 1)) ?>.</strong> <?= e((string) $step) ?>
+                        </li>
+                    <?php endforeach; ?>
+                </ol>
+            <?php endif; ?>
+        </div>
+    <?php endif; ?>
 
     <div class="mt-6 grid gap-6 xl:grid-cols-[0.9fr_1.1fr]">
         <div class="rounded-xl border border-blue-100 bg-blue-50 p-4">

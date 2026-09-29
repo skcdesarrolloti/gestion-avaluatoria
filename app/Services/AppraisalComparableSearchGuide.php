@@ -7,13 +7,18 @@ use App\Support\AppraisalFunctionalVariableCatalog;
 
 final class AppraisalComparableSearchGuide
 {
+    public function __construct(private ?AppraisalComparableSourceSearchBuilder $sources = null) {}
+
     public function build(array $record, array $subject, array $units, array $phProfile): array
     {
+        $this->sources ??= new AppraisalComparableSourceSearchBuilder();
         $type = $this->typeKey((string) ($record['tipo_inmueble'] ?? ''));
         $profile = $this->profile($type, $this->isPh($record, $phProfile));
+        $typeLabel = $this->propertyTypeLabel($type);
+        $businessLabel = $this->label('tipo_negocio', (string) ($record['tipo_negocio'] ?? ''));
         return [
-            'type_label' => $this->propertyTypeLabel($type),
-            'business_label' => $this->label('tipo_negocio', (string) ($record['tipo_negocio'] ?? '')),
+            'type_label' => $typeLabel,
+            'business_label' => $businessLabel,
             'right_label' => $this->label('tipo_derecho', (string) ($record['tipo_derecho'] ?? '')),
             'criteria' => $profile['criteria'],
             'avoid' => $profile['avoid'],
@@ -22,6 +27,7 @@ final class AppraisalComparableSearchGuide
             'captured' => $this->captured($record, $subject, $units, $phProfile),
             'portal_fields' => $this->portalFields($type),
             'portal_filters' => $this->portalFilters($record, $subject),
+            'source_search' => $this->sources->build($record, $subject, $type, $typeLabel, $businessLabel),
         ];
     }
 

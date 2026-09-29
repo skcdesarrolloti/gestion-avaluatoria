@@ -130,6 +130,14 @@ try {
     expect(str_contains(implode(' ', $officeGuide['portal_fields']), 'Administración')
         && str_contains(implode(' ', $officeGuide['portal_fields']), 'Edificio'),
         'guia de portales prepara campos esperados para oficina');
+    $officeSearch = $searchGuide->build(['tipo_inmueble' => 'oficina', 'tipo_negocio' => 'venta'],
+        ['city_name' => 'Cartagena de Indias', 'neighborhood_name' => 'Chambacú',
+            'locality_name' => 'Histórica y del Caribe Norte'], [], []);
+    expect(str_contains((string) ($officeSearch['source_search']['query'] ?? ''), 'Cartagena de Indias')
+        && str_contains((string) ($officeSearch['source_search']['query'] ?? ''), 'Chambacú')
+        && str_contains((string) ($officeSearch['source_search']['portal_sources'][0]['label'] ?? ''), 'FincaRaiz')
+        && str_contains((string) ($officeSearch['source_search']['official_sources'][2]['label'] ?? ''), 'MIDAS'),
+        'buscador 8.3 arma portales y fuente oficial segun ciudad del sujeto');
     $apartmentGuide = $searchGuide->build(['tipo_inmueble' => 'apartamento', 'regimen_ph' => 'si'], [], [], ['ph_name' => 'Edificio prueba']);
     expect(str_contains(mb_strtolower(implode(' ', $apartmentGuide['criteria'])), 'planta electrica')
         || str_contains(mb_strtolower(implode(' ', $apartmentGuide['criteria'])), 'planta eléctrica'), 'metodologia incorpora PH en apartamentos');
