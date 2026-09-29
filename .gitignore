@@ -4,6 +4,10 @@
 .gestion-avaluatoria.env
 /node_modules/
 /vendor/
+/__pycache__/
+__pycache__/
+/tmp/
+/output/
 /storage/*
 !/storage/.gitkeep
 !/storage/normas-tecnicas-sectoriales/
