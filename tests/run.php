@@ -127,6 +127,9 @@ try {
     $officeFactors = implode(' ', array_merge(...array_values($officeGuide['factor_groups'])));
     expect(str_contains($officeFactors, 'Imagen corporativa') && str_contains($officeFactors, 'Baños')
         && !str_contains($officeFactors, 'Habitaciones'), 'matriz oficina excluye vivienda y conserva factores corporativos');
+    expect(str_contains(implode(' ', $officeGuide['portal_fields']), 'Administración')
+        && str_contains(implode(' ', $officeGuide['portal_fields']), 'Edificio'),
+        'guia de portales prepara campos esperados para oficina');
     $apartmentGuide = $searchGuide->build(['tipo_inmueble' => 'apartamento', 'regimen_ph' => 'si'], [], [], ['ph_name' => 'Edificio prueba']);
     expect(str_contains(mb_strtolower(implode(' ', $apartmentGuide['criteria'])), 'planta electrica')
         || str_contains(mb_strtolower(implode(' ', $apartmentGuide['criteria'])), 'planta eléctrica'), 'metodologia incorpora PH en apartamentos');
@@ -144,6 +147,9 @@ try {
     expect(($methodologyApartment['decision']['recommended_method'] ?? '') === 'Comparación o mercado'
         && str_contains((string) ($methodologyApartment['decision']['rows'][0][2] ?? ''), 'NTS M 01'),
         'numeral 8.2 matriz usa soporte de 1.1 y recomienda mercado para apartamento PH');
+    expect(str_contains((string) ($methodologyApartment['sections'][2][1] ?? ''), 'búsqueda y depuración de información')
+        && count($methodologyApartment['decision']['configuration'] ?? []) >= 5,
+        'numeral 8.2 expone texto de entregable y revision de configuracion');
     $methodologyHouse = (new AppraisalMethodologyChapterReport())->build(['tipo_inmueble' => 'casa', 'tipo_negocio' => 'venta']);
     expect(str_contains((string) ($methodologyHouse['decision']['recommended_method'] ?? ''), 'reposición'), 'numeral 8.2 casa orienta mercado y reposicion');
     $methodologyLot = (new AppraisalMethodologyChapterReport())->build(['tipo_inmueble' => 'lote', 'tipo_negocio' => 'venta']);

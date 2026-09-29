@@ -20,6 +20,8 @@ final class AppraisalComparableSearchGuide
             'homologation' => $profile['homologation'],
             'factor_groups' => AppraisalFunctionalVariableCatalog::factorGroupsFor($type),
             'captured' => $this->captured($record, $subject, $units, $phProfile),
+            'portal_fields' => $this->portalFields($type),
+            'portal_filters' => $this->portalFilters($record, $subject),
         ];
     }
 
@@ -126,6 +128,43 @@ final class AppraisalComparableSearchGuide
             static fn (array $unit): bool => ($unit['unit_kind'] ?? '') !== 'common')));
         $this->add($items, 'PH / conjunto', (string) ($ph['ph_name'] ?? ''));
         return $items;
+    }
+
+    private function portalFields(string $type): array
+    {
+        $common = ['Operación: venta o arriendo', 'Ciudad, barrio o microsector',
+            'Tipo de inmueble', 'Precio publicado o canon', 'Área privada, construida o de terreno',
+            'Fuente, enlace, fecha de consulta y datos de contacto'];
+        $typed = match ($type) {
+            'oficina', 'consultorio' => ['Piso', 'Parqueaderos', 'Administración', 'Ascensor',
+                'Seguridad', 'Aire acondicionado', 'Estado / acabados', 'Edificio o centro empresarial'],
+            'apartamento' => ['Habitaciones', 'Baños', 'Parqueaderos', 'Piso', 'Administración',
+                'Ascensor', 'Amenidades', 'Vista', 'Antigüedad'],
+            'casa' => ['Área de lote', 'Área construida', 'Habitaciones', 'Baños', 'Parqueaderos',
+                'Patio / terraza', 'Estado', 'Antigüedad'],
+            'lote' => ['Área de terreno', 'Frente', 'Fondo', 'Uso permitido', 'Servicios',
+                'Vía de acceso', 'Topografía', 'Forma'],
+            'local' => ['Frente comercial', 'Vitrina', 'Ubicación interior o a la calle',
+                'Baños', 'Administración', 'Flujo peatonal o vehicular', 'Parqueaderos'],
+            'bodega' => ['Altura libre', 'Muelles', 'Acceso de carga', 'Patio de maniobra',
+                'Oficinas de apoyo', 'Capacidad eléctrica', 'Seguridad industrial'],
+            default => ['Atributos propios de la tipología', 'Estado', 'Antigüedad',
+                'Servicios', 'Restricciones o anexos relevantes'],
+        };
+        return array_values(array_unique(array_merge($common, $typed)));
+    }
+
+    private function portalFilters(array $record, array $subject): array
+    {
+        $filters = [];
+        $this->add($filters, 'Operación', $this->label('tipo_negocio', (string) ($record['tipo_negocio'] ?? '')));
+        $this->add($filters, 'Tipo de inmueble', $this->label('tipo_inmueble', (string) ($record['tipo_inmueble'] ?? '')));
+        $this->add($filters, 'Ciudad / municipio', (string) ($record['municipio'] ?? ''));
+        $this->add($filters, 'Barrio o microsector', (string) ($subject['neighborhood_name'] ?? ''));
+        $this->add($filters, 'Localidad', (string) ($subject['locality_name'] ?? ''));
+        $this->add($filters, 'Estrato', (string) ($subject['stratum'] ?? ''));
+        $this->add($filters, 'PH', $this->label('regimen_ph', (string) ($record['regimen_ph'] ?? '')));
+        return $filters;
     }
 
     private function add(array &$items, string $label, string $value): void

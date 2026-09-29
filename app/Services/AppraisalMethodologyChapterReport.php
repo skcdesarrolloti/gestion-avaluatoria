@@ -118,9 +118,38 @@ final class AppraisalMethodologyChapterReport
         return [
             'recommended_method' => $method,
             'reason' => $reason,
+            'configuration' => $this->configuration($record),
+            'workflow' => $this->workflow(),
             'rows' => $this->decisionRows($record, $method),
             'niif_note' => $this->niifNote($niif, $base),
             'special_template' => $this->specialTemplate($isDeposit && $ph === 'si'),
+        ];
+    }
+
+    private function configuration(array $record): array
+    {
+        $items = [
+            ['Tipo de negocio', $this->label('tipo_negocio', $record['tipo_negocio'] ?? '')],
+            ['Tipo de inmueble', $this->label('tipo_inmueble', $record['tipo_inmueble'] ?? '')],
+            ['Derecho valorado', $this->label('tipo_derecho', $record['tipo_derecho'] ?? '')],
+            ['Régimen PH', $this->label('regimen_ph', $record['regimen_ph'] ?? '')],
+            ['Estructura del método', $this->label('estructura_metodo', $record['estructura_metodo'] ?? '')],
+            ['Base de valor / NIIF', $this->label('base_valor', $record['base_valor'] ?? '')],
+        ];
+        return array_map(static fn (array $item): array => [
+            'label' => $item[0],
+            'value' => $item[1] !== '' ? $item[1] : 'Pendiente',
+            'state' => $item[1] !== '' ? 'Completo' : 'Revisar',
+        ], $items);
+    }
+
+    private function workflow(): array
+    {
+        return [
+            ['Revisión de configuración', 'Confirmar negocio, tipología, derecho, PH, estructura y base de valor.'],
+            ['Selección metodológica', 'Adoptar el método que mejor represente cómo el mercado forma precio para este activo.'],
+            ['Preparación de búsqueda', 'Traducir la configuración a filtros y características comparables para portales.'],
+            ['Desarrollo posterior', 'Capturar muestras, depurarlas, homologarlas y cerrar el análisis en los subnumerales siguientes.'],
         ];
     }
 
@@ -140,13 +169,15 @@ final class AppraisalMethodologyChapterReport
         $type = $this->label('tipo_inmueble', $record['tipo_inmueble'] ?? 'el bien objeto de estudio');
         $business = $this->label('tipo_negocio', $record['tipo_negocio'] ?? 'el mercado analizado');
         $ph = $this->label('regimen_ph', $record['regimen_ph'] ?? 'pendiente');
-        $text = 'Teniendo en cuenta la tipología registrada como ' . mb_strtolower($type)
-            . ', el tipo de negocio ' . mb_strtolower($business)
-            . ' y el régimen de propiedad horizontal ' . mb_strtolower($ph)
-            . ', la matriz de decisión metodológica orienta la aplicación de: '
-            . $decision['recommended_method'] . '. '
-            . $decision['reason'];
-        $text .= ' La matriz reutiliza los soportes normativos registrados en el numeral 1.1 y la adopción definitiva debe sustentarse con la calidad de las fuentes, la existencia de datos comparables, la unidad de comparación, las restricciones jurídicas o físicas del activo y la consistencia del resultado frente al mercado.';
+        $method = (string) ($decision['recommended_method'] ?? 'Pendiente de selección');
+        $text = 'Para seleccionar la metodología valuatoria se revisó la configuración del expediente: '
+            . 'tipología ' . mb_strtolower($type) . ', tipo de negocio ' . mb_strtolower($business)
+            . ' y régimen de propiedad horizontal ' . mb_strtolower($ph) . '. Con esta lectura, '
+            . 'y sin perder de vista la finalidad del encargo, la base de valor, el derecho objeto de '
+            . 'valuación, las restricciones jurídicas o físicas del activo y la información disponible, '
+            . 'la matriz metodológica orienta la aplicación de ' . $method . '. ' . $decision['reason'];
+        $text .= ' En consecuencia, la búsqueda y depuración de información debe concentrarse en activos comparables por localización, uso, tipología, unidad de comparación, fecha, estado, área, condiciones de PH cuando aplique y soportes verificables. Las diferencias relevantes se documentarán para la homologación posterior, antes de adoptar el valor conclusivo.';
+        $text .= ' Esta selección no constituye todavía el cálculo del valor; define el camino técnico para recolectar muestras, depurarlas, analizarlas y desarrollar el método en los subnumerales siguientes.';
         if ((string) ($decision['niif_note'] ?? '') !== '') $text .= "\n\n" . $decision['niif_note'];
         if ((string) ($decision['special_template'] ?? '') !== '') $text .= "\n\n" . $decision['special_template'];
         return $text;
