@@ -16,7 +16,7 @@ final class MidasDocumentRepository
         return [
             'Localidades' => 'Ruta MIDAS: Descargas > División política > Localidades.',
             'Unidades comuneras de gobierno' => 'Ruta MIDAS: Descargas > División política > Unidades comuneras de gobierno.',
-            'Uso del suelo y tratamientos' => 'Ruta MIDAS: consulta predial o capas de uso/tratamiento; no reemplaza el POT base.',
+            'Uso del suelo y tratamientos' => 'No está en Descargas; búscalo por referencia, coordenada o clic en el predio y revisa ficha/resultados.',
             'Circulares MIDAS' => 'Ruta MIDAS o Planeación: circulares urbanísticas descargables.',
             'Servicios públicos' => 'Ruta MIDAS: Descargas > Servicios públicos.',
             'Transporte y movilidad' => 'Ruta MIDAS: Descargas > Transporte y movilidad.',
