@@ -1047,6 +1047,17 @@ Certificado de tradicion.",
         && str_contains($sectorChapter['text'], 'Chambacú')
         && str_contains($sectorChapter['text'], 'Avenida Pedro de Heredia')
         && str_contains($sectorChapter['text'], 'NTS I 01'), 'entregable sectorial respeta contenido del capitulo 2 del word');
+    $mapSupport = (new \App\Services\AppraisalMidasMapSupport())->select([
+        ['id' => str_repeat('1', 32), 'layer_group' => 'Localidades',
+            'title' => 'Localidades de Cartagena', 'source_filename' => 'pdf_descargas_division_politica_localidades_localidades.pdf'],
+        ['id' => str_repeat('2', 32), 'layer_group' => 'Localidades',
+            'title' => 'Localidad histórica', 'source_filename' => 'pdf_descargas_division_politica_localidades_localidad_historica_1.pdf'],
+        ['id' => str_repeat('3', 32), 'layer_group' => 'Localidades',
+            'title' => 'Localidad de la virgen', 'source_filename' => 'pdf_descargas_division_politica_localidades_localidad_virgen.pdf'],
+    ], ['locality_name' => 'Localidad Histórica y del Caribe Norte'], []);
+    expect(($mapSupport['general']['id'] ?? '') === str_repeat('1', 32)
+        && ($mapSupport['specific'][0]['id'] ?? '') === str_repeat('2', 32),
+        'entregable selecciona mapa general y mapa de localidad MIDAS');
     $constructionRows = AppraisalChapterZeroInput::unitConstructionData();
     expect($constructionRows[0]['built_area_adopted_m2'] === '85.25'
         && str_contains($constructionRows[0]['construction_conservation_json'], 'sistema_portante')

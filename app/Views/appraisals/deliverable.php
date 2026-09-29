@@ -60,6 +60,8 @@ $phSummaryKeys = [
     <textarea class="input mt-5 min-h-80 bg-white font-mono text-sm leading-6" rows="18" readonly><?= e($chapterOneText) ?></textarea>
 </section>
 
+<?php require BASE_PATH . '/app/Views/appraisals/deliverable-sector-maps.php'; ?>
+
 <section class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
     <p class="eyebrow">Capítulo 1 por secciones</p>
     <h2 class="mt-2 text-2xl font-semibold">Cómo queda la memoria descriptiva</h2>

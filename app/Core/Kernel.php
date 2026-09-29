@@ -149,7 +149,7 @@ final class Kernel
                     new \App\Models\AppraisalObsolescenceRepository($db), new \App\Services\AppraisalDossierNumberer($db),
                     new \App\Models\AppraisalSectorRepository($db), new \App\Models\AppraisalSectorSectionRepository($db),
                     new \App\Models\AppraisalReportNoteRepository($db), new AppraisalLegalRepository($db),
-                    new \App\Models\AppraisalUrbanNormRepository($db)),
+                    new \App\Models\AppraisalUrbanNormRepository($db), new MidasDocumentRepository($db)),
             };
             $instance->$action(...array_slice($matches, 1));
             return;
