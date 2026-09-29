@@ -215,6 +215,15 @@ try {
     expect(($methodologyPool['decision']['components'][1]['route'] ?? '') === 'Reposición'
         && str_contains((string) ($methodologyPool['sections'][2][1] ?? ''), 'Piscina: Costo de reposición depreciado'),
         'numeral 8.2 separa metodo por unidad y anexo con piscina por reposicion');
+    $methodologyIncomeUnits = (new AppraisalMethodologyChapterReport())->build(
+        ['tipo_inmueble' => 'apartamento', 'tipo_negocio' => 'venta', 'income_producing' => 'si'],
+        [],
+        [['id' => 'u1', 'unit_kind' => 'property', 'unit_index' => 1, 'label' => 'Apartamento 301', 'property_type' => 'apartamento']]
+    );
+    $incomeRoutes = array_column($methodologyIncomeUnits['decision']['components'][0]['routes'] ?? [], 'key');
+    expect(in_array('renta', $incomeRoutes, true)
+        && str_contains((string) ($methodologyIncomeUnits['decision']['components'][0]['inputs'] ?? ''), 'renta efectiva'),
+        'numeral 8.3 agrega subruta de renta por unidad si produce ingresos');
     $methodologyNiif = (new AppraisalMethodologyChapterReport())->build(['aplica_niif' => 'si', 'base_valor' => 'razonable']);
     expect(str_contains((string) ($methodologyNiif['decision']['niif_note'] ?? ''), 'NIIF'), 'numeral 8.2 agrega nota NIIF cuando aplica');
     $chapterOneViewRecord = array_replace(\App\Support\AppraisalCatalog::defaults(), [
