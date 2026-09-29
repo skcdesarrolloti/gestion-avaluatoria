@@ -12,6 +12,7 @@ test('adds ph anchor after upload redirects without fragment', () => {
 
 test('shows specific message for rejected large uploads', () => {
     assert.match(uploadErrorMessage({ status: 413, responseText: '' }), /tamaño/);
+    assert.match(uploadErrorMessage({ status: 401, responseText: '{"message":"Inicia sesión para continuar."}' }), /sesión de la carga/);
     assert.equal(uploadErrorMessage({ status: 422, responseText: '{"message":"RAR no disponible"}' }), 'RAR no disponible');
 });
 
@@ -67,6 +68,7 @@ test('submits marked upload form through xhr progress', () => {
     assert.equal(prevented, true);
     assert.equal(bar.style.width, '100%');
     assert.equal(button.disabled, true);
+    assert.equal(Xhr.last.withCredentials, true);
     assert.deepEqual(events.filter(event => event[0] === 'history')[0], ['history', 'https://example.test/public/avaluos/abc/bien-sujeto#ph']);
     Object.assign(globalThis, originals);
 });

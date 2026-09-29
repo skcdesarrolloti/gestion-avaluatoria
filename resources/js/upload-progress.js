@@ -33,9 +33,7 @@ function setProgress(parts, percent, message) {
     if (parts.text) parts.text.textContent = message;
 }
 
-function setDisabled(parts, disabled) {
-    parts.submits.forEach(button => { button.disabled = disabled; });
-}
+function setDisabled(parts, disabled) { parts.submits.forEach(button => { button.disabled = disabled; }); }
 
 export function uploadRedirectUrl(responseUrl, fallbackUrl, currentHref = window.location.href) {
     const target = new URL(responseUrl || fallbackUrl, currentHref);
@@ -62,11 +60,10 @@ function renderResponse(xhr, form) {
     window.location.assign(nextUrl);
 }
 
-function uploadInput(form) {
-    return form.querySelector('input[type="file"][name="ph_document[]"], input[type="file"][name="ph_document"]');
-}
+function uploadInput(form) { return form.querySelector('input[type="file"][name="ph_document[]"], input[type="file"][name="ph_document"]'); }
 
 export function uploadErrorMessage(xhr) {
+    if (xhr?.status === 401) return 'La sesión de la carga no llegó al servidor. Recarga la página, verifica que sigas autenticado e intenta de nuevo.';
     try {
         const data = JSON.parse(xhr?.responseText ?? '');
         if (typeof data?.message === 'string' && data.message.trim() !== '') return data.message.slice(0, 220);
@@ -83,6 +80,7 @@ function rawXhrRequest(url, body, { accept = 'text/html', timeout = 300000, prog
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', url, true);
+        xhr.withCredentials = true;
         xhr.timeout = timeout;
         xhr.setRequestHeader('Accept', accept);
         xhr.setRequestHeader('X-Requested-With', 'upload-progress');
@@ -164,6 +162,7 @@ function submitDirectUpload(form, submitter, parts, retryCsrf = true) {
     setDisabled(parts, true);
     setProgress(parts, 1, 'Preparando subida...');
     xhr.open((form.method || 'POST').toUpperCase(), form.action, true);
+    xhr.withCredentials = true;
     xhr.timeout = Number.parseInt(form.dataset?.uploadTimeout || '300000', 10);
     xhr.setRequestHeader('Accept', 'text/html');
     xhr.setRequestHeader('X-Requested-With', 'upload-progress');
