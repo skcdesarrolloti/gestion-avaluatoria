@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace App\Models;
 use App\Core\HttpException;
 use App\Services\{AppraisalPhAgeExtractor, AppraisalPhDocumentStorage, AppraisalPhLegalTrace, AppraisalPhReportBuilder, AppraisalPhSubjectPrefill};
-use App\Support\AppraisalPhCatalog;
+use App\Support\{AppraisalPhCatalog, AppraisalPhGeneratedText};
 use PDO;
 final class AppraisalPhRepository
 {
@@ -119,16 +119,32 @@ final class AppraisalPhRepository
         // Deleting a source must preserve the analyst's saved work.
         return ['filename' => $filename, 'cleared' => $cleared];
     }
-    public function mergeAnalysis(string $appraisalId, int $owner, array $analysis, ?int $expected = null): void
+    public function mergeAnalysis(string $appraisalId, int $owner, array $analysis, ?int $expected = null, bool $refreshDocumental = false): void
     {
         $current = $this->profile($appraisalId, $owner);
-        $data = array_replace($current, $this->mergeEmpty($current, $analysis['core'] ?? []));
+        $incomingCore = $analysis['core'] ?? []; $data = array_replace($current, $this->mergeEmpty($current, $incomingCore));
+        if ($refreshDocumental) $data = array_replace($data, $this->documentalCore($current, $incomingCore));
         foreach (['linkage', 'technical', 'common_areas', 'documents', 'risks', 'photos'] as $key) {
-            $data[$key] = array_replace($current[$key] ?? [], $this->mergeEmpty($current[$key] ?? [], $analysis[$key] ?? []));
+            $incoming = $analysis[$key] ?? []; $data[$key] = array_replace($current[$key] ?? [], $refreshDocumental
+                ? $this->nonEmpty($incoming)
+                : $this->mergeEmpty($current[$key] ?? [], $incoming));
         }
         $data['source_summary'] = (string) ($analysis['summary'] ?? $current['source_summary'] ?? '');
         $data['findings'] = $analysis['findings'] ?? $current['findings'] ?? [];
         $this->save($appraisalId, $owner, $data, $expected ?? (int) ($current['version'] ?? 0));
+    }
+    private function documentalCore(array $current, array $incoming): array
+    {
+        $merged = [];
+        foreach (['regulation_document', 'reform_documents', 'reserve_fund', 'insurance_status', 'restrictions_text'] as $key) {
+            if (!$this->emptyValue($incoming[$key] ?? '')) $merged[$key] = $incoming[$key];
+        }
+        foreach (['diagnosis_text', 'report_text'] as $key) {
+            if (!$this->emptyValue($incoming[$key] ?? '') && AppraisalPhGeneratedText::replaceable((string) ($current[$key] ?? ''))) {
+                $merged[$key] = $incoming[$key];
+            }
+        }
+        return $merged;
     }
     private function hasDocuments(string $appraisalId, int $owner): bool
     { $query = $this->db->prepare('SELECT COUNT(*) FROM appraisal_ph_documents WHERE appraisal_id = ? AND owner_id = ?'); $query->execute([$appraisalId, $owner]); return (int) $query->fetchColumn() > 0; }
@@ -143,6 +159,8 @@ final class AppraisalPhRepository
         }
         return $merged;
     }
+    private function nonEmpty(array $incoming): array
+    { return array_filter($incoming, fn (mixed $value): bool => !$this->emptyValue($value)); }
     private function emptyValue(mixed $value): bool
     {
         if (is_array($value)) {
@@ -180,29 +198,12 @@ final class AppraisalPhRepository
             $profile['photos'] ?? [], (string) ($profile['ph_typology'] ?? ''),
             (string) ($profile['source_summary'] ?? ''), $profile['findings'] ?? []);
         foreach (['diagnosis_text', 'report_text'] as $key) {
-            if ($this->replaceableReport((string) ($profile[$key] ?? ''))) $profile[$key] = $built[$key] ?? '';
+            if (AppraisalPhGeneratedText::replaceable((string) ($profile[$key] ?? ''))) $profile[$key] = $built[$key] ?? '';
         }
         foreach (($built['technical'] ?? []) as $key => $value) {
-            if ($this->replaceableReport((string) ($profile['technical'][$key] ?? ''))) $profile['technical'][$key] = $value;
+            if (AppraisalPhGeneratedText::replaceable((string) ($profile['technical'][$key] ?? ''))) $profile['technical'][$key] = $value;
         }
         return $profile;
-    }
-    private function replaceableReport(string $text): bool
-    {
-        $text = trim($text); if ($text === '') return true;
-        foreach (['Base comparativa:', 'Trazabilidad:', 'Identificación:', 'Tipología y régimen:',
-            'Configuración predial:', 'Bienes comunes y soporte:', 'Reglas de uso y operación:', 'Las reglas de uso y operación de',
-            'Administración y cargas:', 'Incidencia valuatoria:', 'Notas y salvedades:', 'Notas normativas y salvedades:',
-            'La copropiedad corresponde preliminarmente', 'Se revisa preliminarmente como',
-            'Lectura preliminar PH sin hallazgos suficientes', 'Para el análisis de propiedad horizontal se tuvo como soporte',
-            'Condición especial PH:', 'Trazabilidad documental:', 'Lectura comparativa:',
-            'El inmueble objeto de análisis forma parte de', 'El inmueble objeto de medición se localiza en',
-            'La copropiedad ', 'Se verifican ',
-            'Quedan por confirmar ', 'Se registran alertas o salvedades en ', 'Los bienes comunes específicos deben confirmarse',
-            'Bienes comunes esenciales:', 'Bienes comunes no esenciales', 'Áreas comunes de uso exclusivo:', 'Soporte operativo y técnico común:', 'No se han marcado bienes comunes verificados', 'No se han identificado bienes comunes', 'Para la tipología '] as $prefix) {
-            if (str_starts_with($text, $prefix)) return true;
-        }
-        return false;
     }
     private function valuationYear(string $appraisalId, int $owner): int
     {

@@ -19,7 +19,7 @@ final class AppraisalPhExternalOcrService
             $analysis = (new AppraisalPhDocumentAnalyzer())->analyze($text, [$name], $typology, $repo->profile($appraisalId, $owner));
             $repo->updateDocumentAnalysis($documentId, $appraisalId, $owner, mb_strlen($text),
                 'Lectura externa IA/OCR aplicada.', $text);
-            $repo->mergeAnalysis($appraisalId, $owner, $analysis, $expected);
+            $repo->mergeAnalysis($appraisalId, $owner, $analysis, $expected, true);
             return $analysis;
         } finally {
             if ($resolver->temporary($path)) @unlink($path);

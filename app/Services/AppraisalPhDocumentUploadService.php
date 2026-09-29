@@ -78,7 +78,7 @@ final class AppraisalPhDocumentUploadService
                 'analysis_message' => $analysis['summary'],
             ]);
         }
-        $repo->mergeAnalysis($appraisalId, $owner, $analysis, $expected);
+        $repo->mergeAnalysis($appraisalId, $owner, $analysis, $expected, true);
         return $analysis;
     }
     private function archiveText(string $path, string $name, string $extension): array

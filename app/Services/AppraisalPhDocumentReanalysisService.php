@@ -24,7 +24,7 @@ final class AppraisalPhDocumentReanalysisService
             $analysis = (new AppraisalPhDocumentAnalyzer())->analyze($text, $names, $typology, $repo->profile($appraisalId, $owner));
             $repo->updateDocumentAnalysis($documentId, $appraisalId, $owner, mb_strlen($text),
                 (string) ($analysis['summary'] ?? 'Lectura preliminar PH.'), $text);
-            $repo->mergeAnalysis($appraisalId, $owner, $analysis, $expected);
+            $repo->mergeAnalysis($appraisalId, $owner, $analysis, $expected, true);
             return $analysis;
         } finally {
             if ($path !== '' && $resolver->temporary($path)) @unlink($path);

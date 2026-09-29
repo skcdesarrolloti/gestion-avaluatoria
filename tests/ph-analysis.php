@@ -34,3 +34,18 @@ $phRepo->save(str_repeat('d', 32), 1, array_replace($prior, ['ph_name'=>'Edició
 expectStatus(409, fn () => $phRepo->save(str_repeat('d', 32), 1, $prior, $version), 'PH rechaza autoguardado obsoleto');
 expectStatus(409, fn () => $phRepo->mergeAnalysis(str_repeat('d', 32), 1, $result, $version), 'PH rechaza análisis con versión obsoleta');
 expect($phRepo->profile(str_repeat('d', 32), 1)['ph_name'] === 'Edición del analista', 'PH conserva edición tras conflicto');
+$refreshId = str_repeat('h', 32);
+$phRepo->save($refreshId, 1, array_replace(\App\Support\AppraisalPhCatalog::defaults(), [
+    'ph_name' => 'Nombre manual PH', 'report_text' => 'Texto manual libre del analista.',
+    'technical' => ['fuente_documental' => 'lectura-vieja.pdf'],
+    'common_areas' => ['piscina' => ['status' => 'warn', 'notes' => 'Lectura vieja.']],
+]));
+$fresh = $analyzer->analyze('Reglamento de propiedad horizontal. La piscina y los ascensores son bienes comunes.',
+    ['reglamento-nuevo.pdf'], 'oficinas');
+$phRepo->mergeAnalysis($refreshId, 1, $fresh, null, true);
+$refreshed = $phRepo->profile($refreshId, 1);
+expect(($refreshed['ph_name'] ?? '') === 'Nombre manual PH'
+    && ($refreshed['technical']['fuente_documental'] ?? '') === 'reglamento-nuevo.pdf'
+    && !str_contains((string) ($refreshed['common_areas']['piscina']['notes'] ?? ''), 'Lectura vieja')
+    && ($refreshed['report_text'] ?? '') === 'Texto manual libre del analista.',
+    'PH refresca matriz documental sin borrar texto manual libre');
