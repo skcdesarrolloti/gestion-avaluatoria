@@ -6,6 +6,7 @@ use App\Models\AppraisalPhRepository;
 use App\Models\AppraisalRepository;
 use App\Models\AppraisalSubjectRepository;
 use App\Services\AppraisalComparableSearchGuide;
+use App\Services\AppraisalMethodologyChapterReport;
 
 final class AppraisalValuationMethodologyController
 {
@@ -19,8 +20,10 @@ final class AppraisalValuationMethodologyController
         $subject = $this->subjects->find($id, $this->user['id']);
         $units = $this->appraisals->units($id, $this->user['id']);
         $phProfile = $this->ph->profile($id, $this->user['id']);
+        $methodologyChapter = (new AppraisalMethodologyChapterReport())->build($record, $subject);
         view('appraisals/valuation-methodology', ['title' => 'Metodología valuatoria',
             'record' => $record, 'subject' => $subject, 'units' => $units, 'phProfile' => $phProfile,
+            'methodologyChapter' => $methodologyChapter,
             'guide' => $this->guide->build($record, $subject, $units, $phProfile)]);
     }
 }

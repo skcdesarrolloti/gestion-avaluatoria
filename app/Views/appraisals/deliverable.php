@@ -19,6 +19,7 @@ $urbanChapterText = (string) ($urbanChapterData['text'] ?? '');
 $urbanChapterSections = is_array($urbanChapterData['sections'] ?? null) ? $urbanChapterData['sections'] : [];
 $economicChapterData = is_array($economicChapter ?? null) ? $economicChapter : ['sections' => [], 'text' => ''];
 $restrictiveChapterData = is_array($restrictiveChapter ?? null) ? $restrictiveChapter : ['sections' => [], 'text' => ''];
+$methodologyChapterData = is_array($methodologyChapter ?? null) ? $methodologyChapter : ['sections' => [], 'text' => ''];
 $midasTrace = is_array($midasIncorporation ?? null) ? $midasIncorporation : ['rows' => [], 'active' => [], 'text' => ''];
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
@@ -193,6 +194,11 @@ $simpleChapter = ['eyebrow' => 'Capítulo 7 · Condiciones restrictivas', 'title
     'help' => 'Integra estabilidad, ambiente, afectaciones, seguridad, problemáticas, hipótesis y problemas jurídicos.',
     'href' => url('avaluos/' . $record['id'] . '/condiciones-restrictivas'), 'link' => 'Editar módulo 7',
     'theme' => 'red', 'data' => $restrictiveChapterData];
+require BASE_PATH . '/app/Views/appraisals/deliverable-simple-chapter.php';
+$simpleChapter = ['eyebrow' => 'Capítulo 8 · Metodología valuatoria', 'title' => 'Texto introductorio metodológico',
+    'help' => 'Ambientación académica común del informe: Resolución IGAC 941, antecedentes 620, IVS, NIIF, NTS y selección del enfoque aplicable.',
+    'href' => url('avaluos/' . $record['id'] . '/metodologia-valuatoria'), 'link' => 'Revisar módulo 8',
+    'theme' => 'sky', 'data' => $methodologyChapterData];
 require BASE_PATH . '/app/Views/appraisals/deliverable-simple-chapter.php';
 require BASE_PATH . '/app/Views/appraisals/deliverable-ph-summary.php';
 ?>

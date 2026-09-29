@@ -25,6 +25,7 @@ use App\Services\AppraisalSectorChapterReport;
 use App\Services\AppraisalReportNoteIntegrator;
 use App\Services\AppraisalSubjectChapterReport;
 use App\Services\AppraisalComparableSearchGuide;
+use App\Services\AppraisalMethodologyChapterReport;
 use App\Services\AppraisalLegalChapterReport;
 use App\Services\AppraisalNarrativeChapterInput;
 use App\Services\AppraisalNarrativeChapterReport;
@@ -129,6 +130,13 @@ try {
     $apartmentGuide = $searchGuide->build(['tipo_inmueble' => 'apartamento', 'regimen_ph' => 'si'], [], [], ['ph_name' => 'Edificio prueba']);
     expect(str_contains(mb_strtolower(implode(' ', $apartmentGuide['criteria'])), 'planta electrica')
         || str_contains(mb_strtolower(implode(' ', $apartmentGuide['criteria'])), 'planta eléctrica'), 'metodologia incorpora PH en apartamentos');
+    $methodologyReport = (new AppraisalMethodologyChapterReport())->build();
+    $methodologyText = $methodologyReport['text'];
+    expect(str_contains($methodologyText, 'Resolución IGAC 941 de 2026')
+        && str_contains($methodologyText, 'Resolución 620 de 2008')
+        && str_contains($methodologyText, 'IVS')
+        && str_contains($methodologyText, 'NIIF')
+        && str_contains($methodologyText, 'NTS'), 'numeral 8.1 incorpora 941 IVS NIIF NTS y deja 620 como antecedente');
     $chapterOneViewRecord = array_replace(\App\Support\AppraisalCatalog::defaults(), [
         'titulo' => 'Informe de avalúo', 'tipo' => 'comercial', 'tipo_derecho' => 'dominio_pleno',
         'finalidad' => 'negociacion', 'intended_use' => 'Negociación',

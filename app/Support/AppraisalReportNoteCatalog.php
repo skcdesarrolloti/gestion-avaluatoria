@@ -89,6 +89,10 @@ final class AppraisalReportNoteCatalog
                 '7.5'=>'Problemáticas socioeconómicas', '7.6'=>'Hipótesis especiales',
                 '7.7'=>'Problemas jurídicos',
             ],
+            '8' => [
+                '8.1'=>'Marco metodológico y normativo',
+                '8.2'=>'Selección y aplicación del método valuatorio',
+            ],
         ];
     }
 }

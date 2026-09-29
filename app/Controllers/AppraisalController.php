@@ -20,6 +20,7 @@ use App\Models\IgacTypologyRepository;
 use App\Services\AppraisalChapterOneReport;
 use App\Services\AppraisalLegalChapterReport;
 use App\Services\AppraisalSectorChapterReport;
+use App\Services\AppraisalMethodologyChapterReport;
 use App\Services\AppraisalMidasIncorporation;
 use App\Services\AppraisalMidasMapSupport;
 use App\Services\AppraisalDossierNumberer;
@@ -113,11 +114,14 @@ final class AppraisalController
             $this->chapterNotes($notes, '5'), AppraisalReportNoteCatalog::noteSectionLabels('5', $this->chapterNotes($notes, '5')));
         $economicChapter = $this->narrativeReport($id, '6', AppraisalEconomicCatalog::sections(), AppraisalEconomicCatalog::defaults(), $notes, $midasDocuments);
         $restrictiveChapter = $this->narrativeReport($id, '7', AppraisalRestrictiveConditionsCatalog::sections(), AppraisalRestrictiveConditionsCatalog::defaults(), $notes, $midasDocuments);
+        $methodologyChapter = $integrator->apply((new AppraisalMethodologyChapterReport())->build($record, $subject),
+            $this->chapterNotes($notes, '8'), AppraisalReportNoteCatalog::noteSectionLabels('8', $this->chapterNotes($notes, '8')));
         view('appraisals/deliverable', ['title' => 'Entregable', 'record' => $record,
             'phProfile' => $phProfile, 'chapterOne' => $chapterOne, 'sectorChapter' => $sectorChapter,
             'subjectChapter' => $subjectChapter, 'legalChapter' => $legalChapter,
             'urbanChapter' => $urbanChapter, 'economicChapter' => $economicChapter,
-            'restrictiveChapter' => $restrictiveChapter, 'sectorMaps' => $sectorMaps,
+            'restrictiveChapter' => $restrictiveChapter, 'methodologyChapter' => $methodologyChapter,
+            'sectorMaps' => $sectorMaps,
             'midasIncorporation' => (new AppraisalMidasIncorporation())->deliverable($midasDocuments)]);
     }
 
