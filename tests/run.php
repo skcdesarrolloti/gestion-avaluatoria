@@ -833,6 +833,10 @@ try {
     $economicData = AppraisalNarrativeChapterInput::data(AppraisalEconomicCatalog::sections(), [
         'building_activity_level' => 'baja',
         'building_activity_text' => 'Predominan remodelaciones y ampliaciones puntuales.',
+        'predominant_activity' => 'residencial',
+        'secondary_activity' => 'comercio',
+        'tertiary_activity' => 'institucional_3',
+        'activity_corridor_text' => 'El sector es residencial, pero presenta un corredor comercial puntual.',
         'target_market_text' => 'El mercado objetivo se orienta al sector salud.',
         'extra_field' => 'ignorar',
     ]);
@@ -841,7 +845,13 @@ try {
     $economicReport = (new AppraisalNarrativeChapterReport())->build(AppraisalEconomicCatalog::sections(), $storedEconomic);
     expect(str_contains($economicReport['text'], '6.1 Actividad edificadora')
         && str_contains($economicReport['text'], 'Predominan remodelaciones')
+        && str_contains($economicReport['text'], 'Actividad principal del sector: Residencial.')
+        && str_contains($economicReport['text'], 'Actividad secundaria o corredor relevante: Comercio.')
+        && str_contains($economicReport['text'], 'Institucional de tercer nivel')
         && !str_contains($economicReport['text'], 'extra_field'), 'numeral 6 guarda y redacta aspecto economico');
+    expect(str_contains(AppraisalEconomicCatalog::sections()[3]['fields'][3]['prefill'] ?? '', 'corredores')
+        && AppraisalEconomicCatalog::defaults()['economic_activity_text'] === '',
+        'numeral 6 expone textos guia editables sin copiarlos al entregable antes de guardar');
     $restrictiveData = AppraisalNarrativeChapterInput::data(AppraisalRestrictiveConditionsCatalog::sections(), [
         'soil_incidence' => 'no_incide',
         'soil_text' => 'No se evidencian problemas de estabilidad; requiere soporte si cambia la condición.',
@@ -854,6 +864,7 @@ try {
     );
     expect(str_contains($restrictiveReport['text'], '7.1 Problemas de estabilidad')
         && str_contains($restrictiveReport['text'], 'No se evidencian problemas')
+        && str_contains(AppraisalRestrictiveConditionsCatalog::sections()[6]['fields'][1]['prefill'] ?? '', 'No se evidenciaron')
         && str_contains(AppraisalReportNoteCatalog::sections('7')['7.7'] ?? '', 'Problemas jurídicos'),
         'numeral 7 guarda restricciones y expone secciones para ampliaciones');
     $db->prepare('UPDATE appraisal_subjects SET address = ?, address_certificate = ?, adopted_source = ?,

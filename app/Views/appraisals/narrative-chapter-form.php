@@ -5,6 +5,9 @@ $data = is_array($n['data'] ?? null) ? $n['data'] : [];
 $firstCode = (string) ($sections[0]['code'] ?? '');
 $activeJson = json_encode($firstCode, JSON_THROW_ON_ERROR);
 $fieldValue = static fn (string $key): string => (string) ($data[$key] ?? '');
+$textValue = static fn (array $field): string => $fieldValue((string) ($field['key'] ?? '')) !== ''
+    ? $fieldValue((string) ($field['key'] ?? ''))
+    : (string) ($field['prefill'] ?? '');
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
@@ -58,7 +61,7 @@ $fieldValue = static fn (string $key): string => (string) ($data[$key] ?? '');
                                 <?php endforeach; ?>
                             </select>
                         <?php else: ?>
-                            <textarea class="input mt-2 min-h-28" name="<?= e($key) ?>" maxlength="<?= e((string) ($field['max'] ?? 2200)) ?>"><?= e($fieldValue($key)) ?></textarea>
+                            <textarea class="input mt-2 min-h-28" name="<?= e($key) ?>" maxlength="<?= e((string) ($field['max'] ?? 2200)) ?>"><?= e($textValue($field)) ?></textarea>
                         <?php endif; ?>
                     </label>
                 <?php endforeach; ?>
