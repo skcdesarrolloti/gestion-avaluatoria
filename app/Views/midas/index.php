@@ -24,6 +24,11 @@ $targets = [
     'Cambio climático' => 'Numeral 7: amenazas, vulnerabilidad, adaptación y salvedades ambientales.',
     'Otro soporte MIDAS' => 'Se usa solo si el analista define qué campo o numeral sustenta.',
 ];
+$sections = [
+    'Base territorial' => ['Localidades', 'Unidades comuneras de gobierno', 'Barrios / división política'],
+    'Norma urbana' => ['POT / ordenamiento territorial', 'Uso del suelo y tratamientos', 'Circulares MIDAS'],
+    'Entorno y restricciones' => ['Servicios públicos', 'Transporte y movilidad', 'Equipamiento urbano', 'Educación', 'Salud', 'Seguridad', 'Cultura', 'Ambiente y riesgos', 'Cambio climático', 'Otro soporte MIDAS'],
+];
 $formatBytes = static fn ($bytes): string => number_format(((int) $bytes) / 1024, 1, ',', '.') . ' KB';
 $formatDate = static function ($value): string {
     try {
@@ -52,22 +57,32 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
     <?php if ($message): ?><p class="rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($message) ?></p><?php endif; ?>
     <?php if ($error): ?><p class="rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($error) ?></p><?php endif; ?>
 
-    <section class="grid gap-5 lg:grid-cols-[0.85fr_1.15fr]">
+    <section class="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
         <article class="rounded-xl border border-blue-100 bg-blue-50 p-5">
-            <h2 class="text-lg font-semibold text-blue-950">Qué se aloja aquí</h2>
-            <p class="mt-2 text-sm leading-6 text-blue-950">
-                Aquí van documentos o capas generales que sirven para muchos avalúos.
-                Si el archivo corresponde solo a un predio o barrio específico, guárdalo
-                como soporte del avalúo en el numeral 2.
-            </p>
-            <div class="mt-4 grid gap-3 text-sm">
-                <?php foreach ($groups as $group => $description): ?>
+            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                <div>
+                    <h2 class="text-lg font-semibold text-blue-950">Qué se aloja aquí</h2>
+                    <p class="mt-2 max-w-3xl text-sm leading-6 text-blue-950">
+                        MIDAS guarda capas y descargas comunes para muchos avalúos. Los soportes de un caso específico
+                        se anexan en el numeral 2.
+                    </p>
+                </div>
+                <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-blue-800">Separado de Normatividad Urbana</span>
+            </div>
+            <div class="mt-4 grid gap-3 text-sm md:grid-cols-3">
+                <?php foreach ($sections as $sectionTitle => $sectionGroups): ?>
                     <div class="rounded-lg bg-white/70 p-3">
-                        <p class="font-semibold text-blue-950"><?= e((string) $group) ?></p>
-                        <p class="mt-1 leading-5 text-blue-900"><?= e((string) $description) ?></p>
-                        <p class="mt-2 text-xs font-semibold leading-5 text-blue-800">
-                            Nutre expediente: <?= e($targets[(string) $group] ?? 'Pendiente de clasificar por el analista.') ?>
-                        </p>
+                        <p class="font-semibold text-blue-950"><?= e($sectionTitle) ?></p>
+                        <div class="mt-3 space-y-3">
+                            <?php foreach ($sectionGroups as $group): ?>
+                                <?php if (!isset($groups[$group])) { continue; } ?>
+                                <div>
+                                    <p class="text-xs font-semibold uppercase text-blue-800"><?= e($group) ?></p>
+                                    <p class="mt-1 text-xs leading-5 text-blue-900"><?= e((string) $groups[$group]) ?></p>
+                                    <p class="mt-1 text-[11px] font-semibold leading-4 text-blue-700"><?= e($targets[$group] ?? 'Pendiente de clasificar por el analista.') ?></p>
+                                </div>
+                            <?php endforeach; ?>
+                        </div>
                     </div>
                 <?php endforeach; ?>
             </div>
