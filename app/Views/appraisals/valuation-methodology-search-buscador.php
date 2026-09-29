@@ -15,10 +15,10 @@ $explorationSteps = [
 ?>
 <div class="rounded-xl border border-blue-100 bg-blue-50 p-4">
     <p class="text-xs font-bold uppercase text-blue-800">Buscador 8.3 asistido por el bien sujeto</p>
-    <h3 class="mt-2 text-xl font-semibold text-blue-950">Consulta base para inmobiliarias con presencia local</h3>
+    <h3 class="mt-2 text-xl font-semibold text-blue-950">Consulta base para portales e inmobiliarias</h3>
     <p class="mt-2 text-sm leading-6 text-blue-950">
-        La consulta se arma con operación, tipología, barrio, localidad y ciudad del inmueble. Para Cartagena,
-        la prioridad son inmobiliarias con inventario local visible y posibilidad de confirmar disponibilidad.
+        La consulta se arma con operación, tipología, barrio, localidad y ciudad del inmueble. Primero revisa
+        portales para amplitud de mercado y luego inmobiliarias locales para confirmar inventario y disponibilidad.
     </p>
     <div class="mt-4 rounded-lg bg-white p-3 font-mono text-sm font-semibold text-slate-900">
         <?= e($baseQuery ?: 'Completa el bien sujeto para formar una consulta automática.') ?>
@@ -48,11 +48,22 @@ $explorationSteps = [
     </div>
 
     <div class="mt-4">
-        <p class="text-xs font-bold uppercase text-blue-800">Inmobiliarias recomendadas para Cartagena</p>
+        <p class="text-xs font-bold uppercase text-blue-800">Portales inmobiliarios</p>
         <div class="mt-3 grid gap-3 md:grid-cols-2">
             <?php foreach ($portalSources as $source): ?>
                 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-card.php'; ?>
             <?php endforeach; ?>
         </div>
     </div>
+
+    <?php if ($agencySources !== []): ?>
+        <div class="mt-5">
+            <p class="text-xs font-bold uppercase text-blue-800">Inmobiliarias recomendadas para Cartagena, en orden de prioridad</p>
+            <div class="mt-3 grid gap-3 md:grid-cols-2">
+                <?php foreach ($agencySources as $source): ?>
+                    <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-card.php'; ?>
+                <?php endforeach; ?>
+            </div>
+        </div>
+    <?php endif; ?>
 </div>

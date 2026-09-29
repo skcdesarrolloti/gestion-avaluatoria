@@ -135,10 +135,11 @@ try {
             'locality_name' => 'Histórica y del Caribe Norte'], [], []);
     expect(str_contains((string) ($officeSearch['source_search']['query'] ?? ''), 'Cartagena de Indias')
         && str_contains((string) ($officeSearch['source_search']['query'] ?? ''), 'Chambacú')
-        && str_contains((string) ($officeSearch['source_search']['portal_sources'][0]['label'] ?? ''), 'SuCasa')
-        && str_contains(implode(' ', $officeSearch['source_search']['portal_sources'][0]['selection_factors'] ?? []), 'Portafolio')
+        && str_contains((string) ($officeSearch['source_search']['portal_sources'][0]['label'] ?? ''), 'FincaRaiz')
+        && str_contains((string) ($officeSearch['source_search']['agency_sources'][0]['label'] ?? ''), 'Araújo')
+        && str_contains(implode(' ', $officeSearch['source_search']['agency_sources'][0]['selection_factors'] ?? []), '1954')
         && str_contains((string) ($officeSearch['source_search']['official_sources'][2]['label'] ?? ''), 'MIDAS'),
-        'buscador 8.3 arma inmobiliarias y fuente oficial segun ciudad del sujeto');
+        'buscador 8.3 arma portales inmobiliarias y fuente oficial segun ciudad del sujeto');
     $apartmentGuide = $searchGuide->build(['tipo_inmueble' => 'apartamento', 'regimen_ph' => 'si'], [], [], ['ph_name' => 'Edificio prueba']);
     expect(str_contains(mb_strtolower(implode(' ', $apartmentGuide['criteria'])), 'planta electrica')
         || str_contains(mb_strtolower(implode(' ', $apartmentGuide['criteria'])), 'planta eléctrica'), 'metodologia incorpora PH en apartamentos');

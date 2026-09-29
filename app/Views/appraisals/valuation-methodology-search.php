@@ -3,6 +3,7 @@ $portalFields = is_array($guide['portal_fields'] ?? null) ? $guide['portal_field
 $portalFilters = is_array($guide['portal_filters'] ?? null) ? $guide['portal_filters'] : [];
 $sourceSearch = is_array($guide['source_search'] ?? null) ? $guide['source_search'] : [];
 $portalSources = is_array($sourceSearch['portal_sources'] ?? null) ? $sourceSearch['portal_sources'] : [];
+$agencySources = is_array($sourceSearch['agency_sources'] ?? null) ? $sourceSearch['agency_sources'] : [];
 $officialSources = is_array($sourceSearch['official_sources'] ?? null) ? $sourceSearch['official_sources'] : [];
 $captureProtocol = is_array($sourceSearch['capture_protocol'] ?? null) ? $sourceSearch['capture_protocol'] : [];
 $adjustments = is_array($guide['adjustments'] ?? null) ? $guide['adjustments'] : (is_array($guide['homologation'] ?? null) ? $guide['homologation'] : []);
