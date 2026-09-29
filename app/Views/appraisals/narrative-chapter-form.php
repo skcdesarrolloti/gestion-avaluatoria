@@ -67,7 +67,8 @@ $textValue = static fn (array $field): string => $fieldValue((string) ($field['k
             <p class="eyebrow">Estructura del capítulo</p>
             <h2 class="mt-2 text-2xl font-semibold">Diligenciamiento por subnumeral</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                Trabaja una pestaña a la vez. Los textos guardados pasan al entregable; las ayudas solo orientan y no se copian automáticamente.
+                Trabaja una pestaña a la vez. Los textos guardados pasan al entregable; las ayudas no sobrescriben tus campos.
+                Los soportes MIDAS se agregan como trazabilidad del capítulo cuando existan.
             </p>
         </div>
         <button class="btn-primary min-h-11" type="submit">Guardar ahora</button>

@@ -906,9 +906,22 @@ try {
         'source_filename' => 'pdf_descargas_cambio_climatico_plan_adaptacion.pdf',
     ]]);
     expect(count($restrictiveMidasSupport['items']) === 1
-        && str_contains($restrictiveMidasSupport['findings'][0] ?? '', 'Cambio climático MIDAS')
+        && str_contains($restrictiveMidasSupport['findings'][0] ?? '', 'no concluye por sí solo')
         && str_contains(AppraisalRestrictiveConditionsCatalog::sections()[0]['fields'][1]['prefill'] ?? '', 'Cambio climático'),
         'numeral 7 vincula Cambio climatico MIDAS a riesgos y salvedades ambientales');
+    $climateDetailedSupport = $midasNarrativeSupport->forChapter('7', [[
+        'id' => str_repeat('8', 32), 'layer_group' => 'Cambio climático',
+        'title' => 'pdf_descargas_cambio_climatico_lineamientos_de_adaptacion_al_cambio_climatico',
+        'source_filename' => 'pdf_descargas_cambio_climatico_lineamientos_de_adaptacion_al_cambio_climatico_del_area_insular.pdf',
+    ], [
+        'id' => str_repeat('9', 32), 'layer_group' => 'Cambio climático',
+        'title' => 'pdf_descargas_cambio_climatico_plan_adaptacion_4c',
+        'source_filename' => 'pdf_descargas_cambio_climatico_plan_adaptacion_4c.pdf',
+    ]]);
+    expect(str_contains(implode(' ', $climateDetailedSupport['findings']), 'lineamientos de adaptación')
+        && str_contains(implode(' ', $climateDetailedSupport['findings']), 'Plan de adaptación 4C')
+        && str_contains(implode(' ', $climateDetailedSupport['findings']), '7.1'),
+        'Cambio climatico MIDAS resume documentos y subnumerales sin dictamen automatico');
     $midasReportSections = $midasNarrativeSupport->reportSections('6', [[
         'id' => str_repeat('4', 32), 'layer_group' => 'Educación', 'title' => 'Colegios oficiales y privados',
         'source_filename' => 'educacion_colegios.xlsx',

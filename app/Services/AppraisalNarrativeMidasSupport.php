@@ -45,8 +45,9 @@ final class AppraisalNarrativeMidasSupport
     {
         $climate = $this->group($documents, 'Cambio climático');
         $findings = $climate === [] ? [] : [
-            'Cambio climático MIDAS debe revisarse en el numeral 7 para amenazas, vulnerabilidad, adaptación, inundación, salvedades ambientales o ausencia soportada de incidencia.',
-            'Si el soporte muestra una amenaza o condición ambiental relevante, ajusta los textos base de estabilidad, ambiente y restricciones antes de emitir el entregable.',
+            'Cambio climático MIDAS no concluye por sí solo una afectación del predio; se usa como soporte documental para revisar amenazas, vulnerabilidad, adaptación, inundación y salvedades ambientales.',
+            'El soporte alimenta 7.1 cuando exista relación con estabilidad, suelos, inundación o deslizamiento; alimenta 7.2 para ambiente, salubridad o vulnerabilidad climática; y alimenta 7.6 cuando deba dejarse una hipótesis o salvedad especial.',
+            $this->climateSummary($climate),
         ];
         return [
             'title' => 'Soportes MIDAS para condiciones restrictivas',
@@ -54,6 +55,30 @@ final class AppraisalNarrativeMidasSupport
             'items' => $this->items($climate),
             'findings' => $findings,
         ];
+    }
+
+    private function climateSummary(array $documents): string
+    {
+        $labels = [];
+        foreach ($documents as $document) {
+            $label = $this->climateLabel((string) (($document['title'] ?? '') . ' ' . ($document['source_filename'] ?? '')));
+            if ($label !== '') $labels[$label] = true;
+        }
+        if ($labels === []) return 'Soportes de cambio climático cargados: revisa cada PDF antes de modificar las restricciones.';
+        return 'Soportes de cambio climático cargados: ' . implode(', ', array_keys($labels))
+            . '. Úsalos como respaldo de redacción, no como dictamen automático de riesgo predial.';
+    }
+
+    private function climateLabel(string $value): string
+    {
+        $plain = $this->normalize($value);
+        return match (true) {
+            str_contains($plain, 'invemar') => 'INVEMAR',
+            str_contains($plain, 'plan adaptacion') || str_contains($plain, '4c') => 'Plan de adaptación 4C',
+            str_contains($plain, 'lineamientos') => 'lineamientos de adaptación',
+            str_contains($plain, 'integracion') => 'integración del cambio climático',
+            default => trim((string) preg_replace('/\s+/', ' ', $value)),
+        };
     }
 
     private function group(array $documents, string $group): array
@@ -77,8 +102,9 @@ final class AppraisalNarrativeMidasSupport
     private function educationSummary(array $documents): string
     {
         $sectorCounts = []; $localityCounts = []; $total = 0;
+        $reader = new AppraisalEducationMidasReader();
         foreach ($documents as $document) {
-            $rows = $this->readXlsxRows((string) ($document['file_path'] ?? ''));
+            $rows = $reader->rows((string) ($document['file_path'] ?? ''));
             foreach ($rows as $row) {
                 $sector = $this->first($row, ['sector', 'tipo sector', 'oficial privado']);
                 $locality = $this->first($row, ['localidad', 'nombre localidad']);
@@ -94,82 +120,6 @@ final class AppraisalNarrativeMidasSupport
         return trim('Lectura preliminar del Excel de Educación: ' . $total . ' registro(s)'
             . ($sectors !== '' ? '; sector: ' . $sectors : '')
             . ($localities !== '' ? '; localidades principales: ' . $localities : '') . '.');
-    }
-
-    private function readXlsxRows(string $path): array
-    {
-        if ($path === '' || !is_file($path) || !class_exists(\ZipArchive::class)) return [];
-        $zip = new \ZipArchive();
-        if ($zip->open($path) !== true) return [];
-        try {
-            $strings = $this->sharedStrings((string) $zip->getFromName('xl/sharedStrings.xml'));
-            $sheet = (string) ($zip->getFromName('xl/worksheets/sheet1.xml') ?: '');
-            return $this->sheetRows($sheet, $strings);
-        } finally {
-            $zip->close();
-        }
-    }
-
-    private function sharedStrings(string $xml): array
-    {
-        if ($xml === '') return [];
-        preg_match_all('/<si\b.*?<\/si>/s', $xml, $matches);
-        return array_map(static function (string $si): string {
-            preg_match_all('/<t\b[^>]*>(.*?)<\/t>/s', $si, $texts);
-            return html_entity_decode(implode('', $texts[1] ?? []), ENT_QUOTES | ENT_XML1, 'UTF-8');
-        }, $matches[0] ?? []);
-    }
-
-    private function sheetRows(string $xml, array $strings): array
-    {
-        if ($xml === '') return [];
-        preg_match_all('/<row\b([^>]*)>(.*?)<\/row>/s', $xml, $rowMatches, PREG_SET_ORDER);
-        $rawRows = [];
-        foreach ($rowMatches as $rowMatch) $rawRows[] = $this->cells($rowMatch[1] ?? '', $rowMatch[2] ?? '', $strings);
-        $header = $this->header($rawRows);
-        if ($header === []) return [];
-        $rows = [];
-        foreach ($rawRows as $row) {
-            if (($row['_index'] ?? 0) <= ($header['_index'] ?? 0)) continue;
-            $mapped = [];
-            foreach ($header['columns'] as $column => $label) {
-                $mapped[$label] = trim((string) ($row[$column] ?? ''));
-            }
-            if (implode('', $mapped) !== '') $rows[] = $mapped;
-        }
-        return $rows;
-    }
-
-    private function cells(string $rowAttrs, string $rowXml, array $strings): array
-    {
-        preg_match('/\br="(\d+)"/', $rowAttrs, $rowIndex);
-        $row = ['_index' => (int) ($rowIndex[1] ?? 0)];
-        preg_match_all('/<c\b([^>]*)>(.*?)<\/c>/s', $rowXml, $cells, PREG_SET_ORDER);
-        foreach ($cells as $cell) {
-            preg_match('/\br="([A-Z]+)/', $cell[1], $column);
-            $key = $column[1] ?? '';
-            if ($key === '') continue;
-            preg_match('/<v>(.*?)<\/v>/s', $cell[2], $value);
-            $raw = html_entity_decode($value[1] ?? '', ENT_QUOTES | ENT_XML1, 'UTF-8');
-            $row[$key] = str_contains($cell[1], 't="s"') ? (string) ($strings[(int) $raw] ?? '') : $raw;
-        }
-        return $row;
-    }
-
-    private function header(array $rows): array
-    {
-        foreach (array_slice($rows, 0, 20) as $row) {
-            $columns = [];
-            foreach ($row as $column => $value) {
-                if ($column === '_index') continue;
-                $label = $this->normalize((string) $value);
-                if ($label !== '') $columns[$column] = $label;
-            }
-            if (in_array('sector', $columns, true) || in_array('localidad', $columns, true)) {
-                return ['_index' => (int) ($row['_index'] ?? 0), 'columns' => $columns];
-            }
-        }
-        return [];
     }
 
     private function first(array $row, array $keys): string
