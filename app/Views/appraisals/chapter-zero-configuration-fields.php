@@ -69,14 +69,14 @@ $igacSearchPlaceholder = static fn (array $unit): string =>
         <input class="input" type="number" name="igac_property_units_count" min="0" max="50"
             x-model.number="propertyUnits" placeholder="Ej. 3">
         <span class="mt-1 block text-xs leading-5 text-slate-500">
-            Casa + 2 apartamentos = 3. Después de guardar, cada unidad se nombra y clasifica aquí mismo.
+            Casa principal + 2 apartamentos construidos = 3 unidades principales; después se nombra y clasifica cada una.
         </span>
     </label>
     <label class="label">Anexos existentes
         <input class="input" type="number" name="igac_annex_units_count" min="0" max="50"
             x-model.number="annexUnits" placeholder="Ej. 1">
         <span class="mt-1 block text-xs leading-5 text-slate-500">
-            Parqueaderos, depósitos, kioscos, piscinas, ramadas u otros anexos.
+            Usa anexos para parqueaderos, depósitos, piscinas, kioscos, ramadas o mejoras accesorias, no para apartamentos independientes.
         </span>
     </label>
     <?php $name = 'estructura_metodo'; require BASE_PATH . '/app/Views/appraisals/chapter-zero-select-field.php'; ?>
@@ -178,6 +178,7 @@ $igacSearchPlaceholder = static fn (array $unit): string =>
                                 <span x-text="(typologies[igacCategory] || []).length"></span>
                                 referencia(s) IGAC disponibles para esta búsqueda.
                             </span>
+                            <?php require BASE_PATH . '/app/Views/appraisals/chapter-zero-igac-preview.php'; ?>
                         </label>
                         <label class="label">Tratamiento en el avalúo
                             <select class="input" name="config_units[<?= e($key) ?>][valuation_treatment]">

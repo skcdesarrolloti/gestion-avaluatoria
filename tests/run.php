@@ -285,6 +285,8 @@ try {
         && str_contains($configurationViewHtml, 'Buscador IGAC para unidad principal')
         && str_contains($configurationViewHtml, 'Buscador IGAC para anexos')
         && str_contains($configurationViewHtml, 'config_units[annex-1][igac_typology_hint]')
+        && str_contains($configurationViewHtml, 'Referencia visual IGAC')
+        && str_contains($configurationViewHtml, 'Casa principal + 2 apartamentos construidos = 3 unidades principales')
         && str_contains($configurationViewHtml, 'Integrado al inmueble principal')
         && str_contains($configurationViewHtml, 'Piscina'),
         'numeral 1.1 renderiza subpestanas de configuracion');
