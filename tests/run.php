@@ -373,12 +373,12 @@ try {
     }
     expect($nonDownloadRejected, 'biblioteca MIDAS rechaza grupos de consulta por predio');
     $midasDoc = (new MidasDocumentUploadService($midasLibrary))->upload([
-        'layer_group' => 'Datos estadísticos',
-        'document_code' => 'DATOS-MIDAS',
-        'title' => 'Datos estadísticos MIDAS',
+        'layer_group' => 'Cambio climático',
+        'document_code' => 'CAMBIO-CLIMATICO-MIDAS',
+        'title' => 'Cambio climático MIDAS',
         'practical_use' => 'Soporte MIDAS reutilizable.',
-        'applies_to' => 'Numerales 2 y 6',
-    ], ['name' => 'datos-estadisticos-midas.pdf', 'tmp_name' => $tmpMidasLibraryPdf,
+        'applies_to' => 'Numeral 7',
+    ], ['name' => 'cambio-climatico-midas.pdf', 'tmp_name' => $tmpMidasLibraryPdf,
         'error' => UPLOAD_ERR_OK], ['name' => 'Analista']);
     $storedMidasDocs = $midasLibrary->latest();
     expect(count($storedMidasDocs) === 1 && $storedMidasDocs[0]['id'] === $midasDoc['id']
@@ -400,10 +400,10 @@ try {
     $midasDuplicateRejected = false;
     try {
         (new MidasDocumentUploadService($midasLibrary))->upload([
-            'layer_group' => 'Datos estadísticos',
-            'document_code' => 'DATOS-MIDAS',
-            'title' => 'Datos estadísticos MIDAS duplicado',
-        ], ['name' => 'datos-estadisticos-midas.pdf', 'tmp_name' => $tmpMidasLibraryDuplicate,
+            'layer_group' => 'Cambio climático',
+            'document_code' => 'CAMBIO-CLIMATICO-MIDAS',
+            'title' => 'Cambio climático MIDAS duplicado',
+        ], ['name' => 'cambio-climatico-midas.pdf', 'tmp_name' => $tmpMidasLibraryDuplicate,
             'error' => UPLOAD_ERR_OK], ['name' => 'Analista']);
     } catch (RuntimeException $exception) {
         $midasDuplicateRejected = str_contains($exception->getMessage(), 'Ya existe');

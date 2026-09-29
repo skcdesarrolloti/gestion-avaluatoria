@@ -6,7 +6,6 @@ $activeGroup = isset($groups[$activeGroup ?? '']) ? (string) $activeGroup : (str
 $groupStats = is_array($groupStats ?? null) ? $groupStats : [];
 $activeDocuments = array_values(array_filter($documents, static fn (array $doc): bool => ($doc['layer_group'] ?? '') === $activeGroup));
 $targets = [
-    'Datos estadísticos' => 'Numerales 2 y 6: contexto demográfico, económico o estadístico cuando aplique.',
     'Localidades' => 'Numeral 2: sector y fuente territorial. Numeral 3: localidad del predio.',
     'Unidades comuneras de gobierno' => 'Numeral 2: contexto urbano. Numeral 3: UCG del inmueble.',
     'Circulares MIDAS' => 'Numeral 5 y futuro módulo 9: criterios complementarios de Planeación.',
@@ -15,8 +14,7 @@ $targets = [
 ];
 $sections = [
     'Base territorial' => ['Localidades', 'Unidades comuneras de gobierno'],
-    'Documentos descargables' => ['Datos estadísticos', 'Circulares MIDAS'],
-    'Equipamiento y ambiente' => ['Educación', 'Cambio climático'],
+    'Planeación y entorno' => ['Circulares MIDAS', 'Educación', 'Cambio climático'],
 ];
 $formatBytes = static fn ($bytes): string => number_format(((int) $bytes) / 1024, 1, ',', '.') . ' KB';
 $formatDate = static function ($value): string {
@@ -33,8 +31,8 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
             <p class="text-sm font-semibold uppercase tracking-wide text-teal-800">Biblioteca cartográfica</p>
             <h1 class="mt-2 text-3xl font-semibold text-slate-950">MIDAS</h1>
             <p class="mt-3 max-w-3xl text-slate-600">
-                Guarda una sola vez solo las descargas que sí aparecen en MIDAS: datos estadísticos, localidades,
-                UCG, circulares, educación y cambio climático. Las consultas por predio, uso del suelo, barrio,
+                Guarda una sola vez las descargas que ya organizaste para MIDAS: localidades, UCG,
+                circulares, educación y cambio climático. Las consultas por predio, uso del suelo, barrio,
                 servicios, transporte o riesgos se documentan dentro de cada avalúo.
             </p>
         </div>

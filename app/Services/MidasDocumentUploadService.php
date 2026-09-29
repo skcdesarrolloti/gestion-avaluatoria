@@ -110,7 +110,6 @@ final class MidasDocumentUploadService
             preg_match('/(^|[^a-z])ucg[0-9_ -]*/', $plain) === 1 => 'Unidades comuneras de gobierno',
             str_contains($plain, 'localidad') || str_contains($plain, 'localidades') => 'Localidades',
             str_contains($plain, 'circular') => 'Circulares MIDAS',
-            str_contains($plain, 'estadistico') || str_contains($plain, 'estadistica') => 'Datos estadísticos',
             str_contains($plain, 'educacion') => 'Educación',
             str_contains($plain, 'cambio_climatico') || str_contains($plain, 'climatico') => 'Cambio climático',
             default => $selected,
