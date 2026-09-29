@@ -1,24 +1,24 @@
 <?php
 $baseQuery = trim((string) ($sourceSearch['query'] ?? ''));
 $consultSteps = [
-    'Abre una fuente y pega la consulta sugerida en su buscador interno o en Google.',
-    'Aplica primero operación, ciudad, barrio o microsector, tipología y rango de área.',
+    'Abre la inmobiliaria y busca primero dentro de su sitio web o por contacto directo.',
+    'Aplica operación, ciudad, barrio o microsector, tipología y rango de área.',
     'Si aparecen pocos resultados, amplía a la localidad o a un microsector comparable sin mezclar usos.',
     'Solo lleva a la matriz ofertas verificables con enlace, fecha, precio, área y evidencia de contacto.',
 ];
 $explorationSteps = [
     'Mantén esta pestaña abierta y abre cada fuente en una pestaña nueva del navegador.',
-    'En portales, usa sus filtros propios antes de leer avisos: operación, ciudad, tipo de inmueble, área y precio.',
-    'En páginas de inmobiliarias, confirma que el aviso tenga contacto, ubicación aproximada y fecha o señal de vigencia.',
+    'Usa los filtros propios de cada inmobiliaria antes de leer avisos: operación, barrio, tipo, área y precio.',
+    'Confirma que el aviso tenga contacto, ubicación aproximada y fecha o señal de vigencia.',
     'Cuando una oferta parezca comparable, vuelve a Captura y registra la ficha mínima antes de seguir navegando.',
 ];
 ?>
 <div class="rounded-xl border border-blue-100 bg-blue-50 p-4">
     <p class="text-xs font-bold uppercase text-blue-800">Buscador 8.3 asistido por el bien sujeto</p>
-    <h3 class="mt-2 text-xl font-semibold text-blue-950">Consulta base para portales y fuentes oficiales</h3>
+    <h3 class="mt-2 text-xl font-semibold text-blue-950">Consulta base para inmobiliarias con presencia local</h3>
     <p class="mt-2 text-sm leading-6 text-blue-950">
-        La consulta se arma con operación, tipología, barrio, localidad y ciudad del inmueble. No adopta
-        resultados automáticamente; prepara la búsqueda para que el analista capture muestras verificables.
+        La consulta se arma con operación, tipología, barrio, localidad y ciudad del inmueble. Para Cartagena,
+        la prioridad son inmobiliarias con inventario local visible y posibilidad de confirmar disponibilidad.
     </p>
     <div class="mt-4 rounded-lg bg-white p-3 font-mono text-sm font-semibold text-slate-900">
         <?= e($baseQuery ?: 'Completa el bien sujeto para formar una consulta automática.') ?>
@@ -47,22 +47,12 @@ $explorationSteps = [
         </ol>
     </div>
 
-    <div class="mt-4 grid gap-4 xl:grid-cols-2">
-        <div>
-            <p class="text-xs font-bold uppercase text-blue-800">Portales inmobiliarios</p>
-            <div class="mt-3 grid gap-3">
-                <?php foreach ($portalSources as $source): ?>
-                    <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-card.php'; ?>
-                <?php endforeach; ?>
-            </div>
-        </div>
-        <div>
-            <p class="text-xs font-bold uppercase text-blue-800">Ciudad y fuentes oficiales</p>
-            <div class="mt-3 grid gap-3">
-                <?php foreach ($officialSources as $source): ?>
-                    <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-card.php'; ?>
-                <?php endforeach; ?>
-            </div>
+    <div class="mt-4">
+        <p class="text-xs font-bold uppercase text-blue-800">Inmobiliarias recomendadas para Cartagena</p>
+        <div class="mt-3 grid gap-3 md:grid-cols-2">
+            <?php foreach ($portalSources as $source): ?>
+                <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-card.php'; ?>
+            <?php endforeach; ?>
         </div>
     </div>
 </div>

@@ -8,5 +8,13 @@
             <?= e((string) $source['query']) ?>
         </span>
     <?php endif; ?>
+    <?php if (!empty($source['selection_factors']) && is_array($source['selection_factors'])): ?>
+        <span class="mt-3 block text-xs font-bold uppercase text-slate-500">Factores de selección</span>
+        <span class="mt-2 block space-y-1 text-xs leading-5 text-slate-700">
+            <?php foreach ($source['selection_factors'] as $factor): ?>
+                <span class="block">- <?= e((string) $factor) ?></span>
+            <?php endforeach; ?>
+        </span>
+    <?php endif; ?>
     <span class="mt-2 block text-xs font-semibold text-blue-800">Abrir en otra pestaña y traer solo muestras verificables.</span>
 </a>

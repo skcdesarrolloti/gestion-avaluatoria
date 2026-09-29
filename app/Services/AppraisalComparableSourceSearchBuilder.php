@@ -16,14 +16,17 @@ final class AppraisalComparableSourceSearchBuilder
             'city' => $city,
             'neighborhood' => $neighborhood,
             'query' => $query,
-            'portal_sources' => $this->portalSources($query),
+            'portal_sources' => $this->portalSources($query, $city),
             'official_sources' => $this->officialSources($query, $city, $neighborhood, $subject),
             'capture_protocol' => $this->captureProtocol($operation),
         ];
     }
 
-    private function portalSources(string $query): array
+    private function portalSources(string $query, string $city): array
     {
+        if ($this->isCartagena($city)) {
+            return $this->cartagenaAgencies($query);
+        }
         return [
             $this->source('FincaRaiz', 'Portal inmobiliario', 'site:fincaraiz.com.co ' . $query),
             $this->source('Metrocuadrado', 'Portal inmobiliario', 'site:metrocuadrado.com ' . $query),
@@ -31,6 +34,28 @@ final class AppraisalComparableSourceSearchBuilder
             $this->source('Properati', 'Portal inmobiliario', 'site:properati.com.co ' . $query),
             $this->source('Mercado Libre Inmuebles', 'Portal / clasificados', 'site:inmuebles.mercadolibre.com.co ' . $query),
             $this->source('Inmobiliarias locales', 'Búsqueda abierta', $query . ' inmobiliaria local'),
+        ];
+    }
+
+    private function cartagenaAgencies(string $query): array
+    {
+        return [
+            $this->agency('SuCasa Inmobiliaria', 'https://sucasainmobiliaria.com.co/', $query,
+                ['Portafolio local amplio por arriendo y venta.', 'Filtros por tipo, operación, barrio, precio y área.', 'Cobertura de apartamentos, casas, locales, oficinas, lotes y bodegas.']),
+            $this->agency('Vélez Palomino Real Estate', 'https://velezpalomino.com/', $query,
+                ['Inventario visible por venta y alquiler.', 'Búsqueda avanzada por barrio, tipo, negocio y precio.', 'Útil en apartamentos, oficinas, locales y activos de mayor valor.']),
+            $this->agency('Inverfin Inmobiliaria', 'https://inmobiliariainverfin.com/', $query,
+                ['Opera compra, venta, arriendo y administración en Cartagena.', 'Tiene buscador por ciudad, localidad, barrio, tipo y negocio.', 'Aporta contraste en zonas residenciales y turísticas.']),
+            $this->agency('ACR Inmobiliaria', 'https://acrinmobiliaria.com/', $query,
+                ['Red local de captadores en Cartagena de Indias.', 'Publica oferta por barrios específicos como Castillogrande.', 'Útil para validar inmuebles captados por red y propiedades remodeladas.']),
+            $this->agency('Inmobiliaria Cartagena Ltda.', 'https://www.inmobiliariacartagena.com/', $query,
+                ['Marca local con portafolio propio y presencia en portales.', 'Publica oferta en venta y arriendo en sectores tradicionales.', 'Sirve como fuente directa para confirmar disponibilidad con asesor.']),
+            $this->agency('Invercartagena Inmobiliaria', 'https://invercartagenainmobiliaria.com/', $query,
+                ['Trayectoria local reportada en Cartagena.', 'Trabaja compra, venta, administración y alquiler.', 'Usa canales de difusión inmobiliaria para ampliar exposición de inmuebles.']),
+            $this->agency('IBR Inmobiliaria', 'https://www.ibrinmobiliaria.com/propiedades/venta/apartamentos', $query,
+                ['Listado amplio con códigos de inmueble.', 'Cobertura de barrios de distintos rangos de precio.', 'Útil para contrastar vivienda media y económica cuando aplique.']),
+            $this->agency('Invercolombia', 'https://invercolombia.com.co/', $query,
+                ['Presencia fuerte en proyectos inmobiliarios de Cartagena.', 'Útil para contraste de mercado primario o vivienda nueva.', 'No sustituye comparables usados cuando el sujeto sea reventa.']),
         ];
     }
 
@@ -67,6 +92,13 @@ final class AppraisalComparableSourceSearchBuilder
         return ['label' => $label, 'kind' => $kind, 'query' => $query,
             'url' => 'https://www.google.com/search?q=' . rawurlencode($query),
             'instruction' => 'Abrir búsqueda, aplicar filtros del portal y registrar solo ofertas verificables.'];
+    }
+
+    private function agency(string $label, string $url, string $query, array $factors): array
+    {
+        return ['label' => $label, 'kind' => 'Inmobiliaria local seleccionada', 'query' => $query,
+            'url' => $url, 'selection_factors' => $factors,
+            'instruction' => 'Buscar dentro de la inmobiliaria por operación, barrio, tipología y rango de área.'];
     }
 
     private function operation(string $key, string $label): string
