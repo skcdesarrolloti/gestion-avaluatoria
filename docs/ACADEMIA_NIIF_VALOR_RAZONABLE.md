@@ -66,7 +66,7 @@ realmente identico en un mercado activo, sin ajustes relevantes.
 Corresponde a datos observables, directa o indirectamente, distintos de los precios
 de Nivel 1. En avaluos inmobiliarios suele ser la referencia mas comun cuando existen
 ofertas, transacciones, canones, tasas o indicadores de mercado verificables para
-activos similares, y el valuador puede homologar diferencias de ubicacion, area,
+activos similares, y el valuador puede depurar y explicar diferencias de ubicacion, area,
 estado, uso, vetustez, regimen juridico, ingresos, riesgos o condiciones de mercado.
 
 El Nivel 2 no significa que todos los comparables sean perfectos. Significa que la
@@ -75,7 +75,7 @@ ajustes son explicables, trazables y consistentes.
 
 **Uso sugerido en el entregable:** seleccionar Nivel 2 cuando el valor se sustente
 principalmente en comparables, ofertas, transacciones o rentas observables de activos
-similares, con homologaciones razonables y soportadas.
+similares, con diferencias depuradas, comparadas y soportadas.
 
 ### Nivel 3 - Datos no observables o supuestos significativos
 
@@ -126,7 +126,8 @@ Cuando el encargo tenga finalidad NIIF, el texto automatico debe adaptarse asi:
 - El sistema debe evitar afirmar que un activo inmobiliario es Nivel 1 si no hay soporte
   directo de activo identico en mercado activo.
 - Si la fuente principal es mercado comparable, el entregable debe hablar de "datos
-  observables de activos similares" y de homologaciones.
+  observables de activos similares" y de depuracion, clasificacion, comparacion,
+  analisis e interpretacion de ofertas o transacciones.
 - Si la fuente principal es residual, costo, renta proyectada o supuestos internos,
   el entregable debe explicar que existen insumos de Nivel 3 y revelar los supuestos
   significativos.

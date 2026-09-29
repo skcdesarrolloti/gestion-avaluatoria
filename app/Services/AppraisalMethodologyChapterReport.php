@@ -112,8 +112,8 @@ final class AppraisalMethodologyChapterReport
             $reason = 'La tipología puede contrastarse con mercado; si existe explotación económica, la renta ayuda a validar consistencia.';
         }
         if ($isDeposit && $ph === 'si') {
-            $method = 'Homologación por mercado indirecto';
-            $reason = 'El depósito o anexo PH no tiene mercado abierto propio y debe homologarse con el bien comparable más cercano y jurídicamente posible.';
+            $method = 'Comparación indirecta con ajuste técnico sustentado';
+            $reason = 'El depósito o anexo PH no tiene mercado abierto propio; por eso se contrasta con el referente más cercano y jurídicamente posible, dejando expresa la depuración y comparación aplicada.';
         }
         return [
             'recommended_method' => $method,
@@ -204,7 +204,7 @@ final class AppraisalMethodologyChapterReport
     private function specialTemplate(bool $active): string
     {
         if (!$active) return '';
-        return 'Caso especial de depósito o anexo PH: si el bien no tiene independencia jurídica, acceso libre a terceros, vida comercial propia o mercado directo verificable, no debe forzarse una comparación con inmuebles autónomos. En ese escenario se justifica una homologación con el bien más cercano a su utilidad real dentro de la copropiedad, por ejemplo celda de parqueo, parqueadero o anexo funcional, siempre que el área, uso, restricciones, destinación de la copropiedad y ausencia de explotación independiente queden expresamente sustentados.';
+        return 'Caso especial de depósito o anexo PH: si el bien no tiene independencia jurídica, acceso libre a terceros, vida comercial propia o mercado directo verificable, no debe forzarse una comparación con inmuebles autónomos. En ese escenario se justifica comparar con el referente más cercano a su utilidad real dentro de la copropiedad, por ejemplo celda de parqueo, parqueadero o anexo funcional, siempre que el área, uso, restricciones, destinación de la copropiedad y ausencia de explotación independiente queden expresamente sustentados.';
     }
 
     private function label(string $field, mixed $value): string

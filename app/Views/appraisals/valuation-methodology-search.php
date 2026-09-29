@@ -1,9 +1,10 @@
 <?php
 $portalFields = is_array($guide['portal_fields'] ?? null) ? $guide['portal_fields'] : [];
 $portalFilters = is_array($guide['portal_filters'] ?? null) ? $guide['portal_filters'] : [];
+$adjustments = is_array($guide['adjustments'] ?? null) ? $guide['adjustments'] : (is_array($guide['homologation'] ?? null) ? $guide['homologation'] : []);
 $nextStep = is_array($methodologyDecision['next_step'] ?? null) ? $methodologyDecision['next_step'] : ['8.3 Desarrollo del método', ''];
 $formulaFamilies = [
-    ['Mercado', 'Valor unitario = precio depurado / unidad de comparación; luego promedio, mediana, desviación, coeficiente de variación, rango y ajustes de homologación.'],
+    ['Mercado', 'Valor unitario = precio depurado / unidad de comparación; luego promedio, mediana, desviación, coeficiente de variación, rango y ajustes comparativos sustentados.'],
     ['Renta', 'Ingreso neto = canon bruto menos vacancia, administración no recuperable y gastos; valor = ingreso neto anual / tasa, o flujo descontado si aplica.'],
     ['Residual', 'Valor del suelo = ingresos esperados del producto menos costos directos, indirectos, financieros, utilidad, tiempos y riesgos del desarrollo.'],
     ['Costo', 'Valor = terreno + costo de reposición nuevo menos depreciación física, funcional y económica, con soporte de cantidades y precios.'],
@@ -32,7 +33,7 @@ $formulaFamilies = [
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p class="eyebrow">Derecho valorado</p>
             <h3 class="mt-2 text-xl font-semibold"><?= e($guide['right_label'] ?: 'Derecho pendiente') ?></h3>
-            <p class="mt-2 text-sm leading-6 text-slate-600">Si cambia el derecho jurídico, la muestra requiere observación antes de homologarse.</p>
+            <p class="mt-2 text-sm leading-6 text-slate-600">Si cambia el derecho jurídico, la muestra requiere observación y justificación antes de compararse.</p>
         </div>
     </div>
 
@@ -119,9 +120,9 @@ $formulaFamilies = [
                 </ul>
             </div>
             <div class="rounded-xl border border-emerald-200 bg-emerald-50">
-                <div class="rounded-t-xl bg-emerald-700 px-4 py-3 text-sm font-semibold uppercase text-white">Homologación posterior</div>
+                <div class="rounded-t-xl bg-emerald-700 px-4 py-3 text-sm font-semibold uppercase text-white">Depuración y ajustes posteriores</div>
                 <ul class="space-y-3 p-4 text-sm leading-6 text-emerald-950">
-                    <?php foreach (($guide['homologation'] ?? []) as $item): ?><li>- <?= e($item) ?></li><?php endforeach; ?>
+                    <?php foreach ($adjustments as $item): ?><li>- <?= e($item) ?></li><?php endforeach; ?>
                 </ul>
             </div>
         </div>

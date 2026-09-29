@@ -51,6 +51,26 @@
       "modulos_que_lo_utilizan": ["Expediente", "Metodología valuatoria", "Entregable"]
     },
     {
+      "id": "concepto-igac-2520sav-2022-0020131",
+      "codigo": "Concepto IGAC 2520SAV-2022-0020131-EE-001",
+      "nombre": "Depuración, clasificación, comparación, análisis e interpretación de ofertas o transacciones",
+      "tipo_documento": "Concepto",
+      "version": "2022",
+      "fecha_vigencia": "2022-12-23",
+      "estado": "referencia",
+      "categoria_igac": ["marco-valuatorio"],
+      "archivo": "",
+      "archivo_descarga": "",
+      "archivo_nombre": "",
+      "fuente_oficial": "Radicado IGAC 2520SAV-2022-0020131-EE-001",
+      "descripcion_corta": "Respuesta IGAC sobre el uso de ofertas o transacciones en el método de comparación o mercado.",
+      "uso_practico": "Sirve para recordar que el procedimiento no debe presentarse como homogenización u homologación automática, sino como depuración, clasificación, comparación, análisis e interpretación de ofertas o transacciones.",
+      "cuando_consultarlo": "Consúltalo al redactar el método de comparación o mercado, preparar 8.3, revisar ajustes entre muestras o explicar por qué una oferta fue aceptada, depurada o descartada.",
+      "criterio_vigencia": "Concepto de referencia emitido bajo Resolución IGAC 620 de 2008; debe leerse como criterio técnico histórico y armonizarse con la Resolución IGAC 941 de 2026 cuando se use en informes actuales.",
+      "temas_relacionados": ["método de mercado", "comparables", "ofertas", "transacciones", "depuración"],
+      "modulos_que_lo_utilizan": ["Metodología valuatoria", "Comparables", "Entregable"]
+    },
+    {
       "id": "in-gct-pc01-06-v1",
       "codigo": "IN-GCT-PC01-06 V1",
       "nombre": "Identificación Predial",

@@ -133,6 +133,9 @@ try {
     $apartmentGuide = $searchGuide->build(['tipo_inmueble' => 'apartamento', 'regimen_ph' => 'si'], [], [], ['ph_name' => 'Edificio prueba']);
     expect(str_contains(mb_strtolower(implode(' ', $apartmentGuide['criteria'])), 'planta electrica')
         || str_contains(mb_strtolower(implode(' ', $apartmentGuide['criteria'])), 'planta eléctrica'), 'metodologia incorpora PH en apartamentos');
+    expect(isset($officeGuide['adjustments'])
+        && !str_contains(mb_strtolower(implode(' ', $officeGuide['adjustments'])), 'homolog'),
+        'guia de comparables usa depuracion y ajustes sustentados sin homologacion');
     $methodologyReport = (new AppraisalMethodologyChapterReport())->build();
     $methodologyText = $methodologyReport['text'];
     expect(str_contains($methodologyText, 'Resolución IGAC 941 de 2026')
@@ -1113,6 +1116,10 @@ try {
         'biblioteca IGAC explica para que es util cada documento');
     expect(str_contains((string) ($igacResolution['criterio_vigencia'] ?? ''), 'vigente'),
         'biblioteca IGAC conserva lectura de vigencia operativa');
+    $igacConcept = IgacDocumentLibrary::find('concepto-igac-2520sav-2022-0020131');
+    expect($igacConcept !== null
+        && str_contains((string) ($igacConcept['uso_practico'] ?? ''), 'depuración, clasificación, comparación, análisis e interpretación'),
+        'biblioteca IGAC incorpora concepto sobre depuracion de ofertas y transacciones');
     expect(count(IgacDocumentLibrary::documents('conservacion')) === 2, 'biblioteca IGAC filtra documentos de conservacion');
     $db->exec("INSERT OR REPLACE INTO valuation_legal_documents
         (slug, category_code, document_code, title, document_type, status, source_reference, summary,
