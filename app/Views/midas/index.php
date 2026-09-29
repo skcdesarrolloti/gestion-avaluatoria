@@ -44,8 +44,8 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
             <p class="text-sm font-semibold uppercase tracking-wide text-teal-800">Biblioteca cartográfica</p>
             <h1 class="mt-2 text-3xl font-semibold text-slate-950">MIDAS</h1>
             <p class="mt-3 max-w-3xl text-slate-600">
-                Guarda una sola vez las descargas comunes de MIDAS: circulares urbanísticas,
-                POT, división política, servicios, movilidad, equipamientos, riesgos y soportes cartográficos.
+                Guarda una sola vez las descargas comunes de MIDAS: circulares urbanísticas, POT, división política,
+                servicios, movilidad, equipamientos, riesgos y soportes cartográficos.
                 Los avalúos solo anexan evidencias particulares del caso.
             </p>
         </div>
@@ -63,8 +63,7 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
                 <div>
                     <h2 class="text-lg font-semibold text-blue-950">Qué se aloja aquí</h2>
                     <p class="mt-2 max-w-3xl text-sm leading-6 text-blue-950">
-                        MIDAS guarda capas y descargas comunes para muchos avalúos. Los soportes de un caso específico
-                        se anexan en el numeral 2.
+                        MIDAS guarda capas y descargas comunes para muchos avalúos. Los soportes de un caso específico se anexan en el numeral 2.
                     </p>
                 </div>
                 <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-blue-800">Separado de Normatividad Urbana</span>
@@ -99,7 +98,7 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
                 </span>
             </div>
             <form class="mt-5 grid gap-4 md:grid-cols-2" method="post" enctype="multipart/form-data"
-                action="<?= e(url('midas/documentos')) ?>">
+                action="<?= e(url('midas/documentos')) ?>" data-upload-progress data-upload-label="documento MIDAS" data-upload-timeout="600000">
                 <?= csrf_field() ?>
                 <label class="label">Grupo de capa
                     <select class="input mt-2" name="layer_group" required>
@@ -142,6 +141,7 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
                 <label class="label md:col-span-2">Dónde se consulta
                     <input class="input mt-2" name="applies_to" maxlength="240" placeholder="Ej. Numeral 5, numeral 6, numeral 7 o módulo futuro 9">
                 </label>
+                <div class="md:col-span-2"><?php require BASE_PATH . '/app/Views/appraisals/upload-progress.php'; ?></div>
                 <div class="md:col-span-2 flex justify-end"><button class="btn-primary" type="submit">Subir a Biblioteca MIDAS</button></div>
             </form>
         </article>

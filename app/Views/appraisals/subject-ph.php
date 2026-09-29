@@ -94,7 +94,7 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                     </p>
                 </div>
                 <form class="grid gap-3 lg:min-w-80" method="post" enctype="multipart/form-data"
-                    action="<?= e(url($subjectActionBase . '/ph/soportes')) ?>" data-upload-progress data-ph-pdf-render
+                    action="<?= e(url($subjectActionBase . '/ph/soportes')) ?>" data-upload-progress data-upload-label="soporte PH" data-ph-pdf-render
                     data-upload-timeout="1800000" data-upload-chunk-url="<?= e(url($subjectActionBase . '/ph/soportes/chunk')) ?>" data-upload-finish-url="<?= e(url($subjectActionBase . '/ph/soportes/finalizar')) ?>">
                     <?= csrf_field() ?>
                     <input type="hidden" name="version" value="<?= (int) ($ph['version'] ?? 0) ?>">

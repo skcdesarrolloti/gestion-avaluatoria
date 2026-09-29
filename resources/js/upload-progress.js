@@ -1,7 +1,6 @@
 import { csrfToken, keepSessionAlive, refreshSecurityToken, syncToken } from './upload-session.js';
 
-const CHUNK_BYTES = 4 * 1024 * 1024;
-const CHUNK_THRESHOLD = 6 * 1024 * 1024;
+const CHUNK_BYTES = 4 * 1024 * 1024, CHUNK_THRESHOLD = 6 * 1024 * 1024;
 
 function formBody(form, submitter) {
     try { return new FormData(form, submitter); } catch { return new FormData(form); }
@@ -22,6 +21,8 @@ function ui(form) {
         submits: [...form.querySelectorAll('button[type="submit"], input[type="submit"]')],
     };
 }
+
+function uploadLabel(form) { return form.dataset?.uploadLabel?.trim() || 'archivo'; }
 
 function setProgress(parts, percent, message) {
     parts.panel?.classList.remove('hidden');
@@ -157,7 +158,7 @@ export function submitUpload(form, submitter = null) {
 }
 
 function submitDirectUpload(form, submitter, parts, retryCsrf = true) {
-    const xhr = new XMLHttpRequest();
+    const xhr = new XMLHttpRequest(), label = uploadLabel(form);
     const body = syncToken(augmentFormData(form, formBody(form, submitter), submitter));
     const stopKeepAlive = keepSessionAlive();
     setDisabled(parts, true);
@@ -170,11 +171,11 @@ function submitDirectUpload(form, submitter, parts, retryCsrf = true) {
     if (token) xhr.setRequestHeader('X-CSRF-Token', token);
     xhr.upload.onprogress = event => {
         if (!event.lengthComputable) {
-            setProgress(parts, 12, 'Subiendo archivo...');
+            setProgress(parts, 12, `Subiendo ${label}...`);
             return;
         }
         const percent = Math.round((event.loaded / Math.max(event.total, 1)) * 100);
-        setProgress(parts, percent, percent >= 100 ? 'Archivo recibido. Analizando soporte PH...' : `Subiendo soporte PH: ${percent}%`);
+        setProgress(parts, percent, percent >= 100 ? `Archivo recibido. Procesando ${label}...` : `Subiendo ${label}: ${percent}%`);
     };
     xhr.onload = () => {
         stopKeepAlive();
@@ -186,7 +187,7 @@ function submitDirectUpload(form, submitter, parts, retryCsrf = true) {
             return;
         }
         if (xhr.status >= 200 && xhr.status < 400) {
-            setProgress(parts, 100, 'Lectura terminada. Actualizando pantalla...');
+            setProgress(parts, 100, 'Subida terminada. Actualizando pantalla...');
             renderResponse(xhr, form);
             return;
         }
