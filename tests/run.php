@@ -889,6 +889,7 @@ try {
     $restrictiveData = AppraisalNarrativeChapterInput::data(AppraisalRestrictiveConditionsCatalog::sections(), [
         'soil_incidence' => 'no_incide',
         'soil_text' => 'No se evidencian problemas de estabilidad; requiere soporte si cambia la condición.',
+        'climate_midas_incidence' => 'contexto',
         'legal_problem_text' => 'No se evidenciaron problemas jurídicos.',
     ]);
     $narrativeRepo->save(str_repeat('a', 32), 1, '7', $restrictiveData);
@@ -898,8 +899,10 @@ try {
     );
     expect(str_contains($restrictiveReport['text'], '7.1 Problemas de estabilidad')
         && str_contains($restrictiveReport['text'], 'No se evidencian problemas')
+        && str_contains($restrictiveReport['text'], 'Lectura MIDAS Cambio climático: Contexto general')
+        && !str_contains($restrictiveReport['text'], 'No afecta: los documentos son generales')
         && str_contains(AppraisalRestrictiveConditionsCatalog::sections()[6]['fields'][1]['prefill'] ?? '', 'No se evidenciaron')
-        && str_contains(AppraisalRestrictiveConditionsCatalog::sections()[1]['fields'][2]['prefill'] ?? '', 'contexto territorial')
+        && str_contains(AppraisalRestrictiveConditionsCatalog::sections()[1]['fields'][3]['prefill'] ?? '', 'salvedad de revisión')
         && str_contains(AppraisalReportNoteCatalog::sections('7')['7.7'] ?? '', 'Problemas jurídicos'),
         'numeral 7 guarda restricciones y expone secciones para ampliaciones');
     $restrictiveMidasSupport = $midasNarrativeSupport->forChapter('7', [[

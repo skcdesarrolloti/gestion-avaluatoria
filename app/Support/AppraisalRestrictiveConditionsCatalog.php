@@ -16,12 +16,17 @@ final class AppraisalRestrictiveConditionsCatalog
             ]),
             self::section('7.2', 'Impacto ambiental y salubridad', [
                 self::select('environmental_incidence', 'Incidencia observada', self::incidence()),
+                self::select('climate_midas_incidence', 'Lectura MIDAS Cambio climático', self::climateIncidence()),
                 self::text('environmental_text', 'Texto para el entregable',
                     'Describe ruido, tráfico, residuos, aglomeraciones, salubridad o impactos ambientales verificables.',
                     'El sector donde se localiza el inmueble objeto de medición presenta una dinámica urbana que debe revisarse frente a tráfico, aglomeraciones, salubridad, ruido, vulnerabilidad climática u otras condiciones ambientales observables. Cuando aplique, se debe dejar expresa la afectación principal y su relación con el uso del inmueble, apoyándose en Cambio climático MIDAS si el soporte es pertinente.'),
                 self::text('climate_midas_text', 'Cambio climático y soporte MIDAS',
                     'Usa este texto cuando el soporte MIDAS sea general y no haya una afectación predial directa. Si el mapa o la visita muestran amenaza concreta, ajusta la conclusión.',
-                    'Los soportes de Cambio climático disponibles en MIDAS, como lineamientos de adaptación, estudios institucionales y el Plan 4C, se toman como contexto territorial para revisar amenazas ambientales, vulnerabilidad urbana, inundación, drenaje pluvial, erosión costera o aumento del nivel del mar cuando resulten aplicables. Para el inmueble objeto del avalúo no se adopta una afectación climática específica salvo que la cartografía del predio, la visita técnica o un soporte puntual demuestre incidencia directa. En ausencia de evidencia específica, este soporte se deja como contexto y salvedad de revisión.'),
+                    'Revisados los soportes de Cambio climático disponibles en MIDAS, estos se toman como contexto territorial para verificar amenazas ambientales, vulnerabilidad urbana, inundación, drenaje pluvial, erosión costera o aumento del nivel del mar cuando resulten aplicables. Para el inmueble objeto del avalúo no se adopta una afectación climática específica ni una incidencia directa en el valor, salvo que la cartografía del predio, la visita técnica o un soporte puntual demuestre lo contrario. En ausencia de evidencia predial directa, el soporte se deja como salvedad de revisión y no como restricción materializada.'),
+                self::text('climate_decision_guide', 'Criterio práctico para decidir incidencia',
+                    'Guía interna: deja No afecta si no hay evidencia predial; Leve si hay condición sectorial sin impacto directo; Relevante si el soporte ubica el predio en amenaza o la visita evidencia afectación; Pendiente si falta mapa o contraste.',
+                    'No afecta: los documentos son generales de ciudad o zona y no ubican el predio en amenaza. Leve: existe una condición ambiental sectorial, pero no se evidencia impacto físico, jurídico o comercial directo sobre el inmueble. Relevante: la cartografía o la visita ubican el predio en zona de amenaza, inundación, erosión, drenaje crítico u otra condición que deba explicarse en valor o comercialización. Pendiente: falta contrastar el predio con mapa, visita o soporte puntual.',
+                    1600, false),
             ]),
             self::section('7.3', 'Servidumbres, cesiones y afectaciones viales', [
                 self::select('easement_incidence', 'Incidencia observada', self::incidence()),
@@ -62,9 +67,17 @@ final class AppraisalRestrictiveConditionsCatalog
         return ['' => 'Selecciona una opción', 'sin_evidencia' => 'Sin evidencia', 'no_incide' => 'No incide',
             'incidencia_leve' => 'Incidencia leve', 'incidencia_relevante' => 'Incidencia relevante', 'pendiente' => 'Pendiente de soporte'];
     }
+    private static function climateIncidence(): array
+    {
+        return ['' => 'Selecciona una opción', 'no_afecta' => 'No se identifica afectación predial directa',
+            'contexto' => 'Contexto general / salvedad sin incidencia directa',
+            'incidencia_leve' => 'Posible incidencia leve en el sector',
+            'incidencia_relevante' => 'Incidencia relevante soportada',
+            'pendiente' => 'Pendiente de contraste predial'];
+    }
     private static function section(string $code, string $title, array $fields): array { return compact('code', 'title', 'fields'); }
-    private static function text(string $key, string $label, string $help, string $prefill = '', int $max = 2200): array
-    { return ['key' => $key, 'label' => $label, 'type' => 'textarea', 'help' => $help, 'prefill' => $prefill, 'max' => $max]; }
+    private static function text(string $key, string $label, string $help, string $prefill = '', int $max = 2200, bool $report = true): array
+    { return ['key' => $key, 'label' => $label, 'type' => 'textarea', 'help' => $help, 'prefill' => $prefill, 'max' => $max, 'report' => $report]; }
     private static function select(string $key, string $label, array $options): array
     { return ['key' => $key, 'label' => $label, 'type' => 'select', 'options' => $options, 'max' => 80]; }
 }
