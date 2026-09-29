@@ -7,10 +7,12 @@ final class AppraisalMidasFileStorage
 {
     private const ENV_KEY = 'APPRAISAL_MIDAS_STORAGE_DIR';
     private const DEFAULT_DIR = '/storage/soportes-midas';
-    private const MAX_BYTES = 26214400;
+    private const MAX_BYTES = 52428800;
     private const EXTENSIONS = [
         'pdf' => 'application/pdf',
         'csv' => 'text/csv',
+        'xls' => 'application/vnd.ms-excel',
+        'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         'json' => 'application/json',
         'geojson' => 'application/geo+json',
         'zip' => 'application/zip',
@@ -30,11 +32,11 @@ final class AppraisalMidasFileStorage
     {
         $ext = mb_strtolower(pathinfo($name, PATHINFO_EXTENSION));
         if (!is_file($path) || !isset(self::EXTENSIONS[$ext])) {
-            throw new \InvalidArgumentException('Sube PDF, CSV, JSON, GeoJSON o ZIP descargado de MIDAS.');
+            throw new \InvalidArgumentException('Sube PDF, Excel, CSV, JSON, GeoJSON o ZIP descargado de MIDAS.');
         }
         $size = (int) filesize($path);
         if ($size <= 0 || $size > self::MAX_BYTES) {
-            throw new \InvalidArgumentException('El soporte MIDAS debe pesar entre 1 byte y 25 MB.');
+            throw new \InvalidArgumentException('El soporte MIDAS debe pesar entre 1 byte y 50 MB.');
         }
         if ($ext === 'pdf' && !self::startsWith($path, '%PDF')) throw new \InvalidArgumentException('El PDF no parece válido.');
         if ($ext === 'zip' && !self::startsWith($path, "PK\x03\x04")) throw new \InvalidArgumentException('El ZIP no parece válido.');

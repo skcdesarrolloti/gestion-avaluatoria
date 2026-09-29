@@ -446,6 +446,25 @@ try {
     expect(count($ucgResult['stored']) === 1
         && $ucgResult['stored'][0]['layer_group'] === 'Unidades comuneras de gobierno',
         'biblioteca MIDAS reclasifica archivos UCG por nombre');
+    $educationNamed = tempnam(sys_get_temp_dir(), 'ga_midas_lib_');
+    file_put_contents($educationNamed, "excel educacion\n");
+    $educationResult = (new MidasDocumentUploadService($midasLibrary))->uploadMany([
+        'layer_group' => 'Localidades',
+    ], ['name' => ['educacion_colegios_2022_colegios_general_oficiales_no_oficiales_2022.xlsx'],
+        'tmp_name' => [$educationNamed], 'error' => [UPLOAD_ERR_OK]], ['name' => 'Analista']);
+    expect(count($educationResult['stored']) === 1
+        && $educationResult['stored'][0]['layer_group'] === 'Educación'
+        && $educationResult['stored'][0]['mime_type'] === 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+        'biblioteca MIDAS acepta Excel y reclasifica Educacion por nombre');
+    $climateNamed = tempnam(sys_get_temp_dir(), 'ga_midas_lib_');
+    file_put_contents($climateNamed, "%PDF-1.4\n%midas cambio climatico\n");
+    $climateResult = (new MidasDocumentUploadService($midasLibrary))->uploadMany([
+        'layer_group' => 'Educación',
+    ], ['name' => ['pdf_descargas_cambio_climatico_invemar.pdf'], 'tmp_name' => [$climateNamed],
+        'error' => [UPLOAD_ERR_OK]], ['name' => 'Analista']);
+    expect(count($climateResult['stored']) === 1
+        && $climateResult['stored'][0]['layer_group'] === 'Cambio climático',
+        'biblioteca MIDAS reclasifica cambio climatico por nombre descargado');
     foreach ($midasLibrary->latest() as $doc) { $deleted = $midasLibrary->delete($doc['id']); @unlink((string) $deleted['file_path']); }
     @rmdir($midasLibraryDir);
     putenv('MIDAS_LIBRARY_STORAGE_DIR');

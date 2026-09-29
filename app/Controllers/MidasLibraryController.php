@@ -41,6 +41,7 @@ final class MidasLibraryController
                 ->uploadMany($_POST, $_FILES['midas_file'] ?? [], $this->user);
             $message = count($result['stored']) . ' documento(s) MIDAS cargado(s).';
             if ($result['skipped']) $message .= ' ' . count($result['skipped']) . ' ya existía(n) y se omitieron.';
+            if ($result['failed']) $message .= ' ' . count($result['failed']) . ' no se cargó/cargaron: ' . implode(' ', $result['failed']);
             Session::flash('midas_message', $message);
             if ($result['stored']) $selectedGroup = (string) ($result['stored'][0]['layer_group'] ?? $selectedGroup);
         } catch (\Throwable $error) {

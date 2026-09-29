@@ -89,9 +89,9 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
                 </label>
                 <label class="label">Archivo descargado
                     <input class="mt-2 block w-full rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm text-slate-700"
-                        type="file" name="midas_file[]" accept=".pdf,.csv,.json,.geojson,.zip" multiple required>
+                        type="file" name="midas_file[]" accept=".pdf,.xls,.xlsx,.csv,.json,.geojson,.zip" multiple required>
                     <span class="mt-1 block text-xs font-normal text-slate-500">
-                        PDF, CSV, JSON, GeoJSON o ZIP. Máximo interno 25 MB por archivo; el lote también respeta post_max_size.
+                        PDF, Excel, CSV, JSON, GeoJSON o ZIP. Máximo interno 50 MB por archivo; el lote también respeta post_max_size.
                     </span>
                 </label>
                 <div class="rounded-lg bg-slate-50 p-3 text-xs leading-5 text-slate-600 md:col-span-2">

@@ -15,16 +15,23 @@ final class MidasDocumentUploadService
         $items = $this->normalizeFiles($files);
         if ($items === []) throw new \RuntimeException('Selecciona al menos un documento MIDAS.');
         if (count($items) > 20) throw new \RuntimeException('Puedes subir máximo 20 documentos MIDAS por carga.');
-        $stored = []; $skipped = [];
+        $stored = []; $skipped = []; $failed = [];
         foreach ($items as $file) {
             try {
                 $stored[] = $this->upload($this->inputForFile($input, $file, count($items) > 1), $file, $user);
-            } catch (\RuntimeException $error) {
-                if (!str_contains($error->getMessage(), 'Ya existe')) throw $error;
-                $skipped[] = $error->getMessage();
+            } catch (\InvalidArgumentException|\RuntimeException $error) {
+                $message = $error->getMessage();
+                if (str_contains($message, 'Ya existe')) {
+                    $skipped[] = $message;
+                    continue;
+                }
+                $failed[] = $this->cleanName((string) ($file['name'] ?? 'Archivo MIDAS')) . ': ' . $message;
             }
         }
-        return ['stored' => $stored, 'skipped' => $skipped];
+        if ($stored === [] && $skipped === [] && $failed !== []) {
+            throw new \RuntimeException(implode(' ', $failed));
+        }
+        return ['stored' => $stored, 'skipped' => $skipped, 'failed' => $failed];
     }
 
     public function upload(array $input, array $file, array $user): array
