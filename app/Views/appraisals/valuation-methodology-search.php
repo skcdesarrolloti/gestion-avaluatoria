@@ -18,6 +18,7 @@ $searchTabs = [
     'buscador' => 'Buscador',
     'filtros' => 'Filtros',
     'captura' => 'Captura',
+    'matriz' => 'Matriz',
     'variables' => 'Variables',
     'formulas' => 'Fórmulas',
     'criterios' => 'Criterios',
@@ -73,6 +74,9 @@ $searchTabs = [
         </div>
         <div x-show="searchTab === 'captura'">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-captura.php'; ?>
+        </div>
+        <div x-show="searchTab === 'matriz'">
+            <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-matriz.php'; ?>
         </div>
         <div x-show="searchTab === 'variables'">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-variables.php'; ?>
