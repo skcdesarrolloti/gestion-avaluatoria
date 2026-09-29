@@ -2,10 +2,14 @@
 $incomeOptions = ['' => 'Selecciona una opción', 'si' => 'Sí', 'no' => 'No', 'pendiente' => 'Pendiente por verificar'];
 $periodOptions = ['' => 'Selecciona periodicidad', 'mensual' => 'Mensual', 'trimestral' => 'Trimestral', 'anual' => 'Anual', 'otro' => 'Otro'];
 $vatOptions = ['' => 'Selecciona una opción', 'si' => 'Sí', 'no' => 'No', 'no_aplica' => 'No aplica', 'pendiente' => 'Pendiente por verificar'];
-$moneyValue = static fn (string $name): string => $field($name) !== '' ? rtrim(rtrim(number_format((float) $field($name), 2, '.', ''), '0'), '.') : '';
+$moneyValue = static function (string $name) use ($field): string {
+    if ($field($name) === '') return '';
+    $value = (float) $field($name);
+    return '$ ' . number_format($value, fmod($value, 1.0) !== 0.0 ? 2 : 0, ',', '.');
+};
 ?>
 <div class="md:col-span-2 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
-    <h3 class="text-sm font-bold text-emerald-950">Contexto de renta del activo</h3>
+    <h3 class="text-sm font-bold text-emerald-950">Contexto de renta del inmueble o activo</h3>
     <p class="mt-1 text-xs leading-5 text-emerald-900">
         Estos datos no cambian por sí solos el método. Sirven para saber si la renta documentada debe considerarse
         como antecedente económico, soporte de consistencia o insumo principal cuando el encargo sea de renta.
@@ -19,7 +23,7 @@ $moneyValue = static fn (string $name): string => $field($name) !== '' ? rtrim(r
             </select>
         </label>
         <label class="label">Canon o ingreso periódico informado
-            <input class="input" name="rent_amount" inputmode="decimal" maxlength="18"
+            <input class="input" name="rent_amount" inputmode="decimal" maxlength="20" data-money-input
                 value="<?= e($moneyValue('rent_amount')) ?>" placeholder="Ej. 3.500.000">
         </label>
         <label class="label">Periodicidad del canon
@@ -30,7 +34,7 @@ $moneyValue = static fn (string $name): string => $field($name) !== '' ? rtrim(r
             </select>
         </label>
         <label class="label">Administración periódica si aplica PH
-            <input class="input" name="ph_admin_fee_amount" inputmode="decimal" maxlength="18"
+            <input class="input" name="ph_admin_fee_amount" inputmode="decimal" maxlength="20" data-money-input
                 value="<?= e($moneyValue('ph_admin_fee_amount')) ?>" placeholder="Ej. 850.000">
         </label>
         <label class="label">¿El canon causa o cobra IVA?

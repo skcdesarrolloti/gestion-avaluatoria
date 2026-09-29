@@ -23,7 +23,11 @@ $methodologyDecisionRows = is_array($methodologyDecision['rows'] ?? null) ? $met
 </div>
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
-<div class="mt-8" x-data="{ methodologyTab: '81' }">
+<div class="mt-8" x-data="{ methodologyTab: '81' }"
+    data-refresh-on-save-topic="<?= e('appraisal:' . $record['id'] . ':chapter-zero') ?>">
+    <p class="hidden rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800" data-refresh-message>
+        Se actualizó el numeral 1.1. Recargando metodología con la información guardada...
+    </p>
     <div class="rounded-2xl bg-slate-100 p-2">
         <div class="flex gap-2 overflow-x-auto">
             <button type="button" class="min-h-11 shrink-0 rounded-xl px-4 py-2 text-sm font-semibold"

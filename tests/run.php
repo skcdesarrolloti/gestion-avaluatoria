@@ -168,8 +168,16 @@ try {
     expect(($methodologyIncome['decision']['recommended_method'] ?? '') === 'Comparación de mercado'
         && str_contains((string) ($methodologyIncome['sections'][2][1] ?? ''), 'antecedente económico')
         && str_contains((string) ($methodologyIncome['sections'][2][1] ?? ''), '$3.500.000')
+        && str_contains((string) ($methodologyIncome['sections'][2][1] ?? ''), 'administración PH informada: $850.000')
+        && !str_contains((string) ($methodologyIncome['sections'][2][1] ?? ''), 'activo')
         && !str_contains((string) ($methodologyIncome['sections'][2][1] ?? ''), 'renta como contraste'),
-        'numeral 8.2 redacta renta efectiva como antecedente economico para entregable');
+        'numeral 8.2 redacta renta efectiva como antecedente economico para entregable no NIIF');
+    $methodologyNiifIncome = (new AppraisalMethodologyChapterReport())->build([
+        'tipo_inmueble' => 'oficina', 'tipo_negocio' => 'venta', 'aplica_niif' => 'si',
+        'income_producing' => 'si', 'rent_amount' => '3500000.00',
+    ]);
+    expect(str_contains((string) ($methodologyNiifIncome['sections'][2][1] ?? ''), 'antecedente económico del activo'),
+        'numeral 8.2 usa activo cuando el encargo es NIIF');
     $methodologyNiif = (new AppraisalMethodologyChapterReport())->build(['aplica_niif' => 'si', 'base_valor' => 'razonable']);
     expect(str_contains((string) ($methodologyNiif['decision']['niif_note'] ?? ''), 'NIIF'), 'numeral 8.2 agrega nota NIIF cuando aplica');
     $chapterOneViewRecord = array_replace(\App\Support\AppraisalCatalog::defaults(), [

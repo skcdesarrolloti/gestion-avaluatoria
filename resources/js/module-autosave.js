@@ -1,3 +1,5 @@
+import { publishDerivedChange } from './derived-refresh.js';
+
 const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 const states = new WeakMap();
 const activeStates = new Set();
@@ -103,6 +105,7 @@ async function save(form) {
         if (!response.ok || result.ok !== true) throw new Error(result.message || 'No se pudo confirmar el guardado.');
         updateVersion(form, result);
         updateDossierNumber(form, result);
+        publishDerivedChange(form, result);
         state.dirty = state.revision !== revision;
         const time = result.saved_at ? new Date(result.saved_at).toLocaleTimeString('es-CO') : new Date().toLocaleTimeString('es-CO');
         setStatus(form, state.dirty ? 'Cambios pendientes' : 'Autoguardado confirmado: ' + time, state.dirty ? 'pending' : 'saved');

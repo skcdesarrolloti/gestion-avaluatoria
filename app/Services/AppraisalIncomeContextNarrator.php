@@ -14,20 +14,20 @@ final class AppraisalIncomeContextNarrator
         };
     }
 
-    public function paragraph(array $record): string
+    public function paragraph(array $record, string $subjectName): string
     {
         if ((string) ($record['income_producing'] ?? '') !== 'si') return '';
         $parts = [];
         if (($rent = $this->money($record['rent_amount'] ?? null)) !== '') {
             $period = $this->period((string) ($record['rent_period'] ?? ''));
-            $parts[] = 'canon informado de ' . $rent . ($period !== '' ? ' con periodicidad ' . $period : '');
+            $parts[] = 'canon informado: ' . $rent . ($period !== '' ? ' (' . $period . ')' : '');
         }
         if (($admin = $this->money($record['ph_admin_fee_amount'] ?? null)) !== '') {
-            $parts[] = 'administración de propiedad horizontal informada por ' . $admin;
+            $parts[] = 'administración PH informada: ' . $admin;
         }
         if (($vat = $this->vat((string) ($record['rent_charges_vat'] ?? ''))) !== '') $parts[] = $vat;
         $detail = $parts !== [] ? ' Se reporta ' . implode('; ', $parts) . '.' : '';
-        return 'Como antecedente económico del activo, se deja constancia de que el inmueble genera renta. '
+        return 'Como antecedente económico del ' . $subjectName . ', se deja constancia de que genera renta. '
             . 'Esta información se considera para comprender su comportamiento económico y la consistencia del análisis, '
             . 'sin sustituir el método principal salvo que el alcance del encargo exija una valoración por renta.'
             . $detail;
@@ -45,7 +45,7 @@ final class AppraisalIncomeContextNarrator
 
     private function vat(string $value): string
     {
-        return ['si' => 'el canon causa o cobra IVA', 'no' => 'el canon informado no registra IVA',
-            'pendiente' => 'el tratamiento de IVA queda pendiente por confirmar'][$value] ?? '';
+        return ['si' => 'IVA: sí, el canon causa o cobra IVA', 'no' => 'IVA: no registrado en el canon informado',
+            'no_aplica' => 'IVA: no aplica', 'pendiente' => 'IVA: pendiente por confirmar'][$value] ?? '';
     }
 }

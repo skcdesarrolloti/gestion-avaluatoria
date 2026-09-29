@@ -109,8 +109,9 @@ function setup() {
 }
 
 test('module autosave posts form data and updates optimistic version', async () => {
-    const { listeners, runTimer, cleanup } = setup();
+    const { listeners, runTimer, dispatched, cleanup } = setup();
     const form = new HTMLFormElement();
+    form.dataset.autosaveTopic = 'appraisal:abc:chapter-zero';
     const input = new HTMLInputElement(form);
     globalThis.fetch = async (url, request) => {
         assert.equal(url, '/avaluos/abc/expediente/autoguardar');
@@ -127,6 +128,8 @@ test('module autosave posts form data and updates optimistic version', async () 
     assert.equal(form.dossier.value, '01-2026-09-001');
     assert.equal(form.banner.textContent, '01-2026-09-001');
     assert.match(form.status.textContent, /Autoguardado confirmado/);
+    assert.equal(dispatched.at(-1).type, 'ga:record-saved');
+    assert.equal(dispatched.at(-1).detail.topic, 'appraisal:abc:chapter-zero');
     cleanup();
 });
 

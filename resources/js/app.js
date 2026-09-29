@@ -11,6 +11,8 @@ import { obsolescenceLive } from './obsolescence-live.js';
 import { installUploadProgress } from './upload-progress.js';
 import { installHelpTooltips } from './help-tooltips.js';
 import { installConservationSummaryLive } from './conservation-summary-live.js';
+import { installMoneyInputs } from './money-input.js';
+import { installDerivedRefresh } from './derived-refresh.js';
 
 window.Alpine = Alpine;
 Alpine.data('appraisalForm', appraisalForm);
@@ -25,4 +27,6 @@ installPhPdfUpload();
 installUploadProgress();
 installHelpTooltips();
 installConservationSummaryLive();
+installMoneyInputs();
+installDerivedRefresh();
 installFetchNavigation();

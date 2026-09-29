@@ -41,6 +41,7 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional',
         data-save-in-place
         data-no-fetch
         data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/expediente/autoguardar')) ?>"
+        data-autosave-topic="<?= e('appraisal:' . $record['id'] . ':chapter-zero') ?>"
         x-data="{
             busy: false, active: window.location.hash === '#identificacion' || (window.location.hash === '' && <?= $hasDossierNumber ? 'true' : 'false' ?>) ? 'identificacion' : 'configuracion',
             chapterOneTab: 'solicitud',
