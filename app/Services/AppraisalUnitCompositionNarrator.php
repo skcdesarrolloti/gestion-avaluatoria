@@ -25,9 +25,9 @@ final class AppraisalUnitCompositionNarrator
         $text .= '.';
         $named = $this->named($properties, 'unidad principal');
         $namedAnnexes = $this->named($annexes, 'anexo');
-        if ($named !== '') $text .= ' En el numeral 3.1 se identifica(n) la(s) unidad(es) principal(es) como ' . $named . '.';
+        if ($named !== '') $text .= ' Desde el numeral 1.1 se identifica(n) la(s) unidad(es) principal(es) como ' . $named . '.';
         if ($namedAnnexes !== '') $text .= ' Los anexos se identifican como ' . $namedAnnexes . '.';
-        return $text . ' Esta composición debe conservarse en la metodología para no mezclar unidades principales, anexos, áreas privadas, áreas comunes o usos funcionales diferentes sin soporte técnico.';
+        return $text . ' Esta composición debe conservarse en la metodología: los anexos pueden quedar integrados al comparable del inmueble principal o valorarse por separado únicamente cuando el analista lo justifique.';
     }
 
     private function properties(array $units): array

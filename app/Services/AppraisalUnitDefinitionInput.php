@@ -4,6 +4,7 @@ namespace App\Services;
 
 use App\Support\AppraisalCatalog;
 use App\Support\AppraisalConstructionTypeCatalog;
+use App\Support\AppraisalUnitValuationTreatmentCatalog;
 
 final class AppraisalUnitDefinitionInput
 {
@@ -18,12 +19,17 @@ final class AppraisalUnitDefinitionInput
             if (!in_array($propertyType, AppraisalCatalog::allowedValues('tipo_inmueble'), true)) $propertyType = '';
             $constructionType = trim((string) ($unit['construction_type'] ?? ''));
             if (!in_array($constructionType, AppraisalConstructionTypeCatalog::allowed(), true)) $constructionType = '';
+            $treatment = trim((string) ($unit['valuation_treatment'] ?? ''));
+            if (!in_array($treatment, AppraisalUnitValuationTreatmentCatalog::allowed(), true)) {
+                $treatment = AppraisalUnitValuationTreatmentCatalog::defaultFor($match[1], $constructionType);
+            }
             $rows[] = [
                 'unit_kind' => $match[1],
                 'unit_index' => (int) $match[2],
                 'label' => mb_substr(trim((string) ($unit['label'] ?? '')), 0, 120),
                 'property_type' => $propertyType,
                 'construction_type' => $constructionType,
+                'valuation_treatment' => $treatment,
                 'notes' => mb_substr(trim((string) ($unit['notes'] ?? '')), 0, 2000),
             ];
         }

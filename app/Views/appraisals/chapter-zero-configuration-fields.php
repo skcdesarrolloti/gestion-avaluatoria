@@ -9,9 +9,14 @@ $configTabs = [
 ];
 $unitDefinitionUnits = array_values(array_filter($units ?? [], static fn (array $unit): bool => ($unit['unit_kind'] ?? '') !== 'common'));
 $constructionTypes = \App\Support\AppraisalConstructionTypeCatalog::types();
+$valuationTreatments = \App\Support\AppraisalUnitValuationTreatmentCatalog::options();
 $unitDisplay = static function (array $unit): string {
     $fallback = ($unit['unit_kind'] ?? '') === 'annex' ? 'Anexo ' : 'Unidad ';
     return trim((string) ($unit['label'] ?? '')) ?: $fallback . (int) ($unit['unit_index'] ?? 0);
+};
+$treatmentValue = static function (array $unit): string {
+    return (string) (($unit['valuation_treatment'] ?? '')
+        ?: \App\Support\AppraisalUnitValuationTreatmentCatalog::defaultFor((string) ($unit['unit_kind'] ?? ''), (string) ($unit['construction_type'] ?? '')));
 };
 ?>
 <nav class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Bloques del numeral 1.1">
@@ -78,7 +83,7 @@ $unitDisplay = static function (array $unit): string {
                 <p class="eyebrow">Definición temprana de unidades y anexos</p>
                 <h3 class="mt-2 text-lg font-semibold text-slate-950">Qué compone el predio</h3>
                 <p class="mt-2 text-sm leading-6 text-slate-600">
-                    Esta información alimenta la descripción del numeral 3 y la ruta metodológica del numeral 8.
+                    Esta información alimenta la descripción del numeral 3 y la ruta metodológica del numeral 8. Los anexos pueden integrarse al inmueble principal o valorarse por separado solo cuando el analista lo decida.
                 </p>
             </div>
             <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"><?= count($unitDefinitionUnits) ?> creado(s)</span>
@@ -96,17 +101,19 @@ $unitDisplay = static function (array $unit): string {
                             <input class="input" name="config_units[<?= e($key) ?>][label]" maxlength="120"
                                 value="<?= e($unitDisplay($unit)) ?>" placeholder="Ej. Casa principal, Piscina, Parqueadero 1">
                         </label>
-                        <label class="label">Tipo de inmueble
-                            <select class="input" name="config_units[<?= e($key) ?>][property_type]">
-                                <option value="">Usar tipo general del avalúo</option>
-                                <?php foreach (($catalog['selects']['tipo_inmueble'][4] ?? []) as $value => $text): ?>
-                                    <option value="<?= e((string) $value) ?>" <?= (string) ($unit['property_type'] ?? '') === (string) $value ? 'selected' : '' ?>>
-                                        <?= e((string) $text) ?>
-                                    </option>
-                                <?php endforeach; ?>
-                            </select>
-                        </label>
-                        <label class="label">Tipo de construcción o anexo
+                        <?php if (($unit['unit_kind'] ?? '') === 'property'): ?>
+                            <label class="label">Tipo de inmueble de la unidad
+                                <select class="input" name="config_units[<?= e($key) ?>][property_type]">
+                                    <option value="">Usar tipo general del avalúo</option>
+                                    <?php foreach (($catalog['selects']['tipo_inmueble'][4] ?? []) as $value => $text): ?>
+                                        <option value="<?= e((string) $value) ?>" <?= (string) ($unit['property_type'] ?? '') === (string) $value ? 'selected' : '' ?>><?= e((string) $text) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </label>
+                        <?php else: ?>
+                            <input type="hidden" name="config_units[<?= e($key) ?>][property_type]" value="">
+                        <?php endif; ?>
+                        <label class="label"><?= ($unit['unit_kind'] ?? '') === 'annex' ? 'Tipo de anexo o mejora' : 'Tipo de construcción' ?>
                             <select class="input" name="config_units[<?= e($key) ?>][construction_type]">
                                 <?php foreach ($constructionTypes as $value => $text): ?>
                                     <option value="<?= e($value) ?>" <?= (string) ($unit['construction_type'] ?? '') === $value ? 'selected' : '' ?>>
@@ -115,7 +122,17 @@ $unitDisplay = static function (array $unit): string {
                                 <?php endforeach; ?>
                             </select>
                         </label>
-                        <label class="label">Descripción base
+                        <label class="label">Tratamiento en el avalúo
+                            <select class="input" name="config_units[<?= e($key) ?>][valuation_treatment]">
+                                <?php foreach ($valuationTreatments as $value => $text): ?>
+                                    <option value="<?= e($value) ?>" <?= $treatmentValue($unit) === $value ? 'selected' : '' ?>><?= e($text) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <span class="mt-1 block text-xs leading-5 text-slate-500">
+                                Parqueaderos y depósitos suelen integrarse al comparable del apartamento; sepáralos solo por decisión técnica.
+                            </span>
+                        </label>
+                        <label class="label md:col-span-2">Descripción base
                             <input class="input" name="config_units[<?= e($key) ?>][notes]" maxlength="2000"
                                 value="<?= e((string) ($unit['notes'] ?? '')) ?>" placeholder="Uso, independencia, restricciones o relación con el predio">
                         </label>

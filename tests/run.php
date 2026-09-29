@@ -195,22 +195,25 @@ try {
         [],
         [
             ['unit_kind' => 'property', 'unit_index' => 1, 'label' => 'Oficina 206', 'property_type' => 'oficina'],
-            ['unit_kind' => 'annex', 'unit_index' => 1, 'label' => 'Parqueadero No. 60', 'property_type' => 'parqueadero'],
-            ['unit_kind' => 'annex', 'unit_index' => 2, 'label' => 'Depósito No. 12', 'property_type' => 'deposito'],
+            ['unit_kind' => 'annex', 'unit_index' => 1, 'label' => 'Parqueadero No. 60', 'construction_type' => 'parqueo'],
+            ['unit_kind' => 'annex', 'unit_index' => 2, 'label' => 'Depósito No. 12', 'construction_type' => 'deposito'],
         ]
     );
     $methodologyUnitsText = (string) ($methodologyUnits['sections'][2][1] ?? '');
     expect(str_contains($methodologyUnitsText, 'Oficina 206')
         && str_contains($methodologyUnitsText, 'Parqueadero No. 60')
         && str_contains($methodologyUnitsText, 'Depósito No. 12')
-        && str_contains($methodologyUnitsText, 'no mezclar unidades principales, anexos'),
-        'numeral 8.2 incorpora composicion y nombres del numeral 3.1');
+        && str_contains($methodologyUnitsText, 'integrados al comparable del inmueble principal'),
+        'numeral 8.2 incorpora composicion desde 1.1 sin separar anexos por dogma');
+    expect(($methodologyUnits['decision']['components'][1]['route'] ?? '') === 'Integrado',
+        'parqueadero definido como anexo se integra al comparable principal por defecto');
     $methodologyPool = (new AppraisalMethodologyChapterReport())->build(
         ['tipo_inmueble' => 'casa', 'tipo_negocio' => 'venta'],
         [],
         [
             ['id' => 'u1', 'unit_kind' => 'property', 'unit_index' => 1, 'label' => 'Casa principal', 'property_type' => 'casa'],
-            ['id' => 'a1', 'unit_kind' => 'annex', 'unit_index' => 1, 'label' => 'Piscina', 'property_type' => ''],
+            ['id' => 'a1', 'unit_kind' => 'annex', 'unit_index' => 1, 'label' => 'Piscina',
+                'property_type' => '', 'valuation_treatment' => 'reposicion'],
         ]
     );
     expect(($methodologyPool['decision']['components'][1]['route'] ?? '') === 'Reposición'
@@ -232,6 +235,7 @@ try {
     ], [], [[
         'id' => 'a1', 'unit_kind' => 'annex', 'unit_index' => 1,
         'label' => 'Anexo 1', 'property_type' => '', 'construction_type' => 'piscina',
+        'valuation_treatment' => 'reposicion',
     ]]);
     expect(($methodologyPoolFromType['decision']['components'][0]['route'] ?? '') === 'Reposición',
         'numeral 8.2 toma piscina definida en 1.1 como reposicion');
@@ -262,7 +266,8 @@ try {
         ['unit_kind' => 'property', 'unit_index' => 1, 'label' => 'Apartamento 301',
             'property_type' => 'apartamento', 'construction_type' => 'apartamento', 'notes' => ''],
         ['unit_kind' => 'annex', 'unit_index' => 1, 'label' => 'Piscina',
-            'property_type' => '', 'construction_type' => 'piscina', 'notes' => 'Anexo recreativo'],
+            'property_type' => '', 'construction_type' => 'piscina',
+            'valuation_treatment' => 'reposicion', 'notes' => 'Anexo recreativo'],
     ];
     ob_start();
     require BASE_PATH . '/app/Views/appraisals/chapter-zero-configuration-fields.php';
@@ -273,14 +278,17 @@ try {
         && str_contains($configurationViewHtml, 'NIIF y PH')
         && str_contains($configurationViewHtml, 'Definición temprana de unidades y anexos')
         && str_contains($configurationViewHtml, 'config_units[property-1][label]')
+        && str_contains($configurationViewHtml, 'Tratamiento en el avalúo')
+        && str_contains($configurationViewHtml, 'Integrado al inmueble principal')
         && str_contains($configurationViewHtml, 'Piscina'),
         'numeral 1.1 renderiza subpestanas de configuracion');
     $unitDefinitionRows = AppraisalUnitDefinitionInput::rows(['annex-1' => [
         'label' => 'Piscina recreativa', 'property_type' => 'bogus',
-        'construction_type' => 'piscina', 'notes' => str_repeat('x', 2100),
+        'construction_type' => 'piscina', 'valuation_treatment' => 'bogus', 'notes' => str_repeat('x', 2100),
     ]]);
     expect($unitDefinitionRows[0]['unit_kind'] === 'annex'
         && $unitDefinitionRows[0]['construction_type'] === 'piscina'
+        && $unitDefinitionRows[0]['valuation_treatment'] === 'reposicion'
         && $unitDefinitionRows[0]['property_type'] === ''
         && strlen($unitDefinitionRows[0]['notes']) === 2000,
         'definicion temprana 1.1 normaliza unidades y anexos');
@@ -396,7 +404,8 @@ try {
         service_continuity TEXT, subject_reference_date TEXT, latitude TEXT, longitude TEXT,
         notes TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE appraisal_units (id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER,
-        unit_kind TEXT, unit_index INTEGER, area_midas_m2 REAL, built_area_midas_m2 REAL, updated_at TEXT)");
+        unit_kind TEXT, unit_index INTEGER, valuation_treatment TEXT,
+        area_midas_m2 REAL, built_area_midas_m2 REAL, updated_at TEXT)");
     $db->exec("CREATE TABLE appraisal_legal_profiles (
         appraisal_id TEXT PRIMARY KEY, owner_id INTEGER, source_certificate_id TEXT,
         status TEXT, data_json TEXT, annotations_json TEXT, alerts_json TEXT,

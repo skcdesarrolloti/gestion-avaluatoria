@@ -3,6 +3,7 @@ declare(strict_types=1);
 namespace App\Services;
 
 use App\Support\AppraisalCatalog;
+use App\Support\AppraisalUnitValuationTreatmentCatalog;
 
 final class AppraisalMethodologyComponentPlanner
 {
@@ -33,6 +34,8 @@ final class AppraisalMethodologyComponentPlanner
     {
         $label = $this->unitLabel($unit);
         $constructionType = (string) ($unit['construction_type'] ?? '');
+        $treatment = (string) (($unit['valuation_treatment'] ?? '')
+            ?: AppraisalUnitValuationTreatmentCatalog::defaultFor((string) ($unit['unit_kind'] ?? ''), $constructionType));
         $text = mb_strtolower($label . ' ' . ($unit['property_type'] ?? '') . ' ' . $constructionType
             . ' ' . ($unit['igac_typology_hint'] ?? '') . ' ' . ($unit['notes'] ?? ''));
         $type = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'] ?? ''));
@@ -43,6 +46,25 @@ final class AppraisalMethodologyComponentPlanner
         $isImprovement = in_array($constructionType, ['piscina', 'kiosco', 'ramada', 'cerramiento', 'muro',
             'porton', 'placa', 'parqueo', 'cubierta', 'otro'], true)
             || $this->hasAny($text, ['piscina', 'kiosco', 'ramada', 'cerramiento', 'tanque', 'cancha', 'mejora']);
+        if ($treatment === 'integrado') {
+            return $this->pack($unit, $label, 'Integrado al inmueble principal', 'Integrado',
+                'Comparables del inmueble principal que incluyan condición semejante: parqueaderos, depósitos u otros anexos.',
+                'El componente no se separa del valor principal; se exige buscar muestras con la misma condición o dejar ajuste sustentado.');
+        }
+        if ($treatment === 'separado_mercado') {
+            return $this->pack($unit, $label, 'Comparación de mercado independiente', 'Mercado ajustado',
+                'Derecho independiente, precio observable, área, utilidad, restricciones PH, evidencia y fecha.',
+                'El analista decidió valorar este componente por separado porque existe evidencia suficiente y comparable.');
+        }
+        if ($treatment === 'reposicion' || $treatment === 'descriptivo') {
+            return $treatment === 'descriptivo'
+                ? $this->pack($unit, $label, 'Componente descriptivo sin valor separado', 'Descriptivo',
+                    'Descripción, soporte fotográfico, relación con el predio y salvedad de no valoración independiente.',
+                    'El componente queda documentado, pero no se adopta como partida económica separada.')
+                : $this->incomeAware($this->pack($unit, $label, 'Costo de reposición depreciado', 'Reposición',
+                    'Cantidades, costo nuevo, vida útil, edad, estado, depreciación y obsolescencias.',
+                    'La mejora o anexo se mide por costo verificable y estado cuando no se integra al mercado principal.'), $incomeProducing);
+        }
         if ($business === 'arriendo' || $base === 'renta') {
             return $this->pack($unit, $label, 'Renta o capitalización de ingresos', 'Renta',
                 'Canon, administración, IVA, vacancia, gastos no recuperables, ingreso neto y tasa.',
@@ -141,6 +163,15 @@ final class AppraisalMethodologyComponentPlanner
                 ['Referente', 'Comparable indirecto más cercano a la utilidad real del anexo.'],
                 ['Ajustes', 'Área, restricciones, acceso, vida comercial y soporte PH.'],
                 ['Conclusión', 'Valor adoptado y salvedades del componente.'],
+            ]],
+            'Integrado' => ['key' => 'integrado', 'label' => 'Integrado al principal', 'steps' => [
+                ['Condición', 'Identificar si el comparable incluye parqueadero, depósito u otro anexo semejante.'],
+                ['Búsqueda', 'Priorizar ofertas del inmueble principal con la misma composición.'],
+                ['Control', 'Registrar diferencias solo como ajuste sustentado, sin doble conteo.'],
+            ]],
+            'Descriptivo' => ['key' => 'descriptivo', 'label' => 'Solo descriptivo', 'steps' => [
+                ['Descripción', 'Registrar existencia, uso, soporte fotográfico y vínculo con el predio.'],
+                ['Salvedad', 'Indicar que no se adopta valor independiente para el componente.'],
             ]],
             default => ['key' => 'mercado', 'label' => 'Mercado', 'steps' => [
                 ['Consulta', 'Fuentes, portales, inmobiliarias, fecha y filtros de búsqueda.'],

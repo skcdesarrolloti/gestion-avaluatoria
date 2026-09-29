@@ -15,6 +15,8 @@ final class AppraisalConstructionTypeCatalog
             'local' => 'Local comercial',
             'oficina' => 'Oficina',
             'deposito' => 'Depósito / cuarto útil',
+            'kiosco' => 'Kiosco',
+            'ramada' => 'Ramada',
             'mezanine' => 'Mezanine',
             'cubierta' => 'Cubierta / techo',
             'cerramiento' => 'Cerramiento',
