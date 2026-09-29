@@ -6,12 +6,14 @@ final class AppraisalMethodologyChapterReport
 {
     public function __construct(private ?AppraisalIncomeContextNarrator $income = null,
         private ?AppraisalUnitCompositionNarrator $composition = null,
-        private ?AppraisalMethodologyAcademicReport $academic = null) {}
+        private ?AppraisalMethodologyAcademicReport $academic = null,
+        private ?AppraisalMethodologyComponentPlanner $componentPlanner = null) {}
     public function build(array $record = [], array $subject = [], array $units = []): array
     {
         $this->income ??= new AppraisalIncomeContextNarrator();
         $this->composition ??= new AppraisalUnitCompositionNarrator();
         $this->academic ??= new AppraisalMethodologyAcademicReport();
+        $this->componentPlanner ??= new AppraisalMethodologyComponentPlanner();
         $decision = $this->decision($record, $units);
         $sections = array_merge($this->academic->sections(), [
             ['8.2 Selección y justificación de la metodología aplicada', $this->selectionText($record, $units, $decision)],
@@ -70,6 +72,7 @@ final class AppraisalMethodologyChapterReport
             'workflow' => $this->workflow(),
             'next_step' => $this->nextStep($method),
             'rows' => $this->decisionRows($record, $units, $method),
+            'components' => $this->componentPlanner->components($record, $units),
             'niif_note' => $this->niifNote($niif, $base),
             'special_template' => $this->specialTemplate($isDeposit && $ph === 'si'),
             'subject_name' => $subjectName,
@@ -119,6 +122,7 @@ final class AppraisalMethodologyChapterReport
             ['Régimen PH', $this->label('regimen_ph', $record['regimen_ph'] ?? ''), AppraisalCatalog::fieldSupport('regimen_ph'), 'En PH se comparan unidades privadas equivalentes y restricciones de copropiedad.', $method],
             ['Estructura del método', $this->label('estructura_metodo', $record['estructura_metodo'] ?? ''), AppraisalCatalog::fieldSupport('estructura_metodo'), 'Evita mezclar suelo, construcción, área privada o anexos sin soporte.', $method],
             ['Composición del inmueble', $this->composition->status($record, $units), 'Numeral 1.1 define cantidades; numeral 3.1 nombra y clasifica cada unidad y anexo.', 'Separa unidad principal y anexos cuando sus áreas, derechos, usos o mercado no sean equivalentes.', $method],
+            ['Ruta por unidad o anexo', $this->componentPlanner->paragraph($record, $units) ?: 'Sin unidades diferenciadas.', 'Numeral 3.1 define unidades; numerales 3.2 a 3.4 aportan áreas, construcción y diferenciales.', 'Cada componente puede requerir mercado, renta, residual o reposición según su naturaleza y evidencia.', $method],
             ['Base de valor / NIIF', $this->label('base_valor', $record['base_valor'] ?? ''), AppraisalCatalog::fieldSupport('base_valor'), 'La finalidad NIIF condiciona premisa, revelación y fuentes, pero no reemplaza el método valuatorio.', $method],
         ];
     }
@@ -140,6 +144,8 @@ final class AppraisalMethodologyChapterReport
         if ($income !== '') $text .= "\n\n" . $income;
         $composition = $this->composition->paragraph($record, $units);
         if ($composition !== '') $text .= "\n\n" . $composition;
+        $componentParagraph = $this->componentPlanner->paragraph($record, $units);
+        if ($componentParagraph !== '') $text .= "\n\n" . $componentParagraph;
         if ((string) ($decision['niif_note'] ?? '') !== '') $text .= "\n\n" . $decision['niif_note'];
         if ((string) ($decision['special_template'] ?? '') !== '') $text .= "\n\n" . $decision['special_template'];
         return $text;

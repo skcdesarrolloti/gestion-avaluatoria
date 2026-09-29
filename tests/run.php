@@ -204,6 +204,17 @@ try {
         && str_contains($methodologyUnitsText, 'Depósito No. 12')
         && str_contains($methodologyUnitsText, 'no mezclar unidades principales, anexos'),
         'numeral 8.2 incorpora composicion y nombres del numeral 3.1');
+    $methodologyPool = (new AppraisalMethodologyChapterReport())->build(
+        ['tipo_inmueble' => 'casa', 'tipo_negocio' => 'venta'],
+        [],
+        [
+            ['id' => 'u1', 'unit_kind' => 'property', 'unit_index' => 1, 'label' => 'Casa principal', 'property_type' => 'casa'],
+            ['id' => 'a1', 'unit_kind' => 'annex', 'unit_index' => 1, 'label' => 'Piscina', 'property_type' => ''],
+        ]
+    );
+    expect(($methodologyPool['decision']['components'][1]['route'] ?? '') === 'Reposición'
+        && str_contains((string) ($methodologyPool['sections'][2][1] ?? ''), 'Piscina: Costo de reposición depreciado'),
+        'numeral 8.2 separa metodo por unidad y anexo con piscina por reposicion');
     $methodologyNiif = (new AppraisalMethodologyChapterReport())->build(['aplica_niif' => 'si', 'base_valor' => 'razonable']);
     expect(str_contains((string) ($methodologyNiif['decision']['niif_note'] ?? ''), 'NIIF'), 'numeral 8.2 agrega nota NIIF cuando aplica');
     $chapterOneViewRecord = array_replace(\App\Support\AppraisalCatalog::defaults(), [

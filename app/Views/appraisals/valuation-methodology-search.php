@@ -8,6 +8,8 @@ $officialSources = is_array($sourceSearch['official_sources'] ?? null) ? $source
 $captureProtocol = is_array($sourceSearch['capture_protocol'] ?? null) ? $sourceSearch['capture_protocol'] : [];
 $adjustments = is_array($guide['adjustments'] ?? null) ? $guide['adjustments'] : (is_array($guide['homologation'] ?? null) ? $guide['homologation'] : []);
 $nextStep = is_array($methodologyDecision['next_step'] ?? null) ? $methodologyDecision['next_step'] : ['8.3 Desarrollo del método', ''];
+$componentItems = is_array($methodologyDecision['components'] ?? null) ? $methodologyDecision['components'] : [];
+$firstComponent = (string) ($componentItems[0]['id'] ?? '');
 $formulaFamilies = [
     ['Mercado', 'Valor unitario = precio depurado / unidad de comparación; luego promedio, mediana, desviación, coeficiente de variación, rango y ajustes comparativos sustentados.'],
     ['Renta', 'Ingreso neto = canon bruto menos vacancia, administración no recuperable y gastos; valor = ingreso neto anual / tasa, o flujo descontado si aplica.'],
@@ -56,6 +58,33 @@ $searchTabs = [
         <strong>Regla de flujo:</strong>
         <?= e((string) ($nextStep[1] ?? 'Define primero los insumos del método seleccionado.')) ?>
     </div>
+
+    <?php if ($componentItems !== []): ?>
+        <div class="mt-6 rounded-xl border border-blue-100 bg-blue-50 p-4"
+            x-data="{ componentWorkTab: '<?= e($firstComponent) ?>' }">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                    <p class="eyebrow">Ruta operativa por componente</p>
+                    <h3 class="mt-2 text-xl font-semibold text-blue-950">Qué debe capturarse antes del cálculo</h3>
+                </div>
+                <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-blue-800"><?= count($componentItems) ?> ruta(s)</span>
+            </div>
+            <nav class="mt-4 flex gap-2 overflow-x-auto rounded-xl bg-white/70 p-2" aria-label="Rutas por componente">
+                <?php foreach ($componentItems as $component): ?>
+                    <button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
+                        :class="componentWorkTab === '<?= e((string) $component['id']) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
+                        @click="componentWorkTab = '<?= e((string) $component['id']) ?>'"><?= e((string) $component['label']) ?></button>
+                <?php endforeach; ?>
+            </nav>
+            <?php foreach ($componentItems as $component): ?>
+                <article class="mt-3 rounded-lg bg-white p-4 text-sm leading-6 text-slate-700"
+                    x-show="componentWorkTab === '<?= e((string) $component['id']) ?>'">
+                    <strong class="text-slate-950"><?= e((string) $component['method']) ?>:</strong>
+                    <?= e((string) $component['inputs']) ?>
+                </article>
+            <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
 
     <nav class="mt-6 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Pestañas del desarrollo 8.3">
         <?php foreach ($searchTabs as $key => $label): ?>
