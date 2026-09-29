@@ -34,7 +34,7 @@ final class MidasDocumentUploadService
         if ($error !== UPLOAD_ERR_OK) {
             throw new \RuntimeException(($name ?: 'El archivo') . ' ' . MidasDocumentStorage::uploadErrorMessage($error));
         }
-        $groups = MidasDocumentRepository::groups();
+        $groups = MidasDocumentRepository::downloadGroups();
         $group = MidasDocumentRepository::canonicalGroup($this->text($input['layer_group'] ?? '', 120));
         $group = $this->groupForFile($group, $name);
         if (!isset($groups[$group])) throw new \InvalidArgumentException('Selecciona el grupo de capa MIDAS.');
@@ -109,18 +109,10 @@ final class MidasDocumentUploadService
             str_contains($plain, 'unidades_comuneras'),
             preg_match('/(^|[^a-z])ucg[0-9_ -]*/', $plain) === 1 => 'Unidades comuneras de gobierno',
             str_contains($plain, 'localidad') || str_contains($plain, 'localidades') => 'Localidades',
-            str_contains($plain, 'barrio') || str_contains($plain, 'barrios') => 'Otro soporte MIDAS',
             str_contains($plain, 'circular') => 'Circulares MIDAS',
-            str_contains($plain, 'servicio') => 'Servicios públicos',
-            str_contains($plain, 'transporte') || str_contains($plain, 'movilidad') => 'Transporte y movilidad',
-            str_contains($plain, 'equipamiento') => 'Equipamiento urbano',
+            str_contains($plain, 'estadistico') || str_contains($plain, 'estadistica') => 'Datos estadísticos',
             str_contains($plain, 'educacion') => 'Educación',
-            str_contains($plain, 'salud') => 'Salud',
-            str_contains($plain, 'seguridad') => 'Seguridad',
-            str_contains($plain, 'cultura') => 'Cultura',
             str_contains($plain, 'cambio_climatico') || str_contains($plain, 'climatico') => 'Cambio climático',
-            str_contains($plain, 'riesgo') || str_contains($plain, 'amenaza') => 'Ambiente y riesgos',
-            str_contains($plain, 'uso_suelo') || str_contains($plain, 'tratamiento') => 'Uso del suelo y tratamientos',
             default => $selected,
         };
     }

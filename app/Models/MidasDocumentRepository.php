@@ -14,6 +14,7 @@ final class MidasDocumentRepository
     public static function groups(): array
     {
         return [
+            'Datos estadísticos' => 'Ruta MIDAS: Descargas > Datos estadísticos.',
             'Localidades' => 'Ruta MIDAS: Descargas > División política > Localidades.',
             'Unidades comuneras de gobierno' => 'Ruta MIDAS: Descargas > División política > Unidades comuneras de gobierno.',
             'Uso del suelo y tratamientos' => 'No está en Descargas; búscalo por referencia, coordenada o clic en el predio y revisa ficha/resultados.',
@@ -29,6 +30,19 @@ final class MidasDocumentRepository
             'Cambio climático' => 'Ruta MIDAS: Descargas > Cambio climático.',
             'Otro soporte MIDAS' => 'Soporte descargado de MIDAS que no encaja en los grupos anteriores.',
         ];
+    }
+
+    public static function downloadGroups(): array
+    {
+        $groups = self::groups();
+        return array_intersect_key($groups, array_flip([
+            'Datos estadísticos',
+            'Localidades',
+            'Unidades comuneras de gobierno',
+            'Circulares MIDAS',
+            'Educación',
+            'Cambio climático',
+        ]));
     }
 
     public static function canonicalGroup(string $group): string

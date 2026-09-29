@@ -6,26 +6,17 @@ $activeGroup = isset($groups[$activeGroup ?? '']) ? (string) $activeGroup : (str
 $groupStats = is_array($groupStats ?? null) ? $groupStats : [];
 $activeDocuments = array_values(array_filter($documents, static fn (array $doc): bool => ($doc['layer_group'] ?? '') === $activeGroup));
 $targets = [
+    'Datos estadísticos' => 'Numerales 2 y 6: contexto demográfico, económico o estadístico cuando aplique.',
     'Localidades' => 'Numeral 2: sector y fuente territorial. Numeral 3: localidad del predio.',
     'Unidades comuneras de gobierno' => 'Numeral 2: contexto urbano. Numeral 3: UCG del inmueble.',
-    'Uso del suelo y tratamientos' => 'Numeral 5: lectura MIDAS del predio, actividad, usos permitidos, tratamiento y conclusión urbana.',
     'Circulares MIDAS' => 'Numeral 5 y futuro módulo 9: criterios complementarios de Planeación.',
-    'Circulares urbanísticas' => 'Numeral 5 y futuro potencial: altura, parqueaderos, altillos y salvedades normativas.',
-    'Servicios públicos' => 'Numeral 2: cobertura y calidad del entorno; numeral 7 si hay limitaciones.',
-    'Transporte y movilidad' => 'Numeral 2: accesibilidad; numeral 6: dinámica económica y mercado objetivo.',
-    'Equipamiento urbano' => 'Numerales 2 y 6: salud, educación, comercio, seguridad y servicios de soporte.',
     'Educación' => 'Numerales 2 y 6: equipamientos educativos y atracción sectorial.',
-    'Salud' => 'Numerales 2 y 6: concentración de servicios de salud y mercado objetivo.',
-    'Seguridad' => 'Numeral 7: lectura de seguridad y condiciones restrictivas.',
-    'Cultura' => 'Numerales 2 y 6: equipamientos culturales y dinámica urbana.',
-    'Ambiente y riesgos' => 'Numeral 7: inundación, licuación, amenazas y condiciones restrictivas.',
     'Cambio climático' => 'Numeral 7: amenazas, vulnerabilidad, adaptación y salvedades ambientales.',
-    'Otro soporte MIDAS' => 'Se usa solo si el analista define qué campo o numeral sustenta.',
 ];
 $sections = [
     'Base territorial' => ['Localidades', 'Unidades comuneras de gobierno'],
-    'Norma urbana' => ['Uso del suelo y tratamientos', 'Circulares MIDAS'],
-    'Entorno y restricciones' => ['Servicios públicos', 'Transporte y movilidad', 'Equipamiento urbano', 'Educación', 'Salud', 'Seguridad', 'Cultura', 'Ambiente y riesgos', 'Cambio climático', 'Otro soporte MIDAS'],
+    'Documentos descargables' => ['Datos estadísticos', 'Circulares MIDAS'],
+    'Equipamiento y ambiente' => ['Educación', 'Cambio climático'],
 ];
 $formatBytes = static fn ($bytes): string => number_format(((int) $bytes) / 1024, 1, ',', '.') . ' KB';
 $formatDate = static function ($value): string {
@@ -42,15 +33,14 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
             <p class="text-sm font-semibold uppercase tracking-wide text-teal-800">Biblioteca cartográfica</p>
             <h1 class="mt-2 text-3xl font-semibold text-slate-950">MIDAS</h1>
             <p class="mt-3 max-w-3xl text-slate-600">
-                Guarda una sola vez las descargas comunes de MIDAS: circulares urbanísticas, división política,
-                servicios, movilidad, equipamientos, riesgos y soportes cartográficos.
-                El POT base se conserva en Normatividad Urbana; aquí solo van capas MIDAS o evidencias reutilizables.
-                El barrio no aparece como descarga común: se documenta como consulta específica del avalúo.
+                Guarda una sola vez solo las descargas que sí aparecen en MIDAS: datos estadísticos, localidades,
+                UCG, circulares, educación y cambio climático. Las consultas por predio, uso del suelo, barrio,
+                servicios, transporte o riesgos se documentan dentro de cada avalúo.
             </p>
         </div>
         <label class="block min-w-full text-sm font-medium text-slate-700 lg:min-w-80">
             Buscar en Biblioteca MIDAS
-            <input class="input mt-2" type="search" placeholder="barrio, riesgo, transporte" x-model.trim="query">
+            <input class="input mt-2" type="search" placeholder="localidad, UCG, circular, educación" x-model.trim="query">
         </label>
     </div>
     <?php if ($message): ?><p class="rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($message) ?></p><?php endif; ?>
@@ -65,7 +55,7 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
                     <h2 class="text-lg font-semibold text-slate-950">Subir documento MIDAS común</h2>
                     <p class="mt-1 text-sm text-slate-600">
                         Puedes subir por lotes. No se autoguarda: queda en biblioteca cuando pulses Subir.
-                        Si alguno ya existe, se omite sin duplicarlo.
+                        Usa esta biblioteca solo para categorías que MIDAS ofrece como descarga.
                     </p>
                 </div>
                 <span class="rounded-full <?= !empty($storage['writable']) ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700' ?> px-3 py-1 text-xs font-semibold">
@@ -85,7 +75,7 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
                     </select>
                 </label>
                 <label class="label">Código o referencia
-                    <input class="input mt-2" name="document_code" maxlength="120" placeholder="Ej. BARRIO-BOCAGRANDE o CIRC-ALTILLO">
+                    <input class="input mt-2" name="document_code" maxlength="120" placeholder="Ej. UCG-04, LOCALIDAD-HISTORICA o CIRC-ALTILLO">
                     <span class="mt-1 block text-xs font-normal text-slate-500">En carga múltiple puedes dejarlo vacío; se toma del nombre de cada archivo.</span>
                 </label>
                 <label class="label md:col-span-2">Nombre del documento
@@ -115,10 +105,10 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
                 </div>
                 <label class="label md:col-span-2">Para qué es útil
                     <textarea class="input mt-2 min-h-20" name="practical_use" maxlength="700"
-                        placeholder="Ej. Sustenta parqueaderos, altura, uso del suelo, riesgos o delimitación territorial."></textarea>
+                        placeholder="Ej. Sustenta división territorial, circulares urbanísticas, educación o cambio climático."></textarea>
                 </label>
                 <label class="label md:col-span-2">Dónde se consulta
-                    <input class="input mt-2" name="applies_to" maxlength="240" placeholder="Ej. Numeral 5, numeral 6, numeral 7 o módulo futuro 9">
+                    <input class="input mt-2" name="applies_to" maxlength="240" placeholder="Ej. Numeral 2, numeral 5, numeral 6, numeral 7 o módulo futuro 9">
                 </label>
                 <div class="md:col-span-2"><?php require BASE_PATH . '/app/Views/appraisals/upload-progress.php'; ?></div>
                 <div class="md:col-span-2 flex justify-end"><button class="btn-primary" type="submit">Subir a Biblioteca MIDAS</button></div>

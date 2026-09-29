@@ -357,13 +357,28 @@ try {
     $tmpMidasLibraryPdf = tempnam(sys_get_temp_dir(), 'ga_midas_lib_');
     file_put_contents($tmpMidasLibraryPdf, "%PDF-1.4\n%midas biblioteca\n");
     $midasLibrary = new MidasDocumentRepository($db);
+    expect(isset(MidasDocumentRepository::downloadGroups()['Localidades'])
+        && !isset(MidasDocumentRepository::downloadGroups()['Uso del suelo y tratamientos']),
+        'biblioteca MIDAS solo expone grupos descargables');
+    $nonDownloadRejected = false;
+    try {
+        (new MidasDocumentUploadService($midasLibrary))->upload([
+            'layer_group' => 'Uso del suelo y tratamientos',
+            'document_code' => 'USO-SUELO-MIDAS',
+            'title' => 'Uso del suelo MIDAS',
+        ], ['name' => 'uso-suelo-midas.pdf', 'tmp_name' => $tmpMidasLibraryPdf,
+            'error' => UPLOAD_ERR_OK], ['name' => 'Analista']);
+    } catch (InvalidArgumentException) {
+        $nonDownloadRejected = true;
+    }
+    expect($nonDownloadRejected, 'biblioteca MIDAS rechaza grupos de consulta por predio');
     $midasDoc = (new MidasDocumentUploadService($midasLibrary))->upload([
-        'layer_group' => 'Uso del suelo y tratamientos',
-        'document_code' => 'USO-SUELO-MIDAS',
-        'title' => 'Uso del suelo MIDAS',
+        'layer_group' => 'Datos estadísticos',
+        'document_code' => 'DATOS-MIDAS',
+        'title' => 'Datos estadísticos MIDAS',
         'practical_use' => 'Soporte MIDAS reutilizable.',
-        'applies_to' => 'Numeral 5',
-    ], ['name' => 'uso-suelo-midas.pdf', 'tmp_name' => $tmpMidasLibraryPdf,
+        'applies_to' => 'Numerales 2 y 6',
+    ], ['name' => 'datos-estadisticos-midas.pdf', 'tmp_name' => $tmpMidasLibraryPdf,
         'error' => UPLOAD_ERR_OK], ['name' => 'Analista']);
     $storedMidasDocs = $midasLibrary->latest();
     expect(count($storedMidasDocs) === 1 && $storedMidasDocs[0]['id'] === $midasDoc['id']
@@ -385,10 +400,10 @@ try {
     $midasDuplicateRejected = false;
     try {
         (new MidasDocumentUploadService($midasLibrary))->upload([
-            'layer_group' => 'Uso del suelo y tratamientos',
-            'document_code' => 'USO-SUELO-MIDAS',
-            'title' => 'Uso del suelo MIDAS duplicado',
-        ], ['name' => 'uso-suelo-midas.pdf', 'tmp_name' => $tmpMidasLibraryDuplicate,
+            'layer_group' => 'Datos estadísticos',
+            'document_code' => 'DATOS-MIDAS',
+            'title' => 'Datos estadísticos MIDAS duplicado',
+        ], ['name' => 'datos-estadisticos-midas.pdf', 'tmp_name' => $tmpMidasLibraryDuplicate,
             'error' => UPLOAD_ERR_OK], ['name' => 'Analista']);
     } catch (RuntimeException $exception) {
         $midasDuplicateRejected = str_contains($exception->getMessage(), 'Ya existe');

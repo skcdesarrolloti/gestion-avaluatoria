@@ -12,7 +12,7 @@ final class MidasLibraryController
 
     public function index(): void
     {
-        $groups = MidasDocumentRepository::groups();
+        $groups = MidasDocumentRepository::downloadGroups();
         $documents = $this->documents->latest();
         $activeGroup = (string) ($_GET['grupo'] ?? array_key_first($groups));
         if (!isset($groups[$activeGroup])) $activeGroup = (string) array_key_first($groups);
@@ -46,7 +46,7 @@ final class MidasLibraryController
         } catch (\Throwable $error) {
             Session::flash('midas_error', $error->getMessage());
         }
-        $groups = MidasDocumentRepository::groups();
+        $groups = MidasDocumentRepository::downloadGroups();
         $target = isset($groups[$selectedGroup]) ? '?grupo=' . rawurlencode($selectedGroup) : '';
         Http::redirect('midas' . $target . '#biblioteca-midas');
     }
