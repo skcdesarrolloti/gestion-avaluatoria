@@ -2,14 +2,26 @@
 $documents = is_array($documents ?? null) ? $documents : [];
 $groups = is_array($groups ?? null) ? $groups : [];
 $storage = is_array($storage ?? null) ? $storage : [];
+$activeGroup = isset($groups[$activeGroup ?? '']) ? (string) $activeGroup : (string) array_key_first($groups);
+$groupStats = is_array($groupStats ?? null) ? $groupStats : [];
+$activeDocuments = array_values(array_filter($documents, static fn (array $doc): bool => ($doc['layer_group'] ?? '') === $activeGroup));
 $targets = [
+    'Localidades' => 'Numeral 2: sector y fuente territorial. Numeral 3: localidad del predio.',
+    'Unidades comuneras de gobierno' => 'Numeral 2: contexto urbano. Numeral 3: UCG del inmueble.',
     'Barrios / división política' => 'Numeral 2: sector, delimitación y fuente base. Numeral 3: localidad, barrio y UCG.',
     'POT / ordenamiento territorial' => 'Numeral 5: uso del suelo, tratamiento, clasificación y determinantes.',
+    'Uso del suelo y tratamientos' => 'Numeral 5: actividad, usos permitidos, tratamiento y conclusión urbana.',
+    'Circulares MIDAS' => 'Numeral 5 y futuro módulo 9: criterios complementarios de Planeación.',
     'Circulares urbanísticas' => 'Numeral 5 y futuro potencial: altura, parqueaderos, altillos y salvedades normativas.',
     'Servicios públicos' => 'Numeral 2: cobertura y calidad del entorno; numeral 7 si hay limitaciones.',
     'Transporte y movilidad' => 'Numeral 2: accesibilidad; numeral 6: dinámica económica y mercado objetivo.',
     'Equipamiento urbano' => 'Numerales 2 y 6: salud, educación, comercio, seguridad y servicios de soporte.',
+    'Educación' => 'Numerales 2 y 6: equipamientos educativos y atracción sectorial.',
+    'Salud' => 'Numerales 2 y 6: concentración de servicios de salud y mercado objetivo.',
+    'Seguridad' => 'Numeral 7: lectura de seguridad y condiciones restrictivas.',
+    'Cultura' => 'Numerales 2 y 6: equipamientos culturales y dinámica urbana.',
     'Ambiente y riesgos' => 'Numeral 7: inundación, licuación, amenazas y condiciones restrictivas.',
+    'Cambio climático' => 'Numeral 7: amenazas, vulnerabilidad, adaptación y salvedades ambientales.',
     'Otro soporte MIDAS' => 'Se usa solo si el analista define qué campo o numeral sustenta.',
 ];
 $formatBytes = static fn ($bytes): string => number_format(((int) $bytes) / 1024, 1, ',', '.') . ' KB';
@@ -120,15 +132,32 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
         </article>
     </section>
 
-    <section class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
+    <nav class="rounded-lg bg-slate-200/70 p-2" aria-label="Grupos de documentos MIDAS">
+        <div class="flex gap-2 overflow-x-auto">
+            <?php foreach ($groups as $group => $description): ?>
+                <?php $isActive = (string) $group === $activeGroup; ?>
+                <a class="inline-flex min-h-11 shrink-0 items-center gap-2 rounded-md px-3 py-2 text-xs font-semibold transition <?= $isActive ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600 hover:bg-white/70' ?>"
+                    href="<?= e(url('midas?grupo=' . rawurlencode((string) $group) . '#documentos-midas')) ?>"
+                    <?= $isActive ? 'aria-current="page"' : '' ?>>
+                    <span class="max-w-48 truncate"><?= e((string) $group) ?></span>
+                    <span class="rounded-full bg-white/80 px-2 py-0.5 text-[11px] text-slate-500"><?= e((string) ($groupStats[(string) $group] ?? 0)) ?></span>
+                </a>
+            <?php endforeach; ?>
+        </div>
+    </nav>
+
+    <section id="documentos-midas" class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
         <div class="flex flex-wrap items-center justify-between gap-3">
-            <h2 class="text-lg font-semibold text-slate-950">Documentos disponibles</h2>
+            <div>
+                <h2 class="text-lg font-semibold text-slate-950"><?= e($activeGroup) ?></h2>
+                <p class="mt-1 text-sm leading-6 text-slate-600"><?= e((string) ($groups[$activeGroup] ?? 'Documentos MIDAS.')) ?></p>
+            </div>
             <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
-                <?= e(count($documents)) ?> documento(s)
+                <?= e(count($activeDocuments)) ?> documento(s)
             </span>
         </div>
         <div class="mt-5 grid gap-4 lg:grid-cols-2">
-            <?php foreach ($documents as $doc): ?>
+            <?php foreach ($activeDocuments as $doc): ?>
                 <?php $term = mb_strtolower(implode(' ', [$doc['layer_group'], $doc['document_code'], $doc['title'], $doc['practical_use'], $doc['applies_to'], $doc['source_filename']])); ?>
                 <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
                     x-show='query === "" || <?= e(json_encode($term, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>.includes(query.toLowerCase())'>
@@ -165,9 +194,9 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
                     </div>
                 </article>
             <?php endforeach; ?>
-            <?php if (!$documents): ?>
+            <?php if (!$activeDocuments): ?>
                 <p class="rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600 lg:col-span-2">
-                    Aún no hay documentos MIDAS cargados.
+                    Aún no hay documentos MIDAS cargados en este grupo.
                 </p>
             <?php endif; ?>
         </div>

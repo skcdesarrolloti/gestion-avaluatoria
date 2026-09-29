@@ -35,7 +35,7 @@ final class MidasDocumentUploadService
             throw new \RuntimeException(($name ?: 'El archivo') . ' ' . MidasDocumentStorage::uploadErrorMessage($error));
         }
         $groups = MidasDocumentRepository::groups();
-        $group = $this->text($input['layer_group'] ?? '', 120);
+        $group = MidasDocumentRepository::canonicalGroup($this->text($input['layer_group'] ?? '', 120));
         if (!isset($groups[$group])) throw new \InvalidArgumentException('Selecciona el grupo de capa MIDAS.');
         $title = $this->text($input['title'] ?? '', 240);
         if ($title === '') $title = pathinfo($name, PATHINFO_FILENAME) ?: 'Documento MIDAS';

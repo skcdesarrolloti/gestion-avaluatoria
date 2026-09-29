@@ -12,10 +12,21 @@ final class MidasLibraryController
 
     public function index(): void
     {
+        $groups = MidasDocumentRepository::groups();
+        $documents = $this->documents->latest();
+        $activeGroup = (string) ($_GET['grupo'] ?? array_key_first($groups));
+        if (!isset($groups[$activeGroup])) $activeGroup = (string) array_key_first($groups);
+        $groupStats = array_fill_keys(array_keys($groups), 0);
+        foreach ($documents as $document) {
+            $group = (string) ($document['layer_group'] ?? '');
+            $groupStats[$group] = ($groupStats[$group] ?? 0) + 1;
+        }
         view('midas/index', [
             'title' => 'Biblioteca MIDAS',
-            'documents' => $this->documents->latest(),
-            'groups' => MidasDocumentRepository::groups(),
+            'documents' => $documents,
+            'groups' => $groups,
+            'activeGroup' => $activeGroup,
+            'groupStats' => $groupStats,
             'storage' => $this->documents->storageReport(),
             'message' => Session::pullFlash('midas_message'),
             'error' => Session::pullFlash('midas_error'),

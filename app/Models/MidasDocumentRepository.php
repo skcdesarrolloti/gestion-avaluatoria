@@ -14,15 +14,31 @@ final class MidasDocumentRepository
     public static function groups(): array
     {
         return [
+            'Localidades' => 'División política distrital por localidades.',
+            'Unidades comuneras de gobierno' => 'UCG urbanas y rurales para ubicar el sector.',
             'Barrios / división política' => 'Límites, localidades, barrios y UCG.',
             'POT / ordenamiento territorial' => 'POT, usos, tratamientos y reglamentación urbana.',
-            'Circulares urbanísticas' => 'Criterios de Planeación sobre altura, parqueaderos, altillos y reglas complementarias.',
+            'Uso del suelo y tratamientos' => 'Capas de actividad, uso, tratamiento y clasificación del suelo.',
+            'Circulares MIDAS' => 'Circulares descargadas desde MIDAS o Planeación.',
             'Servicios públicos' => 'Cobertura de acueducto, alcantarillado, gas, energía, aseo o alumbrado.',
             'Transporte y movilidad' => 'Vías, transporte masivo, rutas, paraderos y conectividad.',
             'Equipamiento urbano' => 'Educación, salud, cultura, deporte y espacio público.',
+            'Educación' => 'Instituciones educativas y equipamientos de educación.',
+            'Salud' => 'Equipamientos de salud y servicios asistenciales.',
+            'Seguridad' => 'Estaciones, CAI, inspecciones y soporte institucional de seguridad.',
+            'Cultura' => 'Equipamientos culturales, patrimoniales y comunitarios.',
             'Ambiente y riesgos' => 'Amenazas, riesgos, protección ambiental y determinantes.',
+            'Cambio climático' => 'Capas ambientales, adaptación climática, amenazas y vulnerabilidad.',
             'Otro soporte MIDAS' => 'Soporte descargado de MIDAS que no encaja en los grupos anteriores.',
         ];
+    }
+
+    public static function canonicalGroup(string $group): string
+    {
+        return match ($group) {
+            'Circulares urbanísticas', 'Circulares Midas' => 'Circulares MIDAS',
+            default => $group,
+        };
     }
 
     public function latest(): array
@@ -111,6 +127,7 @@ final class MidasDocumentRepository
 
     private function hydrate(array $row): array
     {
+        $row['layer_group'] = self::canonicalGroup((string) $row['layer_group']);
         $path = MidasDocumentStorage::path((string) $row['storage_filename']);
         return [...$row, 'file_path' => $path, 'has_file' => is_file($path) || is_string($row['file_blob'] ?? null)];
     }

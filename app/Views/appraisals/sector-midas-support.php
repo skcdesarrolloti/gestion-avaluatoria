@@ -1,7 +1,6 @@
 <?php
 $midasFiles = is_array($sectorMidasFiles ?? null) ? $sectorMidasFiles : [];
-$midasLayerGroups = ['Barrios / división política', 'POT / ordenamiento territorial', 'Circulares urbanísticas',
-    'Servicios públicos', 'Transporte y movilidad', 'Equipamiento urbano', 'Ambiente y riesgos', 'Otro soporte MIDAS'];
+$midasLayerGroups = array_keys(\App\Models\MidasDocumentRepository::groups());
 $midasPlan = \App\Services\MidasLayerPlan::components();
 $midasReference = preg_replace('/\D+/', '', (string) (($subject['midas_cadastral_reference'] ?? '')
     ?: ($subject['cadastral_reference'] ?? ''))) ?? '';
