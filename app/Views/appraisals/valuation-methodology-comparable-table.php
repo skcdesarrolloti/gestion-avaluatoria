@@ -6,7 +6,11 @@ $blank = ['id' => '', 'active' => 'si', 'status' => 'por_verificar', 'source_typ
     'project_name' => '', 'price_amount' => '', 'price_unit' => '', 'area_m2' => '', 'admin_fee' => '',
     'vat_applies' => '', 'bedrooms' => '', 'bathrooms' => '', 'parking_spaces' => '', 'floor_level' => '',
     'contact_name' => '', 'contact_phone' => '', 'listing_code' => '', 'listing_date' => '',
-    'consulted_at' => date('Y-m-d'), 'comparability_notes' => '', 'rejection_reason' => ''];
+    'consulted_at' => date('Y-m-d'), 'stratum' => '', 'age_years' => '', 'building_condition' => '',
+    'conservation_state' => '', 'view_quality' => '', 'finish_quality' => '', 'elevator' => '',
+    'amenities' => '', 'security_features' => '', 'power_plant' => '', 'parking_relation' => '',
+    'balcony_terrace' => '', 'noise_humidity_sun' => '', 'legal_relation_notes' => '',
+    'comparability_notes' => '', 'rejection_reason' => ''];
 $rowCount = max(10, count($savedRows));
 while (count($savedRows) < $rowCount) $savedRows[] = $blank;
 $money = static fn (mixed $value): string => $value === null || $value === '' ? '' : '$ ' . number_format((float) $value, 0, ',', '.');
@@ -44,7 +48,7 @@ $yesNo = ['' => 'No definido', 'si' => 'Sí', 'no' => 'No'];
         </div>
     </div>
     <div class="mt-4 overflow-x-auto rounded-xl border border-slate-200">
-        <table class="min-w-[2600px] divide-y divide-slate-200 text-left text-sm">
+        <table class="min-w-[4200px] divide-y divide-slate-200 text-left text-sm">
             <thead class="bg-slate-50 text-xs font-bold uppercase text-slate-500">
                 <tr>
                     <th class="px-3 py-3">#</th><th class="px-3 py-3">Usar</th><th class="px-3 py-3">Estado</th>
@@ -54,6 +58,11 @@ $yesNo = ['' => 'No definido', 'si' => 'Sí', 'no' => 'No'];
                     <th class="px-3 py-3">Precio/canon</th><th class="px-3 py-3">Unidad</th><th class="px-3 py-3">Área m2</th>
                     <th class="px-3 py-3">Admin.</th><th class="px-3 py-3">IVA</th><th class="px-3 py-3">Alc.</th>
                     <th class="px-3 py-3">Baños</th><th class="px-3 py-3">Parq.</th><th class="px-3 py-3">Piso</th>
+                    <th class="px-3 py-3">Estrato</th><th class="px-3 py-3">Edad</th><th class="px-3 py-3">Estado edif.</th>
+                    <th class="px-3 py-3">Conservación</th><th class="px-3 py-3">Vista</th><th class="px-3 py-3">Acabados</th>
+                    <th class="px-3 py-3">Ascensor</th><th class="px-3 py-3">Amenidades</th><th class="px-3 py-3">Seguridad</th>
+                    <th class="px-3 py-3">Planta</th><th class="px-3 py-3">Relación parq.</th><th class="px-3 py-3">Balcón/terraza</th>
+                    <th class="px-3 py-3">Ruido/humedad/sol</th><th class="px-3 py-3">Nota jurídica</th>
                     <th class="px-3 py-3">Contacto</th><th class="px-3 py-3">Teléfono</th><th class="px-3 py-3">Código</th>
                     <th class="px-3 py-3">Fecha aviso</th><th class="px-3 py-3">Consulta</th><th class="px-3 py-3">Observación</th><th class="px-3 py-3">Descartar por</th>
                 </tr>
@@ -82,6 +91,20 @@ $yesNo = ['' => 'No definido', 'si' => 'Sí', 'no' => 'No'];
                         <td class="px-3 py-3"><input class="input mt-0 min-w-24" name="<?= e($base) ?>[bathrooms]" value="<?= e((string) $row['bathrooms']) ?>"></td>
                         <td class="px-3 py-3"><input class="input mt-0 min-w-24" name="<?= e($base) ?>[parking_spaces]" value="<?= e((string) $row['parking_spaces']) ?>"></td>
                         <td class="px-3 py-3"><input class="input mt-0 min-w-28" name="<?= e($base) ?>[floor_level]" value="<?= e((string) $row['floor_level']) ?>"></td>
+                        <td class="px-3 py-3"><input class="input mt-0 min-w-24" name="<?= e($base) ?>[stratum]" value="<?= e((string) $row['stratum']) ?>"></td>
+                        <td class="px-3 py-3"><input class="input mt-0 min-w-24" name="<?= e($base) ?>[age_years]" value="<?= e((string) $row['age_years']) ?>"></td>
+                        <td class="px-3 py-3"><input class="input mt-0 min-w-40" name="<?= e($base) ?>[building_condition]" value="<?= e((string) $row['building_condition']) ?>" placeholder="Nuevo, usado"></td>
+                        <td class="px-3 py-3"><input class="input mt-0 min-w-40" name="<?= e($base) ?>[conservation_state]" value="<?= e((string) $row['conservation_state']) ?>" placeholder="Bueno, regular"></td>
+                        <td class="px-3 py-3"><input class="input mt-0 min-w-36" name="<?= e($base) ?>[view_quality]" value="<?= e((string) $row['view_quality']) ?>"></td>
+                        <td class="px-3 py-3"><input class="input mt-0 min-w-40" name="<?= e($base) ?>[finish_quality]" value="<?= e((string) $row['finish_quality']) ?>"></td>
+                        <td class="px-3 py-3"><?php $select($base . '[elevator]', $row['elevator'], $yesNo, 'min-w-28'); ?></td>
+                        <td class="px-3 py-3"><input class="input mt-0 min-w-56" name="<?= e($base) ?>[amenities]" value="<?= e((string) $row['amenities']) ?>" placeholder="Piscina, gimnasio, salón"></td>
+                        <td class="px-3 py-3"><input class="input mt-0 min-w-44" name="<?= e($base) ?>[security_features]" value="<?= e((string) $row['security_features']) ?>"></td>
+                        <td class="px-3 py-3"><input class="input mt-0 min-w-36" name="<?= e($base) ?>[power_plant]" value="<?= e((string) $row['power_plant']) ?>"></td>
+                        <td class="px-3 py-3"><input class="input mt-0 min-w-52" name="<?= e($base) ?>[parking_relation]" value="<?= e((string) $row['parking_relation']) ?>" placeholder="Privado, comunal, asignado"></td>
+                        <td class="px-3 py-3"><input class="input mt-0 min-w-44" name="<?= e($base) ?>[balcony_terrace]" value="<?= e((string) $row['balcony_terrace']) ?>"></td>
+                        <td class="px-3 py-3"><input class="input mt-0 min-w-52" name="<?= e($base) ?>[noise_humidity_sun]" value="<?= e((string) $row['noise_humidity_sun']) ?>"></td>
+                        <td class="px-3 py-3"><input class="input mt-0 min-w-56" name="<?= e($base) ?>[legal_relation_notes]" value="<?= e((string) $row['legal_relation_notes']) ?>"></td>
                         <td class="px-3 py-3"><input class="input mt-0 min-w-44" name="<?= e($base) ?>[contact_name]" value="<?= e((string) $row['contact_name']) ?>"></td>
                         <td class="px-3 py-3"><input class="input mt-0 min-w-36" name="<?= e($base) ?>[contact_phone]" value="<?= e((string) $row['contact_phone']) ?>"></td>
                         <td class="px-3 py-3"><input class="input mt-0 min-w-36" name="<?= e($base) ?>[listing_code]" value="<?= e((string) $row['listing_code']) ?>"></td>

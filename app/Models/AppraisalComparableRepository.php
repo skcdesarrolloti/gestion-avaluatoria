@@ -40,8 +40,11 @@ final class AppraisalComparableRepository
             source_url, query_used, operation, property_type, neighborhood, address_hint,
             project_name, price_amount, price_unit, area_m2, admin_fee, vat_applies, bedrooms,
             bathrooms, parking_spaces, floor_level, contact_name, contact_phone, listing_code,
-            listing_date, consulted_at, comparability_notes, rejection_reason, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            listing_date, consulted_at, stratum, age_years, building_condition, conservation_state,
+            view_quality, finish_quality, elevator, amenities, security_features, power_plant,
+            parking_relation, balcony_terrace, noise_humidity_sun, legal_relation_notes,
+            comparability_notes, rejection_reason, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         $this->db->prepare($sql)->execute([
             $this->id($row['id'] ?? ''), $appraisalId, $owner, $index, $this->choice($row['active'] ?? '', ['si', 'no'], 'si'),
             $this->text($row['status'] ?? 'por_verificar', 40), $this->text($row['source_type'] ?? '', 40),
@@ -56,6 +59,13 @@ final class AppraisalComparableRepository
             $this->text($row['floor_level'] ?? '', 40), $this->text($row['contact_name'] ?? '', 120),
             $this->text($row['contact_phone'] ?? '', 80), $this->text($row['listing_code'] ?? '', 120),
             $this->date($row['listing_date'] ?? null), $this->date($row['consulted_at'] ?? null),
+            $this->text($row['stratum'] ?? '', 20), $this->int($row['age_years'] ?? null),
+            $this->text($row['building_condition'] ?? '', 80), $this->text($row['conservation_state'] ?? '', 80),
+            $this->text($row['view_quality'] ?? '', 80), $this->text($row['finish_quality'] ?? '', 80),
+            $this->text($row['elevator'] ?? '', 20), $this->text($row['amenities'] ?? '', 240),
+            $this->text($row['security_features'] ?? '', 180), $this->text($row['power_plant'] ?? '', 80),
+            $this->text($row['parking_relation'] ?? '', 120), $this->text($row['balcony_terrace'] ?? '', 120),
+            $this->text($row['noise_humidity_sun'] ?? '', 180), $this->text($row['legal_relation_notes'] ?? '', 300),
             $this->body($row['comparability_notes'] ?? ''), $this->body($row['rejection_reason'] ?? ''),
             $now, $now,
         ]);

@@ -10,6 +10,9 @@ final class AppraisalComparableInput
         'price_amount', 'price_unit', 'area_m2', 'admin_fee', 'vat_applies', 'bedrooms',
         'bathrooms', 'parking_spaces', 'floor_level', 'contact_name', 'contact_phone',
         'listing_code', 'listing_date', 'consulted_at', 'comparability_notes', 'rejection_reason',
+        'stratum', 'age_years', 'building_condition', 'conservation_state', 'view_quality',
+        'finish_quality', 'elevator', 'amenities', 'security_features', 'power_plant',
+        'parking_relation', 'balcony_terrace', 'noise_humidity_sun', 'legal_relation_notes',
     ];
 
     public static function rows(array $posted): array
