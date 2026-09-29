@@ -1,6 +1,7 @@
-const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
+import { csrfToken, keepSessionAlive, refreshSecurityToken, syncToken } from './upload-session.js';
+
 const CHUNK_BYTES = 4 * 1024 * 1024;
-const CHUNK_THRESHOLD = 12 * 1024 * 1024;
+const CHUNK_THRESHOLD = 6 * 1024 * 1024;
 
 function formBody(form, submitter) {
     try { return new FormData(form, submitter); } catch { return new FormData(form); }
@@ -10,12 +11,6 @@ function augmentFormData(form, body, submitter) {
     if (typeof form.dispatchEvent === 'function') {
         form.dispatchEvent(new CustomEvent('ga:upload-formdata', { bubbles: true, detail: { body, submitter } }));
     }
-    return body;
-}
-
-function syncToken(body) {
-    const token = csrfToken();
-    if (token && body instanceof FormData) body.set('_token', token);
     return body;
 }
 
@@ -83,7 +78,7 @@ export function uploadErrorMessage(xhr) {
     return 'No se pudo completar la subida. Revisa el archivo e intenta nuevamente.';
 }
 
-function xhrRequest(url, body, { accept = 'text/html', timeout = 300000, progress = null } = {}) {
+function rawXhrRequest(url, body, { accept = 'text/html', timeout = 300000, progress = null } = {}) {
     return new Promise((resolve, reject) => {
         const xhr = new XMLHttpRequest();
         xhr.open('POST', url, true);
@@ -100,13 +95,26 @@ function xhrRequest(url, body, { accept = 'text/html', timeout = 300000, progres
     });
 }
 
+async function xhrRequest(url, body, options = {}, retryCsrf = true) {
+    try { return await rawXhrRequest(url, body, options); }
+    catch (error) {
+        if (retryCsrf && error?.status === 419 && await refreshSecurityToken().catch(() => false)) {
+            syncToken(body);
+            return xhrRequest(url, body, options, false);
+        }
+        throw error;
+    }
+}
+
 async function submitChunkedUpload(form, submitter, file) {
     const parts = ui(form);
+    const stopKeepAlive = keepSessionAlive();
     const uploadId = (globalThis.crypto?.randomUUID?.() ?? `${Date.now()}-${Math.random()}`).replace(/[^A-Za-z0-9_-]/g, '');
     const total = Math.ceil(file.size / CHUNK_BYTES);
     setDisabled(parts, true);
     setProgress(parts, 1, 'Preparando subida por partes...');
     try {
+        await refreshSecurityToken().catch(() => {});
         for (let index = 0; index < total; index++) {
             const start = index * CHUNK_BYTES;
             const body = syncToken(new FormData());
@@ -127,13 +135,14 @@ async function submitChunkedUpload(form, submitter, file) {
         finish.set('filename', file.name); finish.set('size', String(file.size));
         finish.set('ph_typology', form.querySelector('[name="ph_typology"]')?.value ?? '');
         setProgress(parts, 92, 'Archivo recibido. Ensamblando y analizando soporte PH...');
+        await refreshSecurityToken().catch(() => {});
         const xhr = await xhrRequest(form.dataset.uploadFinishUrl, finish, { timeout: Number.parseInt(form.dataset?.uploadTimeout || '300000', 10) });
         setProgress(parts, 100, 'Lectura terminada. Actualizando pantalla...');
         renderResponse(xhr, form);
     } catch (error) {
         setDisabled(parts, false);
         setProgress(parts, 100, error instanceof Error ? error.message : uploadErrorMessage(error));
-    }
+    } finally { stopKeepAlive(); }
 }
 
 export function submitUpload(form, submitter = null) {
@@ -144,8 +153,13 @@ export function submitUpload(form, submitter = null) {
         submitChunkedUpload(form, submitter, file);
         return null;
     }
+    return submitDirectUpload(form, submitter, parts);
+}
+
+function submitDirectUpload(form, submitter, parts, retryCsrf = true) {
     const xhr = new XMLHttpRequest();
     const body = syncToken(augmentFormData(form, formBody(form, submitter), submitter));
+    const stopKeepAlive = keepSessionAlive();
     setDisabled(parts, true);
     setProgress(parts, 1, 'Preparando subida...');
     xhr.open((form.method || 'POST').toUpperCase(), form.action, true);
@@ -163,6 +177,14 @@ export function submitUpload(form, submitter = null) {
         setProgress(parts, percent, percent >= 100 ? 'Archivo recibido. Analizando soporte PH...' : `Subiendo soporte PH: ${percent}%`);
     };
     xhr.onload = () => {
+        stopKeepAlive();
+        if (xhr.status === 419 && retryCsrf) {
+            refreshSecurityToken().then(ok => {
+                if (ok) submitDirectUpload(form, submitter, parts, false);
+                else { setDisabled(parts, false); setProgress(parts, 100, uploadErrorMessage(xhr)); }
+            }).catch(() => { setDisabled(parts, false); setProgress(parts, 100, uploadErrorMessage(xhr)); });
+            return;
+        }
         if (xhr.status >= 200 && xhr.status < 400) {
             setProgress(parts, 100, 'Lectura terminada. Actualizando pantalla...');
             renderResponse(xhr, form);
@@ -172,10 +194,12 @@ export function submitUpload(form, submitter = null) {
         setProgress(parts, 100, uploadErrorMessage(xhr));
     };
     xhr.onerror = () => {
+        stopKeepAlive();
         setDisabled(parts, false);
         setProgress(parts, 100, 'La conexión se interrumpió durante la subida. Intenta nuevamente.');
     };
     xhr.ontimeout = () => {
+        stopKeepAlive();
         setDisabled(parts, false);
         setProgress(parts, 100, 'La subida o análisis tardó demasiado. Intenta con menos archivos por lote o un ZIP más liviano.');
     };
