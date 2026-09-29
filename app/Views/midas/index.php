@@ -4,14 +4,9 @@ $groups = is_array($groups ?? null) ? $groups : [];
 $storage = is_array($storage ?? null) ? $storage : [];
 $activeGroup = isset($groups[$activeGroup ?? '']) ? (string) $activeGroup : (string) array_key_first($groups);
 $groupStats = is_array($groupStats ?? null) ? $groupStats : [];
+$incorporationRows = is_array($incorporationRows ?? null) ? $incorporationRows : [];
 $activeDocuments = array_values(array_filter($documents, static fn (array $doc): bool => ($doc['layer_group'] ?? '') === $activeGroup));
-$targets = [
-    'Localidades' => 'Numeral 2: sector y fuente territorial. Numeral 3: localidad del predio.',
-    'Unidades comuneras de gobierno' => 'Numeral 2: contexto urbano. Numeral 3: UCG del inmueble.',
-    'Circulares MIDAS' => 'Numeral 5 y futuro módulo 9: criterios complementarios de Planeación.',
-    'Educación' => 'Numerales 2 y 6: equipamientos educativos y atracción sectorial.',
-    'Cambio climático' => 'Numeral 7: amenazas, vulnerabilidad, adaptación y salvedades ambientales.',
-];
+$targets = \App\Services\AppraisalMidasIncorporation::targets();
 $sections = [
     'Base territorial' => ['Localidades', 'Unidades comuneras de gobierno'],
     'Planeación y entorno' => ['Circulares MIDAS', 'Educación', 'Cambio climático'],
@@ -112,6 +107,39 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
                 <div class="md:col-span-2 flex justify-end"><button class="btn-primary" type="submit">Subir a Biblioteca MIDAS</button></div>
             </form>
         </article>
+    </section>
+
+    <section class="rounded-xl border border-emerald-100 bg-white p-5 shadow-sm">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+            <div>
+                <h2 class="text-lg font-semibold text-slate-950">Constancia de incorporación al entregable</h2>
+                <p class="mt-1 max-w-3xl text-sm leading-6 text-slate-600">
+                    Cada grupo cargado queda identificado con el capítulo que alimenta. Esta constancia no reemplaza
+                    la revisión del analista: solo deja claro dónde se usa el soporte dentro del informe.
+                </p>
+            </div>
+            <span class="rounded-full bg-emerald-50 px-3 py-1 text-xs font-semibold text-emerald-700">
+                <?= e((string) array_sum($groupStats)) ?> soporte(s)
+            </span>
+        </div>
+        <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
+            <?php foreach ($incorporationRows as $row): ?>
+                <?php $loaded = (int) ($row['count'] ?? 0) > 0; ?>
+                <article class="rounded-lg border <?= $loaded ? 'border-emerald-100 bg-emerald-50/60' : 'border-slate-200 bg-slate-50' ?> p-3 text-xs leading-5">
+                    <div class="flex items-start justify-between gap-2">
+                        <h3 class="text-anywhere font-semibold text-slate-950"><?= e((string) ($row['group'] ?? 'MIDAS')) ?></h3>
+                        <span class="rounded-full bg-white px-2 py-0.5 font-semibold <?= $loaded ? 'text-emerald-700' : 'text-slate-500' ?>">
+                            <?= e((string) ($row['count'] ?? 0)) ?>
+                        </span>
+                    </div>
+                    <p class="mt-2 font-semibold <?= $loaded ? 'text-emerald-800' : 'text-slate-500' ?>">
+                        <?= e((string) ($row['status'] ?? 'Pendiente')) ?>
+                    </p>
+                    <p class="mt-2 text-slate-700"><?= e((string) ($row['target'] ?? 'Pendiente de clasificar.')) ?></p>
+                    <p class="mt-2 text-slate-500"><?= e((string) ($row['note'] ?? '')) ?></p>
+                </article>
+            <?php endforeach; ?>
+        </div>
     </section>
 
     <nav class="rounded-lg bg-slate-200/70 p-2" aria-label="Grupos de documentos MIDAS">

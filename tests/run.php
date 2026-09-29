@@ -29,6 +29,7 @@ use App\Services\AppraisalLegalChapterReport;
 use App\Services\AppraisalNarrativeChapterInput;
 use App\Services\AppraisalNarrativeChapterReport;
 use App\Services\AppraisalNarrativeMidasSupport;
+use App\Services\AppraisalMidasIncorporation;
 use App\Services\AppraisalMidasReview;
 use App\Services\AppraisalMidasSupportUploadService;
 use App\Services\AppraisalLegalInput;
@@ -908,6 +909,25 @@ try {
         && str_contains($restrictiveMidasSupport['findings'][0] ?? '', 'Cambio climático MIDAS')
         && str_contains(AppraisalRestrictiveConditionsCatalog::sections()[0]['fields'][1]['prefill'] ?? '', 'Cambio climático'),
         'numeral 7 vincula Cambio climatico MIDAS a riesgos y salvedades ambientales');
+    $midasReportSections = $midasNarrativeSupport->reportSections('6', [[
+        'id' => str_repeat('4', 32), 'layer_group' => 'Educación', 'title' => 'Colegios oficiales y privados',
+        'source_filename' => 'educacion_colegios.xlsx',
+    ]]);
+    expect(count($midasReportSections) === 1
+        && str_contains($midasReportSections[0][0], 'Soportes MIDAS')
+        && str_contains($midasReportSections[0][1], 'Colegios oficiales y privados'),
+        'soporte MIDAS se convierte en seccion visible del entregable');
+    $midasTrace = (new AppraisalMidasIncorporation())->deliverable([
+        ['layer_group' => 'Localidades', 'title' => 'Localidades Cartagena'],
+        ['layer_group' => 'Unidades comuneras de gobierno', 'title' => 'UCG urbanas'],
+        ['layer_group' => 'Circulares MIDAS', 'title' => 'Circular Altillo'],
+        ['layer_group' => 'Educación', 'title' => 'Colegios 2022'],
+        ['layer_group' => 'Cambio climático', 'title' => 'Plan adaptación'],
+    ]);
+    expect(count($midasTrace['active']) === 5
+        && str_contains($midasTrace['text'], 'Capítulo 7')
+        && str_contains($midasTrace['text'], 'Biblioteca MIDAS incorporada'),
+        'constancia MIDAS resume todos los grupos cargados y su destino en el entregable');
     $db->prepare('UPDATE appraisal_subjects SET address = ?, address_certificate = ?, adopted_source = ?,
         adopted_address = ?, property_registry = ?, cadastral_reference = ?, stratum = ?, current_use = ?,
         urban_treatment = ?, restrictions = ?, legal_urban_affectations = ? WHERE appraisal_id = ? AND owner_id = ?')

@@ -20,12 +20,14 @@ use App\Models\IgacTypologyRepository;
 use App\Services\AppraisalChapterOneReport;
 use App\Services\AppraisalLegalChapterReport;
 use App\Services\AppraisalSectorChapterReport;
+use App\Services\AppraisalMidasIncorporation;
 use App\Services\AppraisalMidasMapSupport;
 use App\Services\AppraisalDossierNumberer;
 use App\Services\AppraisalChapterZeroInput;
 use App\Services\AppraisalSubjectChapterReport;
 use App\Services\AppraisalUrbanNormChapterReport;
 use App\Services\AppraisalNarrativeChapterReport;
+use App\Services\AppraisalNarrativeMidasSupport;
 use App\Services\AppraisalReportNoteIntegrator;
 use App\Services\AppraisalValidator;
 use App\Support\AppraisalCatalog;
@@ -90,6 +92,7 @@ final class AppraisalController
         $units = $this->appraisals->units($id, $this->user['id']);
         $obsolescence = $this->obsolescence?->find($id, $this->user['id']) ?? [];
         $notes = $this->reportNotes?->byAppraisal($id, $this->user['id']) ?? [];
+        $midasDocuments = $this->midasDocuments?->latest() ?? [];
         $integrator = new AppraisalReportNoteIntegrator();
         $chapterOne = $integrator->apply((new AppraisalChapterOneReport())->build($record, $subject, $units),
             $this->chapterNotes($notes, '1'), AppraisalReportNoteCatalog::noteSectionLabels('1', $this->chapterNotes($notes, '1')));
@@ -97,7 +100,7 @@ final class AppraisalController
         $sectorRows = $this->sectorSections?->sections($id, $this->user['id']) ?? [];
         $sectorChapter = $integrator->apply((new AppraisalSectorChapterReport())->build($record, $subject, $sector, $sectorRows),
             $this->chapterNotes($notes, '2'), AppraisalReportNoteCatalog::noteSectionLabels('2', $this->chapterNotes($notes, '2')));
-        $sectorMaps = (new AppraisalMidasMapSupport())->select($this->midasDocuments?->latest() ?? [], $subject, $sector);
+        $sectorMaps = (new AppraisalMidasMapSupport())->select($midasDocuments, $subject, $sector);
         $subjectChapter = $integrator->apply((new AppraisalSubjectChapterReport())->build($record, $subject, $units, $phProfile, $obsolescence),
             $this->chapterNotes($notes, '3'), AppraisalReportNoteCatalog::noteSectionLabels('3', $this->chapterNotes($notes, '3')));
         $legalProfile = $this->legal?->profile($id, $this->user['id']) ?? [];
@@ -108,13 +111,14 @@ final class AppraisalController
         catch (\Throwable $error) { error_log('Gestion avaluatoria entregable urbano ' . get_class($error)); $urbanProfile = []; }
         $urbanChapter = $integrator->apply((new AppraisalUrbanNormChapterReport())->build($urbanProfile),
             $this->chapterNotes($notes, '5'), AppraisalReportNoteCatalog::noteSectionLabels('5', $this->chapterNotes($notes, '5')));
-        $economicChapter = $this->narrativeReport($id, '6', AppraisalEconomicCatalog::sections(), AppraisalEconomicCatalog::defaults(), $notes);
-        $restrictiveChapter = $this->narrativeReport($id, '7', AppraisalRestrictiveConditionsCatalog::sections(), AppraisalRestrictiveConditionsCatalog::defaults(), $notes);
+        $economicChapter = $this->narrativeReport($id, '6', AppraisalEconomicCatalog::sections(), AppraisalEconomicCatalog::defaults(), $notes, $midasDocuments);
+        $restrictiveChapter = $this->narrativeReport($id, '7', AppraisalRestrictiveConditionsCatalog::sections(), AppraisalRestrictiveConditionsCatalog::defaults(), $notes, $midasDocuments);
         view('appraisals/deliverable', ['title' => 'Entregable', 'record' => $record,
             'phProfile' => $phProfile, 'chapterOne' => $chapterOne, 'sectorChapter' => $sectorChapter,
             'subjectChapter' => $subjectChapter, 'legalChapter' => $legalChapter,
             'urbanChapter' => $urbanChapter, 'economicChapter' => $economicChapter,
-            'restrictiveChapter' => $restrictiveChapter, 'sectorMaps' => $sectorMaps]);
+            'restrictiveChapter' => $restrictiveChapter, 'sectorMaps' => $sectorMaps,
+            'midasIncorporation' => (new AppraisalMidasIncorporation())->deliverable($midasDocuments)]);
     }
 
     public function saveChapterZero(string $id): never
@@ -190,10 +194,16 @@ final class AppraisalController
     {
         return array_values(array_filter($notes, static fn (array $note): bool => (string) ($note['chapter_code'] ?? '') === $chapter));
     }
-    private function narrativeReport(string $id, string $chapter, array $sections, array $defaults, array $notes): array
+    private function narrativeReport(string $id, string $chapter, array $sections, array $defaults, array $notes, array $midasDocuments = []): array
     {
         $data = $this->narrativeChapters?->profile($id, $this->user['id'], $chapter, $defaults) ?? $defaults;
         $report = (new AppraisalNarrativeChapterReport())->build($sections, $data);
+        $midasSections = (new AppraisalNarrativeMidasSupport())->reportSections($chapter, $midasDocuments);
+        if ($midasSections !== []) {
+            $report['sections'] = array_merge($report['sections'] ?? [], $midasSections);
+            $report['text'] = trim((string) ($report['text'] ?? '') . "\n\n" . implode("\n\n",
+                array_map(static fn (array $section): string => $section[0] . "\n" . $section[1], $midasSections)));
+        }
         return (new AppraisalReportNoteIntegrator())->apply($report, $this->chapterNotes($notes, $chapter),
             AppraisalReportNoteCatalog::noteSectionLabels($chapter, $this->chapterNotes($notes, $chapter)));
     }

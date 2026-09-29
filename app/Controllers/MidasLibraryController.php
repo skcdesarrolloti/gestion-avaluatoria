@@ -4,6 +4,7 @@ namespace App\Controllers;
 
 use App\Core\{Http, HttpException, Session};
 use App\Models\MidasDocumentRepository;
+use App\Services\AppraisalMidasIncorporation;
 use App\Services\MidasDocumentUploadService;
 
 final class MidasLibraryController
@@ -27,6 +28,7 @@ final class MidasLibraryController
             'groups' => $groups,
             'activeGroup' => $activeGroup,
             'groupStats' => $groupStats,
+            'incorporationRows' => (new AppraisalMidasIncorporation())->rows($documents),
             'storage' => $this->documents->storageReport(),
             'message' => Session::pullFlash('midas_message'),
             'error' => Session::pullFlash('midas_error'),

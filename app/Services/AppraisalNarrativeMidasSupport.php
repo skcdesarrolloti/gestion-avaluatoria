@@ -13,6 +13,18 @@ final class AppraisalNarrativeMidasSupport
         };
     }
 
+    public function reportSections(string $chapter, array $documents): array
+    {
+        $support = $this->forChapter($chapter, $documents);
+        if (($support['items'] ?? []) === []) return [];
+        $findings = array_filter(array_map('strval', $support['findings'] ?? []));
+        $titles = array_map(static fn (array $item): string => (string) ($item['title'] ?? ''), $support['items']);
+        $titles = array_values(array_filter($titles));
+        $text = trim(implode(' ', $findings));
+        if ($titles !== []) $text .= "\n\nDocumentos MIDAS considerados: " . implode('; ', array_slice($titles, 0, 8)) . '.';
+        return [[(string) ($support['title'] ?? 'Soporte MIDAS'), trim($text)]];
+    }
+
     private function economic(array $documents): array
     {
         $education = $this->group($documents, 'Educación');

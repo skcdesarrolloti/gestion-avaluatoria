@@ -19,6 +19,7 @@ $urbanChapterText = (string) ($urbanChapterData['text'] ?? '');
 $urbanChapterSections = is_array($urbanChapterData['sections'] ?? null) ? $urbanChapterData['sections'] : [];
 $economicChapterData = is_array($economicChapter ?? null) ? $economicChapter : ['sections' => [], 'text' => ''];
 $restrictiveChapterData = is_array($restrictiveChapter ?? null) ? $restrictiveChapter : ['sections' => [], 'text' => ''];
+$midasTrace = is_array($midasIncorporation ?? null) ? $midasIncorporation : ['rows' => [], 'active' => [], 'text' => ''];
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
@@ -51,6 +52,7 @@ $restrictiveChapterData = is_array($restrictiveChapter ?? null) ? $restrictiveCh
 </section>
 
 <?php require BASE_PATH . '/app/Views/appraisals/deliverable-sector-maps.php'; ?>
+<?php require BASE_PATH . '/app/Views/appraisals/deliverable-midas-trace.php'; ?>
 
 <section class="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
     <p class="eyebrow">Capítulo 1 por secciones</p>
