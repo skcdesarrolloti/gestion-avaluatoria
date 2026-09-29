@@ -160,6 +160,16 @@ try {
     expect(str_contains((string) ($methodologyLot['decision']['recommended_method'] ?? ''), 'residual'), 'numeral 8.2 lote orienta residual');
     $methodologyRent = (new AppraisalMethodologyChapterReport())->build(['tipo_inmueble' => 'local', 'tipo_negocio' => 'arriendo']);
     expect(str_contains((string) ($methodologyRent['decision']['recommended_method'] ?? ''), 'Renta'), 'numeral 8.2 arriendo orienta renta');
+    $methodologyIncome = (new AppraisalMethodologyChapterReport())->build([
+        'tipo_inmueble' => 'oficina', 'tipo_negocio' => 'venta', 'income_producing' => 'si',
+        'rent_amount' => '3500000.00', 'rent_period' => 'mensual',
+        'ph_admin_fee_amount' => '850000.00', 'rent_charges_vat' => 'si',
+    ]);
+    expect(($methodologyIncome['decision']['recommended_method'] ?? '') === 'Comparación de mercado'
+        && str_contains((string) ($methodologyIncome['sections'][2][1] ?? ''), 'antecedente económico')
+        && str_contains((string) ($methodologyIncome['sections'][2][1] ?? ''), '$3.500.000')
+        && !str_contains((string) ($methodologyIncome['sections'][2][1] ?? ''), 'renta como contraste'),
+        'numeral 8.2 redacta renta efectiva como antecedente economico para entregable');
     $methodologyNiif = (new AppraisalMethodologyChapterReport())->build(['aplica_niif' => 'si', 'base_valor' => 'razonable']);
     expect(str_contains((string) ($methodologyNiif['decision']['niif_note'] ?? ''), 'NIIF'), 'numeral 8.2 agrega nota NIIF cuando aplica');
     $chapterOneViewRecord = array_replace(\App\Support\AppraisalCatalog::defaults(), [
@@ -176,10 +186,15 @@ try {
         && str_contains($chapterOneViewHtml, 'Localización y dirección del inmueble')
         && str_contains($chapterOneViewHtml, 'Checklist documental')
         && str_contains($chapterOneViewHtml, 'Documentos aportados o insumos'), 'numeral 1.2 renderiza despues de selectores');
-    $_POST = ['intended_use' => str_repeat('uso ', 80), 'source_documents_selected' => ['escritura_publica', 'mapa_localizacion', 'invalido']];
+    $_POST = ['intended_use' => str_repeat('uso ', 80), 'source_documents_selected' => ['escritura_publica', 'mapa_localizacion', 'invalido'],
+        'income_producing' => 'si', 'rent_amount' => '3.500.000,50', 'ph_admin_fee_amount' => '850.000',
+        'rent_period' => 'mensual', 'rent_charges_vat' => 'si'];
     $assignmentInput = AppraisalAssignmentInput::data();
     expect(strlen($assignmentInput['intended_use']) > 220
-        && json_decode($assignmentInput['source_documents_json'], true) === ['escritura_publica', 'mapa_localizacion'], 'expediente acepta concepto amplio y checklist documental');
+        && json_decode($assignmentInput['source_documents_json'], true) === ['escritura_publica', 'mapa_localizacion']
+        && $assignmentInput['rent_amount'] === '3500000.50'
+        && $assignmentInput['ph_admin_fee_amount'] === '850000.00',
+        'expediente acepta concepto amplio checklist documental y contexto de renta');
     $_POST = [];
     expectStatus(419, fn () => Session::csrf(), 'CSRF obligatorio');
     $_SERVER['HTTP_X_CSRF_TOKEN'] = 'test-token';

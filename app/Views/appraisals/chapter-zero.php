@@ -110,6 +110,9 @@ $configurationSelects = ['tipo_negocio', 'tipo_inmueble', 'subtipo_funcional',
                 <?php require BASE_PATH . '/app/Views/appraisals/appraisal-dossier-field.php'; ?>
                 <?php foreach ($configurationSelects as $name) {
                     require BASE_PATH . '/app/Views/appraisals/chapter-zero-select-field.php';
+                    if ($name === 'tipo_negocio') {
+                        require BASE_PATH . '/app/Views/appraisals/chapter-zero-income-fields.php';
+                    }
                     if ($name === 'subtipo_funcional'): ?>
                         <label class="label">Unidades inmobiliarias principales
                             <input class="input" type="number" name="igac_property_units_count" min="0" max="50"

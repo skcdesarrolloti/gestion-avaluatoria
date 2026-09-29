@@ -5,11 +5,9 @@ use PDO;
 use App\Core\HttpException;
 use App\Services\AppraisalPhotoStorage;
 use App\Support\AppraisalCatalog;
-
 final class AppraisalRepository
 {
     public function __construct(private PDO $db) {}
-
     public function recent(int $owner, int $page, string $search = '', bool $createdOnly = false): array
     {
         $offset = (max(1, $page) - 1) * 20; $search = trim($search);
@@ -86,6 +84,7 @@ final class AppraisalRepository
             'tipo_inmueble', 'subtipo_funcional', 'finalidad', 'intended_use', 'request_date', 'visit_date', 'value_date',
             'report_date', 'assignment_description', 'assignment_scope', 'assignment_limitations', 'assignment_hypotheses',
             'assignment_report_text', 'source_documents', 'source_documents_json', 'location_description', 'location_image_reference', 'base_valor', 'aplica_niif', 'regimen_ph', 'estructura_metodo', 'appraiser_id',
+            'income_producing', 'rent_amount', 'rent_period', 'ph_admin_fee_amount', 'rent_charges_vat', 'income_notes',
             'igac_category', 'igac_typology_hint', 'igac_property_units_count', 'igac_annex_units_count',
             'inspection_notes', 'configuration_status'];
         $set = implode(', ', array_map(static fn (string $field): string => $field . ' = ?', $fields));

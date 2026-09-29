@@ -1,11 +1,16 @@
 <?php
 declare(strict_types=1);
 namespace App\Services;
-
 use App\Support\AppraisalCatalog;
 
 final class AppraisalMethodologyChapterReport
 {
+    private AppraisalIncomeContextNarrator $income;
+
+    public function __construct(?AppraisalIncomeContextNarrator $income = null)
+    {
+        $this->income = $income ?? new AppraisalIncomeContextNarrator();
+    }
     public function build(array $record = [], array $subject = []): array
     {
         $decision = $this->decision($record);
@@ -25,7 +30,6 @@ final class AppraisalMethodologyChapterReport
             'decision' => $decision,
         ];
     }
-
     private function introductoryText(): string
     {
         return 'La metodología valuatoria se selecciona a partir de la naturaleza del bien, '
@@ -53,7 +57,6 @@ final class AppraisalMethodologyChapterReport
             . 'de inversión, NIC 36 para deterioro, NIIF 16 para derechos de uso y arrendamientos, '
             . 'o NIIF 5 cuando exista clasificación como mantenido para la venta.';
     }
-
     private function referenceText(): string
     {
         return 'Con ese marco, el valuador debe escoger y justificar el enfoque aplicable según '
@@ -70,7 +73,6 @@ final class AppraisalMethodologyChapterReport
             . 'explicar por qué el resultado representa razonablemente el valor estimado para la fecha '
             . 'de valoración.';
     }
-
     private function references(): array
     {
         return [
@@ -81,7 +83,6 @@ final class AppraisalMethodologyChapterReport
             ['Soporte local', 'NTS', 'Estructura del informe, suficiencia documental, salvedades, información examinada y trazabilidad.'],
         ];
     }
-
     private function decision(array $record): array
     {
         $type = (string) ($record['tipo_inmueble'] ?? '');
@@ -90,6 +91,7 @@ final class AppraisalMethodologyChapterReport
         $ph = (string) ($record['regimen_ph'] ?? '');
         $structure = (string) ($record['estructura_metodo'] ?? '');
         $niif = (string) ($record['aplica_niif'] ?? '');
+        $incomeProducing = (string) ($record['income_producing'] ?? '');
         $title = mb_strtolower((string) ($record['titulo'] ?? ''));
         $isDeposit = str_contains($title, 'depósito') || str_contains($title, 'deposito')
             || str_contains($title, 'san alejo');
@@ -108,8 +110,10 @@ final class AppraisalMethodologyChapterReport
             $method = 'Comparación o mercado';
             $reason = 'El apartamento PH suele tener mercado comparable por unidades privadas semejantes dentro de copropiedades equivalentes.';
         } elseif (in_array($type, ['local', 'oficina', 'consultorio', 'bodega', 'parqueadero', 'edificio', 'hotel'], true)) {
-            $method = 'Comparación de mercado, con renta como contraste si el activo produce ingresos';
-            $reason = 'La tipología puede contrastarse con mercado; si existe explotación económica, la renta ayuda a validar consistencia.';
+            $method = 'Comparación de mercado';
+            $reason = $incomeProducing === 'si'
+                ? 'La tipología permite revisar evidencia de mercado de activos semejantes; la renta informada se conserva como antecedente económico del inmueble.'
+                : 'La tipología permite revisar evidencia de mercado de activos semejantes, debidamente depurada y comparable.';
         }
         if ($isDeposit && $ph === 'si') {
             $method = 'Comparación indirecta con ajuste técnico sustentado';
@@ -126,7 +130,6 @@ final class AppraisalMethodologyChapterReport
             'special_template' => $this->specialTemplate($isDeposit && $ph === 'si'),
         ];
     }
-
     private function configuration(array $record): array
     {
         $items = [
@@ -136,6 +139,7 @@ final class AppraisalMethodologyChapterReport
             ['Régimen PH', $this->label('regimen_ph', $record['regimen_ph'] ?? '')],
             ['Estructura del método', $this->label('estructura_metodo', $record['estructura_metodo'] ?? '')],
             ['Base de valor / NIIF', $this->label('base_valor', $record['base_valor'] ?? '')],
+            ['Renta efectiva', $this->income->status($record)],
         ];
         return array_map(static fn (array $item): array => [
             'label' => $item[0],
@@ -143,7 +147,6 @@ final class AppraisalMethodologyChapterReport
             'state' => $item[1] !== '' ? 'Completo' : 'Revisar',
         ], $items);
     }
-
     private function workflow(): array
     {
         return [
@@ -153,7 +156,6 @@ final class AppraisalMethodologyChapterReport
             ['Desarrollo posterior', 'Capturar insumos, depurarlos, calcularlos y cerrar el análisis en los subnumerales siguientes.'],
         ];
     }
-
     private function nextStep(string $method): array
     {
         $key = mb_strtolower($method);
@@ -162,34 +164,31 @@ final class AppraisalMethodologyChapterReport
         if (str_contains($key, 'costo') || str_contains($key, 'reposición')) return ['8.3 Costo de reposición', 'Preparar terreno, costos directos e indirectos, depreciación física, funcional y económica.'];
         return ['8.3 Comparables de mercado', 'Preparar filtros, variables, atributos y fuentes para capturar muestras comparables.'];
     }
-
     private function decisionRows(array $record, string $method): array
     {
         return [
-            ['Tipo de negocio', $this->label('tipo_negocio', $record['tipo_negocio'] ?? ''), AppraisalCatalog::fieldSupport('tipo_negocio'), 'Renta si es arriendo; mercado si es venta.', $method],
+            ['Tipo de negocio', $this->label('tipo_negocio', $record['tipo_negocio'] ?? ''), AppraisalCatalog::fieldSupport('tipo_negocio'), 'Define si la evidencia principal proviene de venta, arriendo o una instrucción específica del encargo.', $method],
             ['Tipo de inmueble', $this->label('tipo_inmueble', $record['tipo_inmueble'] ?? ''), AppraisalCatalog::fieldSupport('tipo_inmueble'), 'Define si aplica mercado, costo, residual o una combinación.', $method],
             ['Régimen PH', $this->label('regimen_ph', $record['regimen_ph'] ?? ''), AppraisalCatalog::fieldSupport('regimen_ph'), 'En PH se comparan unidades privadas equivalentes y restricciones de copropiedad.', $method],
             ['Estructura del método', $this->label('estructura_metodo', $record['estructura_metodo'] ?? ''), AppraisalCatalog::fieldSupport('estructura_metodo'), 'Evita mezclar suelo, construcción, área privada o anexos sin soporte.', $method],
             ['Base de valor / NIIF', $this->label('base_valor', $record['base_valor'] ?? ''), AppraisalCatalog::fieldSupport('base_valor'), 'La finalidad NIIF condiciona premisa, revelación y fuentes, pero no reemplaza el método valuatorio.', $method],
         ];
     }
-
     private function selectionText(array $record, array $decision): string
     {
-        $type = $this->label('tipo_inmueble', $record['tipo_inmueble'] ?? 'el bien objeto de estudio');
-        $business = $this->label('tipo_negocio', $record['tipo_negocio'] ?? 'el mercado analizado');
-        $ph = $this->label('regimen_ph', $record['regimen_ph'] ?? 'pendiente');
         $method = (string) ($decision['recommended_method'] ?? 'Pendiente de selección');
-        $text = 'Para seleccionar la metodología valuatoria se revisó la configuración del expediente: '
-            . 'tipología ' . mb_strtolower($type) . ', tipo de negocio ' . mb_strtolower($business)
-            . ' y régimen de propiedad horizontal ' . mb_strtolower($ph) . '. Con esta lectura, '
-            . 'y sin perder de vista la finalidad del encargo, la base de valor, el derecho objeto de '
-            . 'valuación, las restricciones jurídicas o físicas del activo y la información disponible, '
-            . 'la matriz metodológica orienta la aplicación de ' . $method . '. ' . $decision['reason'];
+        $text = 'Atendiendo la naturaleza del inmueble objeto de estudio, su uso económico, el derecho '
+            . 'que se valora y la finalidad comunicada para el encargo, se selecciona como camino técnico '
+            . 'la aplicación de ' . $method . '. Esta elección se fundamenta en la posibilidad de analizar '
+            . 'información verificable y pertinente para un activo de características semejantes, sin perder '
+            . 'de vista las condiciones jurídicas, físicas, económicas y de propiedad horizontal que puedan '
+            . 'incidir en la lectura del valor. ' . $decision['reason'];
         $next = is_array($decision['next_step'] ?? null) ? $decision['next_step'] : ['8.3 Desarrollo del método', ''];
         $text .= ' Esta selección no constituye todavía el cálculo del valor; define el camino técnico que se desarrollará en '
             . (string) ($next[0] ?? '8.3') . '. Allí se recolectan los insumos propios del método, se depuran las fuentes, '
             . 'se aplican las fórmulas y se documentan las diferencias relevantes antes de adoptar el valor conclusivo.';
+        $income = $this->income->paragraph($record);
+        if ($income !== '') $text .= "\n\n" . $income;
         if ((string) ($decision['niif_note'] ?? '') !== '') $text .= "\n\n" . $decision['niif_note'];
         if ((string) ($decision['special_template'] ?? '') !== '') $text .= "\n\n" . $decision['special_template'];
         return $text;

@@ -83,6 +83,7 @@ final class AppraisalCatalog
             'assignment_description' => 2000, 'assignment_scope' => 2000, 'assignment_limitations' => 2000, 'assignment_hypotheses' => 2000,
             'assignment_report_text' => 5000, 'source_documents' => 3000,
             'location_description' => 2000, 'location_image_reference' => 1000, 'source_documents_json' => 2000,
+            'income_producing' => 20, 'rent_period' => 40, 'rent_charges_vat' => 20, 'income_notes' => 1500,
         ];
     }
 
@@ -90,6 +91,7 @@ final class AppraisalCatalog
     {
         return array_fill_keys(array_merge(self::fieldKeys(), array_keys(self::assignmentFields()), [
             'request_date', 'visit_date', 'value_date', 'report_date', 'expediente_number',
+            'rent_amount', 'ph_admin_fee_amount',
         ]), '');
     }
 
