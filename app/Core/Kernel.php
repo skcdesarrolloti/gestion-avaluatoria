@@ -136,6 +136,7 @@ final class Kernel
                 'urbanNormative' => new \App\Controllers\AppraisalUrbanNormController(new AppraisalRepository($db),
                     new \App\Models\AppraisalUrbanNormRepository($db), new \App\Models\UrbanNormativeRepository($db), new AppraisalSubjectRepository($db), $user, new \App\Models\AppraisalReportNoteRepository($db)),
                 'valuationMethodology' => new \App\Controllers\AppraisalValuationMethodologyController(new AppraisalRepository($db), new AppraisalSubjectRepository($db), new \App\Models\AppraisalPhRepository($db), new \App\Services\AppraisalComparableSearchGuide(), $user),
+                'narrativeChapters' => new \App\Controllers\AppraisalNarrativeController(new AppraisalRepository($db), new \App\Models\AppraisalNarrativeChapterRepository($db), $user),
                 'subject' => new AppraisalSubjectController(new AppraisalRepository($db), $user,
                     new IgacTypologyRepository(), new AppraisalSubjectRepository($db), new GeoMasterRepository($db),
                     new \App\Models\AppraisalPhRepository($db), new \App\Models\AppraisalObsolescenceRepository($db),
@@ -149,7 +150,8 @@ final class Kernel
                     new \App\Models\AppraisalObsolescenceRepository($db), new \App\Services\AppraisalDossierNumberer($db),
                     new \App\Models\AppraisalSectorRepository($db), new \App\Models\AppraisalSectorSectionRepository($db),
                     new \App\Models\AppraisalReportNoteRepository($db), new AppraisalLegalRepository($db),
-                    new \App\Models\AppraisalUrbanNormRepository($db), new MidasDocumentRepository($db)),
+                    new \App\Models\AppraisalUrbanNormRepository($db), new MidasDocumentRepository($db),
+                    new \App\Models\AppraisalNarrativeChapterRepository($db)),
             };
             $instance->$action(...array_slice($matches, 1));
             return;

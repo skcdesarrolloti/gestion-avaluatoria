@@ -78,6 +78,17 @@ final class AppraisalReportNoteCatalog
                 '5.5'=>'Soportes, archivos y normas',
                 '5.6'=>'Conclusión urbanística adoptada',
             ],
+            '6' => [
+                '6.1'=>'Actividad edificadora', '6.2'=>'Perspectivas de valorización',
+                '6.3'=>'Oferta y demanda', '6.4'=>'Actividad económica de la zona',
+                '6.5'=>'Mercado objetivo',
+            ],
+            '7' => [
+                '7.1'=>'Problemas de estabilidad y suelos', '7.2'=>'Impacto ambiental y salubridad',
+                '7.3'=>'Servidumbres, cesiones y afectaciones viales', '7.4'=>'Seguridad',
+                '7.5'=>'Problemáticas socioeconómicas', '7.6'=>'Hipótesis especiales',
+                '7.7'=>'Problemas jurídicos',
+            ],
         ];
     }
 }

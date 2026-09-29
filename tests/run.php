@@ -26,6 +26,8 @@ use App\Services\AppraisalReportNoteIntegrator;
 use App\Services\AppraisalSubjectChapterReport;
 use App\Services\AppraisalComparableSearchGuide;
 use App\Services\AppraisalLegalChapterReport;
+use App\Services\AppraisalNarrativeChapterInput;
+use App\Services\AppraisalNarrativeChapterReport;
 use App\Services\AppraisalMidasReview;
 use App\Services\AppraisalMidasSupportUploadService;
 use App\Services\AppraisalLegalInput;
@@ -60,6 +62,7 @@ use App\Controllers\AppraisalSubjectController;
 use App\Models\AppraisalLegalRepository;
 use App\Models\AppraisalPhRepository;
 use App\Models\AppraisalRepository;
+use App\Models\AppraisalNarrativeChapterRepository;
 use App\Models\AppraisalReportNoteRepository;
 use App\Models\AppraisalSubjectRepository;
 use App\Models\AppraisalUrbanNormRepository;
@@ -85,6 +88,8 @@ use App\Support\AppraisalLegalCatalog;
 use App\Support\AppraisalLegalView;
 use App\Support\AppraisalSpecialAttributeCatalog;
 use App\Support\AppraisalReportNoteCatalog;
+use App\Support\AppraisalEconomicCatalog;
+use App\Support\AppraisalRestrictiveConditionsCatalog;
 use App\Support\SectorBankCatalog;
 
 // All fixtures are in memory; never connect to the configured production database.
@@ -176,6 +181,8 @@ try {
         sort_order INTEGER, include_in_report INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE appraisal_report_note_sections (id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER,
         chapter_code TEXT, section_code TEXT, label TEXT, created_at TEXT, updated_at TEXT)");
+    $db->exec("CREATE TABLE appraisal_narrative_chapters (appraisal_id TEXT, owner_id INTEGER,
+        chapter_code TEXT, data_json TEXT, updated_at TEXT, PRIMARY KEY (appraisal_id, owner_id, chapter_code))");
     $db->exec("CREATE TABLE valuation_standard_categories (code TEXT PRIMARY KEY, name TEXT, group_type TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE valuation_standards (slug TEXT PRIMARY KEY, category_code TEXT, standard_code TEXT, title TEXT, kind TEXT, sector_code TEXT, source_filename TEXT, storage_filename TEXT, summary TEXT, file_size_bytes INTEGER, pdf_blob BLOB, imported_at TEXT, sort_order INTEGER, created_at TEXT, updated_at TEXT)");
     $db->exec("INSERT INTO valuation_standard_categories VALUES
@@ -803,6 +810,33 @@ try {
     expect($subject['predial_base_value'] === '$ 302.123.000' && $subject['predial_destination_code'] === '01'
         && $subject['predial_destination_description'] === 'Residencial'
         && $subject['predial_rate_per_mille'] === '6.8 x mil', 'registro y catastro guarda base destino y tarifa predial');
+    $narrativeRepo = new AppraisalNarrativeChapterRepository($db);
+    $economicData = AppraisalNarrativeChapterInput::data(AppraisalEconomicCatalog::sections(), [
+        'building_activity_level' => 'baja',
+        'building_activity_text' => 'Predominan remodelaciones y ampliaciones puntuales.',
+        'target_market_text' => 'El mercado objetivo se orienta al sector salud.',
+        'extra_field' => 'ignorar',
+    ]);
+    $narrativeRepo->save(str_repeat('a', 32), 1, '6', $economicData);
+    $storedEconomic = $narrativeRepo->profile(str_repeat('a', 32), 1, '6', AppraisalEconomicCatalog::defaults());
+    $economicReport = (new AppraisalNarrativeChapterReport())->build(AppraisalEconomicCatalog::sections(), $storedEconomic);
+    expect(str_contains($economicReport['text'], '6.1 Actividad edificadora')
+        && str_contains($economicReport['text'], 'Predominan remodelaciones')
+        && !str_contains($economicReport['text'], 'extra_field'), 'numeral 6 guarda y redacta aspecto economico');
+    $restrictiveData = AppraisalNarrativeChapterInput::data(AppraisalRestrictiveConditionsCatalog::sections(), [
+        'soil_incidence' => 'no_incide',
+        'soil_text' => 'No se evidencian problemas de estabilidad; requiere soporte si cambia la condición.',
+        'legal_problem_text' => 'No se evidenciaron problemas jurídicos.',
+    ]);
+    $narrativeRepo->save(str_repeat('a', 32), 1, '7', $restrictiveData);
+    $restrictiveReport = (new AppraisalNarrativeChapterReport())->build(
+        AppraisalRestrictiveConditionsCatalog::sections(),
+        $narrativeRepo->profile(str_repeat('a', 32), 1, '7', AppraisalRestrictiveConditionsCatalog::defaults())
+    );
+    expect(str_contains($restrictiveReport['text'], '7.1 Problemas de estabilidad')
+        && str_contains($restrictiveReport['text'], 'No se evidencian problemas')
+        && str_contains(AppraisalReportNoteCatalog::sections('7')['7.7'] ?? '', 'Problemas jurídicos'),
+        'numeral 7 guarda restricciones y expone secciones para ampliaciones');
     $db->prepare('UPDATE appraisal_subjects SET address = ?, address_certificate = ?, adopted_source = ?,
         adopted_address = ?, property_registry = ?, cadastral_reference = ?, stratum = ?, current_use = ?,
         urban_treatment = ?, restrictions = ?, legal_urban_affectations = ? WHERE appraisal_id = ? AND owner_id = ?')
