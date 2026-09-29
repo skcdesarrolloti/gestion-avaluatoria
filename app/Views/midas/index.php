@@ -8,9 +8,8 @@ $activeDocuments = array_values(array_filter($documents, static fn (array $doc):
 $targets = [
     'Localidades' => 'Numeral 2: sector y fuente territorial. Numeral 3: localidad del predio.',
     'Unidades comuneras de gobierno' => 'Numeral 2: contexto urbano. Numeral 3: UCG del inmueble.',
-    'Barrios / división política' => 'Numeral 2: sector, delimitación y fuente base. Numeral 3: localidad, barrio y UCG.',
-    'POT / ordenamiento territorial' => 'Numeral 5: uso del suelo, tratamiento, clasificación y determinantes.',
-    'Uso del suelo y tratamientos' => 'Numeral 5: actividad, usos permitidos, tratamiento y conclusión urbana.',
+    'Barrios / división política' => 'Numeral 2: barrio o sector, delimitación y fuente territorial. Numeral 3: localidad, barrio y UCG.',
+    'Uso del suelo y tratamientos' => 'Numeral 5: lectura MIDAS del predio, actividad, usos permitidos, tratamiento y conclusión urbana.',
     'Circulares MIDAS' => 'Numeral 5 y futuro módulo 9: criterios complementarios de Planeación.',
     'Circulares urbanísticas' => 'Numeral 5 y futuro potencial: altura, parqueaderos, altillos y salvedades normativas.',
     'Servicios públicos' => 'Numeral 2: cobertura y calidad del entorno; numeral 7 si hay limitaciones.',
@@ -26,7 +25,7 @@ $targets = [
 ];
 $sections = [
     'Base territorial' => ['Localidades', 'Unidades comuneras de gobierno', 'Barrios / división política'],
-    'Norma urbana' => ['POT / ordenamiento territorial', 'Uso del suelo y tratamientos', 'Circulares MIDAS'],
+    'Norma urbana' => ['Uso del suelo y tratamientos', 'Circulares MIDAS'],
     'Entorno y restricciones' => ['Servicios públicos', 'Transporte y movilidad', 'Equipamiento urbano', 'Educación', 'Salud', 'Seguridad', 'Cultura', 'Ambiente y riesgos', 'Cambio climático', 'Otro soporte MIDAS'],
 ];
 $formatBytes = static fn ($bytes): string => number_format(((int) $bytes) / 1024, 1, ',', '.') . ' KB';
@@ -44,14 +43,14 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
             <p class="text-sm font-semibold uppercase tracking-wide text-teal-800">Biblioteca cartográfica</p>
             <h1 class="mt-2 text-3xl font-semibold text-slate-950">MIDAS</h1>
             <p class="mt-3 max-w-3xl text-slate-600">
-                Guarda una sola vez las descargas comunes de MIDAS: circulares urbanísticas, POT, división política,
+                Guarda una sola vez las descargas comunes de MIDAS: circulares urbanísticas, división política,
                 servicios, movilidad, equipamientos, riesgos y soportes cartográficos.
-                Los avalúos solo anexan evidencias particulares del caso.
+                El POT base se conserva en Normatividad Urbana; aquí solo van capas MIDAS o evidencias reutilizables.
             </p>
         </div>
         <label class="block min-w-full text-sm font-medium text-slate-700 lg:min-w-80">
             Buscar en Biblioteca MIDAS
-            <input class="input mt-2" type="search" placeholder="POT, barrio, riesgo, transporte" x-model.trim="query">
+            <input class="input mt-2" type="search" placeholder="barrio, riesgo, transporte" x-model.trim="query">
         </label>
     </div>
     <?php if ($message): ?><p class="rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($message) ?></p><?php endif; ?>
@@ -64,7 +63,10 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
             <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
                 <div>
                     <h2 class="text-lg font-semibold text-slate-950">Subir documento MIDAS común</h2>
-                    <p class="mt-1 text-sm text-slate-600">Puedes subir por lotes. Si alguno ya existe, se omite sin duplicarlo.</p>
+                    <p class="mt-1 text-sm text-slate-600">
+                        Puedes subir por lotes. No se autoguarda: queda en biblioteca cuando pulses Subir.
+                        Si alguno ya existe, se omite sin duplicarlo.
+                    </p>
                 </div>
                 <span class="rounded-full <?= !empty($storage['writable']) ? 'bg-emerald-50 text-emerald-700' : 'bg-red-50 text-red-700' ?> px-3 py-1 text-xs font-semibold">
                     <?= !empty($storage['writable']) ? 'Almacenamiento activo' : 'Revisar almacenamiento' ?>
@@ -79,7 +81,7 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
                     </select>
                 </label>
                 <label class="label">Código o referencia
-                    <input class="input mt-2" name="document_code" maxlength="120" placeholder="Ej. CIRC-ALTILLO o POT-2001-USOS">
+                    <input class="input mt-2" name="document_code" maxlength="120" placeholder="Ej. BARRIO-BOCAGRANDE o CIRC-ALTILLO">
                     <span class="mt-1 block text-xs font-normal text-slate-500">En carga múltiple puedes dejarlo vacío; se toma del nombre de cada archivo.</span>
                 </label>
                 <label class="label md:col-span-2">Nombre del documento

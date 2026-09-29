@@ -14,11 +14,10 @@ final class MidasDocumentRepository
     public static function groups(): array
     {
         return [
-            'Localidades' => 'División política distrital por localidades.',
-            'Unidades comuneras de gobierno' => 'UCG urbanas y rurales para ubicar el sector.',
-            'Barrios / división política' => 'Límites, localidades, barrios y UCG.',
-            'POT / ordenamiento territorial' => 'POT, usos, tratamientos y reglamentación urbana.',
-            'Uso del suelo y tratamientos' => 'Capas de actividad, uso, tratamiento y clasificación del suelo.',
+            'Localidades' => 'Localidades oficiales descargadas de MIDAS para ubicar el sector.',
+            'Unidades comuneras de gobierno' => 'UCG urbanas y rurales descargadas de MIDAS.',
+            'Barrios / división política' => 'Barrios, límites de barrio y división territorial del sector.',
+            'Uso del suelo y tratamientos' => 'Capas MIDAS de uso, actividad, tratamiento y clasificación; no reemplaza el POT base.',
             'Circulares MIDAS' => 'Circulares descargadas desde MIDAS o Planeación.',
             'Servicios públicos' => 'Cobertura de acueducto, alcantarillado, gas, energía, aseo o alumbrado.',
             'Transporte y movilidad' => 'Vías, transporte masivo, rutas, paraderos y conectividad.',
@@ -37,6 +36,7 @@ final class MidasDocumentRepository
     {
         return match ($group) {
             'Circulares urbanísticas', 'Circulares Midas' => 'Circulares MIDAS',
+            'POT / ordenamiento territorial' => 'Uso del suelo y tratamientos',
             default => $group,
         };
     }

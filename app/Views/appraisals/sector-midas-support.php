@@ -82,7 +82,7 @@ $midasTabs = [
             <div class="rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
                 <p class="font-semibold">Qué devuelve esta consulta</p>
                 <p class="mt-2">
-                    MIDAS por barrio sirve para delimitar sector, POT, servicios, movilidad, equipamientos,
+                    MIDAS por barrio sirve para delimitar sector, servicios, movilidad, equipamientos,
                     seguridad, ambiente y riesgos. Esto soporta el capítulo 2; no reemplaza la ficha predial.
                 </p>
                 <p class="mt-3 rounded-lg bg-white p-3 text-xs font-semibold text-blue-900">

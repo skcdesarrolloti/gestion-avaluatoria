@@ -358,12 +358,12 @@ try {
     file_put_contents($tmpMidasLibraryPdf, "%PDF-1.4\n%midas biblioteca\n");
     $midasLibrary = new MidasDocumentRepository($db);
     $midasDoc = (new MidasDocumentUploadService($midasLibrary))->upload([
-        'layer_group' => 'POT / ordenamiento territorial',
-        'document_code' => 'POT-COMUN-MIDAS',
-        'title' => 'POT común MIDAS',
-        'practical_use' => 'Soporte urbano reutilizable.',
-        'applies_to' => 'Capítulo 2 y numeral 5',
-    ], ['name' => 'pot-comun-midas.pdf', 'tmp_name' => $tmpMidasLibraryPdf,
+        'layer_group' => 'Uso del suelo y tratamientos',
+        'document_code' => 'USO-SUELO-MIDAS',
+        'title' => 'Uso del suelo MIDAS',
+        'practical_use' => 'Soporte MIDAS reutilizable.',
+        'applies_to' => 'Numeral 5',
+    ], ['name' => 'uso-suelo-midas.pdf', 'tmp_name' => $tmpMidasLibraryPdf,
         'error' => UPLOAD_ERR_OK], ['name' => 'Analista']);
     $storedMidasDocs = $midasLibrary->latest();
     expect(count($storedMidasDocs) === 1 && $storedMidasDocs[0]['id'] === $midasDoc['id']
@@ -385,10 +385,10 @@ try {
     $midasDuplicateRejected = false;
     try {
         (new MidasDocumentUploadService($midasLibrary))->upload([
-            'layer_group' => 'POT / ordenamiento territorial',
-            'document_code' => 'POT-COMUN-MIDAS',
-            'title' => 'POT común MIDAS duplicado',
-        ], ['name' => 'pot-comun-midas.pdf', 'tmp_name' => $tmpMidasLibraryDuplicate,
+            'layer_group' => 'Uso del suelo y tratamientos',
+            'document_code' => 'USO-SUELO-MIDAS',
+            'title' => 'Uso del suelo MIDAS duplicado',
+        ], ['name' => 'uso-suelo-midas.pdf', 'tmp_name' => $tmpMidasLibraryDuplicate,
             'error' => UPLOAD_ERR_OK], ['name' => 'Analista']);
     } catch (RuntimeException $exception) {
         $midasDuplicateRejected = str_contains($exception->getMessage(), 'Ya existe');
