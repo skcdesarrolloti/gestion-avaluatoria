@@ -127,39 +127,49 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
                 <?= e(count($documents)) ?> documento(s)
             </span>
         </div>
-        <div class="mt-5 overflow-x-auto rounded-xl border border-slate-200">
-            <table class="min-w-full divide-y divide-slate-200 text-left text-sm">
-                <thead class="bg-slate-50 text-xs uppercase text-slate-500">
-                    <tr><th class="px-4 py-3">Grupo</th><th class="px-4 py-3">Documento</th><th class="px-4 py-3">Utilidad</th><th class="px-4 py-3">Acción</th></tr>
-                </thead>
-                <tbody class="divide-y divide-slate-100 bg-white">
-                    <?php foreach ($documents as $doc): ?>
-                        <?php $term = mb_strtolower(implode(' ', [$doc['layer_group'], $doc['document_code'], $doc['title'], $doc['practical_use'], $doc['applies_to'], $doc['source_filename']])); ?>
-                        <tr x-show='query === "" || <?= e(json_encode($term, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>.includes(query.toLowerCase())'>
-                            <td class="px-4 py-3 font-semibold text-slate-800"><?= e($doc['layer_group']) ?></td>
-                            <td class="px-4 py-3">
-                                <p class="font-semibold text-slate-950"><?= e($doc['title']) ?></p>
-                                <p class="mt-1 text-xs text-slate-500"><?= e($doc['document_code']) ?> · <?= e($doc['source_filename']) ?> · <?= e($formatBytes($doc['file_size_bytes'])) ?></p>
-                                <p class="mt-1 text-xs text-slate-500"><?= e($formatDate($doc['updated_at'])) ?> · <?= e($doc['status']) ?></p>
-                            </td>
-                            <td class="max-w-md px-4 py-3 text-slate-600">
-                                <?= e($doc['practical_use'] ?: 'Utilidad pendiente de precisar.') ?>
-                                <?php if ($doc['applies_to']): ?><span class="mt-1 block text-xs font-semibold text-slate-500"><?= e($doc['applies_to']) ?></span><?php endif; ?>
-                            </td>
-                            <td class="px-4 py-3">
-                                <div class="flex flex-wrap gap-2">
-                                    <a class="btn-secondary min-h-11" href="<?= e(url('midas/documentos/' . $doc['id'] . '/archivo')) ?>" data-no-fetch>Abrir</a>
-                                    <form method="post" action="<?= e(url('midas/documentos/' . $doc['id'] . '/eliminar')) ?>"
-                                        onsubmit="return confirm('¿Eliminar este documento de Biblioteca MIDAS?');">
-                                        <?= csrf_field() ?><button class="btn-secondary min-h-11" type="submit">Eliminar</button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    <?php endforeach; ?>
-                    <?php if (!$documents): ?><tr><td class="px-4 py-5 text-slate-600" colspan="4">Aún no hay documentos MIDAS cargados.</td></tr><?php endif; ?>
-                </tbody>
-            </table>
+        <div class="mt-5 grid gap-4 lg:grid-cols-2">
+            <?php foreach ($documents as $doc): ?>
+                <?php $term = mb_strtolower(implode(' ', [$doc['layer_group'], $doc['document_code'], $doc['title'], $doc['practical_use'], $doc['applies_to'], $doc['source_filename']])); ?>
+                <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
+                    x-show='query === "" || <?= e(json_encode($term, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>.includes(query.toLowerCase())'>
+                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+                        <div>
+                            <p class="text-sm font-semibold text-teal-800"><?= e($doc['document_code']) ?></p>
+                            <h3 class="mt-2 text-lg font-semibold text-slate-950"><?= e($doc['title']) ?></h3>
+                        </div>
+                        <span class="self-start rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                            <?= e($doc['layer_group']) ?>
+                        </span>
+                    </div>
+                    <p class="mt-4 text-sm leading-6 text-slate-600">
+                        <?= e($doc['practical_use'] ?: 'Utilidad pendiente de precisar.') ?>
+                    </p>
+                    <p class="mt-4 text-sm text-slate-500">
+                        <?= e($doc['source_filename']) ?> · <?= e($formatBytes($doc['file_size_bytes'])) ?>
+                    </p>
+                    <p class="mt-1 text-xs text-slate-500">
+                        <?= e($formatDate($doc['updated_at'])) ?> · <?= e($doc['status']) ?>
+                    </p>
+                    <?php if ($doc['applies_to']): ?>
+                        <p class="mt-4 rounded-lg bg-blue-50 p-3 text-xs font-semibold leading-5 text-blue-800">
+                            Nutre expediente: <?= e($doc['applies_to']) ?>
+                        </p>
+                    <?php endif; ?>
+                    <div class="mt-5 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
+                        <a class="btn-secondary min-h-11" href="<?= e(url('midas/documentos/' . $doc['id'] . '/archivo')) ?>" data-no-fetch>Abrir</a>
+                        <form method="post" action="<?= e(url('midas/documentos/' . $doc['id'] . '/eliminar')) ?>"
+                            onsubmit="return confirm('¿Eliminar este documento de Biblioteca MIDAS?');">
+                            <?= csrf_field() ?>
+                            <button class="btn-secondary min-h-11" type="submit">Eliminar</button>
+                        </form>
+                    </div>
+                </article>
+            <?php endforeach; ?>
+            <?php if (!$documents): ?>
+                <p class="rounded-xl border border-slate-200 bg-slate-50 p-5 text-sm text-slate-600 lg:col-span-2">
+                    Aún no hay documentos MIDAS cargados.
+                </p>
+            <?php endif; ?>
         </div>
     </section>
 </section>
