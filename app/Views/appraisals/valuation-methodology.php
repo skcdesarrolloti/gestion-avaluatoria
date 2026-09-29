@@ -8,6 +8,8 @@ $methodologySections = is_array($methodologyChapterData['sections'] ?? null) ? $
 $methodologyReferences = is_array($methodologyChapterData['references'] ?? null) ? $methodologyChapterData['references'] : [];
 $methodologyDecision = is_array($methodologyChapterData['decision'] ?? null) ? $methodologyChapterData['decision'] : ['rows' => []];
 $methodologyDecisionRows = is_array($methodologyDecision['rows'] ?? null) ? $methodologyDecision['rows'] : [];
+$methodologyMessage = \App\Core\Session::pullFlash('methodology_message');
+$methodologyError = \App\Core\Session::pullFlash('methodology_error');
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
@@ -22,6 +24,12 @@ $methodologyDecisionRows = is_array($methodologyDecision['rows'] ?? null) ? $met
     <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-800">Numeral 8</span>
 </div>
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
+<?php if ($methodologyMessage): ?>
+    <p class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($methodologyMessage) ?></p>
+<?php endif; ?>
+<?php if ($methodologyError): ?>
+    <p class="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($methodologyError) ?></p>
+<?php endif; ?>
 
 <div class="mt-8" x-data="{ methodologyTab: '81' }"
     data-refresh-on-save-topic="<?= e('appraisal:' . $record['id'] . ':chapter-zero,appraisal:' . $record['id'] . ':subject-units') ?>">

@@ -90,6 +90,8 @@ return [
     ['POST', '#^/avaluos/([a-f0-9]{32})/condiciones-restrictivas$#', 'narrativeChapters', 'saveRestrictiveConditions', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/condiciones-restrictivas/autoguardar$#', 'narrativeChapters', 'autosaveRestrictiveConditions', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria$#', 'valuationMethodology', 'show', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/comparables$#', 'valuationMethodology', 'saveComparables', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/comparables/autoguardar$#', 'valuationMethodology', 'autosaveComparables', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/ampliaciones-entregable$#', 'reportNotes', 'show', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/entregable$#', 'appraisals', 'deliverable', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/notas-entregable$#', 'reportNotes', 'save', true],

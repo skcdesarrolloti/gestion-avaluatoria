@@ -41,8 +41,8 @@ $minimumFields = [
     <section class="rounded-xl border border-blue-100 bg-blue-50 p-4 lg:col-span-2">
         <p class="text-xs font-bold uppercase text-blue-800">Ficha mínima de cada muestra</p>
         <p class="mt-2 text-sm leading-6 text-blue-950">
-            Mientras no exista la tabla persistente de comparables, estos son los datos que no se pueden perder
-            al explorar portales o páginas de inmobiliarias.
+            Estos son los datos mínimos que deben quedar registrados al explorar portales o páginas de inmobiliarias.
+            El cuadro siguiente guarda la investigación y deja trazabilidad para la depuración técnica.
         </p>
         <div class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
             <?php foreach ($minimumFields as $field): ?>
@@ -51,3 +51,4 @@ $minimumFields = [
         </div>
     </section>
 </div>
+<?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-table.php'; ?>

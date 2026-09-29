@@ -25,6 +25,7 @@ use App\Services\AppraisalSectorChapterReport;
 use App\Services\AppraisalReportNoteIntegrator;
 use App\Services\AppraisalSubjectChapterReport;
 use App\Services\AppraisalComparableSearchGuide;
+use App\Services\AppraisalComparableInput;
 use App\Services\AppraisalMethodologyChapterReport;
 use App\Services\AppraisalLegalChapterReport;
 use App\Services\AppraisalNarrativeChapterInput;
@@ -245,6 +246,16 @@ try {
         && $assignmentInput['rent_amount'] === '3500000.50'
         && $assignmentInput['ph_admin_fee_amount'] === '850000.00',
         'expediente acepta concepto amplio checklist documental y contexto de renta');
+    $comparableInput = AppraisalComparableInput::rows(['comparables' => [
+        ['source_name' => 'Araújo & Segovia', 'source_url' => 'https://ejemplo.test/oferta',
+            'price_amount' => '$ 650.000.000', 'area_m2' => '92,5', 'admin_fee' => '850.000',
+            'comparability_notes' => 'Apartamento en PH con parqueadero.'],
+        ['source_name' => '', 'price_amount' => '', 'area_m2' => ''],
+    ]]);
+    expect(count($comparableInput) === 1
+        && $comparableInput[0]['source_name'] === 'Araújo & Segovia'
+        && $comparableInput[0]['price_amount'] === '$ 650.000.000',
+        'captura 8.3 conserva solo muestras con datos de investigacion');
     $_POST = [];
     expectStatus(419, fn () => Session::csrf(), 'CSRF obligatorio');
     $_SERVER['HTTP_X_CSRF_TOKEN'] = 'test-token';
