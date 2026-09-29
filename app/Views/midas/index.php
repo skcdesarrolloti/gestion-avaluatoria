@@ -38,7 +38,7 @@ $formatDate = static function ($value): string {
 };
 $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
 ?>
-<section id="biblioteca-midas" class="space-y-7" x-data="{ query: '' }">
+<section id="biblioteca-midas" class="space-y-7" x-data="{ query: '', guide: 'Base territorial' }">
     <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
             <p class="text-sm font-semibold uppercase tracking-wide text-teal-800">Biblioteca cartográfica</p>
@@ -58,34 +58,7 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
     <?php if ($error): ?><p class="rounded-xl bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($error) ?></p><?php endif; ?>
 
     <section class="grid gap-5 xl:grid-cols-[1.05fr_0.95fr]">
-        <article class="rounded-xl border border-blue-100 bg-blue-50 p-5">
-            <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                <div>
-                    <h2 class="text-lg font-semibold text-blue-950">Qué se aloja aquí</h2>
-                    <p class="mt-2 max-w-3xl text-sm leading-6 text-blue-950">
-                        MIDAS guarda capas y descargas comunes para muchos avalúos. Los soportes de un caso específico se anexan en el numeral 2.
-                    </p>
-                </div>
-                <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-blue-800">Separado de Normatividad Urbana</span>
-            </div>
-            <div class="mt-4 grid gap-3 text-sm md:grid-cols-3">
-                <?php foreach ($sections as $sectionTitle => $sectionGroups): ?>
-                    <div class="rounded-lg bg-white/70 p-3">
-                        <p class="font-semibold text-blue-950"><?= e($sectionTitle) ?></p>
-                        <div class="mt-3 space-y-3">
-                            <?php foreach ($sectionGroups as $group): ?>
-                                <?php if (!isset($groups[$group])) { continue; } ?>
-                                <div>
-                                    <p class="text-xs font-semibold uppercase text-blue-800"><?= e($group) ?></p>
-                                    <p class="mt-1 text-xs leading-5 text-blue-900"><?= e((string) $groups[$group]) ?></p>
-                                    <p class="mt-1 text-[11px] font-semibold leading-4 text-blue-700"><?= e($targets[$group] ?? 'Pendiente de clasificar por el analista.') ?></p>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
-            </div>
-        </article>
+        <?php require BASE_PATH . '/app/Views/midas/guide.php'; ?>
 
         <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
             <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
@@ -166,6 +139,7 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
             <div>
                 <h2 class="text-lg font-semibold text-slate-950"><?= e($activeGroup) ?></h2>
                 <p class="mt-1 text-sm leading-6 text-slate-600"><?= e((string) ($groups[$activeGroup] ?? 'Documentos MIDAS.')) ?></p>
+                <p class="mt-2 text-xs font-semibold leading-5 text-blue-800">Se inserta en: <?= e($targets[$activeGroup] ?? 'Pendiente de clasificar por el analista.') ?></p>
             </div>
             <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
                 <?= e(count($activeDocuments)) ?> documento(s)
@@ -176,29 +150,27 @@ $limits = is_array($storage['limits'] ?? null) ? $storage['limits'] : [];
                 <?php $term = mb_strtolower(implode(' ', [$doc['layer_group'], $doc['document_code'], $doc['title'], $doc['practical_use'], $doc['applies_to'], $doc['source_filename']])); ?>
                 <article class="rounded-xl border border-slate-200 bg-white p-5 shadow-sm"
                     x-show='query === "" || <?= e(json_encode($term, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>.includes(query.toLowerCase())'>
-                    <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
-                        <div>
-                            <p class="text-sm font-semibold text-teal-800"><?= e($doc['document_code']) ?></p>
-                            <h3 class="mt-2 text-lg font-semibold text-slate-950"><?= e($doc['title']) ?></h3>
+                    <div class="flex items-start justify-between gap-3">
+                        <div class="min-w-0">
+                            <p class="text-anywhere text-sm font-semibold text-teal-800"><?= e($doc['document_code']) ?></p>
+                            <h3 class="text-anywhere mt-2 font-semibold leading-6 text-slate-950"><?= e($doc['title']) ?></h3>
                         </div>
-                        <span class="self-start rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600">
+                        <span class="text-anywhere max-w-36 shrink-0 rounded-full bg-slate-100 px-3 py-1 text-center text-xs font-semibold text-slate-600">
                             <?= e($doc['layer_group']) ?>
                         </span>
                     </div>
                     <p class="mt-4 text-sm leading-6 text-slate-600">
                         <?= e($doc['practical_use'] ?: 'Utilidad pendiente de precisar.') ?>
                     </p>
-                    <p class="mt-4 text-sm text-slate-500">
+                    <p class="text-anywhere mt-4 text-sm text-slate-500">
                         <?= e($doc['source_filename']) ?> · <?= e($formatBytes($doc['file_size_bytes'])) ?>
                     </p>
                     <p class="mt-1 text-xs text-slate-500">
                         <?= e($formatDate($doc['updated_at'])) ?> · <?= e($doc['status']) ?>
                     </p>
-                    <?php if ($doc['applies_to']): ?>
-                        <p class="mt-4 rounded-lg bg-blue-50 p-3 text-xs font-semibold leading-5 text-blue-800">
-                            Nutre expediente: <?= e($doc['applies_to']) ?>
-                        </p>
-                    <?php endif; ?>
+                    <p class="mt-4 rounded-lg bg-blue-50 p-3 text-xs font-semibold leading-5 text-blue-800">
+                        Se inserta en: <?= e($doc['applies_to'] ?: ($targets[$doc['layer_group']] ?? 'Pendiente de clasificar por el analista.')) ?>
+                    </p>
                     <div class="mt-5 flex flex-wrap gap-2 border-t border-slate-100 pt-4">
                         <a class="btn-secondary min-h-11" href="<?= e(url('midas/documentos/' . $doc['id'] . '/archivo')) ?>" data-no-fetch>Abrir</a>
                         <form method="post" action="<?= e(url('midas/documentos/' . $doc['id'] . '/eliminar')) ?>"
