@@ -8,6 +8,8 @@ $configTabs = [
     'notas' => 'Notas',
 ];
 $unitDefinitionUnits = array_values(array_filter($units ?? [], static fn (array $unit): bool => ($unit['unit_kind'] ?? '') !== 'common'));
+$igacCategories = $igacCategories ?? [];
+$igacTypologiesByCategory = $igacTypologiesByCategory ?? [];
 $constructionTypes = \App\Support\AppraisalConstructionTypeCatalog::types();
 $valuationTreatments = \App\Support\AppraisalUnitValuationTreatmentCatalog::options();
 $unitDisplay = static function (array $unit): string {
@@ -18,6 +20,11 @@ $treatmentValue = static function (array $unit): string {
     return (string) (($unit['valuation_treatment'] ?? '')
         ?: \App\Support\AppraisalUnitValuationTreatmentCatalog::defaultFor((string) ($unit['unit_kind'] ?? ''), (string) ($unit['construction_type'] ?? '')));
 };
+$igacCategoryValue = static fn (array $unit): string =>
+    ($unit['unit_kind'] ?? '') === 'annex' ? 'ANEXOS' : (string) ($unit['igac_category'] ?? '');
+$igacOptionsFor = static fn (string $category): array => $igacTypologiesByCategory[$category] ?? [];
+$igacSearchPlaceholder = static fn (array $unit): string =>
+    ($unit['unit_kind'] ?? '') === 'annex' ? 'Buscar anexo IGAC: piscina, depósito, kiosco...' : 'Buscar tipología IGAC de la unidad principal';
 ?>
 <nav class="flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Bloques del numeral 1.1">
     <?php foreach ($configTabs as $key => $label): ?>
@@ -96,7 +103,10 @@ $treatmentValue = static function (array $unit): string {
             <div class="mt-4 grid gap-4">
                 <?php foreach ($unitDefinitionUnits as $unit): ?>
                     <?php $key = ($unit['unit_kind'] === 'annex' ? 'annex' : 'property') . '-' . (int) $unit['unit_index']; ?>
-                    <article class="grid gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4 md:grid-cols-2">
+                    <?php $igacCategory = $igacCategoryValue($unit); ?>
+                    <article class="grid gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4 md:grid-cols-2"
+                        x-data="{ igacCategory: <?= e(json_encode($igacCategory, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+                            igacHint: <?= e(json_encode((string) ($unit['igac_typology_hint'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?> }">
                         <label class="label">Nombre del componente
                             <input class="input" name="config_units[<?= e($key) ?>][label]" maxlength="120"
                                 value="<?= e($unitDisplay($unit)) ?>" placeholder="Ej. Casa principal, Piscina, Parqueadero 1">
@@ -113,6 +123,41 @@ $treatmentValue = static function (array $unit): string {
                         <?php else: ?>
                             <input type="hidden" name="config_units[<?= e($key) ?>][property_type]" value="">
                         <?php endif; ?>
+                        <?php if (($unit['unit_kind'] ?? '') === 'property'): ?>
+                            <label class="label">Buscador IGAC para unidad principal
+                                <select class="input" name="config_units[<?= e($key) ?>][igac_category]" x-model="igacCategory"
+                                    @change="if (!(typologies[igacCategory] || []).some(item => item.value === igacHint)) igacHint = ''">
+                                    <option value="">Selecciona categoría constructiva</option>
+                                    <?php foreach ($igacCategories as $category): ?>
+                                        <option value="<?= e((string) $category['code']) ?>" <?= $igacCategory === (string) $category['code'] ? 'selected' : '' ?>><?= e((string) $category['name']) ?> · <?= e((string) $category['count']) ?></option>
+                                    <?php endforeach; ?>
+                                </select>
+                            </label>
+                        <?php else: ?>
+                            <input type="hidden" name="config_units[<?= e($key) ?>][igac_category]" value="ANEXOS">
+                            <div class="rounded-lg border border-teal-100 bg-teal-50 p-3 text-sm text-teal-950">
+                                <strong class="block text-xs uppercase text-teal-800">Buscador IGAC para anexos</strong>
+                                Usa la categoría ANEXOS del catálogo IGAC; allí están piscinas, depósitos, kioscos, ramadas y otros componentes.
+                            </div>
+                        <?php endif; ?>
+                        <label class="label">Tipología IGAC de apoyo
+                            <select class="input" name="config_units[<?= e($key) ?>][igac_typology_hint]" x-model="igacHint"
+                                :disabled="!igacCategory" x-init="$el.querySelectorAll('[data-fallback-option]').forEach(option => option.remove())">
+                                <option value="" x-text="igacCategory ? '<?= e($igacSearchPlaceholder($unit)) ?>' : 'Selecciona primero categoría IGAC'"></option>
+                                <?php foreach ($igacOptionsFor($igacCategory) as $option): ?>
+                                    <option data-fallback-option value="<?= e((string) $option['value']) ?>" <?= (string) ($unit['igac_typology_hint'] ?? '') === (string) $option['value'] ? 'selected' : '' ?>>
+                                        <?= e((string) $option['label']) ?>
+                                    </option>
+                                <?php endforeach; ?>
+                                <template x-for="item in (typologies[igacCategory] || [])" :key="item.value">
+                                    <option :value="item.value" x-text="item.label"></option>
+                                </template>
+                            </select>
+                            <span class="mt-1 block text-xs leading-5 text-slate-500" x-show="igacCategory">
+                                <span x-text="(typologies[igacCategory] || []).length"></span>
+                                referencia(s) IGAC disponibles para esta búsqueda.
+                            </span>
+                        </label>
                         <label class="label"><?= ($unit['unit_kind'] ?? '') === 'annex' ? 'Tipo de anexo o mejora' : 'Tipo de construcción' ?>
                             <select class="input" name="config_units[<?= e($key) ?>][construction_type]">
                                 <?php foreach ($constructionTypes as $value => $text): ?>

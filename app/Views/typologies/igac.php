@@ -6,7 +6,7 @@ $activeDocumentCategory = $activeDocumentCategory ?? 'todos';
 $documents = $documents ?? [];
 $documentStats = $documentStats ?? ['documents' => 0, 'topics' => 0];
 ?>
-<section class="space-y-7" x-data="{ query: '' }">
+<section class="space-y-7" x-data="{ docQuery: '', typologyQuery: '' }">
     <div class="flex flex-col gap-5 lg:flex-row lg:items-end lg:justify-between">
         <div>
             <p class="eyebrow">Biblioteca rectora</p>
@@ -16,10 +16,6 @@ $documentStats = $documentStats ?? ['documents' => 0, 'topics' => 0];
                 identificación predial y soporte valuatorio. Cada documento existe una sola vez.
             </p>
         </div>
-        <label class="block min-w-full text-sm font-medium text-slate-700 lg:min-w-80">
-            Buscar en IGAC
-            <input class="input" type="search" placeholder="Código, nombre, tema o módulo" x-model.trim="query">
-        </label>
     </div>
 
     <section class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
@@ -31,6 +27,10 @@ $documentStats = $documentStats ?? ['documents' => 0, 'topics' => 0];
                     La biblioteca queda preparada para nuevas versiones, históricos y más relaciones.
                 </p>
             </div>
+            <label class="block min-w-full text-sm font-medium text-slate-700 lg:min-w-80">
+                Buscar documentos IGAC
+                <input class="input" type="search" placeholder="Resolución, conservación, avalúo..." x-model.trim="docQuery">
+            </label>
             <div class="flex flex-wrap gap-2 text-xs font-semibold">
                 <span class="rounded-full bg-slate-100 px-3 py-1 text-slate-600"><?= e($documentStats['documents']) ?> documento(s)</span>
                 <span class="rounded-full bg-blue-50 px-3 py-1 text-blue-700"><?= e($documentStats['topics']) ?> tema(s)</span>
@@ -62,7 +62,7 @@ $documentStats = $documentStats ?? ['documents' => 0, 'topics' => 0];
             ]));
             ?>
             <article class="rounded-lg border border-slate-200 bg-white p-4 shadow-sm"
-                x-show='query === "" || <?= e(json_encode($term, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>.includes(query.toLowerCase())'>
+                x-show='docQuery === "" || <?= e(json_encode($term, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>.includes(docQuery.toLowerCase())'>
                 <div class="flex flex-wrap items-start justify-between gap-3">
                     <div>
                         <p class="text-anywhere text-sm font-semibold text-teal-800"><?= e((string) $document['codigo']) ?></p>
@@ -103,10 +103,18 @@ $documentStats = $documentStats ?? ['documents' => 0, 'topics' => 0];
     </section>
 
     <section class="rounded-lg border border-slate-200 bg-white p-5 shadow-sm">
-        <h2 class="text-lg font-semibold text-slate-950">Catálogo de tipologías dentro de IGAC</h2>
-        <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            El catálogo operativo conserva sus imágenes y categorías; ahora queda alojado bajo la biblioteca IGAC.
-        </p>
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+            <div>
+                <h2 class="text-lg font-semibold text-slate-950">Catálogo de tipologías dentro de IGAC</h2>
+                <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
+                    El catálogo operativo conserva sus imágenes y categorías; ahora queda alojado bajo la biblioteca IGAC.
+                </p>
+            </div>
+            <label class="block min-w-full text-sm font-medium text-slate-700 lg:min-w-80">
+                Buscar tipologías constructivas
+                <input class="input" type="search" placeholder="Piscina, residencia, depósito, bodega..." x-model.trim="typologyQuery">
+            </label>
+        </div>
     </section>
 
     <nav class="rounded-lg bg-slate-200/70 p-2" aria-label="Categorías de tipologías IGAC">
@@ -137,7 +145,7 @@ $documentStats = $documentStats ?? ['documents' => 0, 'topics' => 0];
                 $imageUrl = url('assets/tipologias-igac/images/' . rawurlencode((string) $typology['image_filename']));
                 ?>
                 <article class="grid min-w-0 max-w-full gap-4 overflow-hidden rounded-lg border border-slate-200 bg-white p-4 shadow-sm sm:grid-cols-[minmax(140px,180px)_minmax(0,1fr)]"
-                    x-show='query === "" || <?= e(json_encode($term, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>.includes(query.toLowerCase())'>
+                    x-show='typologyQuery === "" || <?= e(json_encode($term, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>.includes(typologyQuery.toLowerCase())'>
                     <a class="block aspect-[4/3] w-full self-start overflow-hidden rounded-md border border-slate-200 bg-white" href="<?= e($imageUrl) ?>" target="_blank" rel="noopener" data-no-fetch>
                         <img class="h-full w-full object-contain" src="<?= e($imageUrl) ?>" alt="<?= e($typology['denomination']) ?>" loading="lazy">
                     </a>

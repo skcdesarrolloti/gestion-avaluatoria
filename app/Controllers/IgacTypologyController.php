@@ -12,7 +12,7 @@ final class IgacTypologyController
     {
         $categories = $this->typologies->categories();
         $codes = array_column($categories, 'code');
-        $requested = (string) ($_GET['categoria'] ?? '');
+        $requested = $this->requestedCategory($categories);
         $active = in_array($requested, $codes, true) ? $requested : 'RESIDENCIALES';
         $documentCategories = IgacDocumentLibrary::categories();
         $documentCodes = array_column($documentCategories, 'code');
@@ -29,6 +29,26 @@ final class IgacTypologyController
             'documents' => IgacDocumentLibrary::documents($documentCategory),
             'documentStats' => IgacDocumentLibrary::stats(),
         ]);
+    }
+
+    private function requestedCategory(array $categories): string
+    {
+        $requested = (string) ($_GET['categoria'] ?? ($_GET['tipologia'] ?? ''));
+        $documentFilter = (string) ($_GET['documentos'] ?? '');
+        if ($requested === '' && $documentFilter !== '') $requested = $documentFilter;
+        $needle = $this->normalize($requested);
+        foreach ($categories as $category) {
+            $code = (string) $category['code'];
+            if ($requested === $code || $needle === $this->normalize($code)
+                || str_starts_with($this->normalize((string) $category['name']), $needle)) return $code;
+        }
+        return '';
+    }
+
+    private function normalize(string $value): string
+    {
+        $text = iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', mb_strtolower(trim($value))) ?: mb_strtolower(trim($value));
+        return preg_replace('/[^a-z0-9]+/', '', $text) ?? $text;
     }
 
     public function document(string $id): void

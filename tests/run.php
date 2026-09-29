@@ -262,12 +262,15 @@ try {
     $appraisers = [['id' => 'perito-1', 'code' => '01', 'full_name' => 'Nassif Abuita Nassar']];
     $selectedAppraiser = static fn (string $value): string => $value === 'perito-1' ? 'selected' : '';
     $catalog = ['selects' => \App\Support\AppraisalCatalog::selectFields()];
+    $igacCategories = (new IgacTypologyRepository())->categories();
+    $igacTypologiesByCategory = (new IgacTypologyRepository())->optionsByCategory();
     $units = [
         ['unit_kind' => 'property', 'unit_index' => 1, 'label' => 'Apartamento 301',
             'property_type' => 'apartamento', 'construction_type' => 'apartamento', 'notes' => ''],
         ['unit_kind' => 'annex', 'unit_index' => 1, 'label' => 'Piscina',
             'property_type' => '', 'construction_type' => 'piscina',
-            'valuation_treatment' => 'reposicion', 'notes' => 'Anexo recreativo'],
+            'valuation_treatment' => 'reposicion', 'igac_category' => 'ANEXOS',
+            'igac_typology_hint' => 'Piscina tipo 1', 'notes' => 'Anexo recreativo'],
     ];
     ob_start();
     require BASE_PATH . '/app/Views/appraisals/chapter-zero-configuration-fields.php';
@@ -279,16 +282,23 @@ try {
         && str_contains($configurationViewHtml, 'Definición temprana de unidades y anexos')
         && str_contains($configurationViewHtml, 'config_units[property-1][label]')
         && str_contains($configurationViewHtml, 'Tratamiento en el avalúo')
+        && str_contains($configurationViewHtml, 'Buscador IGAC para unidad principal')
+        && str_contains($configurationViewHtml, 'Buscador IGAC para anexos')
+        && str_contains($configurationViewHtml, 'config_units[annex-1][igac_typology_hint]')
         && str_contains($configurationViewHtml, 'Integrado al inmueble principal')
         && str_contains($configurationViewHtml, 'Piscina'),
         'numeral 1.1 renderiza subpestanas de configuracion');
     $unitDefinitionRows = AppraisalUnitDefinitionInput::rows(['annex-1' => [
         'label' => 'Piscina recreativa', 'property_type' => 'bogus',
-        'construction_type' => 'piscina', 'valuation_treatment' => 'bogus', 'notes' => str_repeat('x', 2100),
+        'construction_type' => 'piscina', 'valuation_treatment' => 'bogus',
+        'igac_category' => 'RESIDENCIALES', 'igac_typology_hint' => 'Piscina tipo 1',
+        'notes' => str_repeat('x', 2100),
     ]]);
     expect($unitDefinitionRows[0]['unit_kind'] === 'annex'
         && $unitDefinitionRows[0]['construction_type'] === 'piscina'
         && $unitDefinitionRows[0]['valuation_treatment'] === 'reposicion'
+        && $unitDefinitionRows[0]['igac_category'] === 'ANEXOS'
+        && $unitDefinitionRows[0]['igac_typology_hint'] === 'Piscina tipo 1'
         && $unitDefinitionRows[0]['property_type'] === ''
         && strlen($unitDefinitionRows[0]['notes']) === 2000,
         'definicion temprana 1.1 normaliza unidades y anexos');
