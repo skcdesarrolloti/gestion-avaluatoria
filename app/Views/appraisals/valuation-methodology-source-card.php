@@ -8,4 +8,5 @@
             <?= e((string) $source['query']) ?>
         </span>
     <?php endif; ?>
+    <span class="mt-2 block text-xs font-semibold text-blue-800">Abrir en otra pestaña y traer solo muestras verificables.</span>
 </a>
