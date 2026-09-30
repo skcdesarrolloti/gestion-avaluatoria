@@ -49,3 +49,18 @@ expect(($refreshed['ph_name'] ?? '') === 'Nombre manual PH'
     && !str_contains((string) ($refreshed['common_areas']['piscina']['notes'] ?? ''), 'Lectura vieja')
     && ($refreshed['report_text'] ?? '') === 'Texto manual libre del analista.',
     'PH refresca matriz documental sin borrar texto manual libre');
+$autoRefreshId = str_repeat('i', 32);
+$phRepo->save($autoRefreshId, 1, array_replace(\App\Support\AppraisalPhCatalog::defaults(), [
+    'ph_name' => 'PH anterior',
+    'report_text' => 'El inmueble objeto de medición se localiza en PH anterior, copropiedad sometida al régimen de propiedad horizontal.',
+    'technical' => ['fuente_documental' => 'lectura-vieja.pdf'],
+]));
+$autoFresh = $analyzer->analyze('Reglamento de propiedad horizontal. Copropiedad TORRE NUEVA. Matricula matriz 060-888999. Cuenta con ascensores y lobby.',
+    ['reglamento-nuevo.pdf'], 'oficinas');
+$phRepo->mergeAnalysis($autoRefreshId, 1, $autoFresh, null, true);
+$autoRefreshed = $phRepo->profile($autoRefreshId, 1);
+$autoReport = (string) ($autoRefreshed['report_text'] ?? '');
+expect(str_contains($autoReport, 'ascensores')
+    && str_contains($autoReport, 'lobby')
+    && ($autoRefreshed['technical']['fuente_documental'] ?? '') === 'reglamento-nuevo.pdf',
+    'PH refresca texto autogenerado del entregable al recalcular soporte');

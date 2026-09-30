@@ -35,7 +35,7 @@ final class AppraisalPhController
             return ($analysis['has_text'] ?? true) === false
                 ? 'Soporte PH cargado, pero no se extrajo texto útil para diligenciar campos.'
                 : '';
-        }, 'Soporte PH analizado. Se llenaron los campos vacíos sugeridos por la lectura preliminar.');
+        }, 'Soporte PH analizado. Se actualizó la ficha y el texto del entregable cuando era autogenerado.');
     }
 
     public function uploadChunk(string $id): never
@@ -56,7 +56,7 @@ final class AppraisalPhController
             return ($analysis['has_text'] ?? true) === false
                 ? 'Soporte PH cargado, pero no se extrajo texto útil para diligenciar campos.'
                 : '';
-        }, 'Soporte PH analizado. Se llenaron los campos vacíos sugeridos por la lectura preliminar.');
+        }, 'Soporte PH analizado. Se actualizó la ficha y el texto del entregable cuando era autogenerado.');
     }
 
     public function deleteDocument(string $id, string $documentId): never
@@ -93,7 +93,7 @@ final class AppraisalPhController
                 $this->user['id'], $typology, $this->ph, $this->version());
             $message = ($analysis['has_text'] ?? true) === false
                 ? 'Soporte PH cargado, pero no se extrajo texto útil para diligenciar campos.'
-                : 'Soporte PH cargado en la ficha. Se llenaron los campos vacíos sugeridos.';
+                : 'Soporte PH cargado en la ficha. Se actualizó la matriz y el texto del entregable cuando era autogenerado.';
             Session::flash('ph_message', $message);
             $this->flashDocumentAction($documentId, 'ok', $message);
         } catch (HttpException $error) { throw $error; } catch (\Throwable $error) { Session::flash('ph_error', $error->getMessage()); }
@@ -108,7 +108,7 @@ final class AppraisalPhController
             $analysis = (new AppraisalPhExternalOcrService())->reanalyze($documentId, $id,
                 $this->user['id'], $typology, $this->ph, $this->version());
             $message = ($analysis['has_text'] ?? false)
-                ? 'OCR externo aplicado. Se llenaron los campos vacíos sugeridos.'
+                ? 'OCR externo aplicado. Se actualizó la matriz y el texto del entregable cuando era autogenerado.'
                 : 'El OCR externo no devolvió texto útil para diligenciar campos.';
             Session::flash('ph_message', $message);
             $this->flashDocumentAction($documentId, 'ok', $message);

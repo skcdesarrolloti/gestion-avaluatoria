@@ -116,7 +116,6 @@ final class AppraisalPhRepository
             WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
         $delete->execute([$id, $appraisalId, $owner]);
         $cleared = !$this->hasDocuments($appraisalId, $owner);
-        // Deleting a source must preserve the analyst's saved work.
         return ['filename' => $filename, 'cleared' => $cleared];
     }
     public function mergeAnalysis(string $appraisalId, int $owner, array $analysis, ?int $expected = null, bool $refreshDocumental = false): void
@@ -131,6 +130,7 @@ final class AppraisalPhRepository
         }
         $data['source_summary'] = (string) ($analysis['summary'] ?? $current['source_summary'] ?? '');
         $data['findings'] = $analysis['findings'] ?? $current['findings'] ?? [];
+        if ($refreshDocumental) $data = $this->withGeneratedReport($data);
         $this->save($appraisalId, $owner, $data, $expected ?? (int) ($current['version'] ?? 0));
     }
     private function documentalCore(array $current, array $incoming): array
