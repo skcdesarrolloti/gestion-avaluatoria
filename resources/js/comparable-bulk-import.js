@@ -84,17 +84,18 @@ function setField(row, key, value) {
     input.value = value;
 }
 
-function fillRows(form, rows, defaultQuery) {
+export function fillRows(form, rows, defaultQuery) {
     const targets = [...form.querySelectorAll('tbody tr')].filter(isBlankRow);
     const known = new Set([...form.querySelectorAll('tbody tr')]
         .map(row => comparableUrlKey(field(row, 'source_url')?.value)).filter(Boolean));
-    let count = 0;
+    let count = 0, firstRow = null;
     let duplicates = 0, overflow = 0;
     rows.forEach(data => {
         const key = comparableUrlKey(data.source_url);
         if (key && known.has(key)) { duplicates++; return; }
         const row = targets.shift();
         if (!row) { overflow++; return; }
+        firstRow ??= row.sectionRowIndex;
         if (key) known.add(key);
         Object.entries(data).forEach(([key, value]) => setField(row, key, value));
         setField(row, 'query_used', defaultQuery);
@@ -102,7 +103,10 @@ function fillRows(form, rows, defaultQuery) {
         setField(row, 'status', 'por_verificar');
         count++;
     });
-    if (count > 0) form.dispatchEvent(new Event('input', { bubbles: true }));
+    if (count > 0) {
+        form.dispatchEvent(new Event('input', { bubbles: true }));
+        form.dispatchEvent(new CustomEvent('comparable-imported', { detail: firstRow }));
+    }
     return { count, duplicates, overflow };
 }
 

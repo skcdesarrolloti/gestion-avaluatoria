@@ -15,6 +15,7 @@ import { installMoneyInputs } from './money-input.js';
 import { installDerivedRefresh } from './derived-refresh.js';
 import { installComparableBulkImport } from './comparable-bulk-import.js';
 import { comparableWorkbench } from './comparable-workbench.js';
+import { installComparableUrlImport } from './comparable-url-import.js';
 
 window.Alpine = Alpine;
 Alpine.data('comparableWorkbench', comparableWorkbench);
@@ -33,4 +34,5 @@ installConservationSummaryLive();
 installMoneyInputs();
 installDerivedRefresh();
 installComparableBulkImport();
+installComparableUrlImport();
 installFetchNavigation();

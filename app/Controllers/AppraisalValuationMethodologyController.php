@@ -54,4 +54,20 @@ final class AppraisalValuationMethodologyController
         $this->appraisals->find($id, $this->user['id']);
         $this->comparables->saveAll($id, $this->user['id'], AppraisalComparableInput::rows($_POST));
     }
+
+    public function readComparable(string $id): never
+    {
+        $this->appraisals->find($id, $this->user['id']);
+        (new \App\Services\RateLimiter(BASE_PATH . '/storage/rate-limits'))->consume('comparable-reader:' . $this->user['id'], 60, 900);
+        try {
+            $url = $_POST['source_url'] ?? '';
+            if (!is_string($url)) throw new \InvalidArgumentException('El enlace debe ser texto.');
+            $result = (new \App\Services\FincaraizListingReader())->read($url);
+            Http::json(['ok' => true] + $result);
+        } catch (\InvalidArgumentException $error) {
+            Http::json(['ok' => false, 'message' => $error->getMessage()], 422);
+        } catch (\RuntimeException $error) {
+            Http::json(['ok' => false, 'message' => $error->getMessage()], 502);
+        }
+    }
 }

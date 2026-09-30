@@ -7,7 +7,7 @@ $bulkQuery = trim((string) ($baseQuery ?? ''));
         <summary class="min-h-11 cursor-pointer font-semibold text-teal-950">Guía: del aviso a la muestra y su soporte</summary>
         <ol class="mt-3 space-y-2 text-sm leading-6 text-slate-700">
             <li><strong>1. Buscar:</strong> usa el enlace de búsqueda conjunta o los filtros del portal: operación, ciudad, barrio, tipo de inmueble y alcobas. La consulta del sistema es una búsqueda, no una instrucción de IA para el portal.</li>
-            <li><strong>2. Abrir el aviso:</strong> copia su enlace y el texto de la ficha (precio, áreas y características). Pégalos juntos abajo. Un enlace solo no extrae esos datos.</li>
+            <li><strong>2. Abrir el aviso:</strong> en FincaRaíz, copia el enlace del inmueble y usa «Leer aviso» arriba. En otros portales, copia enlace y texto (precio, áreas y características) y pégalos juntos abajo.</li>
             <li><strong>3. Cargar:</strong> pulsa «Cargar en filas vacías». Se prellenan los datos que el lector reconozca; lo no reconocido se revisa en la ficha. Para varios avisos, separa cada uno con una línea vacía.</li>
             <li><strong>4. Revisar:</strong> recorre Captura básica, Ubicación, Atributos y Revisión. Son grupos de la misma muestra. No completes con suposiciones datos que el aviso no informa.</li>
             <li><strong>5. Conservar soporte:</strong> guarda una captura o PDF del aviso donde se vean precio, ubicación, áreas y características, junto con URL y fecha. Una foto del inmueble sola no documenta el precio anunciado. Esta captura de datos todavía no adjunta imágenes ni PDF a la muestra.</li>
@@ -17,7 +17,7 @@ $bulkQuery = trim((string) ($baseQuery ?? ''));
     <div class="grid gap-4 lg:grid-cols-[1fr_320px]">
         <div>
             <p class="eyebrow text-teal-800">Captura rápida</p>
-            <h4 class="mt-2 text-lg font-semibold text-teal-950">Pega avisos o filas y el sistema llena la tabla</h4>
+            <h4 class="mt-2 text-lg font-semibold text-teal-950">Alternativa: pegar texto de avisos o filas</h4>
             <p class="mt-2 text-sm leading-6 text-teal-950">
                 No empieces moviendo la barra horizontal. Copia texto de un aviso, varios enlaces o filas desde Excel/Sheets;
                 luego pulsa cargar y revisa las filas creadas en la tabla madre.

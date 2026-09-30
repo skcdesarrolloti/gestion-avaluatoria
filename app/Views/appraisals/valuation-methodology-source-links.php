@@ -28,7 +28,7 @@ $linkButton = static function (array $source, string $tone = 'blue'): void {
     <div class="flex flex-wrap items-start justify-between gap-3">
         <div>
             <p class="text-xs font-bold uppercase text-blue-800">Abrir fuentes de mercado</p>
-            <h3 class="mt-1 text-lg font-semibold text-blue-950">Una búsqueda para explorar varios portales</h3>
+            <h3 class="mt-1 text-lg font-semibold text-blue-950">Búsquedas adaptadas a cada portal</h3>
         </div>
         <?php if ($baseQuery !== ''): ?>
             <button type="button" class="btn-secondary min-h-9 text-xs"
@@ -49,7 +49,13 @@ $linkButton = static function (array $source, string $tone = 'blue'): void {
         <div>
             <p class="text-xs font-bold uppercase text-blue-800">Portales</p>
             <div class="mt-2 flex flex-wrap gap-2">
-                <?php foreach ($portalLinks as $source): $linkButton($source); endforeach; ?>
+                <?php foreach ($portalLinks as $source): ?>
+                    <div class="w-full rounded-lg bg-white p-3">
+                        <?php $linkButton($source); ?>
+                        <p class="mt-1 text-xs font-semibold"><?= e($source['kind'] ?? 'Búsqueda en Google') ?></p>
+                        <p class="mt-1 text-sm"><?= e($source['instruction'] ?? 'Abre un aviso y comprueba sus datos.') ?></p>
+                    </div>
+                <?php endforeach; ?>
             </div>
         </div>
         <div>

@@ -34,6 +34,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
 <form id="tabla-madre-83" class="mt-6 scroll-mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" method="post"
     action="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables')) ?>"
     x-data="comparableWorkbench" :data-comparable-mode="mode" @input="refresh()" @change="refresh()"
+    @comparable-imported="showImported($event.detail)"
     data-module-autosave data-save-in-place
     data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/autoguardar')) ?>">
     <?= csrf_field() ?>
@@ -52,6 +53,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
             <button type="submit" class="btn-primary min-h-11">Guardar captura</button>
         </div>
     </div>
+    <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-url.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-bulk.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-tools.php'; ?>
     <div class="comparable-grid mt-4 overflow-x-auto rounded-xl border border-slate-200" x-ref="grid"

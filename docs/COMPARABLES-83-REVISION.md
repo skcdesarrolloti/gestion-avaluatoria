@@ -83,7 +83,38 @@ Antes de presentar un anexo definitivo se requiere cerrar:
 5. Transporte de lotes grandes: revisar `max_input_vars` en hosting, dado que el
    formulario existente envía todos los campos, incluso los ocultos por paginación.
 
-## Validación
+## Lectura por enlace y búsquedas por portal (30/09/2026)
+
+- Nuevo bloque «Leer un aviso por enlace · FincaRaíz»: pegar enlace individual,
+  leer, revisar vista previa e incorporar como `por_verificar`. La incorporación
+  usa filas vacías, omite enlaces repetidos y muestra la página de la nueva ficha.
+- Servicio PHP lee JSON-LD público. Probado con el aviso 194234202: COP 3.300.000.000,
+  340 m² publicados, 5 alcobas, 6 baños, dirección, fecha, barrio y código. Es una
+  prueba de extracción, no una selección como comparable de la oficina del expediente.
+- Precio solo si la moneda publicada es COP; área solo en MTK. La clase de área,
+  vigencia, ubicación, duplicados entre portales y criterio técnico se verifican.
+  Los datos ausentes no se completan por suposición. No adjunta fotos ni PDF.
+- POST protegido `comparables/leer-aviso`: sesión, CSRF y propiedad del expediente
+  antes de leer. No escribe comparables. Allowlist HTTPS FincaRaíz, DNS público
+  fijado a la conexión, sin redirecciones, TLS verificado, límite 2 MB y 20 s.
+  Límite por usuario: 60 lecturas/15 minutos. Requiere PHP cURL y salida HTTPS.
+- FincaRaíz oficinas venta Cartagena/Castillogrande y casas venta Castillogrande
+  tienen enlace nativo verificado. Metrocuadrado y Ciencuadras: oficinas venta
+  Cartagena; el barrio queda explícitamente pendiente en esos enlaces. Resto de
+  combinaciones conserva Google identificado como tal, sin inventar filtros.
+- La consulta usa tipología exacta; oficina ya no agrega consultorio ni edificio.
+  No agrega localidad si ya hay barrio. No se modifican fórmulas ni criterios 8.4.
+- Otros portales todavía requieren enlace + texto en la captura manual.
+- Validación de esta actualización: 341 verificaciones PHP, 57 pruebas JS, lint
+  de 485 PHP, build y tamaño 48,8 KB gzip. Lectura HTTP real y prellenado probados
+  en vista local sin persistencia; no se ejecutaron migraciones ni pruebas de BD.
+  Los pendientes de concurrencia, transporte y anexos mencionados arriba siguen vigentes.
+- Navegador: vista previa, prellenado, salto a la ficha, rechazo de duplicado y de
+  portal no admitido; móvil 390 px y escritorio sin desbordamiento del documento.
+- Publicar PHP, vistas, rutas y assets compilados juntos. El push al repositorio
+  no sustituye el despliegue manual del hosting.
+
+## Validación previa de fichas y pegado de texto
 
 - Lint PHP: 475 archivos correctos.
 - `php tests/run.php`: 320 verificaciones correctas.

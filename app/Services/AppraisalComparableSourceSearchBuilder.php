@@ -11,28 +11,17 @@ final class AppraisalComparableSourceSearchBuilder
         $locality = $this->first($subject['locality_name'] ?? '', $subject['midas_locality'] ?? '');
         $operation = $this->operation((string) ($record['tipo_negocio'] ?? ''), $businessLabel);
         $typeTerms = $this->typeTerms($type, $typeLabel);
-        $terms = array_values(array_filter([$operation, $typeTerms, $neighborhood, $locality, $city, 'Colombia']));
+        $terms = array_values(array_filter([$operation, $typeTerms, $neighborhood ?: $locality, $city]));
         $query = implode(' ', $terms);
         return [
             'city' => $city,
             'neighborhood' => $neighborhood,
             'query' => $query,
             'query_parts' => $this->queryParts($operation, $typeTerms, $neighborhood, $locality, $city),
-            'portal_sources' => $this->portalSources($query),
+            'portal_sources' => (new ComparablePortalLinks())->build($query, $operation, $type, $city, $neighborhood),
             'agency_sources' => $this->agencySources($query, $city),
             'official_sources' => $this->officialSources($query, $city, $neighborhood, $subject),
             'capture_protocol' => $this->captureProtocol($operation),
-        ];
-    }
-
-    private function portalSources(string $query): array
-    {
-        return [
-            $this->source('FincaRaiz', 'Portal inmobiliario', 'site:fincaraiz.com.co ' . $query),
-            $this->source('Metrocuadrado', 'Portal inmobiliario', 'site:metrocuadrado.com ' . $query),
-            $this->source('Ciencuadras', 'Portal inmobiliario', 'site:ciencuadras.com ' . $query),
-            $this->source('Properati', 'Portal inmobiliario', 'site:properati.com.co ' . $query),
-            $this->source('Mercado Libre Inmuebles', 'Portal / clasificados', 'site:inmuebles.mercadolibre.com.co ' . $query),
         ];
     }
 
@@ -126,7 +115,7 @@ final class AppraisalComparableSourceSearchBuilder
     private function operation(string $key, string $label): string
     {
         return match ($key) {
-            'arriendo' => 'arriendo alquiler',
+            'arriendo' => 'arriendo',
             'venta' => 'venta',
             default => trim($label) !== '' ? mb_strtolower($label) : 'venta arriendo',
         };
@@ -135,8 +124,8 @@ final class AppraisalComparableSourceSearchBuilder
     private function typeTerms(string $type, string $label): string
     {
         return match ($type) {
-            'oficina' => 'oficina consultorio edificio empresarial',
-            'consultorio' => 'consultorio oficina servicios salud',
+            'oficina' => 'oficina',
+            'consultorio' => 'consultorio',
             'local' => 'local comercial',
             'bodega' => 'bodega industrial logística',
             'lote' => 'lote terreno',

@@ -104,6 +104,13 @@ export function comparableWorkbench() {
             this.render();
             this.$nextTick(() => entry.tr.querySelector('select')?.focus());
         },
+        showImported(index) {
+            this.filter = 'all'; this.search = ''; this.group = 'capture';
+            const entry = entries[index];
+            this.page = Math.floor(entries.filter(e => e.used || e.opened).indexOf(entry) / 5) + 1;
+            this.render();
+            this.$nextTick(() => entry?.tr.scrollIntoView({ behavior: 'smooth', block: 'center' }));
+        },
         syncWidth() { this.$refs.track.style.width = `${this.$refs.grid.scrollWidth}px`; },
     };
 }
