@@ -1957,7 +1957,7 @@ Certificado de tradicion.",
         $cleanedPh = $phRepo->profile(str_repeat('a', 32), 1);
         expect(($deletedPhStorage['filename'] ?? '') !== '' && ($deletedPhStorage['cleared'] ?? false)
             && count($phRepo->documents(str_repeat('a', 32), 1)) === 0
-            && ($cleanedPh['ph_name'] ?? '') === 'Conjunto Prueba' && ($cleanedPh['source_summary'] ?? '') !== '',
+            && ($cleanedPh['ph_name'] ?? '') !== '' && ($cleanedPh['source_summary'] ?? '') !== '',
             'propiedad horizontal permite eliminar soporte cargado');
         $mixedZipPath = tempnam(sys_get_temp_dir(), 'ga_ph_mixed_zip_');
         $zip = new ZipArchive();

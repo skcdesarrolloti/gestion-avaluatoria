@@ -136,13 +136,12 @@ final class AppraisalPhRepository
     private function documentalCore(array $current, array $incoming): array
     {
         $merged = [];
-        foreach (['regulation_document', 'reform_documents', 'reserve_fund', 'insurance_status', 'restrictions_text'] as $key) {
+        foreach (['ph_name', 'ph_key', 'ph_typology', 'matrix_registration', 'administration_name', 'administration_contact',
+            'administration_phone', 'administration_email', 'regulation_document', 'reform_documents', 'reserve_fund', 'insurance_status', 'restrictions_text'] as $key) {
             if (!$this->emptyValue($incoming[$key] ?? '')) $merged[$key] = $incoming[$key];
         }
         foreach (['diagnosis_text', 'report_text'] as $key) {
-            if (!$this->emptyValue($incoming[$key] ?? '') && AppraisalPhGeneratedText::replaceable((string) ($current[$key] ?? ''))) {
-                $merged[$key] = $incoming[$key];
-            }
+            if (!$this->emptyValue($incoming[$key] ?? '') && AppraisalPhGeneratedText::replaceable((string) ($current[$key] ?? ''))) $merged[$key] = $incoming[$key];
         }
         return $merged;
     }

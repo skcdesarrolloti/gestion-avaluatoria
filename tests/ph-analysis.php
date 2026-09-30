@@ -60,7 +60,9 @@ $autoFresh = $analyzer->analyze('Reglamento de propiedad horizontal. Copropiedad
 $phRepo->mergeAnalysis($autoRefreshId, 1, $autoFresh, null, true);
 $autoRefreshed = $phRepo->profile($autoRefreshId, 1);
 $autoReport = (string) ($autoRefreshed['report_text'] ?? '');
-expect(str_contains($autoReport, 'ascensores')
+expect(($autoRefreshed['ph_name'] ?? '') === 'Copropiedad TORRE NUEVA'
+    && str_contains($autoReport, 'TORRE NUEVA')
     && str_contains($autoReport, 'lobby')
+    && !str_contains($autoReport, 'PH anterior')
     && ($autoRefreshed['technical']['fuente_documental'] ?? '') === 'reglamento-nuevo.pdf',
-    'PH refresca texto autogenerado del entregable al recalcular soporte');
+    'PH refresca identidad y texto autogenerado del entregable al recalcular soporte');

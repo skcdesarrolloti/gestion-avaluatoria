@@ -9,7 +9,7 @@ final class AppraisalPhIdentityExtractor
         $core = [];
         $text = preg_replace('/\[(?:Documento: [^\]]+|Cobertura: [^\]]+|Página \d+)\]/u', '', $text) ?? $text;
         $joined = preg_replace('/\s+/u', ' ', $text) ?? $text;
-        preg_match_all('/\b(?:EDIFICIO|CONJUNTO|COPROPIEDAD|CENTRO COMERCIAL)\s+["“]?([A-ZÁÉÍÓÚÑ0-9][A-ZÁÉÍÓÚÑ0-9 -]{3,90})/u', $joined, $matches);
+        preg_match_all('/\b(?:EDIFICIO|CONJUNTO|COPROPIEDAD|CENTRO COMERCIAL)\s+["“]?([A-ZÁÉÍÓÚÑ0-9][A-ZÁÉÍÓÚÑ0-9 -]{3,90})/iu', $joined, $matches);
         $names = [];
         foreach ($matches[0] as $name) {
             $name = trim(preg_split('/\s+(?:PROPIEDAD HORIZONTAL|P\.?H\.?|ARTICULO|ARTÍCULO|EL|LA|DE LA|NIT)\b/u', $name)[0], ' .-');
