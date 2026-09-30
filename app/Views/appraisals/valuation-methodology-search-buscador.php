@@ -15,7 +15,7 @@ $explorationSteps = [
 $tip = static fn (string $text): string => '<span class="help-dot" title="' . e($text) . '">?</span>';
 ?>
 <div class="rounded-xl border border-blue-100 bg-blue-50 p-4">
-    <p class="text-xs font-bold uppercase text-blue-800">Buscador 8.3 asistido por el bien sujeto <?= $tip('Este bloque no descarga datos automáticamente. Te arma la consulta base y las fuentes para abrirlas, filtrar y escoger ofertas verificables.') ?></p>
+    <p class="text-xs font-bold uppercase text-blue-800">Buscador 8.3 asistido por el bien sujeto <?= $tip('Origen: datos del expediente, bien sujeto y selección metodológica. Genera una consulta base; no descarga datos automáticamente. Luego diligencias resultados en 2. Capturar.') ?></p>
     <h3 class="mt-2 text-xl font-semibold text-blue-950">Consulta base para portales e inmobiliarias</h3>
     <p class="mt-2 text-sm leading-6 text-blue-950">
         La consulta se arma con operación, tipología, barrio, localidad y ciudad del inmueble. Primero revisa
@@ -49,7 +49,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
     </div>
 
     <div class="mt-4">
-        <p class="text-xs font-bold uppercase text-blue-800">Portales inmobiliarios <?= $tip('Abre cada fuente, copia los datos del aviso comparable y vuelve a Capturar. La trazabilidad queda en enlace, fecha de consulta y observación.') ?></p>
+        <p class="text-xs font-bold uppercase text-blue-800">Portales inmobiliarios <?= $tip('Origen: catálogo interno de fuentes de mercado. Abre cada fuente, copia los datos del aviso comparable y vuelve a 2. Capturar; la trazabilidad queda en enlace, fecha y observación.') ?></p>
         <div class="mt-3 grid gap-3 md:grid-cols-2">
             <?php foreach ($portalSources as $source): ?>
                 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-card.php'; ?>
@@ -59,7 +59,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
 
     <?php if ($agencySources !== []): ?>
         <div class="mt-5">
-            <p class="text-xs font-bold uppercase text-blue-800">Inmobiliarias recomendadas para Cartagena, en orden de prioridad <?= $tip('Úsalas para confirmar inventario local, datos de contacto y ofertas que tal vez no aparecen bien indexadas en portales masivos.') ?></p>
+            <p class="text-xs font-bold uppercase text-blue-800">Inmobiliarias recomendadas para Cartagena, en orden de prioridad <?= $tip('Origen: catálogo local de inmobiliarias según ciudad. Úsalas para confirmar inventario, contacto y ofertas que tal vez no aparecen bien en portales masivos.') ?></p>
             <div class="mt-3 grid gap-3 md:grid-cols-2">
                 <?php foreach ($agencySources as $source): ?>
                     <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-card.php'; ?>

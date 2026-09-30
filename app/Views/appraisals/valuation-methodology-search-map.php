@@ -32,7 +32,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
 <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">Mapa de muestras seleccionadas <?= $tip('El mapa se dibuja automáticamente con las filas activas que tengan latitud y longitud. Si está vacío, vuelve a Capturar y completa esas columnas.') ?></p>
+            <p class="eyebrow">Mapa de muestras seleccionadas <?= $tip('Origen: columnas Latitud, Longitud y Precisión mapa en 2. Capturar muestras. El mapa se dibuja automáticamente con filas activas que tengan coordenadas.') ?></p>
             <h3 class="mt-2 text-xl font-semibold">Concentración espacial del mercado</h3>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Registra latitud y longitud en Captura para ver si las muestras realmente rodean el bien sujeto
