@@ -1,4 +1,5 @@
 @import "tailwindcss" source(none);
+@import "./comparables.css";
 @source "../../app/Views";
 @source "../js";
 

@@ -1,12 +1,16 @@
+import { comparableUrlKey, hasComparableData } from './comparable-review.js';
+
 export function parseComparableBlock(block) {
     const text = String(block ?? '').replace(/\r/g, '').trim();
     if (!text) return {};
     const url = (text.match(/https?:\/\/[^\s)]+/i)?.[0] ?? '').replace(/[.,;]+$/, '');
     const price = text.match(/(?:\$|cop\s*)\s*[\d.,]{5,}/i)?.[0] ?? '';
     const area = text.match(/(\d+(?:[.,]\d+)?)\s*(?:m2|m²|mt2|metros?\s*cuadrados?)/i)?.[1] ?? '';
-    const phone = text.match(/(?:\+?57\s*)?(?:3\d{9}|60\d{8}|[1-9]\d{6,9})/)?.[0] ?? '';
+    const phone = text.replace(/https?:\/\/\S+/gi, '').replace(/(?:\$|cop\s*)\s*[\d.,]+/gi, '')
+        .match(/(?:tel[eé]fono|tel|celular|contacto|whatsapp)\s*[:.]?\s*(\+?[\d ()-]{7,20})/i)?.[1]?.trim() ?? '';
     const lower = text.toLowerCase();
-    const hostname = url ? new URL(url).hostname.replace(/^www\./, '') : '';
+    let hostname = '';
+    try { hostname = url ? new URL(url).hostname.replace(/^www\./, '') : ''; } catch { /* Keep unrecognized text for review. */ }
     const operation = /arriendo|canon|renta/.test(lower) ? 'Arriendo' : (/venta|vende|precio/.test(lower) ? 'Venta' : '');
     const priceUnit = operation === 'Arriendo' ? 'canon_mensual' : (price ? 'precio_total' : '');
     const project = text.split('\n').find(line => /edificio|conjunto|proyecto|condominio|torre/i.test(line)) ?? '';
@@ -29,23 +33,25 @@ export function parseComparableText(text) {
     if (!raw) return [];
     const lines = raw.split(/\n+/).filter(line => line.trim() !== '');
     const tabular = lines.filter(line => line.includes('\t'));
-    if (tabular.length > 1) return tabular.map(line => parseTabularLine(line)).filter(row => meaningful(row));
+    if (tabular.length) return parseTabularRows(tabular);
     const blocks = raw.split(/\n\s*\n/).flatMap(block => splitMultiUrlBlock(block));
     return blocks.map(parseComparableBlock).filter(row => meaningful(row));
 }
 
-function parseTabularLine(line) {
-    const cells = line.split('\t').map(cell => cell.trim());
-    const block = cells.join('\n');
-    const parsed = parseComparableBlock(block);
-    return {
-        ...parsed,
-        source_name: cells[0] || parsed.source_name,
-        source_url: cells.find(cell => /^https?:\/\//i.test(cell)) || parsed.source_url,
-        price_amount: cells.find(cell => /(?:\$|cop\s*)?\s*[\d.,]{5,}/i.test(cell)) || parsed.price_amount,
-        area_m2: cells.find(cell => /\d+(?:[.,]\d+)?\s*(?:m2|m²|mt2)?$/i.test(cell)) || parsed.area_m2,
-        comparability_notes: block.replace(/\s+/g, ' ').slice(0, 500),
-    };
+function parseTabularRows(lines) {
+    const aliases = { fuente: 'source_name', enlace: 'source_url', url: 'source_url', precio: 'price_amount',
+        canon: 'price_amount', area: 'area_m2', 'area m2': 'area_m2', telefono: 'contact_phone',
+        barrio: 'neighborhood', sector: 'neighborhood', operacion: 'operation', proyecto: 'project_name' };
+    const normalize = text => text.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+    const headers = lines[0].split('\t').map(cell => aliases[normalize(cell)] ?? '');
+    const hasHeaders = headers.filter(Boolean).length >= 2;
+    return lines.slice(hasHeaders ? 1 : 0).map(line => {
+        const cells = line.split('\t').map(cell => cell.trim());
+        const parsed = parseComparableBlock(cells.join('\n'));
+        if (hasHeaders) headers.forEach((key, index) => { if (key) parsed[key] = cells[index] ?? ''; });
+        // Bare numbers are ambiguous without column headers; leave them for review.
+        return parsed;
+    }).filter(meaningful);
 }
 
 function splitMultiUrlBlock(block) {
@@ -67,8 +73,8 @@ function field(row, key) {
 }
 
 function isBlankRow(row) {
-    return ['source_name', 'source_url', 'price_amount', 'area_m2', 'neighborhood', 'project_name', 'comparability_notes']
-        .every(key => String(field(row, key)?.value ?? '').trim() === '');
+    return !hasComparableData(Object.fromEntries([...row.querySelectorAll('[name]')]
+        .map(input => [input.name.match(/\[([^\]]+)\]$/)[1], input.value])));
 }
 
 function setField(row, key, value) {
@@ -80,10 +86,16 @@ function setField(row, key, value) {
 
 function fillRows(form, rows, defaultQuery) {
     const targets = [...form.querySelectorAll('tbody tr')].filter(isBlankRow);
+    const known = new Set([...form.querySelectorAll('tbody tr')]
+        .map(row => comparableUrlKey(field(row, 'source_url')?.value)).filter(Boolean));
     let count = 0;
+    let duplicates = 0, overflow = 0;
     rows.forEach(data => {
+        const key = comparableUrlKey(data.source_url);
+        if (key && known.has(key)) { duplicates++; return; }
         const row = targets.shift();
-        if (!row) return;
+        if (!row) { overflow++; return; }
+        if (key) known.add(key);
         Object.entries(data).forEach(([key, value]) => setField(row, key, value));
         setField(row, 'query_used', defaultQuery);
         setField(row, 'active', 'si');
@@ -91,7 +103,7 @@ function fillRows(form, rows, defaultQuery) {
         count++;
     });
     if (count > 0) form.dispatchEvent(new Event('input', { bubbles: true }));
-    return count;
+    return { count, duplicates, overflow };
 }
 
 export function installComparableBulkImport() {
@@ -103,8 +115,10 @@ export function installComparableBulkImport() {
         const input = panel?.querySelector('[data-comparable-bulk-input]');
         const message = panel?.querySelector('[data-comparable-bulk-message]');
         const rows = parseComparableText(input?.value ?? '');
-        const count = form ? fillRows(form, rows, panel?.dataset?.defaultQuery ?? '') : 0;
-        if (message) message.textContent = count ? `${count} fila(s) cargada(s). Revisa y guarda.` : 'Pega enlaces, texto de avisos o filas con datos antes de cargar.';
+        const result = form ? fillRows(form, rows, panel?.dataset?.defaultQuery ?? '') : { count: 0, duplicates: 0, overflow: 0 };
+        if (message) message.textContent = rows.length
+            ? `${result.count} muestra(s) cargada(s), pendientes de revisión. ${result.duplicates} enlace(s) repetido(s) omitido(s). ${result.overflow} sin cargar por límite de 60. El texto original se conserva; consulta el estado de guardado.`
+            : 'Pega enlaces, texto de avisos o filas con datos antes de cargar.';
         form?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
 }

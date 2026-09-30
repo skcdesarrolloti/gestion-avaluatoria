@@ -14,8 +14,10 @@ import { installConservationSummaryLive } from './conservation-summary-live.js';
 import { installMoneyInputs } from './money-input.js';
 import { installDerivedRefresh } from './derived-refresh.js';
 import { installComparableBulkImport } from './comparable-bulk-import.js';
+import { comparableWorkbench } from './comparable-workbench.js';
 
 window.Alpine = Alpine;
+Alpine.data('comparableWorkbench', comparableWorkbench);
 Alpine.data('appraisalForm', appraisalForm);
 Alpine.data('photoUpload', photoUpload);
 Alpine.data('sectorBankTabs', sectorBankTabs);

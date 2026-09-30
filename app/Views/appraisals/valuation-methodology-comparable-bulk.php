@@ -12,11 +12,11 @@ $bulkQuery = trim((string) ($baseQuery ?? ''));
                 luego pulsa cargar y revisa las filas creadas en la tabla madre.
             </p>
             <label class="mt-4 block text-sm font-semibold text-teal-950" for="bulk-comparable-text">Texto, enlaces o filas copiadas</label>
-            <textarea id="bulk-comparable-text" class="input min-h-36 bg-white text-sm leading-6" data-comparable-bulk-input
+            <textarea id="bulk-comparable-text" class="input min-h-36 bg-white text-sm leading-6" data-comparable-bulk-input @input.stop @change.stop
                 placeholder="Pega aquí uno o varios avisos. Ejemplo: enlace, precio, área, edificio, barrio, teléfono u observaciones. También puedes pegar filas copiadas de Excel o Google Sheets."></textarea>
             <div class="mt-3 flex flex-wrap items-center gap-3">
                 <button type="button" class="btn-primary min-h-11" data-comparable-bulk-apply>Cargar en filas vacías</button>
-                <span class="text-sm font-semibold text-teal-800" data-comparable-bulk-message></span>
+                <span class="text-sm font-semibold text-teal-800" role="status" data-comparable-bulk-message></span>
             </div>
         </div>
         <div class="rounded-lg bg-white p-4 text-sm leading-6 text-slate-700">
@@ -28,7 +28,8 @@ $bulkQuery = trim((string) ($baseQuery ?? ''));
                 <li>Operación venta/arriendo cuando el texto la menciona.</li>
             </ul>
             <p class="mt-3 text-xs font-semibold uppercase text-slate-500">Después</p>
-            <p class="mt-1">Solo completas lo que falte: factor 8.4, coordenadas, estado y observación técnica.</p>
+            <p class="mt-1">Separa los avisos con una línea vacía. Para Excel/Sheets incluye encabezados: Fuente, Enlace, Precio, Área, Teléfono, Barrio. Un enlace solo no descarga los datos del aviso.</p>
+            <p class="mt-2">Revisa los valores extraídos y completa los pendientes. Los enlaces repetidos se omiten; un mismo inmueble publicado en portales diferentes requiere revisión manual.</p>
         </div>
     </div>
 </section>

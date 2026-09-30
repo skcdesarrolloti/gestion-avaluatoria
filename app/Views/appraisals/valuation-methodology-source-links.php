@@ -28,7 +28,7 @@ $linkButton = static function (array $source, string $tone = 'blue'): void {
     <div class="flex flex-wrap items-start justify-between gap-3">
         <div>
             <p class="text-xs font-bold uppercase text-blue-800">Abrir fuentes de mercado</p>
-            <h3 class="mt-1 text-lg font-semibold text-blue-950">Primero abre estos enlaces; luego pegas lo encontrado</h3>
+            <h3 class="mt-1 text-lg font-semibold text-blue-950">Una búsqueda para explorar varios portales</h3>
         </div>
         <?php if ($baseQuery !== ''): ?>
             <button type="button" class="btn-secondary min-h-9 text-xs"
@@ -40,6 +40,11 @@ $linkButton = static function (array $source, string $tone = 'blue'): void {
     <code class="text-anywhere mt-3 block rounded-lg bg-white p-3 font-mono text-sm font-semibold text-slate-900">
         <?= e($baseQuery ?: 'Búsqueda base pendiente: completa tipología, operación, ciudad y barrio para afinarla.') ?>
     </code>
+    <?php if ($baseQuery !== ''): ?>
+        <a class="btn-primary mt-3" target="_blank" rel="noopener"
+            href="<?= e('https://www.google.com/search?q=' . rawurlencode($baseQuery . ' (site:fincaraiz.com.co OR site:metrocuadrado.com OR site:ciencuadras.com OR site:properati.com.co OR site:inmuebles.mercadolibre.com.co)')) ?>">Buscar en todos los portales</a>
+        <p class="mt-2 text-sm text-blue-950">Abre una consulta conjunta en Google. Los resultados dependen de su índice; no descarga avisos ni confirma su vigencia. Copia varios avisos y cárgalos juntos abajo.</p>
+    <?php endif; ?>
     <div class="mt-4 grid gap-4 lg:grid-cols-2">
         <div>
             <p class="text-xs font-bold uppercase text-blue-800">Portales</p>

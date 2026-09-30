@@ -33,6 +33,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
 ?>
 <form id="tabla-madre-83" class="mt-6 scroll-mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" method="post"
     action="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables')) ?>"
+    x-data="comparableWorkbench" :data-comparable-mode="mode" @input="refresh()" @change="refresh()"
     data-module-autosave data-save-in-place
     data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/autoguardar')) ?>">
     <?= csrf_field() ?>
@@ -43,7 +44,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Diligencia una fila por cada oferta, transacción o dato de mercado. El sujeto queda fuera de esta tabla:
                 aquí solo van las muestras comparables que luego pasarán a depuración, variables, mapa y fórmulas.
-                Se habilitan 60 filas para construir una base amplia antes de seleccionar las usadas.
+                Captura hasta 60 muestras en fichas de cinco en cinco y revisa los pendientes por grupo de campos.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
@@ -52,7 +53,9 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
         </div>
     </div>
     <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-bulk.php'; ?>
-    <div class="mt-4 overflow-x-auto rounded-xl border border-slate-200">
+    <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-tools.php'; ?>
+    <div class="comparable-grid mt-4 overflow-x-auto rounded-xl border border-slate-200" x-ref="grid"
+        @scroll="$refs.topScroll.scrollLeft = $el.scrollLeft">
         <table class="min-w-[4700px] divide-y divide-slate-200 text-left text-sm">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-table-head.php'; ?>
             <tbody class="divide-y divide-slate-100">
