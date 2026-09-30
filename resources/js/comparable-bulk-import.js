@@ -85,7 +85,7 @@ function setField(row, key, value) {
     input.value = value;
 }
 
-export function fillRows(form, rows, defaultQuery) {
+export function fillRows(form, rows, defaultQuery, confirmDistinct) {
     const existing = [...form.querySelectorAll('tbody tr')].map(row => Object.fromEntries([...row.querySelectorAll('[name]')]
         .map(input => [input.name.match(/\[([^\]]+)\]$/)[1], input.value])));
     const targets = [...form.querySelectorAll('tbody tr')].filter(isBlankRow);
@@ -96,7 +96,7 @@ export function fillRows(form, rows, defaultQuery) {
     rows.forEach(data => {
         const key = comparableUrlKey(data.source_url);
         if (key && known.has(key)) { duplicates++; return; }
-        const review = checkComparableDuplicates(data, existing);
+        const review = checkComparableDuplicates(data, existing, confirmDistinct ? message => confirmDistinct(data, message) : undefined);
         if (review.blocked) { review.exact ? duplicates++ : suspected++; return; }
         const row = targets.shift();
         if (!row) { overflow++; return; }

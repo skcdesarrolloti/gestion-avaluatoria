@@ -1,9 +1,20 @@
 import { fillRows } from './comparable-bulk-import.js';
+import { candidateMatches, matrixRows, unresolvedCandidates } from './comparable-candidate-review.js';
 
 export function fincaraizAreaSearch() {
     let panel, form;
     return {
         phFilter: 'all',
+        refreshDuplicates() {
+            const matches = candidateMatches(this.results, matrixRows(form));
+            this.results.forEach((item, index) => {
+                const signature = JSON.stringify(matches[index]);
+                if (signature !== item.matchSignature) item.distinct = false;
+                item.matchSignature = signature;
+                item.matches = matches[index];
+                item.number = index + 1;
+            });
+        },
         get visibleResults() { return this.results.filter(item => this.phFilter === 'all' || (item.row.ph_regime || 'por_verificar') === this.phFilter); },
         neighborhood: '', neighborhoodId: '', neighborhoods: [], results: [], selected: [], busy: false, page: 1, hasNext: false, message: '', resultUrl: '',
         init() {
@@ -40,15 +51,24 @@ export function fincaraizAreaSearch() {
                 const data = await response.json();
                 if (!response.ok || !data.ok) throw new Error(data.message || 'No se pudo consultar el portal.');
                 this.results = data.results.map(item => ({ ...item, row: { ...item.row, ph_regime: item.row.ph_regime || 'por_verificar' } })); this.page = data.page; this.hasNext = data.has_next; this.resultUrl = data.url;
+                this.refreshDuplicates();
                 this.message = this.results.length ? `${this.results.length} avisos en la página ${this.page}. Marca los que quieras incorporar; aún no están en la tabla.` : 'No se encontraron avisos legibles. Comprueba el barrio en el portal.';
             } catch (error) { this.message = error.name === 'AbortError' ? 'El portal tardó demasiado. Reintenta o abre la búsqueda.' : error.message; }
             finally { clearTimeout(timer); this.busy = false; }
         },
         incorporate() {
+            this.refreshDuplicates();
+            const pending = unresolvedCandidates(this.results, this.selected);
+            if (pending.length) {
+                this.message = `Revisa los avisos resaltados: ${pending.map(item => item.number).join(', ')}. Desmárcalos o confirma que son inmuebles distintos. Todavía no se agregó ninguno.`;
+                panel.querySelector('[data-duplicate-warning]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                return;
+            }
             const rows = this.results.filter(item => this.selected.includes(item.row.source_url)).map(item => ({ ...item.row }));
-            const counts = fillRows(form, rows, this.resultUrl);
+            const counts = fillRows(form, rows, this.resultUrl, data => this.results.some(item => item.row.source_url === data.source_url && item.distinct));
             this.message = `${counts.count} agregados por verificar; ${counts.duplicates} enlaces repetidos omitidos; ${counts.suspected} posibles duplicados sin agregar; ${counts.overflow} sin espacio. Comprueba el estado de guardado.`;
             this.selected = [];
+            this.refreshDuplicates();
         },
     };
 }

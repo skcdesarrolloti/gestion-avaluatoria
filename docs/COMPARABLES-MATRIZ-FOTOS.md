@@ -28,6 +28,23 @@ Verificado en escritorio y móvil; lint de la vista, 359 verificaciones PHP,
 
 ## Persistencia y despliegue
 
+### Revisión de coincidencias antes de incorporar
+
+FincaRaíz numera los avisos y resalta en amarillo las coincidencias con otros
+resultados de la página o con muestras de la matriz. Muestra número, motivos,
+precio, área, ubicación y enlace para comparar. Reutiliza las señales existentes;
+una coincidencia no acredita identidad. Revisa de nuevo al pulsar Agregar y detiene
+todo el lote si hay coincidencias seleccionadas sin resolver. Desmarcar uno de dos
+avisos coincidentes permite conservar el otro; las coincidencias con la matriz
+siguen requiriendo revisión. La casilla de inmueble distinto reemplaza el diálogo
+en esta captura y conserva la anotación de revisión. Un enlace exacto no admite
+esa excepción. Las demás formas de captura mantienen su confirmación anterior.
+
+Validación: 359 verificaciones PHP, 72 pruebas JS, build y 51,7 KB gzip. Navegador
+local con datos ficticios: bloqueo previo del lote, desmarcado e incorporación de
+los restantes, coincidencia posterior con la matriz y vista móvil de 390 px.
+No cambia persistencia ni requiere migración nueva; publicar vista y assets juntos.
+
 - Aplicar `202609300003_comparable_ph_and_photos.php` con `php bin/console.php migrate`
   o `AUTO_MIGRATE=true`. Agrega `ph_regime`, `appraisals.comparables_version` y la
   tabla privada `appraisal_comparable_photos`. No elimina tablas ni columnas.

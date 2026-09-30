@@ -44,8 +44,24 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
         <p class="mt-2 text-xs text-slate-600">Selecciona todos los avisos visibles de esta página y desmarca las casillas de los que no quieras agregar.</p>
         <div class="mt-3 grid gap-2 sm:grid-cols-2">
             <template x-for="item in visibleResults" :key="item.row.source_url">
-                <article class="rounded-lg border border-slate-200 p-3">
+                <article class="rounded-lg border border-slate-200 p-3" :class="item.matches?.length ? 'border-amber-600 bg-amber-50' : ''">
+                    <p class="text-sm font-semibold" x-text="'Aviso ' + item.number"></p>
                     <label class="flex min-h-11 items-center gap-2 font-semibold"><input type="checkbox" :value="item.row.source_url" x-model="selected"><span x-text="item.title"></span></label>
+                    <template x-if="item.matches?.length">
+                        <div data-duplicate-warning class="my-2 rounded border border-amber-600 p-3 text-sm">
+                            <strong x-text="item.matches.some(match => match.exact) ? 'Enlace ya registrado o repetido' : 'Posible inmueble repetido'"></strong>
+                            <template x-for="(match, matchIndex) in item.matches" :key="matchIndex">
+                                <div class="mt-2">
+                                    <p class="font-semibold" x-text="match.label"></p>
+                                    <p x-text="match.reasons.join(', ')"></p>
+                                    <p x-text="money(match.row.price_amount) + ' · ' + (match.row.area_m2 || '—') + ' m² · ' + (match.row.address_hint || match.row.neighborhood || 'Ubicación pendiente')"></p>
+                                    <a x-show="/^https?:\/\//i.test(match.row.source_url || '')" :href="/^https?:\/\//i.test(match.row.source_url || '') ? match.row.source_url : '#'" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center font-semibold text-blue-800">Abrir aviso coincidente</a>
+                                </div>
+                            </template>
+                            <p class="mt-2">Desmarca este aviso si es el mismo inmueble. Una coincidencia de datos no confirma por sí sola que sea repetido.</p>
+                            <label x-show="!item.matches.some(match => match.exact)" class="mt-2 flex min-h-11 items-center gap-2"><input type="checkbox" x-model="item.distinct">Revisé las coincidencias y confirmo que es otro inmueble.</label>
+                        </div>
+                    </template>
                     <label class="mt-2 block text-xs font-semibold">Propiedad horizontal de este aviso
                         <select class="input min-h-11" x-model="item.row.ph_regime" @change="selected = selected.filter(url => visibleResults.some(result => result.row.source_url === url))"><option value="por_verificar">Por verificar</option><option value="si">Sí, PH</option><option value="no">No PH</option></select>
                     </label>
