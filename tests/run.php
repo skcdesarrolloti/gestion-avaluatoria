@@ -361,6 +361,7 @@ try {
         intended_use TEXT DEFAULT '', base_valor TEXT DEFAULT '', regimen_ph TEXT DEFAULT '', assignment_scope TEXT DEFAULT '',
         assignment_description TEXT DEFAULT '', assignment_limitations TEXT DEFAULT '', assignment_hypotheses TEXT DEFAULT '', assignment_report_text TEXT DEFAULT '',
         source_documents TEXT DEFAULT '', source_documents_json TEXT DEFAULT '', location_description TEXT DEFAULT '', location_image_reference TEXT DEFAULT '', request_date TEXT, visit_date TEXT, value_date TEXT, report_date TEXT,
+        igac_property_units_count INTEGER DEFAULT 0, igac_annex_units_count INTEGER DEFAULT 0,
         version INTEGER DEFAULT 1, created_at TEXT, updated_at TEXT)");
     $db->exec("CREATE TABLE appraisal_report_notes (id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER,
         chapter_code TEXT, section_code TEXT, title TEXT, body TEXT, source_note TEXT,
@@ -426,6 +427,15 @@ try {
     $db->exec("CREATE TABLE appraisal_units (id TEXT PRIMARY KEY, appraisal_id TEXT, owner_id INTEGER,
         unit_kind TEXT, unit_index INTEGER, valuation_treatment TEXT,
         area_midas_m2 REAL, built_area_midas_m2 REAL, updated_at TEXT)");
+    $db->exec("INSERT INTO appraisals (id, owner_id, igac_property_units_count, igac_annex_units_count, created_at, updated_at)
+        VALUES ('unit-count-test', 1, 1, 0, '2026-09-30 00:00:00', '2026-09-30 00:00:00')");
+    $db->exec("INSERT INTO appraisal_units (id, appraisal_id, owner_id, unit_kind, unit_index, updated_at) VALUES
+        ('uc-property-1', 'unit-count-test', 1, 'property', 1, '2026-09-30 00:00:00'),
+        ('uc-property-2', 'unit-count-test', 1, 'property', 2, '2026-09-30 00:00:00'),
+        ('uc-annex-1', 'unit-count-test', 1, 'annex', 1, '2026-09-30 00:00:00')");
+    $countFilteredUnits = (new AppraisalRepository($db))->units('unit-count-test', 1);
+    expect(count($countFilteredUnits) === 1 && $countFilteredUnits[0]['id'] === 'uc-property-1',
+        'unidades activas respetan conteos del numeral 1.1');
     $db->exec("CREATE TABLE appraisal_legal_profiles (
         appraisal_id TEXT PRIMARY KEY, owner_id INTEGER, source_certificate_id TEXT,
         status TEXT, data_json TEXT, annotations_json TEXT, alerts_json TEXT,

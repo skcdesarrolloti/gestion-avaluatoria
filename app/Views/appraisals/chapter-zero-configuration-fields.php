@@ -1,5 +1,4 @@
 <?php
-// Campos del numeral 1.1. Hereda $field, $selected, $selectedAppraiser y $count desde chapter-zero.php.
 $configTabs = [
     'expediente' => 'Perito y expediente',
     'metodo' => 'Negocio y tipología',
@@ -94,18 +93,18 @@ $igacSearchPlaceholder = static fn (array $unit): string =>
                     Esta información alimenta la descripción del numeral 3 y la ruta metodológica del numeral 8. Los anexos pueden integrarse al inmueble principal o valorarse por separado solo cuando el analista lo decida.
                 </p>
             </div>
-            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"><?= count($unitDefinitionUnits) ?> creado(s)</span>
+            <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600" x-text="(propertyUnits || 0) + (annexUnits || 0) + ' activo(s)'"></span>
         </div>
         <?php if ($unitDefinitionUnits === []): ?>
-            <p class="mt-4 rounded-lg border border-dashed border-slate-300 p-4 text-sm text-slate-600">
-                Define las cantidades de unidades y anexos, guarda el expediente, y aquí aparecerán los campos para describirlos.
-            </p>
+            <p class="mt-4 rounded-lg border border-dashed border-slate-300 p-4 text-sm text-slate-600" x-show="(propertyUnits || 0) + (annexUnits || 0) > 0">Define las cantidades de unidades y anexos, guarda el expediente, y aquí aparecerán los campos para describirlos.</p>
         <?php else: ?>
+            <p class="mt-4 rounded-lg border border-dashed border-slate-300 p-4 text-sm text-slate-600" x-show="(propertyUnits || 0) + (annexUnits || 0) === 0">No hay componentes activos. Si necesitas describir unidades, define la cantidad arriba y guarda para crear los campos.</p>
             <div class="mt-4 grid gap-4">
                 <?php foreach ($unitDefinitionUnits as $unit): ?>
                     <?php $key = ($unit['unit_kind'] === 'annex' ? 'annex' : 'property') . '-' . (int) $unit['unit_index']; ?>
                     <?php $igacCategory = $igacCategoryValue($unit); ?>
                     <article class="grid gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4 md:grid-cols-2"
+                        x-show="<?= ($unit['unit_kind'] ?? '') === 'annex' ? 'annexUnits' : 'propertyUnits' ?> >= <?= e((string) (int) ($unit['unit_index'] ?? 0)) ?>"
                         x-data="{
                             unitKind: <?= e(json_encode((string) ($unit['unit_kind'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
                             constructionType: <?= e(json_encode((string) ($unit['construction_type'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,

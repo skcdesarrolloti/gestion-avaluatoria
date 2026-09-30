@@ -8,8 +8,7 @@ use App\Support\AppraisalCatalog;
 final class AppraisalRepository
 {
     public function __construct(private PDO $db) {}
-    public function recent(int $owner, int $page, string $search = '', bool $createdOnly = false): array
-    {
+    public function recent(int $owner, int $page, string $search = '', bool $createdOnly = false): array {
         $offset = (max(1, $page) - 1) * 20; $search = trim($search);
         $where = 'owner_id = ?'; $params = [$owner];
         if ($createdOnly) $where .= " AND expediente_number IS NOT NULL AND expediente_number <> ''";
@@ -23,8 +22,7 @@ final class AppraisalRepository
     public function create(int $owner): string
     { $id = bin2hex(random_bytes(16)); $now = gmdate('Y-m-d H:i:s'); $query = $this->db->prepare('INSERT INTO appraisals (id, owner_id, expediente_number, created_at, updated_at) VALUES (?, ?, ?, ?, ?)'); $query->execute([$id, $owner, null, $now, $now]); return $id; }
 
-    public function photos(string $id, int $owner): array
-    {
+    public function photos(string $id, int $owner): array {
         $query = $this->db->prepare('SELECT id, appraisal_id, owner_id, unit_id, source_filename, storage_filename,
             mime_type, file_size_bytes, caption, display_name, created_at, file_blob IS NOT NULL AS has_blob
             FROM appraisal_photos WHERE appraisal_id = ? AND owner_id = ?
@@ -35,16 +33,16 @@ final class AppraisalRepository
         ], $query->fetchAll());
     }
 
-    public function units(string $id, int $owner): array
-    {
-        $query = $this->db->prepare('SELECT * FROM appraisal_units WHERE appraisal_id = ? AND owner_id = ?
-            ORDER BY unit_kind = "common" DESC, unit_kind, unit_index');
-        $query->execute([$id, $owner]);
-        return $query->fetchAll();
+    public function units(string $id, int $owner): array {
+        $query = $this->db->prepare('SELECT u.* FROM appraisal_units u INNER JOIN appraisals a ON a.id = u.appraisal_id
+            AND a.owner_id = u.owner_id WHERE u.appraisal_id = ? AND u.owner_id = ? AND (u.unit_kind = "common"
+            OR (u.unit_kind = "property" AND u.unit_index <= COALESCE(a.igac_property_units_count, 0))
+            OR (u.unit_kind = "annex" AND u.unit_index <= COALESCE(a.igac_annex_units_count, 0)))
+            ORDER BY u.unit_kind = "common" DESC, u.unit_kind, u.unit_index');
+        $query->execute([$id, $owner]); return $query->fetchAll();
     }
 
-    public function findPhoto(string $photoId, int $owner): array
-    {
+    public function findPhoto(string $photoId, int $owner): array {
         $query = $this->db->prepare('SELECT * FROM appraisal_photos WHERE id = ? AND owner_id = ?');
         $query->execute([$photoId, $owner]);
         $row = $query->fetch();
@@ -52,8 +50,7 @@ final class AppraisalRepository
         return $row;
     }
 
-    public function deletePhoto(string $id, string $photoId, int $owner): ?string
-    {
+    public function deletePhoto(string $id, string $photoId, int $owner): ?string {
         $photo = $this->findPhoto($photoId, $owner);
         if ((string) $photo['appraisal_id'] !== $id) throw new HttpException(404, 'No se encontró la foto.');
         $query = $this->db->prepare('DELETE FROM appraisal_photos WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
@@ -63,14 +60,11 @@ final class AppraisalRepository
             : null;
     }
 
-    public function find(string $id, int $owner): array
-    {
+    public function find(string $id, int $owner): array {
         $query = $this->db->prepare('SELECT * FROM appraisals WHERE id = ? AND owner_id = ?');
         $query->execute([$id, $owner]);
         $row = $query->fetch();
-        if (!$row) {
-            throw new HttpException(404, 'No se encontró la ficha.');
-        }
+        if (!$row) throw new HttpException(404, 'No se encontró la ficha.');
         $row = array_replace(AppraisalCatalog::defaults(), $row);
         $row['version'] = (int) $row['version'];
         return $row;
