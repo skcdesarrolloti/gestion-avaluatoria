@@ -1,5 +1,17 @@
 # Revisión de captura de comparables — 30/09/2026
 
+## Selección de resultados de FincaRaíz
+
+Los controles se llaman «Seleccionar todos» y «Desmarcar todos». La ayuda aclara
+que actúan sobre la página actual; cada casilla permite excluir un aviso antes
+de agregar. No cambia la importación ni la revisión de duplicados.
+
+Validación: lint de 490 PHP, 352 verificaciones PHP, 67 pruebas JS, build y tamaño
+de 50,3 KB gzip. En vista local con datos ficticios se comprobó seleccionar tres,
+desmarcar uno (contador dos) y desmarcar todos, en escritorio y móvil de 390 px.
+No se conectó a bases reales ni se ejecutaron migraciones. Requiere actualizar
+la vista en el hosting después del push.
+
 ## Corrección de la búsqueda concatenada
 
 La vista académica de 8.1 reutilizaba `$guide` al recorrer los métodos. Los includes

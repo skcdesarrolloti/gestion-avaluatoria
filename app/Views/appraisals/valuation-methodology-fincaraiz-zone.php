@@ -30,10 +30,11 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
     <p role="status" class="mt-3 text-sm" x-text="message"></p>
     <div x-show="results.length" x-cloak class="mt-3">
         <div class="flex flex-wrap items-center gap-3">
-            <button type="button" class="btn-secondary min-h-11" @click="selected = results.map(item => item.row.source_url)">Marcar esta página</button>
-            <button type="button" class="btn-secondary min-h-11" @click="selected = []" :disabled="!selected.length">Quitar selección</button>
+            <button type="button" class="btn-secondary min-h-11" @click="selected = results.map(item => item.row.source_url)">Seleccionar todos</button>
+            <button type="button" class="btn-secondary min-h-11" @click="selected = []" :disabled="!selected.length">Desmarcar todos</button>
             <button type="button" class="btn-primary min-h-11" @click="incorporate()" :disabled="!selected.length || busy">Agregar seleccionados (<span x-text="selected.length"></span>)</button>
         </div>
+        <p class="mt-2 text-xs text-slate-600">Selecciona todos los avisos de esta página y desmarca las casillas de los que no quieras agregar.</p>
         <div class="mt-3 grid gap-2 sm:grid-cols-2">
             <template x-for="item in results" :key="item.row.source_url">
                 <article class="rounded-lg border border-slate-200 p-3">
