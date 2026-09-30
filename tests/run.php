@@ -155,6 +155,12 @@ try {
         && str_contains($methodologyText, 'IVS')
         && str_contains($methodologyText, 'NIIF')
         && str_contains($methodologyText, 'NTS'), 'numeral 8.1 incorpora 941 IVS NIIF NTS y deja 620 como antecedente');
+    $methodGuideLabels = implode(' ', array_column($methodologyReport['method_guides'] ?? [], 'label'));
+    $methodGuideArticles = implode(' ', array_column($methodologyReport['method_guides'] ?? [], 'articles'));
+    expect(str_contains($methodGuideLabels, 'Mercado') && str_contains($methodGuideLabels, 'Renta')
+        && str_contains($methodGuideLabels, 'Costo') && str_contains($methodGuideLabels, 'Residual')
+        && str_contains($methodGuideArticles, '16 a 21') && str_contains($methodGuideArticles, '31 a 34'),
+        'numeral 8.1 expone guia por metodo con articulos de resolucion 941');
     $methodologyApartment = (new AppraisalMethodologyChapterReport())->build([
         'tipo_inmueble' => 'apartamento', 'tipo_negocio' => 'venta', 'regimen_ph' => 'si',
         'estructura_metodo' => 'area_privada', 'base_valor' => 'mercado',
@@ -164,14 +170,21 @@ try {
         'numeral 8.2 matriz usa soporte de 1.1 y recomienda mercado para apartamento PH');
     expect(str_contains((string) ($methodologyApartment['sections'][2][1] ?? ''), 'Esta selección no constituye todavía el cálculo del valor')
         && count($methodologyApartment['decision']['configuration'] ?? []) >= 5
-        && str_contains((string) (($methodologyApartment['decision']['next_step'][0] ?? '')), '8.3'),
-        'numeral 8.2 expone texto de entregable y revision de configuracion');
+        && str_contains((string) (($methodologyApartment['decision']['next_step'][0] ?? '')), '8.3')
+        && str_contains((string) ($methodologyApartment['decision']['normative_inputs']['articles'] ?? ''), '16 a 21'),
+        'numeral 8.2 expone texto de entregable, revision de configuracion e insumo 941');
     $methodologyHouse = (new AppraisalMethodologyChapterReport())->build(['tipo_inmueble' => 'casa', 'tipo_negocio' => 'venta']);
-    expect(str_contains((string) ($methodologyHouse['decision']['recommended_method'] ?? ''), 'reposición'), 'numeral 8.2 casa orienta mercado y reposicion');
+    expect(str_contains((string) ($methodologyHouse['decision']['recommended_method'] ?? ''), 'reposición')
+        && str_contains((string) ($methodologyHouse['decision']['normative_inputs']['articles'] ?? ''), '27 a 30'),
+        'numeral 8.2 casa orienta mercado y reposicion con articulos de costo');
     $methodologyLot = (new AppraisalMethodologyChapterReport())->build(['tipo_inmueble' => 'lote', 'tipo_negocio' => 'venta']);
-    expect(str_contains((string) ($methodologyLot['decision']['recommended_method'] ?? ''), 'residual'), 'numeral 8.2 lote orienta residual');
+    expect(str_contains((string) ($methodologyLot['decision']['recommended_method'] ?? ''), 'residual')
+        && str_contains((string) ($methodologyLot['decision']['normative_inputs']['articles'] ?? ''), '31 a 34'),
+        'numeral 8.2 lote orienta residual con articulos de resolucion 941');
     $methodologyRent = (new AppraisalMethodologyChapterReport())->build(['tipo_inmueble' => 'local', 'tipo_negocio' => 'arriendo']);
-    expect(str_contains((string) ($methodologyRent['decision']['recommended_method'] ?? ''), 'Renta'), 'numeral 8.2 arriendo orienta renta');
+    expect(str_contains((string) ($methodologyRent['decision']['recommended_method'] ?? ''), 'Renta')
+        && str_contains((string) ($methodologyRent['decision']['normative_inputs']['articles'] ?? ''), '22 a 26'),
+        'numeral 8.2 arriendo orienta renta con articulos de resolucion 941');
     $methodologyIncome = (new AppraisalMethodologyChapterReport())->build([
         'tipo_inmueble' => 'oficina', 'tipo_negocio' => 'venta', 'income_producing' => 'si',
         'rent_amount' => '3500000.00', 'rent_period' => 'mensual',

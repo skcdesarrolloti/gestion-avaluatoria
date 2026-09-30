@@ -3,6 +3,9 @@ $configItems = is_array($methodologyDecision['configuration'] ?? null) ? $method
 $workflowItems = is_array($methodologyDecision['workflow'] ?? null) ? $methodologyDecision['workflow'] : [];
 $componentItems = is_array($methodologyDecision['components'] ?? null) ? $methodologyDecision['components'] : [];
 $nextStep = is_array($methodologyDecision['next_step'] ?? null) ? $methodologyDecision['next_step'] : ['8.3 Desarrollo del método', ''];
+$normativeInputs = is_array($methodologyDecision['normative_inputs'] ?? null) ? $methodologyDecision['normative_inputs'] : [];
+$normativeInputItems = is_array($normativeInputs['items'] ?? null) ? $normativeInputs['items'] : [];
+$normativeNotice = (string) ($methodologyDecision['normative_notice'] ?? '');
 $deliverable82 = trim((string) ($methodologyChapterData['sections'][2][1] ?? ''));
 $firstComponent = (string) ($componentItems[0]['id'] ?? '');
 ?>
@@ -50,6 +53,30 @@ $firstComponent = (string) ($componentItems[0]['id'] ?? '');
                     <p class="mt-2 text-xs leading-5 text-slate-600"><?= e((string) ($item[1] ?? '')) ?></p>
                 </article>
             <?php endforeach; ?>
+        </div>
+    <?php endif; ?>
+
+    <?php if ($normativeInputs !== []): ?>
+        <div class="mt-6 rounded-xl border border-blue-100 bg-white p-4">
+            <div class="flex flex-wrap items-start justify-between gap-3">
+                <div>
+                    <p class="text-xs font-bold uppercase text-blue-700">Insumo normativo para decidir</p>
+                    <h3 class="mt-2 text-xl font-semibold text-slate-950">
+                        Resolución 941: <?= e((string) ($normativeInputs['method'] ?? 'método')) ?>
+                    </h3>
+                    <p class="mt-1 text-sm font-semibold text-blue-800"><?= e((string) ($normativeInputs['articles'] ?? '')) ?></p>
+                </div>
+            </div>
+            <?php if ($normativeNotice !== ''): ?>
+                <p class="mt-3 rounded-lg bg-blue-50 p-3 text-sm leading-6 text-blue-950"><?= e($normativeNotice) ?></p>
+            <?php endif; ?>
+            <?php if ($normativeInputItems !== []): ?>
+                <div class="mt-4 grid gap-3 md:grid-cols-2">
+                    <?php foreach ($normativeInputItems as $item): ?>
+                        <p class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700"><?= e((string) $item) ?></p>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
         </div>
     <?php endif; ?>
 

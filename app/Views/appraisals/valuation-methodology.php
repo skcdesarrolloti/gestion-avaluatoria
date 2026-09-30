@@ -6,6 +6,7 @@ $methodologyChapterData = is_array($methodologyChapter ?? null) ? $methodologyCh
 $methodologyText = (string) ($methodologyChapterData['text'] ?? '');
 $methodologySections = is_array($methodologyChapterData['sections'] ?? null) ? $methodologyChapterData['sections'] : [];
 $methodologyReferences = is_array($methodologyChapterData['references'] ?? null) ? $methodologyChapterData['references'] : [];
+$methodologyGuides = is_array($methodologyChapterData['method_guides'] ?? null) ? $methodologyChapterData['method_guides'] : [];
 $methodologyDecision = is_array($methodologyChapterData['decision'] ?? null) ? $methodologyChapterData['decision'] : ['rows' => []];
 $methodologyDecisionRows = is_array($methodologyDecision['rows'] ?? null) ? $methodologyDecision['rows'] : [];
 $methodologyMessage = \App\Core\Session::pullFlash('methodology_message');
@@ -62,6 +63,7 @@ $methodologyError = \App\Core\Session::pullFlash('methodology_error');
         </div>
         <a class="rounded-full bg-white px-4 py-2 text-sm font-bold text-indigo-800" target="_blank" rel="noopener" href="https://www.igac.gov.co/node/53595">Fuente IGAC 941</a>
     </div>
+    <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-method-guides.php'; ?>
     <textarea class="input mt-5 min-h-80 bg-white font-mono text-sm leading-6" rows="18" readonly><?= e($methodologyText) ?></textarea>
     <div class="mt-5 grid gap-4 lg:grid-cols-2">
         <?php foreach ($methodologySections as $section): ?>

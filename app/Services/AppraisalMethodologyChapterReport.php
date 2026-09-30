@@ -7,13 +7,15 @@ final class AppraisalMethodologyChapterReport
     public function __construct(private ?AppraisalIncomeContextNarrator $income = null,
         private ?AppraisalUnitCompositionNarrator $composition = null,
         private ?AppraisalMethodologyAcademicReport $academic = null,
-        private ?AppraisalMethodologyComponentPlanner $componentPlanner = null) {}
+        private ?AppraisalMethodologyComponentPlanner $componentPlanner = null,
+        private ?AppraisalMethodologyResolution941Guide $resolutionGuide = null) {}
     public function build(array $record = [], array $subject = [], array $units = []): array
     {
         $this->income ??= new AppraisalIncomeContextNarrator();
         $this->composition ??= new AppraisalUnitCompositionNarrator();
         $this->academic ??= new AppraisalMethodologyAcademicReport();
         $this->componentPlanner ??= new AppraisalMethodologyComponentPlanner();
+        $this->resolutionGuide ??= new AppraisalMethodologyResolution941Guide();
         $decision = $this->decision($record, $units);
         $sections = array_merge($this->academic->sections(), [
             ['8.2 Selección y justificación de la metodología aplicada', $this->selectionText($record, $units, $decision)],
@@ -25,6 +27,7 @@ final class AppraisalMethodologyChapterReport
                 $sections
             )),
             'references' => $this->academic->references(),
+            'method_guides' => $this->resolutionGuide->methodGuides(),
             'decision' => $decision,
         ];
     }
@@ -73,6 +76,8 @@ final class AppraisalMethodologyChapterReport
             'next_step' => $this->nextStep($method),
             'rows' => $this->decisionRows($record, $units, $method),
             'components' => $this->componentPlanner->components($record, $units),
+            'normative_inputs' => $this->resolutionGuide->inputsForMethod($method),
+            'normative_notice' => $this->resolutionGuide->selectionNotice(),
             'niif_note' => $this->niifNote($niif, $base),
             'special_template' => $this->specialTemplate($isDeposit && $ph === 'si'),
             'subject_name' => $subjectName,
@@ -140,6 +145,12 @@ final class AppraisalMethodologyChapterReport
         $text .= ' Esta selección no constituye todavía el cálculo del valor; define el camino técnico que se desarrollará en '
             . (string) ($next[0] ?? '8.3') . '. Allí se recolectan los insumos propios del método, se depuran las fuentes, '
             . 'se aplican las fórmulas y se documentan las diferencias relevantes antes de adoptar el valor conclusivo.';
+        $normativeInputs = is_array($decision['normative_inputs'] ?? null) ? $decision['normative_inputs'] : [];
+        if ($normativeInputs !== []) {
+            $text .= ' Conforme a la Resolución IGAC 941 de 2026, el desarrollo de este método se soporta en '
+                . (string) ($normativeInputs['articles'] ?? 'los artículos aplicables')
+                . ' y exige verificar los insumos pertinentes antes de pasar al análisis operativo.';
+        }
         $income = $this->income->paragraph($record, $subjectName);
         if ($income !== '') $text .= "\n\n" . $income;
         $composition = $this->composition->paragraph($record, $units);
