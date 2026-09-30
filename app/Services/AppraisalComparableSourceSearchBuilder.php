@@ -10,12 +10,14 @@ final class AppraisalComparableSourceSearchBuilder
         $neighborhood = $this->first($subject['neighborhood_name'] ?? '', $subject['midas_territory'] ?? '');
         $locality = $this->first($subject['locality_name'] ?? '', $subject['midas_locality'] ?? '');
         $operation = $this->operation((string) ($record['tipo_negocio'] ?? ''), $businessLabel);
-        $terms = array_values(array_filter([$operation, $this->typeTerms($type, $typeLabel), $neighborhood, $locality, $city, 'Colombia']));
+        $typeTerms = $this->typeTerms($type, $typeLabel);
+        $terms = array_values(array_filter([$operation, $typeTerms, $neighborhood, $locality, $city, 'Colombia']));
         $query = implode(' ', $terms);
         return [
             'city' => $city,
             'neighborhood' => $neighborhood,
             'query' => $query,
+            'query_parts' => $this->queryParts($operation, $typeTerms, $neighborhood, $locality, $city),
             'portal_sources' => $this->portalSources($query),
             'agency_sources' => $this->agencySources($query, $city),
             'official_sources' => $this->officialSources($query, $city, $neighborhood, $subject),
@@ -100,6 +102,18 @@ final class AppraisalComparableSourceSearchBuilder
         return ['label' => $label, 'kind' => $kind, 'query' => $query,
             'url' => 'https://www.google.com/search?q=' . rawurlencode($query),
             'instruction' => 'Abrir búsqueda, aplicar filtros del portal y registrar solo ofertas verificables.'];
+    }
+
+    private function queryParts(string $operation, string $typeTerms, string $neighborhood, string $locality, string $city): array
+    {
+        return [
+            ['label' => 'Operación', 'value' => $operation, 'origin' => 'Numeral 1 · tipo de negocio'],
+            ['label' => 'Tipo de inmueble', 'value' => $typeTerms, 'origin' => 'Numeral 1 · tipología del bien'],
+            ['label' => 'Barrio o microsector', 'value' => $neighborhood, 'origin' => 'Numeral 2/3 · ubicación del sujeto'],
+            ['label' => 'Localidad', 'value' => $locality, 'origin' => 'Numeral 2 · sector y entorno'],
+            ['label' => 'Ciudad', 'value' => $city, 'origin' => 'Expediente / bien sujeto'],
+            ['label' => 'País', 'value' => 'Colombia', 'origin' => 'Filtro fijo para portales nacionales'],
+        ];
     }
 
     private function agency(string $label, string $url, string $query, string $category, array $factors): array

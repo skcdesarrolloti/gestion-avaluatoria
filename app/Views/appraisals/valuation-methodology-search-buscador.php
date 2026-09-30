@@ -1,5 +1,6 @@
 <?php
 $baseQuery = trim((string) ($sourceSearch['query'] ?? ''));
+$queryParts = is_array($sourceSearch['query_parts'] ?? null) ? $sourceSearch['query_parts'] : [];
 $consultSteps = [
     'Abre la inmobiliaria y busca primero dentro de su sitio web o por contacto directo.',
     'Aplica operación, ciudad, barrio o microsector, tipología y rango de área.',
@@ -23,6 +24,18 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
     </p>
     <div class="mt-4 rounded-lg bg-white p-3 font-mono text-sm font-semibold text-slate-900">
         <?= e($baseQuery ?: 'Completa el bien sujeto para formar una consulta automática.') ?>
+    </div>
+    <div class="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
+        <?php foreach ($queryParts as $part): ?>
+            <?php $value = trim((string) ($part['value'] ?? '')); ?>
+            <div class="rounded-lg bg-white/80 p-3">
+                <p class="text-xs font-bold uppercase text-blue-800"><?= e((string) ($part['label'] ?? 'Dato')) ?></p>
+                <p class="mt-1 text-sm font-semibold <?= $value === '' ? 'text-orange-800' : 'text-slate-900' ?>">
+                    <?= e($value !== '' ? $value : 'Pendiente por completar') ?>
+                </p>
+                <p class="mt-1 text-xs text-slate-500"><?= e((string) ($part['origin'] ?? '')) ?></p>
+            </div>
+        <?php endforeach; ?>
     </div>
 
     <div class="mt-4 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
@@ -49,22 +62,6 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
     </div>
 
     <div class="mt-4">
-        <p class="text-xs font-bold uppercase text-blue-800">Portales inmobiliarios <?= $tip('Origen: catálogo interno de fuentes de mercado. Abre cada fuente, copia los datos del aviso comparable y vuelve a 2. Capturar; la trazabilidad queda en enlace, fecha y observación.') ?></p>
-        <div class="mt-3 grid gap-3 md:grid-cols-2">
-            <?php foreach ($portalSources as $source): ?>
-                <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-card.php'; ?>
-            <?php endforeach; ?>
-        </div>
+        <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-links.php'; ?>
     </div>
-
-    <?php if ($agencySources !== []): ?>
-        <div class="mt-5">
-            <p class="text-xs font-bold uppercase text-blue-800">Inmobiliarias recomendadas para Cartagena, en orden de prioridad <?= $tip('Origen: catálogo local de inmobiliarias según ciudad. Úsalas para confirmar inventario, contacto y ofertas que tal vez no aparecen bien en portales masivos.') ?></p>
-            <div class="mt-3 grid gap-3 md:grid-cols-2">
-                <?php foreach ($agencySources as $source): ?>
-                    <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-card.php'; ?>
-                <?php endforeach; ?>
-            </div>
-        </div>
-    <?php endif; ?>
 </div>

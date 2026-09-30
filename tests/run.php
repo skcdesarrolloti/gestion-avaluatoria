@@ -140,6 +140,7 @@ try {
         && str_contains((string) ($officeSearch['source_search']['portal_sources'][0]['label'] ?? ''), 'FincaRaiz')
         && str_contains((string) ($officeSearch['source_search']['agency_sources'][0]['label'] ?? ''), 'Araújo')
         && str_contains(implode(' ', $officeSearch['source_search']['agency_sources'][0]['selection_factors'] ?? []), '1954')
+        && str_contains(implode(' ', array_map(static fn (array $part): string => ($part['label'] ?? '') . ' ' . ($part['origin'] ?? ''), $officeSearch['source_search']['query_parts'] ?? [])), 'Operación')
         && str_contains((string) ($officeSearch['source_search']['official_sources'][2]['label'] ?? ''), 'MIDAS'),
         'buscador 8.3 arma portales inmobiliarias y fuente oficial segun ciudad del sujeto');
     $apartmentGuide = $searchGuide->build(['tipo_inmueble' => 'apartamento', 'regimen_ph' => 'si'], [], [], ['ph_name' => 'Edificio prueba']);
