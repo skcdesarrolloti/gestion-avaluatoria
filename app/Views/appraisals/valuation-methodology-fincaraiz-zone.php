@@ -37,19 +37,22 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
         <p class="mb-3 text-xs">El portal no confirma PH en estos resúmenes. Verifica y clasifica cada aviso; este filtro actúa sobre los resultados cargados, no sobre todo el portal.</p>
         <p x-show="!visibleResults.length" class="mb-3 text-sm">No hay avisos clasificados con este régimen en la página. Revisa «Por verificar» o muestra todos.</p>
         <div class="flex flex-wrap items-center gap-3">
-            <button type="button" class="btn-secondary min-h-11" @click="selected = visibleResults.map(item => item.row.source_url)">Seleccionar todos</button>
+            <button type="button" class="btn-primary min-h-11" @click="selectSuggested()">Seleccionar sugeridos</button>
+            <button type="button" class="btn-secondary min-h-11" @click="refreshDuplicates(); selected = visibleResults.filter(item => item.tone !== 'registered').map(item => item.row.source_url)">Seleccionar todos los disponibles</button>
             <button type="button" class="btn-secondary min-h-11" @click="selected = []" :disabled="!selected.length">Desmarcar todos</button>
             <button type="button" class="btn-primary min-h-11" @click="incorporate()" :disabled="!selected.length || busy">Agregar seleccionados (<span x-text="selected.length"></span>)</button>
         </div>
-        <p class="mt-2 text-xs text-slate-600">Selecciona todos los avisos visibles de esta página y desmarca las casillas de los que no quieras agregar.</p>
+        <p class="mt-2 text-sm">Verde: sugerido para conservar. Amarillo: alternativa o coincidencia por revisar. Gris: ya incorporado, no se vuelve a agregar.</p>
+        <p class="mt-1 text-xs text-slate-600">Los sugeridos conservan el primer aviso sin coincidencia con otro sugerido ni con la matriz. Es una ayuda de selección, no confirma que sean inmuebles distintos. Puedes cambiar las casillas.</p>
         <div class="mt-3 grid gap-2 sm:grid-cols-2">
             <template x-for="item in visibleResults" :key="item.row.source_url">
-                <article class="rounded-lg border border-slate-200 p-3" :class="item.matches?.length ? 'border-amber-600 bg-amber-50' : ''">
+                <article class="rounded-lg border p-3" :class="item.tone === 'registered' ? 'border-slate-300 bg-slate-100' : (item.tone === 'suggested' ? 'border-teal-600 bg-teal-50' : 'border-amber-600 bg-amber-50')">
                     <p class="text-sm font-semibold" x-text="'Aviso ' + item.number"></p>
-                    <label class="flex min-h-11 items-center gap-2 font-semibold"><input type="checkbox" :value="item.row.source_url" x-model="selected"><span x-text="item.title"></span></label>
+                    <p class="my-1 text-sm font-semibold" x-text="item.label"></p>
+                    <label class="flex min-h-11 items-center gap-2 font-semibold"><input type="checkbox" :value="item.row.source_url" x-model="selected" :disabled="item.tone === 'registered'"><span x-text="item.title"></span></label>
                     <template x-if="item.matches?.length">
-                        <div data-duplicate-warning class="my-2 rounded border border-amber-600 p-3 text-sm">
-                            <strong x-text="item.matches.some(match => match.exact) ? 'Enlace ya registrado o repetido' : 'Posible inmueble repetido'"></strong>
+                        <details data-duplicate-warning class="my-2 rounded border p-2 text-sm">
+                            <summary class="min-h-11 cursor-pointer py-3 font-semibold">Ver coincidencias (<span x-text="item.matches.length"></span>)</summary>
                             <template x-for="(match, matchIndex) in item.matches" :key="matchIndex">
                                 <div class="mt-2">
                                     <p class="font-semibold" x-text="match.label"></p>
@@ -60,7 +63,7 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
                             </template>
                             <p class="mt-2">Desmarca este aviso si es el mismo inmueble. Una coincidencia de datos no confirma por sí sola que sea repetido.</p>
                             <label x-show="!item.matches.some(match => match.exact)" class="mt-2 flex min-h-11 items-center gap-2"><input type="checkbox" x-model="item.distinct">Revisé las coincidencias y confirmo que es otro inmueble.</label>
-                        </div>
+                        </details>
                     </template>
                     <label class="mt-2 block text-xs font-semibold">Propiedad horizontal de este aviso
                         <select class="input min-h-11" x-model="item.row.ph_regime" @change="selected = selected.filter(url => visibleResults.some(result => result.row.source_url === url))"><option value="por_verificar">Por verificar</option><option value="si">Sí, PH</option><option value="no">No PH</option></select>

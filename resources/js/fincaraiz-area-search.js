@@ -1,5 +1,5 @@
 import { fillRows } from './comparable-bulk-import.js';
-import { candidateMatches, matrixRows, unresolvedCandidates } from './comparable-candidate-review.js';
+import { candidateMatches, matrixRows, unresolvedCandidates, candidateSuggestions } from './comparable-candidate-review.js';
 
 export function fincaraizAreaSearch() {
     let panel, form;
@@ -14,6 +14,13 @@ export function fincaraizAreaSearch() {
                 item.matches = matches[index];
                 item.number = index + 1;
             });
+            candidateSuggestions(this.results).forEach((suggestion, i) => Object.assign(this.results[i], suggestion));
+            this.selected = this.selected.filter(url => this.results.some(item => item.row.source_url === url && item.tone !== 'registered'));
+        },
+        selectSuggested() {
+            this.refreshDuplicates();
+            this.selected = this.visibleResults.filter(item => item.suggested).map(item => item.row.source_url);
+            this.message = this.selected.length ? `${this.selected.length} sugeridos seleccionados. Puedes cambiar las casillas antes de agregar.` : 'No hay sugeridos nuevos en esta página: los avisos ya están en la matriz o requieren revisar coincidencias con ella.';
         },
         get visibleResults() { return this.results.filter(item => this.phFilter === 'all' || (item.row.ph_regime || 'por_verificar') === this.phFilter); },
         neighborhood: '', neighborhoodId: '', neighborhoods: [], results: [], selected: [], busy: false, page: 1, hasNext: false, message: '', resultUrl: '',
@@ -33,7 +40,13 @@ export function fincaraizAreaSearch() {
             return this.neighborhoods.find(item => item.id === this.neighborhoodId)?.search_url || '';
         },
         clear() { this.results = []; this.selected = []; this.message = ''; this.hasNext = false; this.page = 1; this.resultUrl = ''; },
-        money(value) { return value ? new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(String(value).replace(',', '.'))) : 'Precio pendiente'; },
+        money(value) {
+            let raw = String(value ?? '').replace(/[^\d.,]/g, '');
+            if (raw.includes(',')) raw = raw.replaceAll('.', '').replace(',', '.');
+            else if (/^\d{1,3}(\.\d{3})+$/.test(raw)) raw = raw.replaceAll('.', '');
+            const amount = Number(raw);
+            return raw && Number.isFinite(amount) ? new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(amount) : 'Precio pendiente';
+        },
         async search(page = 1) {
             if (this.busy) return;
             if (!this.neighborhoodId) { this.message = 'Selecciona un barrio de las sugerencias del catálogo.'; return; }
@@ -52,7 +65,7 @@ export function fincaraizAreaSearch() {
                 if (!response.ok || !data.ok) throw new Error(data.message || 'No se pudo consultar el portal.');
                 this.results = data.results.map(item => ({ ...item, row: { ...item.row, ph_regime: item.row.ph_regime || 'por_verificar' } })); this.page = data.page; this.hasNext = data.has_next; this.resultUrl = data.url;
                 this.refreshDuplicates();
-                this.message = this.results.length ? `${this.results.length} avisos en la página ${this.page}. Marca los que quieras incorporar; aún no están en la tabla.` : 'No se encontraron avisos legibles. Comprueba el barrio en el portal.';
+                this.message = this.results.length ? `${this.results.length} avisos en la página ${this.page}: ${this.results.filter(item => item.suggested).length} sugeridos nuevos; ${this.results.filter(item => item.tone === 'registered').length} ya incorporados.` : 'No se encontraron avisos legibles. Comprueba el barrio en el portal.';
             } catch (error) { this.message = error.name === 'AbortError' ? 'El portal tardó demasiado. Reintenta o abre la búsqueda.' : error.message; }
             finally { clearTimeout(timer); this.busy = false; }
         },

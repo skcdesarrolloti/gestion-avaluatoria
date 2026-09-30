@@ -23,3 +23,17 @@ export function matrixRows(form) {
         [...row.querySelectorAll('[name]')].map(input => [input.name.match(/\[([^\]]+)\]$/)[1], input.value])
     ));
 }
+
+export function candidateSuggestions(results) {
+    const keep = [];
+    return results.map(item => {
+        const registered = item.matches.find(match => match.inMatrix && match.exact);
+        if (registered) return { tone: 'registered', suggested: false, label: `Ya incorporado: ${registered.label}` };
+        const matrixMatch = item.matches.find(match => match.inMatrix);
+        if (matrixMatch) return { tone: 'review', suggested: false, label: `Revisar coincidencia con ${matrixMatch.label}` };
+        const representative = keep.find(other => duplicateEvidence(item.row, other.row));
+        if (representative) return { tone: 'review', suggested: false, label: `Alternativa al aviso ${representative.number}: puedes dejar solo uno` };
+        keep.push(item);
+        return { tone: 'suggested', suggested: true, label: item.matches.length ? 'Sugerido para conservar entre los coincidentes' : 'Nuevo · sin coincidencias detectadas' };
+    });
+}

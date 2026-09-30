@@ -1,8 +1,25 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { candidateMatches, unresolvedCandidates } from '../resources/js/comparable-candidate-review.js';
+import { candidateMatches, unresolvedCandidates, candidateSuggestions } from '../resources/js/comparable-candidate-review.js';
 
 const row = { source_url: 'https://example.com/1', price_amount: '420000000', area_m2: '40', neighborhood: 'Bocagrande' };
+function prepare(rows, existing = []) {
+    const results = rows.map((row, i) => ({ row, number: i + 1 }));
+    candidateMatches(results, existing).forEach((matches, i) => { results[i].matches = matches; });
+    return results;
+}
+test('suggestions keep one of matching candidates and independent new properties', () => {
+    const results = prepare([row, { ...row, source_url: 'https://example.com/2' }, { ...row, source_url: 'https://example.com/3', area_m2: '90' }]);
+    const suggestions = candidateSuggestions(results);
+    assert.deepEqual(suggestions.map(item => item.suggested), [true, false, true]);
+    assert.match(suggestions[1].label, /aviso 1/);
+    assert.equal(unresolvedCandidates(results, results.filter((_, i) => suggestions[i].suggested).map(item => item.row.source_url)).length, 0);
+});
+test('existing exact URLs stay grey and possible matrix duplicates are never suggested', () => {
+    const results = prepare([row, { ...row, source_url: 'https://example.com/2' }], [row]);
+    assert.deepEqual(candidateSuggestions(results).map(item => item.tone), ['registered', 'review']);
+    assert.ok(candidateSuggestions(results).every(item => !item.suggested));
+});
 test('unchecking a matching candidate permits keeping just one, but matrix matches still require review', () => {
     const results = [{ row }, { row: { ...row, source_url: 'https://example.com/2' } }];
     candidateMatches(results, []).forEach((matches, i) => { results[i].matches = matches; });

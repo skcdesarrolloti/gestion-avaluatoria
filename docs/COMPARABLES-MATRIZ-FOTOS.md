@@ -30,6 +30,18 @@ Verificado en escritorio y móvil; lint de la vista, 359 verificaciones PHP,
 
 ### Revisión de coincidencias antes de incorporar
 
+Actualización de selección: verde identifica los sugeridos nuevos; amarillo, las
+alternativas y las coincidencias con la matriz; gris, enlaces ya incorporados,
+con casilla bloqueada. «Seleccionar sugeridos» conserva por orden de resultados
+avisos sin coincidencias con la matriz ni con otro sugerido; no declara identidad
+ni calidad del comparable. Permite desmarcar y elegir otra alternativa. Los detalles
+quedan plegados para acortar las tarjetas. «Seleccionar todos los disponibles»
+excluye los grises. La confirmación de posibles duplicados sigue siendo necesaria
+si se seleccionan ambos. Se corrigió el formato de precios con símbolos y puntos
+de miles en las coincidencias. Verificado con 74 pruebas JS, 359 verificaciones PHP,
+lint de la vista, build y 52,0 KB gzip; prueba local de selección, incorporación,
+bloqueo de enlaces incorporados y ausencia de errores de navegador. Sin migración.
+
 FincaRaíz numera los avisos y resalta en amarillo las coincidencias con otros
 resultados de la página o con muestras de la matriz. Muestra número, motivos,
 precio, área, ubicación y enlace para comparar. Reutiliza las señales existentes;
