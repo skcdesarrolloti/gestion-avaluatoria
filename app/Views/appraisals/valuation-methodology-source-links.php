@@ -21,17 +21,17 @@ $linkButton = static function (array $source, string $tone = 'blue'): void {
     $url = (string) ($source['url'] ?? '#');
     $class = $tone === 'emerald' ? 'border-emerald-200 text-emerald-800 hover:bg-emerald-50' : 'border-blue-200 text-blue-800 hover:bg-blue-50';
 ?>
-    <a class="inline-flex min-h-10 items-center rounded-lg border bg-white px-3 py-2 text-sm font-bold <?= e($class) ?>"
+    <a class="inline-flex min-h-11 items-center rounded-lg border bg-white px-3 py-2 text-sm font-bold <?= e($class) ?>"
         target="_blank" rel="noopener" href="<?= e($url) ?>"><?= e($label) ?></a>
 <?php }; ?>
 <section class="rounded-xl border border-blue-100 bg-blue-50 p-4">
     <div class="flex flex-wrap items-start justify-between gap-3">
         <div>
             <p class="text-xs font-bold uppercase text-blue-800">Abrir fuentes de mercado</p>
-            <h3 class="mt-1 text-lg font-semibold text-blue-950">Búsquedas adaptadas a cada portal</h3>
+            <h3 class="mt-1 text-lg font-semibold text-blue-950">Trabaja una fuente a la vez</h3>
         </div>
         <?php if ($baseQuery !== ''): ?>
-            <button type="button" class="btn-secondary min-h-9 text-xs"
+            <button type="button" class="btn-secondary min-h-11 text-xs"
                 x-on:click="navigator.clipboard?.writeText(<?= e(json_encode($baseQuery, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>)">
                 Copiar búsqueda
             </button>
@@ -40,29 +40,38 @@ $linkButton = static function (array $source, string $tone = 'blue'): void {
     <code class="text-anywhere mt-3 block rounded-lg bg-white p-3 font-mono text-sm font-semibold text-slate-900">
         <?= e($baseQuery ?: 'Búsqueda base pendiente: completa tipología, operación, ciudad y barrio para afinarla.') ?>
     </code>
-    <?php if ($baseQuery !== ''): ?>
-        <a class="btn-primary mt-3" target="_blank" rel="noopener"
-            href="<?= e('https://www.google.com/search?q=' . rawurlencode($baseQuery . ' (site:fincaraiz.com.co OR site:metrocuadrado.com OR site:ciencuadras.com OR site:properati.com.co OR site:inmuebles.mercadolibre.com.co)')) ?>">Buscar en todos los portales</a>
-        <p class="mt-2 text-sm text-blue-950">Abre una consulta conjunta en Google. Los resultados dependen de su índice; no descarga avisos ni confirma su vigencia. Copia varios avisos y cárgalos juntos abajo.</p>
-    <?php endif; ?>
+    <p class="mt-3 text-sm leading-6 text-blue-950">Empieza por FincaRaíz: abre un aviso, copia su enlace y vuelve a «Leer un aviso por enlace». Revisa e incorpora la muestra antes de continuar con otro aviso o fuente.</p>
+    <p class="mt-2 text-sm leading-6 text-blue-950">La frase de arriba resume el inmueble buscado. Cada fuente indica qué filtros aplica y cuáles debes completar. En las demás fuentes, copia el enlace y el texto del aviso para la captura manual.</p>
     <div class="mt-4 grid gap-4 lg:grid-cols-2">
         <div>
-            <p class="text-xs font-bold uppercase text-blue-800">Portales</p>
-            <div class="mt-2 flex flex-wrap gap-2">
-                <?php foreach ($portalLinks as $source): ?>
-                    <div class="w-full rounded-lg bg-white p-3">
+            <p class="text-xs font-bold uppercase text-blue-800">1. Portales · uno por uno</p>
+            <ol class="mt-2 space-y-2">
+                <?php foreach ($portalLinks as $index => $source): ?>
+                    <li class="rounded-lg bg-white p-3">
+                        <p class="mb-1 text-xs text-slate-600">Portal <?= e((string) ($index + 1)) ?> de <?= e((string) count($portalLinks)) ?></p>
                         <?php $linkButton($source); ?>
                         <p class="mt-1 text-xs font-semibold"><?= e($source['kind'] ?? 'Búsqueda en Google') ?></p>
                         <p class="mt-1 text-sm"><?= e($source['instruction'] ?? 'Abre un aviso y comprueba sus datos.') ?></p>
-                    </div>
+                    </li>
                 <?php endforeach; ?>
-            </div>
+            </ol>
         </div>
         <div>
-            <p class="text-xs font-bold uppercase text-emerald-800">Inmobiliarias</p>
-            <div class="mt-2 flex flex-wrap gap-2">
-                <?php foreach ($agencyLinks as $source): $linkButton($source, 'emerald'); endforeach; ?>
-            </div>
+            <p class="text-xs font-bold uppercase text-emerald-800">2. Inmobiliarias · una por una</p>
+            <p class="mt-2 text-sm text-emerald-950">Estos enlaces abren el sitio de cada inmobiliaria. Aplica allí los filtros del expediente; no se envía automáticamente la frase completa.</p>
+            <ol class="mt-2 space-y-2">
+                <?php foreach ($agencyLinks as $index => $source): ?>
+                    <li class="rounded-lg bg-white p-3">
+                        <p class="mb-1 text-xs text-slate-600">Inmobiliaria <?= e((string) ($index + 1)) ?> de <?= e((string) count($agencyLinks)) ?></p>
+                        <?php $linkButton($source, 'emerald'); ?>
+                        <details class="mt-1 text-sm">
+                            <summary class="min-h-11 cursor-pointer py-3 font-semibold text-emerald-800">Cómo buscar y capturar aquí</summary>
+                            <p class="leading-6"><?= e($source['instruction'] ?? 'Selecciona operación, tipo de inmueble, ciudad y barrio en el buscador del sitio.') ?></p>
+                            <p class="mt-2 leading-6">Abre la ficha del inmueble. Copia su enlace y texto; vuelve a «Alternativa: pegar texto de avisos o filas» y revisa los datos antes de pasar a la siguiente fuente.</p>
+                        </details>
+                    </li>
+                <?php endforeach; ?>
+            </ol>
         </div>
     </div>
 </section>

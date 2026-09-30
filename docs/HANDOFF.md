@@ -1,7 +1,7 @@
 # Entrega al responsable de la implementación
 
 Actualización del 30/09/2026: [captura y revisión de comparables 8.3](COMPARABLES-83-REVISION.md).
-Fichas paginadas, pendientes, búsqueda conjunta y pegado por lotes. Incluye límites
+Fichas paginadas, pendientes, búsqueda por fuente y pegado por lotes. Incluye límites
 de la revisión NTS y pendientes del anexo y de concurrencia del guardado existente.
 
 Actualización PH del 21/09/2026: [lectura documental](PH-LECTURA.md). El numeral 3.5

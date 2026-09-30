@@ -85,6 +85,14 @@ Antes de presentar un anexo definitivo se requiere cerrar:
 
 ## Lectura por enlace y búsquedas por portal (30/09/2026)
 
+- Ajuste de navegación solicitado: se elimina «Buscar en todos los portales».
+  Portales e inmobiliarias se muestran en listas numeradas independientes, con
+  instrucciones de captura. Las inmobiliarias indican que sus filtros se aplican
+  manualmente en su sitio; no se presentan como integraciones automáticas.
+  Verificado el cambio en escritorio y móvil de 390 px, apertura de ayudas,
+  lint de 485 PHP, 341 verificaciones PHP, 57 pruebas JS y build de 48,8 KB gzip.
+  Sin cambios de esquema ni persistencia; no requiere migración.
+
 - Nuevo bloque «Leer un aviso por enlace · FincaRaíz»: pegar enlace individual,
   leer, revisar vista previa e incorporar como `por_verificar`. La incorporación
   usa filas vacías, omite enlaces repetidos y muestra la página de la nueva ficha.
