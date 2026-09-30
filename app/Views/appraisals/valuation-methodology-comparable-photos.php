@@ -5,12 +5,24 @@
         <h4 class="font-semibold" x-text="photoTitle"></h4>
         <button type="button" class="btn-secondary min-h-11" @click="photoOpen = false" :disabled="photoBusy">Cerrar fotos</button>
     </div>
-    <p class="mt-2 text-sm">Abre el aviso, guarda la foto o una captura en tu equipo y cárgala aquí. Se vincula únicamente a esta muestra; el lector del portal no descarga fotos automáticamente.</p>
+    <a x-show="photoSourceUrl" :href="photoSourceUrl || '#'" target="_blank" rel="noopener" class="btn-secondary mt-3 min-h-11">1. Abrir aviso de esta muestra</a>
+    <p x-show="!photoSourceUrl" class="mt-2 text-sm">Completa el enlace del inmueble en la matriz para abrir su aviso desde aquí.</p>
+    <p class="mt-2 text-sm">En el aviso: clic derecho sobre la foto → «Copiar imagen». Regresa, haz clic en el recuadro y pulsa Ctrl+V. La foto se sube directamente a esta muestra y aparece abajo al confirmar el guardado.</p>
+    <div tabindex="0" role="region" aria-label="Pegar foto de esta muestra" @paste.prevent.stop="pastePhoto($event)"
+        :aria-disabled="photoBusy || !photoReady" :aria-busy="photoBusy"
+        class="mt-3 cursor-text rounded-lg border-2 border-dashed border-teal-600 bg-white p-4 focus:outline-2 focus:outline-teal-800">
+        <strong>2. Haz clic aquí y pega la foto con Ctrl+V</strong>
+        <p class="mt-1 text-sm">También admite una captura copiada. Una imagen JPG, PNG o WEBP por vez, máximo 5 MB. Pegar la dirección de la imagen no sube la foto.</p>
+    </div>
+    <button type="button" x-show="photoRetry" class="btn-primary mt-3 min-h-11" @click="retryPhoto()" :disabled="photoBusy">Reintentar foto pendiente</button>
+    <label for="comparable-photo-caption" class="label mt-3">Descripción opcional · escríbela antes de pegar</label>
+    <input id="comparable-photo-caption" class="input" x-model="photoCaption" maxlength="300" :disabled="photoBusy" placeholder="Ej.: recepción, foto del aviso consultado hoy">
+    <details class="mt-3">
+    <summary class="min-h-11 cursor-pointer py-3 font-semibold">Alternativa: elegir una foto guardada en el equipo</summary>
     <label for="comparable-photo-file" class="label mt-3">Foto del inmueble · JPG, PNG o WEBP, máximo 5 MB</label>
     <input id="comparable-photo-file" type="file" accept="image/jpeg,image/png,image/webp" x-ref="photoFile" :disabled="photoBusy" class="input min-h-11" aria-describedby="comparable-photo-message">
-    <label for="comparable-photo-caption" class="label mt-3">Descripción y procedencia de la foto</label>
-    <input id="comparable-photo-caption" class="input" x-model="photoCaption" maxlength="300" :disabled="photoBusy" placeholder="Ej.: recepción, captura del aviso consultado el 30/09/2026">
-    <button type="button" class="btn-primary mt-3 min-h-11" @click="uploadPhoto()" :disabled="photoBusy">Subir foto</button>
+    <button type="button" class="btn-primary mt-3 min-h-11" @click="uploadPhoto()" :disabled="photoBusy || !photoReady">Subir archivo elegido</button>
+    </details>
     <p id="comparable-photo-message" role="status" class="mt-2 text-sm" x-text="photoMessage"></p>
     <div class="mt-3 grid gap-3 sm:grid-cols-3">
         <template x-for="photo in photos" :key="photo.id">

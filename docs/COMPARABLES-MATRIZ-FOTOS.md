@@ -8,6 +8,18 @@ grupos de la matriz y al desplegable de criterios; no se eliminan datos técnico
 
 Cada fila tiene «Fotos»: confirma los autoguardados pendientes antes de consultar
 el soporte y permite subir una imagen por acción, tantas veces como se requiera.
+El panel incluye «Abrir aviso de esta muestra» desde su URL registrada y un área
+para pegar con Ctrl+V una imagen copiada o captura. Pegar sube directamente por
+multipart al mismo endpoint privado y muestra éxito tras respuesta; elegir un
+archivo queda como alternativa plegada. Texto, HTML y enlaces del portapapeles
+no se descargan ni insertan. No usa lectura automática del portapapeles. Conserva
+en memoria la imagen fallida para reintentar mientras siga abierto el panel; al
+abrir otra muestra se limpia y nunca se reutiliza en otra. Descripción opcional
+antes de pegar; JPG/PNG/WEBP hasta 5 MB y validación real en servidor conservada.
+Validación de esta mejora: 359 comprobaciones PHP, 81 pruebas JS, lint, build y
+53,2 KB gzip. Pegado real de PNG en navegador local con endpoint simulado y vista
+móvil; prueba multipart/reintento y límites en JS. La persistencia privada sigue
+el endpoint previamente probado; esta mejora no cambia esquema ni almacenamiento.
 Admite JPG, PNG o WEBP hasta 5 MB; valida contenido/extensión en servidor, muestra
 miniaturas privadas y conserva descripción, nombre original, fecha y SHA-256.
 Una imagen idéntica en la misma muestra no se duplica. No descarga fotos del portal,
