@@ -13,6 +13,7 @@ import { installHelpTooltips } from './help-tooltips.js';
 import { installConservationSummaryLive } from './conservation-summary-live.js';
 import { installMoneyInputs } from './money-input.js';
 import { installDerivedRefresh } from './derived-refresh.js';
+import { installComparableBulkImport } from './comparable-bulk-import.js';
 
 window.Alpine = Alpine;
 Alpine.data('appraisalForm', appraisalForm);
@@ -29,4 +30,5 @@ installHelpTooltips();
 installConservationSummaryLive();
 installMoneyInputs();
 installDerivedRefresh();
+installComparableBulkImport();
 installFetchNavigation();
