@@ -40,8 +40,11 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
             <button type="button" class="btn-primary min-h-11" @click="selectSuggested()">Seleccionar sugeridos</button>
             <button type="button" class="btn-secondary min-h-11" @click="refreshDuplicates(); selected = visibleResults.filter(item => item.tone !== 'registered').map(item => item.row.source_url)">Seleccionar todos los disponibles</button>
             <button type="button" class="btn-secondary min-h-11" @click="selected = []" :disabled="!selected.length">Desmarcar todos</button>
-            <button type="button" class="btn-primary min-h-11" @click="incorporate()" :disabled="!selected.length || busy">Agregar seleccionados (<span x-text="selected.length"></span>)</button>
+            <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'matriz'">Ver en matriz (<span x-text="total"></span>)</button>
+            <button type="button" class="btn-primary min-h-11" @click="incorporate()" :disabled="!selected.length || busy">Agregar nuevos seleccionados (<span x-text="selected.length"></span>)</button>
         </div>
+        <p class="mt-2 text-sm" role="status"><strong><span x-text="total"></span> en la matriz en total</strong> · <span x-text="results.filter(item => item.tone === 'registered').length"></span> avisos de esta página ya están en ella · <span x-text="selected.length"></span> seleccionados pendientes de agregar.</p>
+        <p class="mt-1 text-xs text-slate-600">Buscar y seleccionar no agregan muestras. «Agregar nuevos seleccionados» las incorpora a la matriz y activa el autoguardado; consulta su confirmación de guardado.</p>
         <p class="mt-2 text-sm">Verde: sugerido para conservar. Amarillo: alternativa o coincidencia por revisar. Gris: ya incorporado, no se vuelve a agregar.</p>
         <p class="mt-1 text-xs text-slate-600">Los sugeridos conservan el primer aviso sin coincidencia con otro sugerido ni con la matriz. Es una ayuda de selección, no confirma que sean inmuebles distintos. Puedes cambiar las casillas.</p>
         <div class="mt-3 grid gap-2 sm:grid-cols-2">

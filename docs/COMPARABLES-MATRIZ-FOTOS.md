@@ -30,6 +30,18 @@ Verificado en escritorio y móvil; lint de la vista, 359 verificaciones PHP,
 
 ### Revisión de coincidencias antes de incorporar
 
+Contadores de captura: junto a la selección, «Ver en matriz (N)» usa el mismo total
+del encabezado; «Agregar nuevos seleccionados (N)» cuenta solo pendientes. Un
+resumen distingue total de matriz, coincidencias exactas de esta página y selección.
+El total describe filas de trabajo; el estado de autoguardado confirma persistencia.
+Revisados controlador/servicio de búsqueda y las llamadas de importación: buscar
+y seleccionar no incorporan ni guardan muestras. Una prueba de regresión confirma
+que consultar y seleccionar dejan intacta la matriz y no disparan eventos de guardado.
+Esto no reconstruye cómo se incorporaron registros en una sesión anterior del hosting.
+Validación: 359 verificaciones PHP, 75 pruebas JS, lint, build y 52,1 KB gzip;
+navegador local confirmó 12 existentes + 2 pendientes, después 14 + 0 y navegación
+a la matriz. Publicar vista y assets; sin cambios de esquema.
+
 Actualización de selección: verde identifica los sugeridos nuevos; amarillo, las
 alternativas y las coincidencias con la matriz; gris, enlaces ya incorporados,
 con casilla bloqueada. «Seleccionar sugeridos» conserva por orden de resultados

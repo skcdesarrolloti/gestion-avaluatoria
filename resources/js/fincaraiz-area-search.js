@@ -70,6 +70,7 @@ export function fincaraizAreaSearch() {
             finally { clearTimeout(timer); this.busy = false; }
         },
         incorporate() {
+            if (this.busy || !this.selected.length) return;
             this.refreshDuplicates();
             const pending = unresolvedCandidates(this.results, this.selected);
             if (pending.length) {
