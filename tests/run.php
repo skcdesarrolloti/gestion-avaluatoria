@@ -4,6 +4,7 @@ require dirname(__DIR__) . '/bootstrap.php';
 require __DIR__ . '/support.php';
 require __DIR__ . '/comparable-search-render.php';
 require __DIR__ . '/comparable-url-reader.php';
+require __DIR__ . '/comparable-area-search.php';
 use App\Core\Session;
 use App\Database\Schema;
 use App\Core\Http;

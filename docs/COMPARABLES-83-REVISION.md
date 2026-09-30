@@ -85,6 +85,30 @@ Antes de presentar un anexo definitivo se requiere cerrar:
 
 ## Lectura por enlace y búsquedas por portal (30/09/2026)
 
+- Búsqueda por barrio en FincaRaíz para oficinas en venta en Cartagena: el barrio
+  inicia desde el expediente y puede cambiarse sin modificar el sujeto. Consulta
+  una página pública de resultados por petición, permite marcar varios avisos y
+  agregarlos juntos a la tabla como por verificar. Página siguiente solo si existe
+  enlace publicado; máximo 10 páginas. Los demás casos conservan lectura individual.
+- Se verifica URL canónica del listado; no se aceptan redirecciones o un listado
+  genérico que no confirme la zona. Mismas restricciones de conexión del lector.
+  Endpoint POST `comparables/buscar-zona` con CSRF, sesión y propietario; comprueba
+  tipo, negocio y ciudad del expediente. Máximo 30 consultas por 15 minutos/usuario.
+- Se usa el resumen JSON-LD de cada aviso, no la ficha completa. Conserva URL, código,
+  consulta, precio COP, área MTK y datos publicados. `query_used` guarda la URL de
+  búsqueda con barrio y página. La ubicación del resumen puede ser inexacta y el
+  área puede estar redondeada: revisar ficha y evidencia antes del análisis.
+- La pestaña principal queda con barrio, buscar, resultados seleccionables y
+  paginación. Captura por enlace y pegado de texto pasan a un desplegable secundario.
+  Barrio y selección temporal no se guardan hasta incorporar; no modifica otras fuentes.
+- Comprobación en vivo de Bocagrande: primera página 21 avisos legibles y segunda
+  17 al momento de la prueba. No equivale a 38 inmuebles únicos ni comparables válidos.
+  Validación: 347 verificaciones PHP, 64 pruebas JS, lint 489 PHP y build 50,3 KB gzip.
+  Navegador: incorporación conjunta, contador acumulativo, siguiente página y fin
+  de resultados, interfaz escritorio/móvil 390 px. No permite paginar con selección
+  pendiente; incorporar o quitar selección primero.
+  Sin migraciones ni cambios de persistencia; se mantienen los pendientes documentados.
+
 - «Buscar otro inmueble» en FincaRaíz limpia enlace, vista previa, errores y estado
   de incorporación y abre la búsqueda de la pestaña. No modifica filas. Durante
   una lectura pendiente no permite reiniciar para evitar una respuesta tardía.

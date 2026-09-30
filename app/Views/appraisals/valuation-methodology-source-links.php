@@ -34,6 +34,9 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
     ?>
         <section role="tabpanel" id="source-panel-<?= $sourceIndex ?>" aria-labelledby="source-tab-<?= $sourceIndex ?>"
             x-show="sourceTab === <?= $sourceIndex ?>" <?= $sourceIndex ? 'x-cloak' : '' ?> class="mt-4 rounded-xl bg-white p-4">
+            <?php if ($isFincaraiz && isset($record['id'])): ?>
+                <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-fincaraiz-zone.php'; ?>
+            <?php else: ?>
             <h4 class="font-semibold text-blue-950">1. Buscar en <?= e($source['label']) ?></h4>
             <p class="mt-2 text-sm font-semibold">Tu búsqueda para esta fuente</p>
             <p class="text-anywhere mt-1 rounded-lg bg-slate-50 p-3 text-sm"><?= e($baseQuery ?: 'Completa tipo de inmueble, operación y ubicación en el expediente.') ?></p>
@@ -51,6 +54,7 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
             <?php if ($isFincaraiz): ?><details class="mt-3"><summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Si la lectura falla: pegar enlace y texto</summary><?php endif; ?>
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-paste.php'; ?>
             <?php if ($isFincaraiz): ?></details><?php endif; ?>
+            <?php endif; ?>
         </section>
     <?php endforeach; ?>
 </section>

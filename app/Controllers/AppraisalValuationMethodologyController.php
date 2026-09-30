@@ -70,4 +70,23 @@ final class AppraisalValuationMethodologyController
             Http::json(['ok' => false, 'message' => $error->getMessage()], 502);
         }
     }
+
+    public function searchComparables(string $id): never
+    {
+        $record = $this->appraisals->find($id, $this->user['id']);
+        $subject = $this->subjects->find($id, $this->user['id']);
+        (new \App\Services\RateLimiter(BASE_PATH . '/storage/rate-limits'))->consume('comparable-search:' . $this->user['id'], 30, 900);
+        try {
+            $city = mb_strtolower(trim((string) ($subject['city_name'] ?? '')) ?: trim((string) ($record['municipio'] ?? '')));
+            if (($record['tipo_inmueble'] ?? '') !== 'oficina' || ($record['tipo_negocio'] ?? '') !== 'venta'
+                || !in_array($city, ['cartagena', 'cartagena de indias'], true)) {
+                throw new \InvalidArgumentException('La búsqueda por barrio está disponible para oficinas en venta en Cartagena. Usa la lectura individual para otros casos.');
+            }
+            $neighborhood = $_POST['neighborhood'] ?? '';
+            $page = filter_var($_POST['page'] ?? 1, FILTER_VALIDATE_INT);
+            if (!is_string($neighborhood) || $page === false) throw new \InvalidArgumentException('Barrio o página inválidos.');
+            Http::json(['ok' => true] + (new \App\Services\FincaraizAreaSearch())->search($neighborhood, $page));
+        } catch (\InvalidArgumentException $error) { Http::json(['ok' => false, 'message' => $error->getMessage()], 422); }
+        catch (\RuntimeException $error) { Http::json(['ok' => false, 'message' => $error->getMessage()], 502); }
+    }
 }

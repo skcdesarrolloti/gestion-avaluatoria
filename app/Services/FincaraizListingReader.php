@@ -19,6 +19,14 @@ final class FincaraizListingReader
     public function read(string $url): array
     {
         $url = self::canonicalUrl($url);
+        return (new FincaraizListingParser())->parse($this->fetch($url), $url);
+    }
+
+    public function fetch(string $url): string
+    {
+        if (!preg_match('~^https://www\.fincaraiz\.com\.co/venta/oficinas/[a-z0-9-]+/cartagena(?:/pagina[2-9]|/pagina10)?$~D', $url)) {
+            $url = self::canonicalUrl($url);
+        }
         if (!extension_loaded('curl')) throw new \RuntimeException('El servidor necesita la extensión PHP cURL para leer avisos.');
         $addresses = gethostbynamel('www.fincaraiz.com.co') ?: [];
         $ip = $addresses[0] ?? '';
@@ -43,6 +51,6 @@ final class FincaraizListingReader
         if ($success === false || $status !== 200) {
             throw new \RuntimeException('El portal no permitió leer este aviso o ya no está disponible. Puedes copiar su texto en la captura manual.');
         }
-        return (new FincaraizListingParser())->parse($html, $url);
+        return $html;
     }
 }
