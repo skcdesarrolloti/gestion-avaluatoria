@@ -17,8 +17,50 @@ $minimumFields = [
     'Factor que soporta para el análisis 8.4',
     'Observación de comparabilidad',
 ];
+$baseQuery = trim((string) ($sourceSearch['query'] ?? ''));
 $tip = static fn (string $text): string => '<span class="help-dot" title="' . e($text) . '">?</span>';
 ?>
+<section class="mb-6 rounded-xl border border-blue-100 bg-blue-50 p-4">
+    <p class="text-xs font-bold uppercase text-blue-800">Primero busca con este texto</p>
+    <h3 class="mt-2 text-xl font-semibold text-blue-950">Prompt de búsqueda y fuentes para traer comparables</h3>
+    <p class="mt-2 text-sm leading-6 text-blue-950">
+        Usa este texto en Google, portales e inmobiliarias. Cuando encuentres una oferta comparable, vuelve aquí
+        y registra una fila en la tabla madre.
+    </p>
+    <div class="mt-4 flex flex-wrap items-center gap-3 rounded-lg bg-white p-3">
+        <code class="text-anywhere flex-1 font-mono text-sm font-semibold text-slate-900">
+            <?= e($baseQuery ?: 'Completa el bien sujeto para formar una búsqueda automática.') ?>
+        </code>
+        <?php if ($baseQuery !== ''): ?>
+            <button type="button" class="btn-secondary min-h-9 text-xs"
+                x-on:click="navigator.clipboard?.writeText(<?= e(json_encode($baseQuery, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>)">
+                Copiar búsqueda
+            </button>
+        <?php endif; ?>
+    </div>
+    <div class="mt-4 grid gap-4 xl:grid-cols-2">
+        <div>
+            <p class="text-xs font-bold uppercase text-blue-800">Portales</p>
+            <div class="mt-3 grid gap-3">
+                <?php foreach ($portalSources as $source): ?>
+                    <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-card.php'; ?>
+                <?php endforeach; ?>
+            </div>
+        </div>
+        <div>
+            <p class="text-xs font-bold uppercase text-blue-800">Inmobiliarias locales</p>
+            <?php if ($agencySources === []): ?>
+                <p class="mt-3 rounded-lg bg-white p-3 text-sm text-slate-600">No hay inmobiliarias priorizadas para esta ciudad; usa portales y fuentes locales verificables.</p>
+            <?php else: ?>
+                <div class="mt-3 grid gap-3">
+                    <?php foreach ($agencySources as $source): ?>
+                        <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-card.php'; ?>
+                    <?php endforeach; ?>
+                </div>
+            <?php endif; ?>
+        </div>
+    </div>
+</section>
 <section class="mb-6 rounded-xl border border-orange-100 bg-orange-50 p-4">
     <p class="text-xs font-bold uppercase text-orange-800">Qué hago ahora</p>
     <h3 class="mt-2 text-xl font-semibold text-orange-950">Llena la tabla madre: una fila por cada muestra encontrada</h3>
