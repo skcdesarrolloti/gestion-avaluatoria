@@ -80,10 +80,16 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
         <p class="text-xs font-bold uppercase text-blue-800">Diseño de muestra para 8.3 <?= $tip('Aquí decides la estrategia antes de buscar: qué factores vas a probar, cuántas observaciones necesitas y cuándo una oferta entra o se descarta. No es cálculo; es el plan de investigación.') ?></p>
         <h3 class="mt-2 text-xl font-semibold text-blue-950">Antes de capturar, decide qué factores vas a probar</h3>
         <p class="mt-3 text-sm leading-6 text-blue-950"><?= e((string) ($sampleDesign['minimum_message'] ?? '')) ?></p>
-        <p class="mt-3 rounded-lg bg-white p-3 text-sm leading-6 text-blue-950">
-            Léelo como una lista de trabajo: primero confirma la tipología del sujeto, luego escoge los factores
-            que sí vas a comparar y finalmente busca suficientes ofertas para soportarlos.
-        </p>
+        <div class="mt-3 rounded-lg border border-blue-200 bg-blue-100 p-3 text-sm leading-6 text-blue-950">
+            <p class="text-xs font-bold uppercase text-blue-800">Guía generada automáticamente, no editable</p>
+            <p class="mt-1">
+                Sale de la tipología del bien sujeto, los factores disponibles para 8.4 y la guía interna de muestra.
+                Para trabajarla, ve al sitio de diligenciamiento y registra las ofertas reales.
+            </p>
+            <button type="button" class="btn-secondary mt-3 min-h-9 text-xs" x-on:click="searchTab = 'captura'; window.scrollTo({ top: 0, behavior: 'smooth' })">
+                Ir a 2. Capturar muestras
+            </button>
+        </div>
         <div class="mt-4 grid gap-3">
             <?php foreach (($sampleDesign['protocol'] ?? []) as $step): ?>
                 <p class="rounded-lg bg-white p-3 text-sm leading-6 text-slate-700"><?= e((string) $step) ?></p>
