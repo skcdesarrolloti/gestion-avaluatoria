@@ -29,6 +29,7 @@ $operations = ['' => 'Seleccionar', 'Venta' => 'Venta', 'Arriendo' => 'Arriendo'
 $priceUnits = ['' => 'Seleccionar', 'precio_total' => 'Precio total', 'canon_mensual' => 'Canon mensual', 'valor_m2' => 'Valor/m2'];
 $yesNo = ['' => 'No definido', 'si' => 'Sí', 'no' => 'No'];
 $locationPrecisions = ['' => 'No definida', 'exacta' => 'Exacta', 'aproximada' => 'Aproximada', 'sector' => 'Solo sector'];
+$tip = static fn (string $text): string => '<span class="help-dot" title="' . e($text) . '">?</span>';
 ?>
 <form class="mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" method="post"
     action="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables')) ?>"
@@ -55,11 +56,13 @@ $locationPrecisions = ['' => 'No definida', 'exacta' => 'Exacta', 'aproximada' =
             <thead class="bg-slate-50 text-xs font-bold uppercase text-slate-500">
                 <tr>
                     <th class="px-3 py-3">#</th><th class="px-3 py-3">Usar</th><th class="px-3 py-3">Estado</th>
-                    <th class="px-3 py-3">Factor 8.4</th>
+                    <th class="px-3 py-3">Factor 8.4 <?= $tip('Marca aquí para qué variable servirá esta muestra en el análisis 8.4: ubicación, área, estado, piso, parqueaderos, amenidades u otra variable relevante.') ?></th>
                     <th class="px-3 py-3">Tipo fuente</th><th class="px-3 py-3">Fuente</th><th class="px-3 py-3">Enlace</th>
                     <th class="px-3 py-3">Consulta</th><th class="px-3 py-3">Operación</th><th class="px-3 py-3">Tipo inmueble</th>
                     <th class="px-3 py-3">Barrio/sector</th><th class="px-3 py-3">Dirección</th><th class="px-3 py-3">Edificio/proyecto</th>
-                    <th class="px-3 py-3">Latitud</th><th class="px-3 py-3">Longitud</th><th class="px-3 py-3">Precisión mapa</th>
+                    <th class="px-3 py-3">Latitud <?= $tip('Coordenada norte-sur de la muestra. Puedes tomarla de Google Maps o del portal cuando exista ubicación. Si no es exacta, deja precisión aproximada o solo sector.') ?></th>
+                    <th class="px-3 py-3">Longitud <?= $tip('Coordenada oriente-occidente de la muestra. Junto con latitud alimenta el mapa del paso 3; usa punto como separador decimal.') ?></th>
+                    <th class="px-3 py-3">Precisión mapa <?= $tip('Indica si la coordenada es exacta, aproximada o solo del sector. Esto evita tratar como exacta una ubicación tomada por referencia general.') ?></th>
                     <th class="px-3 py-3">Precio/canon</th><th class="px-3 py-3">Unidad</th><th class="px-3 py-3">Área m2</th>
                     <th class="px-3 py-3">Admin.</th><th class="px-3 py-3">IVA</th><th class="px-3 py-3">Alc.</th>
                     <th class="px-3 py-3">Baños</th><th class="px-3 py-3">Parq.</th><th class="px-3 py-3">Piso</th>

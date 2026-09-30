@@ -27,11 +27,12 @@ $xy = static function (float $lat, float $lng) use ($minLat, $maxLat, $minLng, $
 };
 $boundsText = $hasMap ? number_format($minLat, 5, '.', '') . ', ' . number_format($minLng, 5, '.', '')
     . ' / ' . number_format($maxLat, 5, '.', '') . ', ' . number_format($maxLng, 5, '.', '') : '';
+$tip = static fn (string $text): string => '<span class="help-dot" title="' . e($text) . '">?</span>';
 ?>
 <section class="rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">Mapa de muestras seleccionadas</p>
+            <p class="eyebrow">Mapa de muestras seleccionadas <?= $tip('El mapa se dibuja automáticamente con las filas activas que tengan latitud y longitud. Si está vacío, vuelve a Capturar y completa esas columnas.') ?></p>
             <h3 class="mt-2 text-xl font-semibold">Concentración espacial del mercado</h3>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Registra latitud y longitud en Captura para ver si las muestras realmente rodean el bien sujeto
@@ -44,6 +45,8 @@ $boundsText = $hasMap ? number_format($minLat, 5, '.', '') . ', ' . number_forma
         <div class="mt-4 rounded-xl border border-dashed border-slate-300 bg-slate-50 p-6 text-sm leading-6 text-slate-600">
             Aún no hay coordenadas. En la pestaña Captura completa latitud y longitud de las muestras usadas o
             preseleccionadas. Si el portal no muestra dirección exacta, marca la precisión como aproximada o solo sector.
+            Para obtenerlas puedes abrir la ubicación en Google Maps, hacer clic sobre el punto y copiar los dos números
+            que aparecen como latitud y longitud.
         </div>
     <?php else: ?>
         <div class="mt-4 grid gap-4 xl:grid-cols-[1.1fr_0.9fr]">
