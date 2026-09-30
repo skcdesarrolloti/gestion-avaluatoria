@@ -9,7 +9,7 @@ $bulkQuery = trim((string) ($baseQuery ?? ''));
             <li><strong>1. Buscar:</strong> elige una fuente y sigue su indicación de filtros: operación, ciudad, barrio, tipo de inmueble y alcobas. Captura y revisa sus avisos antes de pasar a la siguiente. La frase del sistema resume la búsqueda; no es una instrucción de IA para el portal.</li>
             <li><strong>2. Abrir el aviso:</strong> en FincaRaíz, copia el enlace del inmueble y usa «Leer aviso» arriba. En otros portales, copia enlace y texto (precio, áreas y características) y pégalos juntos abajo.</li>
             <li><strong>3. Cargar:</strong> pulsa «Cargar en filas vacías». Se prellenan los datos que el lector reconozca; lo no reconocido se revisa en la ficha. Para varios avisos, separa cada uno con una línea vacía.</li>
-            <li><strong>4. Revisar:</strong> recorre Captura básica, Ubicación, Atributos y Revisión. Son grupos de la misma muestra. No completes con suposiciones datos que el aviso no informa.</li>
+            <li><strong>3. Matriz de datos:</strong> recorre Captura básica, Ubicación, Atributos y Revisión. Son grupos de la misma muestra. No completes con suposiciones datos que el aviso no informa.</li>
             <li><strong>5. Conservar soporte:</strong> guarda una captura o PDF del aviso donde se vean precio, ubicación, áreas y características, junto con URL y fecha. Una foto del inmueble sola no documenta el precio anunciado. Esta captura de datos todavía no adjunta imágenes ni PDF a la muestra.</li>
             <li><strong>6. Preparar 8.4:</strong> verifica vigencia y duplicados, documenta la selección y los descartes. Los atributos describen la muestra; no se aplican coeficientes de homologación desde esta pantalla.</li>
         </ol>

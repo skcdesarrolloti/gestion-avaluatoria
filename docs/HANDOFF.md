@@ -1,5 +1,9 @@
 # Entrega al responsable de la implementación
 
+Actualización: [matriz, PH y fotos de comparables](COMPARABLES-MATRIZ-FOTOS.md).
+Incluye migración nueva, fotos privadas por muestra, envío compacto y control de
+versión de la matriz; reemplaza los pendientes anteriores de transporte/concurrencia.
+
 Actualización del 30/09/2026: [captura y revisión de comparables 8.3](COMPARABLES-83-REVISION.md).
 Fichas paginadas, pendientes, búsqueda por fuente y pegado por lotes. Incluye límites
 de la revisión NTS y pendientes del anexo y de concurrencia del guardado existente.

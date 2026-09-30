@@ -21,8 +21,8 @@ $formulaFamilies = [
 $searchTabs = [
     'buscar' => '1. Buscar',
     'captura' => '2. Capturar',
-    'mapa' => '3. Mapa',
-    'revision' => '4. Revisar',
+    'matriz' => '3. Matriz de datos',
+    'mapa' => '4. Mapas',
 ];
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ searchTab: 'buscar' }">
@@ -77,13 +77,14 @@ $searchTabs = [
                 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-filtros.php'; ?>
             </div>
         </div>
-        <div id="captura-83" class="scroll-mt-6" x-show="searchTab === 'captura'">
+        <div id="captura-83" class="scroll-mt-6" x-show="['captura', 'matriz'].includes(searchTab)">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-captura.php'; ?>
         </div>
         <div x-show="searchTab === 'mapa'">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-map.php'; ?>
         </div>
-        <div x-show="searchTab === 'revision'">
+        <div x-show="searchTab === 'matriz'">
+            <details class="mt-6 rounded-xl border border-slate-200 p-4"><summary class="min-h-11 cursor-pointer font-semibold">Criterios y preparación del análisis</summary>
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-matriz.php'; ?>
             <div class="mt-6">
                 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-variables.php'; ?>
@@ -93,7 +94,7 @@ $searchTabs = [
             </div>
             <div class="mt-6">
                 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-criterios.php'; ?>
-            </div>
+            </div></details>
         </div>
     </div>
 </section>

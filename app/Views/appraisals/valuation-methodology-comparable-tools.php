@@ -4,7 +4,12 @@
         <span x-text="duplicates"></span> con enlace repetido
     </p>
     <p class="mt-1 text-xs text-slate-600">Control operativo de captura. No certifica cumplimiento NTS ni suficiencia de la muestra. Los datos sin publicar quedan pendientes de verificación.</p>
-    <div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" @input.stop @change.stop>
+    <p class="mb-2 text-xs">PH del inmueble avaluado: <strong><?= e(['si' => 'Sí', 'no' => 'No', 'no_aplica' => 'No aplica'][$record['regimen_ph'] ?? ''] ?? 'Por verificar') ?></strong>. Clasifica las muestras por separado.</p>
+        <div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" @input.stop @change.stop>
+        <label class="label">Propiedad horizontal
+            <select class="input" :value="phFilter" @change="phFilter = $event.target.value; page = 1; render()"><option value="all">Todos los regímenes</option><option value="si">Sí, PH</option><option value="no">No PH</option><option value="por_verificar">Por verificar</option></select>
+            <span class="mt-1 block text-xs font-normal">Separa PH de amenidades. Completa el régimen con soporte; no se deduce del precio de administración.</span>
+        </label>
         <label class="label">Vista
             <select class="input" :value="mode" @change="mode = $event.target.value; render()" aria-describedby="comparable-view-help"><option value="cards">Fichas sin desplazamiento lateral</option><option value="table">Tabla comparativa</option></select>
             <span id="comparable-view-help" class="mt-1 block text-xs font-normal text-slate-600">Fichas para diligenciar; tabla para comparar varias muestras.</span>
@@ -25,7 +30,7 @@
     <div class="mt-3 flex flex-wrap items-center gap-2">
         <button type="button" class="btn-secondary" @click="add()" :disabled="total >= 60">Nueva muestra</button>
         <button type="button" class="btn-secondary" @click="page--; render()" :disabled="page <= 1">Anterior</button>
-        <span class="text-sm" aria-live="polite">Página <span x-text="page"></span> de <span x-text="pages"></span> · hasta 5 fichas</span>
+        <span class="text-sm" aria-live="polite">Página <span x-text="page"></span> de <span x-text="pages"></span> · hasta 10 inmuebles</span>
         <button type="button" class="btn-secondary" @click="page++; render()" :disabled="page >= pages">Siguiente</button>
         <button type="submit" class="btn-primary">Guardar ahora</button>
         <span class="text-xs" data-autosave-status aria-live="polite">Autoguardado activo</span>

@@ -31,7 +31,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
             <h3 class="mt-2 text-xl font-semibold text-teal-950">Aquí no se calcula todavía: aquí construyes la muestra de mercado</h3>
             <p class="mt-2 max-w-4xl text-sm leading-6 text-teal-950"><?= e($nextAction) ?></p>
             <p class="mt-1 max-w-4xl text-xs font-semibold leading-5 text-teal-800">
-                Flujo simple: 1. Buscar fuentes, 2. Capturar comparables, 3. Ver mapa, 4. Revisar matriz y variables.
+                Flujo simple: 1. Buscar fuentes, 2. Capturar comparables, 3. Matriz de datos, 4. Mapas.
             </p>
         </div>
         <span class="rounded-full bg-white px-3 py-1 text-xs font-bold text-teal-800"><?= e((string) $usableCount) ?>/<?= e((string) $targetTotal) ?> muestras</span>
@@ -46,7 +46,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
             <span class="mt-1 block text-xs font-medium leading-5 text-slate-500">Llena 60 filas posibles con precio, área, fuente, fecha, factor y observación.</span>
         </article>
         <article class="rounded-lg bg-white p-3 text-sm font-semibold text-slate-800 shadow-sm">
-            3. Revisar ubicación
+            4. Revisar ubicación
             <span class="mt-1 block text-xs font-medium leading-5 text-slate-500">Marca coordenadas para ver si la muestra sí corresponde al microsector comparable.</span>
         </article>
     </div>
@@ -57,12 +57,12 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
             <p class="mt-1 text-xs leading-5 text-slate-500">Se llena en: 2. Capturar.</p>
         </div>
         <div class="rounded-lg bg-white px-3 py-2">
-            <p class="text-xs font-bold uppercase text-slate-500">Con factor 8.4 <?= $tip('Origen: columna Factor 8.4 en 2. Capturar muestras. Se cuenta cuando marcas para qué variable servirá cada muestra en el análisis estadístico de 8.4.') ?></p>
+            <p class="text-xs font-bold uppercase text-slate-500">Con factor 8.4 <?= $tip('Origen: columna Factor 8.4 en 3. Matriz de datos. Se cuenta cuando marcas para qué variable servirá cada muestra en el análisis estadístico de 8.4.') ?></p>
             <p class="font-semibold text-slate-950"><?= e((string) array_sum($factorCounts)) ?></p>
             <p class="mt-1 text-xs leading-5 text-slate-500">Se llena en: columna Factor 8.4.</p>
         </div>
         <div class="rounded-lg bg-white px-3 py-2">
-            <p class="text-xs font-bold uppercase text-slate-500">Con coordenadas <?= $tip('Origen: columnas Latitud y Longitud en 2. Capturar muestras. Se cuenta cuando una fila activa tiene ambas coordenadas y alimenta el mapa del paso 3.') ?></p>
+            <p class="text-xs font-bold uppercase text-slate-500">Con coordenadas <?= $tip('Origen: columnas Latitud y Longitud en 3. Matriz de datos. Se cuenta cuando una fila activa tiene ambas coordenadas y alimenta el mapa del paso 4.') ?></p>
             <p class="font-semibold text-slate-950"><?= e((string) $georefCount) ?></p>
             <p class="mt-1 text-xs leading-5 text-slate-500">Se llena en: Latitud y Longitud.</p>
         </div>
@@ -70,9 +70,8 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
 </section>
 
 <section class="mt-4 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
-    <strong>Importante:</strong> por ahora el aplicativo no se conecta solo a los portales ni descarga avisos automáticamente.
-    Te deja la consulta lista, los portales e inmobiliarias priorizadas y la tabla para registrar la muestra. Si defines la búsqueda,
-    Codex puede ayudarte a explorar fuentes y devolverte datos para capturarlos, pero el sistema aún no hace scraping automático.
+    FincaRaíz permite consultar oficinas en venta por barrio de Cartagena y seleccionar los resultados que se incorporan a la matriz.
+    En otras fuentes usa el enlace y el texto del aviso. Revisa los datos publicados y adjunta sus fotos desde la matriz.
 </section>
 
 <div class="mt-6 grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
@@ -163,7 +162,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
 <section class="mt-6 rounded-xl border border-slate-200 bg-white p-4">
     <div class="flex flex-wrap items-start justify-between gap-3">
         <div>
-            <p class="text-xs font-bold uppercase text-slate-500">Factores de análisis <?= $tip('Origen: campo Factor 8.4 de cada fila en 2. Capturar muestras. El tablero suma observaciones por variable para saber si hay soporte suficiente.') ?></p>
+            <p class="text-xs font-bold uppercase text-slate-500">Factores de análisis <?= $tip('Origen: campo Factor 8.4 de cada fila en 3. Matriz de datos. El tablero suma observaciones por variable para saber si hay soporte suficiente.') ?></p>
             <h3 class="mt-2 text-xl font-semibold text-slate-950">Meta de muestra por factor</h3>
             <p class="mt-2 text-sm leading-6 text-slate-600">
                 Cada muestra capturada se marca con un factor. El tablero ayuda a ver si la investigación ya soporta

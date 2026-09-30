@@ -6,6 +6,7 @@ require __DIR__ . '/comparable-search-render.php';
 require __DIR__ . '/comparable-url-reader.php';
 require __DIR__ . '/comparable-area-search.php';
 require __DIR__ . '/comparable-neighborhood-catalog.php';
+require __DIR__ . '/comparable-photo-input.php';
 use App\Core\Session;
 use App\Database\Schema;
 use App\Core\Http;

@@ -8,7 +8,7 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
     <p class="mt-2 text-sm leading-6">Trabaja con esta fuente. Cada aviso que agregues se suma a tu tabla.</p>
     <div class="mt-3 flex flex-wrap items-center gap-3 text-sm">
         <strong><span x-text="total"><?= count($comparableRows ?? []) ?></span> muestras en la tabla</strong>
-        <a class="btn-secondary min-h-11" href="#capture-review">Ver y revisar tabla</a>
+        <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'matriz'">Ver Matriz de datos</button>
         <span data-autosave-status>Consulta el estado de guardado al incorporar.</span>
     </div>
     <details class="mt-3" x-ref="sourcePicker">

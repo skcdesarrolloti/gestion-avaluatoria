@@ -62,6 +62,6 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
     </div>
 
     <div class="mt-4">
-        <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-links.php'; ?>
+        <button type="button" class="btn-primary min-h-11" @click="searchTab = 'captura'">Ir a Capturar por fuente</button>
     </div>
 </div>

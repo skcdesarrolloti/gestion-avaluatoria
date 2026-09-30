@@ -1,10 +1,11 @@
+import { comparablePhotos } from './comparable-photos.js';
 import { hasComparableData, missingComparableFields, comparableUrlKey } from './comparable-review.js';
 
 const groups = {
     capture: ['source_type', 'source_name', 'source_url', 'operation', 'property_type', 'neighborhood',
-        'project_name', 'price_amount', 'price_unit', 'area_m2', 'consulted_at', 'contact_name', 'contact_phone'],
+        'project_name', 'ph_regime', 'price_amount', 'price_unit', 'area_m2', 'consulted_at', 'contact_name', 'contact_phone'],
     location: ['neighborhood', 'address_hint', 'project_name', 'latitude', 'longitude', 'location_precision', 'map_notes'],
-    attributes: ['admin_fee', 'vat_applies', 'bedrooms', 'bathrooms', 'parking_spaces', 'floor_level', 'stratum',
+    attributes: ['ph_regime', 'admin_fee', 'vat_applies', 'bedrooms', 'bathrooms', 'parking_spaces', 'floor_level', 'stratum',
         'age_years', 'building_condition', 'conservation_state', 'view_quality', 'finish_quality', 'elevator',
         'amenities', 'security_features', 'power_plant', 'parking_relation', 'balcony_terrace', 'noise_humidity_sun'],
     review: ['active', 'status', 'analysis_factor', 'query_used', 'listing_code', 'listing_date',
@@ -14,7 +15,7 @@ const groups = {
 export function comparableWorkbench() {
     let entries = [], resize, form;
     return {
-        mode: 'cards', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
+        ...comparablePhotos(), phFilter: 'all', mode: 'table', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
         pending: 0, duplicates: 0, shown: 0,
         get groupHelp() {
             return {
@@ -27,6 +28,7 @@ export function comparableWorkbench() {
         },
         init() {
             form = this.$el;
+            this.initPhotos(form);
             const headers = [...form.querySelectorAll('thead th')].map(th => th.childNodes[0].textContent.trim());
             entries = [...form.querySelectorAll('tbody tr')].map((tr, index) => {
                 const controls = [...tr.querySelectorAll('[name]')];
@@ -76,12 +78,12 @@ export function comparableWorkbench() {
         },
         render() {
             const query = this.search.toLocaleLowerCase('es').trim();
-            const eligible = entries.filter(e => (e.used || e.opened || (this.total === 0 && e.index === 0)) &&
+            const eligible = entries.filter(e => (this.phFilter === 'all' || (e.data.ph_regime || 'por_verificar') === this.phFilter) && (e.used || e.opened || (this.total === 0 && e.index === 0)) &&
                 (this.filter !== 'pending' || e.missing.length) && (this.filter !== 'duplicates' || e.duplicate) &&
                 (!query || Object.values(e.data).join(' ').toLocaleLowerCase('es').includes(query)));
-            this.pages = Math.max(1, Math.ceil(eligible.length / 5));
+            this.pages = Math.max(1, Math.ceil(eligible.length / 10));
             this.page = Math.min(this.page, this.pages);
-            const visible = eligible.slice((this.page - 1) * 5, this.page * 5);
+            const visible = eligible.slice((this.page - 1) * 10, this.page * 10);
             this.shown = eligible.length;
             for (const entry of entries) entry.tr.hidden = !visible.includes(entry);
             const fields = groups[this.group];
@@ -99,15 +101,15 @@ export function comparableWorkbench() {
             const entry = entries.find(e => !e.used);
             if (!entry) return;
             entry.opened = true;
-            this.filter = 'all'; this.search = ''; this.group = 'capture';
-            this.page = Math.ceil(entries.filter(e => e.used || e.opened).indexOf(entry) / 5 + 0.2);
+            this.phFilter = 'all'; this.filter = 'all'; this.search = ''; this.group = 'capture';
+            this.page = Math.ceil(entries.filter(e => e.used || e.opened).indexOf(entry) / 10 + 0.1);
             this.render();
             this.$nextTick(() => entry.tr.querySelector('select')?.focus());
         },
         showImported(index) {
-            this.filter = 'all'; this.search = ''; this.group = 'capture';
+            this.phFilter = 'all'; this.filter = 'all'; this.search = ''; this.group = 'capture';
             const entry = entries[index];
-            this.page = Math.floor(entries.filter(e => e.used || e.opened).indexOf(entry) / 5) + 1;
+            this.page = Math.floor(entries.filter(e => e.used || e.opened).indexOf(entry) / 10) + 1;
             this.render();
         },
         syncWidth() { this.$refs.track.style.width = `${this.$refs.grid.scrollWidth}px`; },

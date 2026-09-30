@@ -29,16 +29,24 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
     </div>
     <p role="status" class="mt-3 text-sm" x-text="message"></p>
     <div x-show="results.length" x-cloak class="mt-3">
+        <p class="mb-2 text-xs">PH del inmueble avaluado: <strong><?= e(['si' => 'Sí', 'no' => 'No', 'no_aplica' => 'No aplica'][$record['regimen_ph'] ?? ''] ?? 'Por verificar') ?></strong>. Clasifica las muestras por separado.</p>
+        <label class="label" for="capture-ph-filter">Filtrar resultados por propiedad horizontal</label>
+        <select id="capture-ph-filter" class="input mb-3" x-model="phFilter" @change="selected = []"><option value="all">Todos, incluidos por verificar</option><option value="si">Sí, PH</option><option value="no">No PH</option><option value="por_verificar">Por verificar</option></select>
+        <p class="mb-3 text-xs">El portal no confirma PH en estos resúmenes. Verifica y clasifica cada aviso; este filtro actúa sobre los resultados cargados, no sobre todo el portal.</p>
+        <p x-show="!visibleResults.length" class="mb-3 text-sm">No hay avisos clasificados con este régimen en la página. Revisa «Por verificar» o muestra todos.</p>
         <div class="flex flex-wrap items-center gap-3">
-            <button type="button" class="btn-secondary min-h-11" @click="selected = results.map(item => item.row.source_url)">Seleccionar todos</button>
+            <button type="button" class="btn-secondary min-h-11" @click="selected = visibleResults.map(item => item.row.source_url)">Seleccionar todos</button>
             <button type="button" class="btn-secondary min-h-11" @click="selected = []" :disabled="!selected.length">Desmarcar todos</button>
             <button type="button" class="btn-primary min-h-11" @click="incorporate()" :disabled="!selected.length || busy">Agregar seleccionados (<span x-text="selected.length"></span>)</button>
         </div>
-        <p class="mt-2 text-xs text-slate-600">Selecciona todos los avisos de esta página y desmarca las casillas de los que no quieras agregar.</p>
+        <p class="mt-2 text-xs text-slate-600">Selecciona todos los avisos visibles de esta página y desmarca las casillas de los que no quieras agregar.</p>
         <div class="mt-3 grid gap-2 sm:grid-cols-2">
-            <template x-for="item in results" :key="item.row.source_url">
+            <template x-for="item in visibleResults" :key="item.row.source_url">
                 <article class="rounded-lg border border-slate-200 p-3">
                     <label class="flex min-h-11 items-center gap-2 font-semibold"><input type="checkbox" :value="item.row.source_url" x-model="selected"><span x-text="item.title"></span></label>
+                    <label class="mt-2 block text-xs font-semibold">Propiedad horizontal de este aviso
+                        <select class="input min-h-11" x-model="item.row.ph_regime" @change="selected = selected.filter(url => visibleResults.some(result => result.row.source_url === url))"><option value="por_verificar">Por verificar</option><option value="si">Sí, PH</option><option value="no">No PH</option></select>
+                    </label>
                     <p class="text-sm"><span x-text="money(item.row.price_amount)"></span> · <span x-text="item.row.area_m2 || 'Área pendiente'"></span> m²</p>
                     <p class="text-sm text-slate-600" x-text="item.row.address_hint || 'Dirección pendiente'"></p>
                     <a class="inline-flex min-h-11 items-center text-sm font-semibold text-blue-800" :href="item.row.source_url" target="_blank" rel="noopener">Ver ficha y comprobar ubicación</a>

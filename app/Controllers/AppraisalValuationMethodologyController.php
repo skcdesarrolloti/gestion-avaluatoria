@@ -52,14 +52,17 @@ final class AppraisalValuationMethodologyController
 
     public function autosaveComparables(string $id): never
     {
-        $this->persistComparables($id);
-        Http::json(['ok' => true, 'saved_at' => gmdate('Y-m-d\TH:i:s\Z')]);
+        $version = $this->persistComparables($id);
+        Http::json(['ok' => true, 'version' => $version, 'saved_at' => gmdate('Y-m-d\TH:i:s\Z')]);
     }
 
-    private function persistComparables(string $id): void
+    private function persistComparables(string $id): int
     {
         $this->appraisals->find($id, $this->user['id']);
-        $this->comparables->saveAll($id, $this->user['id'], AppraisalComparableInput::rows($_POST));
+        if (($_POST['matrix_complete'] ?? '') !== '1') throw new \App\Core\HttpException(422, 'El envío de la matriz llegó incompleto; no se guardaron cambios.');
+        $version = filter_var($_POST['version'] ?? null, FILTER_VALIDATE_INT);
+        if ($version === false || $version === null || $version < 0) throw new \App\Core\HttpException(422, 'Falta la versión de la matriz. Recarga antes de guardar.');
+        return $this->comparables->saveAll($id, $this->user['id'], AppraisalComparableInput::rows($_POST), $version);
     }
 
     public function readComparable(string $id): never

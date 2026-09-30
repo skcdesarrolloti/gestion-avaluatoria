@@ -135,6 +135,7 @@ final class Kernel
                     new AppraisalLegalRepository($db), new AppraisalSubjectRepository($db), $user, new \App\Models\AppraisalReportNoteRepository($db)),
                 'urbanNormative' => new \App\Controllers\AppraisalUrbanNormController(new AppraisalRepository($db),
                     new \App\Models\AppraisalUrbanNormRepository($db), new \App\Models\UrbanNormativeRepository($db), new AppraisalSubjectRepository($db), $user, new \App\Models\AppraisalReportNoteRepository($db)),
+                'comparablePhotos' => new \App\Controllers\ComparablePhotoController(new AppraisalRepository($db), new \App\Models\ComparablePhotoRepository($db), $user),
                 'valuationMethodology' => new \App\Controllers\AppraisalValuationMethodologyController(new AppraisalRepository($db), new AppraisalSubjectRepository($db), new \App\Models\AppraisalPhRepository($db), new \App\Models\AppraisalComparableRepository($db), new \App\Services\AppraisalComparableSearchGuide(), $user, new GeoMasterRepository($db)),
                 'narrativeChapters' => new \App\Controllers\AppraisalNarrativeController(new AppraisalRepository($db), new \App\Models\AppraisalNarrativeChapterRepository($db), $user, new MidasDocumentRepository($db)),
                 'subject' => new AppraisalSubjectController(new AppraisalRepository($db), $user,

@@ -15,10 +15,13 @@ final class AppraisalComparableRepository
         return $query->fetchAll();
     }
 
-    public function saveAll(string $appraisalId, int $owner, array $rows): void
+    public function saveAll(string $appraisalId, int $owner, array $rows, int $version): int
     {
         $this->db->beginTransaction();
         try {
+            $guard = $this->db->prepare('UPDATE appraisals SET comparables_version = comparables_version + 1 WHERE id = ? AND owner_id = ? AND comparables_version = ?');
+            $guard->execute([$appraisalId, $owner, $version]);
+            if ($guard->rowCount() !== 1) throw new \App\Core\HttpException(409, 'La matriz cambió en otra pestaña. Conserva tus cambios y recarga antes de continuar.');
             $this->db->prepare('DELETE FROM appraisal_comparables WHERE appraisal_id = ? AND owner_id = ?')
                 ->execute([$appraisalId, $owner]);
             foreach (array_slice(array_values($rows), 0, 60) as $index => $row) {
@@ -26,6 +29,7 @@ final class AppraisalComparableRepository
                 $this->insert($appraisalId, $owner, $index + 1, $row);
             }
             $this->db->commit();
+            return $version + 1;
         } catch (\Throwable $error) {
             $this->db->rollBack();
             throw $error;
@@ -44,8 +48,8 @@ final class AppraisalComparableRepository
             view_quality, finish_quality, elevator, amenities, security_features, power_plant,
             parking_relation, balcony_terrace, noise_humidity_sun, legal_relation_notes,
             analysis_factor, latitude, longitude, location_precision, map_notes,
-            comparability_notes, rejection_reason, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            comparability_notes, rejection_reason, created_at, updated_at, ph_regime)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         $this->db->prepare($sql)->execute([
             $this->id($row['id'] ?? ''), $appraisalId, $owner, $index, $this->choice($row['active'] ?? '', ['si', 'no'], 'si'),
             $this->text($row['status'] ?? 'por_verificar', 40), $this->text($row['source_type'] ?? '', 40),
@@ -71,7 +75,7 @@ final class AppraisalComparableRepository
             $this->coordinate($row['longitude'] ?? null, -180, 180), $this->text($row['location_precision'] ?? '', 40),
             $this->text($row['map_notes'] ?? '', 300),
             $this->body($row['comparability_notes'] ?? ''), $this->body($row['rejection_reason'] ?? ''),
-            $now, $now,
+            $now, $now, $this->choice($row['ph_regime'] ?? '', ['si', 'no', 'por_verificar'], 'por_verificar'),
         ]);
     }
 

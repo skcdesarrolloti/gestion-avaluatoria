@@ -5,7 +5,7 @@ namespace App\Services;
 final class AppraisalComparableInput
 {
     private const FIELDS = [
-        'id', 'active', 'status', 'source_type', 'source_name', 'source_url', 'query_used',
+        'ph_regime', 'id', 'active', 'status', 'source_type', 'source_name', 'source_url', 'query_used',
         'operation', 'property_type', 'neighborhood', 'address_hint', 'project_name',
         'price_amount', 'price_unit', 'area_m2', 'admin_fee', 'vat_applies', 'bedrooms',
         'bathrooms', 'parking_spaces', 'floor_level', 'contact_name', 'contact_phone',
@@ -19,12 +19,23 @@ final class AppraisalComparableInput
     public static function rows(array $posted): array
     {
         $items = $posted['comparables'] ?? [];
+        if (isset($posted['comparable_rows_json'])) {
+            try {
+                if (!is_string($posted['comparable_rows_json']) || strlen($posted['comparable_rows_json']) > 2000000) throw new \JsonException();
+                $items = json_decode($posted['comparable_rows_json'], true, 8, JSON_THROW_ON_ERROR);
+                if (!is_array($items) || !array_is_list($items) || count($items) > 60) throw new \JsonException();
+            } catch (\JsonException) { throw new \App\Core\HttpException(422, 'La matriz recibida no es válida; no se guardaron cambios.'); }
+        }
         if (!is_array($items)) return [];
         $rows = [];
         foreach ($items as $item) {
             if (!is_array($item)) continue;
             $row = [];
-            foreach (self::FIELDS as $field) $row[$field] = $item[$field] ?? '';
+            foreach (self::FIELDS as $field) {
+                $value = $item[$field] ?? '';
+                if (!is_scalar($value) && $value !== null) throw new \App\Core\HttpException(422, 'Un campo de la matriz contiene un formato inválido.');
+                $row[$field] = $value;
+            }
             if (self::meaningful($row)) $rows[] = $row;
         }
         return $rows;

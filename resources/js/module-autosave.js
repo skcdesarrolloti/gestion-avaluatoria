@@ -1,3 +1,4 @@
+import { packComparableRows } from './comparable-transport.js';
 import { publishDerivedChange } from './derived-refresh.js';
 
 const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
@@ -37,6 +38,7 @@ function formBody(form, extras = {}) {
     const body = new FormData(form);
     form.querySelectorAll('input[type="file"][name]').forEach(input => body.delete(input.name));
     Object.entries(extras).forEach(([key, value]) => body.set(key, value));
+    if (form.hasAttribute?.('data-comparable-json')) packComparableRows(body);
     return body;
 }
 

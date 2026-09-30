@@ -3,6 +3,8 @@ import { fillRows } from './comparable-bulk-import.js';
 export function fincaraizAreaSearch() {
     let panel, form;
     return {
+        phFilter: 'all',
+        get visibleResults() { return this.results.filter(item => this.phFilter === 'all' || (item.row.ph_regime || 'por_verificar') === this.phFilter); },
         neighborhood: '', neighborhoodId: '', neighborhoods: [], results: [], selected: [], busy: false, page: 1, hasNext: false, message: '', resultUrl: '',
         init() {
             panel = this.$el; form = panel.closest('form');
@@ -37,7 +39,7 @@ export function fincaraizAreaSearch() {
                 if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('Comprueba la sesión e intenta de nuevo.');
                 const data = await response.json();
                 if (!response.ok || !data.ok) throw new Error(data.message || 'No se pudo consultar el portal.');
-                this.results = data.results; this.page = data.page; this.hasNext = data.has_next; this.resultUrl = data.url;
+                this.results = data.results.map(item => ({ ...item, row: { ...item.row, ph_regime: item.row.ph_regime || 'por_verificar' } })); this.page = data.page; this.hasNext = data.has_next; this.resultUrl = data.url;
                 this.message = this.results.length ? `${this.results.length} avisos en la página ${this.page}. Marca los que quieras incorporar; aún no están en la tabla.` : 'No se encontraron avisos legibles. Comprueba el barrio en el portal.';
             } catch (error) { this.message = error.name === 'AbortError' ? 'El portal tardó demasiado. Reintenta o abre la búsqueda.' : error.message; }
             finally { clearTimeout(timer); this.busy = false; }

@@ -1,5 +1,9 @@
 # Crear y evolucionar la base sin SQL manual
 
+Comparables: `202609300003_comparable_ph_and_photos.php` agrega régimen PH por
+muestra, versión optimista de la colección y fotos privadas en BD vinculadas por
+ID estable. Ver [matriz y fotos](COMPARABLES-MATRIZ-FOTOS.md) para despliegue y límites.
+
 PH: la migración `202609210001_add_ph_profile_version.php` agrega `version` a
 `appraisal_ph_profiles`. Cada guardado incrementa la versión; edición y análisis
 rechazan versiones obsoletas con HTTP 409. El original y texto por páginas siguen

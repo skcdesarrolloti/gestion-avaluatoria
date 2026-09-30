@@ -1,4 +1,4 @@
-.comparable-tools { position: sticky; top: 0; z-index: 12; }
+.comparable-tools { position: relative; z-index: 2; }
 .comparable-scroll { overflow-x: auto; min-height: 24px; }
 .comparable-field-label { display: block; font-size: .75rem; font-weight: 600; color: #334155; margin-bottom: .4rem; }
 .comparable-row-summary { display: block; font-size: .8rem; font-weight: 500; white-space: normal; color: #475569; }
@@ -17,4 +17,13 @@
 @media (max-width: 767px) {
     .comparable-tools { position: static; }
     [data-comparable-mode="cards"] tbody tr { grid-template-columns: minmax(0, 1fr); }
+}
+
+[data-comparable-mode="table"] .comparable-grid table { min-width: max-content; }
+[data-comparable-mode="table"] .comparable-grid .comparable-field-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+[data-comparable-mode="table"] .comparable-grid th:first-child { position: sticky; left: 0; background: #f8fafc; z-index: 3; }
+.comparable-grid { position: relative; max-width: 100%; }
+
+@media (max-width: 767px) {
+    [data-comparable-mode="table"] td:first-child { min-width: 100px; max-width: 120px; }
 }
