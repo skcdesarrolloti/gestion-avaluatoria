@@ -135,6 +135,7 @@ $renderPhTextarea = static function (string $name, string $label, string $value,
                 </div>
             </div>
         </section>
+        <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-document-forms.php'; ?>
         <?php require BASE_PATH . '/app/Views/appraisals/subject-ph-form.php'; ?>
     <?php endif; ?>
 </section>

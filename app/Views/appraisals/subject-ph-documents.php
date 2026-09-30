@@ -12,41 +12,26 @@
                     <?php if ($canLoad): ?>
                         <a class="btn-secondary min-h-11 px-3 text-xs" target="_blank" rel="noopener"
                             href="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/texto')) ?>">Texto por páginas</a>
-                        <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/cargar')) ?>">
-                            <?= csrf_field() ?>
-                            <input type="hidden" name="version" value="<?= (int) ($ph['version'] ?? 0) ?>">
-                            <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
-                            <input type="hidden" name="ph_typology" value="<?= e((string) ($ph['ph_typology'] ?? '')) ?>">
-                            <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="submit"
-                                title="Usa el texto OCR ya guardado para recalcular la ficha y la matriz por tipología.">
-                                Recalcular matriz
-                            </button>
-                        </form>
+                        <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="submit"
+                            form="ph-load-<?= e((string) $doc['id']) ?>"
+                            title="Usa el texto OCR ya guardado para recalcular la ficha y la matriz por tipología.">
+                            Recalcular matriz
+                        </button>
                     <?php elseif ($hasFile): ?>
                         <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="button" disabled
                             title="No hay texto extraído para cargar en la ficha.">Cargar</button>
-                        <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/ocr-externo')) ?>"
-                            onsubmit="this.querySelector('button[type=submit]').textContent='Leyendo IA/OCR...';">
-                            <?= csrf_field() ?>
-                            <input type="hidden" name="version" value="<?= (int) ($ph['version'] ?? 0) ?>">
-                            <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
-                            <input type="hidden" name="ph_typology" value="<?= e((string) ($ph['ph_typology'] ?? '')) ?>">
-                            <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="submit"
-                                title="<?= empty($phExternalOcr) ? 'Falta configurar PH_EXTERNAL_OCR_ENDPOINT en el servidor.' : 'Enviar este soporte al OCR/IA configurado.' ?>">
-                                Leer con IA/OCR
-                            </button>
-                        </form>
+                        <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="submit"
+                            form="ph-ocr-<?= e((string) $doc['id']) ?>" onclick="this.textContent='Leyendo IA/OCR...';"
+                            title="<?= empty($phExternalOcr) ? 'Falta configurar PH_EXTERNAL_OCR_ENDPOINT en el servidor.' : 'Enviar este soporte al OCR/IA configurado.' ?>">
+                            Leer con IA/OCR
+                        </button>
                     <?php else: ?>
                         <button class="btn-secondary min-h-9 px-3 py-1 text-xs" type="button" disabled
                             title="El archivo físico ya no está disponible. Elimina este soporte y vuelve a subirlo.">Archivo no disponible</button>
                     <?php endif; ?>
-                    <form method="post" action="<?= e(url($subjectActionBase . '/ph/soportes/' . $doc['id'] . '/eliminar')) ?>"
-                        onsubmit="return confirm('¿Eliminar este soporte PH del avalúo? Los campos ya diligenciados se conservarán.');">
-                        <?= csrf_field() ?>
-                            <input type="hidden" name="version" value="<?= (int) ($ph['version'] ?? 0) ?>">
-                        <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
-                        <button class="btn-secondary min-h-9 px-3 py-1 text-xs text-red-700" type="submit">Eliminar</button>
-                    </form>
+                    <button class="btn-secondary min-h-9 px-3 py-1 text-xs text-red-700" type="submit"
+                        form="ph-delete-<?= e((string) $doc['id']) ?>"
+                        onclick="return confirm('¿Eliminar este soporte PH del avalúo? Los campos ya diligenciados se conservarán.');">Eliminar</button>
                     </div>
                 </div>
                 <?php if (($phActionDocumentId ?? '') === (string) $doc['id'] && !empty($phActionMessage)): ?>
