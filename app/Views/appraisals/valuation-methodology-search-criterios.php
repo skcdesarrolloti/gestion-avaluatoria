@@ -20,11 +20,14 @@
             </ul>
         </div>
         <div class="rounded-xl border border-emerald-200 bg-emerald-50">
-            <div class="rounded-t-xl bg-emerald-700 px-4 py-3 text-sm font-semibold uppercase text-white">Depuración y ajustes posteriores</div>
+            <div class="rounded-t-xl bg-emerald-700 px-4 py-3 text-sm font-semibold uppercase text-white">Depuración estadística posterior</div>
             <ul class="space-y-3 p-4 text-sm leading-6 text-emerald-950">
                 <?php foreach ($adjustments as $item): ?>
                     <li>- <?= e($item) ?></li>
                 <?php endforeach; ?>
+                <li>- Calcular dispersión por factor antes de adoptar una medida de tendencia central.</li>
+                <li>- Preferir mediana, media recortada o intervalo sustentado cuando la muestra sea asimétrica.</li>
+                <li>- Documentar outliers y puntos influyentes; no usar homologación automática.</li>
             </ul>
         </div>
     </div>

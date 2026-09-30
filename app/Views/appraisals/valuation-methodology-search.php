@@ -7,16 +7,21 @@ $agencySources = is_array($sourceSearch['agency_sources'] ?? null) ? $sourceSear
 $officialSources = is_array($sourceSearch['official_sources'] ?? null) ? $sourceSearch['official_sources'] : [];
 $captureProtocol = is_array($sourceSearch['capture_protocol'] ?? null) ? $sourceSearch['capture_protocol'] : [];
 $adjustments = is_array($guide['adjustments'] ?? null) ? $guide['adjustments'] : (is_array($guide['homologation'] ?? null) ? $guide['homologation'] : []);
+$sampleDesign = is_array($guide['sample_design'] ?? null) ? $guide['sample_design'] : [];
+$factorTargets = is_array($sampleDesign['factor_targets'] ?? null) ? $sampleDesign['factor_targets'] : [];
+$factorOptions = ['' => 'Seleccionar factor'];
+foreach ($factorTargets as $target) $factorOptions[(string) ($target['key'] ?? '')] = (string) ($target['label'] ?? 'Factor');
 $nextStep = is_array($methodologyDecision['next_step'] ?? null) ? $methodologyDecision['next_step'] : ['8.3 Desarrollo del método', ''];
 $componentItems = is_array($methodologyDecision['components'] ?? null) ? $methodologyDecision['components'] : [];
 $firstComponent = (string) ($componentItems[0]['id'] ?? '');
 $formulaFamilies = [
-    ['Mercado', 'Valor unitario = precio depurado / unidad de comparación; luego promedio, mediana, desviación, coeficiente de variación, rango y ajustes comparativos sustentados.'],
+    ['Mercado', 'Valor unitario = precio depurado / unidad de comparación. En 8.4 se revisa mediana, media recortada, dispersión, intervalo t de Student, outliers y MAPE si hay modelo.'],
     ['Renta', 'Ingreso neto = canon bruto menos vacancia, administración no recuperable y gastos; valor = ingreso neto anual / tasa, o flujo descontado si aplica.'],
     ['Residual', 'Valor del suelo = ingresos esperados del producto menos costos directos, indirectos, financieros, utilidad, tiempos y riesgos del desarrollo.'],
     ['Costo', 'Valor = terreno + costo de reposición nuevo menos depreciación física, funcional y económica, con soporte de cantidades y precios.'],
 ];
 $searchTabs = [
+    'diseno' => 'Diseño de muestra',
     'buscador' => 'Buscador',
     'filtros' => 'Filtros',
     'captura' => 'Captura',
@@ -26,7 +31,7 @@ $searchTabs = [
     'criterios' => 'Criterios',
 ];
 ?>
-<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ searchTab: 'buscador' }">
+<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ searchTab: 'diseno' }">
     <div class="mb-6">
         <p class="eyebrow">8.3 Desarrollo operativo del método</p>
         <h2 class="mt-2 text-2xl font-semibold"><?= e((string) ($nextStep[0] ?? 'Búsqueda y preparación técnica')) ?></h2>
@@ -125,6 +130,9 @@ $searchTabs = [
     </nav>
 
     <div class="mt-6">
+        <div x-show="searchTab === 'diseno'">
+            <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-diseno.php'; ?>
+        </div>
         <div x-show="searchTab === 'buscador'">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-buscador.php'; ?>
         </div>

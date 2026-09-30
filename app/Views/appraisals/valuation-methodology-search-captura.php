@@ -1,9 +1,9 @@
 <?php
 $captureNext = [
-    'Captura entre 5 y 10 ofertas o transacciones comparables cuando el mercado lo permita.',
+    'Captura muestras verificables hasta acercarte a la meta de 15 observaciones por cada factor que realmente vas a analizar.',
     'Descarta duplicados, avisos sin datos mínimos o inmuebles con uso, derecho o escala no comparable.',
     'Registra enlace, fecha, fuente, precio, área, administración, IVA si aplica y observaciones verificables.',
-    'Con las muestras depuradas, pasa a variables y fórmulas antes de cerrar el análisis.',
+    'Con las muestras depuradas, pasa a variables y prepara el análisis estadístico robusto del numeral 8.4.',
 ];
 $minimumFields = [
     'Fuente y enlace del aviso',
@@ -14,6 +14,7 @@ $minimumFields = [
     'Barrio, sector o dirección aproximada',
     'Administración e IVA si aplica',
     'Teléfono, contacto o inmobiliaria',
+    'Factor que soporta para el análisis 8.4',
     'Observación de comparabilidad',
 ];
 ?>

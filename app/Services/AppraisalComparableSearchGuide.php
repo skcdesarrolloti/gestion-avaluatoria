@@ -7,7 +7,8 @@ use App\Support\AppraisalFunctionalVariableCatalog;
 
 final class AppraisalComparableSearchGuide
 {
-    public function __construct(private ?AppraisalComparableSourceSearchBuilder $sources = null) {}
+    public function __construct(private ?AppraisalComparableSourceSearchBuilder $sources = null,
+        private ?AppraisalComparableSampleDesignGuide $sampleDesign = null) {}
 
     public function build(array $record, array $subject, array $units, array $phProfile): array
     {
@@ -16,6 +17,8 @@ final class AppraisalComparableSearchGuide
         $profile = $this->profile($type, $this->isPh($record, $phProfile));
         $typeLabel = $this->propertyTypeLabel($type);
         $businessLabel = $this->label('tipo_negocio', (string) ($record['tipo_negocio'] ?? ''));
+        $factorGroups = AppraisalFunctionalVariableCatalog::factorGroupsFor($type);
+        $this->sampleDesign ??= new AppraisalComparableSampleDesignGuide();
         return [
             'type_label' => $typeLabel,
             'business_label' => $businessLabel,
@@ -23,7 +26,8 @@ final class AppraisalComparableSearchGuide
             'criteria' => $profile['criteria'],
             'avoid' => $profile['avoid'],
             'adjustments' => $profile['adjustments'],
-            'factor_groups' => AppraisalFunctionalVariableCatalog::factorGroupsFor($type),
+            'factor_groups' => $factorGroups,
+            'sample_design' => $this->sampleDesign->build($factorGroups),
             'captured' => $this->captured($record, $subject, $units, $phProfile),
             'portal_fields' => $this->portalFields($type),
             'portal_filters' => $this->portalFilters($record, $subject),

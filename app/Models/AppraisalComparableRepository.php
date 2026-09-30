@@ -21,7 +21,7 @@ final class AppraisalComparableRepository
         try {
             $this->db->prepare('DELETE FROM appraisal_comparables WHERE appraisal_id = ? AND owner_id = ?')
                 ->execute([$appraisalId, $owner]);
-            foreach (array_slice(array_values($rows), 0, 12) as $index => $row) {
+            foreach (array_slice(array_values($rows), 0, 60) as $index => $row) {
                 if (!is_array($row) || !$this->meaningful($row)) continue;
                 $this->insert($appraisalId, $owner, $index + 1, $row);
             }
@@ -43,8 +43,8 @@ final class AppraisalComparableRepository
             listing_date, consulted_at, stratum, age_years, building_condition, conservation_state,
             view_quality, finish_quality, elevator, amenities, security_features, power_plant,
             parking_relation, balcony_terrace, noise_humidity_sun, legal_relation_notes,
-            comparability_notes, rejection_reason, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            analysis_factor, comparability_notes, rejection_reason, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         $this->db->prepare($sql)->execute([
             $this->id($row['id'] ?? ''), $appraisalId, $owner, $index, $this->choice($row['active'] ?? '', ['si', 'no'], 'si'),
             $this->text($row['status'] ?? 'por_verificar', 40), $this->text($row['source_type'] ?? '', 40),
@@ -66,6 +66,7 @@ final class AppraisalComparableRepository
             $this->text($row['security_features'] ?? '', 180), $this->text($row['power_plant'] ?? '', 80),
             $this->text($row['parking_relation'] ?? '', 120), $this->text($row['balcony_terrace'] ?? '', 120),
             $this->text($row['noise_humidity_sun'] ?? '', 180), $this->text($row['legal_relation_notes'] ?? '', 300),
+            $this->text($row['analysis_factor'] ?? '', 100),
             $this->body($row['comparability_notes'] ?? ''), $this->body($row['rejection_reason'] ?? ''),
             $now, $now,
         ]);
@@ -73,7 +74,7 @@ final class AppraisalComparableRepository
 
     private function meaningful(array $row): bool
     {
-        foreach (['source_name', 'source_url', 'price_amount', 'area_m2', 'neighborhood', 'project_name', 'comparability_notes'] as $field) {
+        foreach (['source_name', 'source_url', 'price_amount', 'area_m2', 'neighborhood', 'project_name', 'comparability_notes', 'analysis_factor'] as $field) {
             if (trim((string) ($row[$field] ?? '')) !== '') return true;
         }
         return false;

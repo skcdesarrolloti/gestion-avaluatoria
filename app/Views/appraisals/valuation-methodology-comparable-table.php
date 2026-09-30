@@ -10,8 +10,8 @@ $blank = ['id' => '', 'active' => 'si', 'status' => 'por_verificar', 'source_typ
     'conservation_state' => '', 'view_quality' => '', 'finish_quality' => '', 'elevator' => '',
     'amenities' => '', 'security_features' => '', 'power_plant' => '', 'parking_relation' => '',
     'balcony_terrace' => '', 'noise_humidity_sun' => '', 'legal_relation_notes' => '',
-    'comparability_notes' => '', 'rejection_reason' => ''];
-$rowCount = max(10, count($savedRows));
+    'analysis_factor' => '', 'comparability_notes' => '', 'rejection_reason' => ''];
+$rowCount = max(15, count($savedRows));
 while (count($savedRows) < $rowCount) $savedRows[] = $blank;
 $money = static fn (mixed $value): string => $value === null || $value === '' ? '' : '$ ' . number_format((float) $value, 0, ',', '.');
 $number = static fn (mixed $value): string => $value === null || $value === '' ? '' : rtrim(rtrim(number_format((float) $value, 2, ',', '.'), '0'), ',');
@@ -52,6 +52,7 @@ $yesNo = ['' => 'No definido', 'si' => 'Sí', 'no' => 'No'];
             <thead class="bg-slate-50 text-xs font-bold uppercase text-slate-500">
                 <tr>
                     <th class="px-3 py-3">#</th><th class="px-3 py-3">Usar</th><th class="px-3 py-3">Estado</th>
+                    <th class="px-3 py-3">Factor 8.4</th>
                     <th class="px-3 py-3">Tipo fuente</th><th class="px-3 py-3">Fuente</th><th class="px-3 py-3">Enlace</th>
                     <th class="px-3 py-3">Consulta</th><th class="px-3 py-3">Operación</th><th class="px-3 py-3">Tipo inmueble</th>
                     <th class="px-3 py-3">Barrio/sector</th><th class="px-3 py-3">Dirección</th><th class="px-3 py-3">Edificio/proyecto</th>
@@ -73,6 +74,7 @@ $yesNo = ['' => 'No definido', 'si' => 'Sí', 'no' => 'No'];
                         <td class="px-3 py-3 font-bold text-slate-500"><?= e((string) ($index + 1)) ?><input type="hidden" name="<?= e($base) ?>[id]" value="<?= e((string) $row['id']) ?>"></td>
                         <td class="px-3 py-3"><?php $select($base . '[active]', $row['active'], ['si' => 'Sí', 'no' => 'No'], 'min-w-24'); ?></td>
                         <td class="px-3 py-3"><?php $select($base . '[status]', $row['status'], $statuses); ?></td>
+                        <td class="px-3 py-3"><?php $select($base . '[analysis_factor]', $row['analysis_factor'], $factorOptions ?? ['' => 'Seleccionar factor'], 'min-w-48'); ?></td>
                         <td class="px-3 py-3"><?php $select($base . '[source_type]', $row['source_type'], $sourceTypes); ?></td>
                         <td class="px-3 py-3"><input class="input mt-0 min-w-48" name="<?= e($base) ?>[source_name]" value="<?= e((string) $row['source_name']) ?>" placeholder="Araújo & Segovia"></td>
                         <td class="px-3 py-3"><input class="input mt-0 min-w-64" name="<?= e($base) ?>[source_url]" value="<?= e((string) $row['source_url']) ?>" placeholder="https://..."></td>

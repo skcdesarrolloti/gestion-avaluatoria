@@ -13,6 +13,7 @@ final class AppraisalComparableInput
         'stratum', 'age_years', 'building_condition', 'conservation_state', 'view_quality',
         'finish_quality', 'elevator', 'amenities', 'security_features', 'power_plant',
         'parking_relation', 'balcony_terrace', 'noise_humidity_sun', 'legal_relation_notes',
+        'analysis_factor',
     ];
 
     public static function rows(array $posted): array
@@ -31,7 +32,7 @@ final class AppraisalComparableInput
 
     private static function meaningful(array $row): bool
     {
-        foreach (['source_name', 'source_url', 'price_amount', 'area_m2', 'neighborhood', 'project_name', 'comparability_notes'] as $field) {
+        foreach (['source_name', 'source_url', 'price_amount', 'area_m2', 'neighborhood', 'project_name', 'comparability_notes', 'analysis_factor'] as $field) {
             if (trim((string) ($row[$field] ?? '')) !== '') return true;
         }
         return false;
