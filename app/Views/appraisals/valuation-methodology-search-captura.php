@@ -20,7 +20,6 @@ $minimumFields = [
 $baseQuery = trim((string) ($sourceSearch['query'] ?? ''));
 $tip = static fn (string $text): string => '<span class="help-dot" title="' . e($text) . '">?</span>';
 ?>
-<?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-links.php'; ?>
 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-table.php'; ?>
 <details class="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-4">
     <summary class="cursor-pointer text-sm font-bold text-slate-700">Ver protocolo y ficha mínima de soporte</summary>

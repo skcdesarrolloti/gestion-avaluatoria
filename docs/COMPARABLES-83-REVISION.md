@@ -85,6 +85,22 @@ Antes de presentar un anexo definitivo se requiere cerrar:
 
 ## Lectura por enlace y búsquedas por portal (30/09/2026)
 
+- Flujo revisado con el usuario: pestaña propia para cada portal/inmobiliaria,
+  agrupadas en Portales e Inmobiliarias. Cada pestaña reúne consulta del expediente,
+  enlace externo, filtros disponibles y captura. FincaRaíz tiene lector por URL;
+  las demás fuentes tienen enlace + texto, sin simular lectores automáticos.
+- Todas las fuentes incorporan filas en la misma tabla. Contador y accesos entre
+  captura/revisión. Tras incorporar un aviso por URL, el campo se limpia y recibe
+  foco; ya no se desplaza automáticamente a la tabla. Texto no incorporado se
+  conserva al alternar pestañas durante la sesión de página, no al recargar.
+- Ayuda explica cómo abrir un aviso individual, distinguirlo de resultados y
+  qué hacer si el portal muestra una sola oferta. No amplía criterios automáticamente.
+- Verificación del flujo: lectura HTTP real, incorporación de FincaRaíz y texto
+  desde otra pestaña (12 a 14 filas sin reemplazos), conservación del texto entre
+  pestañas, agrupación de inmobiliarias, escritorio y móvil 390 px. Lint 486 PHP,
+  341 verificaciones PHP, 57 pruebas JS, build y tamaño 48,8 KB gzip. Sin cambios
+  de BD ni pruebas nuevas de persistencia. Publicar vistas y ambos assets juntos.
+
 - Ajuste de navegación solicitado: se elimina «Buscar en todos los portales».
   Portales e inmobiliarias se muestran en listas numeradas independientes, con
   instrucciones de captura. Las inmobiliarias indican que sus filtros se aplican

@@ -38,7 +38,8 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
     data-module-autosave data-save-in-place
     data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/autoguardar')) ?>">
     <?= csrf_field() ?>
-    <div class="flex flex-wrap items-start justify-between gap-4">
+    <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-links.php'; ?>
+    <div id="capture-review" class="scroll-mt-6 flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Tabla madre de comparables</p>
             <h3 class="mt-2 text-xl font-semibold">Captura de investigación verificable</h3>
@@ -51,10 +52,9 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
         <div class="flex flex-wrap items-center gap-3">
             <span class="text-sm font-semibold text-slate-500" data-autosave-status>Autoguardado activo</span>
             <button type="submit" class="btn-primary min-h-11">Guardar captura</button>
+            <a href="#capture-sources" class="btn-secondary min-h-11">Seguir capturando</a>
         </div>
     </div>
-    <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-url.php'; ?>
-    <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-bulk.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-tools.php'; ?>
     <div class="comparable-grid mt-4 overflow-x-auto rounded-xl border border-slate-200" x-ref="grid"
         @scroll="$refs.topScroll.scrollLeft = $el.scrollLeft">

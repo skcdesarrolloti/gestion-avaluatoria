@@ -27,10 +27,15 @@ export function installComparableUrlImport() {
             const result = previews.get(panel);
             if (!result) return;
             const counts = fillRows(form, [result.row], panel.dataset.defaultQuery ?? '');
-            message.textContent = counts.count ? 'Ficha incorporada por verificar. Revisa los campos y el estado de guardado.'
+            message.textContent = counts.count ? 'Muestra agregada a la tabla. Puedes pegar el siguiente enlace aquí. Revisa los campos y el estado de guardado abajo.'
                 : counts.duplicates ? 'Este enlace ya está en la captura. Revisa la muestra existente.' : 'No hay filas vacías: límite de 60 muestras.';
             previews.delete(panel);
             add.disabled = true;
+            if (counts.count) {
+                panel.querySelector('[data-listing-url]').value = '';
+                panel.querySelector('[data-listing-preview]').textContent = '';
+                panel.querySelector('[data-listing-url]').focus();
+            }
             return;
         }
         const input = panel.querySelector('[data-listing-url]');

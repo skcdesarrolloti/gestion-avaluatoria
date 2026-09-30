@@ -1,77 +1,56 @@
 <?php
-$fallbackPortals = [
-    ['label' => 'FincaRaiz', 'url' => 'https://www.google.com/search?q=' . rawurlencode('site:fincaraiz.com.co ' . $baseQuery)],
-    ['label' => 'Metrocuadrado', 'url' => 'https://www.google.com/search?q=' . rawurlencode('site:metrocuadrado.com ' . $baseQuery)],
-    ['label' => 'Ciencuadras', 'url' => 'https://www.google.com/search?q=' . rawurlencode('site:ciencuadras.com ' . $baseQuery)],
-    ['label' => 'Properati', 'url' => 'https://www.google.com/search?q=' . rawurlencode('site:properati.com.co ' . $baseQuery)],
-    ['label' => 'Mercado Libre', 'url' => 'https://www.google.com/search?q=' . rawurlencode('site:inmuebles.mercadolibre.com.co ' . $baseQuery)],
-];
-$fallbackAgencies = [
-    ['label' => 'Araújo & Segovia', 'url' => 'https://www.araujoysegovia.com/'],
-    ['label' => 'SuCasa Inmobiliaria', 'url' => 'https://sucasainmobiliaria.com.co/'],
-    ['label' => 'Asesorar Inmobiliaria', 'url' => 'https://asesorarinmobiliaria.com/'],
-    ['label' => 'Inmobiliaria Cartagena', 'url' => 'https://www.inmobiliariacartagena.com/'],
-    ['label' => 'Vélez Palomino', 'url' => 'https://velezpalomino.com/'],
-    ['label' => 'Inverfin', 'url' => 'https://inmobiliariainverfin.com/'],
-];
-$portalLinks = $portalSources ?: $fallbackPortals;
-$agencyLinks = $agencySources ?: $fallbackAgencies;
-$linkButton = static function (array $source, string $tone = 'blue'): void {
-    $label = (string) ($source['label'] ?? 'Fuente');
-    $url = (string) ($source['url'] ?? '#');
-    $class = $tone === 'emerald' ? 'border-emerald-200 text-emerald-800 hover:bg-emerald-50' : 'border-blue-200 text-blue-800 hover:bg-blue-50';
+$portalLinks = $portalSources ?? ($guide['source_search']['portal_sources'] ?? []);
+$agencyLinks = $agencySources ?? ($guide['source_search']['agency_sources'] ?? []);
+$sourceTabs = array_merge($portalLinks, $agencyLinks);
 ?>
-    <a class="inline-flex min-h-11 items-center rounded-lg border bg-white px-3 py-2 text-sm font-bold <?= e($class) ?>"
-        target="_blank" rel="noopener" href="<?= e($url) ?>"><?= e($label) ?></a>
-<?php }; ?>
-<section class="rounded-xl border border-blue-100 bg-blue-50 p-4">
-    <div class="flex flex-wrap items-start justify-between gap-3">
-        <div>
-            <p class="text-xs font-bold uppercase text-blue-800">Abrir fuentes de mercado</p>
-            <h3 class="mt-1 text-lg font-semibold text-blue-950">Trabaja una fuente a la vez</h3>
-        </div>
-        <?php if ($baseQuery !== ''): ?>
-            <button type="button" class="btn-secondary min-h-11 text-xs"
-                x-on:click="navigator.clipboard?.writeText(<?= e(json_encode($baseQuery, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>)">
-                Copiar búsqueda
+<section id="capture-sources" class="mb-6 rounded-xl border border-blue-100 bg-blue-50 p-4" x-data="{ sourceTab: 0 }">
+    <h3 class="text-lg font-semibold text-blue-950">Busca y captura desde la pestaña de cada fuente</h3>
+    <p class="mt-2 text-sm leading-6">Cada aviso incorporado agrega una fila a la misma tabla. Puedes repetir la captura y cambiar de fuente sin perder las muestras incorporadas.</p>
+    <div class="mt-3 flex flex-wrap items-center gap-3 text-sm">
+        <strong><span x-text="total"><?= count($comparableRows ?? []) ?></span> muestras en la tabla</strong>
+        <a class="btn-secondary min-h-11" href="#capture-review">Ver y revisar tabla</a>
+        <span data-autosave-status>Consulta el estado de guardado al incorporar.</span>
+    </div>
+    <div class="mt-4 flex gap-2" aria-label="Grupo de fuentes">
+        <button type="button" class="btn-secondary min-h-11" @click="sourceTab = 0" :aria-pressed="sourceTab < <?= count($portalLinks) ?>">Portales</button>
+        <?php if ($agencyLinks): ?><button type="button" class="btn-secondary min-h-11" @click="sourceTab = <?= count($portalLinks) ?>" :aria-pressed="sourceTab >= <?= count($portalLinks) ?>">Inmobiliarias</button><?php endif; ?>
+    </div>
+    <div role="tablist" aria-label="Fuentes de mercado" class="mt-2 flex flex-wrap gap-2"
+        @keydown.arrow-right.prevent="sourceTab = (sourceTab + 1) % <?= count($sourceTabs) ?: 1 ?>; $nextTick(() => $el.querySelectorAll('[role=tab]')[sourceTab].focus())"
+        @keydown.arrow-left.prevent="sourceTab = (sourceTab + <?= count($sourceTabs) - 1 ?>) % <?= count($sourceTabs) ?: 1 ?>; $nextTick(() => $el.querySelectorAll('[role=tab]')[sourceTab].focus())">
+        <?php foreach ($sourceTabs as $sourceIndex => $source): ?>
+            <button type="button" role="tab" id="source-tab-<?= $sourceIndex ?>" aria-controls="source-panel-<?= $sourceIndex ?>"
+                x-show="(sourceTab < <?= count($portalLinks) ?>) === <?= $sourceIndex < count($portalLinks) ? 'true' : 'false' ?>"
+                :aria-selected="sourceTab === <?= $sourceIndex ?>" :tabindex="sourceTab === <?= $sourceIndex ?> ? 0 : -1"
+                @click="sourceTab = <?= $sourceIndex ?>" class="min-h-11 rounded-lg border px-3 py-2 text-sm font-semibold"
+                :class="sourceTab === <?= $sourceIndex ?> ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-blue-900 border-blue-200'">
+                <?= e($source['label']) ?>
             </button>
-        <?php endif; ?>
+        <?php endforeach; ?>
     </div>
-    <code class="text-anywhere mt-3 block rounded-lg bg-white p-3 font-mono text-sm font-semibold text-slate-900">
-        <?= e($baseQuery ?: 'Búsqueda base pendiente: completa tipología, operación, ciudad y barrio para afinarla.') ?>
-    </code>
-    <p class="mt-3 text-sm leading-6 text-blue-950">Empieza por FincaRaíz: abre un aviso, copia su enlace y vuelve a «Leer un aviso por enlace». Revisa e incorpora la muestra antes de continuar con otro aviso o fuente.</p>
-    <p class="mt-2 text-sm leading-6 text-blue-950">La frase de arriba resume el inmueble buscado. Cada fuente indica qué filtros aplica y cuáles debes completar. En las demás fuentes, copia el enlace y el texto del aviso para la captura manual.</p>
-    <div class="mt-4 grid gap-4 lg:grid-cols-2">
-        <div>
-            <p class="text-xs font-bold uppercase text-blue-800">1. Portales · uno por uno</p>
-            <ol class="mt-2 space-y-2">
-                <?php foreach ($portalLinks as $index => $source): ?>
-                    <li class="rounded-lg bg-white p-3">
-                        <p class="mb-1 text-xs text-slate-600">Portal <?= e((string) ($index + 1)) ?> de <?= e((string) count($portalLinks)) ?></p>
-                        <?php $linkButton($source); ?>
-                        <p class="mt-1 text-xs font-semibold"><?= e($source['kind'] ?? 'Búsqueda en Google') ?></p>
-                        <p class="mt-1 text-sm"><?= e($source['instruction'] ?? 'Abre un aviso y comprueba sus datos.') ?></p>
-                    </li>
-                <?php endforeach; ?>
-            </ol>
-        </div>
-        <div>
-            <p class="text-xs font-bold uppercase text-emerald-800">2. Inmobiliarias · una por una</p>
-            <p class="mt-2 text-sm text-emerald-950">Estos enlaces abren el sitio de cada inmobiliaria. Aplica allí los filtros del expediente; no se envía automáticamente la frase completa.</p>
-            <ol class="mt-2 space-y-2">
-                <?php foreach ($agencyLinks as $index => $source): ?>
-                    <li class="rounded-lg bg-white p-3">
-                        <p class="mb-1 text-xs text-slate-600">Inmobiliaria <?= e((string) ($index + 1)) ?> de <?= e((string) count($agencyLinks)) ?></p>
-                        <?php $linkButton($source, 'emerald'); ?>
-                        <details class="mt-1 text-sm">
-                            <summary class="min-h-11 cursor-pointer py-3 font-semibold text-emerald-800">Cómo buscar y capturar aquí</summary>
-                            <p class="leading-6"><?= e($source['instruction'] ?? 'Selecciona operación, tipo de inmueble, ciudad y barrio en el buscador del sitio.') ?></p>
-                            <p class="mt-2 leading-6">Abre la ficha del inmueble. Copia su enlace y texto; vuelve a «Alternativa: pegar texto de avisos o filas» y revisa los datos antes de pasar a la siguiente fuente.</p>
-                        </details>
-                    </li>
-                <?php endforeach; ?>
-            </ol>
-        </div>
-    </div>
+    <?php foreach ($sourceTabs as $sourceIndex => $source):
+        $isFincaraiz = str_contains(strtolower($source['label']), 'fincaraiz');
+        $isAgency = $sourceIndex >= count($portalLinks);
+    ?>
+        <section role="tabpanel" id="source-panel-<?= $sourceIndex ?>" aria-labelledby="source-tab-<?= $sourceIndex ?>"
+            x-show="sourceTab === <?= $sourceIndex ?>" <?= $sourceIndex ? 'x-cloak' : '' ?> class="mt-4 rounded-xl bg-white p-4">
+            <h4 class="font-semibold text-blue-950">1. Buscar en <?= e($source['label']) ?></h4>
+            <p class="mt-2 text-sm font-semibold">Tu búsqueda para esta fuente</p>
+            <p class="text-anywhere mt-1 rounded-lg bg-slate-50 p-3 text-sm"><?= e($baseQuery ?: 'Completa tipo de inmueble, operación y ubicación en el expediente.') ?></p>
+            <p class="mt-2 text-sm leading-6"><?= e($source['instruction'] ?? '') ?></p>
+            <p class="mt-1 text-xs text-slate-600"><?= $isAgency ? 'Selecciona los filtros dentro de la inmobiliaria; el enlace abre su sitio.' : e($source['kind'] ?? '') ?></p>
+            <a class="btn-primary mt-3 min-h-11" href="<?= e($source['url']) ?>" target="_blank" rel="noopener">Abrir búsqueda en <?= e($source['label']) ?></a>
+            <?php if ($isFincaraiz): ?>
+                <p class="mt-3 text-sm leading-6">El botón aplica los filtros disponibles; no necesitas pegar un prompt. En los resultados, haz clic en el <strong>título o foto de un inmueble</strong>. Copia la dirección de esa ficha, que termina en un código numérico.</p>
+                <details class="mt-2 text-sm">
+                    <summary class="min-h-11 cursor-pointer py-3 font-semibold">¿Solo aparece un resultado?</summary>
+                    <p class="leading-6">Es la oferta que muestra ese portal con esos filtros, no un límite de esta tabla. Continúa en otra fuente. Si amplías el barrio dentro del portal, registra el sector real y justifica su comparabilidad; no cambies el tipo de inmueble solo para completar cantidad.</p>
+                </details>
+                <?php if (isset($record['id'])) require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-url.php'; ?>
+            <?php endif; ?>
+            <?php if ($isFincaraiz): ?><details class="mt-3"><summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Si la lectura falla: pegar enlace y texto</summary><?php endif; ?>
+            <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-paste.php'; ?>
+            <?php if ($isFincaraiz): ?></details><?php endif; ?>
+        </section>
+    <?php endforeach; ?>
 </section>

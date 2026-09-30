@@ -109,7 +109,6 @@ export function comparableWorkbench() {
             const entry = entries[index];
             this.page = Math.floor(entries.filter(e => e.used || e.opened).indexOf(entry) / 5) + 1;
             this.render();
-            this.$nextTick(() => entry?.tr.scrollIntoView({ behavior: 'smooth', block: 'center' }));
         },
         syncWidth() { this.$refs.track.style.width = `${this.$refs.grid.scrollWidth}px`; },
     };
