@@ -165,6 +165,10 @@ try {
         && str_contains($methodGuideLabels, 'Costo') && str_contains($methodGuideLabels, 'Residual')
         && str_contains($methodGuideArticles, '16 a 21') && str_contains($methodGuideArticles, '31 a 34'),
         'numeral 8.1 expone guia por metodo con articulos de resolucion 941');
+    $marketArticleTitles = implode(' ', array_column($methodologyReport['method_guides'][0]['article_cards'] ?? [], 'title'));
+    expect(str_contains($marketArticleTitles, 'Herramientas estadísticas')
+        && str_contains($marketArticleTitles, 'Adopción del valor'),
+        'numeral 8.1 incluye tarjetas legibles de articulos por metodo');
     $methodologyApartment = (new AppraisalMethodologyChapterReport())->build([
         'tipo_inmueble' => 'apartamento', 'tipo_negocio' => 'venta', 'regimen_ph' => 'si',
         'estructura_metodo' => 'area_privada', 'base_valor' => 'mercado',
@@ -175,7 +179,8 @@ try {
     expect(str_contains((string) ($methodologyApartment['sections'][2][1] ?? ''), 'Esta selección no constituye todavía el cálculo del valor')
         && count($methodologyApartment['decision']['configuration'] ?? []) >= 5
         && str_contains((string) (($methodologyApartment['decision']['next_step'][0] ?? '')), '8.3')
-        && str_contains((string) ($methodologyApartment['decision']['normative_inputs']['articles'] ?? ''), '16 a 21'),
+        && str_contains((string) ($methodologyApartment['decision']['normative_inputs']['articles'] ?? ''), '16 a 21')
+        && str_contains(implode(' ', array_column($methodologyApartment['decision']['normative_inputs']['article_cards'] ?? [], 'number')), 'Art. 20'),
         'numeral 8.2 expone texto de entregable, revision de configuracion e insumo 941');
     $methodologyHouse = (new AppraisalMethodologyChapterReport())->build(['tipo_inmueble' => 'casa', 'tipo_negocio' => 'venta']);
     expect(str_contains((string) ($methodologyHouse['decision']['recommended_method'] ?? ''), 'reposición')

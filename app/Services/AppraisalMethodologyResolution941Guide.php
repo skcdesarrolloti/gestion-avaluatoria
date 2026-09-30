@@ -4,6 +4,8 @@ namespace App\Services;
 
 final class AppraisalMethodologyResolution941Guide
 {
+    public function __construct(private ?AppraisalMethodologyResolution941Articles $articles = null) {}
+
     public function methodGuides(): array
     {
         return [
@@ -23,6 +25,7 @@ final class AppraisalMethodologyResolution941Guide
             'method' => (string) ($guide['label'] ?? 'Método'),
             'articles' => (string) ($guide['articles'] ?? ''),
             'items' => $guide['decision_inputs'] ?? [],
+            'article_cards' => $this->articles()->for($key),
         ];
     }
 
@@ -38,6 +41,7 @@ final class AppraisalMethodologyResolution941Guide
             'label' => 'Mercado',
             'articles' => 'Arts. 16 a 21',
             'summary' => 'Compara ofertas o transacciones recientes de inmuebles similares; exige clasificar, analizar, interpretar y soportar cada dato.',
+            'article_cards' => $this->articles()->for('mercado'),
             'decision_inputs' => [
                 'Ofertas o transacciones recientes, comparables y verificables.',
                 'Ubicación, valor pedido o transado, áreas, fuente, URL o contacto y fecha de captura.',
@@ -76,6 +80,7 @@ final class AppraisalMethodologyResolution941Guide
             'label' => 'Renta',
             'articles' => 'Arts. 22 a 26',
             'summary' => 'Estima valor desde rentas o beneficios económicos; puede usar capitalización directa o flujo de caja descontado.',
+            'article_cards' => $this->articles()->for('renta'),
             'decision_inputs' => [
                 'Canon real o canon de mercado, periodicidad, ocupación, vacancia y soportes de contrato u oferta.',
                 'Gastos y deducciones: administración, predial, seguros, mantenimiento, IVA y costos operativos.',
@@ -114,6 +119,7 @@ final class AppraisalMethodologyResolution941Guide
             'label' => 'Costo',
             'articles' => 'Arts. 27 a 30',
             'summary' => 'Suma valor del terreno y valor actual de construcciones o anexos, descontando depreciación y obsolescencia.',
+            'article_cards' => $this->articles()->for('costo'),
             'decision_inputs' => [
                 'Valor del terreno por método viable y soporte de mercado o norma aplicable.',
                 'Costo nuevo de reposición o reproducción, con costos directos e indirectos verificables.',
@@ -152,6 +158,7 @@ final class AppraisalMethodologyResolution941Guide
             'label' => 'Residual',
             'articles' => 'Arts. 31 a 34',
             'summary' => 'Estima el valor desde el producto inmobiliario factible, descontando costos, cargas, utilidad y tiempos de desarrollo.',
+            'article_cards' => $this->articles()->for('residual'),
             'decision_inputs' => [
                 'Norma urbana, afectaciones, cesiones, área neta, área útil, edificabilidad y usos.',
                 'Producto inmobiliario vendible y precios de venta sustentados por mercado.',
@@ -195,5 +202,10 @@ final class AppraisalMethodologyResolution941Guide
         if (str_contains($method, 'residual')) return 'residual';
         if (str_contains($method, 'costo') || str_contains($method, 'reposicion') || str_contains($method, 'reposición')) return 'costo';
         return 'mercado';
+    }
+
+    private function articles(): AppraisalMethodologyResolution941Articles
+    {
+        return $this->articles ??= new AppraisalMethodologyResolution941Articles();
     }
 }

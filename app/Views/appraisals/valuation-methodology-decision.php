@@ -5,6 +5,7 @@ $componentItems = is_array($methodologyDecision['components'] ?? null) ? $method
 $nextStep = is_array($methodologyDecision['next_step'] ?? null) ? $methodologyDecision['next_step'] : ['8.3 Desarrollo del método', ''];
 $normativeInputs = is_array($methodologyDecision['normative_inputs'] ?? null) ? $methodologyDecision['normative_inputs'] : [];
 $normativeInputItems = is_array($normativeInputs['items'] ?? null) ? $normativeInputs['items'] : [];
+$normativeArticles = is_array($normativeInputs['article_cards'] ?? null) ? $normativeInputs['article_cards'] : [];
 $normativeNotice = (string) ($methodologyDecision['normative_notice'] ?? '');
 $deliverable82 = trim((string) ($methodologyChapterData['sections'][2][1] ?? ''));
 $firstComponent = (string) ($componentItems[0]['id'] ?? '');
@@ -76,6 +77,28 @@ $firstComponent = (string) ($componentItems[0]['id'] ?? '');
                         <p class="rounded-lg border border-slate-200 bg-slate-50 p-3 text-sm leading-6 text-slate-700"><?= e((string) $item) ?></p>
                     <?php endforeach; ?>
                 </div>
+            <?php endif; ?>
+            <?php if ($normativeArticles !== []): ?>
+                <details class="mt-4 rounded-xl border border-blue-100 bg-blue-50">
+                    <summary class="cursor-pointer px-4 py-3 text-sm font-bold text-blue-900">Leer artículos y resaltados del método</summary>
+                    <div class="grid gap-3 border-t border-blue-100 p-4 md:grid-cols-2 xl:grid-cols-3">
+                        <?php foreach ($normativeArticles as $article): ?>
+                            <?php $highlights = is_array($article['highlights'] ?? null) ? $article['highlights'] : []; ?>
+                            <article class="rounded-lg border border-white bg-white p-3 text-sm leading-6">
+                                <p class="text-xs font-bold uppercase text-blue-700"><?= e((string) ($article['number'] ?? 'Artículo')) ?></p>
+                                <h4 class="mt-1 font-semibold text-slate-950"><?= e((string) ($article['title'] ?? '')) ?></h4>
+                                <p class="mt-2 text-slate-700"><?= e((string) ($article['summary'] ?? '')) ?></p>
+                                <?php if ($highlights !== []): ?>
+                                    <div class="mt-3 flex flex-wrap gap-2">
+                                        <?php foreach ($highlights as $highlight): ?>
+                                            <mark class="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-900"><?= e((string) $highlight) ?></mark>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </article>
+                        <?php endforeach; ?>
+                    </div>
+                </details>
             <?php endif; ?>
         </div>
     <?php endif; ?>

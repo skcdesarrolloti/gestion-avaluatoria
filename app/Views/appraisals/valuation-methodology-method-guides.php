@@ -28,7 +28,11 @@ $firstMethodPart = (string) ($methodologyGuides[0]['parts'][0]['key'] ?? 'compre
             <?php endforeach; ?>
         </nav>
         <?php foreach ($methodologyGuides as $guide): ?>
-            <?php $guideKey = (string) ($guide['key'] ?? ''); $parts = is_array($guide['parts'] ?? null) ? $guide['parts'] : []; ?>
+            <?php
+            $guideKey = (string) ($guide['key'] ?? '');
+            $parts = is_array($guide['parts'] ?? null) ? $guide['parts'] : [];
+            $articleCards = is_array($guide['article_cards'] ?? null) ? $guide['article_cards'] : [];
+            ?>
             <article class="mt-4 rounded-xl border border-slate-200 bg-slate-50 p-4"
                 x-show="methodGuideTab === '<?= e($guideKey) ?>'">
                 <div class="flex flex-wrap items-start justify-between gap-3">
@@ -38,6 +42,25 @@ $firstMethodPart = (string) ($methodologyGuides[0]['parts'][0]['key'] ?? 'compre
                         <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-700"><?= e((string) ($guide['summary'] ?? '')) ?></p>
                     </div>
                 </div>
+                <?php if ($articleCards !== []): ?>
+                    <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                        <?php foreach ($articleCards as $article): ?>
+                            <?php $highlights = is_array($article['highlights'] ?? null) ? $article['highlights'] : []; ?>
+                            <section class="rounded-xl border border-indigo-100 bg-white p-4 text-sm leading-6">
+                                <p class="text-xs font-bold uppercase text-indigo-700"><?= e((string) ($article['number'] ?? 'Artículo')) ?></p>
+                                <h5 class="mt-1 font-semibold text-slate-950"><?= e((string) ($article['title'] ?? '')) ?></h5>
+                                <p class="mt-2 text-slate-700"><?= e((string) ($article['summary'] ?? '')) ?></p>
+                                <?php if ($highlights !== []): ?>
+                                    <div class="mt-3 flex flex-wrap gap-2">
+                                        <?php foreach ($highlights as $highlight): ?>
+                                            <mark class="rounded-full bg-amber-100 px-2 py-1 text-xs font-bold text-amber-900"><?= e((string) $highlight) ?></mark>
+                                        <?php endforeach; ?>
+                                    </div>
+                                <?php endif; ?>
+                            </section>
+                        <?php endforeach; ?>
+                    </div>
+                <?php endif; ?>
                 <nav class="mt-4 flex gap-2 overflow-x-auto" aria-label="Detalle del método">
                     <?php foreach ($parts as $part): ?>
                         <?php $partKey = (string) ($part['key'] ?? ''); ?>
