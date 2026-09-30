@@ -32,6 +32,15 @@ $phReadableDocuments = array_filter($phLoadedDocuments, static fn (array $doc): 
                             Copropiedad: <?= e((string) ($item['ph_name'] ?: $item['ph_key'] ?: 'sin nombre')) ?>
                         </p>
                         <?php require BASE_PATH . '/app/Views/appraisals/search-result-card.php'; ?>
+                        <form class="mt-2 rounded-xl border border-blue-100 bg-white p-3 text-xs leading-5 text-blue-950"
+                            method="post" action="<?= e(url($subjectActionBase . '/ph/copropiedad')) ?>">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="version" value="<?= (int) ($ph['version'] ?? 0) ?>">
+                            <input type="hidden" name="source_appraisal_id" value="<?= e((string) ($item['id'] ?? '')) ?>">
+                            <input type="hidden" name="return_to" value="<?= e($subjectActionBase . '#ph') ?>">
+                            <p>Copia nombre, tipología, administración, bienes comunes, riesgos y lectura técnica sin traer la unidad privada de otro avalúo.</p>
+                            <button class="btn-primary mt-2 min-h-10 px-3 py-1 text-xs" type="submit">Usar datos PH en este avalúo</button>
+                        </form>
                     </div>
                 <?php endforeach; ?>
                 <?php unset($searchResultRoute); ?>

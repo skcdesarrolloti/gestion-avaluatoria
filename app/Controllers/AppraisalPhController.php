@@ -3,7 +3,7 @@ declare(strict_types=1);
 namespace App\Controllers;
 use App\Core\{Http, HttpException, Session};
 use App\Models\{AppraisalPhRepository, AppraisalRepository};
-use App\Services\{AppraisalPhChunkUploadService, AppraisalPhClientText, AppraisalPhDocumentReanalysisService, AppraisalPhDocumentStorage, AppraisalPhDocumentUploadService, AppraisalPhExternalOcrService, AppraisalPhInput};
+use App\Services\{AppraisalPhChunkUploadService, AppraisalPhClientText, AppraisalPhDocumentReanalysisService, AppraisalPhDocumentStorage, AppraisalPhDocumentUploadService, AppraisalPhExternalOcrService, AppraisalPhInput, AppraisalPhProfileAdoption};
 
 final class AppraisalPhController
 {
@@ -14,6 +14,24 @@ final class AppraisalPhController
     {
         $this->saveAndRedirect($id, fn () => $this->ph->save($id, $this->user['id'], AppraisalPhInput::data(), $this->version()),
             'Propiedad horizontal guardada correctamente.');
+    }
+
+    public function adoptCoproperty(string $id): never
+    {
+        $this->saveAndRedirect($id, function () use ($id): string {
+            $sourceId = (string) ($_POST['source_appraisal_id'] ?? '');
+            if (!preg_match('/^[a-f0-9]{32}$/', $sourceId) || $sourceId === $id) {
+                throw new \InvalidArgumentException('Selecciona una copropiedad válida del banco PH.');
+            }
+            $this->appraisals->find($sourceId, $this->user['id']);
+            $source = $this->ph->profile($sourceId, $this->user['id']);
+            if (trim((string) (($source['ph_name'] ?? '') ?: ($source['ph_key'] ?? ''))) === '') {
+                throw new \InvalidArgumentException('La copropiedad seleccionada no tiene nombre o llave PH.');
+            }
+            $data = (new AppraisalPhProfileAdoption())->adopt($this->ph->profile($id, $this->user['id']), $source);
+            $this->ph->save($id, $this->user['id'], $data, $this->version());
+            return 'Copropiedad cargada desde el banco PH. Se conservaron los datos propios del inmueble actual.';
+        }, 'Copropiedad cargada desde el banco PH.');
     }
 
     public function autosave(string $id): never

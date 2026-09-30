@@ -112,6 +112,7 @@ return [
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/obsolescencias$#', 'obsolescence', 'save', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/obsolescencias/autoguardar$#', 'obsolescence', 'autosave', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph$#', 'subjectPh', 'save', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/copropiedad$#', 'subjectPh', 'adoptCoproperty', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/autoguardar$#', 'subjectPh', 'autosave', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/soportes/chunk$#', 'subjectPh', 'uploadChunk', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/ph/soportes/finalizar$#', 'subjectPh', 'finishChunkUpload', true],

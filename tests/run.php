@@ -1736,6 +1736,35 @@ Certificado de tradicion.",
         'propiedad horizontal conserva retorno a pestana PH');
     expect($phRepo->searchByCoproperty('Conjunto Prueba', 1, str_repeat('a', 32))[0]['client_name'] === 'Cliente PH',
         'busqueda PH muestra contexto del avaluo relacionado');
+    $adoptedPh = (new \App\Services\AppraisalPhProfileAdoption())->adopt([
+        'private_unit' => 'Oficina actual', 'coefficient' => '1.20%',
+        'linkage' => ['legal_registration' => '060-ACTUAL', 'sector_neighborhood' => 'Chambacú'],
+        'report_text' => 'Texto actual editable',
+    ], [
+        'ph_name' => 'Banco PH reutilizable', 'private_unit' => 'Unidad fuente', 'coefficient' => '9%',
+        'linkage' => ['legal_registration' => '060-FUENTE'], 'report_text' => 'Texto fuente',
+        'common_areas' => ['lobby' => ['status' => 'ok', 'notes' => 'Recepción']],
+        'technical' => ['fuente_documental' => 'reglamento.pdf',
+            'parqueadero_identificacion_sujeto' => 'Parqueadero fuente'],
+    ]);
+    expect(($adoptedPh['ph_name'] ?? '') === 'Banco PH reutilizable'
+        && ($adoptedPh['private_unit'] ?? '') === 'Oficina actual'
+        && ($adoptedPh['coefficient'] ?? '') === '1.20%'
+        && ($adoptedPh['linkage']['legal_registration'] ?? '') === '060-ACTUAL'
+        && ($adoptedPh['common_areas']['lobby']['status'] ?? '') === 'ok'
+        && ($adoptedPh['technical']['fuente_documental'] ?? '') === 'reglamento.pdf'
+        && !isset($adoptedPh['technical']['parqueadero_identificacion_sujeto'])
+        && ($adoptedPh['report_text'] ?? 'x') === '',
+        'banco PH copia datos reutilizables sin traer unidad privada ajena');
+    $phSearchQuery = 'Conjunto Prueba'; $phSearchResults = $phRepo->searchByCoproperty('Conjunto Prueba', 1, str_repeat('a', 32));
+    $ph = $storedPh; $phDocuments = []; $linkage = []; $subjectActionBase = 'avaluos/' . str_repeat('a', 32) . '/bien-sujeto';
+    ob_start();
+    require BASE_PATH . '/app/Views/appraisals/subject-ph-search.php';
+    $phSearchHtml = ob_get_clean();
+    expect(str_contains($phSearchHtml, '/bien-sujeto/ph/copropiedad')
+        && str_contains($phSearchHtml, 'Usar datos PH en este avalúo')
+        && str_contains($phSearchHtml, 'source_appraisal_id'),
+        'banco PH permite seleccionar copropiedad guardada como plantilla');
     $phAnalysis = (new \App\Services\AppraisalPhDocumentAnalyzer())->analyze(
         'Reglamento de propiedad horizontal Copropiedad ZONA FRANCA LA CANDELARIA. Matricula matriz 060-239752. '
         . 'Cuenta con vias internas, porteria, red contra incendios, patios de maniobra, cuota de administracion, '
