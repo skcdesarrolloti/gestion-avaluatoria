@@ -27,7 +27,7 @@ final class AppraisalComparableSearchGuide
             'avoid' => $profile['avoid'],
             'adjustments' => $profile['adjustments'],
             'factor_groups' => $factorGroups,
-            'sample_design' => $this->sampleDesign->build($factorGroups),
+            'sample_design' => $this->sampleDesign->build($factorGroups, $type),
             'captured' => $this->captured($record, $subject, $units, $phProfile),
             'portal_fields' => $this->portalFields($type),
             'portal_filters' => $this->portalFilters($record, $subject),

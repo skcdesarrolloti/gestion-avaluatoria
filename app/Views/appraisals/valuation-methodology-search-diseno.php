@@ -1,5 +1,6 @@
 <?php
 $targetPerFactor = (int) ($sampleDesign['target_per_factor'] ?? 15);
+$targetTotal = (int) ($sampleDesign['target_total'] ?? 60);
 $sampleRows = is_array($comparableRows ?? null) ? $comparableRows : [];
 $factorCounts = [];
 foreach ($sampleRows as $row) {
@@ -35,6 +36,54 @@ foreach ($sampleRows as $row) {
         </div>
     </section>
 </div>
+
+<section class="mt-6 rounded-xl border border-indigo-100 bg-indigo-50 p-4">
+    <div class="flex flex-wrap items-start justify-between gap-3">
+        <div>
+            <p class="text-xs font-bold uppercase text-indigo-800">Cumplimiento Resolución 941</p>
+            <h3 class="mt-2 text-xl font-semibold text-indigo-950">Artículos que gobiernan el método de mercado</h3>
+            <p class="mt-2 text-sm leading-6 text-indigo-950">
+                Usa estas tarjetas como lista de control antes de pasar a 8.4. No son transcripción literal:
+                son una lectura operativa para que la investigación de mercado quede soportada.
+            </p>
+        </div>
+        <span class="rounded-full bg-white px-3 py-1 text-xs font-bold text-indigo-800">Arts. 16 a 21</span>
+    </div>
+    <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <?php foreach (($sampleDesign['compliance_articles'] ?? []) as $article): ?>
+            <article class="rounded-lg bg-white p-3 text-sm leading-6 text-slate-700">
+                <p class="text-xs font-bold uppercase text-indigo-700"><?= e((string) ($article[0] ?? 'Art.')) ?></p>
+                <p class="mt-1"><?= e((string) ($article[1] ?? '')) ?></p>
+            </article>
+        <?php endforeach; ?>
+    </div>
+</section>
+
+<section class="mt-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
+    <div class="rounded-xl border border-orange-100 bg-orange-50 p-4">
+        <p class="text-xs font-bold uppercase text-orange-800">Construcción de 60 datos</p>
+        <h3 class="mt-2 text-xl font-semibold text-orange-950"><?= e((string) $targetTotal) ?> comparables como banco de investigación</h3>
+        <div class="mt-3 grid gap-2">
+            <?php foreach (($sampleDesign['sample_plan'] ?? []) as $label => $text): ?>
+                <p class="rounded-lg bg-white p-3 text-sm leading-6 text-slate-700">
+                    <strong><?= e((string) $label) ?>:</strong> <?= e((string) $text) ?>
+                </p>
+            <?php endforeach; ?>
+        </div>
+    </div>
+    <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
+        <p class="text-xs font-bold uppercase text-slate-500">Factores prioritarios de esta tipología</p>
+        <p class="mt-2 text-sm leading-6 text-slate-700">
+            Estos son los factores que conviene agotar primero. Si alguno no aplica al caso, el analista lo deja sin uso
+            y documenta el motivo en la captura.
+        </p>
+        <div class="mt-3 grid gap-2 sm:grid-cols-2">
+            <?php foreach (($sampleDesign['priority_factors'] ?? []) as $factor): ?>
+                <span class="rounded-lg bg-white px-3 py-2 text-sm font-semibold text-slate-700"><?= e((string) $factor) ?></span>
+            <?php endforeach; ?>
+        </div>
+    </div>
+</section>
 
 <section class="mt-6 rounded-xl border border-slate-200 bg-white p-4">
     <div class="flex flex-wrap items-start justify-between gap-3">

@@ -10,8 +10,9 @@ $blank = ['id' => '', 'active' => 'si', 'status' => 'por_verificar', 'source_typ
     'conservation_state' => '', 'view_quality' => '', 'finish_quality' => '', 'elevator' => '',
     'amenities' => '', 'security_features' => '', 'power_plant' => '', 'parking_relation' => '',
     'balcony_terrace' => '', 'noise_humidity_sun' => '', 'legal_relation_notes' => '',
-    'analysis_factor' => '', 'comparability_notes' => '', 'rejection_reason' => ''];
-$rowCount = max(15, count($savedRows));
+    'analysis_factor' => '', 'latitude' => '', 'longitude' => '', 'location_precision' => '',
+    'map_notes' => '', 'comparability_notes' => '', 'rejection_reason' => ''];
+$rowCount = max(60, count($savedRows));
 while (count($savedRows) < $rowCount) $savedRows[] = $blank;
 $money = static fn (mixed $value): string => $value === null || $value === '' ? '' : '$ ' . number_format((float) $value, 0, ',', '.');
 $number = static fn (mixed $value): string => $value === null || $value === '' ? '' : rtrim(rtrim(number_format((float) $value, 2, ',', '.'), '0'), ',');
@@ -27,6 +28,7 @@ $statuses = ['por_verificar' => 'Por verificar', 'preseleccionada' => 'Preselecc
 $operations = ['' => 'Seleccionar', 'Venta' => 'Venta', 'Arriendo' => 'Arriendo'];
 $priceUnits = ['' => 'Seleccionar', 'precio_total' => 'Precio total', 'canon_mensual' => 'Canon mensual', 'valor_m2' => 'Valor/m2'];
 $yesNo = ['' => 'No definido', 'si' => 'Sí', 'no' => 'No'];
+$locationPrecisions = ['' => 'No definida', 'exacta' => 'Exacta', 'aproximada' => 'Aproximada', 'sector' => 'Solo sector'];
 ?>
 <form class="mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" method="post"
     action="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables')) ?>"
@@ -39,7 +41,8 @@ $yesNo = ['' => 'No definido', 'si' => 'Sí', 'no' => 'No'];
             <h3 class="mt-2 text-xl font-semibold">Captura de investigación verificable</h3>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Diligencia una fila por cada oferta, transacción o dato de mercado. El sujeto queda fuera de esta tabla:
-                aquí solo van las muestras comparables que luego pasarán a depuración, variables y fórmulas.
+                aquí solo van las muestras comparables que luego pasarán a depuración, variables, mapa y fórmulas.
+                Se habilitan 60 filas para construir una base amplia antes de seleccionar las usadas.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
@@ -48,7 +51,7 @@ $yesNo = ['' => 'No definido', 'si' => 'Sí', 'no' => 'No'];
         </div>
     </div>
     <div class="mt-4 overflow-x-auto rounded-xl border border-slate-200">
-        <table class="min-w-[4200px] divide-y divide-slate-200 text-left text-sm">
+        <table class="min-w-[4700px] divide-y divide-slate-200 text-left text-sm">
             <thead class="bg-slate-50 text-xs font-bold uppercase text-slate-500">
                 <tr>
                     <th class="px-3 py-3">#</th><th class="px-3 py-3">Usar</th><th class="px-3 py-3">Estado</th>
@@ -56,6 +59,7 @@ $yesNo = ['' => 'No definido', 'si' => 'Sí', 'no' => 'No'];
                     <th class="px-3 py-3">Tipo fuente</th><th class="px-3 py-3">Fuente</th><th class="px-3 py-3">Enlace</th>
                     <th class="px-3 py-3">Consulta</th><th class="px-3 py-3">Operación</th><th class="px-3 py-3">Tipo inmueble</th>
                     <th class="px-3 py-3">Barrio/sector</th><th class="px-3 py-3">Dirección</th><th class="px-3 py-3">Edificio/proyecto</th>
+                    <th class="px-3 py-3">Latitud</th><th class="px-3 py-3">Longitud</th><th class="px-3 py-3">Precisión mapa</th>
                     <th class="px-3 py-3">Precio/canon</th><th class="px-3 py-3">Unidad</th><th class="px-3 py-3">Área m2</th>
                     <th class="px-3 py-3">Admin.</th><th class="px-3 py-3">IVA</th><th class="px-3 py-3">Alc.</th>
                     <th class="px-3 py-3">Baños</th><th class="px-3 py-3">Parq.</th><th class="px-3 py-3">Piso</th>
@@ -65,7 +69,7 @@ $yesNo = ['' => 'No definido', 'si' => 'Sí', 'no' => 'No'];
                     <th class="px-3 py-3">Planta</th><th class="px-3 py-3">Relación parq.</th><th class="px-3 py-3">Balcón/terraza</th>
                     <th class="px-3 py-3">Ruido/humedad/sol</th><th class="px-3 py-3">Nota jurídica</th>
                     <th class="px-3 py-3">Contacto</th><th class="px-3 py-3">Teléfono</th><th class="px-3 py-3">Código</th>
-                    <th class="px-3 py-3">Fecha aviso</th><th class="px-3 py-3">Consulta</th><th class="px-3 py-3">Observación</th><th class="px-3 py-3">Descartar por</th>
+                    <th class="px-3 py-3">Fecha aviso</th><th class="px-3 py-3">Consulta</th><th class="px-3 py-3">Nota mapa</th><th class="px-3 py-3">Observación</th><th class="px-3 py-3">Descartar por</th>
                 </tr>
             </thead>
             <tbody class="divide-y divide-slate-100">
@@ -84,6 +88,9 @@ $yesNo = ['' => 'No definido', 'si' => 'Sí', 'no' => 'No'];
                         <td class="px-3 py-3"><input class="input mt-0 min-w-44" name="<?= e($base) ?>[neighborhood]" value="<?= e((string) $row['neighborhood']) ?>" placeholder="Castillogrande"></td>
                         <td class="px-3 py-3"><input class="input mt-0 min-w-52" name="<?= e($base) ?>[address_hint]" value="<?= e((string) $row['address_hint']) ?>" placeholder="Dirección aproximada"></td>
                         <td class="px-3 py-3"><input class="input mt-0 min-w-52" name="<?= e($base) ?>[project_name]" value="<?= e((string) $row['project_name']) ?>" placeholder="Edificio o conjunto"></td>
+                        <td class="px-3 py-3"><input class="input mt-0 min-w-32" name="<?= e($base) ?>[latitude]" value="<?= e((string) $row['latitude']) ?>" placeholder="10.391000"></td>
+                        <td class="px-3 py-3"><input class="input mt-0 min-w-32" name="<?= e($base) ?>[longitude]" value="<?= e((string) $row['longitude']) ?>" placeholder="-75.550000"></td>
+                        <td class="px-3 py-3"><?php $select($base . '[location_precision]', $row['location_precision'], $locationPrecisions, 'min-w-36'); ?></td>
                         <td class="px-3 py-3"><input class="input mt-0 min-w-40" data-money-input name="<?= e($base) ?>[price_amount]" value="<?= e($money($row['price_amount'])) ?>" placeholder="$ 0"></td>
                         <td class="px-3 py-3"><?php $select($base . '[price_unit]', $row['price_unit'], $priceUnits); ?></td>
                         <td class="px-3 py-3"><input class="input mt-0 min-w-28" name="<?= e($base) ?>[area_m2]" value="<?= e($number($row['area_m2'])) ?>" placeholder="0"></td>
@@ -112,6 +119,7 @@ $yesNo = ['' => 'No definido', 'si' => 'Sí', 'no' => 'No'];
                         <td class="px-3 py-3"><input class="input mt-0 min-w-36" name="<?= e($base) ?>[listing_code]" value="<?= e((string) $row['listing_code']) ?>"></td>
                         <td class="px-3 py-3"><input type="date" class="input mt-0 min-w-40" name="<?= e($base) ?>[listing_date]" value="<?= e((string) $row['listing_date']) ?>"></td>
                         <td class="px-3 py-3"><input type="date" class="input mt-0 min-w-40" name="<?= e($base) ?>[consulted_at]" value="<?= e((string) $row['consulted_at']) ?>"></td>
+                        <td class="px-3 py-3"><textarea class="input mt-0 min-h-24 min-w-52" name="<?= e($base) ?>[map_notes]" placeholder="Ubicación exacta, aproximada o tomada del portal"><?= e((string) $row['map_notes']) ?></textarea></td>
                         <td class="px-3 py-3"><textarea class="input mt-0 min-h-24 min-w-64" name="<?= e($base) ?>[comparability_notes]" placeholder="Por qué sirve o qué ajuste requiere"><?= e((string) $row['comparability_notes']) ?></textarea></td>
                         <td class="px-3 py-3"><textarea class="input mt-0 min-h-24 min-w-56" name="<?= e($base) ?>[rejection_reason]" placeholder="Motivo si se descarta"><?= e((string) $row['rejection_reason']) ?></textarea></td>
                     </tr>

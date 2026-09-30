@@ -43,8 +43,9 @@ final class AppraisalComparableRepository
             listing_date, consulted_at, stratum, age_years, building_condition, conservation_state,
             view_quality, finish_quality, elevator, amenities, security_features, power_plant,
             parking_relation, balcony_terrace, noise_humidity_sun, legal_relation_notes,
-            analysis_factor, comparability_notes, rejection_reason, created_at, updated_at)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            analysis_factor, latitude, longitude, location_precision, map_notes,
+            comparability_notes, rejection_reason, created_at, updated_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         $this->db->prepare($sql)->execute([
             $this->id($row['id'] ?? ''), $appraisalId, $owner, $index, $this->choice($row['active'] ?? '', ['si', 'no'], 'si'),
             $this->text($row['status'] ?? 'por_verificar', 40), $this->text($row['source_type'] ?? '', 40),
@@ -66,7 +67,9 @@ final class AppraisalComparableRepository
             $this->text($row['security_features'] ?? '', 180), $this->text($row['power_plant'] ?? '', 80),
             $this->text($row['parking_relation'] ?? '', 120), $this->text($row['balcony_terrace'] ?? '', 120),
             $this->text($row['noise_humidity_sun'] ?? '', 180), $this->text($row['legal_relation_notes'] ?? '', 300),
-            $this->text($row['analysis_factor'] ?? '', 100),
+            $this->text($row['analysis_factor'] ?? '', 100), $this->coordinate($row['latitude'] ?? null, -90, 90),
+            $this->coordinate($row['longitude'] ?? null, -180, 180), $this->text($row['location_precision'] ?? '', 40),
+            $this->text($row['map_notes'] ?? '', 300),
             $this->body($row['comparability_notes'] ?? ''), $this->body($row['rejection_reason'] ?? ''),
             $now, $now,
         ]);
@@ -74,7 +77,7 @@ final class AppraisalComparableRepository
 
     private function meaningful(array $row): bool
     {
-        foreach (['source_name', 'source_url', 'price_amount', 'area_m2', 'neighborhood', 'project_name', 'comparability_notes', 'analysis_factor'] as $field) {
+        foreach (['source_name', 'source_url', 'price_amount', 'area_m2', 'neighborhood', 'project_name', 'comparability_notes', 'analysis_factor', 'latitude', 'longitude'] as $field) {
             if (trim((string) ($row[$field] ?? '')) !== '') return true;
         }
         return false;
@@ -104,5 +107,12 @@ final class AppraisalComparableRepository
             $text = preg_match('/^\d{1,3}(\.\d{3})+$/', $text) ? str_replace('.', '', $text) : str_replace(',', '', $text);
         }
         return is_numeric($text) ? number_format((float) $text, 2, '.', '') : null;
+    }
+    private function coordinate(mixed $value, float $min, float $max): ?string
+    {
+        $text = str_replace(',', '.', trim((string) $value));
+        if ($text === '' || !is_numeric($text)) return null;
+        $number = (float) $text;
+        return $number >= $min && $number <= $max ? number_format($number, 7, '.', '') : null;
     }
 }

@@ -25,6 +25,7 @@ $searchTabs = [
     'buscador' => 'Buscador',
     'filtros' => 'Filtros',
     'captura' => 'Captura',
+    'mapa' => 'Mapa',
     'matriz' => 'Matriz',
     'variables' => 'Variables',
     'formulas' => 'Fórmulas',
@@ -33,11 +34,12 @@ $searchTabs = [
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ searchTab: 'diseno' }">
     <div class="mb-6">
-        <p class="eyebrow">8.3 Desarrollo operativo del método</p>
-        <h2 class="mt-2 text-2xl font-semibold"><?= e((string) ($nextStep[0] ?? 'Búsqueda y preparación técnica')) ?></h2>
+        <p class="eyebrow">8.3 Desarrollo operativo del método de mercado</p>
+        <h2 class="mt-2 text-2xl font-semibold">Investigación, muestra y trazabilidad de mercado</h2>
         <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Este bloque inicia después de decidir el método en 8.2. Primero prepara la consulta y luego ordena
-            filtros, captura, variables, fórmulas y criterios antes de pasar al análisis.
+            Este bloque queda enfocado en comparación o mercado. Primero prepara la consulta conforme a los
+            artículos 16 a 21 de la Resolución 941; luego ordena filtros, captura, georreferenciación,
+            variables, fórmulas y criterios antes de pasar al análisis estadístico de 8.4.
         </p>
     </div>
 
@@ -141,6 +143,9 @@ $searchTabs = [
         </div>
         <div x-show="searchTab === 'captura'">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-captura.php'; ?>
+        </div>
+        <div x-show="searchTab === 'mapa'">
+            <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-map.php'; ?>
         </div>
         <div x-show="searchTab === 'matriz'">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-matriz.php'; ?>

@@ -149,9 +149,12 @@ try {
         && !str_contains(mb_strtolower(implode(' ', $officeGuide['adjustments'])), 'homolog'),
         'guia de comparables usa depuracion y ajustes sustentados sin homologacion');
     expect((int) ($officeGuide['sample_design']['target_per_factor'] ?? 0) === 15
+        && (int) ($officeGuide['sample_design']['target_total'] ?? 0) === 60
         && str_contains(implode(' ', $officeGuide['sample_design']['statistics'] ?? []), 't de Student')
-        && str_contains(implode(' ', $officeGuide['sample_design']['statistics'] ?? []), 'MAPE'),
-        'guia 8.3 diseña muestra robusta con meta por factor y estadistica para 8.4');
+        && str_contains(implode(' ', $officeGuide['sample_design']['statistics'] ?? []), 'MAPE')
+        && str_contains(implode(' ', array_map(static fn ($row): string => implode(' ', $row), $officeGuide['sample_design']['compliance_articles'] ?? [])), 'Art. 20')
+        && str_contains(implode(' ', $officeGuide['sample_design']['priority_factors'] ?? []), 'imagen corporativa'),
+        'guia 8.3 diseña muestra robusta de mercado con 60 datos, norma y estadistica para 8.4');
     $methodologyReport = (new AppraisalMethodologyChapterReport())->build();
     $methodologyText = $methodologyReport['text'];
     expect(str_contains($methodologyText, 'Resolución IGAC 941 de 2026')
@@ -347,14 +350,18 @@ try {
         ['source_name' => 'Araújo & Segovia', 'source_url' => 'https://ejemplo.test/oferta',
             'price_amount' => '$ 650.000.000', 'area_m2' => '92,5', 'admin_fee' => '850.000',
             'analysis_factor' => 'numeral_3_5_ph_copropiedad_o_soporte_comun',
+            'latitude' => '10.391000', 'longitude' => '-75.550000',
+            'location_precision' => 'aproximada', 'map_notes' => 'Ubicación tomada del portal.',
             'comparability_notes' => 'Apartamento en PH con parqueadero.'],
         ['source_name' => '', 'price_amount' => '', 'area_m2' => ''],
     ]]);
     expect(count($comparableInput) === 1
         && $comparableInput[0]['source_name'] === 'Araújo & Segovia'
         && $comparableInput[0]['price_amount'] === '$ 650.000.000'
-        && $comparableInput[0]['analysis_factor'] === 'numeral_3_5_ph_copropiedad_o_soporte_comun',
-        'captura 8.3 conserva solo muestras con datos de investigacion');
+        && $comparableInput[0]['analysis_factor'] === 'numeral_3_5_ph_copropiedad_o_soporte_comun'
+        && $comparableInput[0]['latitude'] === '10.391000'
+        && $comparableInput[0]['location_precision'] === 'aproximada',
+        'captura 8.3 conserva muestras, factor y coordenadas de investigacion');
     $_POST = [];
     expectStatus(419, fn () => Session::csrf(), 'CSRF obligatorio');
     $_SERVER['HTTP_X_CSRF_TOKEN'] = 'test-token';
