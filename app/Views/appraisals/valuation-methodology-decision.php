@@ -7,7 +7,6 @@ $normativeInputs = is_array($methodologyDecision['normative_inputs'] ?? null) ? 
 $normativeInputItems = is_array($normativeInputs['items'] ?? null) ? $normativeInputs['items'] : [];
 $normativeArticles = is_array($normativeInputs['article_cards'] ?? null) ? $normativeInputs['article_cards'] : [];
 $normativeNotice = (string) ($methodologyDecision['normative_notice'] ?? '');
-$deliverable82 = trim((string) ($methodologyChapterData['sections'][2][1] ?? ''));
 $firstComponent = (string) ($componentItems[0]['id'] ?? '');
 ?>
 <section class="rounded-2xl border border-emerald-100 bg-emerald-50 p-6 shadow-sm sm:p-8">
@@ -145,11 +144,6 @@ $firstComponent = (string) ($componentItems[0]['id'] ?? '');
             <?php endforeach; ?>
         </div>
     <?php endif; ?>
-
-    <div class="mt-6 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
-        <strong>Texto que irá al entregable 8.2:</strong>
-        <p class="mt-2 whitespace-pre-wrap"><?= e($deliverable82) ?></p>
-    </div>
 
     <details class="mt-6 rounded-xl border border-emerald-100 bg-white">
         <summary class="cursor-pointer px-4 py-3 text-sm font-semibold text-emerald-900">Ver matriz técnica de soporte</summary>

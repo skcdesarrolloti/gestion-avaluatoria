@@ -48,6 +48,9 @@ $methodologyError = \App\Core\Session::pullFlash('methodology_error');
             <button type="button" class="min-h-11 shrink-0 rounded-xl px-4 py-2 text-sm font-semibold"
                 :class="methodologyTab === '83' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
                 @click="methodologyTab = '83'">8.3 Desarrollo operativo</button>
+            <button type="button" class="min-h-11 shrink-0 rounded-xl px-4 py-2 text-sm font-semibold"
+                :class="methodologyTab === 'entregable' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
+                @click="methodologyTab = 'entregable'">Entregable</button>
         </div>
     </div>
 
@@ -55,7 +58,7 @@ $methodologyError = \App\Core\Session::pullFlash('methodology_error');
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">8.1 Academia valuatoria</p>
-            <h2 class="mt-2 text-2xl font-semibold text-indigo-950">Texto base que pasa al entregable</h2>
+            <h2 class="mt-2 text-2xl font-semibold text-indigo-950">Marco académico para decidir</h2>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-indigo-900">
                 Actualizado con Resolución IGAC 941 de 2026. La Resolución 620 queda como antecedente, no como
                 regla principal. IVS, NIIF y NTS se citan como marco complementario según la finalidad del encargo.
@@ -64,26 +67,9 @@ $methodologyError = \App\Core\Session::pullFlash('methodology_error');
         <a class="rounded-full bg-white px-4 py-2 text-sm font-bold text-indigo-800" target="_blank" rel="noopener" href="https://www.igac.gov.co/node/53595">Fuente IGAC 941</a>
     </div>
     <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-method-guides.php'; ?>
-    <textarea class="input mt-5 min-h-80 bg-white font-mono text-sm leading-6" rows="18" readonly><?= e($methodologyText) ?></textarea>
-    <div class="mt-5 grid gap-4 lg:grid-cols-2">
-        <?php foreach ($methodologySections as $section): ?>
-            <article class="rounded-xl border border-white/80 bg-white/80 p-4 text-sm leading-6">
-                <h3 class="font-semibold text-slate-950"><?= e((string) ($section[0] ?? 'Sección')) ?></h3>
-                <p class="mt-2 whitespace-pre-wrap text-slate-700"><?= e((string) ($section[1] ?? '')) ?></p>
-            </article>
-        <?php endforeach; ?>
-    </div>
-    <?php if ($methodologyReferences !== []): ?>
-        <div class="mt-5 grid gap-3 md:grid-cols-2 xl:grid-cols-5">
-            <?php foreach ($methodologyReferences as $reference): ?>
-                <article class="rounded-xl border border-indigo-100 bg-white p-4 text-sm leading-5">
-                    <p class="text-xs font-bold uppercase text-indigo-700"><?= e((string) ($reference[0] ?? 'Referencia')) ?></p>
-                    <h3 class="mt-2 font-semibold text-slate-950"><?= e((string) ($reference[1] ?? '')) ?></h3>
-                    <p class="mt-2 text-xs leading-5 text-slate-600"><?= e((string) ($reference[2] ?? '')) ?></p>
-                </article>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
+    <button type="button" class="btn-secondary mt-5 min-h-11" @click="methodologyTab = 'entregable'">
+        Ver texto en Entregable
+    </button>
 </section>
 
 <div x-show="methodologyTab === '82'" class="mt-6 space-y-8">
@@ -115,5 +101,9 @@ $methodologyError = \App\Core\Session::pullFlash('methodology_error');
         </div>
     <?php endif; ?>
 </section>
+</div>
+
+<div x-show="methodologyTab === 'entregable'" class="mt-6 space-y-8">
+<?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-deliverable-preview.php'; ?>
 </div>
 </div>
