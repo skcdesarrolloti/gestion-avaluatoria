@@ -10,11 +10,13 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
     data-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/buscar-zona')) ?>"
     @input.stop @change.stop :aria-busy="busy">
     <h4 class="font-semibold">FincaRaíz · Datos del expediente</h4>
-    <div class="mt-2 grid gap-2 sm:grid-cols-3">
+    <div class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         <label class="text-sm">Tipo de inmueble<input class="input mt-1" value="<?= e((string) ($guide['type_label'] ?? '')) ?>" readonly placeholder="Completa el tipo en el expediente"></label>
         <label class="text-sm">Operación<input class="input mt-1" value="<?= e((string) ($guide['business_label'] ?? '')) ?>" readonly placeholder="Completa la operación en el expediente"></label>
         <label class="text-sm">Ciudad<input class="input mt-1" value="<?= e((string) ($sourceSearch['city'] ?? $guide['source_search']['city'] ?? $record['municipio'] ?? '')) ?>" readonly placeholder="Completa la ciudad en el expediente"></label>
+        <label class="text-sm">Propiedad horizontal (PH)<input class="input mt-1" value="<?= e(['si' => 'Sí', 'no' => 'No', 'no_aplica' => 'No aplica'][$record['regimen_ph'] ?? ''] ?? 'Por definir en el expediente') ?>" readonly placeholder="Completa PH en el expediente" aria-describedby="fincaraiz-subject-ph-help"></label>
     </div>
+    <p id="fincaraiz-subject-ph-help" class="mt-2 text-xs text-slate-600">PH se toma del expediente del inmueble avaluado. El régimen de cada comparable se verifica por separado.</p>
     <label for="fincaraiz-neighborhood" class="mt-3 block text-sm font-semibold">Barrio donde buscar</label>
     <input id="fincaraiz-neighborhood" type="search" autocomplete="off" class="input mt-1 w-full" placeholder="Escribe para buscar en el catálogo: Boca…" x-model="neighborhood" :disabled="busy" @input="editNeighborhood()" @keydown.enter.prevent="search(1)" aria-describedby="fincaraiz-zone-help">
     <p id="fincaraiz-zone-help" class="mt-1 text-xs text-slate-600">Barrio inicial del expediente. Para cambiar la zona de búsqueda, escribe y selecciona una sugerencia de la base de datos; no modifica el inmueble avaluado.</p>

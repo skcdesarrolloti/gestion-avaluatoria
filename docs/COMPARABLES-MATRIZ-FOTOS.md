@@ -20,6 +20,12 @@ de captura actúa sobre los candidatos cargados de esa página, no es un filtro
 remoto de FincaRaíz. Seleccionar todos respeta ese filtro. La matriz permite filtrar
 las muestras ya incorporadas por régimen, sin descartarlas ni borrarlas.
 
+El panel «FincaRaíz · Datos del expediente» muestra PH antes de buscar, junto a
+tipo, operación y ciudad. Lee `regimen_ph` del expediente en un campo de solo
+lectura: Sí, No, No aplica o Por definir en el expediente si falta el dato.
+Verificado en escritorio y móvil; lint de la vista, 359 verificaciones PHP,
+69 pruebas JS, build y control de tamaño correctos. No requiere migración nueva.
+
 ## Persistencia y despliegue
 
 - Aplicar `202609300003_comparable_ph_and_photos.php` con `php bin/console.php migrate`
