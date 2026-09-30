@@ -3,14 +3,60 @@ $targetPerFactor = (int) ($sampleDesign['target_per_factor'] ?? 15);
 $targetTotal = (int) ($sampleDesign['target_total'] ?? 60);
 $sampleRows = is_array($comparableRows ?? null) ? $comparableRows : [];
 $factorCounts = [];
+$usableCount = 0;
+$georefCount = 0;
 foreach ($sampleRows as $row) {
+    $hasData = trim((string) ($row['source_name'] ?? '')) !== ''
+        || trim((string) ($row['source_url'] ?? '')) !== ''
+        || trim((string) ($row['price_amount'] ?? '')) !== ''
+        || trim((string) ($row['area_m2'] ?? '')) !== '';
+    if ($hasData && ($row['active'] ?? 'si') === 'si' && ($row['status'] ?? '') !== 'descartada') $usableCount++;
+    if (trim((string) ($row['latitude'] ?? '')) !== '' && trim((string) ($row['longitude'] ?? '')) !== '') $georefCount++;
     $factor = (string) ($row['analysis_factor'] ?? '');
     if ($factor !== '' && ($row['active'] ?? 'si') === 'si' && ($row['status'] ?? '') !== 'descartada') {
         $factorCounts[$factor] = ($factorCounts[$factor] ?? 0) + 1;
     }
 }
+$nextAction = $usableCount === 0
+    ? 'Empieza en Buscador: abre portales e inmobiliarias, filtra por ciudad, barrio y tipología, y trae las primeras ofertas verificables.'
+    : ($usableCount < $targetTotal
+        ? 'Sigue en Captura: completa precio, área, fuente, enlace, fecha y factor 8.4 hasta acercarte a 60 muestras.'
+        : 'Pasa a Mapa y Matriz: revisa concentración espacial, duplicados, descartes y datos listos para 8.4.');
 ?>
-<div class="grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
+<section class="rounded-xl border border-teal-100 bg-teal-50 p-4">
+    <div class="flex flex-wrap items-start justify-between gap-4">
+        <div>
+            <p class="text-xs font-bold uppercase text-teal-800">Qué hago en este numeral</p>
+            <h3 class="mt-2 text-xl font-semibold text-teal-950">Aquí no se calcula todavía: aquí construyes la muestra de mercado</h3>
+            <p class="mt-2 max-w-4xl text-sm leading-6 text-teal-950"><?= e($nextAction) ?></p>
+        </div>
+        <span class="rounded-full bg-white px-3 py-1 text-xs font-bold text-teal-800"><?= e((string) $usableCount) ?>/<?= e((string) $targetTotal) ?> muestras</span>
+    </div>
+    <div class="mt-4 grid gap-3 md:grid-cols-3">
+        <button type="button" class="rounded-lg bg-white p-3 text-left text-sm font-semibold text-slate-800 shadow-sm"
+            @click="searchTab = 'buscador'">
+            1. Buscar fuentes
+            <span class="mt-1 block text-xs font-medium leading-5 text-slate-500">Portales + inmobiliarias locales. Abre fuentes y copia enlaces verificables.</span>
+        </button>
+        <button type="button" class="rounded-lg bg-white p-3 text-left text-sm font-semibold text-slate-800 shadow-sm"
+            @click="searchTab = 'captura'">
+            2. Diligenciar comparables
+            <span class="mt-1 block text-xs font-medium leading-5 text-slate-500">Llena 60 filas posibles con precio, área, fuente, fecha, factor y observación.</span>
+        </button>
+        <button type="button" class="rounded-lg bg-white p-3 text-left text-sm font-semibold text-slate-800 shadow-sm"
+            @click="searchTab = 'mapa'">
+            3. Revisar ubicación
+            <span class="mt-1 block text-xs font-medium leading-5 text-slate-500">Marca coordenadas para ver si la muestra sí corresponde al microsector comparable.</span>
+        </button>
+    </div>
+    <div class="mt-4 grid gap-3 sm:grid-cols-3">
+        <div class="rounded-lg bg-white px-3 py-2"><p class="text-xs font-bold uppercase text-slate-500">Con datos</p><p class="font-semibold text-slate-950"><?= e((string) $usableCount) ?></p></div>
+        <div class="rounded-lg bg-white px-3 py-2"><p class="text-xs font-bold uppercase text-slate-500">Con factor 8.4</p><p class="font-semibold text-slate-950"><?= e((string) array_sum($factorCounts)) ?></p></div>
+        <div class="rounded-lg bg-white px-3 py-2"><p class="text-xs font-bold uppercase text-slate-500">Con coordenadas</p><p class="font-semibold text-slate-950"><?= e((string) $georefCount) ?></p></div>
+    </div>
+</section>
+
+<div class="mt-6 grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
     <section class="rounded-xl border border-blue-100 bg-blue-50 p-4">
         <p class="text-xs font-bold uppercase text-blue-800">Diseño de muestra para 8.3</p>
         <h3 class="mt-2 text-xl font-semibold text-blue-950">Antes de capturar, decide qué factores vas a probar</h3>
