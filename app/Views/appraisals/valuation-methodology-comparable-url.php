@@ -9,8 +9,10 @@
     <div class="mt-3 flex flex-wrap gap-3">
         <button type="button" class="btn-primary min-h-11" data-listing-read>Leer aviso</button>
         <button type="button" class="btn-secondary min-h-11" data-listing-add disabled>Agregar a la tabla como por verificar</button>
+        <a class="btn-secondary min-h-11" data-listing-next href="<?= e($source['url'] ?? 'https://www.fincaraiz.com.co/') ?>" target="_blank" rel="noopener">Buscar otro inmueble</a>
     </div>
     <p id="listing-reader-status" role="status" class="mt-3 text-sm leading-6" data-listing-message></p>
+    <p class="mt-2 text-xs">«Buscar otro inmueble» limpia esta captura y abre la búsqueda. No borra las filas de la tabla. Las coincidencias entre fuentes requieren revisión; pueden existir duplicados que los datos publicados no permitan detectar.</p>
     <div class="text-anywhere mt-3 space-y-1 text-sm" data-listing-preview></div>
     <p class="mt-2 text-xs text-slate-600">La lectura prellena los datos publicados que reconoce. No confirma comparabilidad ni adjunta fotografías o PDF. Precio y clase de área deben revisarse.</p>
 </section>

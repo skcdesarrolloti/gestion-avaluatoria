@@ -17,18 +17,31 @@ export function installComparableUrlImport() {
         panel.querySelector('[data-listing-message]').textContent = '';
     }, true);
     document.addEventListener('click', async event => {
-        const button = event.target.closest?.('[data-listing-read], [data-listing-add]');
+        const button = event.target.closest?.('[data-listing-read], [data-listing-add], [data-listing-next]');
         if (!button) return;
         const panel = button.closest('[data-listing-reader]');
         const form = panel.closest('form');
         const message = panel.querySelector('[data-listing-message]');
         const add = panel.querySelector('[data-listing-add]');
+        if (button.hasAttribute('data-listing-next')) {
+            if (panel.getAttribute('aria-busy') === 'true') { event.preventDefault(); return; }
+            previews.delete(panel);
+            add.disabled = true;
+            const input = panel.querySelector('[data-listing-url]');
+            input.value = '';
+            input.removeAttribute('aria-invalid');
+            panel.querySelector('[data-listing-preview]').textContent = '';
+            message.textContent = 'Captura limpia para otro inmueble. Las muestras agregadas siguen en la tabla.';
+            return;
+        }
         if (button.hasAttribute('data-listing-add')) {
             const result = previews.get(panel);
             if (!result) return;
             const counts = fillRows(form, [result.row], panel.dataset.defaultQuery ?? '');
             message.textContent = counts.count ? 'Muestra agregada a la tabla. Puedes pegar el siguiente enlace aquí. Revisa los campos y el estado de guardado abajo.'
-                : counts.duplicates ? 'Este enlace ya está en la captura. Revisa la muestra existente.' : 'No hay filas vacías: límite de 60 muestras.';
+                : counts.duplicates ? 'Este enlace ya está en la captura. Revisa la muestra existente.'
+                    : counts.suspected ? 'Posible duplicado: no se agregó. Revisa las muestras indicadas en la tabla; la vista previa se conserva.' : 'No hay filas vacías: límite de 60 muestras.';
+            if (counts.suspected) return;
             previews.delete(panel);
             add.disabled = true;
             if (counts.count) {

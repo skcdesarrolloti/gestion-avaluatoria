@@ -85,6 +85,22 @@ Antes de presentar un anexo definitivo se requiere cerrar:
 
 ## Lectura por enlace y búsquedas por portal (30/09/2026)
 
+- «Buscar otro inmueble» en FincaRaíz limpia enlace, vista previa, errores y estado
+  de incorporación y abre la búsqueda de la pestaña. No modifica filas. Durante
+  una lectura pendiente no permite reiniciar para evitar una respuesta tardía.
+- Antes de incorporar por URL o texto, se contrasta con las filas del expediente,
+  incluidas las de otras fuentes y las incorporadas en el mismo lote. URL idéntica
+  normalizada se omite. Dirección numérica coincidente + área, o área + precio +
+  sector/edificio coincidentes, generan confirmación de posible duplicado con
+  números de muestra y motivos. Cancelar no incorpora; confirmar inmueble distinto
+  incorpora dejando la decisión en observaciones. No compara fotos ni asegura
+  identidad; los datos incompletos o distintos pueden impedir detectar repetidos.
+  Es una ayuda en la captura del navegador, no una restricción única en BD ni
+  validación de identidad al editar manualmente o enviar directamente al servidor.
+- Validación: 341 verificaciones PHP, 64 pruebas JS (7 casos de coincidencias,
+  cancelación y registro de decisión), lint 486 PHP, build y 49,6 KB gzip.
+  No cambia esquema ni persistencia; publicar vista y assets compilados juntos.
+
 - Flujo revisado con el usuario: pestaña propia para cada portal/inmobiliaria,
   agrupadas en Portales e Inmobiliarias. Cada pestaña reúne consulta del expediente,
   enlace externo, filtros disponibles y captura. FincaRaíz tiene lector por URL;

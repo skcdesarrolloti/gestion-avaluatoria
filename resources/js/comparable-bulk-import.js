@@ -1,4 +1,5 @@
 import { comparableUrlKey, hasComparableData } from './comparable-review.js';
+import { checkComparableDuplicates } from './comparable-duplicates.js';
 
 export function parseComparableBlock(block) {
     const text = String(block ?? '').replace(/\r/g, '').trim();
@@ -85,18 +86,23 @@ function setField(row, key, value) {
 }
 
 export function fillRows(form, rows, defaultQuery) {
+    const existing = [...form.querySelectorAll('tbody tr')].map(row => Object.fromEntries([...row.querySelectorAll('[name]')]
+        .map(input => [input.name.match(/\[([^\]]+)\]$/)[1], input.value])));
     const targets = [...form.querySelectorAll('tbody tr')].filter(isBlankRow);
     const known = new Set([...form.querySelectorAll('tbody tr')]
         .map(row => comparableUrlKey(field(row, 'source_url')?.value)).filter(Boolean));
     let count = 0, firstRow = null;
-    let duplicates = 0, overflow = 0;
+    let duplicates = 0, overflow = 0, suspected = 0;
     rows.forEach(data => {
         const key = comparableUrlKey(data.source_url);
         if (key && known.has(key)) { duplicates++; return; }
+        const review = checkComparableDuplicates(data, existing);
+        if (review.blocked) { review.exact ? duplicates++ : suspected++; return; }
         const row = targets.shift();
         if (!row) { overflow++; return; }
         firstRow ??= row.sectionRowIndex;
         if (key) known.add(key);
+        existing[row.sectionRowIndex] = data;
         Object.entries(data).forEach(([key, value]) => setField(row, key, value));
         setField(row, 'query_used', defaultQuery);
         setField(row, 'active', 'si');
@@ -107,7 +113,7 @@ export function fillRows(form, rows, defaultQuery) {
         form.dispatchEvent(new Event('input', { bubbles: true }));
         form.dispatchEvent(new CustomEvent('comparable-imported', { detail: firstRow }));
     }
-    return { count, duplicates, overflow };
+    return { count, duplicates, overflow, suspected };
 }
 
 export function installComparableBulkImport() {
@@ -121,7 +127,7 @@ export function installComparableBulkImport() {
         const rows = parseComparableText(input?.value ?? '');
         const result = form ? fillRows(form, rows, panel?.dataset?.defaultQuery ?? '') : { count: 0, duplicates: 0, overflow: 0 };
         if (message) message.textContent = rows.length
-            ? `${result.count} muestra(s) cargada(s), pendientes de revisión. ${result.duplicates} enlace(s) repetido(s) omitido(s). ${result.overflow} sin cargar por límite de 60. El texto original se conserva; consulta el estado de guardado.`
+            ? `${result.count} muestra(s) cargada(s). ${result.duplicates} enlace(s) repetido(s) omitido(s). ${result.suspected || 0} posible(s) duplicado(s) sin agregar: revisa la tabla. ${result.overflow} sin cargar por límite de 60. El texto original se conserva; consulta el estado de guardado.`
             : 'Pega enlaces, texto de avisos o filas con datos antes de cargar.';
         form?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
