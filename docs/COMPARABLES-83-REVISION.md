@@ -1,5 +1,15 @@
 # Revisión de captura de comparables — 30/09/2026
 
+## Corrección de la búsqueda concatenada
+
+La vista académica de 8.1 reutilizaba `$guide` al recorrer los métodos. Los includes
+PHP comparten ámbito, por lo que 8.3 recibía el último método en lugar de los datos
+del sujeto. Se renombró la variable local a `$methodGuide`. Buscar y Capturar vuelven
+a recibir la consulta generada con operación, tipología, barrio, localidad y ciudad.
+No se inventan datos del expediente ni se alteran las reglas de composición.
+La regresión renderiza academia y enlaces en el mismo ámbito y comprueba que se
+conservan la consulta y los criterios en el enlace del portal.
+
 ## Aclaración del responsable y corrección de guías
 
 El objetivo del responsable es automatizar la captura de avisos y conservar evidencia

@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require dirname(__DIR__) . '/bootstrap.php';
 require __DIR__ . '/support.php';
+require __DIR__ . '/comparable-search-render.php';
 use App\Core\Session;
 use App\Database\Schema;
 use App\Core\Http;
