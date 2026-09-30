@@ -85,6 +85,13 @@ Antes de presentar un anexo definitivo se requiere cerrar:
 
 ## Lectura por enlace y búsquedas por portal (30/09/2026)
 
+- Presentación de una fuente a la vez: FincaRaíz inicial; se reemplaza la fila de
+  pestañas simultáneas por «Cambiar de fuente», cerrado por defecto, con selector
+  de portales/inmobiliarias. Elegir cierra el selector y solo muestra esa fuente.
+  Conserva estado de captura y tabla; cambiar fuente no dispara autoguardado.
+  Verificado cambio FincaRaíz/Metrocuadrado y regreso, escritorio y móvil 390 px;
+  352 controles PHP, 67 pruebas JS, build y tamaño 50,3 KB gzip. Sin cambios de BD.
+
 - Barrio de búsqueda desde catálogo: se precarga por `neighborhood_id` del sujeto,
   con sugerencias de barrios activos de su `city_id`. Tipo, operación y ciudad se
   muestran desde los datos del expediente, sin edición en esta búsqueda.

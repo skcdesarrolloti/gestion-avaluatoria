@@ -4,35 +4,36 @@ $agencyLinks = $agencySources ?? ($guide['source_search']['agency_sources'] ?? [
 $sourceTabs = array_merge($portalLinks, $agencyLinks);
 ?>
 <section id="capture-sources" class="mb-6 rounded-xl border border-blue-100 bg-blue-50 p-4" x-data="{ sourceTab: 0 }">
-    <h3 class="text-lg font-semibold text-blue-950">Busca y captura desde la pestaña de cada fuente</h3>
-    <p class="mt-2 text-sm leading-6">Cada aviso incorporado agrega una fila a la misma tabla. Puedes repetir la captura y cambiar de fuente sin perder las muestras incorporadas.</p>
+    <h3 class="text-lg font-semibold text-blue-950" x-text="'Captura en ' + <?= e(json_encode(array_column($sourceTabs, 'label'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>[sourceTab]">Captura en <?= e($sourceTabs[0]['label'] ?? 'la fuente seleccionada') ?></h3>
+    <p class="mt-2 text-sm leading-6">Trabaja con esta fuente. Cada aviso que agregues se suma a tu tabla.</p>
     <div class="mt-3 flex flex-wrap items-center gap-3 text-sm">
         <strong><span x-text="total"><?= count($comparableRows ?? []) ?></span> muestras en la tabla</strong>
         <a class="btn-secondary min-h-11" href="#capture-review">Ver y revisar tabla</a>
         <span data-autosave-status>Consulta el estado de guardado al incorporar.</span>
     </div>
-    <div class="mt-4 flex gap-2" aria-label="Grupo de fuentes">
-        <button type="button" class="btn-secondary min-h-11" @click="sourceTab = 0" :aria-pressed="sourceTab < <?= count($portalLinks) ?>">Portales</button>
-        <?php if ($agencyLinks): ?><button type="button" class="btn-secondary min-h-11" @click="sourceTab = <?= count($portalLinks) ?>" :aria-pressed="sourceTab >= <?= count($portalLinks) ?>">Inmobiliarias</button><?php endif; ?>
-    </div>
-    <div role="tablist" aria-label="Fuentes de mercado" class="mt-2 flex flex-wrap gap-2"
-        @keydown.arrow-right.prevent="sourceTab = (sourceTab + 1) % <?= count($sourceTabs) ?: 1 ?>; $nextTick(() => $el.querySelectorAll('[role=tab]')[sourceTab].focus())"
-        @keydown.arrow-left.prevent="sourceTab = (sourceTab + <?= count($sourceTabs) - 1 ?>) % <?= count($sourceTabs) ?: 1 ?>; $nextTick(() => $el.querySelectorAll('[role=tab]')[sourceTab].focus())">
-        <?php foreach ($sourceTabs as $sourceIndex => $source): ?>
-            <button type="button" role="tab" id="source-tab-<?= $sourceIndex ?>" aria-controls="source-panel-<?= $sourceIndex ?>"
-                x-show="(sourceTab < <?= count($portalLinks) ?>) === <?= $sourceIndex < count($portalLinks) ? 'true' : 'false' ?>"
-                :aria-selected="sourceTab === <?= $sourceIndex ?>" :tabindex="sourceTab === <?= $sourceIndex ?> ? 0 : -1"
-                @click="sourceTab = <?= $sourceIndex ?>" class="min-h-11 rounded-lg border px-3 py-2 text-sm font-semibold"
-                :class="sourceTab === <?= $sourceIndex ?> ? 'bg-blue-700 text-white border-blue-700' : 'bg-white text-blue-900 border-blue-200'">
-                <?= e($source['label']) ?>
-            </button>
-        <?php endforeach; ?>
-    </div>
+    <details class="mt-3" x-ref="sourcePicker">
+        <summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold text-blue-800">Cambiar de fuente</summary>
+        <label for="market-source-choice" class="block text-sm font-semibold">Elige el portal o la inmobiliaria para continuar</label>
+        <select id="market-source-choice" class="input mt-1 w-full" :value="sourceTab" @input.stop
+            @change.stop="sourceTab = Number($event.target.value); $refs.sourcePicker.open = false; $refs.sourcePicker.querySelector('summary').focus()">
+            <option value="" disabled>Selecciona una fuente</option>
+            <optgroup label="Portales">
+                <?php foreach ($portalLinks as $sourceIndex => $source): ?>
+                    <option value="<?= $sourceIndex ?>"><?= e($source['label']) ?></option>
+                <?php endforeach; ?>
+            </optgroup>
+            <optgroup label="Inmobiliarias">
+                <?php foreach ($agencyLinks as $sourceIndex => $source): ?>
+                    <option value="<?= count($portalLinks) + $sourceIndex ?>"><?= e($source['label']) ?></option>
+                <?php endforeach; ?>
+            </optgroup>
+        </select>
+    </details>
     <?php foreach ($sourceTabs as $sourceIndex => $source):
         $isFincaraiz = str_contains(strtolower($source['label']), 'fincaraiz');
         $isAgency = $sourceIndex >= count($portalLinks);
     ?>
-        <section role="tabpanel" id="source-panel-<?= $sourceIndex ?>" aria-labelledby="source-tab-<?= $sourceIndex ?>"
+        <section id="source-panel-<?= $sourceIndex ?>" aria-label="<?= e($source['label']) ?>"
             x-show="sourceTab === <?= $sourceIndex ?>" <?= $sourceIndex ? 'x-cloak' : '' ?> class="mt-4 rounded-xl bg-white p-4">
             <?php if ($isFincaraiz && isset($record['id'])): ?>
                 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-fincaraiz-zone.php'; ?>
