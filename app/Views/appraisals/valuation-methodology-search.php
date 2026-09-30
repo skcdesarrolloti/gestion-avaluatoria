@@ -12,8 +12,6 @@ $factorTargets = is_array($sampleDesign['factor_targets'] ?? null) ? $sampleDesi
 $factorOptions = ['' => 'Seleccionar factor'];
 foreach ($factorTargets as $target) $factorOptions[(string) ($target['key'] ?? '')] = (string) ($target['label'] ?? 'Factor');
 $nextStep = is_array($methodologyDecision['next_step'] ?? null) ? $methodologyDecision['next_step'] : ['8.3 Desarrollo del método', ''];
-$componentItems = is_array($methodologyDecision['components'] ?? null) ? $methodologyDecision['components'] : [];
-$firstComponent = (string) ($componentItems[0]['id'] ?? '');
 $formulaFamilies = [
     ['Mercado', 'Valor unitario = precio depurado / unidad de comparación. En 8.4 se revisa mediana, media recortada, dispersión, intervalo t de Student, outliers y MAPE si hay modelo.'],
     ['Renta', 'Ingreso neto = canon bruto menos vacancia, administración no recuperable y gastos; valor = ingreso neto anual / tasa, o flujo descontado si aplica.'],
@@ -65,63 +63,6 @@ $searchTabs = [
         <strong>Regla de flujo:</strong>
         <?= e((string) ($nextStep[1] ?? 'Define primero los insumos del método seleccionado.')) ?>
     </div>
-
-    <?php if ($componentItems !== []): ?>
-        <div class="mt-6 rounded-xl border border-blue-100 bg-blue-50 p-4"
-            x-data="{ componentWorkTab: '<?= e($firstComponent) ?>' }">
-            <div class="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                    <p class="eyebrow">Ruta operativa por componente</p>
-                    <h3 class="mt-2 text-xl font-semibold text-blue-950">Qué debe capturarse antes del cálculo</h3>
-                </div>
-                <span class="rounded-full bg-white px-3 py-1 text-xs font-semibold text-blue-800"><?= count($componentItems) ?> ruta(s)</span>
-            </div>
-            <nav class="mt-4 flex gap-2 overflow-x-auto rounded-xl bg-white/70 p-2" aria-label="Rutas por componente">
-                <?php foreach ($componentItems as $component): ?>
-                    <button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
-                        :class="componentWorkTab === '<?= e((string) $component['id']) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
-                        @click="componentWorkTab = '<?= e((string) $component['id']) ?>'"><?= e((string) $component['label']) ?></button>
-                <?php endforeach; ?>
-            </nav>
-            <?php foreach ($componentItems as $component): ?>
-                <?php
-                $routes = is_array($component['routes'] ?? null) ? $component['routes'] : [];
-                $firstRoute = (string) ($routes[0]['key'] ?? 'mercado');
-                ?>
-                <article class="mt-3 rounded-lg bg-white p-4 text-sm leading-6 text-slate-700"
-                    x-show="componentWorkTab === '<?= e((string) $component['id']) ?>'"
-                    x-data="{ routeTab: '<?= e($firstRoute) ?>' }">
-                    <div class="flex flex-wrap items-start justify-between gap-3">
-                        <div>
-                            <strong class="text-slate-950"><?= e((string) $component['method']) ?>:</strong>
-                            <?= e((string) $component['inputs']) ?>
-                        </div>
-                        <span class="rounded-full bg-blue-50 px-3 py-1 text-xs font-semibold text-blue-800"><?= count($routes) ?> método(s)</span>
-                    </div>
-                    <?php if ($routes !== []): ?>
-                        <nav class="mt-4 flex gap-2 overflow-x-auto rounded-lg bg-slate-100 p-2" aria-label="Subrutas metodológicas">
-                            <?php foreach ($routes as $route): ?>
-                                <button type="button" class="min-h-10 shrink-0 rounded-md px-3 py-2 text-xs font-bold"
-                                    :class="routeTab === '<?= e((string) $route['key']) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
-                                    @click="routeTab = '<?= e((string) $route['key']) ?>'"><?= e((string) $route['label']) ?></button>
-                            <?php endforeach; ?>
-                        </nav>
-                        <?php foreach ($routes as $route): ?>
-                            <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3"
-                                x-show="routeTab === '<?= e((string) $route['key']) ?>'">
-                                <?php foreach (($route['steps'] ?? []) as $step): ?>
-                                    <div class="rounded-lg border border-slate-200 bg-slate-50 p-3">
-                                        <p class="text-xs font-bold uppercase text-slate-500"><?= e((string) ($step[0] ?? 'Paso')) ?></p>
-                                        <p class="mt-2 text-sm leading-6 text-slate-700"><?= e((string) ($step[1] ?? '')) ?></p>
-                                    </div>
-                                <?php endforeach; ?>
-                            </div>
-                        <?php endforeach; ?>
-                    <?php endif; ?>
-                </article>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
 
     <nav class="mt-6 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Pestañas del desarrollo 8.3">
         <?php foreach ($searchTabs as $key => $label): ?>

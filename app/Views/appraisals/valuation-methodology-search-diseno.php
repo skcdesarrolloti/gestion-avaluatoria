@@ -29,25 +29,25 @@ $nextAction = $usableCount === 0
             <p class="text-xs font-bold uppercase text-teal-800">Qué hago en este numeral</p>
             <h3 class="mt-2 text-xl font-semibold text-teal-950">Aquí no se calcula todavía: aquí construyes la muestra de mercado</h3>
             <p class="mt-2 max-w-4xl text-sm leading-6 text-teal-950"><?= e($nextAction) ?></p>
+            <p class="mt-1 max-w-4xl text-xs font-semibold leading-5 text-teal-800">
+                Usa las pestañas en este orden: Buscador, Filtros, Captura, Mapa, Matriz, Variables, Fórmulas y Criterios.
+            </p>
         </div>
         <span class="rounded-full bg-white px-3 py-1 text-xs font-bold text-teal-800"><?= e((string) $usableCount) ?>/<?= e((string) $targetTotal) ?> muestras</span>
     </div>
     <div class="mt-4 grid gap-3 md:grid-cols-3">
-        <button type="button" class="rounded-lg bg-white p-3 text-left text-sm font-semibold text-slate-800 shadow-sm"
-            @click="searchTab = 'buscador'">
+        <article class="rounded-lg bg-white p-3 text-sm font-semibold text-slate-800 shadow-sm">
             1. Buscar fuentes
             <span class="mt-1 block text-xs font-medium leading-5 text-slate-500">Portales + inmobiliarias locales. Abre fuentes y copia enlaces verificables.</span>
-        </button>
-        <button type="button" class="rounded-lg bg-white p-3 text-left text-sm font-semibold text-slate-800 shadow-sm"
-            @click="searchTab = 'captura'">
+        </article>
+        <article class="rounded-lg bg-white p-3 text-sm font-semibold text-slate-800 shadow-sm">
             2. Diligenciar comparables
             <span class="mt-1 block text-xs font-medium leading-5 text-slate-500">Llena 60 filas posibles con precio, área, fuente, fecha, factor y observación.</span>
-        </button>
-        <button type="button" class="rounded-lg bg-white p-3 text-left text-sm font-semibold text-slate-800 shadow-sm"
-            @click="searchTab = 'mapa'">
+        </article>
+        <article class="rounded-lg bg-white p-3 text-sm font-semibold text-slate-800 shadow-sm">
             3. Revisar ubicación
             <span class="mt-1 block text-xs font-medium leading-5 text-slate-500">Marca coordenadas para ver si la muestra sí corresponde al microsector comparable.</span>
-        </button>
+        </article>
     </div>
     <div class="mt-4 grid gap-3 sm:grid-cols-3">
         <div class="rounded-lg bg-white px-3 py-2"><p class="text-xs font-bold uppercase text-slate-500">Con datos</p><p class="font-semibold text-slate-950"><?= e((string) $usableCount) ?></p></div>
