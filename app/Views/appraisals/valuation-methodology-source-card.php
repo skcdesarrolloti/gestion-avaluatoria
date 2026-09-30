@@ -21,5 +21,8 @@
             <?php endforeach; ?>
         </span>
     <?php endif; ?>
-    <span class="mt-2 block text-xs font-semibold text-blue-800">Abrir en otra pestaña y traer solo muestras verificables.</span>
+    <span class="mt-3 inline-flex min-h-9 items-center rounded-md bg-blue-700 px-3 py-2 text-xs font-bold text-white">
+        Abrir búsqueda
+    </span>
+    <span class="ml-2 text-xs font-semibold text-blue-800">Luego registra la muestra en Capturar.</span>
 </a>

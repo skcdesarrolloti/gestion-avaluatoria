@@ -19,18 +19,13 @@ $formulaFamilies = [
     ['Costo', 'Valor = terreno + costo de reposición nuevo menos depreciación física, funcional y económica, con soporte de cantidades y precios.'],
 ];
 $searchTabs = [
-    'diseno' => 'Diseño de muestra',
-    'buscador' => 'Buscador',
-    'filtros' => 'Filtros',
-    'captura' => 'Captura',
-    'mapa' => 'Mapa',
-    'matriz' => 'Matriz',
-    'variables' => 'Variables',
-    'formulas' => 'Fórmulas',
-    'criterios' => 'Criterios',
+    'buscar' => '1. Buscar',
+    'captura' => '2. Capturar',
+    'mapa' => '3. Mapa',
+    'revision' => '4. Revisar',
 ];
 ?>
-<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ searchTab: 'diseno' }">
+<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ searchTab: 'buscar' }">
     <div class="mb-6">
         <p class="eyebrow">8.3 Desarrollo operativo del método de mercado</p>
         <h2 class="mt-2 text-2xl font-semibold">Investigación, muestra y trazabilidad de mercado</h2>
@@ -73,14 +68,14 @@ $searchTabs = [
     </nav>
 
     <div class="mt-6">
-        <div x-show="searchTab === 'diseno'">
+        <div x-show="searchTab === 'buscar'">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-diseno.php'; ?>
-        </div>
-        <div x-show="searchTab === 'buscador'">
-            <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-buscador.php'; ?>
-        </div>
-        <div x-show="searchTab === 'filtros'">
-            <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-filtros.php'; ?>
+            <div class="mt-6">
+                <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-buscador.php'; ?>
+            </div>
+            <div class="mt-6">
+                <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-filtros.php'; ?>
+            </div>
         </div>
         <div x-show="searchTab === 'captura'">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-captura.php'; ?>
@@ -88,17 +83,17 @@ $searchTabs = [
         <div x-show="searchTab === 'mapa'">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-map.php'; ?>
         </div>
-        <div x-show="searchTab === 'matriz'">
+        <div x-show="searchTab === 'revision'">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-matriz.php'; ?>
-        </div>
-        <div x-show="searchTab === 'variables'">
-            <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-variables.php'; ?>
-        </div>
-        <div x-show="searchTab === 'formulas'">
-            <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-formulas.php'; ?>
-        </div>
-        <div x-show="searchTab === 'criterios'">
-            <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-criterios.php'; ?>
+            <div class="mt-6">
+                <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-variables.php'; ?>
+            </div>
+            <div class="mt-6">
+                <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-formulas.php'; ?>
+            </div>
+            <div class="mt-6">
+                <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-criterios.php'; ?>
+            </div>
         </div>
     </div>
 </section>

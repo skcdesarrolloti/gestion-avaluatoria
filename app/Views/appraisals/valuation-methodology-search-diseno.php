@@ -30,7 +30,7 @@ $nextAction = $usableCount === 0
             <h3 class="mt-2 text-xl font-semibold text-teal-950">Aquí no se calcula todavía: aquí construyes la muestra de mercado</h3>
             <p class="mt-2 max-w-4xl text-sm leading-6 text-teal-950"><?= e($nextAction) ?></p>
             <p class="mt-1 max-w-4xl text-xs font-semibold leading-5 text-teal-800">
-                Usa las pestañas en este orden: Buscador, Filtros, Captura, Mapa, Matriz, Variables, Fórmulas y Criterios.
+                Flujo simple: 1. Buscar fuentes, 2. Capturar comparables, 3. Ver mapa, 4. Revisar matriz y variables.
             </p>
         </div>
         <span class="rounded-full bg-white px-3 py-1 text-xs font-bold text-teal-800"><?= e((string) $usableCount) ?>/<?= e((string) $targetTotal) ?> muestras</span>
@@ -38,7 +38,7 @@ $nextAction = $usableCount === 0
     <div class="mt-4 grid gap-3 md:grid-cols-3">
         <article class="rounded-lg bg-white p-3 text-sm font-semibold text-slate-800 shadow-sm">
             1. Buscar fuentes
-            <span class="mt-1 block text-xs font-medium leading-5 text-slate-500">Portales + inmobiliarias locales. Abre fuentes y copia enlaces verificables.</span>
+            <span class="mt-1 block text-xs font-medium leading-5 text-slate-500">El sistema prepara la búsqueda; abres las fuentes y traes ofertas verificables.</span>
         </article>
         <article class="rounded-lg bg-white p-3 text-sm font-semibold text-slate-800 shadow-sm">
             2. Diligenciar comparables
@@ -54,6 +54,12 @@ $nextAction = $usableCount === 0
         <div class="rounded-lg bg-white px-3 py-2"><p class="text-xs font-bold uppercase text-slate-500">Con factor 8.4</p><p class="font-semibold text-slate-950"><?= e((string) array_sum($factorCounts)) ?></p></div>
         <div class="rounded-lg bg-white px-3 py-2"><p class="text-xs font-bold uppercase text-slate-500">Con coordenadas</p><p class="font-semibold text-slate-950"><?= e((string) $georefCount) ?></p></div>
     </div>
+</section>
+
+<section class="mt-4 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
+    <strong>Importante:</strong> por ahora el aplicativo no se conecta solo a los portales ni descarga avisos automáticamente.
+    Te deja la consulta lista, los portales e inmobiliarias priorizadas y la tabla para registrar la muestra. Si defines la búsqueda,
+    Codex puede ayudarte a explorar fuentes y devolverte datos para capturarlos, pero el sistema aún no hace scraping automático.
 </section>
 
 <div class="mt-6 grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
