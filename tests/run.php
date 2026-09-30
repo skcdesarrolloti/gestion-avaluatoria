@@ -1274,6 +1274,8 @@ try {
     expect($igacResolution !== null, 'biblioteca IGAC centraliza resolucion 941');
     expect(str_ends_with((string) ($igacResolution['archivo_descarga'] ?? ''), '.pdf'),
         'biblioteca IGAC conserva descarga directa de resolucion 941');
+    expect(str_contains((string) file_get_contents(BASE_PATH . '/app/Controllers/IgacTypologyController.php'), 'CURL_HTTP_VERSION_1_1'),
+        'descarga IGAC fuerza transporte compatible sin HTTP2');
     expect(str_contains((string) ($igacResolution['uso_practico'] ?? ''), 'marco rector vigente'),
         'biblioteca IGAC explica para que es util cada documento');
     expect(str_contains((string) ($igacResolution['criterio_vigencia'] ?? ''), 'vigente'),

@@ -90,28 +90,43 @@ final class IgacTypologyController
     private function fetchOfficialFile(string $url): string
     {
         if (function_exists('curl_init')) {
-            $curl = curl_init($url);
-            curl_setopt_array($curl, [
-                CURLOPT_RETURNTRANSFER => true,
-                CURLOPT_FOLLOWLOCATION => true,
-                CURLOPT_CONNECTTIMEOUT => 10,
-                CURLOPT_TIMEOUT => 45,
-                CURLOPT_USERAGENT => 'GestionAvaluatoria/1.0',
-            ]);
-            $body = curl_exec($curl);
-            $status = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
-            $error = curl_error($curl);
-            curl_close($curl);
-            if (is_string($body) && $body !== '' && $status >= 200 && $status < 300) return $body;
-            throw new \App\Core\HttpException(502, 'No se pudo descargar el archivo IGAC. ' . ($error ?: 'Estado HTTP ' . $status));
+            $lastError = '';
+            foreach ([CURL_HTTP_VERSION_1_1, CURL_HTTP_VERSION_1_0] as $httpVersion) {
+                [$body, $status, $error] = $this->curlFetch($url, $httpVersion);
+                if (is_string($body) && $body !== '' && $status >= 200 && $status < 300) return $body;
+                $lastError = $error ?: 'Estado HTTP ' . $status;
+            }
+            throw new \App\Core\HttpException(502, 'No se pudo descargar el archivo IGAC. ' . $lastError);
         }
         $context = stream_context_create(['http' => [
+            'protocol_version' => 1.1,
             'timeout' => 45,
-            'header' => "User-Agent: GestionAvaluatoria/1.0\r\n",
+            'header' => "User-Agent: GestionAvaluatoria/1.0\r\nAccept: application/pdf, application/octet-stream, */*\r\nConnection: close\r\n",
         ]]);
         $body = @file_get_contents($url, false, $context);
         if (is_string($body) && $body !== '') return $body;
         throw new \App\Core\HttpException(502, 'No se pudo descargar el archivo IGAC.');
+    }
+
+    private function curlFetch(string $url, int $httpVersion): array
+    {
+        $curl = curl_init($url);
+        curl_setopt_array($curl, [
+            CURLOPT_RETURNTRANSFER => true,
+            CURLOPT_FOLLOWLOCATION => true,
+            CURLOPT_CONNECTTIMEOUT => 10,
+            CURLOPT_TIMEOUT => 45,
+            CURLOPT_USERAGENT => 'GestionAvaluatoria/1.0',
+            CURLOPT_HTTP_VERSION => $httpVersion,
+            CURLOPT_ENCODING => '',
+            CURLOPT_HTTPHEADER => ['Accept: application/pdf, application/octet-stream, */*', 'Connection: close'],
+            CURLOPT_REFERER => 'https://www.igac.gov.co/',
+        ]);
+        $body = curl_exec($curl);
+        $status = (int) curl_getinfo($curl, CURLINFO_RESPONSE_CODE);
+        $error = curl_error($curl);
+        curl_close($curl);
+        return [$body, $status, $error];
     }
 
     private function downloadName(array $document, string $url): string
