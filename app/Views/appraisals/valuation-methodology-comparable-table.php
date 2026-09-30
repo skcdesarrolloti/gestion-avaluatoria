@@ -31,7 +31,7 @@ $yesNo = ['' => 'No definido', 'si' => 'Sí', 'no' => 'No'];
 $locationPrecisions = ['' => 'No definida', 'exacta' => 'Exacta', 'aproximada' => 'Aproximada', 'sector' => 'Solo sector'];
 $tip = static fn (string $text): string => '<span class="help-dot" title="' . e($text) . '">?</span>';
 ?>
-<form class="mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" method="post"
+<form id="tabla-madre-83" class="mt-6 scroll-mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" method="post"
     action="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables')) ?>"
     data-module-autosave data-save-in-place
     data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/autoguardar')) ?>">

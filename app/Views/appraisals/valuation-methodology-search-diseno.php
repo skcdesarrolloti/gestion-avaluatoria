@@ -86,7 +86,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
                 Sale de la tipología del bien sujeto, los factores disponibles para 8.4 y la guía interna de muestra.
                 Para trabajarla, ve al sitio de diligenciamiento y registra las ofertas reales.
             </p>
-            <button type="button" class="btn-secondary mt-3 min-h-9 text-xs" x-on:click="searchTab = 'captura'; window.scrollTo({ top: 0, behavior: 'smooth' })">
+            <button type="button" class="btn-secondary mt-3 min-h-9 text-xs" x-on:click="searchTab = 'captura'; $nextTick(() => document.getElementById('captura-83')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))">
                 Ir a 2. Capturar muestras
             </button>
         </div>

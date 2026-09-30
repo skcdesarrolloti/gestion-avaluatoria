@@ -77,7 +77,7 @@ $searchTabs = [
                 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-filtros.php'; ?>
             </div>
         </div>
-        <div x-show="searchTab === 'captura'">
+        <div id="captura-83" class="scroll-mt-6" x-show="searchTab === 'captura'">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-captura.php'; ?>
         </div>
         <div x-show="searchTab === 'mapa'">

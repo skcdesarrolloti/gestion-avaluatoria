@@ -19,11 +19,26 @@ $minimumFields = [
 ];
 $tip = static fn (string $text): string => '<span class="help-dot" title="' . e($text) . '">?</span>';
 ?>
+<section class="mb-6 rounded-xl border border-orange-100 bg-orange-50 p-4">
+    <p class="text-xs font-bold uppercase text-orange-800">Qué hago ahora</p>
+    <h3 class="mt-2 text-xl font-semibold text-orange-950">Llena la tabla madre: una fila por cada muestra encontrada</h3>
+    <p class="mt-2 text-sm leading-6 text-orange-950">
+        El protocolo de arriba es una guía. La acción real está abajo: registra fuente, enlace, fecha, precio,
+        área, ubicación y el factor 8.4 que soporta cada oferta o dato de mercado.
+    </p>
+    <button type="button" class="btn-secondary mt-3 min-h-9 text-xs"
+        x-on:click="document.getElementById('tabla-madre-83')?.scrollIntoView({ behavior: 'smooth', block: 'start' })">
+        Ir a la tabla madre
+    </button>
+</section>
 <div class="grid gap-6 lg:grid-cols-2">
     <section class="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
         <p class="text-xs font-bold uppercase text-emerald-800">Protocolo de captura <?= $tip('Origen: método seleccionado en 8.2, tipología del bien y diseño de muestra de 8.3. Sirve para decidir si una oferta entra: comparable, verificable y con datos mínimos.') ?></p>
         <?php if ($captureProtocol === []): ?>
-            <p class="mt-3 text-sm leading-6 text-emerald-950">Completa la configuración del método para proponer el protocolo de captura.</p>
+            <p class="mt-3 text-sm leading-6 text-emerald-950">
+                Si este protocolo aún no aparece, no te detengas: usa la ficha mínima y empieza por la tabla madre.
+                Luego el sistema irá alimentando contadores, matriz, mapa y revisión.
+            </p>
         <?php else: ?>
             <ol class="mt-3 space-y-2 text-sm leading-6 text-emerald-950">
                 <?php foreach ($captureProtocol as $index => $step): ?>
