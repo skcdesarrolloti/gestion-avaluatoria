@@ -1,5 +1,8 @@
 # Entrega al responsable de la implementación
 
+Metrocuadrado: [captura por barrio](COMPARABLES-METROCUADRADO.md), lectura inicial
+de oficinas en venta en Cartagena, selección por lote y coincidencias compartidas.
+
 Actualización: [matriz, PH y fotos de comparables](COMPARABLES-MATRIZ-FOTOS.md).
 Incluye migración nueva, fotos privadas por muestra, envío compacto y control de
 versión de la matriz; reemplaza los pendientes anteriores de transporte/concurrencia.

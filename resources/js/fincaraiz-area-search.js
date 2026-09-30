@@ -23,7 +23,7 @@ export function fincaraizAreaSearch() {
             this.message = this.selected.length ? `${this.selected.length} sugeridos seleccionados. Puedes cambiar las casillas antes de agregar.` : 'No hay sugeridos nuevos en esta página: los avisos ya están en la matriz o requieren revisar coincidencias con ella.';
         },
         get visibleResults() { return this.results.filter(item => this.phFilter === 'all' || (item.row.ph_regime || 'por_verificar') === this.phFilter); },
-        neighborhood: '', neighborhoodId: '', neighborhoods: [], results: [], selected: [], busy: false, page: 1, hasNext: false, message: '', resultUrl: '',
+        neighborhood: '', neighborhoodId: '', neighborhoods: [], results: [], selected: [], busy: false, page: 1, hasNext: false, message: '', resultUrl: '', notice: '',
         init() {
             panel = this.$el; form = panel.closest('form');
             this.neighborhoods = JSON.parse(panel.dataset.neighborhoods || '[]');
@@ -39,7 +39,7 @@ export function fincaraizAreaSearch() {
         get searchUrl() {
             return this.neighborhoods.find(item => item.id === this.neighborhoodId)?.search_url || '';
         },
-        clear() { this.results = []; this.selected = []; this.message = ''; this.hasNext = false; this.page = 1; this.resultUrl = ''; },
+        clear() { this.results = []; this.selected = []; this.message = ''; this.hasNext = false; this.page = 1; this.resultUrl = ''; this.notice = ''; },
         money(value) {
             let raw = String(value ?? '').replace(/[^\d.,]/g, '');
             if (raw.includes(',')) raw = raw.replaceAll('.', '').replace(',', '.');
@@ -50,13 +50,14 @@ export function fincaraizAreaSearch() {
         async search(page = 1) {
             if (this.busy) return;
             if (!this.neighborhoodId) { this.message = 'Selecciona un barrio de las sugerencias del catálogo.'; return; }
-            this.busy = true; this.results = []; this.selected = []; this.hasNext = false;
+            this.busy = true; this.results = []; this.selected = []; this.hasNext = false; this.notice = '';
             this.message = 'Buscando oficinas en el barrio…';
             const abort = new AbortController();
             const timer = setTimeout(() => abort.abort(), 25000);
             try {
                 const body = new FormData();
                 body.set('neighborhood_id', this.neighborhoodId); body.set('page', String(page));
+                body.set('portal', panel.dataset.portal || 'fincaraiz');
                 const token = form.querySelector('[name="_token"]')?.value || document.querySelector('meta[name="csrf-token"]')?.content || '';
                 body.set('_token', token);
                 const response = await fetch(panel.dataset.endpoint, { method: 'POST', body, signal: abort.signal, headers: { Accept: 'application/json', 'X-CSRF-Token': token } });
@@ -65,6 +66,7 @@ export function fincaraizAreaSearch() {
                 if (!response.ok || !data.ok) throw new Error(data.message || 'No se pudo consultar el portal.');
                 this.results = data.results.map(item => ({ ...item, row: { ...item.row, ph_regime: item.row.ph_regime || 'por_verificar' } })); this.page = data.page; this.hasNext = data.has_next; this.resultUrl = data.url;
                 this.refreshDuplicates();
+                this.notice = data.notice || '';
                 this.message = this.results.length ? `${this.results.length} avisos en la página ${this.page}: ${this.results.filter(item => item.suggested).length} sugeridos nuevos; ${this.results.filter(item => item.tone === 'registered').length} ya incorporados.` : 'No se encontraron avisos legibles. Comprueba el barrio en el portal.';
             } catch (error) { this.message = error.name === 'AbortError' ? 'El portal tardó demasiado. Reintenta o abre la búsqueda.' : error.message; }
             finally { clearTimeout(timer); this.busy = false; }

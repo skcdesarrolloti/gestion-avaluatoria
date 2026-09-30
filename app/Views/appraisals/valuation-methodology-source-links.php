@@ -31,11 +31,12 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
     </details>
     <?php foreach ($sourceTabs as $sourceIndex => $source):
         $isFincaraiz = str_contains(strtolower($source['label']), 'fincaraiz');
+        $isMetrocuadrado = str_contains(strtolower($source['label']), 'metrocuadrado');
         $isAgency = $sourceIndex >= count($portalLinks);
     ?>
         <section id="source-panel-<?= $sourceIndex ?>" aria-label="<?= e($source['label']) ?>"
             x-show="sourceTab === <?= $sourceIndex ?>" <?= $sourceIndex ? 'x-cloak' : '' ?> class="mt-4 rounded-xl bg-white p-4">
-            <?php if ($isFincaraiz && isset($record['id'])): ?>
+            <?php if (($isFincaraiz || $isMetrocuadrado) && isset($record['id'])): ?>
                 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-fincaraiz-zone.php'; ?>
             <?php else: ?>
             <h4 class="font-semibold text-blue-950">1. Buscar en <?= e($source['label']) ?></h4>

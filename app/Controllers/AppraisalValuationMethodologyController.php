@@ -96,6 +96,12 @@ final class AppraisalValuationMethodologyController
             $page = filter_var($_POST['page'] ?? 1, FILTER_VALIDATE_INT);
             if (!is_string($neighborhoodId) || $page === false) throw new \InvalidArgumentException('Barrio o página inválidos.');
             $neighborhood = $this->geo->marketNeighborhood($neighborhoodId, (string) ($subject['city_id'] ?? ''));
+            $portal = $_POST['portal'] ?? 'fincaraiz';
+            if (!in_array($portal, ['fincaraiz', 'metrocuadrado'], true)) throw new \InvalidArgumentException('Portal no admitido.');
+            if ($portal === 'metrocuadrado') {
+                if ($page !== 1) throw new \InvalidArgumentException('Metrocuadrado admite la lectura inicial del barrio.');
+                Http::json(['ok' => true] + (new \App\Services\MetrocuadradoAreaSearch())->search($neighborhood));
+            }
             Http::json(['ok' => true] + (new \App\Services\FincaraizAreaSearch())->search($neighborhood, $page));
         } catch (\App\Core\HttpException $error) { Http::json(['ok' => false, 'message' => $error->getMessage()], $error->status); }
         catch (\InvalidArgumentException $error) { Http::json(['ok' => false, 'message' => $error->getMessage()], 422); }

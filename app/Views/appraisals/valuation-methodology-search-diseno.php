@@ -70,7 +70,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
 </section>
 
 <section class="mt-4 rounded-xl border border-amber-100 bg-amber-50 p-4 text-sm leading-6 text-amber-950">
-    FincaRaíz permite consultar oficinas en venta por barrio de Cartagena y seleccionar los resultados que se incorporan a la matriz.
+    FincaRaíz y Metrocuadrado permiten consultar oficinas en venta por barrio de Cartagena y seleccionar los resultados que se incorporan a la matriz.
     En otras fuentes usa el enlace y el texto del aviso. Revisa los datos publicados y adjunta sus fotos desde la matriz.
 </section>
 

@@ -14,13 +14,15 @@ test('searching and selecting suggested listings never write matrix fields or tr
     };
     const component = fincaraizAreaSearch();
     component.$el = { closest: () => form, dataset: {
-        neighborhoodId: '1', neighborhoods: JSON.stringify([{ id: '1', name: 'Bocagrande' }]), endpoint: '/test-search',
+        neighborhoodId: '1', neighborhoods: JSON.stringify([{ id: '1', name: 'Bocagrande' }]), endpoint: '/test-search', portal: 'metrocuadrado',
     } };
     const originalFetch = globalThis.fetch;
-    globalThis.fetch = async () => ({ ok: true, headers: new Headers({ 'content-type': 'application/json' }), json: async () => ({
+    globalThis.fetch = async (url, options) => {
+        assert.equal(options.body.get('portal'), 'metrocuadrado');
+        return { ok: true, headers: new Headers({ 'content-type': 'application/json' }), json: async () => ({
         ok: true, page: 1, has_next: false, url: 'https://example.com/search',
         results: [{ title: 'Nueva oficina', row: { source_url: 'https://example.com/new', price_amount: '450000000', area_m2: '46' } }],
-    }) });
+    }) }; };
     try {
         component.init();
         await component.search();
