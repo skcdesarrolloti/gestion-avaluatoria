@@ -6,16 +6,20 @@
     <p class="mt-1 text-xs text-slate-600">Control operativo de captura. No certifica cumplimiento NTS ni suficiencia de la muestra. Los datos sin publicar quedan pendientes de verificación.</p>
     <div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" @input.stop @change.stop>
         <label class="label">Vista
-            <select class="input" x-model="mode" @change="render()"><option value="cards">Fichas sin desplazamiento lateral</option><option value="table">Tabla comparativa</option></select>
+            <select class="input" :value="mode" @change="mode = $event.target.value; render()" aria-describedby="comparable-view-help"><option value="cards">Fichas sin desplazamiento lateral</option><option value="table">Tabla comparativa</option></select>
+            <span id="comparable-view-help" class="mt-1 block text-xs font-normal text-slate-600">Fichas para diligenciar; tabla para comparar varias muestras.</span>
         </label>
         <label class="label">Campos a revisar
-            <select class="input" x-model="group" @change="render()"><option value="capture">1. Captura básica</option><option value="location">2. Ubicación y mapa</option><option value="attributes">3. Atributos del inmueble</option><option value="review">4. Revisión y selección</option><option value="all">Todos los campos</option></select>
+            <select class="input" :value="group" @change="group = $event.target.value; render()" aria-describedby="comparable-group-help"><option value="capture">1. Captura básica</option><option value="location">2. Ubicación y mapa</option><option value="attributes">3. Atributos del inmueble</option><option value="review">4. Revisión y selección</option><option value="all">Todos los campos</option></select>
+            <span id="comparable-group-help" class="mt-1 block text-xs font-normal text-slate-600" x-text="groupHelp"></span>
         </label>
         <label class="label">Mostrar
-            <select class="input" x-model="filter" @change="page = 1; render()"><option value="all">Todas las muestras</option><option value="pending">Con datos pendientes</option><option value="duplicates">Enlaces repetidos</option></select>
+            <select class="input" :value="filter" @change="filter = $event.target.value; page = 1; render()" aria-describedby="comparable-filter-help"><option value="all">Todas las muestras</option><option value="pending">Con datos pendientes</option><option value="duplicates">Enlaces repetidos</option></select>
+            <span id="comparable-filter-help" class="mt-1 block text-xs font-normal text-slate-600">Filtra las fichas registradas; no borra muestras ni cambia su selección técnica.</span>
         </label>
         <label class="label">Buscar en la captura
-            <input class="input" placeholder="Fuente, barrio, edificio o código" x-model="search" @input="page = 1; render()">
+            <input class="input" placeholder="Fuente, barrio, edificio o código" :value="search" @input="search = $event.target.value; page = 1; render()" aria-describedby="comparable-search-help">
+            <span id="comparable-search-help" class="mt-1 block text-xs font-normal text-slate-600">Busca entre tus muestras. No busca inmuebles en los portales.</span>
         </label>
     </div>
     <div class="mt-3 flex flex-wrap items-center gap-2">

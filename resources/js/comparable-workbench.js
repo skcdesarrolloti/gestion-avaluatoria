@@ -12,13 +12,23 @@ const groups = {
 };
 
 export function comparableWorkbench() {
-    let entries = [], resize;
+    let entries = [], resize, form;
     return {
         mode: 'cards', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
         pending: 0, duplicates: 0, shown: 0,
+        get groupHelp() {
+            return {
+                capture: 'Fuente, enlace, precio, área y contacto del aviso.',
+                location: 'Sector, dirección y coordenadas; indica si la ubicación es aproximada.',
+                attributes: 'Alcobas, baños, parqueaderos, edad, estado y dotaciones publicadas.',
+                review: 'Estado, variable de análisis y razones para incluir o descartar. No aplica factores de ajuste.',
+                all: 'Muestra todos los campos de la misma ficha. Cambiar de grupo conserva lo diligenciado.',
+            }[this.group];
+        },
         init() {
-            const headers = [...this.$el.querySelectorAll('thead th')].map(th => th.childNodes[0].textContent.trim());
-            entries = [...this.$el.querySelectorAll('tbody tr')].map((tr, index) => {
+            form = this.$el;
+            const headers = [...form.querySelectorAll('thead th')].map(th => th.childNodes[0].textContent.trim());
+            entries = [...form.querySelectorAll('tbody tr')].map((tr, index) => {
                 const controls = [...tr.querySelectorAll('[name]')];
                 for (const [column, cell] of [...tr.cells].entries()) {
                     const input = cell.querySelector('input:not([type=hidden]),select,textarea');
@@ -80,7 +90,7 @@ export function comparableWorkbench() {
             [...first.tr.cells].forEach((cell, index) => {
                 const key = cell.querySelector('[name]')?.name.match(/\[([^\]]+)\]$/)?.[1];
                 const hidden = index > 0 && this.group !== 'all' && !fields?.includes(key);
-                this.$el.querySelectorAll(`thead th:nth-child(${index + 1}), tbody td:nth-child(${index + 1})`)
+                form.querySelectorAll(`thead th:nth-child(${index + 1}), tbody td:nth-child(${index + 1})`)
                     .forEach(node => { node.hidden = hidden; });
             });
             this.$nextTick(() => this.syncWidth());

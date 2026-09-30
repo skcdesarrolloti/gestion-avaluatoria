@@ -1,5 +1,27 @@
 # Revisión de captura de comparables — 30/09/2026
 
+## Aclaración del responsable y corrección de guías
+
+El objetivo del responsable es automatizar la captura de avisos y conservar evidencia
+para un informe explicado y sustentado, incluyendo posible uso judicial. 8.4 debe
+desarrollar el análisis estadístico conforme a los criterios aprobados de la 941;
+los grupos de atributos de 8.3 no constituyen coeficientes de homologación.
+Ampliar la muestra no garantiza por sí solo reducir su dispersión: se requiere
+comparabilidad, verificación y depuración documentada.
+
+Se corrigió un fallo observado en producción: `render()` consultaba `$el`, que al
+invocarse desde un selector podía ser ese selector en lugar del formulario. Ahora
+conserva la referencia al formulario inicial y actualiza el valor antes de renderizar.
+Se agregaron ayudas a cada desplegable y una guía del aviso a su soporte.
+Comprobado en navegador el cambio inmediato a Atributos y la edición de sus campos.
+
+La captura automática completa sigue pendiente de prueba con un aviso real del
+usuario: evaluar lectura por URL y, si la fuente no lo permite, capturador voluntario
+en navegador. Debe prellenar datos, conservar original, URL, fecha y soporte visual,
+separar extracción de verificación humana, mantener selección y descarte trazables
+y alimentar el anexo desde la evidencia guardada. No se presenta esa integración
+como implementada ni se sustituyen soportes por fotos aisladas del inmueble.
+
 ## Resultado
 
 La captura de 8.3 pasa de mostrar 60 filas por 47 columnas a fichas paginadas
