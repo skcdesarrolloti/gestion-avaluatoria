@@ -5,16 +5,27 @@ $zoneSupported = ($record['tipo_inmueble'] ?? '') === 'oficina' && ($record['tip
 $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_search']['neighborhood'] ?? '');
 ?>
 <?php if ($zoneSupported): ?>
-<section x-data="fincaraizAreaSearch" data-neighborhood="<?= e($zoneNeighborhood) ?>"
+<section x-data="fincaraizAreaSearch" data-neighborhood-id="<?= e((string) ($subject['neighborhood_id'] ?? '')) ?>"
+    data-neighborhoods="<?= e(json_encode($marketNeighborhoods ?? [], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>"
     data-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/buscar-zona')) ?>"
     @input.stop @change.stop :aria-busy="busy">
-    <h4 class="font-semibold">FincaRaíz · Oficinas en venta · Cartagena</h4>
+    <h4 class="font-semibold">FincaRaíz · Datos del expediente</h4>
+    <div class="mt-2 grid gap-2 sm:grid-cols-3">
+        <label class="text-sm">Tipo de inmueble<input class="input mt-1" value="<?= e((string) ($guide['type_label'] ?? '')) ?>" readonly placeholder="Completa el tipo en el expediente"></label>
+        <label class="text-sm">Operación<input class="input mt-1" value="<?= e((string) ($guide['business_label'] ?? '')) ?>" readonly placeholder="Completa la operación en el expediente"></label>
+        <label class="text-sm">Ciudad<input class="input mt-1" value="<?= e((string) ($sourceSearch['city'] ?? $guide['source_search']['city'] ?? $record['municipio'] ?? '')) ?>" readonly placeholder="Completa la ciudad en el expediente"></label>
+    </div>
     <label for="fincaraiz-neighborhood" class="mt-3 block text-sm font-semibold">Barrio donde buscar</label>
-    <input id="fincaraiz-neighborhood" class="input mt-1 w-full" placeholder="Ejemplo: Bocagrande" x-model="neighborhood" :disabled="busy" @input="clear()" @keydown.enter.prevent="search(1)" aria-describedby="fincaraiz-zone-help">
-    <p id="fincaraiz-zone-help" class="mt-1 text-xs text-slate-600">Se toma del expediente; puedes cambiarlo solo para esta búsqueda. No modifica el inmueble avaluado.</p>
+    <input id="fincaraiz-neighborhood" type="search" autocomplete="off" class="input mt-1 w-full" placeholder="Escribe para buscar en el catálogo: Boca…" x-model="neighborhood" :disabled="busy" @input="editNeighborhood()" @keydown.enter.prevent="search(1)" aria-describedby="fincaraiz-zone-help">
+    <p id="fincaraiz-zone-help" class="mt-1 text-xs text-slate-600">Barrio inicial del expediente. Para cambiar la zona de búsqueda, escribe y selecciona una sugerencia de la base de datos; no modifica el inmueble avaluado.</p>
+    <div x-show="!neighborhoodId" class="mt-2 flex flex-wrap gap-2" aria-label="Sugerencias de barrios">
+        <template x-for="item in suggestions" :key="item.id"><button type="button" class="btn-secondary min-h-11" @click="choose(item)" :disabled="busy" x-text="item.name"></button></template>
+        <p x-show="!suggestions.length" class="text-sm">No hay coincidencias activas en el catálogo de esta ciudad. Revisa el barrio en los datos del expediente.</p>
+    </div>
+    <p x-show="neighborhoodId" class="mt-1 text-xs text-teal-800">Barrio seleccionado del catálogo.</p>
     <div class="mt-3 flex flex-wrap gap-2">
-        <button type="button" class="btn-primary min-h-11" @click="search(1)" :disabled="busy">Buscar oficinas del barrio</button>
-        <a class="btn-secondary min-h-11" :href="searchUrl" href="<?= e($source['url']) ?>" target="_blank" rel="noopener">Ver en FincaRaíz</a>
+        <button type="button" class="btn-primary min-h-11" @click="search(1)" :disabled="busy || !neighborhoodId">Buscar oficinas del barrio</button>
+        <a x-show="neighborhoodId" class="btn-secondary min-h-11" :href="searchUrl" target="_blank" rel="noopener">Ver en FincaRaíz</a>
     </div>
     <p role="status" class="mt-3 text-sm" x-text="message"></p>
     <div x-show="results.length" x-cloak class="mt-3">

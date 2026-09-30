@@ -3,25 +3,34 @@ import { fillRows } from './comparable-bulk-import.js';
 export function fincaraizAreaSearch() {
     let panel, form;
     return {
-        neighborhood: '', results: [], selected: [], busy: false, page: 1, hasNext: false, message: '', resultUrl: '',
-        init() { panel = this.$el; form = panel.closest('form'); this.neighborhood = panel.dataset.neighborhood || ''; },
+        neighborhood: '', neighborhoodId: '', neighborhoods: [], results: [], selected: [], busy: false, page: 1, hasNext: false, message: '', resultUrl: '',
+        init() {
+            panel = this.$el; form = panel.closest('form');
+            this.neighborhoods = JSON.parse(panel.dataset.neighborhoods || '[]');
+            const initial = this.neighborhoods.find(item => item.id === panel.dataset.neighborhoodId);
+            if (initial) this.choose(initial);
+        },
+        get suggestions() {
+            const normalize = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim();
+            return this.neighborhoods.filter(item => normalize(item.name).includes(normalize(this.neighborhood))).slice(0, 12);
+        },
+        choose(item) { this.clear(); this.neighborhood = item.name; this.neighborhoodId = item.id; },
+        editNeighborhood() { this.neighborhoodId = ''; this.clear(); },
         get searchUrl() {
-            let slug = this.neighborhood.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
-            if (slug === 'castillo-grande') slug = 'castillogrande';
-            return `https://www.fincaraiz.com.co/venta/oficinas/${slug}/cartagena`;
+            return this.neighborhoods.find(item => item.id === this.neighborhoodId)?.search_url || '';
         },
         clear() { this.results = []; this.selected = []; this.message = ''; this.hasNext = false; this.page = 1; this.resultUrl = ''; },
         money(value) { return value ? new Intl.NumberFormat('es-CO', { style: 'currency', currency: 'COP', maximumFractionDigits: 0 }).format(Number(String(value).replace(',', '.'))) : 'Precio pendiente'; },
         async search(page = 1) {
             if (this.busy) return;
-            if (!this.neighborhood.trim()) { this.message = 'Escribe el barrio.'; return; }
+            if (!this.neighborhoodId) { this.message = 'Selecciona un barrio de las sugerencias del catálogo.'; return; }
             this.busy = true; this.results = []; this.selected = []; this.hasNext = false;
             this.message = 'Buscando oficinas en el barrio…';
             const abort = new AbortController();
             const timer = setTimeout(() => abort.abort(), 25000);
             try {
                 const body = new FormData();
-                body.set('neighborhood', this.neighborhood); body.set('page', String(page));
+                body.set('neighborhood_id', this.neighborhoodId); body.set('page', String(page));
                 const token = form.querySelector('[name="_token"]')?.value || document.querySelector('meta[name="csrf-token"]')?.content || '';
                 body.set('_token', token);
                 const response = await fetch(panel.dataset.endpoint, { method: 'POST', body, signal: abort.signal, headers: { Accept: 'application/json', 'X-CSRF-Token': token } });

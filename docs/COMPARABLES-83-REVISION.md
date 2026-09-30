@@ -85,6 +85,24 @@ Antes de presentar un anexo definitivo se requiere cerrar:
 
 ## Lectura por enlace y búsquedas por portal (30/09/2026)
 
+- Barrio de búsqueda desde catálogo: se precarga por `neighborhood_id` del sujeto,
+  con sugerencias de barrios activos de su `city_id`. Tipo, operación y ciudad se
+  muestran desde los datos del expediente, sin edición en esta búsqueda.
+  Escribir invalida la selección y limpia resultados; elegir una sugerencia usa el
+  nombre guardado y habilita buscar. No acepta texto libre para consultar.
+- El POST recibe `neighborhood_id`, valida que esté activo y pertenezca a la ciudad
+  del sujeto y resuelve su nombre en BD antes de construir la URL. URL del enlace
+  externo generada en servidor con el mismo adaptador. Si falta ciudad/barrio válido,
+  se indica completar el catálogo/expediente. La grafía del catálogo no garantiza
+  que el portal use la misma ruta: sigue comprobándose el canónico de resultados.
+- Sin esquema nuevo ni cambios en el barrio del sujeto. Pruebas con SQLite en
+  memoria: rechazos de IDs de otra ciudad, inactivos y nombres libres. 352 controles
+  PHP, 67 pruebas JS; navegador con catálogo de prueba: precarga, «Boca» → sugerencia,
+  selección y enlace, escritorio/móvil. No se consultó la BD de producción ni se
+  ejecutaron pruebas MySQL de persistencia. Build 50,3 KB gzip.
+- Publicar también Kernel, controlador y repositorio GeoMaster junto con vista y JS;
+  el contrato de búsqueda cambia de texto a ID y exige actualizar ambos lados juntos.
+
 - Búsqueda por barrio en FincaRaíz para oficinas en venta en Cartagena: el barrio
   inicia desde el expediente y puede cambiarse sin modificar el sujeto. Consulta
   una página pública de resultados por petición, permite marcar varios avisos y

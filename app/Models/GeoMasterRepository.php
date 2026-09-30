@@ -32,6 +32,23 @@ final class GeoMasterRepository
             ORDER BY d.name, c.name, CASE WHEN n.active = 'Si' THEN 0 ELSE 1 END, n.name")->fetchAll();
     }
 
+    public function activeNeighborhoodsForCity(string $cityId): array
+    {
+        $query = $this->db->prepare("SELECT n.id, n.name FROM master_neighborhoods n
+            JOIN master_cities c ON c.id = n.city_id
+            WHERE n.city_id = ? AND n.active = 'Si' AND c.active = 'Si' ORDER BY n.name, n.id");
+        $query->execute([$cityId]);
+        return $query->fetchAll();
+    }
+
+    public function marketNeighborhood(string $id, string $cityId): string
+    {
+        foreach ($this->activeNeighborhoodsForCity($cityId) as $row) {
+            if ((string) $row['id'] === $id) return (string) $row['name'];
+        }
+        throw new HttpException(422, 'Selecciona un barrio activo del catálogo de la ciudad del expediente.');
+    }
+
     public function localities(): array
     {
         return $this->db->query("SELECT l.*, c.name AS city_name, d.name AS department_name

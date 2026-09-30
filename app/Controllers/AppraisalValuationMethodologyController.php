@@ -16,7 +16,8 @@ final class AppraisalValuationMethodologyController
     public function __construct(private AppraisalRepository $appraisals,
         private AppraisalSubjectRepository $subjects, private AppraisalPhRepository $ph,
         private AppraisalComparableRepository $comparables,
-        private AppraisalComparableSearchGuide $guide, private array $user) {}
+        private AppraisalComparableSearchGuide $guide, private array $user,
+        private \App\Models\GeoMasterRepository $geo) {}
 
     public function show(string $id): void
     {
@@ -26,9 +27,15 @@ final class AppraisalValuationMethodologyController
         $phProfile = $this->ph->profile($id, $this->user['id']);
         $comparableRows = $this->comparables->forAppraisal($id, $this->user['id']);
         $methodologyChapter = (new AppraisalMethodologyChapterReport())->build($record, $subject, $units);
+        $marketNeighborhoods = array_map(static function (array $row): array {
+            try { $url = \App\Services\FincaraizAreaSearch::url((string) $row['name']); }
+            catch (\InvalidArgumentException) { $url = ''; }
+            return $row + ['search_url' => $url];
+        }, $this->geo->activeNeighborhoodsForCity((string) ($subject['city_id'] ?? '')));
         view('appraisals/valuation-methodology', ['title' => 'Metodología valuatoria',
             'record' => $record, 'subject' => $subject, 'units' => $units, 'phProfile' => $phProfile,
             'methodologyChapter' => $methodologyChapter, 'comparableRows' => $comparableRows,
+            'marketNeighborhoods' => $marketNeighborhoods,
             'guide' => $this->guide->build($record, $subject, $units, $phProfile)]);
     }
 
@@ -82,11 +89,13 @@ final class AppraisalValuationMethodologyController
                 || !in_array($city, ['cartagena', 'cartagena de indias'], true)) {
                 throw new \InvalidArgumentException('La búsqueda por barrio está disponible para oficinas en venta en Cartagena. Usa la lectura individual para otros casos.');
             }
-            $neighborhood = $_POST['neighborhood'] ?? '';
+            $neighborhoodId = $_POST['neighborhood_id'] ?? '';
             $page = filter_var($_POST['page'] ?? 1, FILTER_VALIDATE_INT);
-            if (!is_string($neighborhood) || $page === false) throw new \InvalidArgumentException('Barrio o página inválidos.');
+            if (!is_string($neighborhoodId) || $page === false) throw new \InvalidArgumentException('Barrio o página inválidos.');
+            $neighborhood = $this->geo->marketNeighborhood($neighborhoodId, (string) ($subject['city_id'] ?? ''));
             Http::json(['ok' => true] + (new \App\Services\FincaraizAreaSearch())->search($neighborhood, $page));
-        } catch (\InvalidArgumentException $error) { Http::json(['ok' => false, 'message' => $error->getMessage()], 422); }
+        } catch (\App\Core\HttpException $error) { Http::json(['ok' => false, 'message' => $error->getMessage()], $error->status); }
+        catch (\InvalidArgumentException $error) { Http::json(['ok' => false, 'message' => $error->getMessage()], 422); }
         catch (\RuntimeException $error) { Http::json(['ok' => false, 'message' => $error->getMessage()], 502); }
     }
 }
