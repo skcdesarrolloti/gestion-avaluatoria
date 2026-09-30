@@ -1,4 +1,5 @@
 import { comparablePhotos } from './comparable-photos.js';
+import { comparableRemoval } from './comparable-removal.js';
 import { hasComparableData, missingComparableFields, comparableUrlKey } from './comparable-review.js';
 
 const groups = {
@@ -15,7 +16,7 @@ const groups = {
 export function comparableWorkbench() {
     let entries = [], resize, form;
     return {
-        ...comparablePhotos(), phFilter: 'all', mode: 'table', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
+        ...comparablePhotos(), ...comparableRemoval(), phFilter: 'all', mode: 'table', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
         pending: 0, duplicates: 0, shown: 0,
         get groupHelp() {
             return {
@@ -50,6 +51,7 @@ export function comparableWorkbench() {
                 tr.cells[0].append(summary);
                 return { tr, controls, summary, index, opened: false, data: {} };
             });
+            this.initRemoval(form, entries);
             this.refresh();
             resize = new ResizeObserver(() => this.syncWidth());
             resize.observe(this.$refs.grid);

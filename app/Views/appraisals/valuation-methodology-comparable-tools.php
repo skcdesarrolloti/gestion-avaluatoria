@@ -35,6 +35,7 @@
         <button type="submit" class="btn-primary">Guardar ahora</button>
         <span class="text-xs" data-autosave-status aria-live="polite">Autoguardado activo</span>
     </div>
+    <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-removal.php'; ?>
     <p class="mt-2 text-sm" x-show="shown === 0">No hay muestras que coincidan con este filtro.</p>
     <div x-show="mode === 'table'" class="mt-3">
         <p class="text-xs text-slate-600">Desplaza la tabla aquí, sin bajar al final. También puedes usar las flechas del teclado.</p>

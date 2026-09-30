@@ -8,7 +8,7 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
 <section x-data="fincaraizAreaSearch" data-neighborhood-id="<?= e((string) ($subject['neighborhood_id'] ?? '')) ?>"
     data-neighborhoods="<?= e(json_encode($marketNeighborhoods ?? [], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>"
     data-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/buscar-zona')) ?>"
-    @input.stop @change.stop :aria-busy="busy">
+    @input.stop @change.stop @comparable-matrix-changed.window="selected = []; refreshDuplicates()" :aria-busy="busy">
     <h4 class="font-semibold">FincaRaíz · Datos del expediente</h4>
     <div class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         <label class="text-sm">Tipo de inmueble<input class="input mt-1" value="<?= e((string) ($guide['type_label'] ?? '')) ?>" readonly placeholder="Completa el tipo en el expediente"></label>

@@ -66,7 +66,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
             <tbody class="divide-y divide-slate-100">
                 <?php foreach ($savedRows as $index => $row): $row += $blank; if ($row['id'] === '') $row['id'] = bin2hex(random_bytes(16)); $base = 'comparables[' . $index . ']'; ?>
                     <tr class="align-top">
-                        <td class="px-3 py-3 font-bold text-slate-500"><?= e((string) ($index + 1)) ?><input type="hidden" name="<?= e($base) ?>[id]" value="<?= e((string) $row['id']) ?>"><button type="button" class="btn-secondary mt-2 min-h-11" @click="openPhotos(<?= $index ?>)">Fotos</button></td>
+                        <td class="px-3 py-3 font-bold text-slate-500"><label class="flex min-h-11 items-center gap-2" @input.stop @change.stop><input type="checkbox" value="<?= $index ?>" x-model="removalSelection" :disabled="removalBusy || photoBusy" aria-label="Seleccionar muestra <?= $index + 1 ?> para eliminar"><?= $index + 1 ?></label><input type="hidden" name="<?= e($base) ?>[id]" value="<?= e((string) $row['id']) ?>"><button type="button" class="btn-secondary mt-2 min-h-11" @click="openPhotos(<?= $index ?>)" :disabled="removalBusy">Fotos</button></td>
                         <td class="px-3 py-3"><?php $select($base . '[active]', $row['active'], ['si' => 'Sí', 'no' => 'No'], 'min-w-24'); ?></td>
                         <td class="px-3 py-3"><?php $select($base . '[status]', $row['status'], $statuses); ?></td>
                         <td class="px-3 py-3"><?php $select($base . '[analysis_factor]', $row['analysis_factor'], $factorOptions ?? ['' => 'Seleccionar factor'], 'min-w-48'); ?></td>

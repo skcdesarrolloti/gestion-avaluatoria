@@ -28,6 +28,30 @@ Verificado en escritorio y móvil; lint de la vista, 359 verificaciones PHP,
 
 ## Persistencia y despliegue
 
+### Retirar muestras y reiniciar
+
+La matriz permite marcar filas, seleccionar la página visible, eliminar las
+seleccionadas o vaciar toda la matriz (incluye páginas y filtros ocultos). Cada
+retiro requiere confirmación con cantidad y primero confirma cambios pendientes;
+si hay error/conflicto previo no retira filas. Usa el guardado versionado existente
+y solo anuncia guardado tras confirmación. Los errores posteriores conservan el
+borrador y piden reintento. No modifica los datos generales del expediente.
+
+«Restaurar retiradas» conserva en memoria las filas de esta página abierta, sin
+localStorage; desaparece al recargar/cerrar. Restaura en filas vacías, sin pisar
+nuevas muestras. Los IDs retirados se renuevan para las capturas nuevas. Las fotos
+no se purgan físicamente y solo vuelven a estar accesibles al restaurar sus IDs
+originales; no hay papelera persistente ni recuperación desde la interfaz después
+de recargar. Se bloquea retiro durante cargas de fotos. La captura vuelve a revisar
+coincidencias después de retirar/restaurar.
+
+Validación: 359 comprobaciones PHP, 78 pruebas JS, lint de vistas, build y 52,7 KB
+gzip. Navegador local con datos ficticios: selección de diez filas, retiro,
+restauración, vaciado de doce y vista móvil. Persistencia: 27 verificaciones en
+MariaDB desechable `GA_TEST_PORT=33320`, solo `ga_test_app` y `ga_test_auth`;
+vaciar/recargar y restaurar ID/fotos incluidos. Sin cambios de esquema ni acceso
+a datos de producción. Publicar vistas y assets juntos.
+
 ### Revisión de coincidencias antes de incorporar
 
 Contadores de captura: junto a la selección, «Ver en matriz (N)» usa el mismo total
