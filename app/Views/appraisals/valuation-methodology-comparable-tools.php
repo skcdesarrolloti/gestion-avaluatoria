@@ -36,8 +36,9 @@
         <span class="text-xs" data-autosave-status aria-live="polite">Autoguardado activo</span>
     </div>
     <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-removal.php'; ?>
-    <p class="mt-2 text-sm" x-show="shown === 0">No hay muestras que coincidan con este filtro.</p>
-    <div x-show="mode === 'table'" class="mt-3">
+    <p class="mt-2 rounded-lg bg-teal-50 p-3 text-sm" x-show="total === 0 && shown === 0">La matriz está vacía: no quedan muestras. Pulsa «Seguir capturando» para buscar avisos o «Nueva muestra» para diligenciar una manualmente.</p>
+    <p class="mt-2 text-sm" x-show="shown === 0 && total > 0">No hay muestras que coincidan con este filtro.</p>
+    <div x-show="mode === 'table' && shown > 0" class="mt-3">
         <p class="text-xs text-slate-600">Desplaza la tabla aquí, sin bajar al final. También puedes usar las flechas del teclado.</p>
         <div class="comparable-scroll" x-ref="topScroll" tabindex="0" role="region" aria-label="Desplazamiento horizontal de comparables"
             @scroll="$refs.grid.scrollLeft = $el.scrollLeft"><div x-ref="track" style="height:1px"></div></div>

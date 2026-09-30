@@ -42,6 +42,14 @@ Verificado en escritorio y móvil; lint de la vista, 359 verificaciones PHP,
 
 ### Retirar muestras y reiniciar
 
+Corrección del estado vacío: al quedar cero muestras se oculta la tabla y aparece
+«La matriz está vacía». La fila manual solo se abre con Nueva muestra; mientras
+carezca de datos no permite seleccionarla para eliminar. La selección se depura
+al refrescar para excluir filas vacías. Verificado en navegador local: eliminar
+una de doce deja once, vaciar deja cero, Nueva muestra abre una fila no seleccionable;
+359 comprobaciones PHP, 81 pruebas JS, lint, build y tamaño correctos. No cambia
+el guardado ni el alcance de eliminación de filas seleccionadas.
+
 La matriz permite marcar filas, seleccionar la página visible, eliminar las
 seleccionadas o vaciar toda la matriz (incluye páginas y filtros ocultos). Cada
 retiro requiere confirmación con cantidad y primero confirma cambios pendientes;

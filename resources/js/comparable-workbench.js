@@ -17,7 +17,7 @@ export function comparableWorkbench() {
     let entries = [], resize, form;
     return {
         ...comparablePhotos(), ...comparableRemoval(), phFilter: 'all', mode: 'table', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
-        pending: 0, duplicates: 0, shown: 0,
+        pending: 0, duplicates: 0, shown: 0, usedIndexes: [],
         get groupHelp() {
             return {
                 capture: 'Fuente, enlace, precio, área y contacto del aviso.',
@@ -74,13 +74,15 @@ export function comparableWorkbench() {
                         'Falta: ' + entry.missing.join(', ') : 'Datos básicos diligenciados; verificar soporte'}${entry.duplicate ? ' · Enlace repetido' : ''}`;
             }
             this.total = entries.filter(e => e.used).length;
+            this.usedIndexes = entries.filter(e => e.used).map(e => String(e.index));
+            this.removalSelection = this.removalSelection.filter(index => this.usedIndexes.includes(index));
             this.pending = entries.filter(e => e.used && e.missing.length).length;
             this.duplicates = entries.filter(e => e.used && e.duplicate).length;
             this.render();
         },
         render() {
             const query = this.search.toLocaleLowerCase('es').trim();
-            const eligible = entries.filter(e => (this.phFilter === 'all' || (e.data.ph_regime || 'por_verificar') === this.phFilter) && (e.used || e.opened || (this.total === 0 && e.index === 0)) &&
+            const eligible = entries.filter(e => (this.phFilter === 'all' || (e.data.ph_regime || 'por_verificar') === this.phFilter) && (e.used || e.opened) &&
                 (this.filter !== 'pending' || e.missing.length) && (this.filter !== 'duplicates' || e.duplicate) &&
                 (!query || Object.values(e.data).join(' ').toLocaleLowerCase('es').includes(query)));
             this.pages = Math.max(1, Math.ceil(eligible.length / 10));
