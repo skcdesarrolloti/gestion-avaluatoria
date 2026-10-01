@@ -85,3 +85,16 @@ historial. Esta versión no permite enmendar una presentación registrada.
 
 Publicar el código en Git no actualiza el hosting; comprobar migración y recorrido
 con los datos reales después de que el responsable actualice el programa.
+
+## Historial compacto (1 de octubre de 2026)
+
+Cada antecedente manual se presenta como acordeón, con identificación, fecha y
+juzgado en el resumen. Solo se abre uno por vez. Agregar antecedente abre un nuevo
+proceso, cuyo tipo puede cambiarse a publicación. Las presentaciones registradas
+son también plegables. Los campos y el transporte de autoguardado se conservan;
+no requiere migración ni volver a ingresar antecedentes.
+
+Validación: lint PHP, 398 verificaciones PHP, 106 pruebas JS, build y tamaño 57,2 KB.
+Navegador local con cuatro antecedentes: apertura/cierre y exclusión entre paneles;
+comprobación DOM con viewport reducido sin desbordamiento horizontal. La captura
+visual del navegador agotó el tiempo de espera; no se verificó imagen móvil.
