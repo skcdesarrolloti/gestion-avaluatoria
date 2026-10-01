@@ -7,11 +7,12 @@
         <li><strong>Agrega el lote.</strong> Pulsa «Agregar sugeridos sin coincidencias». Se omiten los ya registrados y las posibles coincidencias con la matriz; entre avisos similares se conserva uno. Comprueba el guardado y continúa con otra página. El análisis lo haces después en la Matriz de datos.</li>
     </ol>
     <p class="mt-3 text-sm font-semibold">Copia la página de resultados completa, no solo su dirección. No necesitas abrir cada inmueble.</p>
+    <p role="status" x-ref="pasteFeedback" x-show="message" x-cloak class="mt-3 rounded-lg border bg-white p-3 text-sm font-semibold" x-text="message"></p>
     <label for="<?= e($pasteComponent) ?>-results" class="mt-3 block text-sm font-semibold">Pega la página de resultados</label>
-    <textarea id="<?= e($pasteComponent) ?>-results" class="input mt-1 min-h-24 w-full bg-white" @paste="paste($event)"
+    <textarea id="<?= e($pasteComponent) ?>-results" class="input mt-1 min-h-24 w-full bg-white" :value="pastedText"
+        @paste="paste($event); $nextTick(() => $refs.pasteFeedback.scrollIntoView({ block: 'center', behavior: 'smooth' }))"
         placeholder="Haz clic aquí y pulsa Ctrl+V para preparar todos los avisos copiados." aria-describedby="<?= e($pasteComponent) ?>-help"></textarea>
     <p id="<?= e($pasteComponent) ?>-help" class="mt-2 text-xs">Solo oficinas en venta de la ciudad del expediente. No agrega al pegar. PH y fotos se completan después; revisa la ubicación publicada de cada aviso.</p>
-    <p role="status" class="mt-3 text-sm font-semibold" x-text="message"></p>
     <div x-show="results.length" x-cloak class="mt-3">
         <p class="mb-3 text-sm font-semibold" x-text="suggestedCount + ' sugeridos para agregar · ' + registeredCount + ' ya registrados · ' + reviewCount + ' posibles coincidencias omitidas del lote sugerido'"></p>
         <div class="flex flex-wrap gap-2">

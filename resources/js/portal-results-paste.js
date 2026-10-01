@@ -5,7 +5,7 @@ const normalize = value => String(value ?? '').toLowerCase().trim();
 export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false }) {
     let panel, form;
     return {
-        results: [], selected: [], message: '', busy: false,
+        results: [], selected: [], message: '', pastedText: '', busy: false,
         get suggestedCount() { return this.results.filter(item => item.suggested).length; },
         get registeredCount() { return this.results.filter(item => item.tone === 'registered').length; },
         get reviewCount() { return this.results.filter(item => item.tone === 'review').length; },
@@ -15,17 +15,19 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
             this.results = []; this.selected = [];
             const html = event.clipboardData?.getData('text/html') || '';
             const text = event.clipboardData?.getData('text/plain') || '';
+            this.pastedText = text.slice(0, 4000) + (text.length > 4000 ? '\n… Vista abreviada del texto recibido.' : '');
+            if (!text && !html) { this.message = 'No llegó texto de la página. Si copiaste una foto o captura, vuelve al listado de inmuebles y copia la página con Ctrl+A y Ctrl+C.'; return; }
             if (html.length + text.length > 2000000) { this.message = 'Copia solo una página de resultados (máximo 2 MB).'; return; }
             let rows = html ? readRows(html, panel.dataset.city) : [];
             if (allowTsv && !rows.length && text.includes('\t')) rows = parseComparableText(text).filter(row =>
                 validUrl(row.source_url) && row.price_amount && row.area_m2 && normalize(row.operation) === 'venta');
             if (!rows.length) {
-                this.message = `No se reconocieron tarjetas. Abre los resultados de ${label}, espera que carguen y usa Ctrl+A y Ctrl+C; vuelve aquí y pega con Ctrl+V. Pegar solo la dirección no trae los inmuebles.`;
+                this.message = `No se reconocieron tarjetas. Sí llegó contenido, pero no se pudieron leer sus avisos. Copia directamente la página de resultados de ${label} con Ctrl+A y Ctrl+C y pega con Ctrl+V (sin Mayús). No copies una ficha individual ni pases el texto por otra aplicación.`;
                 return;
             }
             this.results = rows.slice(0, 60).map((row, i) => ({ row, number: i + 1, matches: [] }));
             this.selected = []; this.refresh();
-            this.message = `${this.results.length} avisos preparados; todavía no se han agregado. Comprueba barrio, precio y área. Solo se lee la página copiada.`;
+            this.message = `Pegado recibido: ${this.results.length} avisos preparados. Ahora pulsa «Agregar sugeridos sin coincidencias», debajo del cuadro. Todavía no se han agregado a la matriz.`;
         },
         refresh() {
             const matches = candidateMatches(this.results, matrixRows(form));

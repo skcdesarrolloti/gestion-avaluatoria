@@ -49,3 +49,17 @@ No cambia esquema, autorización, CSRF ni persistencia optimista/autoguardado.
   No hay migración ni nueva prueba de base de datos. No se importó a producción.
 
 Publicar código y assets juntos en el hosting; subir a Git no actualiza el hosting.
+
+## Respuesta visible al pegar
+
+El cuadro conserva una vista abreviada del texto recibido (hasta 4.000 caracteres).
+El resultado aparece encima y se desplaza a la vista tras pegar; distingue contenido
+vacío, contenido no reconocido y avisos preparados. No cambia el lector ni agrega
+muestras automáticamente. El HTML externo sigue separado de la interfaz.
+
+Ante un reporte de tarjetas no reconocidas, repetir la copia directa desde Chrome
+preparó 27 avisos, con 13 sugeridos frente a las 44 muestras de la matriz. No se
+estableció la causa del primer pegado y no se incorporaron muestras en esa prueba.
+Se verificó la nueva respuesta en escritorio y en un contenedor móvil de 390 px.
+Validación: 90 pruebas JS, 370 verificaciones PHP, lint de la vista, build y 55,0 KB
+gzip. Sin cambios de esquema o persistencia; no se ejecutó la suite de base de datos.
