@@ -17,6 +17,7 @@ $firstMethodPart = (string) ($methodologyGuides[0]['parts'][0]['key'] ?? 'compre
             <a class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-800"
                 href="<?= e(\App\Support\IgacDocumentLibrary::urlFor('resolucion-igac-941-2026')) ?>">Resolución 941</a>
         </div>
+        <?php require __DIR__ . '/valuation-methodology-normative-review.php'; ?>
         <nav class="mt-4 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Métodos Resolución 941">
             <?php foreach ($methodologyGuides as $methodGuide): ?>
                 <?php $guideKey = (string) ($methodGuide['key'] ?? ''); ?>
@@ -50,6 +51,8 @@ $firstMethodPart = (string) ($methodologyGuides[0]['parts'][0]['key'] ?? 'compre
                                 <p class="text-xs font-bold uppercase text-indigo-700"><?= e((string) ($article['number'] ?? 'Artículo')) ?></p>
                                 <h5 class="mt-1 font-semibold text-slate-950"><?= e((string) ($article['title'] ?? '')) ?></h5>
                                 <p class="mt-2 text-slate-700"><?= e((string) ($article['summary'] ?? '')) ?></p>
+                                <?php $readingNumber = (int) preg_replace('/\D/', '', (string) ($article['number'] ?? ''));
+                                require __DIR__ . '/valuation-methodology-article-reading.php'; ?>
                                 <?php if ($highlights !== []): ?>
                                     <div class="mt-3 flex flex-wrap gap-2">
                                         <?php foreach ($highlights as $highlight): ?>

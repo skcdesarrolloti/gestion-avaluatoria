@@ -26,8 +26,8 @@
                     <li>- <?= e($item) ?></li>
                 <?php endforeach; ?>
                 <li>- Calcular dispersión por factor antes de adoptar una medida de tendencia central.</li>
-                <li>- Preferir mediana, media recortada o intervalo sustentado cuando la muestra sea asimétrica.</li>
-                <li>- Documentar outliers y puntos influyentes; no usar homologación automática.</li>
+                <li>- Justificar el estadístico con comparabilidad y condiciones del mercado; la asimetría no determina por sí sola el valor (art. 21).</li>
+                <li>- Documentar valores atípicos y puntos influyentes; no usar homologación mediante factores (anexo 2.1).</li>
             </ul>
         </div>
     </div>

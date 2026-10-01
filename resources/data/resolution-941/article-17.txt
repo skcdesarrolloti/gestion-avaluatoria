@@ -1,0 +1,39 @@
+Artículo 17. Aplicación del Método de Comparación o de Mercado. Para la aplicación de este método se deberán identificar y consignar todos los datos de mercado necesarios (ofertas y/o transacciones recientes de inmuebles similares o comparables con el que se esté valorando), como mínimo los siguientes:
+
+a) Ubicación de la oferta o transacción (municipio, vereda o barrio, dirección o nombre del inmueble, georreferenciación aproximada). Cuando, por las características de la fuente consultada, no sea posible obtener la ubicación exacta de la oferta o transacción, deberá registrarse la localización con el mayor nivel de precisión disponible e indicar la fuente de la información.
+
+b) Valor de oferta (valor de pedido) y valor de negociación o transacción.
+
+c) Áreas de terreno, construcciones, cultivos y anexos constructivos; así como las áreas privadas, garajes, depósitos, áreas libres para inmuebles sometidos al régimen de propiedad horizontal.
+
+d) Fuente de la información de la transacción o de la oferta (número telefónico, enlace de acceso, página web, nombre vendedor, entre otros).
+
+e) Fecha de captura de la oferta y/o de la transacción.
+
+En el proceso de análisis de los datos de mercado se deberá tener en cuenta:
+
+a) Para los inmuebles no sometidos al régimen de propiedad horizontal, los valores del terreno y de la construcción deberán ser analizados de manera independiente para cada uno de los datos obtenidos, con sus respectivas áreas y valores unitarios. No obstante, el valor total deberá analizarse considerando la composición de las áreas de terreno y construcción, de cada oferta o transacción.
+
+b) Cuando se aplique un porcentaje de negociación, este deberá estar justificado.
+
+c) La depuración de los datos de mercado se realizará sobre el valor de la oferta negociada, es decir, una vez aplicado el porcentaje de negociación.
+
+d) Los valores de las construcciones se estimarán con base en los lineamientos técnicos del método de costo.
+
+f) Al efectuar la depuración de ofertas o transacciones de inmuebles sometidos al régimen de propiedad horizontal, se debe considerar la existencia de garajes, depósitos, áreas libres (bien sea privados o comunes de uso exclusivo), para efectos de descontarlos y así obtener el valor integral correspondiente al área privada.
+
+e) Se deberán documentar todos los datos de ofertas o transacciones utilizados.
+
+f) Para las ofertas o transacciones obtenidas a partir de fuentes secundarias, se deberá adjuntar evidencia verificable de los datos de contacto, tales como fotografías, videos, capturas de pantalla de la publicación, enlace URL del sitio web y números telefónicos.
+
+g) Los datos deberán ser corroborados e incluir una descripción completa de las características relevantes.
+
+h) Se deberá incluir un cuadro o tabla que detalle los aspectos considerados durante el proceso de comparación. En particular, se deberá presentar la relación entre las ofertas, transacciones, inmuebles comparables o datos derivados de la investigación, junto con su respectiva clasificación, descripción detallada, análisis efectuado, proceso de depuración aplicado, cálculos realizados y los resultados obtenidos.
+
+i) Cuando se trate del avalúo de un lote cuya forma es irregular respecto de los lotes investigados, este valor podrá ser ajustado para el bien objeto de valoración, utilizando fórmulas para ajuste por condición de forma, descritas en el anexo técnico.
+
+j) Cuando se utilice el método de comparación o de mercado, el avaluador deberá tener en cuenta los cultivos permanentes o la infraestructura productiva existente en las ofertas para realizar la depuración correspondiente. Cuando no sea posible obtener las cantidades o la información requerida para dicho descuento, podrá emplear datos de áreas estimadas lo más precisas a partir de la información suministrada por el vendedor. Los valores de los cultivos y de la infraestructura podrán tomarse de fuentes oficiales o de los cálculos realizados para el inmueble objeto de estudio.
+
+En el anexo técnico se relacionan los aspectos mínimos que debe contener el estudio de mercado inmobiliario.
+
+Parágrafo: el método de comparación o de mercado no constituye un proceso de igualación de las ofertas o transacciones frente al inmueble objeto de estudio. Su aplicación consiste en el análisis técnico de las dinámicas del mercado para la construcción del valor, los cuales sirven como base técnica para determinar el valor comercial del inmueble avaluado.

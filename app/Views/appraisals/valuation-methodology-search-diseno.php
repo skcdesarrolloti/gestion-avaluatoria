@@ -20,7 +20,7 @@ foreach ($sampleRows as $row) {
 $nextAction = $usableCount === 0
     ? 'Empieza en Buscador: abre portales e inmobiliarias, filtra por ciudad, barrio y tipología, y trae las primeras ofertas verificables.'
     : ($usableCount < $targetTotal
-        ? 'Sigue en Captura: completa precio, área, fuente, enlace, fecha y factor 8.4 hasta acercarte a 60 muestras.'
+        ? 'Sigue en Captura: completa datos y soportes de las muestras pertinentes. La suficiencia se justifica técnicamente; no depende de llenar 60 filas.'
         : 'Pasa a Mapa y Matriz: revisa concentración espacial, duplicados, descartes y datos listos para 8.4.');
 $tip = static fn (string $text): string => '<span class="help-dot" title="' . e($text) . '">?</span>';
 ?>
@@ -43,7 +43,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
         </article>
         <article class="rounded-lg bg-white p-3 text-sm font-semibold text-slate-800 shadow-sm">
             2. Diligenciar comparables
-            <span class="mt-1 block text-xs font-medium leading-5 text-slate-500">Llena 60 filas posibles con precio, área, fuente, fecha, factor y observación.</span>
+            <span class="mt-1 block text-xs font-medium leading-5 text-slate-500">Registra datos y soportes verificables. Capacidad actual: 60 filas; no es un mínimo normativo.</span>
         </article>
         <article class="rounded-lg bg-white p-3 text-sm font-semibold text-slate-800 shadow-sm">
             4. Revisar ubicación
@@ -128,6 +128,8 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
             <article class="rounded-lg bg-white p-3 text-sm leading-6 text-slate-700">
                 <p class="text-xs font-bold uppercase text-indigo-700"><?= e((string) ($article[0] ?? 'Art.')) ?></p>
                 <p class="mt-1"><?= e((string) ($article[1] ?? '')) ?></p>
+                <?php $readingNumber = (int) preg_replace('/\D/', '', (string) ($article[0] ?? ''));
+                require __DIR__ . '/valuation-methodology-article-reading.php'; ?>
             </article>
         <?php endforeach; ?>
     </div>

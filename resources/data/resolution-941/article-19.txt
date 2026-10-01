@@ -1,0 +1,19 @@
+Artículo 19. Lineamientos para el análisis de los datos de mercado inmobiliario. El análisis de los datos comparables empleados para la determinación del valor comercial mediante el método de comparación o de mercado, deberá realizarse integralmente, considerando entre otros elementos el tipo de inmueble, la naturaleza del mercado inmobiliario y la calidad de la información disponible.
+
+El avaluador deberá garantizar que los datos empleados sean similares y/o comparables y cuenten con características semejantes. En inmuebles urbanos: áreas, normatividad urbanística, estrato socioeconómico, disponibilidad de servicios públicos, cercanía a vías principales, sistemas de transporte público o masivo, infraestructura urbana, forma y disposición del terreno, entre otros. En inmuebles rurales: áreas, tipo de vocación del suelo (agrícola, pecuaria, forestal, etc.), calidad y fertilidad del suelo (Áreas Homogéneas de Tierra, Valor potencial, clases agrológicas, aptitud de uso, etc.), pendiente y topografía, disponibilidad y acceso al agua, accesibilidad, distancia a centros poblados, presencia de infraestructura productiva, normatividad urbanística y ambiental, entre otros.
+
+En el marco del análisis de los datos similares y/o comparables y su correspondiente tratamiento técnico y en virtud de la condición jurídica del inmueble en avalúo (PH o NPH), se debe tener en cuenta los siguientes lineamientos:
+
+1. Inmuebles no sometidos al régimen de propiedad horizontal (NPH):
+
+a) Realizar la desagregación del valor total de la oferta o transacción entre sus componentes de terreno y construcción y/o anexos constructivos y/o cultivos permanentes.
+
+b) El procesamiento estadístico podrá ejecutarse, bien sea sobre el valor unitario de terreno o con los valores totales o unitarios integrales, previa verificación rigurosa de la composición y relación entre las áreas de terreno y las áreas construidas de los datos, así como su comparabilidad con el inmueble objeto de avalúo, garantizando que dichos datos sean comparables y/o semejantes. 
+
+2. Inmuebles sometidos al régimen de propiedad horizontal (PH):
+
+a) El análisis estadístico de los datos se efectuará sobre valores integrales por metro cuadrado de área privada.
+
+b) Cuando el dato de mercado (apartamento, local, oficina, etc.) cuente con garajes, depósitos, áreas libres o cualquier otra unidad, de carácter privado o comunes de uso exclusivo, su valor se deberá descontar del valor negociado, de manera que permita la comparación con el inmueble objeto de avalúo.
+
+c) Cuando se trate de inmuebles donde la PH refiera a la figura de condominio o similar, o cuya condición jurídica recaiga sobre el terreno o dónde dada la condición de la PH su condición física se asemeja a un NPH, aplicarán las mismas condiciones del numeral 1 del presente artículo, expresado en valores integrales.

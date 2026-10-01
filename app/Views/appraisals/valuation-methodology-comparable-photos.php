@@ -8,6 +8,7 @@
     <a x-show="photoSourceUrl" :href="photoSourceUrl || '#'" target="_blank" rel="noopener" class="btn-secondary mt-3 min-h-11">1. Abrir aviso de esta muestra</a>
     <p x-show="!photoSourceUrl" class="mt-2 text-sm">Completa el enlace del inmueble en la matriz para abrir su aviso desde aquí.</p>
     <p class="mt-2 text-sm">En el aviso: clic derecho sobre la foto → «Copiar imagen». Regresa, haz clic en el recuadro y pulsa Ctrl+V. La foto se sube directamente a esta muestra y aparece abajo al confirmar el guardado.</p>
+    <p class="mt-2 text-sm">Soporte de la investigación: agrega también una captura del aviso donde se vean URL, precio, áreas y ubicación; registra la fecha de consulta en la matriz. Una foto sola no reemplaza esa evidencia (arts. 14 y 17, anexo 2.1).</p>
     <div tabindex="0" role="region" aria-label="Pegar foto de esta muestra" @paste.prevent.stop="pastePhoto($event)"
         :aria-disabled="photoBusy || !photoReady" :aria-busy="photoBusy"
         class="mt-3 cursor-text rounded-lg border-2 border-dashed border-teal-600 bg-white p-4 focus:outline-2 focus:outline-teal-800">

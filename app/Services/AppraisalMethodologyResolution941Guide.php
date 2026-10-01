@@ -52,11 +52,11 @@ final class AppraisalMethodologyResolution941Guide
                 $this->part('comprende', 'Qué comprende', [
                     'Identificar el mercado relevante del bien sujeto: ciudad, barrio, uso, tipología, derecho y fecha.',
                     'Recopilar datos de ofertas o transacciones recientes y comparables, no inmuebles lejanos o de uso distinto sin justificación.',
-                    'Analizar la muestra como evidencia de mercado; no presentar homologaciones automáticas.',
+                    'Analizar la muestra como evidencia de mercado; el anexo 2.1 excluye la homologación mediante factores, manual o automática.',
                 ]),
                 $this->part('insumos', 'Insumos mínimos', [
                     'Ubicación precisa o la mayor localización disponible, con fuente expresa.',
-                    'Valor de oferta o transacción, áreas de terreno, construcción, anexos, garajes, depósitos y áreas libres.',
+                    'Valor pedido y negociado o transado; negociación justificada y áreas separadas de terreno, construcción, privadas, anexos, garajes, depósitos y áreas libres.',
                     'Fuente verificable: portal, inmobiliaria, contacto, captura de pantalla, fotografía, URL y fecha de consulta.',
                 ]),
                 $this->part('desarrollo', 'Desarrollo técnico', [
@@ -66,7 +66,7 @@ final class AppraisalMethodologyResolution941Guide
                 ]),
                 $this->part('cierre', 'Cierre en informe', [
                     'Dejar trazabilidad de cada comparable aceptado o descartado.',
-                    'Explicar ajustes por ubicación, área, estado, uso, PH, parqueaderos, depósitos y demás diferenciales relevantes.',
+                    'Explicar comparabilidad, negociación justificada y descuentos procedentes. No homologar precios mediante factores por ubicación, área, estado o amenidades.',
                     'Conservar anexos probatorios suficientes para que el lector pueda verificar la muestra.',
                 ]),
             ],

@@ -1,0 +1,19 @@
+Artículo 20. Lineamientos para el uso de herramientas y medidas estadísticas en el método de comparación o de mercado. Para el tratamiento de la información económica capturada, el avaluador podrá emplear, según la naturaleza de la información y la cantidad de datos disponibles, herramientas y medidas estadísticas como insumos técnicos para el análisis integral, entre las cuales se encuentran, de forma enunciativa y no taxativa las siguientes:
+
+a) Medidas de tendencia central (media aritmética, mediana, moda, medias recortadas, entre otras).
+
+b) Medidas de dispersión (desviación estándar, coeficiente de variación, rango, entre otras).
+
+c) Medidas de forma y distribución (asimetría, curtosis, representaciones gráficas de densidad o histogramas, entre otras).
+
+d) Medidas y técnicas robustas (rango intercuartílico - IQR, mediana absoluta de las desviaciones - MAD, diagramas de caja y bigotes, entre otras).
+
+e) Modelos estadísticos, econométricos o de analítica de datos debidamente sustentados.
+
+El uso de estas medidas es de carácter optativo y complementario. No constituyen un listado obligatorio ni reglas automáticas de decisión.
+
+Parágrafo 1. Criterio de aplicabilidad y suficiencia de datos. La selección, aplicabilidad y pertinencia de las medidas estadísticas utilizadas dependerá del rigor técnico del avaluador y de la suficiencia muestral del conjunto de datos comparables analizado.
+
+Parágrafo 2. Podrán emplearse como herramientas complementarias dentro del proceso valuatorio conforme a la Norma Internacional de Valuación vigente (IVS) emitida por el International Valuation Standards Council, los Modelos de Valuación Automatizados (AVM), Herramientas Avanzadas, así como los modelos econométricos, geoestadísticos, de aprendizaje automático, inteligencia artificial u otros enfoques cuantitativos.
+
+El avaluador que emplee este tipo de herramientas será responsable de garantizar la confiabilidad, idoneidad y rigor técnico de sus resultados. Para ello, los modelos utilizados deberán: (i) estar debidamente documentados en un manual auditable que permita verificar su trazabilidad, la verificación de supuestos y sus limitaciones técnicas; (ii) sustentar la calidad, suficiencia y ausencia de sesgo en los datos de entrada; (iii) incluir la medición del error del modelo mediante métricas verificables (como R2, Pseudo- R2, MAPE, RMSE, entre otros); y (iv) contar con la validación efectiva y el análisis crítico del avaluador, sin que el resultado del modelo pueda presentarse por sí solo como un avalúo final.

@@ -32,10 +32,10 @@ final class AppraisalMethodologyAcademicReport
             . 'la forma en que los participantes del mercado formarían precio, con datos verificables, '
             . 'comparables, trazables y suficientes para sustentar el juicio profesional.'
             . "\n\n"
-            . 'Para avalúos comerciales en Colombia, la Resolución IGAC 941 de 2026 constituye '
+            . 'Para los avalúos comprendidos en su ámbito de aplicación, la Resolución IGAC 941 de 2026 constituye '
             . 'el marco vigente que fija los métodos y las condiciones de elaboración y presentación '
             . 'de avalúos conforme al Decreto 1170 de 2015. Esta resolución actualiza el marco que '
-            . 'venía de la Resolución 620 de 2008, la cual queda como antecedente técnico e histórico. '
+            . 'venía de la Resolución 620 de 2008; el artículo 59 conserva el régimen anterior para los trámites iniciados antes de su vigencia. '
             . 'Por tanto, la selección metodológica debe armonizarse con la Resolución 941, el Decreto '
             . '1420 de 1998 cuando resulte aplicable, la Ley 1673 de 2013 y el régimen de autorregulación '
             . 'del avaluador, así como con las Normas Técnicas Sectoriales - NTS que orientan suficiencia, '

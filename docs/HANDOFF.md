@@ -1,5 +1,9 @@
 # Entrega al responsable de la implementación
 
+Resolución 941: [revisión completa y brechas de comparables](REVISION-RESOLUCION-941.md).
+Lectura plegable de arts. 16–21; pendientes de negociación, áreas por régimen,
+evidencia y memoria de cálculo. La captura no certifica cumplimiento normativo.
+
 Mercado Libre: [búsqueda directa y captura por lote](COMPARABLES-MERCADOLIBRE.md),
 con filtros verificados para oficinas en venta en Bocagrande y guía 1–2–3.
 

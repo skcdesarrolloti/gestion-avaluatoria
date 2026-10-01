@@ -30,10 +30,10 @@ final class AppraisalMethodologyResolution941Articles
                 'Ordena separar la lectura estadística según régimen jurídico: PH sobre área privada integral y NPH con desagregación cuando aplique.',
                 ['PH vs NPH', 'área privada', 'garajes y depósitos']),
             $this->article('Art. 20', 'Herramientas estadísticas y analítica avanzada',
-                'Autoriza medidas de tendencia central, dispersión, forma, técnicas robustas y modelos estadísticos como apoyo sustentado.',
+                'Las medidas estadísticas son optativas y complementarias. Los modelos exigen documentación auditable, calidad de datos, métricas de error y validación del avaluador.',
                 ['mediana y media recortada', 'IQR/MAD', 'modelos auditables']),
             $this->article('Art. 21', 'Adopción del valor y dispersión',
-                'Regula el coeficiente de variación y exige justificar la adopción de media, mediana u otro estadístico según la muestra.',
+                'Para adoptar la media fija CV máximo urbano de 7,50% y rural de 10%; exige análisis de mercado y justificación del criterio alternativo.',
                 ['CV urbano 7,50%', 'CV rural 10%', 'justificar el estadístico']),
         ];
     }
