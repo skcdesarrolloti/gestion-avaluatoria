@@ -11,6 +11,8 @@
         <p class="md:col-span-2 text-sm">El analista verá únicamente los avalúos que cree con este acceso. Tú podrás revisarlos; no se le concede acceso a tus expedientes anteriores ni a la administración. Crear acceso no firma ni presenta informes.</p>
         <button class="btn-primary" :disabled="busy" x-text="busy ? 'Creando acceso…' : 'Crear acceso del analista'">Crear acceso del analista</button>
     </form>
+    <h4 class="text-lg font-semibold">Accesos registrados en tu cuenta (<?= count($analystAccounts ?? []) ?>)</h4>
+    <?php if (empty($analystAccounts)): ?><p class="rounded-lg border p-3" role="status">Todavía no hay accesos de analista registrados en tu cuenta. Los campos de arriba son para crear uno; escribirlos no crea ni guarda la cuenta. Si aparece un error al crear, el acceso no quedó registrado.</p><?php endif; ?>
     <?php foreach (($analystAccounts ?? []) as $account): ?>
     <div class="rounded-lg border p-3"><p><?= e($account['full_name']) ?> · <strong><?= e($account['username']) ?></strong> · <?= $account['active'] ? 'Activo' : 'Desactivado' ?></p>
         <?php if ($account['active']): ?><form class="mt-2" method="post" action="<?= e(url('maestros/accesos/'.$account['id'].'/desactivar')) ?>"><?= csrf_field() ?><button class="btn-secondary">Desactivar acceso</button></form><?php endif; ?>

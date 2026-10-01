@@ -50,3 +50,12 @@ bloqueada para expedientes, cambio y nuevo ingreso, CSRF, alta de avalúo, guard
 de comparable por analista y lectura/listado por titular; rechazo de ficha anterior
 y cambio de responsable. Revisión visual escritorio; móvil DOM sin desbordamiento.
 Lint/build/check:size incluidos. Esta validación es local, no del hosting.
+
+## Diagnóstico de alta duplicada
+
+El formulario distingue usuario compartido de funcionarios, analista propio activo
+ o desactivado y nombre no disponible. La lista muestra un contador y un estado
+vacío explícito. No restablece contraseñas ni vincula cuentas compartidas mediante
+el nombre de usuario. Validación: lint, 398 verificaciones PHP, 106 JS, build y
+check:size 57,2 KB. No se verificó la cuenta sabuita en la base de producción:
+la configuración local no dispone de conexión a ese servidor.

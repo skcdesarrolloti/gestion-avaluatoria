@@ -11,7 +11,14 @@ final class AnalystAccessController
         Session::flash('access_values',json_encode(['username'=>$this->text('username'),'full_name'=>$this->text('full_name'),'appraiser_id'=>$this->text('appraiser_id')],JSON_UNESCAPED_UNICODE));
         try {
             $login=strtolower(trim($this->text('username'))); $name=trim($this->text('full_name')); $expert=$this->text('appraiser_id');
-            if ($this->staff->hasLogin($login) || $this->accounts->byLogin($login)) throw new HttpException(422,'Ese usuario ya está registrado. Elige otro; no se cambia su cuenta existente.');
+            $existing=$this->accounts->byLogin($login);
+            if ($existing && (int)$existing['owner_id'] === (int)$this->user['id']) {
+                throw new HttpException(422, $existing['active']
+                    ? 'Este analista ya está creado en tu cuenta y está activo. Consulta Accesos registrados debajo del formulario. No necesitas crearlo otra vez; su contraseña no se restablece aquí.'
+                    : 'Este analista ya está creado en tu cuenta, pero está desactivado. No se puede habilitar creando otra vez el mismo usuario.');
+            }
+            if ($this->staff->hasLogin($login)) throw new HttpException(422,'Este usuario ya existe en el acceso compartido de funcionarios de SuCasa. No se creó un acceso de analista ni se cambió su contraseña. Su administrador debe revisar la cuenta existente; este formulario no la vincula automáticamente.');
+            if ($existing) throw new HttpException(422,'Ese nombre de usuario no está disponible para crear un analista en tu cuenta. No se guardó este acceso.');
             $valid=array_column($this->experts->eligibleForAssignment(),'id');
             if (!in_array($expert,$valid,true)) throw new HttpException(422,'Selecciona tu perito responsable con RAA vigente.');
             $this->accounts->create($this->user['id'],$expert,$name,$login);
