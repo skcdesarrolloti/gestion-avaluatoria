@@ -43,3 +43,28 @@ test('Clipboard keeps a title attribute when the portal excludes the link text f
     const html = card('aa', '$ 400.000.000', '40 m²').replace('>Oficina en Venta en Bocagrande</a>', '></a>');
     assert.equal(read(html).length, 1);
 });
+
+const sharedCard = (id, price, area) => `<article><img alt="Foto 1 de Oficina">
+    <div><wl-share title="Oficina en Venta en Bocagrande"
+        url="https://www.properati.com.co/detalle/1234-${id}"><div class="share__icon"></div></wl-share>
+    <div data-test="snippet__price">${price}</div>
+    <div data-test="snippet__location">Bocagrande, Cartagena, Bolívar</div></div>
+    <span data-test="area-value">${area}</span><span data-test="agency-name">Agencia publicada</span></article>`;
+
+test('Actual Chrome selection without title links reads the retained share URL and title per article', () => {
+    const rows = read(sharedCard('aa', '$ 1.260.000.000', '300 m²') + sharedCard('bb', '$ 1.750.000.000', '170 m²'));
+    assert.deepEqual(rows.map(row => [row.source_url, row.price_amount, row.area_m2]), [
+        ['https://www.properati.com.co/detalle/1234-aa', '1.260.000.000', '300'],
+        ['https://www.properati.com.co/detalle/1234-bb', '1.750.000.000', '170'],
+    ]);
+    assert.equal(rows[0].contact_name, 'Agencia publicada');
+    assert.equal(rows[0].ph_regime, 'por_verificar');
+});
+
+test('Share fallback validates domain, operation and missing fields like normal title links', () => {
+    const html = sharedCard('aa', '$ 400.000.000', '40 m²');
+    assert.equal(read(html.replace('www.properati.com.co', 'evil.test')).length, 0);
+    assert.equal(read(html.replace('en Venta', 'en Arriendo')).length, 0);
+    assert.equal(read(html.replace('40 m²', '') + sharedCard('bb', '$ 500.000.000', '50 m²')).length, 1);
+    assert.equal(read(html + html).length, 1);
+});

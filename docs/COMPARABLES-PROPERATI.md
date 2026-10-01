@@ -83,3 +83,19 @@ Regresión DOM con linkedom (solo desarrollo): cuatro casos para separación de
 tarjetas, área ausente, ciudad ajena, precios ambiguos, enlaces y título no seleccionado.
 94 pruebas JS, 370 verificaciones PHP, build y 55,4 KB gzip. No cambian BD, guardado
 ni selección de sugeridos. No se agregaron muestras a producción durante la corrección.
+
+## Causa confirmada con el pegado original
+
+La prueba local pegada por el usuario permitió inspeccionar el HTML real: conserva
+30 `article` y los datos de precio/área, pero omite todos los enlaces de los títulos
+(`snippet__title`). Cada tarjeta conserva `wl-share` con el título y URL de detalle.
+El lector usa esos dos atributos como alternativa, dentro del mismo artículo, con
+las mismas validaciones de dominio, tipo, operación, ciudad, precio y área.
+
+Se reprodujo el pegado original completo (682.288 caracteres HTML) en navegador:
+27 avisos reconocidos con URL, precio y área; las tarjetas sin área siguen omitidas.
+No se insertaron muestras en producción. Esto resuelve la incertidumbre anotada
+arriba sobre el formato del usuario. Dos regresiones nuevas cubren el botón de
+compartir, duplicados, URL ajena, arriendo y área ausente sin mezclar tarjetas.
+96 pruebas JS, 370 verificaciones PHP, lint de la vista, build y verificación de
+tamaño. Sin cambios en persistencia, esquema o interfaz.

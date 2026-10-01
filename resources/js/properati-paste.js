@@ -36,8 +36,11 @@ export function copiedProperatiRows(html, city) {
     template.innerHTML = html; // Detached, inert; external markup is never displayed or executed.
     const cards = [...template.content.querySelectorAll('article')].map(article => {
         const text = key => article.querySelector(`[data-test="${key}"]`)?.textContent || '';
-        return { url: article.querySelector('a[data-test="snippet__title"]')?.getAttribute('href'),
-            heading: text('snippet__title'), location: text('snippet__location'), price: text('snippet__price'),
+        const title = article.querySelector('a[data-test="snippet__title"]');
+        const share = article.querySelector('wl-share[url][title]');
+        return { url: title?.getAttribute('href') || share?.getAttribute('url'),
+            heading: text('snippet__title') || share?.getAttribute('title'),
+            location: text('snippet__location'), price: text('snippet__price'),
             area: text('area-value'), agency: text('agency-name') };
     });
     return parseProperatiCards([...cards, ...properatiClipboardCards(template.content, properatiUrl)], city);
