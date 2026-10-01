@@ -1,5 +1,9 @@
 # Crear y evolucionar la base sin SQL manual
 
+Captura 8.3: `202610010003_comparable_capture_details.php` agrega `capture_details`
+a appraisal_comparables para áreas por régimen y trazabilidad de evidencia.
+No reemplaza filas ni fotos. Ver [Mapas y áreas](COMPARABLES-MAPAS-AREAS.md).
+
 Perito judicial: `202610010002_create_judicial_expert_records.php` crea perfiles
 privados por propietario/perito y anexos versionados por expediente, con copia
 de cada presentación. Ver [módulo CGP](PERITO-JUDICIAL-CGP.md). No altera muestras.

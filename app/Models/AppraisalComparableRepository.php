@@ -12,7 +12,10 @@ final class AppraisalComparableRepository
         $query = $this->db->prepare('SELECT * FROM appraisal_comparables
             WHERE appraisal_id = ? AND owner_id = ? ORDER BY sample_index');
         $query->execute([$appraisalId, $owner]);
-        return $query->fetchAll();
+        return array_map(static function (array $row): array {
+            $detail = json_decode($row['capture_details'] ?? '{}', true, 8, JSON_THROW_ON_ERROR);
+            return $row + (is_array($detail) ? $detail : []);
+        }, $query->fetchAll());
     }
 
     public function saveAll(string $appraisalId, int $owner, array $rows, int $version): int
@@ -22,11 +25,13 @@ final class AppraisalComparableRepository
             $guard = $this->db->prepare('UPDATE appraisals SET comparables_version = comparables_version + 1 WHERE id = ? AND owner_id = ? AND comparables_version = ?');
             $guard->execute([$appraisalId, $owner, $version]);
             if ($guard->rowCount() !== 1) throw new \App\Core\HttpException(409, 'La matriz cambió en otra pestaña. Conserva tus cambios y recarga antes de continuar.');
+            $previous = [];
+            foreach ($this->forAppraisal($appraisalId, $owner) as $saved) $previous[$saved['id']] = \App\Services\ComparableCaptureDetail::normalize($saved);
             $this->db->prepare('DELETE FROM appraisal_comparables WHERE appraisal_id = ? AND owner_id = ?')
                 ->execute([$appraisalId, $owner]);
             foreach (array_values($rows) as $index => $row) {
                 if (!is_array($row) || !$this->meaningful($row)) continue;
-                $this->insert($appraisalId, $owner, $index + 1, $row);
+                $this->insert($appraisalId, $owner, $index + 1, $row + ($previous[$row['id'] ?? ''] ?? []));
             }
             $this->db->commit();
             return $version + 1;
@@ -48,8 +53,8 @@ final class AppraisalComparableRepository
             view_quality, finish_quality, elevator, amenities, security_features, power_plant,
             parking_relation, balcony_terrace, noise_humidity_sun, legal_relation_notes,
             analysis_factor, latitude, longitude, location_precision, map_notes,
-            comparability_notes, rejection_reason, created_at, updated_at, ph_regime)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
+            comparability_notes, rejection_reason, created_at, updated_at, ph_regime, capture_details)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)';
         $this->db->prepare($sql)->execute([
             $this->id($row['id'] ?? ''), $appraisalId, $owner, $index, $this->choice($row['active'] ?? '', ['si', 'no'], 'si'),
             $this->text($row['status'] ?? 'por_verificar', 40), $this->text($row['source_type'] ?? '', 40),
@@ -76,6 +81,7 @@ final class AppraisalComparableRepository
             $this->text($row['map_notes'] ?? '', 300),
             $this->body($row['comparability_notes'] ?? ''), $this->body($row['rejection_reason'] ?? ''),
             $now, $now, $this->choice($row['ph_regime'] ?? '', ['si', 'no', 'por_verificar'], 'por_verificar'),
+            json_encode(\App\Services\ComparableCaptureDetail::normalize($row), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR),
         ]);
     }
 

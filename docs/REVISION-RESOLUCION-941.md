@@ -94,7 +94,16 @@ de aceptación propias antes de declararlos completos.
 - 7 (pp. 59–62): bibliografía. Las referencias no se convierten por sí solas en reglas
   automáticas ni justifican copiar valores de los ejemplos al expediente.
 
-## Entrega y prioridad propuesta
+## Actualización posterior: captura 8.3
+
+Se incorporaron áreas por régimen y fuente/salvedades; coordenadas y evidencia
+se diligencian en «4. Mapas y evidencia» sobre la misma muestra. Ver
+[alcance y pruebas](COMPARABLES-MAPAS-AREAS.md). Se conserva el área publicada.
+Continúan pendientes negociación, desagregación monetaria, clasificación avanzada
+de soportes, memoria de cálculo y decisiones trazables en 8.4. Esta ampliación
+no cierra por sí sola todas las brechas normativas.
+
+## Entrega inicial y prioridad propuesta
 
 1. Se incorpora flecha de lectura completa para arts. 16–21 en 8.1 y en Buscar 8.3,
    con fuente y página. Cerrada inicialmente, scroll interno y teclado.

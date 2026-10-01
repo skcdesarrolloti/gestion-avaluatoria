@@ -1,5 +1,9 @@
 # Entrega al responsable de la implementación
 
+Comparables: [Mapas, evidencia y áreas PH/no PH en 8.3](COMPARABLES-MAPAS-AREAS.md).
+Aplicar migración `202610010003_comparable_capture_details.php`. Conserva muestras;
+análisis, desagregación monetaria y estadísticos siguen pendientes para 8.4.
+
 Perito: [antecedentes y anexo judicial CGP](PERITO-JUDICIAL-CGP.md). Nueva pestaña
 en Maestros, declaraciones por expediente Judicial, exportación TXT por apartado
 y registro explícito de presentación que alimenta historial y conserva copia.

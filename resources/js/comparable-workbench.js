@@ -1,4 +1,5 @@
 import { rowFactory } from './comparable-row-growth.js';
+import { mapFields, compositionVisible, locationPoints } from './comparable-location.js';
 import { comparablePhotos } from './comparable-photos.js';
 import { comparableRemoval } from './comparable-removal.js';
 import { hasComparableData, missingComparableFields, comparableUrlKey } from './comparable-review.js';
@@ -6,7 +7,8 @@ import { hasComparableData, missingComparableFields, comparableUrlKey } from './
 const groups = {
     capture: ['source_type', 'source_name', 'source_url', 'operation', 'property_type', 'neighborhood',
         'project_name', 'ph_regime', 'price_amount', 'price_unit', 'area_m2', 'consulted_at', 'contact_name', 'contact_phone'],
-    location: ['neighborhood', 'address_hint', 'project_name', 'latitude', 'longitude', 'location_precision', 'map_notes'],
+    location: ['source_name', 'source_url', 'consulted_at', 'neighborhood', 'address_hint', 'project_name', ...mapFields],
+    composition: ['ph_regime', 'ph_special', 'area_m2', 'area_basis', 'private_built_m2', 'private_free_m2', 'ph_units_detail', 'land_m2', 'built_m2', 'annexes_detail', 'crops_detail', 'areas_source'],
     attributes: ['ph_regime', 'admin_fee', 'vat_applies', 'bedrooms', 'bathrooms', 'parking_spaces', 'floor_level', 'stratum',
         'age_years', 'building_condition', 'conservation_state', 'view_quality', 'finish_quality', 'elevator',
         'amenities', 'security_features', 'power_plant', 'parking_relation', 'balcony_terrace', 'noise_humidity_sun'],
@@ -18,10 +20,11 @@ export function comparableWorkbench() {
     let entries = [], resize, form, createRow, prepare, grow;
     return {
         ...comparablePhotos(), ...comparableRemoval(), phFilter: 'all', mode: 'table', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
-        pending: 0, duplicates: 0, shown: 0, usedIndexes: [],
+        pending: 0, duplicates: 0, shown: 0, usedIndexes: [], mapPoints: [],
         get groupHelp() {
             return {
                 capture: 'Fuente, enlace, precio, área y contacto del aviso.',
+                composition: 'Áreas originales y sus soportes según PH/no PH. La desagregación de valores y los cálculos corresponden a 8.4.',
                 location: 'Sector, dirección y coordenadas; indica si la ubicación es aproximada.',
                 attributes: 'Alcobas, baños, parqueaderos, edad, estado y dotaciones publicadas.',
                 review: 'Estado, variable de análisis y razones para incluir o descartar. No aplica factores de ajuste.',
@@ -58,6 +61,7 @@ export function comparableWorkbench() {
             form.addEventListener('comparable-grow', grow);
             this.initRemoval(form, entries);
             this.refresh();
+            this.$watch('searchTab', () => { this.page = 1; this.render(); });
             resize = new ResizeObserver(() => this.syncWidth());
             resize.observe(this.$refs.grid);
             resize.observe(this.$refs.grid.querySelector('table'));
@@ -90,6 +94,7 @@ export function comparableWorkbench() {
             this.removalSelection = this.removalSelection.filter(index => this.usedIndexes.includes(index));
             this.pending = entries.filter(e => e.used && e.missing.length).length;
             this.duplicates = entries.filter(e => e.used && e.duplicate).length;
+            this.mapPoints = locationPoints(entries.map(e => e.data), {latitude:form.dataset.subjectLatitude, longitude:form.dataset.subjectLongitude});
             this.render();
         },
         render() {
@@ -102,14 +107,15 @@ export function comparableWorkbench() {
             const visible = eligible.slice((this.page - 1) * 10, this.page * 10);
             this.shown = eligible.length;
             for (const entry of entries) entry.tr.hidden = !visible.includes(entry);
-            const fields = groups[this.group];
+            const mapMode = this.searchTab === 'mapa';
+            const fields = groups[mapMode ? 'location' : this.group];
             const first = entries[0];
             if (!first) return;
             [...first.tr.cells].forEach((cell, index) => {
                 const key = cell.querySelector('[name]')?.name.match(/\[([^\]]+)\]$/)?.[1];
-                const hidden = index > 0 && this.group !== 'all' && !fields?.includes(key);
-                form.querySelectorAll(`thead th:nth-child(${index + 1}), tbody td:nth-child(${index + 1})`)
-                    .forEach(node => { node.hidden = hidden; });
+                const hidden = index > 0 && (mapMode ? !fields.includes(key) : mapFields.includes(key) || (this.group !== 'all' && !fields?.includes(key)));
+                form.querySelector(`thead th:nth-child(${index + 1})`).hidden = hidden;
+                for (const entry of entries) entry.tr.cells[index].hidden = hidden || (!mapMode && this.mode === 'cards' && !compositionVisible(key, entry.data));
             });
             this.$nextTick(() => this.syncWidth());
         },

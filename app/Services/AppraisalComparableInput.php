@@ -36,6 +36,11 @@ final class AppraisalComparableInput
                 if (!is_scalar($value) && $value !== null) throw new \App\Core\HttpException(422, 'Un campo de la matriz contiene un formato inválido.');
                 $row[$field] = $value;
             }
+            foreach ([...array_keys(ComparableCaptureDetail::fields()), 'ph_special'] as $field) {
+                if (!array_key_exists($field, $item)) continue;
+                if (!is_scalar($item[$field]) && $item[$field] !== null) throw new \App\Core\HttpException(422, 'Un campo de captura contiene un formato inválido.');
+                $row[$field] = $item[$field];
+            }
             if (self::meaningful($row)) $rows[] = $row;
         }
         return $rows;

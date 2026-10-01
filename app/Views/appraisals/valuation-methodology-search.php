@@ -22,7 +22,7 @@ $searchTabs = [
     'buscar' => '1. Buscar',
     'captura' => '2. Capturar',
     'matriz' => '3. Matriz de datos',
-    'mapa' => '4. Mapas',
+    'mapa' => '4. Mapas y evidencia',
 ];
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ searchTab: 'buscar' }">
@@ -77,11 +77,8 @@ $searchTabs = [
                 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-filtros.php'; ?>
             </div>
         </div>
-        <div id="captura-83" class="scroll-mt-6" x-show="['captura', 'matriz'].includes(searchTab)">
+        <div id="captura-83" class="scroll-mt-6" x-show="['captura', 'matriz', 'mapa'].includes(searchTab)">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-captura.php'; ?>
-        </div>
-        <div x-show="searchTab === 'mapa'">
-            <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-map.php'; ?>
         </div>
         <div x-show="searchTab === 'matriz'">
             <details class="mt-6 rounded-xl border border-slate-200 p-4"><summary class="min-h-11 cursor-pointer font-semibold">Criterios y preparación del análisis</summary>

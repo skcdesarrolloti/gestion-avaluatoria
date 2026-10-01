@@ -1,53 +1,22 @@
-<?php
-$savedRows = is_array($comparableRows ?? null) ? array_values($comparableRows) : [];
-$blank = ['id' => '', 'active' => 'si', 'status' => 'por_verificar', 'source_type' => '',
-    'source_name' => '', 'source_url' => '', 'query_used' => '', 'operation' => (string) ($guide['business_label'] ?? ''),
-    'property_type' => (string) ($guide['type_label'] ?? ''), 'neighborhood' => '', 'address_hint' => '',
-    'project_name' => '', 'price_amount' => '', 'price_unit' => '', 'area_m2' => '', 'admin_fee' => '',
-    'vat_applies' => '', 'bedrooms' => '', 'bathrooms' => '', 'parking_spaces' => '', 'floor_level' => '',
-    'contact_name' => '', 'contact_phone' => '', 'listing_code' => '', 'listing_date' => '',
-    'consulted_at' => date('Y-m-d'), 'stratum' => '', 'age_years' => '', 'building_condition' => '',
-    'conservation_state' => '', 'view_quality' => '', 'finish_quality' => '', 'elevator' => '',
-    'amenities' => '', 'security_features' => '', 'power_plant' => '', 'parking_relation' => '',
-    'balcony_terrace' => '', 'noise_humidity_sun' => '', 'legal_relation_notes' => '',
-    'analysis_factor' => '', 'latitude' => '', 'longitude' => '', 'location_precision' => '',
-    'ph_regime' => 'por_verificar', 'map_notes' => '', 'comparability_notes' => '', 'rejection_reason' => ''];
-$rowCount = max(1, count($savedRows));
-while (count($savedRows) < $rowCount) $savedRows[] = array_replace($blank, ['id' => bin2hex(random_bytes(16))]);
-$money = static fn (mixed $value): string => $value === null || $value === '' ? '' : '$ ' . number_format((float) $value, 0, ',', '.');
-$number = static fn (mixed $value): string => $value === null || $value === '' ? '' : rtrim(rtrim(number_format((float) $value, 2, ',', '.'), '0'), ',');
-$select = static function (string $name, mixed $value, array $options, string $class = ''): void { ?>
-    <select name="<?= e($name) ?>" class="min-h-11 w-full min-w-36 rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm <?= e($class) ?>">
-        <?php foreach ($options as $key => $label): ?>
-            <option value="<?= e($key) ?>" <?= (string) $value === (string) $key ? 'selected' : '' ?>><?= e($label) ?></option>
-        <?php endforeach; ?>
-    </select>
-<?php };
-$sourceTypes = ['' => 'Seleccionar', 'portal' => 'Portal', 'inmobiliaria' => 'Inmobiliaria', 'directa' => 'Directa', 'oficial' => 'Oficial', 'otro' => 'Otra'];
-$statuses = ['por_verificar' => 'Por verificar', 'preseleccionada' => 'Preseleccionada', 'descartada' => 'Descartada', 'usada' => 'Usada'];
-$operations = ['' => 'Seleccionar', 'Venta' => 'Venta', 'Arriendo' => 'Arriendo'];
-$priceUnits = ['' => 'Seleccionar', 'precio_total' => 'Precio total', 'canon_mensual' => 'Canon mensual', 'valor_m2' => 'Valor/m2'];
-$yesNo = ['' => 'No definido', 'si' => 'Sí', 'no' => 'No'];
-$locationPrecisions = ['' => 'No definida', 'exacta' => 'Exacta', 'aproximada' => 'Aproximada', 'sector' => 'Solo sector'];
-$tip = static fn (string $text): string => '<span class="help-dot" title="' . e($text) . '">?</span>';
-?>
+<?php require __DIR__ . '/valuation-methodology-comparable-config.php'; ?>
 <form id="tabla-madre-83" class="mt-6 scroll-mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" method="post"
     action="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables')) ?>"
-    x-data="comparableWorkbench" :data-comparable-mode="mode" @input="refresh()" @change="refresh()"
+    x-data="comparableWorkbench" :data-comparable-mode="searchTab === 'mapa' ? 'cards' : mode" @input="refresh()" @change="refresh()"
     @comparable-imported="showImported($event.detail)"
     data-module-autosave data-save-in-place data-comparable-json
+    data-subject-latitude="<?= e($subject['latitude'] ?? '') ?>" data-subject-longitude="<?= e($subject['longitude'] ?? '') ?>"
     data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/autoguardar')) ?>">
     <?= csrf_field() ?>
     <input type="hidden" name="version" value="<?= (int) ($record['comparables_version'] ?? 0) ?>">
     <div x-show="searchTab === 'captura'"><?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-links.php'; ?></div>
-    <section x-show="searchTab === 'matriz'" x-effect="if (searchTab === 'matriz') $nextTick(() => syncWidth())">
-    <div id="capture-review" class="scroll-mt-6 flex flex-wrap items-start justify-between gap-4">
+    <section x-show="['matriz', 'mapa'].includes(searchTab)" x-effect="if (['matriz', 'mapa'].includes(searchTab)) $nextTick(() => syncWidth())">
+    <div id="capture-review" x-show="searchTab === 'matriz'" class="scroll-mt-6 flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Tabla madre de comparables</p>
             <h3 class="mt-2 text-xl font-semibold">Matriz de datos</h3>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Diligencia una fila por cada oferta, transacción o dato de mercado. El sujeto queda fuera de esta tabla:
-                aquí solo van las muestras comparables que luego pasarán a depuración, variables, mapa y fórmulas.
+                aquí se preparan las muestras que se analizarán en 8.4. Completa ubicación y soporte en «4. Mapas y evidencia».
                 Un inmueble por fila y sus datos por columnas. Sin límite de cantidad de muestras; revisa los pendientes, PH y fotos por inmueble.
             </p>
         </div>
@@ -57,6 +26,8 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
             <button type="button" @click="searchTab = 'captura'" class="btn-secondary min-h-11">Seguir capturando</button>
         </div>
     </div>
+    <div x-show="searchTab === 'matriz'"><?php require __DIR__ . '/valuation-methodology-capture-areas.php'; ?></div>
+    <div x-show="searchTab === 'mapa'"><?php require __DIR__ . '/valuation-methodology-search-map.php'; ?></div>
     <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-tools.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-photos.php'; ?>
     <div class="comparable-grid mt-4 overflow-x-auto rounded-xl border border-slate-200" x-ref="grid" x-show="shown > 0"
@@ -66,7 +37,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
             <tbody class="divide-y divide-slate-100">
                 <?php foreach ($savedRows as $index => $row): $row += $blank; if ($row['id'] === '') $row['id'] = bin2hex(random_bytes(16)); $base = 'comparables[' . $index . ']'; ?>
                     <tr class="align-top">
-                        <td class="px-3 py-3 font-bold text-slate-500"><label class="flex min-h-11 items-center gap-2" @input.stop @change.stop><input type="checkbox" value="<?= $index ?>" x-model="removalSelection" :disabled="removalBusy || photoBusy || !usedIndexes.includes('<?= $index ?>')" aria-label="Seleccionar muestra <?= $index + 1 ?> para eliminar"><?= $index + 1 ?></label><input type="hidden" name="<?= e($base) ?>[id]" value="<?= e((string) $row['id']) ?>"><button type="button" class="btn-secondary mt-2 min-h-11" @click="openPhotos(<?= $index ?>)" :disabled="removalBusy">Fotos</button></td>
+                        <td class="px-3 py-3 font-bold text-slate-500"><label class="flex min-h-11 items-center gap-2" @input.stop @change.stop><input x-show="searchTab !== 'mapa'" type="checkbox" value="<?= $index ?>" x-model="removalSelection" :disabled="removalBusy || photoBusy || !usedIndexes.includes('<?= $index ?>')" aria-label="Seleccionar muestra <?= $index + 1 ?> para eliminar"><?= $index + 1 ?></label><input type="hidden" name="<?= e($base) ?>[id]" value="<?= e((string) $row['id']) ?>"><button type="button" class="btn-secondary mt-2 min-h-11" @click="openPhotos(<?= $index ?>)" :disabled="removalBusy">Fotos y soporte</button></td>
                         <td class="px-3 py-3"><?php $select($base . '[active]', $row['active'], ['si' => 'Sí', 'no' => 'No'], 'min-w-24'); ?></td>
                         <td class="px-3 py-3"><?php $select($base . '[status]', $row['status'], $statuses); ?></td>
                         <td class="px-3 py-3"><?php $select($base . '[analysis_factor]', $row['analysis_factor'], $factorOptions ?? ['' => 'Seleccionar factor'], 'min-w-48'); ?></td>
@@ -114,6 +85,10 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
                         <td class="px-3 py-3"><textarea class="input mt-0 min-h-24 min-w-52" name="<?= e($base) ?>[map_notes]" placeholder="Ubicación exacta, aproximada o tomada del portal"><?= e((string) $row['map_notes']) ?></textarea></td>
                         <td class="px-3 py-3"><textarea class="input mt-0 min-h-24 min-w-64" name="<?= e($base) ?>[comparability_notes]" placeholder="Por qué sirve o qué ajuste requiere"><?= e((string) $row['comparability_notes']) ?></textarea></td>
                         <td class="px-3 py-3"><textarea class="input mt-0 min-h-24 min-w-56" name="<?= e($base) ?>[rejection_reason]" placeholder="Motivo si se descarta"><?= e((string) $row['rejection_reason']) ?></textarea></td>
+                        <?php foreach (\App\Services\ComparableCaptureDetail::fields() as $field => [$label, $type, $scope]): ?>
+                            <td class="px-3 py-3"><?php if ($type === 'number'): ?><input type="number" min="0" step="0.0001" class="input min-w-36" name="<?= e($base . '[' . $field . ']') ?>" value="<?= e($row[$field] ?? '') ?>" placeholder="m²; sin separadores de miles"><?php else: ?><textarea class="input min-w-52" name="<?= e($base . '[' . $field . ']') ?>" maxlength="1600" rows="3" placeholder="<?= e($label) ?>; indica lo pendiente de verificar."><?= e($row[$field] ?? '') ?></textarea><?php endif; ?></td>
+                        <?php endforeach; ?>
+                        <td class="px-3 py-3"><?php $select($base . '[ph_special]', $row['ph_special'] ?? '', ['' => 'Sin tratamiento especial confirmado', 'condominio' => 'Condominio / PH asimilable a NPH (art. 19.2.c)']); ?></td>
                     </tr>
                 <?php endforeach; ?>
             </tbody>
