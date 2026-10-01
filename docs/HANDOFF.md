@@ -1,5 +1,10 @@
 # Entrega al responsable de la implementación
 
+Guías de los cuatro métodos: lectura completa de arts. 16–34, requisitos y
+pendientes por método y revisión transversal de la Resolución 941. Ver
+[revisión normativa](REVISION-RESOLUCION-941.md). Sin nuevas fórmulas ejecutables,
+persistencia ni migraciones; requiere actualizar el código del hosting.
+
 [Acceso del analista desde Perito responsable](ACCESO-ANALISTA.md): cuenta local
 delegada, clave temporal con cambio inicial, nuevos avalúos visibles al titular y
 perito responsable fijado. Aplicar migración `202610010004_create_analyst_access.php`.

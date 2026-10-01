@@ -1,0 +1,29 @@
+Artículo 26. Aplicación del flujo de caja descontado. Para la aplicación del método de Flujo de Caja Descontado en la valoración de inmuebles, se plantean los siguientes pasos esenciales:
+
+1. Estimación de los ingresos y gastos: en función de las características del inmueble objeto de avalúo, se deberán identificar y estimar todos los ingresos derivados de su explotación, así como los egresos necesarios para su operación y mantenimiento. Se deberá establecer con claridad el nivel de ingresos que será utilizado en el análisis y que servirá de base para la determinación del valor del inmueble.
+
+En cuanto a los gastos de operación, deberán incluirse, como mínimo los siguientes:
+
+a) Impuesto predial.
+
+b) Seguros.
+
+c) Mantenimiento y reparaciones menores.
+
+d) Gastos de administración.
+
+e) Servicios públicos (cuando aplique)
+
+f) Imprevistos y otros gastos operativos.
+
+g) Comisión por administración inmobiliaria.
+
+2. Construcción del flujo de caja: el flujo de caja es un instrumento de análisis financiero que refleja de manera dinámica las entradas y salidas de efectivo durante un periodo de tiempo determinado; así como la situación de efectivo al final de dicho periodo. Podrá elaborarse con periodicidad anual, semestral o mensual; no obstante, a menor periodicidad, mayor será el nivel de detalle y precisión de los resultados, lo que incrementa la utilidad de su análisis.
+
+Para su construcción, deberán incluirse todas los ingresos y egresos previstos para la operación del inmueble, reconociéndolos en el momento en que se generen.
+
+3. Determinación de la tasa de descuento: esta se estimará en función de las alternativas de inversión disponibles en el mercado de capitales y de los riesgos asociados a la inversión inmobiliaria.
+
+Su determinación podrá realizarse mediante procedimientos directos (mercado) o indirectos (construcción de tasa); en todos los casos, deberá contar con el respectivo soporte técnico.
+
+4. Estimación del valor del inmueble: el valor estimado para el inmueble corresponderá al Valor Presente Neto (VPN) de los flujos de caja proyectados, traídos a Valor Presente o Actual a la tasa de descuento definida en el numeral anterior.

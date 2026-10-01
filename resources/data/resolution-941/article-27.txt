@@ -1,0 +1,21 @@
+Artículo 27. Definición del Método del Costo. Es el procedimiento valuatorio mediante el cual se determina técnicamente el valor comercial total de un inmueble, a partir de la estimación del valor del terreno y del valor actual o depreciado de las construcciones y anexos constructivos que formen parte del bien y deban ser considerados conforme al encargo valuatorio.
+
+Para ello, se empleará la siguiente ecuación:
+
+VC = (CT − D) + VT
+
+En donde:
+
+VC = Valor comercial del inmueble.
+
+CT = Costo total de reposición o reproducción a nuevo de las construcciones y anexos constructivos que deban ser considerados conforme al encargo valuatorio.
+
+D = Depreciación acumulada.
+
+VT = Valor total del terreno.
+
+El costo total de la construcción a nuevo, de reposición o reproducción, deberá estar soportado en fuentes técnicas idóneas, especializadas y verificables y/o en presupuestos de obra debidamente sustentados.
+
+La depreciación acumulada deberá calcularse mediante un modelo continuo que incorpore la edad y el estado de conservación.
+
+El valor del terreno deberá determinarse mediante la aplicación de cualquiera de las metodologías técnicamente viables y establecidas en la presente resolución.

@@ -1,0 +1,5 @@
+Artículo 25. Capitalización por análisis de flujo de caja descontado. Mediante este análisis se identifica el crecimiento en el ingreso sobre un periodo de tiempo preestablecido de la inversión. El valor del inmueble es igual al valor descontado de los beneficios futuros, los cuales representan los flujos de caja anuales (positivos y negativos) en un periodo de tiempo, más el valor continuo o perpetuo al final del periodo para el cual se hizo la proyección de ingresos.
+
+Para este análisis es necesaria la aplicación de dos diferentes tasas:
+
+1. Tasa de descuento, aplicable a los flujos netos de efectivo futuros, determinada principalmente por el nivel de riesgo asociado al tipo de inmueble; y 2. Tasa terminal de capitalización, utilizada para estimar el valor futuro (valor continuo) del inmueble con base en los ingresos esperados del último año o periodo proyectado.

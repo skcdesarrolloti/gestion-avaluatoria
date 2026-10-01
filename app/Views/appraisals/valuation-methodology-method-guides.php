@@ -64,6 +64,7 @@ $firstMethodPart = (string) ($methodologyGuides[0]['parts'][0]['key'] ?? 'compre
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
+                <?php require __DIR__ . '/valuation-methodology-method-review.php'; ?>
                 <nav class="mt-4 flex gap-2 overflow-x-auto" aria-label="Detalle del método">
                     <?php foreach ($parts as $part): ?>
                         <?php $partKey = (string) ($part['key'] ?? ''); ?>

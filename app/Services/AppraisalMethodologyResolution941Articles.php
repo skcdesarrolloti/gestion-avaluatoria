@@ -48,10 +48,10 @@ final class AppraisalMethodologyResolution941Articles
                 'Usa la relación entre renta y tasa de capitalización cuando el ingreso es representativo y estabilizado.',
                 ['A = r / i', 'renta estabilizada', 'tasa coherente']),
             $this->article('Art. 24', 'Renta, tasa y deducciones',
-                'Exige coherencia entre renta bruta/neta y tasa bruta/neta; excluye rentas de intangibles y verifica topes legales.',
+                'Exige investigar contratos y arriendos comparables, contrastar el canon con el mercado y sustentar la tasa. El tope legal citado aplica a vivienda urbana.',
                 ['bruta con bruta', 'neta con neta', 'sin intangibles']),
             $this->article('Art. 25', 'Flujo de caja descontado',
-                'Permite valorar desde beneficios futuros descontados y valor terminal cuando el ingreso cambia en el tiempo.',
+                'Valora beneficios futuros y valor continuo. Distingue la tasa de descuento de los flujos y la tasa terminal de capitalización; ambas necesitan sustento.',
                 ['FCD', 'flujos futuros', 'valor presente']),
             $this->article('Art. 26', 'Aplicación del FCD',
                 'Ordena estimar ingresos, egresos, periodicidad, tasa de descuento y VPN con soporte técnico.',
@@ -72,7 +72,7 @@ final class AppraisalMethodologyResolution941Articles
                 'Permite sustentar vida útil remanente cuando la edad supera la referencia y el estado conserva utilidad.',
                 ['vida remanente', 'estado de conservación', 'soporte técnico']),
             $this->article('Art. 30', 'Depreciación acumulada',
-                'Exige modelos continuos y el sistema Ross-Heideck combinado para construcción y anexos.',
+                'Exige Ross–Heideck continuo por edad y conservación. Su parágrafo exceptúa la depreciación por edad de BIC y otros bienes allí descritos; sí considera su conservación.',
                 ['Ross-Heideck', 'modelo continuo', 'sin escalera']),
         ];
     }
@@ -87,10 +87,10 @@ final class AppraisalMethodologyResolution941Articles
                 'Diferencia el modelo estático de corto plazo y el dinámico con ingresos, costos y tiempos de desarrollo.',
                 ['estático', 'dinámico', 'tiempos del proyecto']),
             $this->article('Art. 33', 'Aplicación del residual',
-                'Exige norma urbana, áreas vendibles, ventas, urbanismo, construcción, indirectos, financiación y utilidad esperada.',
+                'Exige factibilidad, ventas, costos y utilidad sustentados. Regula el resultado total, su desagregación y la excepción del parágrafo; no se suma nuevamente la construcción.',
                 ['norma urbana', 'áreas vendibles', 'TIR y VPN']),
             $this->article('Art. 34', 'Valor de terreno en bruto',
-                'Permite estimar VTB desde valor de terreno urbanizado, área útil, ganancia de urbanizar y costos de urbanismo.',
+                'Solo procede si no es posible la comparación directa del terreno en bruto ni resulta aplicable el residual. Distingue área útil, ganancia de urbanizar y costos de urbanismo.',
                 ['VTB', 'área útil', 'costos de urbanismo']),
         ];
     }

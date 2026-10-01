@@ -1,0 +1,45 @@
+Artículo 30. Determinación de la depreciación acumulada. Para la estimación de la depreciación acumulada de las construcciones se deberán emplear modelos continuos, excluyendo los modelos discontinuos o en escalera. En tal sentido, para las construcciones y anexos constructivos, se aplicará el sistema de depreciación que combina las teorías de Ross y Heideck (modelo Ross – Heideck), el cual incorpora los dos aspectos fundamentales de la depreciación, correspondientes a depreciación por edad y depreciación por estado de conservación.
+
+La depreciación acumulada se representará mediante la siguiente ecuación:
+
+Depreciación = (½ × (x/n + x²/n²)) × E
+
+Donde E se estimará con la siguiente ecuación:
+
+E = (100 − Coeficiente Depreciación) / 100
+
+El factor de depreciación (FD) corresponderá a la siguiente ecuación:
+
+FD = (1 − ½ × (x/n + x²/n²)) × E
+
+En donde:
+
+FD = Factor de depreciación.
+
+x = Edad de la construcción.
+
+n = Vida útil.
+
+E = Coeficiente asociado a la calificación del estado de conservación, según los criterios de mantenimiento y/o conservación establecidos por Heideck.
+
+Así las cosas, para calcular el valor actual de la construcción, se aplica la siguiente ecuación:
+
+VA = Vn × (1 − ½ × (x/n + x²/n²)) × E
+
+En donde:
+
+VA = Valor Actual
+
+Vn = Valor a nuevo o reposición de la construcción
+
+x = Edad de la construcción.
+
+n = Vida útil.
+
+E = Coeficiente asociado a la calificación del estado de conservación, según los criterios de mantenimiento y/o conservación establecidos por Heideck.
+
+Para ampliar la aplicación de estas expresiones, se deberá consultar el anexo técnico.
+
+Parágrafo. Las construcciones catalogadas como Bienes de Interés Cultural (BIC), de conservación arquitectónica, históricas o monumentales, así como aquellas cuya antigüedad constituya un atributo de valor en el mercado, no estarán sujetas a depreciación acumulada por edad. No obstante, su valor sí se verá afectado por el estado de conservación actual.
+
+Cuando el inmueble, por su estado de conservación, requiera obras de restauración, reforzamiento, adecuación o intervención especializada, el avaluador podrá determinar la depreciación por estado de conservación con base en el costo de dichas intervenciones, debidamente sustentado en presupuestos de obra, estudios o fuentes técnicas idóneas especializadas en materia de conservación patrimonial. El valor así establecido corresponderá al valor a descontar del costo de reposición o reproducción a nuevo.

@@ -127,3 +127,36 @@ DOM en pantalla estrecha: una columna, sin desbordamiento horizontal y texto con
 scroll interno. La captura de pantalla con viewport móvil falló en la herramienta;
 la comprobación responsive fue DOM, no imagen. Sin cambios de persistencia/esquema,
 no se ejecutaron pruebas de bases de datos. Pendiente actualización del hosting.
+
+## Ampliación a los cuatro métodos — 1 de octubre de 2026
+
+Se amplía la revisión anterior de los 61 artículos y el anexo con lectura íntegra
+plegable de los artículos 22–34: renta, costo y residual. Los textos se cotejaron
+visualmente con las páginas 23–34 del PDF firmado del IGAC; se conservan parágrafos
+ y ecuaciones, adaptando su presentación a texto. Fuente institucional:
+https://www.igac.gov.co/node/53595 y anexo técnico oficial Anexo_Final_.pdf.
+
+Cada método tiene su propia revisión plegable de requisitos, insumos disponibles
+ y trabajo pendiente. El panel común conserva ámbito, preparación, informe,
+casos especiales y cierre normativo. Ningún panel acredita cumplimiento automático.
+
+Precisiones incorporadas:
+- Renta: coherencia bruta/neta, alcance del límite de vivienda urbana, dos tasas
+  distintas en FCD, valor continuo y gastos mínimos.
+- Costo: CT, D y VT separados; reposición/reproducción, presupuesto localizado,
+  alternativas justificadas ante falta de documentación, vida remanente y VUP.
+  El anexo 2.3.2 admite evaluar VUP desde 90% de vida de referencia, con condiciones
+  de conservación 2,5–4,5 y exclusión de BIC. La excepción del art. 30 excluye edad,
+  pero conserva el análisis del estado. Las ecuaciones se transcriben para consulta;
+  no se implementa un calculador ni descuentos automáticos por obsolescencia.
+- Residual: factibilidad, estático/dinámico, utilidad y trazabilidad; resultado y
+  excepción del art. 33, sin sumar nuevamente construcción; condición de uso de VTB.
+- Mercado: captura 8.3 y análisis 8.4, corroboración, negociación y memoria pendientes.
+
+Validación: PHP 437 verificaciones; JavaScript 106 pruebas; lint, build y tamaño
+correctos (57,2 KB gzip). Vista real local: navegación por los cuatro métodos,
+apertura/cierre de artículo 30 y requisitos de costo; revisión visual de escritorio.
+La captura móvil agotó el tiempo de la herramienta; DOM en ventana estrecha reportó
+585 px de viewport y 562 px de contenido, sin desbordamiento horizontal. No se
+presenta esto como una captura móvil validada. Sin cambios de BD ni migraciones,
+no aplica la prueba de persistencia. Pendiente actualizar el hosting.

@@ -96,7 +96,7 @@ final class AppraisalMethodologyResolution941Guide
                 $this->part('insumos', 'Insumos mínimos', [
                     'Canon, periodo de pago, administración, IVA, gastos, vacancia, fecha y soporte documental.',
                     'Rentas comparables y precios de venta comparables cuando se derive tasa por observación directa.',
-                    'Supuestos de crecimiento, egresos, horizonte, valor terminal y tasa si se usa FCD.',
+                    'Supuestos de crecimiento, egresos, horizonte y valor continuo; distinguir tasa de descuento y tasa terminal de capitalización en FCD.',
                 ]),
                 $this->part('desarrollo', 'Desarrollo técnico', [
                     'Usar renta neta con tasa neta o renta bruta con tasa bruta; no mezclar magnitudes.',
@@ -118,7 +118,7 @@ final class AppraisalMethodologyResolution941Guide
             'key' => 'costo',
             'label' => 'Costo',
             'articles' => 'Arts. 27 a 30',
-            'summary' => 'Suma valor del terreno y valor actual de construcciones o anexos, descontando depreciación y obsolescencia.',
+            'summary' => 'Suma el valor del terreno y el costo a nuevo de construcciones y anexos menos su depreciación acumulada, con las excepciones del artículo 30.',
             'article_cards' => $this->articles()->for('costo'),
             'decision_inputs' => [
                 'Valor del terreno por método viable y soporte de mercado o norma aplicable.',
@@ -135,12 +135,12 @@ final class AppraisalMethodologyResolution941Guide
                 $this->part('insumos', 'Insumos mínimos', [
                     'Medición del componente, unidad de costo, cantidades, especificaciones y fecha de precios.',
                     'Fuentes de costo: presupuesto, publicaciones técnicas, bases de datos, tipología IGAC o soporte de obra.',
-                    'Edad aparente, vida útil, mantenimiento, estado de obra y obsolescencias observadas.',
+                    'Edad sustentada, vida útil de referencia, mantenimiento, conservación y vida remanente; justificar la vida útil prolongada cuando corresponda.',
                 ]),
                 $this->part('desarrollo', 'Desarrollo técnico', [
                     'Calcular costo total a nuevo, depreciación acumulada y valor actual del componente.',
                     'Relacionar el terreno por el método que corresponda y evitar doble conteo con el método de mercado.',
-                    'Usar modelos continuos de depreciación y dejar constancia cuando falten planos o mediciones completas.',
+                    'Aplicar Ross–Heideck continuo y la excepción patrimonial del art. 30; documentar conservación y justificar fuentes alternativas si faltan planos o mediciones.',
                 ]),
                 $this->part('cierre', 'Cierre en informe', [
                     'Explicar por qué el componente se valora por reposición/costo y no integrado al comparable.',
@@ -179,7 +179,7 @@ final class AppraisalMethodologyResolution941Guide
                 $this->part('desarrollo', 'Desarrollo técnico', [
                     'Calcular ingresos totales del producto final con soporte de mercado.',
                     'Restar costos, cargas y utilidad esperada; en dinámico descontar flujos a una tasa sustentada.',
-                    'Usar valor de terreno en bruto cuando corresponda y la información permita aplicar la fórmula.',
+                    'Aplicar art. 34 solo cuando no proceda comparación directa del terreno en bruto ni residual; no adicionar nuevamente construcción al resultado del art. 33.',
                 ]),
                 $this->part('cierre', 'Cierre en informe', [
                     'Justificar la factibilidad normativa y económica del escenario adoptado.',

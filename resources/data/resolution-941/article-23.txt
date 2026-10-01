@@ -1,0 +1,25 @@
+Artículo 23. Capitalización directa. Es una técnica valuatoria que permite estimar el valor comercial de un inmueble a partir de su capacidad de generar ingresos por concepto de arrendamiento.
+
+La estimación del valor comercial del inmueble se obtendrá mediante la siguiente ecuación:
+
+A = r / i
+
+En donde:
+
+A = Avalúo o valor comercial del inmueble.
+
+r = renta (canon de arrendamiento o ingreso).
+
+i = Tasa de capitalización de la renta.
+
+La determinación de variables se efectuará, así:
+
+Tanto la renta como la tasa de capitalización deberán estar en términos brutos o en términos netos. Si la información de las tasas del mercado corresponde a rentas brutas y por lo tanto dicha tasa será también en términos brutos, se deberá aplicar a una renta bruta antes de deducciones. Si se obtiene el dato de la tasa neta de capitalización, se deberá aplicar a una renta neta libre de deducciones.
+
+La variable r: Se entiende por ingreso o renta neta el valor del canon de arrendamiento o renta bruta menos las deducciones que corresponden al propietario: administración o pago de la copropiedad, impuesto predial o impuestos del inmueble, seguros, mantenimiento y otros gastos que correspondan al propietario. De no contar con esta información se deberá calcular el ingreso bruto descontando el valor de la administración cuando aplique.
+
+Las rentas consideradas deberán estar asociadas exclusivamente a la tenencia y uso del inmueble.
+
+La variable tasa i, deberá derivarse, preferiblemente, de la relación observada en el mercado entre los valores del canon de arrendamiento y los precios de venta de inmuebles comparables (observación directa del mercado). En su defecto, podrá construirse siempre que se cuente con el soporte técnico correspondiente.
+
+Parágrafo: No se tendrán en cuenta rentas asociadas a marcas, patentes, secretos empresariales, derechos de autor, nombres comerciales, derechos deportivos, espectro radioeléctrico, fondo de comercio, prima comercial y otros similares.

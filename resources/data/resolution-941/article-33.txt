@@ -1,0 +1,27 @@
+Artículo 33. Aplicación del Método (Técnica) Residual. El desarrollo de este método (técnica) deberá tener en cuenta, entre otros, los siguientes aspectos:
+
+1. Análisis normativo: determinación de afectaciones (si aplica), cesiones, área neta urbanizable, área útil, así como el análisis de volumetría, edificabilidad y usos para establecer las áreas vendibles del producto inmobiliario final.
+
+2. Estimación de las ventas totales: para el cálculo de las ventas totales se deberá analizar el tipo de producto inmobiliario que, conforme al principio de máximo y mejor uso, pueda desarrollarse sobre el terreno. La estimación de los valores de venta deberá sustentarse mediante el método de comparación o de mercado, utilizando información de ofertas y/o transacciones de inmuebles comparables y semejantes al producto inmobiliario planteado, considerando, entre otros, aspectos como áreas, ubicación, tipología, características constructivas y del proyecto, y demás variables que permitan soportar técnicamente los valores adoptados.
+
+3. Costos de urbanismo: el costo de urbanismo corresponderá a la suma de los costos necesarios para habilitar el suelo a su uso específico proyectado. Cuando se requiera, o cuando el inmueble se ubique en zonas de amenaza, se deberán considerar los costos de mitigación correspondientes. Esta información debe estar soportada en presupuestos, estudios o fuentes técnicas idóneas especializadas. Tener en cuenta no duplicar los costos indirectos del urbanismo.
+
+4. Costos de construcción: corresponden exclusivamente a los costos directos de construcción (materiales, mano de obra y equipos) requeridos para ejecutar el producto inmobiliario, los cuales deberán estar sustentados en presupuestos de obra, estudios o fuentes técnicas idóneas y especializadas.
+
+5. Costo total del proyecto: corresponde a la suma del costo de urbanismo, las cargas urbanísticas asociadas al proyecto y/o plan parcial (cuando aplique), los costos directos de construcción y los demás costos asociados al desarrollo del proyecto, entre ellos los costos indirectos, financieros, de gerencia y comercialización, considerando los volúmenes y unidades requeridas para el desarrollo del proyecto planteado.
+
+6. Utilidad esperada: la utilidad esperada deberá ser concordante con el uso del suelo, la localización y las especificaciones del tipo de proyecto que se plantea, así como las condiciones del mercado, la renta fija y los riesgos asociados al negocio inmobiliario al momento del cálculo. De igual manera, deberá considerar la tasa interna de retorno (TIR) del sector constructor e inmobiliario y garantizar que el valor presente (VPN o VAN) del flujo del proyecto sea, como mínimo igual a cero. Para la estimación del valor presente (VPN), se deberá tener en cuenta el costo de oportunidad del dinero, el cual incluye la tasa del riesgo sectorial y el momento económico.
+
+El porcentaje de utilidad deberá derivarse de un análisis financiero detallado de la inversión, de manera que se garantice que el beneficio económico esperado por el desarrollador o constructor sea superior al valor que se obtendría al comparar el capital invertido con la inflación y los intereses que pagaría una entidad bancaria o la renta fija.
+
+Para tal efecto, se deberán considerar factores como las tasas de interés vigentes, el riesgo asociado a la actividad y el horizonte temporal estimado para el desarrollo del proyecto.
+
+7. Soporte de la información: para el desarrollo de este método, el avaluador deberá indicar las fuentes o medios de los cuales se obtuvo cada uno de los datos e información utilizados en el análisis.
+
+8. Resultado del método: el valor resultante de este método corresponderá al valor total del inmueble, es decir, al valor del terreno junto con el de la construcción.
+
+En consecuencia, al valor obtenido no se le deberá adicionar nuevamente el valor de la construcción.
+
+9. Presentación desagregada del valor: cuando se requiera presentar de forma independiente el valor del terreno y el de la construcción, se deberá estimar el valor de la construcción mediante los lineamientos del método del costo y descontarlo del valor total del inmueble.
+
+Parágrafo. Cuando el inmueble se encuentre desarrollado bajo su mayor y mejor uso, el método podrá aplicarse de manera excepcional con el único fin de establecer el valor del terreno, caso en el cual no se requerirá descontar el valor de las construcciones existentes, al considerarse estas plenamente integradas al potencial de desarrollo óptimo del terreno.

@@ -1,0 +1,45 @@
+Artículo 34. Estimación del Valor de un Terreno en Bruto (VTB). Cuando por las condiciones del mercado inmobiliario, no sea posible determinar el valor de un terreno en bruto mediante comparación directa con ofertas o transacciones, ni resulte aplicable el método residual, se podrá estimar su valor tomando como referencia el valor de un terreno urbanizado con condiciones similares de uso del suelo y ubicación.
+
+La estimación se podrá realizar mediante la siguiente ecuación:
+
+VTB = %AU × {(Vtu × (1 − g)) − Cu}
+
+La determinación de las variables se efectuará, así:
+
+VTB = Valor de un terreno en bruto.
+
+Para el cálculo será necesario identificar la norma urbanística aplicable al inmueble, señalando de manera expresa, los siguientes aspectos:
+
+a) Clasificación del suelo y tratamiento urbanístico.
+
+b) Afectaciones, (tales como rondas hídricas, zonas de amenaza o riesgo, suelos de protección, entre otras).
+
+c) Cesiones obligatorias.
+
+d) Densidad y área mínima de loteo.
+
+%AU = Porcentaje de área útil.
+
+El Área Útil AU, se obtendrá a partir del área total o bruta del inmueble, descontando, conforme la normatividad urbanística aplicable, las áreas correspondientes a afectaciones, cesiones y vías locales. Este resultado correspondiente al área útil y no deberá confundirse con el índice de ocupación previsto en las normas urbanísticas para efectos de edificabilidad.
+
+El %AU: se obtendrá del resultado de la siguiente ecuación:
+
+%AU = (AT − AF − C) / AT
+
+En donde:
+
+%AU = Porcentaje de área útil.
+
+AT = Área total, o área bruta del inmueble.
+
+AF = Área de afectaciones.
+
+C = Área destinada a cesiones obligatorias.
+
+Vtu = Valor del terreno urbanizado de referencia. El valor del terreno útil urbanizado se determina mediante la aplicación del método de comparación o de mercado.
+
+Lo datos utilizados deberán reflejar de manera clara sus condiciones y características, a fin de permitir un adecuado análisis de comparabilidad.
+
+g = Ganancia por la acción de urbanizar. Expresada como un porcentaje sobre el valor de venta. Esta variable integra el margen de utilidad del urbanizador y los gastos propios de la gestión para el desarrollo urbanístico, tales como los administrativos, financieros, de licenciamiento, trámites, comercialización, ventas e imprevistos, sin incluir los costos de urbanismo (Cu).
+
+Cu = Costos de urbanismo, asociado al área útil. Corresponden exclusivamente a los costos directos e indirectos requeridos para la ejecución de las obras de urbanismo, expresados por metro cuadrado de área útil. Estos deberán ser coherentes con las características del urbanismo presentado por los datos de mercado y corresponder al proyecto planteado, de conformidad a la normatividad vigente.
