@@ -1,6 +1,7 @@
 import { rowFactory } from './comparable-row-growth.js';
 import { mapFields, compositionVisible, locationPoints } from './comparable-location.js';
 import { comparablePhotos } from './comparable-photos.js';
+import { comparableMapNavigation } from './comparable-map-navigation.js';
 import { comparableRemoval } from './comparable-removal.js';
 import { hasComparableData, missingComparableFields, comparableUrlKey } from './comparable-review.js';
 
@@ -19,7 +20,7 @@ const groups = {
 export function comparableWorkbench() {
     let entries = [], resize, form, createRow, prepare, grow;
     return {
-        ...comparablePhotos(), ...comparableRemoval(), phFilter: 'all', mode: 'table', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
+        ...comparablePhotos(), ...comparableMapNavigation(), ...comparableRemoval(), phFilter: 'all', mode: 'table', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
         pending: 0, duplicates: 0, shown: 0, usedIndexes: [], mapPoints: [],
         get groupHelp() {
             return {
@@ -102,12 +103,14 @@ export function comparableWorkbench() {
             const eligible = entries.filter(e => (this.phFilter === 'all' || (e.data.ph_regime || 'por_verificar') === this.phFilter) && (e.used || e.opened) &&
                 (this.filter !== 'pending' || e.missing.length) && (this.filter !== 'duplicates' || e.duplicate) &&
                 (!query || Object.values(e.data).join(' ').toLocaleLowerCase('es').includes(query)));
-            this.pages = Math.max(1, Math.ceil(eligible.length / 10));
+            const mapMode = this.searchTab === 'mapa', pageSize = mapMode ? 1 : 10;
+            this.pages = Math.max(1, Math.ceil(eligible.length / pageSize));
             this.page = Math.min(this.page, this.pages);
-            const visible = eligible.slice((this.page - 1) * 10, this.page * 10);
+            const visible = eligible.slice((this.page - 1) * pageSize, this.page * pageSize);
+            this.mapIndex = mapMode ? visible[0]?.index ?? null : null;
+            if (mapMode && this.photoOpen && this.photoIndex !== this.mapIndex && !this.photoBusy) this.photoOpen = false;
             this.shown = eligible.length;
             for (const entry of entries) entry.tr.hidden = !visible.includes(entry);
-            const mapMode = this.searchTab === 'mapa';
             const fields = groups[mapMode ? 'location' : this.group];
             const first = entries[0];
             if (!first) return;

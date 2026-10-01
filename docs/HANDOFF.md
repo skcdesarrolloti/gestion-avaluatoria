@@ -1,5 +1,9 @@
 # Entrega al responsable de la implementación
 
+Fotos en Mapas: una ficha por vez y «Continuar con la siguiente muestra», con
+confirmación de guardado y bloqueo ante foto pendiente. Galería de altura limitada.
+Sin migración nueva; ver pruebas y limitación de subida en [Mapas](COMPARABLES-MAPAS-AREAS.md).
+
 Comparables: [Mapas, evidencia y áreas PH/no PH en 8.3](COMPARABLES-MAPAS-AREAS.md).
 Aplicar migración `202610010003_comparable_capture_details.php`. Conserva muestras;
 análisis, desagregación monetaria y estadísticos siguen pendientes para 8.4.

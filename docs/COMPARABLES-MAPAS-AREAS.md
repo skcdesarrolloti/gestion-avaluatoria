@@ -42,3 +42,22 @@ de la transacción/versionado existente. Un vacío explícito sí borra ese camp
   de la herramienta; no se atribuye validación visual a esa pantalla.
 
 No se escribió en la base de producción. Actualizar hosting es un paso separado.
+
+## Recorrido de fotos, una muestra a la vez
+
+Mapas muestra una ficha por página; la matriz conserva diez. «Fotos de esta muestra»
+abre el soporte en el mismo lugar. «Continuar con la siguiente muestra» confirma
+el autoguardado antes de reemplazar la ficha y cargar las fotos de la siguiente.
+Permite varias imágenes antes de avanzar; no avanza automáticamente al pegar.
+La navegación y filtros se bloquean durante carga o reintento pendiente. La galería
+tiene altura limitada para que añadir fotos no alargue indefinidamente la página.
+No hay migración ni cambio de almacenamiento en esta mejora.
+
+Validación adicional: 398 verificaciones PHP, 106 pruebas JS, lint, build y 57.2 KB
+gzip. Quince comprobaciones en ga_test_app local puerto 33329: pertenencia de fotos,
+recuperación binaria, conservación por ID, reintento y rechazo de acceso ajeno.
+Navegador: recorrido 1→2→3, límite final, foto recuperada después de recargar,
+imagen cargada correctamente, escritorio visual y móvil DOM 390 px sin desborde.
+La selección de archivo por la extensión fue bloqueada por falta de permiso de
+file URLs; la imagen de prueba se guardó mediante el servicio/repositorio local
+y se recuperó por la interfaz. No se certificó una subida del usuario en hosting.

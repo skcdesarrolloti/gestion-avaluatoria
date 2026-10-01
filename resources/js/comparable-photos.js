@@ -6,9 +6,10 @@ export function comparablePhotos() {
     return {
         initPhotos(element) { form = element; },
         photoOpen: false, photoBusy: false, photoMessage: '', photoTitle: '', photoEndpoint: '', photos: [], photoCaption: '',
-        photoSourceUrl: '', photoReady: false, photoRetry: false,
+        photoSourceUrl: '', photoReady: false, photoRetry: false, photoIndex: null,
         async openPhotos(index) {
             if (this.photoBusy) return;
+            this.photoIndex = index;
             const row = form.querySelectorAll('.comparable-grid tbody tr')[index];
             const value = key => row.querySelector(`[name$="[${key}]"]`)?.value || '';
             this.photoOpen = true; this.photos = []; this.photoCaption = '';

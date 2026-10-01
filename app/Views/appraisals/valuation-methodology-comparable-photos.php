@@ -3,7 +3,7 @@
     class="mt-4 scroll-mt-6 rounded-xl border border-teal-200 bg-teal-50 p-4" aria-label="Fotos del comparable">
     <div class="flex flex-wrap items-center justify-between gap-3">
         <h4 class="font-semibold" x-text="photoTitle"></h4>
-        <button type="button" class="btn-secondary min-h-11" @click="photoOpen = false" :disabled="photoBusy">Cerrar fotos</button>
+        <button type="button" class="btn-secondary min-h-11" @click="photoOpen = false" :disabled="photoBusy || mapBusy || photoRetry">Cerrar fotos</button>
     </div>
     <a x-show="photoSourceUrl" :href="photoSourceUrl || '#'" target="_blank" rel="noopener" class="btn-secondary mt-3 min-h-11">1. Abrir aviso de esta muestra</a>
     <p x-show="!photoSourceUrl" class="mt-2 text-sm">Completa el enlace del inmueble en la matriz para abrir su aviso desde aquí.</p>
@@ -25,7 +25,13 @@
     <button type="button" class="btn-primary mt-3 min-h-11" @click="uploadPhoto()" :disabled="photoBusy || !photoReady">Subir archivo elegido</button>
     </details>
     <p id="comparable-photo-message" role="status" class="mt-2 text-sm" x-text="photoMessage"></p>
-    <div class="mt-3 grid gap-3 sm:grid-cols-3">
+    <div class="mt-3 flex flex-wrap items-center gap-3" x-show="searchTab === 'mapa'">
+        <button type="button" class="btn-secondary" @click="moveMap(-1, true)" :disabled="page <= 1 || photoBusy || photoRetry || mapBusy">Muestra anterior</button>
+        <button type="button" class="btn-primary" @click="moveMap(1, true)" :disabled="page >= pages || photoBusy || photoRetry || mapBusy">Continuar con la siguiente muestra</button>
+        <span x-show="photoReady" class="text-sm" x-text="photos.length + ' fotos guardadas en esta muestra'"></span>
+        <p class="w-full text-sm">Puedes pegar varias fotos antes de continuar. La siguiente muestra se abre al confirmar el guardado; si una foto falla, reinténtala antes de avanzar.</p>
+    </div>
+    <div class="mt-3 grid max-h-80 gap-3 overflow-y-auto sm:grid-cols-3">
         <template x-for="photo in photos" :key="photo.id">
             <figure class="rounded-lg border border-slate-200 bg-white p-2">
                 <a :href="photoEndpoint + '/' + photo.id" target="_blank" rel="noopener" data-no-fetch>

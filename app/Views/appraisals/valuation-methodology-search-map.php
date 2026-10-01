@@ -2,6 +2,7 @@
     <p class="eyebrow">8.3 · misma matriz, misma muestra</p>
     <h3 class="text-xl font-semibold">Mapas y evidencia</h3>
     <p>Completa aquí la ubicación y el soporte de cada inmueble. Las fichas de abajo son las mismas filas de la matriz; no debes importar ni escribir de nuevo las muestras.</p>
+    <p>Trabaja una muestra a la vez. Abre «Fotos de esta muestra», pega sus imágenes y pulsa «Continuar con la siguiente muestra». También puedes recorrer las fichas con Anterior y Siguiente.</p>
     <ol class="list-decimal space-y-2 pl-5 text-sm">
         <li>Registra latitud, longitud, precisión y fuente. Si el portal solo ubica el sector, conserva esa salvedad; no inventes un punto exacto.</li>
         <li>Pulsa «Fotos y soporte» en la muestra y pega una captura con URL, precio, áreas y ubicación. Escribe qué evidencia conservaste y su fecha; una foto decorativa no basta.</li>
