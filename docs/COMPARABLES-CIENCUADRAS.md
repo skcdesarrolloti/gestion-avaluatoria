@@ -9,6 +9,8 @@ La solicitud HTTP directa devolvió 403 «Acceso denegado». No se implementó n
 se anuncia lector automático por servidor. Para oficinas en venta se habilitó
 copiar una página de resultados completa: aplicar barrio con Enter, hacer clic
 en el título y Ctrl+A/Ctrl+C; pegar con Ctrl+V en el campo del aplicativo.
+La pestaña muestra siempre la guía numerada 1–2–3 junto al campo de pegado:
+buscar/copiar, volver/pegar y seleccionar/agregar, con recordatorio de guardado.
 El pegado HTML se procesa en una plantilla inerte, sin insertar markup ni cargar
 imágenes externas. Solo toma tarjetas con precio de compra, área, oficina, ciudad
 del expediente y enlace HTTPS individual de Ciencuadras. Máximo 2 MB/60 tarjetas.
