@@ -12,6 +12,8 @@ final class AppraisalRepository
 
     public function create(int $owner): string
     { return AppraisalCreation::create($this->db,$owner,$this->actor); }
+    public function convertUnitToAnnex(string $id, int $owner, string $unitId, int $version): void
+    { $this->find($id, $owner); AppraisalUnitReclassification::toAnnex($this->db, $id, $owner, $unitId, $version); }
 
     public function photos(string $id, int $owner): array {
         $query = $this->db->prepare('SELECT id, appraisal_id, owner_id, unit_id, source_filename, storage_filename,

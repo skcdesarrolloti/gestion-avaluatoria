@@ -36,7 +36,6 @@ use App\Support\AppraisalCatalog;
 use App\Support\AppraisalEconomicCatalog;
 use App\Support\AppraisalReportNoteCatalog;
 use App\Support\AppraisalRestrictiveConditionsCatalog;
-
 final class AppraisalController
 {
     public function __construct(private AppraisalRepository $appraisals, private array $user,
@@ -47,7 +46,6 @@ final class AppraisalController
         private ?AppraisalReportNoteRepository $reportNotes = null, private ?AppraisalLegalRepository $legal = null,
         private ?AppraisalUrbanNormRepository $urbanNorms = null, private ?MidasDocumentRepository $midasDocuments = null,
         private ?AppraisalNarrativeChapterRepository $narrativeChapters = null) {}
-
     public function index(): void
     {
         $page = filter_var($_GET['page'] ?? 1, FILTER_VALIDATE_INT) ?: 1;
@@ -136,6 +134,7 @@ final class AppraisalController
             $this->appraisals->saveUnitDefinitionsByKey($id, $this->user['id'],
                 AppraisalUnitDefinitionInput::rows($_POST['config_units'] ?? []));
             $dossier = $this->createDossierIfRequested($id);
+            if (!empty($_POST['convert_to_annex'])) $this->appraisals->convertUnitToAnnex($id, $this->user['id'], (string) $_POST['convert_to_annex'], (int) $_POST['version'] + 1);
             Session::flash('chapter_zero_message', $dossier ? 'Expediente ' . $dossier . ' creado correctamente.' : 'Expediente guardado correctamente.');
             Http::redirect($this->chapterZeroRedirect($id));
         } catch (\Throwable $error) {
@@ -173,6 +172,7 @@ final class AppraisalController
     }
     private function chapterZeroRedirect(string $id): string
     {
+        if (!empty($_POST['convert_to_annex'])) return 'avaluos/' . $id . '/expediente?config_tab=metodo#configuracion';
         $next = (string) ($_POST['next'] ?? '');
         if ($next === 'sector') return 'avaluos/' . $id . '/sector';
         if ($next === 'subject') return 'avaluos/' . $id . '/bien-sujeto#atributos';

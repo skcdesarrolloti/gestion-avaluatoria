@@ -168,7 +168,7 @@ export function installModuleAutosave() {
     });
     document.addEventListener('submit', event => {
         const form = event.target;
-        if (form.hasAttribute?.('data-save-in-place')) {
+        if (form.hasAttribute?.('data-save-in-place') && !event.submitter?.hasAttribute?.('data-reclassify-unit')) {
             event.preventDefault();
             event.stopImmediatePropagation();
             const state = stateFor(form);

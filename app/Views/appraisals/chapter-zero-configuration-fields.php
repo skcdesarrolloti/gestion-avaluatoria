@@ -104,6 +104,12 @@ $igacSearchPlaceholder = static fn (array $unit): string =>
                                 value="<?= e($unitDisplay($unit)) ?>" placeholder="Ej. Casa principal, Piscina, Parqueadero 1">
                         </label>
                         <?php if (($unit['unit_kind'] ?? '') === 'property'): ?>
+                            <div class="text-sm text-slate-600"><p>Clasificación actual: unidad principal. El nombre no cambia su clasificación.</p>
+                                <button type="submit" class="btn-secondary mt-2" data-reclassify-unit name="convert_to_annex" value="<?= e((string) ($unit['id'] ?? '')) ?>">Cambiar a anexo o mejora</button>
+                                <p class="mt-1 text-xs">Guarda los datos y conserva este componente, sus fotos y soportes.</p>
+                            </div>
+                        <?php else: ?><p class="text-sm font-semibold text-teal-800">Clasificación: anexo o mejora</p><?php endif; ?>
+                        <?php if (($unit['unit_kind'] ?? '') === 'property'): ?>
                             <label class="label">Tipo de inmueble de la unidad
                                 <select class="input" name="config_units[<?= e($key) ?>][property_type]">
                                     <option value="">Usar tipo general del avalúo</option>

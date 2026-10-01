@@ -13,6 +13,7 @@ $photoNamePlaceholder = $photoUploadNamePlaceholder ?? 'Ej. Portada principal, c
 $photoFieldId = 'photo_upload_' . substr(hash('sha1', $photoUnitId . '|' . $photoCaption . '|' . $photoTitle), 0, 10);
 $compact = $photoUploadCompact ?? false;
 $allowUrl = $photoUploadAllowUrl ?? false;
+$sectorUpload = str_ends_with($subjectActionBase, '/sector');
 $submitDisabled = $allowUrl ? "busy || (!hasFiles && url.trim() === '')" : 'busy || !hasFiles';
 $visiblePhotos = $photoUnitId === '' ? $photos : array_values(array_filter($photos,
     static fn (array $photo): bool => (string) ($photo['unit_id'] ?? '') === $photoUnitId));
@@ -44,7 +45,8 @@ $visiblePhotos = $photoCaption === '' ? $visiblePhotos : array_values(array_filt
         <?php endif; ?>
         <form class="mt-6 grid gap-4 lg:grid-cols-[1fr_auto]" method="post" enctype="multipart/form-data"
             action="<?= e(url($subjectActionBase . '/fotos')) ?>"
-            x-data="photoUpload" @submit="busy = true">
+            x-data="<?= $sectorUpload ? 'sectorPhotoUpload' : 'photoUpload' ?>"
+            <?= $sectorUpload ? '@submit.prevent="save()" @ga:upload-error="failed()"' : '@submit="busy = true"' ?>>
             <?= csrf_field() ?>
             <?php if ($photoUnitId): ?><input type="hidden" name="unit_id" value="<?= e($photoUnitId) ?>"><?php endif; ?>
             <input type="hidden" name="photo_caption" value="<?= e($photoCaption) ?>">
@@ -86,8 +88,12 @@ $visiblePhotos = $photoCaption === '' ? $visiblePhotos : array_values(array_filt
             </div>
             <div class="flex items-end">
                 <button class="btn-primary min-h-11 w-full lg:w-auto" type="submit" :disabled="<?= e($submitDisabled) ?>"
-                    x-text="busy ? 'Subiendo...' : 'Agregar fotos'">Agregar fotos</button>
+                    x-text="busy ? 'Subiendo...' : '<?= $sectorUpload ? 'Guardar / Reintentar carga' : 'Agregar fotos' ?>'">Agregar fotos</button>
             </div>
+            <?php if ($sectorUpload): ?>
+                <p class="text-sm text-teal-800 lg:col-span-2" role="status" x-text="status || 'Al elegir o pegar una imagen se sube automáticamente. Espera la confirmación antes de continuar.'"></p>
+                <p class="hidden rounded-lg bg-amber-50 p-3 text-sm lg:col-span-2" data-upload-progress-panel role="status"><span data-upload-progress-text></span></p>
+            <?php endif; ?>
         </form>
         <?php if ($visiblePhotos): ?>
             <div class="mt-6 grid gap-4 sm:grid-cols-2">

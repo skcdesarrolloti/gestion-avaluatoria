@@ -1,18 +1,15 @@
+import { redirectedUrl } from './fetch-navigation.js';
 import { csrfToken, keepSessionAlive, refreshSecurityToken, syncToken } from './upload-session.js';
-
 const CHUNK_BYTES = 4 * 1024 * 1024, CHUNK_THRESHOLD = 6 * 1024 * 1024;
-
 function formBody(form, submitter) {
     try { return new FormData(form, submitter); } catch { return new FormData(form); }
 }
-
 function augmentFormData(form, body, submitter) {
     if (typeof form.dispatchEvent === 'function') {
         form.dispatchEvent(new CustomEvent('ga:upload-formdata', { bubbles: true, detail: { body, submitter } }));
     }
     return body;
 }
-
 function ui(form) {
     return {
         bar: form.querySelector('[data-upload-progress-bar]'),
@@ -33,7 +30,10 @@ function setProgress(parts, percent, message) {
     if (parts.text) parts.text.textContent = message;
 }
 
-function setDisabled(parts, disabled) { parts.submits.forEach(button => { button.disabled = disabled; }); }
+function setDisabled(parts, disabled) {
+    parts.submits.forEach(button => { button.disabled = disabled; });
+    if (!disabled) parts.submits[0]?.form?.dispatchEvent(new CustomEvent("ga:upload-error"));
+}
 
 export function uploadRedirectUrl(responseUrl, fallbackUrl, currentHref = window.location.href) {
     const target = new URL(responseUrl || fallbackUrl, currentHref);
@@ -43,7 +43,7 @@ export function uploadRedirectUrl(responseUrl, fallbackUrl, currentHref = window
 }
 
 function renderResponse(xhr, form) {
-    const nextUrl = uploadRedirectUrl(xhr.responseURL, form.action);
+    const nextUrl = redirectedUrl(uploadRedirectUrl(xhr.responseURL, form.action), form.action, new FormData(form));
     const type = xhr.getResponseHeader('content-type') ?? '';
     if (type.includes('text/html') && xhr.responseText) {
         const next = new DOMParser().parseFromString(xhr.responseText, 'text/html');
@@ -51,10 +51,10 @@ function renderResponse(xhr, form) {
         document.title = next.title || document.title;
         const token = next.querySelector('meta[name="csrf-token"]')?.content;
         if (token) document.querySelector('meta[name="csrf-token"]')?.setAttribute('content', token);
+        history.replaceState({}, '', nextUrl);
         window.Alpine?.destroyTree(document.body);
         document.body.replaceWith(next.body);
         window.Alpine?.initTree(document.body);
-        history.replaceState({}, '', nextUrl);
         return;
     }
     window.location.assign(nextUrl);

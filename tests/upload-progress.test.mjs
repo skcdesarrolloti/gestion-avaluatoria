@@ -25,7 +25,7 @@ test('submits marked upload form through xhr progress', () => {
     const listeners = {};
     const events = [];
     class Form {}
-    class Body { constructor(form, submitter) { this.form = form; this.submitter = submitter; } set(key, value) { this[key] = value; } }
+    class Body { constructor(form, submitter) { this.form = form; this.submitter = submitter; } set(key, value) { this[key] = value; } get(key) { return this[key] ?? null; } }
     class Xhr {
         constructor() { this.upload = {}; Xhr.last = this; }
         open(method, url) { this.method = method; this.url = url; }

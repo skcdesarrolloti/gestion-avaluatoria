@@ -43,7 +43,7 @@ $currentStep = 'expediente';
         x-data="{
             busy: false, active: window.location.hash === '#identificacion' || (window.location.hash === '' && <?= $hasDossierNumber ? 'true' : 'false' ?>) ? 'identificacion' : 'configuracion',
             chapterOneTab: 'solicitud',
-            configTab: 'expediente',
+            configTab: '<?= ($_GET['config_tab'] ?? '') === 'metodo' ? 'metodo' : 'expediente' ?>',
             notes: <?= e(json_encode($initial['notes'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             subtypeByProperty: <?= e(json_encode(AppraisalCatalog::subtypesByPropertyType(), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
             typologies: <?= e(json_encode($igacTypologiesByCategory ?? [], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
