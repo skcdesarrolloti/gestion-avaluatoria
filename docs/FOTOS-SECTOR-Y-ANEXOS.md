@@ -2,6 +2,11 @@
 
 ## Fotos
 
+El numeral 2.4 incluye «Foto del uso predominante», con nombre, pegar Ctrl+V,
+selección de archivo y eliminación. Usa la etiqueta independiente
+`sector:uso-predominante` y vuelve a `#banco-04`. Probado en navegador con
+imagen pegada y recarga; no requiere migración ni altera fotos de otros numerales.
+
 Los formularios de fotos del sector ahora envían automáticamente los archivos al
 elegirlos o pegarlos. La selección anterior solo preparaba una vista previa y
 requería pulsar Agregar fotos; el autoguardado del texto no enviaba esos archivos.

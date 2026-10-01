@@ -8,6 +8,11 @@ $photoSections = [
             'Pega con Ctrl+V o sube la imagen satelital que soporte la lectura espacial.',
             'Ej. Imagen satelital del barrio ' . ($neighborhoodLabel ?: 'seleccionado')],
     ],
+    '04' => [
+        ['sector:uso-predominante', 'Soporte del uso predominante', 'Foto del uso predominante · 2.4',
+            'Copia una foto y pégala con Ctrl+V en el recuadro, o elige un archivo. Espera la confirmación de guardado.',
+            'Ej. Actividad industrial del sector ' . ($neighborhoodLabel ?: 'seleccionado')],
+    ],
     '06' => [
         ['sector:mapa-vias', 'Soporte vial', 'Figura 3 · Mapa vial',
             'Pega con Ctrl+V o sube vías principales, accesos o señalización.',
@@ -22,7 +27,7 @@ $photoSections = [
 $photoRows = $photoSections[(string) $sectionCode] ?? [];
 ?>
 <?php if ($photoRows): ?>
-    <div class="mt-5 grid gap-4 lg:grid-cols-2">
+    <div class="mt-5 grid gap-4 <?= count($photoRows) > 1 ? 'lg:grid-cols-2' : '' ?>">
         <?php foreach ($photoRows as [$caption, $eyebrow, $title, $description, $placeholder]): ?>
             <?php
             $embedded = true; $photoUploadEmbedded = true; $photoUploadCompact = true;
