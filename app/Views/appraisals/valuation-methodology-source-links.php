@@ -54,7 +54,8 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
                 <?php if (isset($record['id'])) require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-url.php'; ?>
             <?php endif; ?>
             <?php if ($isFincaraiz): ?><details class="mt-3"><summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Si la lectura falla: pegar enlace y texto</summary><?php endif; ?>
-            <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-paste.php'; ?>
+            <?php require BASE_PATH . '/app/Views/appraisals/' . ($source['label'] === 'Ciencuadras' && ($record['tipo_inmueble'] ?? '') === 'oficina' && ($record['tipo_negocio'] ?? '') === 'venta'
+                ? 'valuation-methodology-ciencuadras-paste.php' : 'valuation-methodology-source-paste.php'); ?>
             <?php if ($isFincaraiz): ?></details><?php endif; ?>
             <?php endif; ?>
         </section>

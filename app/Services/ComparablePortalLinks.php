@@ -32,7 +32,7 @@ final class ComparablePortalLinks
                 $sources[$index]['kind'] = 'Filtros del portal';
                 $sources[$index]['instruction'] = 'Venta, oficina y Cartagena aplicados. Comprueba el barrio «' . $neighborhood . '» en el portal; no está filtrado en este enlace.';
             }
-            $sources[2]['instruction'] = 'Venta y oficina aplicados; la ubicación se busca por texto. Comprueba que cada resultado corresponda a ' . $neighborhood . ', ' . $city . '. La captura actual requiere enlace y datos: no descarga los avisos automáticamente.';
+            $sources[2]['instruction'] = 'Venta y oficina aplicados. Pulsa Enter en el campo del barrio dentro del portal; comprueba que los resultados correspondan a ' . $neighborhood . ', ' . $city . '. Después copia la página completa para preparar los avisos juntos.';
         }
         return $sources;
     }

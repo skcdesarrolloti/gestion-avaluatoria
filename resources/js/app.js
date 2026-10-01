@@ -17,8 +17,10 @@ import { installComparableBulkImport } from './comparable-bulk-import.js';
 import { comparableWorkbench } from './comparable-workbench.js';
 import { installComparableUrlImport } from './comparable-url-import.js';
 import { fincaraizAreaSearch } from './fincaraiz-area-search.js';
+import { ciencuadrasPaste } from './ciencuadras-paste.js';
 
 window.Alpine = Alpine;
+Alpine.data('ciencuadrasPaste', ciencuadrasPaste);
 Alpine.data('fincaraizAreaSearch', fincaraizAreaSearch);
 Alpine.data('comparableWorkbench', comparableWorkbench);
 Alpine.data('appraisalForm', appraisalForm);
