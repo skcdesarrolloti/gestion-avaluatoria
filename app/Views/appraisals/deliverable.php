@@ -23,6 +23,7 @@ $methodologyChapterData = is_array($methodologyChapter ?? null) ? $methodologyCh
 $midasTrace = is_array($midasIncorporation ?? null) ? $midasIncorporation : ['rows' => [], 'active' => [], 'text' => ''];
 ?>
 <a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
+<?php if (($record['finalidad'] ?? '') === 'judicial'): ?><a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/judicial')) ?>">Revisar y exportar anexo judicial · CGP</a><?php endif; ?>
 <div class="mt-3 flex flex-wrap items-start justify-between gap-5">
     <div>
         <p class="eyebrow">Entregable</p>

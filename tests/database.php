@@ -53,6 +53,7 @@ expectStatus(409, fn () => $ph->save($id, 1, ['ph_name'=>'Edición obsoleta'], 1
 expect($ph->profile($id, 1)['ph_name'] === 'PH editada', 'PH MySQL conserva edición tras conflicto');
 expect($ph->profile($id, 2)['ph_name'] === '', 'PH MySQL aísla propietario');
 require __DIR__ . '/comparable-persistence.php';
+require __DIR__ . '/judicial-persistence.php';
 // An applied migration must never be silently changed.
 $app->exec("UPDATE schema_migrations SET checksum = REPEAT('0', 64) WHERE version = '202609150002_add_observaciones.php'");
 $detected = false;

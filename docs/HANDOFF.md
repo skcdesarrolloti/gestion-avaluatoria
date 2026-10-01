@@ -1,5 +1,10 @@
 # Entrega al responsable de la implementación
 
+Perito: [antecedentes y anexo judicial CGP](PERITO-JUDICIAL-CGP.md). Nueva pestaña
+en Maestros, declaraciones por expediente Judicial, exportación TXT por apartado
+y registro explícito de presentación que alimenta historial y conserva copia.
+Aplicar migración `202610010002_create_judicial_expert_records.php`.
+
 Comparables: [sin tope de 60 y conservación de datos](COMPARABLES-SIN-TOPE.md).
 Aplicar migración nueva que amplía sample_index; no borrar ni reimportar muestras.
 

@@ -1,5 +1,9 @@
 # Crear y evolucionar la base sin SQL manual
 
+Perito judicial: `202610010002_create_judicial_expert_records.php` crea perfiles
+privados por propietario/perito y anexos versionados por expediente, con copia
+de cada presentación. Ver [módulo CGP](PERITO-JUDICIAL-CGP.md). No altera muestras.
+
 Comparables sin tope: `202610010001_expand_comparable_sample_index.php` amplía
 sample_index de TINYINT a INT UNSIGNED, conservando filas, índices y fotos.
 Ver [actualización](COMPARABLES-SIN-TOPE.md). No requiere reimportar muestras.

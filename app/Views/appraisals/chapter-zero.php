@@ -105,4 +105,5 @@ $currentStep = 'expediente';
 
         <?php require BASE_PATH . '/app/Views/appraisals/chapter-zero-aside.php'; ?>
     </form>
+    <section class="mt-6 rounded-xl border bg-white p-5"><h2 class="text-xl font-semibold">Dictamen destinado a un juzgado</h2><p class="my-3">Si guardaste finalidad Judicial, completa las declaraciones del perito y exporta el anexo del Código General del Proceso.</p><a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/judicial')) ?>">Preparar anexo judicial y registrar presentación</a></section>
 </div>

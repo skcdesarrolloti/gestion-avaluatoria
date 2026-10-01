@@ -6,6 +6,9 @@ completos de InversKC. El proyecto original permanece intacto.
 
 ## Incluido
 
+- [Perito y anexo judicial CGP](docs/PERITO-JUDICIAL-CGP.md): academia, historial,
+  declaraciones por expediente Judicial y exportación por apartado.
+
 - Login con funcionarios de SuCasa, sesiones, CSRF y límite de intentos.
 - Mis fichas, creación de borradores y formulario inicial con guardado en BD.
 - Autoguardado, validación, propiedad por usuario y conflictos entre pestañas.

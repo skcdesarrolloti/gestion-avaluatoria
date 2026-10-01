@@ -120,6 +120,7 @@ final class Kernel
                 'legal' => new LegalFrameworkController(new LegalDocumentRepository($db)),
                 'maintenance' => new MaintenanceController($db, $user),
                 'masters' => new MasterDataController(new AppraiserRepository($db), new MasterDocumentRepository($db)),
+                'judicial' => new \App\Controllers\JudicialExpertController(new \App\Models\JudicialExpertRepository($db), new AppraisalRepository($db), new AppraiserRepository($db), $user),
                 'standards' => new StandardController(new ValuationStandardRepository($db)),
                 'reportNotes' => new \App\Controllers\AppraisalReportNoteController(
                     new AppraisalRepository($db), new \App\Models\AppraisalReportNoteRepository($db), $user),
@@ -214,6 +215,5 @@ final class Kernel
         }
         return 'No se pudo verificar el acceso. Revisa la conexión de funcionarios.';
     }
-    private function loginData(): array
-    { return ['title' => 'Iniciar sesión', 'error' => Session::pullFlash('login_error'), 'username' => Session::pullFlash('login_username')]; }
+    private function loginData(): array { return ['title' => 'Iniciar sesión', 'error' => Session::pullFlash('login_error'), 'username' => Session::pullFlash('login_username')]; }
 }
