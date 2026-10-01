@@ -1,4 +1,5 @@
 import { portalResultsPaste } from './portal-results-paste.js';
+import { properatiClipboardCards } from './properati-clipboard.js';
 
 const normalize = value => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 export function properatiUrl(value) {
@@ -39,7 +40,7 @@ export function copiedProperatiRows(html, city) {
             heading: text('snippet__title'), location: text('snippet__location'), price: text('snippet__price'),
             area: text('area-value'), agency: text('agency-name') };
     });
-    return parseProperatiCards(cards, city);
+    return parseProperatiCards([...cards, ...properatiClipboardCards(template.content, properatiUrl)], city);
 }
 
 export function properatiPaste() {

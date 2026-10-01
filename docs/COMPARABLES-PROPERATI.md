@@ -63,3 +63,23 @@ estableció la causa del primer pegado y no se incorporaron muestras en esa prue
 Se verificó la nueva respuesta en escritorio y en un contenedor móvil de 390 px.
 Validación: 90 pruebas JS, 370 verificaciones PHP, lint de la vista, build y 55,0 KB
 gzip. Sin cambios de esquema o persistencia; no se ejecutó la suite de base de datos.
+
+## Compatibilidad del HTML copiado
+
+El lector admite también fragmentos sin `article` o `data-test`: encuentra el enlace
+del aviso y su contenedor con un único enlace de inmueble distinto. Exige precio,
+área y ubicación inequívocos dentro de ese contenedor; nunca usa el área de otra
+tarjeta. El título puede venir del atributo `title` si no se seleccionó su texto.
+No inventa enlaces cuando el portapapeles solo trae texto sin direcciones.
+
+La nueva captura del usuario mostró texto recibido, pero no permite recuperar el
+HTML original del intento fallido. La prueba reproducible elimina esas etiquetas
+de la copia de Properati: Chrome leyó 27 avisos antes y después, con idénticos enlaces,
+precios y áreas. Esta prueba amplía compatibilidad, no acredita el formato exacto
+de aquel intento. Pendiente comprobar el siguiente pegado nativo del usuario tras
+actualizar el hosting.
+
+Regresión DOM con linkedom (solo desarrollo): cuatro casos para separación de
+tarjetas, área ausente, ciudad ajena, precios ambiguos, enlaces y título no seleccionado.
+94 pruebas JS, 370 verificaciones PHP, build y 55,4 KB gzip. No cambian BD, guardado
+ni selección de sugeridos. No se agregaron muestras a producción durante la corrección.
