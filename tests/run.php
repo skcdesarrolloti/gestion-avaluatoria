@@ -278,6 +278,7 @@ try {
         'titulo' => 'Informe de avalúo', 'tipo' => 'comercial', 'tipo_derecho' => 'dominio_pleno',
         'finalidad' => 'negociacion', 'intended_use' => 'Negociación',
     ]);
+    $record = ['id' => str_repeat('a', 32)];
     $field = static fn (string $name): string => (string) ($chapterOneViewRecord[$name] ?? '');
     $selected = static fn (string $name, string $value): string => $field($name) === $value ? 'selected' : '';
     ob_start();

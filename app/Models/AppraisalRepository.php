@@ -63,8 +63,13 @@ final class AppraisalRepository
 
     public function saveChapterZero(string $id, int $owner, int $version, array $data): array
     {
+        $previous = $this->find($id, $owner);
+        foreach (['requester_email', 'requester_phone', 'requester_municipality', 'value_date_notes'] as $field) {
+            if (!array_key_exists($field, $data)) $data[$field] = $previous[$field];
+        }
         $now = gmdate('Y-m-d H:i:s');
         $fields = ['titulo', 'tipo', 'direccion', 'municipio', 'client_name', 'requester_name', 'requester_identification',
+            'requester_email', 'requester_phone', 'requester_municipality', 'value_date_notes',
             'requester_capacity', 'property_owner_name', 'report_recipient', 'observaciones', 'tipo_derecho', 'tipo_negocio', 'destinacion',
             'tipo_inmueble', 'subtipo_funcional', 'finalidad', 'intended_use', 'request_date', 'visit_date', 'value_date',
             'report_date', 'assignment_description', 'assignment_scope', 'assignment_limitations', 'assignment_hypotheses',

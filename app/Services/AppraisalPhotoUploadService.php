@@ -68,6 +68,9 @@ final class AppraisalPhotoUploadService
     {
         $photoId = bin2hex(random_bytes(16));
         $source = basename(str_replace('\\', '/', (string) $files['name'][$index]));
+        if ($caption === 'location:chapter-one' && filesize((string) $files['tmp_name'][$index]) > 12 * 1024 * 1024) {
+            throw new \InvalidArgumentException('La imagen de localización supera 12 MB.');
+        }
         $info = AppraisalPhotoStorage::inspect((string) $files['tmp_name'][$index], $source);
         $storage = 'foto-' . $appraisalId . '-' . $photoId . '.' . $info['extension'];
         $bytes = AppraisalPhotoStorage::storeUploaded((string) $files['tmp_name'][$index],

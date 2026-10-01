@@ -1,5 +1,9 @@
 # Entrega al responsable de la implementación
 
+[Expediente: solicitante, fecha y foto 1.4](EXPEDIENTE-SOLICITANTE.md): campos de
+contacto, uso previsto de 1400 caracteres, explicación en 1.3.5 y carga de imagen
+en 1.4. Aplicar migración `202610010005_assignment_contact_and_value_date_notes.php`.
+
 Guías de los cuatro métodos: lectura completa de arts. 16–34, requisitos y
 pendientes por método y revisión transversal de la Resolución 941. Ver
 [revisión normativa](REVISION-RESOLUCION-941.md). Sin nuevas fórmulas ejecutables,

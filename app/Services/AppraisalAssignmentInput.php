@@ -9,7 +9,11 @@ final class AppraisalAssignmentInput
     {
         $data = [];
         foreach (AppraisalCatalog::assignmentFields() as $field => $limit) {
+            if (in_array($field, ['requester_email', 'requester_phone', 'requester_municipality', 'value_date_notes'], true) && !array_key_exists($field, $_POST)) continue;
             $data[$field] = mb_substr(trim((string) ($_POST[$field] ?? '')), 0, $limit);
+        }
+        if (($data['requester_email'] ?? '') !== '' && !filter_var($data['requester_email'], FILTER_VALIDATE_EMAIL)) {
+            throw new \App\Core\HttpException(422, 'Revisa el correo del solicitante.', ['requester_email' => 'Escribe un correo válido.']);
         }
         $data['income_producing'] = self::select($_POST['income_producing'] ?? '', ['', 'si', 'no', 'pendiente']);
         $data['rent_period'] = self::select($_POST['rent_period'] ?? '', ['', 'mensual', 'trimestral', 'anual', 'otro']);

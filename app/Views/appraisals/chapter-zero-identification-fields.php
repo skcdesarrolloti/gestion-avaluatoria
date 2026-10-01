@@ -25,30 +25,7 @@ $tabs = [
     Diligencia un bloque a la vez. Todos los campos se conservan en el formulario y alimentan el capítulo 1 del entregable.
 </div>
 <div class="md:col-span-2 grid gap-5 md:grid-cols-2" x-show="chapterOneTab === 'solicitud'">
-<?= $sectionTitle('1.1 Solicitud del avalúo') ?>
-<label class="label">Solicitante
-    <input class="input" name="requester_name" maxlength="160" value="<?= e($field('requester_name')) ?>"
-        placeholder="Ej. Dra. Martha Espinosa B.">
-    <?= $supportText('NTS S 03: identificación de quien formula o canaliza la solicitud del avalúo.') ?>
-</label>
-<label class="label">Calidad/cargo en que solicita
-    <input class="input" name="requester_capacity" maxlength="220" value="<?= e($field('requester_capacity')) ?>"
-        placeholder="Ej. directora Oficina Cartagena; propietario; representante legal; interesado en compra">
-    <span class="mt-1 block text-xs leading-5 text-slate-500">Si es empresa, registra cargo y dependencia. Si es particular, registra la calidad o interés con que pide el avalúo.</span>
-    <?= $supportText('NTS S 03: permite precisar representación, cargo, interés o calidad con que se solicita la valuación.') ?>
-</label>
-
-<?= $sectionTitle('1.2 Razón social e identificación del solicitante') ?>
-<label class="label">Cliente / contratante
-    <input class="input" name="client_name" maxlength="160" value="<?= e($field('client_name')) ?>"
-        placeholder="Persona o entidad que contrata el encargo">
-    <?= $supportText('NTS S 03 y NTS I 01: identificación del solicitante o contratante del informe.') ?>
-</label>
-<label class="label">Identificación del solicitante
-    <input class="input" name="requester_identification" maxlength="80" value="<?= e($field('requester_identification')) ?>"
-        placeholder="NIT, cédula o identificación reportada">
-    <?= $supportText('NTS I 01: identificación suficiente del solicitante y trazabilidad del encargo.') ?>
-</label>
+<?php require BASE_PATH . '/app/Views/appraisals/chapter-zero-requester.php'; ?>
 </div>
 
 <div class="md:col-span-2 grid gap-5 md:grid-cols-2" x-show="chapterOneTab === 'encargo'" x-cloak>
@@ -77,8 +54,9 @@ $tabs = [
 <?= $sectionTitle('1.3.3 Uso que se pretende dar a la valuación') ?>
 <?php $name = 'finalidad'; require BASE_PATH . '/app/Views/appraisals/chapter-zero-select-field.php'; ?>
 <label class="label md:col-span-2">Uso previsto del informe
-    <textarea class="input" name="intended_use" rows="5" maxlength="1200"
+    <textarea class="input" name="intended_use" rows="7" maxlength="1400"
         placeholder="Ej. estimar el valor de mercado para actualizar libros contables, soportar negociación, garantía o decisión interna."><?= e($field('intended_use')) ?></textarea>
+    <span class="mt-1 block text-xs text-slate-500">Hasta 1400 caracteres.</span>
     <?= $supportText('NTS S 03 y NTS I 01: uso previsto de la valuación y propósito comunicado al lector.') ?>
 </label>
 
@@ -91,6 +69,11 @@ $tabs = [
 <label class="label">Fecha de valor
     <input class="input" type="date" name="value_date" value="<?= e($field('value_date')) ?>">
     <?= $supportText('NTS S 03 e IVS: fecha efectiva de valoración o fecha de aplicación del valor.') ?>
+</label>
+
+<label class="label md:col-span-2">Explicación de la fecha de aplicación del valor
+    <textarea class="input" name="value_date_notes" rows="4" maxlength="1400" placeholder="Explica la fecha de aplicación del valor y las condiciones temporales del encargo."><?= e($field('value_date_notes')) ?></textarea>
+    <span class="mt-1 block text-xs text-slate-500">Complementa la fecha; hasta 1400 caracteres. Se incluye en el numeral 1.3.5 del informe.</span>
 </label>
 
 <?= $sectionTitle('1.3.6 Ámbito o amplitud de la valuación y del informe') ?>
@@ -118,11 +101,13 @@ $tabs = [
         placeholder="Describe dirección, edificio, piso, entorno inmediato, referencias urbanas y ubicación de unidades o anexos."><?= e($field('location_description')) ?></textarea>
     <?= $supportText('Decreto 1420 de 1998: localización, dirección y contexto físico del inmueble objeto de avalúo.') ?>
 </label>
-<label class="label md:col-span-2">Foto, mapa o soporte visual de localización
+<label class="label md:col-span-2">Descripción del soporte visual de localización
     <textarea class="input" name="location_image_reference" rows="3" maxlength="1000"
         placeholder="Ej. usar foto/mapa cargado en 3.7; captura satelital de localización; foto de fachada o acceso principal."><?= e($field('location_image_reference')) ?></textarea>
-    <?= $supportText('Referencia editorial para insertar o ubicar la imagen de localización en el entregable; el archivo puede cargarse en el módulo de fotos.') ?>
+    <span class="mt-1 block text-xs text-slate-500">Describe la imagen y su fuente. Carga el archivo en el recuadro siguiente.</span>
 </label>
+
+<?php require BASE_PATH . '/app/Views/appraisals/chapter-zero-location-photos.php'; ?>
 
 <?= $sectionTitle('1.5 Objeto del avalúo') ?>
 <div class="md:col-span-2 rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
@@ -150,10 +135,7 @@ $tabs = [
 <?php $name = 'destinacion'; require BASE_PATH . '/app/Views/appraisals/chapter-zero-select-field.php'; ?>
 
 <?= $sectionTitle('1.10 Fechas') ?>
-<label class="label">Fecha de solicitud
-    <input class="input" type="date" name="request_date" value="<?= e($field('request_date')) ?>">
-    <?= $supportText('NTS S 03: fecha en que se recibió o formalizó el encargo.') ?>
-</label>
+
 <label class="label">Fecha de visita
     <input class="input" type="date" name="visit_date" value="<?= e($field('visit_date')) ?>">
     <?= $supportText('NTS I 01: fecha de visita o verificación del bien, cuando aplique.') ?>

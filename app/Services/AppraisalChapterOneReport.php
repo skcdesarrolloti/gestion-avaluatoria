@@ -49,6 +49,9 @@ final class AppraisalChapterOneReport
         $capacity = $this->text($r['requester_capacity'] ?? '');
         $text = 'Razón social o nombre del solicitante: ' . $this->end($name)
             . ($id !== '' ? ' Identificación: ' . $id . '.' : ' Identificación pendiente de soporte o diligenciamiento.');
+        foreach (['requester_email' => 'Correo', 'requester_phone' => 'Celular', 'requester_municipality' => 'Municipio del solicitante'] as $key => $label) {
+            if ($this->text($r[$key] ?? '') !== '') $text .= ' ' . $label . ': ' . $this->end($r[$key]);
+        }
         return $capacity !== '' ? $text . ' Calidad o cargo reportado para la solicitud: ' . $this->end($capacity) : $text;
     }
     private function assignment(array $r, array $s, array $u): string
@@ -83,7 +86,9 @@ final class AppraisalChapterOneReport
         ];
         return $definitions[$key] ?? 'Los criterios empleados se fundamentan en la base de ' . $basis . ', según la finalidad, el alcance y la información disponible del encargo.';
     }
-    private function valueDate(array $r): string { return 'La fecha de aplicación de la estimación corresponde a ' . $this->date($r['value_date'] ?? '') . '.'; }
+    private function valueDate(array $r): string {
+        return trim('La fecha de aplicación de la estimación corresponde a ' . $this->date($r['value_date'] ?? '') . '. ' . $this->text($r['value_date_notes'] ?? ''));
+    }
     private function scope(array $r): string { return $this->text($r['assignment_scope'] ?? '') ?: 'El informe puede ser utilizado por el destinatario para los fines indicados en el encargo, dentro del alcance técnico, documental y temporal aquí señalado.'; }
     private function limitations(array $r): string { return $this->text($r['assignment_limitations'] ?? '') ?: 'No se registran condiciones contingentes o restrictivas especiales distintas de las salvedades, soportes y limitaciones expresamente indicadas en el informe.'; }
     private function location(array $r, array $s, array $u): string

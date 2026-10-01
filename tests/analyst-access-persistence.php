@@ -22,6 +22,7 @@ declare(strict_types=1);
     expect($ownerRepo->find($own,1)['appraiser_id']===$expert,'avalúo del analista visible al titular con perito asignado');
     expect(count($analystRepo->recent(1,1))===1 && $analystRepo->recent(1,1)[0]['id']===$own,'listado del analista no incluye expedientes previos del titular');
     $accounts->requireRecord($own,$actor);
+    require __DIR__ . '/assignment-persistence.php';
     expectStatus(404,fn()=>$accounts->requireRecord($private,$actor),'analista no abre expedientes previos por URL');
     expectStatus(404,fn()=>$accounts->requireRecord($own,array_replace($actor,['id'=>3])),'identidad de otro titular rechazada');
     foreach (['/maestros','/maestros/accesos','/mantenimiento/migraciones/ejecutar',"/avaluos/$own/judicial/presentar"] as $path)

@@ -64,6 +64,11 @@ $midasTrace = is_array($midasIncorporation ?? null) ? $midasIncorporation : ['ro
             <article class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6">
                 <h3 class="font-semibold text-slate-950"><?= e((string) ($section[0] ?? 'Sección')) ?></h3>
                 <p class="mt-2 whitespace-pre-wrap text-slate-700"><?= e((string) ($section[1] ?? '')) ?></p>
+                <?php if (str_starts_with((string) ($section[0] ?? ''), '1.4 ')): ?>
+                    <?php foreach ($locationPhotos ?? [] as $image): ?>
+                        <figure class="mt-3"><img class="max-h-96 w-full object-contain" src="<?= e($image['url']) ?>" alt="<?= e($image['name']) ?>"><figcaption><?= e($image['name']) ?></figcaption></figure>
+                    <?php endforeach; ?>
+                <?php endif; ?>
             </article>
         <?php endforeach; ?>
     </div>

@@ -23,7 +23,7 @@
                 </select>
             </label>
             <label class="label">Uso previsto del informe, traído del módulo 1 <?= $urbanUseTip('Viene del encargo; no define la norma urbana. La ruta se escoge arriba.') ?>
-                <textarea class="input min-h-24 bg-slate-50" name="intended_use" rows="3" maxlength="1200" readonly placeholder="Se toma del módulo 1"><?= e($value('intended_use') ?: $urbanUseFromModuleOne) ?></textarea>
+                <textarea class="input min-h-24 bg-slate-50" name="intended_use" rows="3" maxlength="1400" readonly placeholder="Se toma del módulo 1"><?= e($value('intended_use') ?: $urbanUseFromModuleOne) ?></textarea>
                 <span class="mt-1 block text-xs font-medium text-slate-500">Si está mal, corrígelo en el módulo 1. Aquí solo se muestra para no perder el contexto del encargo.</span>
             </label>
             <div class="md:col-span-2 flex flex-wrap items-center gap-3 rounded-xl border border-blue-100 bg-blue-50 p-4 text-sm text-blue-950">

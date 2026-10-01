@@ -1,5 +1,9 @@
 # Crear y evolucionar la base sin SQL manual
 
+Expediente: `202610010005_assignment_contact_and_value_date_notes.php` agrega
+correo, celular, municipio del solicitante y explicación de fecha de valor.
+Conserva datos y fotos existentes; ver [detalle](EXPEDIENTE-SOLICITANTE.md).
+
 Accesos: `202610010004_create_analyst_access.php` crea analyst_accounts en la base
 app y agrega analyst_account_id a appraisals. No modifica funcionarios/WordPress
 ni propietarios existentes. Ver [acceso delegado](ACCESO-ANALISTA.md).

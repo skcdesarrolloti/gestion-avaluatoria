@@ -121,6 +121,7 @@ final class AppraisalSubjectController
     {
         $this->appraisals->find($id, $this->user['id']);
         $photo = $this->appraisals->findPhoto($photoId, $this->user['id']);
+        if ((string) $photo['appraisal_id'] !== $id) throw new HttpException(404, 'No se encontró la foto.');
         $path = AppraisalRepository::photoPath((string) $photo['storage_filename']);
         $blob = $photo['file_blob'] ?? null;
         if (!is_file($path) && !is_string($blob)) throw new HttpException(404, 'No se encontró la foto.');
@@ -146,13 +147,11 @@ final class AppraisalSubjectController
         Session::flash('chapter_zero_photo_message', 'Foto retirada del expediente.');
         Http::redirect($this->safePhotoReturn($id));
     }
-
     private function saveAttributesAndPhotos(string $id): void
     {
         $this->appraisals->saveUnitAttributes($id, $this->user['id'], AppraisalAttributeInput::unitAttributeData());
         (new AppraisalPhotoUploadService())->storeAttributeEvidence($_FILES['attribute_photos'] ?? [], $id, $this->user['id'], $this->appraisals);
     }
-
     private function saveSubjectData(string $id, callable $save, string $message, string $hash): never
     {
         $this->appraisals->find($id, $this->user['id']);
@@ -160,7 +159,6 @@ final class AppraisalSubjectController
         catch (\Throwable $error) { Session::flash('subject_error', $error->getMessage()); }
         Http::redirect('avaluos/' . $id . '/bien-sujeto' . $hash);
     }
-
     private function saveUnitsAndRedirect(string $id, string $target): never
     {
         $this->appraisals->find($id, $this->user['id']);
@@ -171,7 +169,6 @@ final class AppraisalSubjectController
         } catch (\Throwable $error) { Session::flash('chapter_zero_preclass_error', $error->getMessage()); }
         Http::redirect($target);
     }
-
     private function savePreclassificationAndRedirect(string $id, string $target): never
     {
         $this->appraisals->find($id, $this->user['id']);
@@ -182,7 +179,6 @@ final class AppraisalSubjectController
         } catch (\Throwable $error) { Session::flash('chapter_zero_preclass_error', $error->getMessage()); }
         Http::redirect($target);
     }
-
     private function uploadPhotosAndRedirect(string $id, string $target): never
     {
         $record = $this->appraisals->find($id, $this->user['id']);
@@ -193,11 +189,15 @@ final class AppraisalSubjectController
             if ($displayName === '') $displayName = $this->attributePhotoName($caption);
             $count = (new AppraisalPhotoUploadService())->store($_FILES['photos'] ?? [], $record['id'],
                 $this->user['id'], $this->appraisals, $unitId, $caption, $displayName);
+            if (Http::wantsJson()) Http::json(['ok' => true, 'message' => $count . ' foto(s) guardada(s).',
+                'photos' => \App\Services\AppraisalLocationPhotos::items($this->appraisals, $id, $this->user['id'])]);
             Session::flash('chapter_zero_photo_message', $count === 1 ? 'Foto cargada correctamente.' : $count . ' fotos cargadas correctamente.');
-        } catch (\Throwable $error) { Session::flash('chapter_zero_photo_error', $error->getMessage()); }
+        } catch (\Throwable $error) {
+            if (Http::wantsJson()) Http::json(['ok' => false, 'message' => $error->getMessage()], 422);
+            Session::flash('chapter_zero_photo_error', $error->getMessage());
+        }
         Http::redirect($target);
     }
-
     private function safePhotoReturn(string $id): string
     {
         $target = (string) ($_POST['return_to'] ?? '');
@@ -206,13 +206,11 @@ final class AppraisalSubjectController
             || preg_match('#^' . preg_quote($subject, '#') . '\#fotos(?:-general|-[a-f0-9]{32})$#', $target)
             || preg_match('#^' . preg_quote($sector, '#') . '(?:\#[a-z_]+)?$#', $target) ? $target : $subject . '#fotos';
     }
-
     private function attributePhotoName(string $caption): string
     {
         if (!preg_match('/^attribute:([a-z0-9_]+)$/', $caption, $match)) return '';
         return AppraisalSpecialAttributeCatalog::labels()[$match[1]] ?? '';
     }
-
     private function igacCodes(): array { return array_column($this->typologies->categories(), 'code'); }
     private function savedJson(): never { Http::json(['ok' => true, 'saved_at' => gmdate('Y-m-d\TH:i:s\Z')]); }
 }

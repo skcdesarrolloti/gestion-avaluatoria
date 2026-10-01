@@ -80,8 +80,8 @@ final class AppraisalController
             'reportNoteSections' => AppraisalReportNoteCatalog::withNoteSections('1', $reportNotes),
             'reportNoteChapter' => '1',
             'reportNoteReturn' => 'avaluos/' . $id . '/expediente#identificacion',
-            'chapterZeroMessage' => Session::pullFlash('chapter_zero_message'),
-            'chapterZeroError' => Session::pullFlash('chapter_zero_error'),
+            'chapterZeroMessage' => Session::pullFlash('chapter_zero_message'), 'chapterZeroError' => Session::pullFlash('chapter_zero_error'),
+            'locationPhotos' => \App\Services\AppraisalLocationPhotos::items($this->appraisals, $id, $this->user['id']),
             'catalog' => ['selects' => AppraisalCatalog::selectFields(), 'notes' => AppraisalCatalog::notes()]]);
     }
 
@@ -118,6 +118,7 @@ final class AppraisalController
         $methodologyChapter = $integrator->apply((new AppraisalMethodologyChapterReport())->build($record, $subject, $units),
             $this->chapterNotes($notes, '8'), AppraisalReportNoteCatalog::noteSectionLabels('8', $this->chapterNotes($notes, '8')));
         view('appraisals/deliverable', ['title' => 'Entregable', 'record' => $record,
+            'locationPhotos' => \App\Services\AppraisalLocationPhotos::items($this->appraisals, $id, $this->user['id']),
             'phProfile' => $phProfile, 'chapterOne' => $chapterOne, 'sectorChapter' => $sectorChapter,
             'subjectChapter' => $subjectChapter, 'legalChapter' => $legalChapter,
             'urbanChapter' => $urbanChapter, 'economicChapter' => $economicChapter,
@@ -170,7 +171,6 @@ final class AppraisalController
         $result = $this->appraisals->save($id, $this->user['id'], $input['version'], $data);
         Http::json(['ok' => true] + $result);
     }
-
     private function chapterZeroRedirect(string $id): string
     {
         $next = (string) ($_POST['next'] ?? '');
