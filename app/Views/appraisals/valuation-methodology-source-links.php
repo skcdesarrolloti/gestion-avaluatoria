@@ -59,7 +59,7 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
             <?php endif; ?>
             <?php if ($isFincaraiz): ?><details class="mt-3"><summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Si la lectura falla: pegar enlace y texto</summary><?php endif; ?>
             <?php
-            $batchPortal = ['Ciencuadras' => 'ciencuadras', 'Properati' => 'properati'][$source['label']] ?? '';
+            $batchPortal = ['Ciencuadras' => 'ciencuadras', 'Properati' => 'properati', 'Mercado Libre Inmuebles' => 'mercadolibre'][$source['label']] ?? '';
             require BASE_PATH . '/app/Views/appraisals/' . ($batchPortal && ($record['tipo_inmueble'] ?? '') === 'oficina' && ($record['tipo_negocio'] ?? '') === 'venta'
                 ? 'valuation-methodology-' . $batchPortal . '-paste.php' : 'valuation-methodology-source-paste.php'); ?>
             <?php if ($isFincaraiz): ?></details><?php endif; ?>

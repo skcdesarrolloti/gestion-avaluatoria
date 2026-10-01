@@ -9,7 +9,7 @@ final class ComparablePortalLinks
         $sources = [];
         foreach (['FincaRaiz' => 'fincaraiz.com.co', 'Metrocuadrado' => 'metrocuadrado.com',
             'Ciencuadras' => 'ciencuadras.com', 'Properati' => 'properati.com.co',
-            'Mercado Libre Inmuebles' => 'inmuebles.mercadolibre.com.co'] as $label => $domain) {
+            'Mercado Libre Inmuebles' => 'mercadolibre.com.co'] as $label => $domain) {
             $sources[] = ['label' => $label, 'kind' => 'Búsqueda en Google', 'query' => $query,
                 'url' => 'https://www.google.com/search?q=' . rawurlencode('site:' . $domain . ' ' . $query),
                 'instruction' => 'Busca en Google dentro del portal. Abre el aviso y comprueba los filtros.'];
@@ -27,6 +27,11 @@ final class ComparablePortalLinks
                 : 'Venta, oficina y Cartagena aplicados. Falta seleccionar o comprobar el barrio: ' . $neighborhood . '.';
         }
         if ($type === 'oficina') {
+            if ($this->slug($neighborhood) === 'bocagrande') {
+                $sources[4]['url'] = 'https://listado.mercadolibre.com.co/inmuebles/oficinas/venta/bolivar/cartagena-de-indias/bocagrande/';
+                $sources[4]['kind'] = 'Filtros del portal';
+                $sources[4]['instruction'] = 'Oficinas en venta en Bocagrande, Cartagena. Copia la página completa de resultados para preparar el lote.';
+            }
             $sources[3]['url'] = 'https://www.properati.com.co/s/'
                 . ($this->slug($neighborhood) === 'bocagrande' ? 'bocagrande' : 'cartagena-bolivar') . '/oficina/venta';
             $sources[3]['kind'] = 'Filtros del portal · Red Proppit';

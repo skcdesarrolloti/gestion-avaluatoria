@@ -19,10 +19,12 @@ import { installComparableUrlImport } from './comparable-url-import.js';
 import { fincaraizAreaSearch } from './fincaraiz-area-search.js';
 import { ciencuadrasPaste } from './ciencuadras-paste.js';
 import { properatiPaste } from './properati-paste.js';
+import { mercadolibrePaste } from './mercadolibre-paste.js';
 
 window.Alpine = Alpine;
 Alpine.data('ciencuadrasPaste', ciencuadrasPaste);
 Alpine.data('properatiPaste', properatiPaste);
+Alpine.data('mercadolibrePaste', mercadolibrePaste);
 Alpine.data('fincaraizAreaSearch', fincaraizAreaSearch);
 Alpine.data('comparableWorkbench', comparableWorkbench);
 Alpine.data('appraisalForm', appraisalForm);

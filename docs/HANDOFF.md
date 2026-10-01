@@ -1,5 +1,8 @@
 # Entrega al responsable de la implementación
 
+Mercado Libre: [búsqueda directa y captura por lote](COMPARABLES-MERCADOLIBRE.md),
+con filtros verificados para oficinas en venta en Bocagrande y guía 1–2–3.
+
 Properati: [captura por lote y red Proppit](COMPARABLES-PROPERATI.md), con guía
 1–2–3 y selección sin coincidencias compartida con Ciencuadras.
 
