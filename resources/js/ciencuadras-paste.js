@@ -47,6 +47,9 @@ export function ciencuadrasPaste() {
     let panel, form;
     return {
         results: [], selected: [], message: '', busy: false,
+        get suggestedCount() { return this.results.filter(item => item.suggested).length; },
+        get registeredCount() { return this.results.filter(item => item.tone === 'registered').length; },
+        get reviewCount() { return this.results.filter(item => item.tone === 'review').length; },
         init() { panel = this.$el; form = document.getElementById('tabla-madre-83'); },
         paste(event) {
             event.preventDefault();
@@ -73,6 +76,13 @@ export function ciencuadrasPaste() {
             this.selected = this.selected.filter(url => this.results.some(item => item.row.source_url === url && item.tone !== 'registered'));
         },
         selectAll() { this.refresh(); this.selected = this.results.filter(item => item.tone !== 'registered').map(item => item.row.source_url); },
+        addSuggested() {
+            if (this.busy) return;
+            this.refresh();
+            this.selected = this.results.filter(item => item.suggested).map(item => item.row.source_url);
+            if (!this.selected.length) { this.message = 'No hay sugeridos nuevos: los avisos ya están registrados o tienen coincidencias pendientes de revisión.'; return; }
+            this.add();
+        },
         add() {
             if (this.busy || !this.selected.length) return;
             this.busy = true;

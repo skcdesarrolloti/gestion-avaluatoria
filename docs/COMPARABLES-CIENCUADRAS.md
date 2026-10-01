@@ -17,7 +17,15 @@ del expediente y enlace HTTPS individual de Ciencuadras. Máximo 2 MB/60 tarjeta
 Los destacados de otras ciudades se descartan. El barrio publicado se conserva
 para revisión, sin sustituirlo por el del sujeto.
 
-Pegar prepara una vista previa sin guardar. Seleccionar todos permite desmarcar
+Pegar prepara una vista previa sin guardar. La acción principal «Agregar sugeridos
+sin coincidencias» carga el lote con un clic: omite enlaces ya registrados y
+coincidencias con la matriz; conserva el primer sugerido de cada grupo coincidente
+del lote. Revalida la matriz al pulsar y no elimina datos. Muestra los conteos de
+sugeridos, registrados y coincidencias; las tarjetas quedan plegadas bajo una
+selección opcional. El análisis posterior se realiza en la matriz. Esta selección
+conservadora no confirma identidad ni comparabilidad.
+
+En la selección opcional, Seleccionar todos permite desmarcar
 individualmente; solo Agregar incorpora. Los enlaces ya registrados se omiten.
 Las coincidencias posibles se señalan y pueden incorporarse como por verificar,
 dejando nota de revisión pendiente, sin declarar que sean inmuebles distintos.
