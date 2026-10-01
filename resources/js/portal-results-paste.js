@@ -25,7 +25,7 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
                 this.message = `No se reconocieron tarjetas. Sí llegó contenido, pero no se pudieron leer sus avisos. Copia directamente la página de resultados de ${label} con Ctrl+A y Ctrl+C y pega con Ctrl+V (sin Mayús). No copies una ficha individual ni pases el texto por otra aplicación.`;
                 return;
             }
-            this.results = rows.slice(0, 60).map((row, i) => ({ row, number: i + 1, matches: [] }));
+            this.results = rows.map((row, i) => ({ row, number: i + 1, matches: [] }));
             this.selected = []; this.refresh();
             this.message = `Pegado recibido: ${this.results.length} avisos preparados. Ahora pulsa «Agregar sugeridos sin coincidencias», debajo del cuadro. Todavía no se han agregado a la matriz.`;
         },
@@ -52,7 +52,7 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
                 const rows = this.results.filter(item => this.selected.includes(item.row.source_url)).map(item => item.row);
                 const result = fillRows(form, rows, panel.dataset.query || '', undefined, { deferDuplicateReview: true });
                 this.selected = []; this.refresh();
-                this.message = `${result.count} avisos incorporados como por verificar. ${result.duplicates} enlaces ya registrados omitidos. ${result.overflow} sin cargar por límite de 60. Revisa el estado de guardado en la matriz.`;
+                this.message = `${result.count} avisos incorporados como por verificar. ${result.duplicates} enlaces ya registrados omitidos. ${result.overflow} sin cargar por un problema al crear la fila. Revisa el estado de guardado en la matriz.`;
             } finally { this.busy = false; }
         },
     };

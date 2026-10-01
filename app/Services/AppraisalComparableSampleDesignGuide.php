@@ -8,8 +8,7 @@ final class AppraisalComparableSampleDesignGuide
     {
         return [
             'target_per_factor' => 15,
-            'target_total' => 60,
-            'minimum_message' => 'Las referencias de 15 muestras por factor y 60 en total son metas internas de organización, no mínimos exigidos por la Resolución 941. El avaluador debe justificar la suficiencia y comparabilidad de los datos y consignar sus limitaciones (art. 20).',
+            'minimum_message' => 'La referencia de 15 muestras por factor es una meta interna de organización, no un mínimo exigido por la Resolución 941. El avaluador debe justificar la suficiencia y comparabilidad de los datos y consignar sus limitaciones (art. 20).',
             'factor_targets' => $this->factorTargets($factorGroups),
             'priority_factors' => $this->priorityFactors($type),
             'compliance_articles' => $this->complianceArticles(),
@@ -17,7 +16,7 @@ final class AppraisalComparableSampleDesignGuide
                 'Base comparable' => 'Arranca con muestras de la misma operación, ciudad, barrio o microsector, tipología, derecho y unidad de comparación.',
                 'Ampliación controlada' => 'Si no hay datos suficientes, amplía por anillos: mismo barrio, barrios sustitutos, misma ciudad y fuente regional, dejando trazabilidad.',
                 'Depuración' => 'Clasifica cada dato como preseleccionado, usado o descartado. No mezcles ofertas sin verificar con transacciones o fuentes confirmadas.',
-                'Cierre para 8.4' => 'Entrega registros depurados con sus soportes y salvedades. La capacidad actual de 60 filas no acredita suficiencia ni obliga a completarlas.',
+                'Cierre para 8.4' => 'Entrega registros depurados con sus soportes y salvedades. La cantidad de filas no acredita suficiencia por sí sola.',
             ],
             'protocol' => [
                 'Definir primero los factores que realmente inciden en el bien sujeto; no abrir variables que no serán analizadas.',

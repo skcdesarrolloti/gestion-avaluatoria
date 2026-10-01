@@ -24,7 +24,7 @@ final class AppraisalComparableRepository
             if ($guard->rowCount() !== 1) throw new \App\Core\HttpException(409, 'La matriz cambió en otra pestaña. Conserva tus cambios y recarga antes de continuar.');
             $this->db->prepare('DELETE FROM appraisal_comparables WHERE appraisal_id = ? AND owner_id = ?')
                 ->execute([$appraisalId, $owner]);
-            foreach (array_slice(array_values($rows), 0, 60) as $index => $row) {
+            foreach (array_values($rows) as $index => $row) {
                 if (!is_array($row) || !$this->meaningful($row)) continue;
                 $this->insert($appraisalId, $owner, $index + 1, $row);
             }

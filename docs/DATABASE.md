@@ -1,5 +1,9 @@
 # Crear y evolucionar la base sin SQL manual
 
+Comparables sin tope: `202610010001_expand_comparable_sample_index.php` amplía
+sample_index de TINYINT a INT UNSIGNED, conservando filas, índices y fotos.
+Ver [actualización](COMPARABLES-SIN-TOPE.md). No requiere reimportar muestras.
+
 Comparables: `202609300003_comparable_ph_and_photos.php` agrega régimen PH por
 muestra, versión optimista de la colección y fotos privadas en BD vinculadas por
 ID estable. Ver [matriz y fotos](COMPARABLES-MATRIZ-FOTOS.md) para despliegue y límites.

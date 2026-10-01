@@ -36,7 +36,11 @@ export function comparableRemoval(flush = flushModuleAutosaves) {
         },
         async undoRemoval() {
             if (this.removalBusy || this.photoBusy || !removed.length) return;
-            const blanks = entries.filter(entry => !hasComparableData(values(entry)));
+            let blanks = entries.filter(entry => !hasComparableData(values(entry)));
+            if (blanks.length < removed.length) {
+                form.dispatchEvent(new CustomEvent('comparable-grow', { detail: removed.length - blanks.length }));
+                blanks = entries.filter(entry => !hasComparableData(values(entry)));
+            }
             if (blanks.length < removed.length) { this.removalMessage = 'No hay espacio para restaurar todas las muestras retiradas. No se cambió la matriz.'; return; }
             this.removalBusy = true;
             try {

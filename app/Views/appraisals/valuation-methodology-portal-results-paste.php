@@ -14,12 +14,12 @@
         placeholder="Haz clic aquí y pulsa Ctrl+V para preparar todos los avisos copiados." aria-describedby="<?= e($pasteComponent) ?>-help"></textarea>
     <p id="<?= e($pasteComponent) ?>-help" class="mt-2 text-xs">Solo oficinas en venta de la ciudad del expediente. No agrega al pegar. PH y fotos se completan después; revisa la ubicación publicada de cada aviso.</p>
     <div x-show="results.length" x-cloak class="mt-3">
-        <p class="mb-3 text-sm font-semibold" x-text="suggestedCount + ' sugeridos para agregar · ' + registeredCount + ' ya registrados · ' + reviewCount + ' posibles coincidencias omitidas del lote sugerido'"></p>
+        <p class="mb-3 text-sm font-semibold" x-text="results.length + ' avisos leídos en esta página · ' + suggestedCount + ' sugeridos para agregar · ' + registeredCount + ' ya registrados · ' + reviewCount + ' posibles coincidencias omitidas del lote sugerido'"></p>
         <div class="flex flex-wrap gap-2">
             <button type="button" class="btn-primary min-h-11" :disabled="busy || !suggestedCount" @click="addSuggested()" x-text="'Agregar sugeridos sin coincidencias (' + suggestedCount + ')'">Agregar sugeridos sin coincidencias</button>
             <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'matriz'">Ver Matriz de datos</button>
         </div>
-        <p class="mt-2 text-xs">La coincidencia es una ayuda de captura, no confirma que sean el mismo inmueble. Los omitidos siguen disponibles aquí; no se borran muestras de la matriz.</p>
+        <p class="mt-2 text-xs">La coincidencia es una ayuda de captura, no confirma que sean el mismo inmueble. Los omitidos siguen disponibles aquí; no se borran muestras de la matriz. «Muestra N de la matriz» identifica una fila existente, no la cantidad de avisos de este portal.</p>
         <details class="mt-3">
         <summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Ver avisos o cambiar la selección (opcional)</summary>
         <div class="flex flex-wrap gap-2">

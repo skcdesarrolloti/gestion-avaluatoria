@@ -1,3 +1,4 @@
+import { rowFactory } from './comparable-row-growth.js';
 import { comparablePhotos } from './comparable-photos.js';
 import { comparableRemoval } from './comparable-removal.js';
 import { hasComparableData, missingComparableFields, comparableUrlKey } from './comparable-review.js';
@@ -14,7 +15,7 @@ const groups = {
 };
 
 export function comparableWorkbench() {
-    let entries = [], resize, form;
+    let entries = [], resize, form, createRow, prepare, grow;
     return {
         ...comparablePhotos(), ...comparableRemoval(), phFilter: 'all', mode: 'table', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
         pending: 0, duplicates: 0, shown: 0, usedIndexes: [],
@@ -31,7 +32,8 @@ export function comparableWorkbench() {
             form = this.$el;
             this.initPhotos(form);
             const headers = [...form.querySelectorAll('thead th')].map(th => th.childNodes[0].textContent.trim());
-            entries = [...form.querySelectorAll('tbody tr')].map((tr, index) => {
+            createRow = rowFactory(form);
+            prepare = (tr, index) => {
                 const controls = [...tr.querySelectorAll('[name]')];
                 for (const [column, cell] of [...tr.cells].entries()) {
                     const input = cell.querySelector('input:not([type=hidden]),select,textarea');
@@ -49,15 +51,25 @@ export function comparableWorkbench() {
                 const summary = document.createElement('span');
                 summary.className = 'comparable-row-summary';
                 tr.cells[0].append(summary);
-                return { tr, controls, summary, index, opened: false, data: {} };
-            });
+                return { tr, controls, summary, index, opened: false, used: false, missing: [], data: {} };
+            };
+            entries = [...form.querySelectorAll('tbody tr')].map(prepare);
+            grow = event => { for (let i = 0; i < event.detail; i++) this.appendRow(); };
+            form.addEventListener('comparable-grow', grow);
             this.initRemoval(form, entries);
             this.refresh();
             resize = new ResizeObserver(() => this.syncWidth());
             resize.observe(this.$refs.grid);
             resize.observe(this.$refs.grid.querySelector('table'));
         },
-        destroy() { resize?.disconnect(); },
+        destroy() { resize?.disconnect(); form.removeEventListener('comparable-grow', grow); },
+        appendRow() {
+            const tr = createRow(entries.length);
+            const entry = prepare(tr, entries.length);
+            entries.push(entry);
+            form.querySelector('tbody').append(tr);
+            return entry;
+        },
         refresh() {
             const counts = new Map();
             for (const entry of entries) {
@@ -102,8 +114,7 @@ export function comparableWorkbench() {
             this.$nextTick(() => this.syncWidth());
         },
         add() {
-            const entry = entries.find(e => !e.used);
-            if (!entry) return;
+            const entry = entries.find(e => !e.used && !e.opened) || this.appendRow();
             entry.opened = true;
             this.phFilter = 'all'; this.filter = 'all'; this.search = ''; this.group = 'capture';
             this.page = Math.ceil(entries.filter(e => e.used || e.opened).indexOf(entry) / 10 + 0.1);

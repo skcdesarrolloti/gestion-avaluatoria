@@ -19,7 +19,7 @@
         <li><strong>Expediente e informe (arts. 5–15, 59):</strong> verificar marco del encargo, régimen temporal, visita,
             documentos, RAA, selección motivada del método y anexos. Las sugerencias del aplicativo requieren decisión profesional.</li>
     </ul>
-    <p class="mt-3">Las 60 filas son capacidad del aplicativo; no constituyen un mínimo normativo ni una aprobación de la muestra.</p>
+    <p class="mt-3">La matriz no impone una cantidad máxima de muestras; el número de filas no acredita suficiencia normativa.</p>
     <a class="inline-flex min-h-11 items-center font-semibold underline"
         href="<?= e(\App\Support\IgacDocumentLibrary::urlFor('anexo-tecnico-resolucion-igac-941-2026')) ?>">Consultar anexo técnico en la biblioteca</a>
 </details>

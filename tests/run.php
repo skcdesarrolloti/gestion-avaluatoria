@@ -157,12 +157,11 @@ try {
         && !str_contains(mb_strtolower(implode(' ', $officeGuide['adjustments'])), 'homolog'),
         'guia de comparables usa depuracion y ajustes sustentados sin homologacion');
     expect((int) ($officeGuide['sample_design']['target_per_factor'] ?? 0) === 15
-        && (int) ($officeGuide['sample_design']['target_total'] ?? 0) === 60
         && str_contains(implode(' ', $officeGuide['sample_design']['statistics'] ?? []), 't de Student')
         && str_contains(implode(' ', $officeGuide['sample_design']['statistics'] ?? []), 'MAPE')
         && str_contains(implode(' ', array_map(static fn ($row): string => implode(' ', $row), $officeGuide['sample_design']['compliance_articles'] ?? [])), 'Art. 20')
         && str_contains(implode(' ', $officeGuide['sample_design']['priority_factors'] ?? []), 'imagen corporativa'),
-        'guia 8.3 diseña muestra robusta de mercado con 60 datos, norma y estadistica para 8.4');
+        'guia 8.3 diseña muestra robusta de mercado con norma y estadistica para 8.4');
     $methodologyReport = (new AppraisalMethodologyChapterReport())->build();
     $methodologyText = $methodologyReport['text'];
     expect(str_contains($methodologyText, 'Resolución IGAC 941 de 2026')

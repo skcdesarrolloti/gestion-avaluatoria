@@ -1,5 +1,8 @@
 # Entrega al responsable de la implementación
 
+Comparables: [sin tope de 60 y conservación de datos](COMPARABLES-SIN-TOPE.md).
+Aplicar migración nueva que amplía sample_index; no borrar ni reimportar muestras.
+
 Resolución 941: [revisión completa y brechas de comparables](REVISION-RESOLUCION-941.md).
 Lectura plegable de arts. 16–21; pendientes de negociación, áreas por régimen,
 evidencia y memoria de cálculo. La captura no certifica cumplimiento normativo.

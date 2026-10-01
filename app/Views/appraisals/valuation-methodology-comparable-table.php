@@ -12,7 +12,7 @@ $blank = ['id' => '', 'active' => 'si', 'status' => 'por_verificar', 'source_typ
     'balcony_terrace' => '', 'noise_humidity_sun' => '', 'legal_relation_notes' => '',
     'analysis_factor' => '', 'latitude' => '', 'longitude' => '', 'location_precision' => '',
     'ph_regime' => 'por_verificar', 'map_notes' => '', 'comparability_notes' => '', 'rejection_reason' => ''];
-$rowCount = max(60, count($savedRows));
+$rowCount = max(1, count($savedRows));
 while (count($savedRows) < $rowCount) $savedRows[] = array_replace($blank, ['id' => bin2hex(random_bytes(16))]);
 $money = static fn (mixed $value): string => $value === null || $value === '' ? '' : '$ ' . number_format((float) $value, 0, ',', '.');
 $number = static fn (mixed $value): string => $value === null || $value === '' ? '' : rtrim(rtrim(number_format((float) $value, 2, ',', '.'), '0'), ',');
@@ -48,7 +48,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Diligencia una fila por cada oferta, transacción o dato de mercado. El sujeto queda fuera de esta tabla:
                 aquí solo van las muestras comparables que luego pasarán a depuración, variables, mapa y fórmulas.
-                Un inmueble por fila y sus datos por columnas. Hasta 60 muestras; revisa los pendientes, PH y fotos por inmueble.
+                Un inmueble por fila y sus datos por columnas. Sin límite de cantidad de muestras; revisa los pendientes, PH y fotos por inmueble.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">

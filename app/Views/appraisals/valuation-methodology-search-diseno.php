@@ -1,6 +1,5 @@
 <?php
 $targetPerFactor = (int) ($sampleDesign['target_per_factor'] ?? 15);
-$targetTotal = (int) ($sampleDesign['target_total'] ?? 60);
 $sampleRows = is_array($comparableRows ?? null) ? $comparableRows : [];
 $factorCounts = [];
 $usableCount = 0;
@@ -19,9 +18,7 @@ foreach ($sampleRows as $row) {
 }
 $nextAction = $usableCount === 0
     ? 'Empieza en Buscador: abre portales e inmobiliarias, filtra por ciudad, barrio y tipología, y trae las primeras ofertas verificables.'
-    : ($usableCount < $targetTotal
-        ? 'Sigue en Captura: completa datos y soportes de las muestras pertinentes. La suficiencia se justifica técnicamente; no depende de llenar 60 filas.'
-        : 'Pasa a Mapa y Matriz: revisa concentración espacial, duplicados, descartes y datos listos para 8.4.');
+    : 'Completa datos y soportes en la Matriz; revisa localización, coincidencias y comparabilidad. La suficiencia se justifica técnicamente.';
 $tip = static fn (string $text): string => '<span class="help-dot" title="' . e($text) . '">?</span>';
 ?>
 <section class="rounded-xl border border-teal-100 bg-teal-50 p-4">
@@ -34,7 +31,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
                 Flujo simple: 1. Buscar fuentes, 2. Capturar comparables, 3. Matriz de datos, 4. Mapas.
             </p>
         </div>
-        <span class="rounded-full bg-white px-3 py-1 text-xs font-bold text-teal-800"><?= e((string) $usableCount) ?>/<?= e((string) $targetTotal) ?> muestras</span>
+        <span class="rounded-full bg-white px-3 py-1 text-xs font-bold text-teal-800"><?= e((string) $usableCount) ?> muestras</span>
     </div>
     <div class="mt-4 grid gap-3 md:grid-cols-3">
         <article class="rounded-lg bg-white p-3 text-sm font-semibold text-slate-800 shadow-sm">
@@ -43,7 +40,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
         </article>
         <article class="rounded-lg bg-white p-3 text-sm font-semibold text-slate-800 shadow-sm">
             2. Diligenciar comparables
-            <span class="mt-1 block text-xs font-medium leading-5 text-slate-500">Registra datos y soportes verificables. Capacidad actual: 60 filas; no es un mínimo normativo.</span>
+            <span class="mt-1 block text-xs font-medium leading-5 text-slate-500">Registra datos y soportes verificables. Sin límite de cantidad; conserva y completa las muestras existentes.</span>
         </article>
         <article class="rounded-lg bg-white p-3 text-sm font-semibold text-slate-800 shadow-sm">
             4. Revisar ubicación
@@ -137,8 +134,8 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
 
 <section class="mt-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
     <div class="rounded-xl border border-orange-100 bg-orange-50 p-4">
-        <p class="text-xs font-bold uppercase text-orange-800">Construcción de 60 datos <?= $tip('Origen: guía interna de muestra para 8.3. Es una meta de banco de investigación; se diligencia en 2. Capturar y luego se depura para usar solo comparables válidos.') ?></p>
-        <h3 class="mt-2 text-xl font-semibold text-orange-950"><?= e((string) $targetTotal) ?> comparables como banco de investigación</h3>
+        <p class="text-xs font-bold uppercase text-orange-800">Construcción de la muestra <?= $tip('Origen: guía interna de muestra para 8.3. Es una meta de banco de investigación; se diligencia en 2. Capturar y luego se depura para usar solo comparables válidos.') ?></p>
+        <h3 class="mt-2 text-xl font-semibold text-orange-950">Comparables como banco de investigación</h3>
         <div class="mt-3 grid gap-2">
             <?php foreach (($sampleDesign['sample_plan'] ?? []) as $label => $text): ?>
                 <p class="rounded-lg bg-white p-3 text-sm leading-6 text-slate-700">

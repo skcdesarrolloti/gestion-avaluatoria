@@ -23,7 +23,7 @@ final class AppraisalComparableInput
             try {
                 if (!is_string($posted['comparable_rows_json']) || strlen($posted['comparable_rows_json']) > 2000000) throw new \JsonException();
                 $items = json_decode($posted['comparable_rows_json'], true, 8, JSON_THROW_ON_ERROR);
-                if (!is_array($items) || !array_is_list($items) || count($items) > 60) throw new \JsonException();
+                if (!is_array($items) || !array_is_list($items)) throw new \JsonException();
             } catch (\JsonException) { throw new \App\Core\HttpException(422, 'La matriz recibida no es válida; no se guardaron cambios.'); }
         }
         if (!is_array($items)) return [];

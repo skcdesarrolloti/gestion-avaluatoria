@@ -103,7 +103,10 @@ export function fillRows(form, rows, defaultQuery, confirmDistinct, options = {}
         const review = options.deferDuplicateReview ? { blocked: false }
             : checkComparableDuplicates(data, existing, confirmDistinct ? message => confirmDistinct(data, message) : undefined);
         if (review.blocked) { review.exact ? duplicates++ : suspected++; return; }
-        const row = targets.shift();
+        const row = targets.shift() || (() => {
+            form.dispatchEvent(new CustomEvent('comparable-grow', { detail: 1 }));
+            return [...form.querySelectorAll('tbody tr')].find(isBlankRow);
+        })();
         if (!row) { overflow++; return; }
         if (options.deferDuplicateReview) data.comparability_notes = `${data.comparability_notes || ''}\nRevisión de posibles duplicados entre fuentes pendiente.`.trim();
         firstRow ??= row.sectionRowIndex;
@@ -133,7 +136,7 @@ export function installComparableBulkImport() {
         const rows = parseComparableText(input?.value ?? '');
         const result = form ? fillRows(form, rows, panel?.dataset?.defaultQuery ?? '') : { count: 0, duplicates: 0, overflow: 0 };
         if (message) message.textContent = rows.length
-            ? `${result.count} muestra(s) cargada(s). ${result.duplicates} enlace(s) repetido(s) omitido(s). ${result.suspected || 0} posible(s) duplicado(s) sin agregar: revisa la tabla. ${result.overflow} sin cargar por límite de 60. El texto original se conserva; consulta el estado de guardado.`
+            ? `${result.count} muestra(s) cargada(s). ${result.duplicates} enlace(s) repetido(s) omitido(s). ${result.suspected || 0} posible(s) duplicado(s) sin agregar: revisa la tabla. ${result.overflow} sin cargar por un problema al crear la fila. El texto original se conserva; consulta el estado de guardado.`
             : 'Pega enlaces, texto de avisos o filas con datos antes de cargar.';
         form?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
