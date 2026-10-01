@@ -152,7 +152,7 @@ final class AppraisalController
             $this->appraisals->saveUnitDefinitionsByKey($id, $this->user['id'],
                 AppraisalUnitDefinitionInput::rows($_POST['config_units'] ?? []));
             $dossier = $this->createDossierIfRequested($id);
-            Http::json(['ok' => true, 'expediente_number' => $dossier] + $result);
+            Http::json(['ok' => true, 'expediente_number' => $dossier, 'object_text' => \App\Services\AppraisalObjectText::build($data)] + $result);
         } catch (\Throwable $error) {
             Http::json(['ok' => false, 'message' => $this->chapterZeroErrorMessage($error)],
                 $error instanceof HttpException ? $error->status : 500);

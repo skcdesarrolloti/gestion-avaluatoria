@@ -63,7 +63,13 @@ $midasTrace = is_array($midasIncorporation ?? null) ? $midasIncorporation : ['ro
         <?php foreach ($chapterOneSections as $section): ?>
             <article class="rounded-xl border border-slate-200 bg-slate-50 p-4 text-sm leading-6">
                 <h3 class="font-semibold text-slate-950"><?= e((string) ($section[0] ?? 'Sección')) ?></h3>
-                <p class="mt-2 whitespace-pre-wrap text-slate-700"><?= e((string) ($section[1] ?? '')) ?></p>
+                <?php
+                $sectionBody = (string) ($section[1] ?? '');
+                $documentText = \App\Services\AppraisalDocumentTable::text($record);
+                if (str_starts_with((string) ($section[0] ?? ''), '1.11 ') && $documentText !== '' && str_starts_with($sectionBody, $documentText)) $sectionBody = trim(substr($sectionBody, strlen($documentText)));
+                ?>
+                <?php if ($sectionBody !== ''): ?><p class="mt-2 whitespace-pre-wrap text-slate-700"><?= e($sectionBody) ?></p><?php endif; ?>
+                <?php if (str_starts_with((string) ($section[0] ?? ''), '1.11 ')) require BASE_PATH . '/app/Views/appraisals/deliverable-document-table.php'; ?>
                 <?php if (str_starts_with((string) ($section[0] ?? ''), '1.4 ')): ?>
                     <?php foreach ($locationPhotos ?? [] as $image): ?>
                         <figure class="mt-3"><img class="max-h-96 w-full object-contain" src="<?= e($image['url']) ?>" alt="<?= e($image['name']) ?>"><figcaption><?= e($image['name']) ?></figcaption></figure>

@@ -42,3 +42,32 @@ que omita los campos nuevos conserva sus valores al guardar.
 
 No se accedió ni se modificó la base de producción. La actualización del hosting
 y la migración deben estar aplicadas para que el analista vea los cambios.
+
+## Objeto visible y tabla documental — 1 de octubre de 2026
+
+1.5 muestra el texto del generador usado por el entregable. La respuesta de
+ autoguardado refresca esta vista después de confirmar persistencia. Se redacta
+con base de valor, tipo de inmueble, localización y finalidad; si faltan base o
+finalidad, se indica pendiente sin asumir valor de mercado.
+
+1.11 incorpora tabla Ítem/Descripción/Documento aportado o estado. Las siete
+primeras filas siguen la referencia del usuario; conserva los demás tipos del
+catálogo anterior. Cada fila admite 1000 caracteres, sin adjunto obligatorio.
+No se copian los datos particulares de la escritura del ejemplo a expedientes.
+Se mantienen observaciones y marcas anteriores; estas se identifican como
+antecedentes, sin convertir casillas vacías en «No suministrado». La tabla se
+presenta también en el entregable y sus valores pasan al texto consolidado.
+
+Aplicar `202610010006_assignment_document_table.php` por el migrador o
+AUTO_MIGRATE. Agrega una columna TEXT nullable; no borra ni reescribe datos.
+Clientes anteriores que omiten la tabla no borran sus valores. El despliegue
+actualiza código/assets, conservando la BD, .env y storage del hosting.
+Antes de actualizar, esperar confirmación de autoguardado; los cambios aún
+pendientes en memoria del navegador no equivalen a información persistida.
+
+Validación: 443 verificaciones PHP, 109 pruebas JS, lint/build/check:size;
+75 pruebas MySQL en ga_test_app/auth, puerto local desechable 33332, incluyendo
+migración repetida, conservación y tabla recuperada por titular. HTTP con dos
+sesiones confirma vista previa idéntica al entregable, persistencia de tabla,
+observación histórica y cliente anterior. Escritorio inspeccionado; DOM estrecho
+585 px de viewport y 562 px de contenido sin desbordamiento. Sin cambios de producción.

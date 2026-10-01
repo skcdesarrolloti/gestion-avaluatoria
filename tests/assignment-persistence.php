@@ -5,9 +5,11 @@ $_POST = ['version' => 1, 'appraiser_id' => $expert, 'requester_email' => 'solic
     'requester_phone' => '+57 300 123 4567', 'requester_municipality' => 'Cartagena, Bolívar',
     'request_date' => '2026-10-01', 'value_date' => '2026-09-30',
     'value_date_notes' => 'Valor referido a la fecha del encargo.', 'intended_use' => str_repeat('á', 1400)];
+$_POST['source_document_details'] = ['escritura_publica' => 'Escritura de prueba', 'planos' => 'No suministrado'];
 $assignment = App\Services\AppraisalChapterZeroInput::chapterZeroData(1, [], [$expert]);
 $analystRepo->saveChapterZero($own, 1, 1, $assignment);
 $reloaded = $ownerRepo->find($own, 1);
+expect(App\Services\AppraisalDocumentTable::rows($reloaded)['planos']['text'] === 'No suministrado', 'tabla documental del analista persiste y titular la recupera');
 expect($reloaded['requester_email'] === $_POST['requester_email'] && $reloaded['requester_phone'] === $_POST['requester_phone']
     && $reloaded['requester_municipality'] === $_POST['requester_municipality'] && $reloaded['request_date'] === '2026-10-01',
     'datos del solicitante guardados por analista se recuperan desde titular');
@@ -17,8 +19,10 @@ expectStatus(409, fn () => $analystRepo->saveChapterZero($own, 1, 1, $assignment
 $report = (new App\Services\AppraisalChapterOneReport())->build($reloaded, [], []);
 expect(str_contains($report['text'], 'solicitante@example.test') && str_contains($report['text'], 'Valor referido a la fecha del encargo.'), 'datos nuevos alimentan informe');
 unset($assignment['requester_email'], $assignment['requester_phone'], $assignment['requester_municipality'], $assignment['value_date_notes']);
+unset($assignment['source_document_details']);
 $analystRepo->saveChapterZero($own, 1, 2, $assignment);
 expect($ownerRepo->find($own, 1)['requester_email'] === 'solicitante@example.test', 'formulario anterior no borra campos nuevos omitidos');
+expect(App\Services\AppraisalDocumentTable::rows($ownerRepo->find($own, 1))['planos']['text'] === 'No suministrado', 'formulario anterior conserva tabla documental omitida');
 $_POST['requester_email'] = 'correo inválido';
 expectStatus(422, fn () => App\Services\AppraisalAssignmentInput::data(), 'correo inválido se rechaza sin guardar');
 $tmp = tempnam(sys_get_temp_dir(), 'ga-photo-');

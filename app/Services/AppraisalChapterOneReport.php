@@ -98,7 +98,7 @@ final class AppraisalChapterOneReport
         $image = $this->text($r['location_image_reference'] ?? '');
         return $image !== '' ? $base . ' Soporte visual de localización: ' . $this->end($image) : $base;
     }
-    private function object(array $r): string { return 'El objeto del avalúo es estimar ' . mb_strtolower($this->basisLabel($r)) . ' del inmueble objeto de valuación, conforme a la finalidad del encargo.'; }
+    private function object(array $r): string { return AppraisalObjectText::build($r); }
     private function recipient(array $r): string { return 'El destinatario de la valuación corresponde a ' . $this->end($this->first($r['report_recipient'] ?? '', $r['client_name'] ?? 'el solicitante')); }
     private function type(array $r): string { return 'Corresponde a ' . mb_strtolower($this->labelFor('tipo', $r['tipo'] ?? 'avalúo pendiente de clasificar')) . ' para un activo con destinación ' . mb_strtolower($this->labelFor('destinacion', $r['destinacion'] ?? 'por definir')) . '.'; }
     private function assetRight(array $r): string { return 'El activo corresponde a ' . mb_strtolower($this->labelFor('tipo_inmueble', $r['tipo_inmueble'] ?? 'inmueble')) . (($r['regimen_ph'] ?? '') === 'si' ? ', sometido al régimen de propiedad horizontal' : '') . '.'; }
@@ -109,10 +109,10 @@ final class AppraisalChapterOneReport
     }
     private function documents(array $r): string
     {
-        $selected = $this->selectedDocumentLabels($r);
+        $table = AppraisalDocumentTable::text($r);
         $docs = $this->blockText($r['source_documents'] ?? '');
         $parts = [];
-        if ($selected) $parts[] = 'Documentos marcados como aportados o revisados: ' . implode('; ', $selected) . '.';
+        if ($table !== '') $parts[] = $table;
         if ($docs !== '') $parts[] = $docs;
         if ($parts) return implode("\n", $parts);
         return 'Documentos e insumos pendientes de relacionar: escritura pública, certificado de tradición y libertad, impuesto predial, documentos de identificación tributaria, reglamento de propiedad horizontal, fotografías y demás soportes aportados según aplique.';
@@ -120,16 +120,6 @@ final class AppraisalChapterOneReport
     private function normative(array $r): string
     {
         return 'Este capítulo se estructura con base en NTS S 03 y NTS I 01 para identificar solicitante, activo, derechos valuados, uso previsto, base de valor, fechas, alcance, condiciones restrictivas, información examinada y salvedades. El Decreto 1420 de 1998 soporta la identificación de localización, características físicas, jurídicas y económicas del inmueble. Las IVS se toman como referencia de alcance, base de valor, datos, supuestos, limitaciones y reporte. La información consignada organiza el encargo valuatorio y no sustituye estudio de títulos, certificación administrativa ni verificación jurídica especializada.';
-    }
-
-    private function selectedDocumentLabels(array $r): array
-    {
-        $decoded = json_decode((string) ($r['source_documents_json'] ?? ''), true);
-        if (!is_array($decoded)) return [];
-        $options = AppraisalCatalog::sourceDocumentOptions();
-        $labels = [];
-        foreach ($decoded as $key) if (isset($options[(string) $key])) $labels[] = $options[(string) $key];
-        return $labels;
     }
 
     private function locationText(array $r, array $s): string { return $this->first($s['adopted_address'] ?? '', $s['address'] ?? '', $r['direccion'] ?? '') . ($this->first($s['city_name'] ?? '', $r['municipio'] ?? '') !== '' ? ', ' . $this->first($s['city_name'] ?? '', $r['municipio'] ?? '') : ''); }

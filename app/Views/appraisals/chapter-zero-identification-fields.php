@@ -111,7 +111,9 @@ $tabs = [
 
 <?= $sectionTitle('1.5 Objeto del avalúo') ?>
 <div class="md:col-span-2 rounded-2xl border border-blue-100 bg-blue-50 p-4 text-sm leading-6 text-blue-950">
-    El objeto del avalúo se construye automáticamente con la base o tipo de valor seleccionada, el activo identificado y la finalidad del encargo.
+    <p class="font-semibold">Redacción para el entregable</p>
+    <p class="mt-2 whitespace-pre-wrap" data-object-preview><?= e(\App\Services\AppraisalObjectText::build($record ?? [])) ?></p>
+    <p class="mt-2 text-xs">Esta es la misma redacción del numeral 1.5 del entregable. Se actualiza cuando se confirma el guardado de la base de valor, el inmueble y la finalidad.</p>
 </div>
 
 <?= $sectionTitle('1.6 Destinatario de la valuación') ?>
@@ -148,18 +150,7 @@ $tabs = [
 
 <div class="md:col-span-2 grid gap-5 md:grid-cols-2" x-show="chapterOneTab === 'documentos'" x-cloak>
 <?= $sectionTitle('1.11 Documentos aportados o insumos') ?>
-<div class="md:col-span-2 rounded-2xl border border-slate-200 bg-white p-4">
-    <p class="text-sm font-semibold text-slate-800">Checklist documental</p>
-    <p class="mt-1 text-xs leading-5 text-slate-500">Marca el documento recibido. La ampliación técnica se desarrolla en el capítulo correspondiente.</p>
-    <div class="mt-4 grid gap-3 md:grid-cols-2">
-        <?php foreach ($documentOptions as $key => $label): ?>
-            <label class="flex min-h-11 items-start gap-3 rounded-xl border border-slate-200 bg-slate-50 p-3 text-sm font-medium text-slate-700">
-                <input class="mt-1 size-4" type="checkbox" name="source_documents_selected[]" value="<?= e($key) ?>" <?= $hasDocument($key) ?>>
-                <span><?= e($label) ?></span>
-            </label>
-        <?php endforeach; ?>
-    </div>
-</div>
+<?php require BASE_PATH . '/app/Views/appraisals/chapter-zero-document-table.php'; ?>
 <label class="label md:col-span-2">Observaciones sobre documentos e insumos
     <textarea class="input" name="source_documents" rows="5" maxlength="3000"
         placeholder="Ej. Escritura Pública No. 259 del 20/02/2017 de la Notaría Quinta de Cartagena; CTL; predial; RUT; fotografías."><?= e($field('source_documents')) ?></textarea>

@@ -106,6 +106,7 @@ async function save(form) {
         if (response.status === 409) state.conflict = true;
         if (!response.ok || result.ok !== true) throw new Error(result.message || 'No se pudo confirmar el guardado.');
         updateVersion(form, result);
+        if (typeof result.object_text === 'string') form.querySelectorAll('[data-object-preview]').forEach(node => { node.textContent = result.object_text; });
         updateDossierNumber(form, result);
         publishDerivedChange(form, result);
         state.dirty = state.revision !== revision;

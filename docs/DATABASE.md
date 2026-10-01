@@ -1,5 +1,8 @@
 # Crear y evolucionar la base sin SQL manual
 
+Tabla 1.11: `202610010006_assignment_document_table.php` agrega el detalle
+documental sin reemplazar marcas ni observaciones anteriores.
+
 Expediente: `202610010005_assignment_contact_and_value_date_notes.php` agrega
 correo, celular, municipio del solicitante y explicación de fecha de valor.
 Conserva datos y fotos existentes; ver [detalle](EXPEDIENTE-SOLICITANTE.md).

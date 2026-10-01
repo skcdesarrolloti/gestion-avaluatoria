@@ -6,6 +6,7 @@ require __DIR__ . '/comparable-capture-detail.php';
 require __DIR__ . '/judicial-expert.php';
 require __DIR__ . '/judicial-render.php';
 require __DIR__ . '/resolution-941-reading.php';
+require __DIR__ . '/assignment-document-table.php';
 require __DIR__ . '/comparable-search-render.php';
 require __DIR__ . '/comparable-url-reader.php';
 require __DIR__ . '/comparable-area-search.php';
@@ -287,7 +288,7 @@ try {
     expect(str_contains($chapterOneViewHtml, 'Uso previsto del informe')
         && str_contains($chapterOneViewHtml, 'Fecha de solicitud')
         && str_contains($chapterOneViewHtml, 'Localización y dirección del inmueble')
-        && str_contains($chapterOneViewHtml, 'Checklist documental')
+        && str_contains($chapterOneViewHtml, 'Documentos aportados · relación para el entregable')
         && str_contains($chapterOneViewHtml, 'Documentos aportados o insumos'), 'numeral 1.2 renderiza despues de selectores');
     $record = array_replace(\App\Support\AppraisalCatalog::defaults(), [
         'id' => str_repeat('a', 32), 'version' => 1, 'igac_property_units_count' => 1, 'igac_annex_units_count' => 2,
@@ -1391,7 +1392,7 @@ Certificado de tradicion.",
         && str_contains($chapterOneReport['text'], 'Valor de Mercado')
         && str_contains($chapterOneReport['text'], 'comprador dispuesto a comprar')
         && str_contains($chapterOneReport['text'], 'Soporte visual de localización')
-        && str_contains($chapterOneReport['text'], 'Escritura pública o título aportado')
+        && str_contains($chapterOneReport['text'], 'Escritura pública:')
         && str_contains($chapterOneReport['text'], 'Oficina 206, Parqueadero No 60')
         && str_contains($chapterOneReport['text'], 'NTS S 03'), 'entregable expediente construye memoria descriptiva normativa');
     $reasonableBasis = (new AppraisalChapterOneReport())->build(['base_valor' => 'razonable'], [], []);

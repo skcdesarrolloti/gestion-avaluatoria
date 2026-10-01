@@ -1,5 +1,9 @@
 # Entrega al responsable de la implementación
 
+Objeto 1.5 visible y tabla documental 1.11: aplicar migración
+`202610010006_assignment_document_table.php`; conserva datos anteriores.
+Ver [expediente](EXPEDIENTE-SOLICITANTE.md).
+
 [Expediente: solicitante, fecha y foto 1.4](EXPEDIENTE-SOLICITANTE.md): campos de
 contacto, uso previsto de 1400 caracteres, explicación en 1.3.5 y carga de imagen
 en 1.4. Aplicar migración `202610010005_assignment_contact_and_value_date_notes.php`.
