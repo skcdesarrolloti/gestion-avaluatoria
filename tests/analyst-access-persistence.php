@@ -1,0 +1,41 @@
+<?php
+declare(strict_types=1);
+(static function () use ($app,$auth): void {
+    if (session_status() !== PHP_SESSION_ACTIVE) session_start();
+    $accounts=new App\Models\AnalystAccountRepository($app);
+    $staff=new App\Models\FuncionarioRepository($auth);
+    $authService=new App\Services\AuthService($staff,static fn()=>$accounts);
+    $expert=str_repeat('f',32);
+    $account=$accounts->create(1,$expert,'Analista de prueba','analistaprueba');
+    expect($authService->attempt('analistaprueba','analistaprueba'),'analista usa clave inicial solo para activar acceso');
+    $actor=$authService->current();
+    expect($actor['id']===1 && $actor['analyst_id']===$account && $actor['name']==='Analista de prueba' && $actor['must_change'],'actor analista separado del titular y del perito');
+    $_SERVER['HTTP_ACCEPT']='application/json';
+    expectStatus(403,fn()=>App\Services\AnalystAccessPolicy::enforce($accounts,$actor,'/','GET'),'clave inicial no permite leer expedientes');
+    expectStatus(422,fn()=>$accounts->changePassword($account,1,'analistaprueba'),'contraseña permanente no puede ser usuario');
+    $accounts->changePassword($account,1,'Solo-prueba-nueva-2026!');
+    expect($authService->current()===null,'cambio de clave invalida sesión anterior');
+    expect(!$authService->attempt('analistaprueba','analistaprueba') && $authService->attempt('analistaprueba','Solo-prueba-nueva-2026!'),'clave temporal deja de funcionar');
+    $actor=$authService->current(); $ownerRepo=new App\Models\AppraisalRepository($app);
+    $analystRepo=new App\Models\AppraisalRepository($app,$actor);
+    $own=$analystRepo->create(1); $private=$ownerRepo->create(1);
+    expect($ownerRepo->find($own,1)['appraiser_id']===$expert,'avalúo del analista visible al titular con perito asignado');
+    expect(count($analystRepo->recent(1,1))===1 && $analystRepo->recent(1,1)[0]['id']===$own,'listado del analista no incluye expedientes previos del titular');
+    $accounts->requireRecord($own,$actor);
+    expectStatus(404,fn()=>$accounts->requireRecord($private,$actor),'analista no abre expedientes previos por URL');
+    expectStatus(404,fn()=>$accounts->requireRecord($own,array_replace($actor,['id'=>3])),'identidad de otro titular rechazada');
+    foreach (['/maestros','/maestros/accesos','/mantenimiento/migraciones/ejecutar',"/avaluos/$own/judicial/presentar"] as $path)
+        expectStatus(403,fn()=>App\Services\AnalystAccessPolicy::enforce($accounts,$actor,$path,'POST'),'analista no administra ni presenta: '.$path);
+    $_POST=['appraiser_id'=>'otro'];
+    expectStatus(403,fn()=>App\Services\AnalystAccessPolicy::enforce($accounts,$actor,"/avaluos/$own/expediente",'POST'),'analista no cambia responsable');
+    $_POST=[]; App\Services\AnalystAccessPolicy::enforce($accounts,$actor,"/avaluos/$own/expediente/autoguardar",'POST');
+    expect($_POST['appraiser_id']===$expert,'responsable no desaparece si cliente omite campo');
+    $_POST=[];
+    expectStatus(404,fn()=>$accounts->revoke($account,3),'otro titular no revoca acceso');
+    $accounts->revoke($account,1);
+    expect($authService->current()===null && !$authService->attempt('analistaprueba','Solo-prueba-nueva-2026!'),'revocación corta sesión y login sin borrar expedientes');
+    expect($ownerRepo->find($own,1)['id']===$own,'revocación conserva expediente');
+    $accounts->create(2,$expert,'Dependiente inactivo','dependiente');
+    expect(!$authService->attempt('dependiente','dependiente'),'titular inactivo impide acceso delegado');
+    unset($_SESSION['user'],$_SERVER['HTTP_ACCEPT']);
+})();

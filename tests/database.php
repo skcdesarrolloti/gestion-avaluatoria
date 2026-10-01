@@ -55,6 +55,7 @@ expect($ph->profile($id, 2)['ph_name'] === '', 'PH MySQL aísla propietario');
 require __DIR__ . '/comparable-persistence.php';
 require __DIR__ . '/comparable-detail-persistence.php';
 require __DIR__ . '/judicial-persistence.php';
+require __DIR__ . '/analyst-access-persistence.php';
 // An applied migration must never be silently changed.
 $app->exec("UPDATE schema_migrations SET checksum = REPEAT('0', 64) WHERE version = '202609150002_add_observaciones.php'");
 $detected = false;

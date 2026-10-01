@@ -7,20 +7,11 @@ use App\Services\AppraisalPhotoStorage;
 use App\Support\AppraisalCatalog;
 final class AppraisalRepository
 {
-    public function __construct(private PDO $db) {}
-    public function recent(int $owner, int $page, string $search = '', bool $createdOnly = false): array {
-        $offset = (max(1, $page) - 1) * 20; $search = trim($search);
-        $where = 'owner_id = ?'; $params = [$owner];
-        if ($createdOnly) $where .= " AND expediente_number IS NOT NULL AND expediente_number <> ''";
-        if ($search !== '') { $where .= ' AND (expediente_number LIKE ? OR titulo LIKE ? OR municipio LIKE ? OR property_owner_name LIKE ? OR client_name LIKE ? OR requester_name LIKE ? OR requester_capacity LIKE ? OR report_recipient LIKE ?)'; $needle = '%' . $search . '%'; $params = array_merge([$owner], array_fill(0, 8, $needle)); }
-        $query = $this->db->prepare("SELECT id, expediente_number, titulo, tipo, municipio, property_owner_name, client_name, updated_at
-            FROM appraisals WHERE $where ORDER BY updated_at DESC, id DESC LIMIT 21 OFFSET $offset");
-        $query->execute($params);
-        return $query->fetchAll();
-    }
+    public function __construct(private PDO $db, private ?array $actor = null) {}
+    public function recent(int $owner, int $page, string $search = '', bool $createdOnly = false): array { return AppraisalListing::recent($this->db,$this->actor,$owner,$page,$search,$createdOnly); }
 
     public function create(int $owner): string
-    { $id = bin2hex(random_bytes(16)); $now = gmdate('Y-m-d H:i:s'); $query = $this->db->prepare('INSERT INTO appraisals (id, owner_id, expediente_number, created_at, updated_at) VALUES (?, ?, ?, ?, ?)'); $query->execute([$id, $owner, null, $now, $now]); return $id; }
+    { return AppraisalCreation::create($this->db,$owner,$this->actor); }
 
     public function photos(string $id, int $owner): array {
         $query = $this->db->prepare('SELECT id, appraisal_id, owner_id, unit_id, source_filename, storage_filename,

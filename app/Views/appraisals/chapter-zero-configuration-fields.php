@@ -38,25 +38,7 @@ $igacSearchPlaceholder = static fn (array $unit): string =>
 </div>
 
 <div class="mt-5 grid gap-5 md:grid-cols-2" x-show="configTab === 'expediente'">
-    <label class="label">Perito responsable
-        <select class="input" name="appraiser_id">
-            <option value="">Selecciona perito</option>
-            <?php foreach ($appraisers as $appraiser): ?>
-                <option value="<?= e($appraiser['id']) ?>" <?= $selectedAppraiser($appraiser['id']) ?>>
-                    <?= e($appraiser['code'] . ' · ' . $appraiser['full_name']) ?>
-                </option>
-            <?php endforeach; ?>
-        </select>
-        <?php if (count($appraisers) === 1 && $field('appraiser_id') === ''): ?>
-            <span class="mt-1 block text-xs leading-5 text-emerald-700">
-                Se selecciona automáticamente porque solo hay un perito vigente.
-            </span>
-        <?php elseif (count($appraisers) === 0): ?>
-            <span class="mt-1 block text-xs leading-5 text-red-700">
-                No hay peritos con RAA vigente. Actualiza el RAA en Maestros para asignar expediente.
-            </span>
-        <?php endif; ?>
-    </label>
+    <?php require __DIR__ . '/chapter-zero-responsible.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/appraisal-dossier-field.php'; ?>
 </div>
 

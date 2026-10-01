@@ -22,6 +22,7 @@ final class MasterDataController
         view('masters/index', [
             'title' => 'Creación de Maestros',
             'appraisers' => $this->appraisers->all(),
+            'analystAccounts' => (new \App\Models\AnalystAccountRepository(\App\Core\Database::connection()))->forOwner((int)$_SESSION['user']['id']),
             'documents' => $this->documents->latest(),
             'documentDestinations' => MasterDocumentRepository::destinations(),
             'documentModules' => MasterDocumentRepository::modules(),

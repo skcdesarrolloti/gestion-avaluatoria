@@ -33,6 +33,10 @@ final class FuncionarioRepository
         $query->execute([$id]);
         return $query->fetch() ?: null;
     }
+    public function hasLogin(string $login): bool {
+        $query=$this->db->prepare("SELECT 1 FROM {$this->table} WHERE {$this->userColumn} = ? LIMIT 1");
+        $query->execute([$login]); return (bool)$query->fetchColumn();
+    }
 
     public function checkSchema(): void
     {

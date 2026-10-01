@@ -18,7 +18,7 @@ $today = new DateTimeImmutable('today', new DateTimeZone('America/Bogota'));
 
     <?php require BASE_PATH . '/app/Views/masters/document-library.php'; ?>
 
-    <section id="crear-perito" x-data="{ expertTab: 'raa' }" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
+    <section id="crear-perito" x-data="{ expertTab: <?= ($_GET['tab'] ?? '') === 'access' ? '\'access\'' : '\'raa\'' ?> }" class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
         <div class="grid gap-5 lg:grid-cols-[1fr_22rem]">
             <div>
                 <p class="eyebrow">RAA como fuente</p>
@@ -31,7 +31,8 @@ $today = new DateTimeImmutable('today', new DateTimeZone('America/Bogota'));
                 Un RAA vencido no se guarda como usable y no aparecerá en el expediente valuatorio. El certificado se toma como vigente por 30 días calendario desde su expedición.
             </div>
         </div>
-        <nav class="my-5 flex flex-wrap gap-3" aria-label="Ficha del perito"><button type="button" class="btn-secondary" @click="expertTab = 'raa'" :aria-pressed="expertTab === 'raa'">Identidad y RAA</button><button type="button" class="btn-secondary" @click="expertTab = 'judicial'" :aria-pressed="expertTab === 'judicial'">Requisitos judiciales · CGP</button></nav>
+        <nav class="my-5 flex flex-wrap gap-3" aria-label="Ficha del perito"><button type="button" class="btn-secondary" @click="expertTab = 'raa'" :aria-pressed="expertTab === 'raa'">Identidad y RAA</button><button type="button" class="btn-secondary" @click="expertTab = 'judicial'" :aria-pressed="expertTab === 'judicial'">Requisitos judiciales · CGP</button><button type="button" class="btn-secondary" @click="expertTab = 'access'" :aria-pressed="expertTab === 'access'">Acceso del analista</button></nav>
+        <?php require __DIR__ . '/analyst-access.php'; ?>
         <div x-show="expertTab === 'judicial'" x-cloak class="space-y-3"><p>Selecciona el perito para completar sus antecedentes y consultar los requisitos del artículo 226.</p>
             <?php if (!$appraisers): ?><p>Primero registra el perito con su RAA.</p><?php endif; ?>
             <?php foreach ($appraisers as $person): ?><a class="btn-secondary" href="<?= e(url('maestros/peritos/' . $person['id'] . '/judicial')) ?>"><?= e($person['full_name']) ?> · Abrir ficha judicial</a><?php endforeach; ?>

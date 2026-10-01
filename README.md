@@ -6,6 +6,9 @@ completos de InversKC. El proyecto original permanece intacto.
 
 ## Incluido
 
+- [Acceso del analista](docs/ACCESO-ANALISTA.md) desde Perito responsable,
+  con nuevos avalúos compartidos con el titular y permisos por expediente.
+
 - [Perito y anexo judicial CGP](docs/PERITO-JUDICIAL-CGP.md): academia, historial,
   declaraciones por expediente Judicial y exportación por apartado.
 

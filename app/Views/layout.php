@@ -31,6 +31,7 @@ $tabs = [
 if ($maintenanceEnabled) {
     $tabs[] = ['label' => 'Migraciones', 'href' => url('mantenimiento/migraciones'), 'active' => $isActive('/mantenimiento')];
 }
+if (!empty($_SESSION['user']['analyst_id'])) $tabs=array_values(array_filter($tabs,static fn($tab)=>!in_array($tab['label'],['Creación de Maestros','Migraciones','MIDAS'],true)));
 ?>
 <body class="min-h-dvh bg-slate-50 text-slate-900 antialiased">
     <div id="app-loader" class="app-loader" role="status" aria-live="polite" hidden>
@@ -55,7 +56,7 @@ if ($maintenanceEnabled) {
             <div class="app-shell">
                 <div class="flex flex-wrap justify-end gap-3">
                     <a class="app-action app-action-blue" href="<?= e(url('valuaciones')) ?>">Valuaciones</a>
-                    <a class="app-action app-action-teal" href="<?= e(url('maestros')) ?>">Maestros</a>
+                    <?php if (empty($_SESSION['user']['analyst_id'])): ?><a class="app-action app-action-teal" href="<?= e(url('maestros')) ?>">Maestros</a><?php endif; ?>
                     <a class="app-action app-action-orange" href="<?= e(url()) ?>">Mis avalúos</a>
                     <a class="app-action app-action-teal" href="<?= e(url('normas-tecnicas-sectoriales')) ?>">Normas técnicas</a>
                     <a class="app-action app-action-orange" href="<?= e(url('marco-juridico-valuatorio')) ?>">Marco jurídico</a>

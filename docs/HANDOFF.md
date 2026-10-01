@@ -1,5 +1,10 @@
 # Entrega al responsable de la implementación
 
+[Acceso del analista desde Perito responsable](ACCESO-ANALISTA.md): cuenta local
+delegada, clave temporal con cambio inicial, nuevos avalúos visibles al titular y
+perito responsable fijado. Aplicar migración `202610010004_create_analyst_access.php`.
+WordPress sigue solo lectura. No hay cuentas nuevas en producción por esta entrega.
+
 Fotos en Mapas: una ficha por vez y «Continuar con la siguiente muestra», con
 confirmación de guardado y bloqueo ante foto pendiente. Galería de altura limitada.
 Sin migración nueva; ver pruebas y limitación de subida en [Mapas](COMPARABLES-MAPAS-AREAS.md).
@@ -107,8 +112,8 @@ Configurar y comprobar acceso → definir expediente y permisos → migraciones 
 por módulo → formularios pequeños con autoguardado → pruebas con casos aprobados →
 informes y revisión → importación histórica independiente si se solicita.
 
-No hay aún datos migrados, motor de cálculos, PDF/DOCX, carga de anexos, auditoría de
-negocio ni colaboración entre funcionarios. Agregarlos cuando el jefe entregue la
+No hay aún importación histórica, motor de cálculos completo ni auditoría de
+negocio completa. La colaboración habilitada se limita al acceso delegado descrito arriba. Agregar otros permisos cuando el jefe entregue la
 implementación. Si se generan documentos de SuCasa, aplicar la skill de branding correspondiente.
 
 ## Contrato del autoguardado

@@ -1,5 +1,9 @@
 # Crear y evolucionar la base sin SQL manual
 
+Accesos: `202610010004_create_analyst_access.php` crea analyst_accounts en la base
+app y agrega analyst_account_id a appraisals. No modifica funcionarios/WordPress
+ni propietarios existentes. Ver [acceso delegado](ACCESO-ANALISTA.md).
+
 Captura 8.3: `202610010003_comparable_capture_details.php` agrega `capture_details`
 a appraisal_comparables para áreas por régimen y trazabilidad de evidencia.
 No reemplaza filas ni fotos. Ver [Mapas y áreas](COMPARABLES-MAPAS-AREAS.md).

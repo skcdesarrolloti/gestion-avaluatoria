@@ -3,6 +3,10 @@ declare(strict_types=1);
 
 // method, path expression, controller, action, requires authentication
 return [
+    ['POST', '#^/maestros/accesos$#', 'analystAccess', 'create', true],
+    ['POST', '#^/maestros/accesos/([a-f0-9]{32})/desactivar$#', 'analystAccess', 'revoke', true],
+    ['GET', '#^/acceso/clave$#', 'analystAccess', 'password', true],
+    ['POST', '#^/acceso/clave$#', 'analystAccess', 'changePassword', true],
     ['GET', '#^/login$#', 'auth', 'login', false],
     ['POST', '#^/login$#', 'auth', 'attempt', false],
     ['GET', '#^/diagnostico/login$#', 'diagnostics', 'login', false],
