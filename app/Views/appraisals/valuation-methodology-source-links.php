@@ -19,7 +19,7 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
             <option value="" disabled>Selecciona una fuente</option>
             <optgroup label="Portales">
                 <?php foreach ($portalLinks as $sourceIndex => $source): ?>
-                    <option value="<?= $sourceIndex ?>"><?= e($source['label']) ?></option>
+                    <option value="<?= $sourceIndex ?>"><?= e($source['label'] . (isset($source['network']) ? ' · Red ' . $source['network'] : '')) ?></option>
                 <?php endforeach; ?>
             </optgroup>
             <optgroup label="Inmobiliarias">
@@ -40,6 +40,10 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
                 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-fincaraiz-zone.php'; ?>
             <?php else: ?>
             <h4 class="font-semibold text-blue-950">1. Buscar en <?= e($source['label']) ?></h4>
+            <?php if (($source['network'] ?? '') === 'Proppit'): ?>
+                <p class="mt-2 text-sm">Red Proppit · Captura actual: Properati. Conservamos el portal y el enlace de cada aviso para revisar publicaciones del mismo inmueble en otras fuentes.</p>
+                <details class="mt-2 text-sm"><summary class="min-h-11 cursor-pointer py-3">Portales de la red</summary><p>Properati, Mitula, Punto Propiedad, Trovit, Nuroa y Nestoria. Trabajamos una fuente a la vez; este pegado reconoce Properati. Proppit gestiona la publicación y no garantiza que los inventarios de todos los portales sean iguales.</p></details>
+            <?php endif; ?>
             <p class="mt-2 text-sm font-semibold">Tu búsqueda para esta fuente</p>
             <p class="text-anywhere mt-1 rounded-lg bg-slate-50 p-3 text-sm"><?= e($baseQuery ?: 'Completa tipo de inmueble, operación y ubicación en el expediente.') ?></p>
             <p class="mt-2 text-sm leading-6"><?= e($source['instruction'] ?? '') ?></p>
@@ -54,8 +58,10 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
                 <?php if (isset($record['id'])) require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-url.php'; ?>
             <?php endif; ?>
             <?php if ($isFincaraiz): ?><details class="mt-3"><summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Si la lectura falla: pegar enlace y texto</summary><?php endif; ?>
-            <?php require BASE_PATH . '/app/Views/appraisals/' . ($source['label'] === 'Ciencuadras' && ($record['tipo_inmueble'] ?? '') === 'oficina' && ($record['tipo_negocio'] ?? '') === 'venta'
-                ? 'valuation-methodology-ciencuadras-paste.php' : 'valuation-methodology-source-paste.php'); ?>
+            <?php
+            $batchPortal = ['Ciencuadras' => 'ciencuadras', 'Properati' => 'properati'][$source['label']] ?? '';
+            require BASE_PATH . '/app/Views/appraisals/' . ($batchPortal && ($record['tipo_inmueble'] ?? '') === 'oficina' && ($record['tipo_negocio'] ?? '') === 'venta'
+                ? 'valuation-methodology-' . $batchPortal . '-paste.php' : 'valuation-methodology-source-paste.php'); ?>
             <?php if ($isFincaraiz): ?></details><?php endif; ?>
             <?php endif; ?>
         </section>

@@ -14,6 +14,7 @@ final class ComparablePortalLinks
                 'url' => 'https://www.google.com/search?q=' . rawurlencode('site:' . $domain . ' ' . $query),
                 'instruction' => 'Busca en Google dentro del portal. Abre el aviso y comprueba los filtros.'];
         }
+        $sources[3]['network'] = 'Proppit';
         // Only enable combinations checked in the actual portal. Others retain an explicit fallback.
         $cartagena = in_array($this->slug($city), ['cartagena', 'cartagena-de-indias'], true);
         if (!$cartagena || $operation !== 'venta') return $sources;
@@ -26,6 +27,12 @@ final class ComparablePortalLinks
                 : 'Venta, oficina y Cartagena aplicados. Falta seleccionar o comprobar el barrio: ' . $neighborhood . '.';
         }
         if ($type === 'oficina') {
+            $sources[3]['url'] = 'https://www.properati.com.co/s/'
+                . ($this->slug($neighborhood) === 'bocagrande' ? 'bocagrande' : 'cartagena-bolivar') . '/oficina/venta';
+            $sources[3]['kind'] = 'Filtros del portal · Red Proppit';
+            $sources[3]['instruction'] = $this->slug($neighborhood) === 'bocagrande'
+                ? 'Oficinas en venta en Bocagrande. Copia los resultados de cada página para preparar el lote.'
+                : 'Oficinas en venta en Cartagena. Selecciona o comprueba el barrio «' . $neighborhood . '» antes de copiar los resultados.';
             $sources[1]['url'] = 'https://www.metrocuadrado.com/oficinas/venta/cartagena-de-indias/';
             $sources[2]['url'] = 'https://www.ciencuadras.com/venta/oficina?v=' . rawurlencode(trim($neighborhood) ?: $city);
             foreach ([1, 2] as $index) {

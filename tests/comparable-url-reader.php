@@ -39,4 +39,9 @@ declare(strict_types=1);
         && $sources['portal_sources'][2]['url'] === 'https://www.ciencuadras.com/venta/oficina?v=Castillogrande', 'enlaces usan barrio del expediente sin afirmar filtro geográfico exacto');
     $fallback = (new \App\Services\ComparablePortalLinks())->build('venta consultorio Cartagena', 'venta', 'consultorio', 'Cartagena', '');
     expect(str_contains($fallback[0]['url'], 'google.com/search') && $fallback[0]['kind'] === 'Búsqueda en Google', 'combinación no comprobada identifica búsqueda alternativa');
+    $properati = (new \App\Services\ComparablePortalLinks())->build('venta oficina Bocagrande Cartagena', 'venta', 'oficina', 'Cartagena', 'Bocagrande')[3];
+    expect($properati['url'] === 'https://www.properati.com.co/s/bocagrande/oficina/venta'
+        && $properati['label'] === 'Properati' && $properati['network'] === 'Proppit', 'Properati conserva fuente y red con ruta de barrio verificada');
+    expect($sources['portal_sources'][3]['url'] === 'https://www.properati.com.co/s/cartagena-bolivar/oficina/venta'
+        && str_contains($sources['portal_sources'][3]['instruction'], 'comprueba el barrio'), 'Properati no inventa ruta para un barrio no comprobado');
 })();

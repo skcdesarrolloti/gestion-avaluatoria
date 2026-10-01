@@ -1,5 +1,8 @@
 # Entrega al responsable de la implementación
 
+Properati: [captura por lote y red Proppit](COMPARABLES-PROPERATI.md), con guía
+1–2–3 y selección sin coincidencias compartida con Ciencuadras.
+
 Ciencuadras: [validación y límites de captura](COMPARABLES-CIENCUADRAS.md).
 
 Metrocuadrado: [captura por barrio](COMPARABLES-METROCUADRADO.md), lectura inicial
