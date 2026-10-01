@@ -1,5 +1,7 @@
 # Entrega al responsable de la implementación
 
+Ciencuadras: [validación y límites de captura](COMPARABLES-CIENCUADRAS.md).
+
 Metrocuadrado: [captura por barrio](COMPARABLES-METROCUADRADO.md), lectura inicial
 de oficinas en venta en Cartagena, selección por lote y coincidencias compartidas.
 

@@ -3,6 +3,13 @@ import assert from 'node:assert/strict';
 import { parseComparableBlock, parseComparableText } from '../resources/js/comparable-bulk-import.js';
 import { comparableUrlKey, hasComparableData, missingComparableFields } from '../resources/js/comparable-review.js';
 
+test('explicit tabular operation determines unit despite dual-operation listing URL', () => {
+    const [row] = parseComparableText('fuente\tenlace\tprecio\tarea\toperacion\nCiencuadras\thttps://www.ciencuadras.com/inmueble/oficina-en-arriendo-o-venta-123\t$600.000.000\t42\tVenta');
+    assert.equal(row.operation, 'Venta');
+    assert.equal(row.price_unit, 'precio_total');
+    assert.equal(row.price_amount, '$600.000.000');
+});
+
 test('extracts useful fields from copied listing text', () => {
     const row = parseComparableBlock(`Venta oficina Edificio Bahía
 https://www.fincaraiz.com.co/oficina-cartagena-123

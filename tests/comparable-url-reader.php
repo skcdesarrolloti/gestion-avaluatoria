@@ -36,7 +36,7 @@ declare(strict_types=1);
         'locality_name' => 'Histórica y del Caribe Norte'], 'oficina', 'Oficina', 'Venta');
     expect($sources['query'] === 'venta oficina Castillogrande Cartagena de Indias', 'consulta no añade consultorios ni localidad redundante');
     expect($sources['portal_sources'][0]['url'] === 'https://www.fincaraiz.com.co/venta/oficinas/castillogrande/cartagena'
-        && $sources['portal_sources'][2]['url'] === 'https://www.ciencuadras.com/venta/oficina?v=Cartagena', 'enlaces usan filtros comprobados de cada portal');
+        && $sources['portal_sources'][2]['url'] === 'https://www.ciencuadras.com/venta/oficina?v=Castillogrande', 'enlaces usan barrio del expediente sin afirmar filtro geográfico exacto');
     $fallback = (new \App\Services\ComparablePortalLinks())->build('venta consultorio Cartagena', 'venta', 'consultorio', 'Cartagena', '');
     expect(str_contains($fallback[0]['url'], 'google.com/search') && $fallback[0]['kind'] === 'Búsqueda en Google', 'combinación no comprobada identifica búsqueda alternativa');
 })();

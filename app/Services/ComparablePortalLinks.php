@@ -27,11 +27,12 @@ final class ComparablePortalLinks
         }
         if ($type === 'oficina') {
             $sources[1]['url'] = 'https://www.metrocuadrado.com/oficinas/venta/cartagena-de-indias/';
-            $sources[2]['url'] = 'https://www.ciencuadras.com/venta/oficina?v=Cartagena';
+            $sources[2]['url'] = 'https://www.ciencuadras.com/venta/oficina?v=' . rawurlencode(trim($neighborhood) ?: $city);
             foreach ([1, 2] as $index) {
                 $sources[$index]['kind'] = 'Filtros del portal';
                 $sources[$index]['instruction'] = 'Venta, oficina y Cartagena aplicados. Comprueba el barrio «' . $neighborhood . '» en el portal; no está filtrado en este enlace.';
             }
+            $sources[2]['instruction'] = 'Venta y oficina aplicados; la ubicación se busca por texto. Comprueba que cada resultado corresponda a ' . $neighborhood . ', ' . $city . '. La captura actual requiere enlace y datos: no descarga los avisos automáticamente.';
         }
         return $sources;
     }

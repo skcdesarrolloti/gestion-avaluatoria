@@ -50,6 +50,10 @@ function parseTabularRows(lines) {
         const cells = line.split('\t').map(cell => cell.trim());
         const parsed = parseComparableBlock(cells.join('\n'));
         if (hasHeaders) headers.forEach((key, index) => { if (key) parsed[key] = cells[index] ?? ''; });
+        if (hasHeaders && headers.includes('operation') && parsed.price_amount) {
+            parsed.price_unit = normalize(parsed.operation) === 'venta' ? 'precio_total'
+                : (normalize(parsed.operation) === 'arriendo' ? 'canon_mensual' : '');
+        }
         // Bare numbers are ambiguous without column headers; leave them for review.
         return parsed;
     }).filter(meaningful);
