@@ -39,7 +39,7 @@ final class SectorBankCatalog
                 '', 'SI', null],
             ['dane_cnpv', 'Base territorial', 'DANE CNPV 2018 / Geoportal DANE',
                 'Departamento Administrativo Nacional de Estadística',
-                'https://geoportal.dane.gov.co/', 'PARCIAL', '2018'],
+                'https://geoportal.dane.gov.co/', 'PARCIAL', null],
             ['google_maps_earth', 'Soporte visual', 'Google Maps / Google Earth',
                 'Fuente visual de apoyo cartográfico',
                 'https://www.google.com/maps', 'NO', null],

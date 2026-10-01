@@ -94,9 +94,17 @@ $visiblePhotos = $photoCaption === '' ? $visiblePhotos : array_values(array_filt
                 <?php foreach ($visiblePhotos as $photo): ?>
                     <?php $canRender = !empty($photo['file_available']) || !empty($photo['has_blob']); ?>
                     <div class="overflow-hidden rounded-xl border border-slate-200 bg-slate-50">
+                        <form class="border-t border-slate-200 bg-white p-3" method="post"
+                            action="<?= e(url('avaluos/' . $record['id'] . '/fotos/' . $photo['id'] . '/eliminar')) ?>"
+                            x-data="{ busy: false }" @submit="busy = true">
+                            <?= csrf_field() ?>
+                            <input type="hidden" name="return_to" value="<?= e($photoReturnTo) ?>">
+                            <button class="btn-secondary min-h-11 w-full text-sm" type="submit" :disabled="busy"
+                                x-text="busy ? 'Quitando...' : 'Eliminar foto'">Eliminar foto</button>
+                        </form>
                         <?php if ($canRender): ?>
                             <a class="block" href="<?= e(url('avaluos/' . $record['id'] . '/fotos/' . $photo['id'])) ?>" target="_blank" rel="noopener">
-                                <img class="aspect-[4/3] w-full object-contain" alt="Foto del inmueble"
+                                <img class="max-h-72 w-full object-contain" alt="Foto del inmueble"
                                     src="<?= e(url('avaluos/' . $record['id'] . '/fotos/' . $photo['id'])) ?>" loading="lazy">
                             </a>
                             <?php if (empty($photo['file_available']) && !empty($photo['has_blob'])): ?>
@@ -112,14 +120,7 @@ $visiblePhotos = $photoCaption === '' ? $visiblePhotos : array_values(array_filt
                                 <?= e((string) (($photo['display_name'] ?? '') ?: $photo['source_filename'])) ?>
                             </p>
                         </div>
-                        <form class="border-t border-slate-200 bg-white p-3" method="post"
-                            action="<?= e(url('avaluos/' . $record['id'] . '/fotos/' . $photo['id'] . '/eliminar')) ?>"
-                            x-data="{ busy: false }" @submit="busy = true">
-                            <?= csrf_field() ?>
-                            <input type="hidden" name="return_to" value="<?= e($photoReturnTo) ?>">
-                            <button class="btn-secondary min-h-10 w-full text-sm" type="submit" :disabled="busy"
-                                x-text="busy ? 'Quitando...' : 'Quitar foto'">Quitar foto</button>
-                        </form>
+
                     </div>
                 <?php endforeach; ?>
             </div>

@@ -34,7 +34,13 @@ $app->exec("INSERT INTO appraisals (id, owner_id, titulo, created_at, updated_at
 $migrator = new Migrator($app, $directory);
 expect(count($migrator->run()) === count(glob($directory . '/*.php')), 'migracion recupera tabla parcial y agrega columnas');
 expect($migrator->run() === [], 'migracion repetida no duplica cambios');
+$geo = new App\Models\GeoMasterRepository($app);
+$mamonal = array_values(array_filter($geo->neighborhoods(), fn ($row) => $row['name'] === 'Mamonal'));
+expect(count($mamonal) === 1 && $mamonal[0]['active'] === 'Si', 'Mamonal activo sin duplicados tras migración repetida');
+expect(App\Services\GeoNeighborhoodResolver::id(['neighborhood_query' => 'Mam'], $geo->neighborhoods()) === $mamonal[0]['id'], 'primeras letras Mam resuelven Mamonal');
 $repo = new AppraisalRepository($app);
+(new App\Models\SectorBankRepository($app))->seedSources();
+expect($app->query("SELECT latest_revision FROM master_sector_sources WHERE source_key = 'dane_cnpv'")->fetchColumn() === null, 'fuentes sectoriales aceptan revisión desconocida sin inventar fecha');
 expect($repo->find(str_repeat('1', 32), 1)['titulo'] === 'Conservar datos', 'datos previos preservados al agregar columna');
 $id = $repo->create(1);
 expectStatus(404, fn () => $repo->find($id, 2), 'lectura de ficha ajena rechazada');

@@ -144,7 +144,7 @@ final class AppraisalSubjectController
         $this->appraisals->find($id, $this->user['id']);
         $path = $this->appraisals->deletePhoto($id, $photoId, $this->user['id']);
         if ($path && is_file($path)) @unlink($path);
-        Session::flash('chapter_zero_photo_message', 'Foto retirada del expediente.');
+        Session::flash(str_contains($this->safePhotoReturn($id), '/sector') ? 'sector_photo_message' : 'chapter_zero_photo_message', 'Foto retirada del expediente.');
         Http::redirect($this->safePhotoReturn($id));
     }
     private function saveAttributesAndPhotos(string $id): void
@@ -204,7 +204,7 @@ final class AppraisalSubjectController
         [$subject, $sector] = ['avaluos/' . $id . '/bien-sujeto', 'avaluos/' . $id . '/sector'];
         return in_array($target, ['avaluos/' . $id . '/expediente', $subject, $subject . '#atributos', $subject . '#fotos', $subject . '#fotos-ph'], true)
             || preg_match('#^' . preg_quote($subject, '#') . '\#fotos(?:-general|-[a-f0-9]{32})$#', $target)
-            || preg_match('#^' . preg_quote($sector, '#') . '(?:\#[a-z_]+)?$#', $target) ? $target : $subject . '#fotos';
+            || preg_match('#^' . preg_quote($sector, '#') . '(?:\#[a-z0-9_-]+)?$#', $target) ? $target : $subject . '#fotos';
     }
     private function attributePhotoName(string $caption): string
     {

@@ -7,6 +7,7 @@ require __DIR__ . '/judicial-expert.php';
 require __DIR__ . '/judicial-render.php';
 require __DIR__ . '/resolution-941-reading.php';
 require __DIR__ . '/assignment-document-table.php';
+require __DIR__ . '/sector-photo-controls.php';
 require __DIR__ . '/comparable-search-render.php';
 require __DIR__ . '/comparable-url-reader.php';
 require __DIR__ . '/comparable-area-search.php';
@@ -2691,6 +2692,8 @@ Certificado de tradicion.",
     $photoController = (new ReflectionClass(AppraisalSubjectController::class))->newInstanceWithoutConstructor();
     $safePhotoReturn = new ReflectionMethod(AppraisalSubjectController::class, 'safePhotoReturn');
     $safePhotoReturn->setAccessible(true);
+    $_POST['return_to'] = 'avaluos/' . $photoRecordId . '/sector#banco-02';
+    expect($safePhotoReturn->invoke($photoController, $photoRecordId) === $_POST['return_to'], 'eliminar foto regresa a delimitación 2.2');
     $_POST = ['return_to' => 'avaluos/' . $photoRecordId . '/bien-sujeto#fotos-general'];
     expect($safePhotoReturn->invoke($photoController, $photoRecordId) === $_POST['return_to'], 'retorno a fotos generales conservado');
     $_POST = ['return_to' => 'avaluos/' . $photoRecordId . '/bien-sujeto#fotos-' . $photoUnitId];
