@@ -1,6 +1,6 @@
 <?php
 $constructionUnitLabel = static function (array $unit): string {
-    return ($unit['unit_kind'] === 'annex' ? 'Anexo ' : 'Unidad ') . (int) $unit['unit_index'];
+    return trim((string) ($unit['label'] ?? '')) ?: ($unit['unit_kind'] === 'annex' ? 'Anexo ' : 'Unidad ') . (int) $unit['unit_index'];
 };
 $constructionUnits = array_values(array_filter($units, static fn (array $unit): bool => $unit['unit_kind'] !== 'common'));
 $cv = static fn (array $unit, string $key): string => (string) ($unit[$key] ?? '');

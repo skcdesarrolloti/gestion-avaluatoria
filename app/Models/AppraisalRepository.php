@@ -31,7 +31,7 @@ final class AppraisalRepository
             AND a.owner_id = u.owner_id WHERE u.appraisal_id = ? AND u.owner_id = ? AND (u.unit_kind = "common"
             OR (u.unit_kind = "property" AND u.unit_index <= COALESCE(a.igac_property_units_count, 0))
             OR (u.unit_kind = "annex" AND u.unit_index <= COALESCE(a.igac_annex_units_count, 0)))
-            ORDER BY u.unit_kind = "common" DESC, u.unit_kind, u.unit_index');
+            ORDER BY u.unit_kind = "common" DESC, u.unit_kind = "property" DESC, u.unit_index');
         $query->execute([$id, $owner]); return $query->fetchAll();
     }
 

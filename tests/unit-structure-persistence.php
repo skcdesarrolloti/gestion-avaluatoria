@@ -55,3 +55,18 @@ $withAnnex = array_replace($repo->find($structureId, 1), ['igac_annex_units_coun
 $repo->saveChapterZero($structureId, 1, (int) $withAnnex['version'], $withAnnex);
 expect($readStructure()['id'] === $unitStructureBefore['id'] && $readStructure()['label'] === 'Cerramiento'
     && $readStructure()['notes'] === 'Conservar', 'reactivar anexo recupera identidad y datos sin sobrescritura oculta');
+
+$twoAnnexes = array_replace($repo->find($structureId, 1), ['igac_annex_units_count' => 2]);
+$repo->saveChapterZero($structureId, 1, (int) $twoAnnexes['version'], $twoAnnexes);
+$namedDefinitions = \App\Services\AppraisalUnitDefinitionInput::rows([
+    'property-1' => ['label' => 'Oficina principal', 'construction_type' => 'oficina'],
+    'annex-1' => ['label' => 'Depósito', 'construction_type' => 'deposito'],
+    'annex-2' => ['label' => 'Garaje', 'construction_type' => 'parqueo'],
+], $twoAnnexes);
+$repo->saveUnitDefinitionsByKey($structureId, 1, $namedDefinitions);
+$namedUnits = $repo->units($structureId, 1);
+$repo->ensureUnits($structureId, 1, 1, 2);
+$repo->saveUnitDefinitionsByKey($structureId, 1, $namedDefinitions);
+expect(array_column($repo->units($structureId, 1), 'label') === ['Oficina principal', 'Depósito', 'Garaje']
+    && array_column($repo->units($structureId, 1), 'id') === array_column($namedUnits, 'id'),
+    'principal y dos anexos conservan nombres, orden e identidad al guardar repetidamente sin duplicar');

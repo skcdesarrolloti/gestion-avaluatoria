@@ -1,5 +1,18 @@
 # Entrega al responsable de la implementación
 
+Composición: principales primero y bloque separado de anexos; contador distingue
+ambos. Capítulos 3.2, 3.3 y 3.4 muestran el nombre registrado, no solo «Anexo N».
+Cada ficha del numeral 1 muestra «Cómo se va a valorar», método guardado y enlace
+al M2 del mismo ID de componente para elegir/revisar el método existente. No se
+agrega otro selector ni almacenamiento de métodos en el capítulo 1. Se conserva
+el tratamiento integrado/separado y la estructura como conceptos distintos.
+Prueba local de 1 principal + 2 anexos: Oficina principal, Depósito y Garaje,
+guardados repetidamente con IDs y nombres estables, sin duplicados. Navegador:
+separación, enlace a M2 de Depósito, guardar Mercado y verlo al regresar al numeral 1.
+PHP 555, JS 113, BD desechable puerto 3355: 114; lint, build y tamaño 58,1 KB.
+Escritorio visual y viewport estrecho sin desbordamiento (562 px). Sin migración;
+no se inspeccionaron los registros del hosting ni se confirmó duplicación allí.
+
 Composición sin anexos: al indicar 0, la ficha del anexo queda oculta y sus campos
 deshabilitados; guardado manual y automático descartan definiciones fuera de las
 cantidades activas. Capítulo 8 también filtra colecciones anteriores por cantidad.

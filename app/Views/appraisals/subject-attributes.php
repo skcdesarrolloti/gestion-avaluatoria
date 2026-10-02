@@ -1,5 +1,5 @@
 <?php
-$attributeUnitLabel = static fn (array $unit): string => ($unit['unit_kind'] === 'annex' ? 'Anexo ' : 'Unidad ') . (int) $unit['unit_index'];
+$attributeUnitLabel = static fn (array $unit): string => trim((string) ($unit['label'] ?? '')) ?: ($unit['unit_kind'] === 'annex' ? 'Anexo ' : 'Unidad ') . (int) $unit['unit_index'];
 $attributeUnits = array_values(array_filter($units, static fn (array $unit): bool => $unit['unit_kind'] !== 'common'));
 $attributeCatalogForUnit = static function (array $unit) use ($record): array {
     $type = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'] ?? ''));
