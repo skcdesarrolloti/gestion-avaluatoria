@@ -37,7 +37,7 @@ final class AppraisalValuationMethodologyController
         $method = is_string($_GET['method'] ?? null) ? $_GET['method'] : 'mercado';
         if (!isset(\App\Services\MethodologyWorkflow::METHODS[$method])) $method = 'mercado';
         $stage = is_string($_GET['stage'] ?? null) ? $_GET['stage'] : 'components';
-        if (!in_array($stage, ['components', 'integration', '1', '2', '3', '4', '5'], true)) $stage = 'components';
+        if (!in_array($stage, ['components', 'integration', 'decision', 'report', '1', '2', '3', '4', '5'], true)) $stage = 'components';
         $searchRecord = $record;
         if ($componentKey !== '') $searchRecord['tipo_inmueble'] = $components[$componentKey]['unit']['property_type'] ?? $record['tipo_inmueble'];
         $methodologyChapter = (new AppraisalMethodologyChapterReport())->build($record, $subject, $units);

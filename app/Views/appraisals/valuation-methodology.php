@@ -6,25 +6,31 @@ $prefix = Workflow::PREFIXES[$method];
 $factorGroups = $guide['factor_groups'] ?? [];
 $methodologyGuides = array_values(array_filter($methodologyChapter['method_guides'], static fn ($item) => $item['key'] === $method));
 $methodologyDecision = $methodologyChapter['decision'];
+$methodologyDecisionRows = $methodologyDecision['rows'] ?? [];
+$methodologyChapterData = $methodologyChapter;
+$methodologyText = $methodologyChapter['text'] ?? '';
+$methodologySections = $methodologyChapter['sections'] ?? [];
+$methodologyReferences = $methodologyChapter['references'] ?? [];
 $basePath = 'avaluos/' . $record['id'] . '/metodologia-valuatoria';
 $flowUrl = static fn ($step, $m = null, $key = null) => url($basePath . '?' . http_build_query([
     'method' => $m ?? $method, 'stage' => $step, 'component' => $key ?? $componentKey]));
 $componentLabel = $components[$componentKey]['label'] ?? 'Banco de muestras sin asignar';
 ?>
 <p class="eyebrow">Capítulo 8 · Metodología valuatoria</p>
-<h1 class="mt-2 text-3xl font-semibold">Métodos por componente del predio</h1>
-<p class="mt-3 text-slate-600">Identifica qué se valora, asigna su método y desarrolla cada componente por separado. Consultar un método no cambia la selección guardada.</p>
+<h1 class="mt-2 text-3xl font-semibold">Metodología valuatoria</h1>
+<p class="mt-3 text-slate-600">Inmuebles y anexos → método → M1–M5. Consulta la matriz del expediente y continúa con las muestras ya registradas.</p>
 <?php require __DIR__ . '/step-nav.php'; ?>
 <?php foreach (['methodology_message', 'methodology_error'] as $flash): $notice = \App\Core\Session::pullFlash($flash); if (!$notice) continue; ?>
     <p role="status" class="mt-4 rounded-xl border p-4"><?= e($notice) ?></p>
 <?php endforeach; ?>
 <nav class="mt-6 flex flex-wrap gap-3" aria-label="Organización del capítulo 8">
-    <a class="btn-secondary" href="<?= e($flowUrl('components')) ?>">Componentes y métodos</a>
+    <a class="btn-secondary" href="<?= e($flowUrl('components')) ?>">Inmuebles y anexos</a>
+    <a class="btn-secondary" href="<?= e($flowUrl('decision')) ?>">Matriz y método</a>
+    <a class="btn-secondary" href="<?= e($flowUrl('3', 'mercado', '')) ?>">Muestras sin asignar (<?= count(\App\Services\MethodologyComparableScope::rows($allComparableRows, '')) ?>)</a>
     <a class="btn-secondary" href="<?= e($flowUrl('integration')) ?>">Integración del avalúo</a>
+    <a class="btn-secondary" href="<?= e($flowUrl('report')) ?>">Texto del numeral 8</a>
 </nav>
-<?php if ($stage === 'components' || $stage === 'integration'): ?>
-    <?php require __DIR__ . '/methodology-components.php'; ?>
-<?php else: ?>
+<?php if ($componentKey !== ''): ?>
 <section class="mt-6 rounded-xl border border-teal-200 bg-teal-50 p-4">
     <p class="font-semibold">Componente en trabajo: <?= e($componentLabel) ?></p>
     <?php if ($stage !== '2'): ?><p class="mt-2 text-sm">Método guardado: <?= e($methods[$selected['method'] ?? ''] ?? 'Pendiente de selección') ?></p><?php endif; ?>
@@ -37,6 +43,7 @@ $componentLabel = $components[$componentKey]['label'] ?? 'Banco de muestras sin 
         </div>
     </details>
 </section>
+<?php endif; ?>
 <nav class="mt-4 flex flex-wrap gap-2 rounded-xl bg-slate-100 p-2" aria-label="Métodos de valoración">
     <?php foreach ($methods as $key => $label): ?>
     <a class="min-h-11 rounded-xl px-4 py-3 font-semibold <?= $key === $method ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600' ?>"
@@ -50,9 +57,16 @@ $componentLabel = $components[$componentKey]['label'] ?? 'Banco de muestras sin 
     <?php endforeach; ?>
 </nav>
 <div class="mt-6">
-<?php if ($stage === '1'): ?>
+<?php if ($stage === 'components' || $stage === 'integration'): ?>
+    <?php require __DIR__ . '/methodology-components.php'; ?>
+<?php elseif ($stage === 'decision'): ?>
+    <?php require __DIR__ . '/valuation-methodology-decision.php'; ?>
+<?php elseif ($stage === 'report'): ?>
+    <?php require __DIR__ . '/valuation-methodology-deliverable-preview.php'; ?>
+<?php elseif ($stage === '1'): ?>
     <?php require __DIR__ . '/valuation-methodology-method-guides.php'; ?>
 <?php elseif ($stage === '2'): ?>
+    <?php require __DIR__ . '/valuation-methodology-decision.php'; ?>
     <?php require __DIR__ . '/methodology-selection.php'; ?>
 <?php elseif ($method !== 'mercado'): ?>
     <section class="rounded-xl border bg-white p-6"><h2 class="text-xl font-semibold"><?= e($prefix . $stage . ' ' . Workflow::STAGES[$stage]) ?></h2>
@@ -64,4 +78,3 @@ $componentLabel = $components[$componentKey]['label'] ?? 'Banco de muestras sin 
     <?php require __DIR__ . '/methodology-market-analysis.php'; ?>
 <?php endif; ?>
 </div>
-<?php endif; ?>

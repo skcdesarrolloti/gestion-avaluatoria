@@ -1,5 +1,24 @@
 # Capítulo 8: componentes y recorrido de Mercado
 
+## Corrección de navegación del 02/10/2026
+
+La entrada vuelve a mostrar inmuebles y anexos, la ruta derivada de los datos
+del expediente y accesos por identidad a cada etapa. Métodos y M1–M5 quedan
+visibles también en la entrada. Se reconectan la matriz metodológica anterior
+y el texto consolidado del numeral 8, que habían quedado fuera de la vista.
+Las muestras sin asignar tienen acceso directo con conteo. Consultar estos
+enlaces no asigna muestras ni modifica decisiones guardadas.
+
+No cambia el esquema, la persistencia ni la configuración. No requiere una
+migración nueva. Publicar los archivos modificados mediante el despliegue habitual.
+Validación local: lint PHP, 466 verificaciones PHP, 112 pruebas JS, build y
+check:size (58.1 KB gzip). Prueba de render con inmueble, anexo integrado y
+muestra anterior; vista inicial inspeccionada en navegador a tamaño escritorio
+y móvil (390 px, 375 px de contenido sin desbordamiento global).
+La revisión visual usa datos ficticios, no una sesión autenticada del hosting.
+No se ejecutaron pruebas de BD en esta corrección de vistas ni se verificaron
+los datos o el despliegue en producción.
+
 Primero se asigna un método a cada componente. Consultar una pestaña no cambia
 la elección guardada. Unidades y anexos conservan sus IDs. El terreno separado
 es opcional y nunca se asigna ni suma automáticamente.

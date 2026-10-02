@@ -1,5 +1,5 @@
 <?php if ($componentKey === ''): ?>
-<p class="rounded-xl border bg-white p-5">Selecciona un componente desde «Componentes y métodos». El banco sin asignar conserva las muestras anteriores sin adjudicarlas automáticamente.</p>
+<p class="rounded-xl border bg-white p-5">Selecciona el inmueble o anexo desde «Inmuebles y anexos» para guardar su método. Puedes consultar las muestras anteriores en M3 o en «Muestras sin asignar».</p>
 <?php else: ?>
 <form x-data="{ chosenMethod: <?= e(json_encode(($selected['method'] ?? '') ?: $method)) ?> }" method="post" action="<?= e(url($basePath . '/flujo')) ?>" data-module-autosave data-save-in-place
     data-autosave-endpoint="<?= e(url($basePath . '/flujo')) ?>" class="rounded-2xl border bg-white p-5 sm:p-8">

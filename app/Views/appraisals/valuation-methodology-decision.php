@@ -25,9 +25,9 @@ $firstComponent = (string) ($componentItems[0]['id'] ?? '');
                     <strong><?= e((string) ($nextStep[0] ?? '8.3 Desarrollo del método')) ?>:</strong>
                     <?= e((string) ($nextStep[1] ?? '')) ?>
                 </div>
-                <button type="button" class="btn-primary mt-4 min-h-11" @click="methodologyTab = '83'">
-                    Ir al desarrollo 8.3
-                </button>
+                <a class="btn-primary mt-4 min-h-11" href="<?= e($flowUrl('3')) ?>">
+                    Ir a M3 · Insumos y comparables
+                </a>
             </div>
         </div>
         <div class="grid gap-3 sm:grid-cols-2">

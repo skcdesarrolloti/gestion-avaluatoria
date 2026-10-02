@@ -7,7 +7,7 @@ expect(request($flowPath . '/flujo', http_build_query($flowPost), $jsonHeaders)[
 expect(request($flowPath . '/flujo', http_build_query($flowPost), $jsonHeaders)['status'] === 409, 'HTTP detecta conflicto metodológico');
 expect(request($flowPath . '/flujo', http_build_query(array_replace($flowPost, ['_token' => 'bad'])), $jsonHeaders)['status'] === 419, 'HTTP exige CSRF para selección');
 expect(request($flowPath . '/flujo', http_build_query(array_replace($flowPost, ['version' => 1, 'component' => 'ajeno'])), $jsonHeaders)['status'] === 422, 'HTTP rechaza componente no perteneciente al expediente');
-foreach (['1', '2', '3', '4', '5', 'components', 'integration'] as $stage) {
+foreach (['1', '2', '3', '4', '5', 'components', 'integration', 'decision', 'report'] as $stage) {
     $response = request($flowPath . '?component=principal&stage=' . $stage);
     expect($response['status'] === 200 && !str_contains($response['body'], 'Warning:') && !str_contains($response['body'], 'Fatal error:'), 'HTTP renderiza etapa ' . $stage . ' sin errores');
 }

@@ -20,7 +20,8 @@ $deliverable82 = trim((string) ($methodologyChapterData['sections'][2][1] ?? '')
         <article class="rounded-xl border border-white/80 bg-white p-4">
             <p class="text-xs font-bold uppercase text-sky-700">8.1 Marco académico</p>
             <h3 class="mt-2 font-semibold text-slate-950">Texto base para informe</h3>
-            <textarea class="input mt-3 min-h-80 bg-slate-50 font-mono text-sm leading-6" rows="18" readonly><?= e($methodologyText) ?></textarea>
+            <label for="methodology-text" class="mt-3 block font-semibold">Texto del numeral 8</label>
+            <textarea id="methodology-text" placeholder="La redacción del numeral aparecerá aquí." class="input mt-3 min-h-80 bg-slate-50 font-mono text-sm leading-6" rows="18" readonly><?= e($methodologyText) ?></textarea>
         </article>
         <article class="rounded-xl border border-white/80 bg-white p-4">
             <p class="text-xs font-bold uppercase text-sky-700">8.2 Selección metodológica</p>
