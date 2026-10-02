@@ -5,12 +5,16 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
 ?>
 <section id="capture-sources" class="mb-6 rounded-xl border border-blue-100 bg-blue-50 p-4" x-data="{ sourceTab: 0 }">
     <h3 class="text-lg font-semibold text-blue-950" x-text="'Captura en ' + <?= e(json_encode(array_column($sourceTabs, 'label'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>[sourceTab]">Captura en <?= e($sourceTabs[0]['label'] ?? 'la fuente seleccionada') ?></h3>
-    <p class="mt-2 text-sm leading-6">Trabaja con esta fuente. Cada aviso que agregues se suma a tu tabla.</p>
+    <p class="mt-2 text-sm leading-6">Trabaja con esta fuente. Cada aviso que agregues se suma a tu tabla. Conservamos la lectura por portal, el pegado de avisos y la revisión de repetidos.</p>
+    <p class="mt-2 text-sm leading-6">Si el portal no permite lectura directa, copia su contenido con Ctrl+A y Ctrl+C y pégalo con Ctrl+V en el lector de esa fuente. Revisa los inmuebles reconocidos antes de incorporarlos. Los datos que el portal no publique se completan manualmente o quedan pendientes; no se inventan.</p>
     <div class="mt-3 flex flex-wrap items-center gap-3 text-sm">
         <strong><span x-text="total"><?= count($comparableRows ?? []) ?></span> muestras en la tabla</strong>
         <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'matriz'">Ver Matriz de datos</button>
+        <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'matriz'; mode = 'cards'; add()">Capturar muestra manual</button>
+        <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'mapa'">Completar ubicación y soportes</button>
         <span data-autosave-status>Consulta el estado de guardado al incorporar.</span>
     </div>
+    <?php require __DIR__ . '/methodology-capture-reading.php'; ?>
     <details class="mt-3" x-ref="sourcePicker">
         <summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold text-blue-800">Cambiar de fuente</summary>
         <label for="market-source-choice" class="block text-sm font-semibold">Elige el portal o la inmobiliaria para continuar</label>

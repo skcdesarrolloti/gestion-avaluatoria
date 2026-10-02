@@ -224,3 +224,19 @@ Los soportes MIDAS del numeral 2 quedan reservados para evidencias específicas 
 El menú también enumera los campos del expediente y separa soporte normativo directo,
 derivación metodológica y control operativo interno.
 
+
+## 2026-10-02 · Acceso visible a captura de portales
+
+M3 abre en Portales y pegado. El capítulo 8 ofrece un acceso directo a M3,
+conservando el componente activo y el banco anterior. La captura mantiene los
+lectores por portal, URL individual, pegado por fuente y control de repetidos.
+Se agregan accesos a ficha manual, matriz y mapas, y consulta del artículo 17.
+Los datos incompletos siguen siendo borradores; el cálculo corresponde a M4.
+No se modifican importadores, persistencia, migraciones ni datos existentes.
+Cultivos deja de figurar en el grupo habitual de áreas; permanece disponible en
+Todos los campos para conservar información anterior. Esto no implementa todavía
+una clasificación automática urbano/rural ni los campos normativos pendientes.
+Validación: PHP 471, JS 113, lint PHP, build y tamaño 58.1 KB gzip.
+Navegador local con datos sintéticos: entrada directa a portales, apertura del
+lector de enlace/texto y ficha manual. No se probó descarga real de los portales
+ni guardado en hosting en esta revisión. No se cambió el esquema de BD.

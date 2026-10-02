@@ -1,9 +1,9 @@
 <?php
 $captureNext = [
-    'Captura muestras verificables hasta acercarte a la meta de 15 observaciones por cada factor que realmente vas a analizar.',
-    'Descarta duplicados, avisos sin datos mínimos o inmuebles con uso, derecho o escala no comparable.',
+    'Captura los datos disponibles de cada aviso y conserva su fuente y soporte.',
+    'Revisa las alertas de repetidos antes de incorporar; completa manualmente la información faltante sin inventarla.',
     'Registra enlace, fecha, fuente, precio, área, administración, IVA si aplica y observaciones verificables.',
-    'Con las muestras depuradas, pasa a variables y prepara el análisis estadístico robusto del numeral M4.',
+    'Conserva pendientes y salvedades. La selección técnica, depuración y cálculos se realizan en M4.',
 ];
 $minimumFields = [
     'Fuente y enlace del aviso',

@@ -9,7 +9,7 @@ const groups = {
     capture: ['source_type', 'source_name', 'source_url', 'operation', 'property_type', 'neighborhood',
         'project_name', 'ph_regime', 'price_amount', 'price_unit', 'area_m2', 'consulted_at', 'contact_name', 'contact_phone'],
     location: ['source_name', 'source_url', 'consulted_at', 'neighborhood', 'address_hint', 'project_name', ...mapFields],
-    composition: ['ph_regime', 'ph_special', 'area_m2', 'area_basis', 'private_built_m2', 'private_free_m2', 'ph_units_detail', 'land_m2', 'built_m2', 'annexes_detail', 'crops_detail', 'areas_source'],
+    composition: ['ph_regime', 'ph_special', 'area_m2', 'area_basis', 'private_built_m2', 'private_free_m2', 'ph_units_detail', 'land_m2', 'built_m2', 'annexes_detail', 'areas_source'],
     attributes: ['ph_regime', 'admin_fee', 'vat_applies', 'bedrooms', 'bathrooms', 'parking_spaces', 'floor_level', 'stratum',
         'age_years', 'building_condition', 'conservation_state', 'view_quality', 'finish_quality', 'elevator',
         'amenities', 'security_features', 'power_plant', 'parking_relation', 'balcony_terrace', 'noise_humidity_sun'],

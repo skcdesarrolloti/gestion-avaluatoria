@@ -11,6 +11,7 @@
         <?php if ($step === 'decision'): ?><a class="btn-secondary" <?= !$globalStage ? 'aria-current="page"' : '' ?> href="<?= e($flowUrl('decision') . '#elegir-componente') ?>">C · Analizar inmueble</a><?php endif; ?>
     <?php endforeach; ?>
     </nav>
+    <a class="btn-secondary mt-3" href="<?= e($flowUrl('3', 'mercado', $componentKey)) ?>">Portales y pegado de comparables → M3</a>
     <?php if (!$globalStage): ?><p class="mt-3 font-semibold">C · <?= $componentKey === '' ? 'Asignar muestras a un inmueble' : 'Trabajo de ' . e($componentLabel) ?></p><?php endif; ?>
     <details class="mt-3"><summary class="min-h-11 cursor-pointer text-teal-800">Herramienta de apoyo · muestras anteriores</summary>
         <p class="mb-3 text-sm">Este banco conserva las muestras anteriores. Asígnalas a su inmueble para utilizarlas en M3; no es otra etapa del análisis.</p>

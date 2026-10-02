@@ -20,12 +20,12 @@ $formulaFamilies = [
 ];
 $searchTabs = [
     'buscar' => '1. Buscar',
-    'captura' => '2. Capturar',
+    'captura' => '2. Portales y pegado',
     'matriz' => '3. Matriz de datos',
     'mapa' => '4. Mapas y evidencia',
 ];
 ?>
-<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ searchTab: 'buscar' }">
+<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ searchTab: 'captura' }">
     <div class="mb-6">
         <p class="eyebrow">M3 Desarrollo operativo del método de mercado</p>
         <h2 class="mt-2 text-2xl font-semibold">Investigación, muestra y trazabilidad de mercado</h2>
