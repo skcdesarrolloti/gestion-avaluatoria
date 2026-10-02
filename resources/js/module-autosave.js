@@ -1,5 +1,6 @@
 import { packComparableRows } from './comparable-transport.js';
 import { publishDerivedChange } from './derived-refresh.js';
+import { acknowledgeCompositionMethods } from './composition-method-save.js';
 
 const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 const states = new WeakMap();
@@ -106,6 +107,7 @@ async function save(form) {
         if (response.status === 409) state.conflict = true;
         if (!response.ok || result.ok !== true) throw new Error(result.message || 'No se pudo confirmar el guardado.');
         updateVersion(form, result);
+        acknowledgeCompositionMethods(form, result);
         if (typeof result.object_text === 'string') form.querySelectorAll('[data-object-preview]').forEach(node => { node.textContent = result.object_text; });
         updateDossierNumber(form, result);
         publishDerivedChange(form, result);

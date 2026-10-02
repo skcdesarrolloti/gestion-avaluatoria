@@ -30,12 +30,6 @@
                                 value="<?= e($unitDisplay($unit)) ?>" placeholder="Ej. Casa principal, Piscina, Parqueadero 1">
                         </label>
                         <?php if (($unit['unit_kind'] ?? '') === 'property'): ?>
-                            <div class="text-sm text-slate-600"><p>Clasificación actual: unidad principal. El nombre no cambia su clasificación.</p>
-                                <button type="submit" class="btn-secondary mt-2" data-reclassify-unit name="convert_to_annex" value="<?= e((string) ($unit['id'] ?? '')) ?>">Cambiar a anexo o mejora</button>
-                                <p class="mt-1 text-xs">Guarda los datos y conserva este componente, sus fotos y soportes.</p>
-                            </div>
-                        <?php else: ?><p class="text-sm font-semibold text-teal-800">Clasificación: anexo o mejora</p><?php endif; ?>
-                        <?php if (($unit['unit_kind'] ?? '') === 'property'): ?>
                             <label class="label">Tipo de inmueble de la unidad
                                 <select class="input" name="config_units[<?= e($key) ?>][property_type]">
                                     <option value="">Usar tipo general del avalúo</option>
@@ -90,7 +84,7 @@
                                 </template>
                             </select>
                             <span class="mt-2 block text-sm font-normal leading-6 text-teal-900" x-show="constructionType === 'oficina'" x-cloak>
-                                Para Oficina, esta lista reúne <strong>Comerciales y Edificios</strong>, incluidos ED.Servicios_Tipo_1, Tipo_2 y Tipo_3. Cada referencia indica su categoría original. Revisa su descripción y especificaciones antes de elegir; no todas corresponden a tu oficina. La tipología la decide el analista.
+                                Oficinas: referencias de Comerciales y Edificios. Consulta sus especificaciones antes de elegir.
                             </span>
                             <span class="mt-1 block text-xs leading-5 text-slate-500" x-show="igacCategory">
                                 <span x-text="igacOptions.length"></span>
@@ -99,26 +93,19 @@
                             <?php require BASE_PATH . '/app/Views/appraisals/chapter-zero-igac-preview.php'; ?>
                         </label>
                         <?php require __DIR__ . '/chapter-zero-unit-method.php'; ?>
-                        <label class="label">Cómo se incluye en el avalúo · Tratamiento en el avalúo
+                        <label class="label">Tratamiento en el avalúo
                             <select class="input" name="config_units[<?= e($key) ?>][valuation_treatment]">
                                 <?php foreach ($valuationTreatments as $value => $text): ?>
                                     <option value="<?= e($value) ?>" <?= $treatmentValue($unit) === $value ? 'selected' : '' ?>><?= e($text) ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <span class="mt-1 block text-xs leading-5 text-slate-500">
-                                Comprueba naturaleza jurídica y cobertura. En PH distingue la liquidación del sujeto (art. 36) de la depuración de muestras (art. 19).
-                            </span>
                         </label>
-                        <label class="label">Estructura del método de esta unidad o anexo
+                        <label class="label">Qué comprende esta unidad
                             <select class="input" name="config_units[<?= e($key) ?>][method_structure]">
                                 <?php foreach (\App\Support\UnitMethodStructure::options() as $value => $text): ?>
                                     <option value="<?= e($value) ?>" <?= ($unit['method_structure'] ?? '') === $value ? 'selected' : '' ?>><?= e($text) ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <span class="mt-1 block text-xs text-slate-500">Define qué comprende este componente según sus datos registrados. No selecciona automáticamente Mercado, Costo ni otro método.</span>
                         </label>
-                        <label class="label md:col-span-2">Descripción base
-                            <input class="input" name="config_units[<?= e($key) ?>][notes]" maxlength="2000"
-                                value="<?= e((string) ($unit['notes'] ?? '')) ?>" placeholder="Uso, independencia, restricciones o relación con el predio">
-                        </label>
+                        <input type="hidden" name="config_units[<?= e($key) ?>][notes]" value="<?= e((string) ($unit['notes'] ?? '')) ?>">
                     </fieldset>

@@ -1,5 +1,17 @@
 # Entrega al responsable de la implementación
 
+Composición simplificada (vigente): cada ficha permite definir unidad, método de
+valoración y referencia IGAC. El selector Mercado/Costo/Renta/Residual se guarda
+ahora en el numeral 1, sobre el mismo methodology_workflow del capítulo 8.
+Sustituye el recuadro y enlace a M2 descritos en la entrega anterior. Se mantienen
+principales/anexos separados, tratamiento y cobertura; notas existentes conservadas.
+Guardado atómico con versión de metodología: un cambio concurrente devuelve 409
+sin guardar parcialmente; editar otros campos no sobrescribe el método de otra pestaña.
+Validación: PHP 555, JS 114, BD local desechable puerto 3356: 119; lint, build y
+58,2 KB gzip. Navegador: seleccionar Mercado, autoguardar y recargar; persiste junto
+al Costo independiente del anexo. Revisión visual escritorio y ancho reducido sin
+desbordamiento. Sin migración nueva; hosting pendiente de actualizar por el usuario.
+
 Retiro puntual solicitado: sin bloque «Volver al capítulo 8» en composición del
 numeral 1 ni botón «Ver capítulo 1 · Composición» en el 8. Se mantienen selección
 del método, datos y navegación general. Fieldsets con x-cloak evitan mostrar

@@ -33,6 +33,8 @@ final class AppraisalUnitDefinitionInput
                 'igac_typology_hint' => $unit['igac_typology_hint'] ?? '',
             ]);
             $rows[] = [
+                'method_choice' => array_key_exists('method_choice', $unit) ? \App\Services\MethodologyWorkflow::input(['method' => $unit['method_choice']])['method'] : null,
+                'original_method' => (string) ($unit['original_method'] ?? ''),
                 'method_structure' => self::structure($unit),
                 'unit_kind' => $match[1],
                 'unit_index' => (int) $match[2],

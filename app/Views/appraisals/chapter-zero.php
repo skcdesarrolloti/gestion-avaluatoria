@@ -62,6 +62,7 @@ $currentStep = 'expediente';
         }" @submit="busy = true" @ga:dossier-created.window="setActive('identificacion')">
         <?= csrf_field() ?>
         <input type="hidden" name="version" value="<?= e($record['version']) ?>">
+        <input type="hidden" name="composition_method_version" value="<?= e((string) ($record['methodology_version'] ?? 1)) ?>">
         <input type="hidden" name="igac_category" value="<?= e($field('igac_category')) ?>">
         <input type="hidden" name="igac_typology_hint" value="<?= e($field('igac_typology_hint')) ?>">
         <input type="hidden" name="direccion" value="<?= e($field('direccion')) ?>">

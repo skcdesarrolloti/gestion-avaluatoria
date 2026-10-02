@@ -89,6 +89,9 @@ final class AppraisalRepository
         return ['version' => $version + 1, 'saved_at' => str_replace(' ', 'T', $now) . 'Z'];
     }
 
+    public function saveComposition(string $id, int $owner, int $version, array $data, array $posted, int $methodVersion): array
+    { return (new AppraisalCompositionSave($this->db, $this))->save($id, $owner, $version, $data, $posted, $methodVersion); }
+
     public function savePreclassification(string $id, int $owner, int $version, array $data): array {
         $now = gmdate('Y-m-d H:i:s');
         $query = $this->db->prepare('UPDATE appraisals SET igac_category = ?, igac_typology_hint = ?,
@@ -116,7 +119,7 @@ final class AppraisalRepository
     }
 
     public function saveUnitDefinitionsByKey(string $id, int $owner, array $units): void
-    { if ($units === []) return; $now = gmdate('Y-m-d H:i:s'); $query = $this->db->prepare('UPDATE appraisal_units SET label = ?, property_type = ?, construction_type = ?, valuation_treatment = ?, method_structure = COALESCE(?, method_structure), igac_category = ?, igac_typology_hint = ?, notes = ?, updated_at = ? WHERE appraisal_id = ? AND owner_id = ? AND unit_kind = ? AND unit_index = ?'); foreach ($units as $unit) { $label = (string) ($unit['label'] ?: (($unit['unit_kind'] === 'annex' ? 'Anexo ' : 'Unidad ') . (int) $unit['unit_index'])); $query->execute([$label, $unit['property_type'], $unit['construction_type'], $unit['valuation_treatment'], $unit['method_structure'] ?? null, $unit['igac_category'], $unit['igac_typology_hint'], $unit['notes'], $now, $id, $owner, $unit['unit_kind'], $unit['unit_index']]); } }
+    { AppraisalUnitDefinitions::save($this->db, $id, $owner, $units); }
 
     public function saveUnitSurfaces(string $id, int $owner, array $units): void
     {
