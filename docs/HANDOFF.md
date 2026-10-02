@@ -479,3 +479,19 @@ Validación: 585 checks PHP, 116 JS, 612 archivos PHP sin errores, build y 58,8 
 gzip. UI aislada con datos ficticios: tres filas, depósito sin descripción pendiente,
 enlace abre controles del garaje, sin errores de consola; CSS 390 px sin
 desbordamiento de página. El push publica código en Git; usuario actualiza hosting.
+
+## 2026-10-02 · Tipo del anexo en 3.1
+
+La lista de tipo de inmueble principal no incluía depósito y sugería heredar el
+tipo general para los anexos. 3.1 muestra ahora la clasificación construction_type
+ya guardada en 3.3 para cada anexo, con enlace a su panel Datos básicos para editarla.
+Depósito se presenta como Depósito / cuarto útil y parqueo como Garaje / parqueadero
+/ celda de parqueo. Si está vacío, pide diligenciar en 3.3. No duplica el editor ni
+asigna tipos por nombre; la unidad principal conserva la lista property_type.
+El formulario mantiene el property_type existente del anexo en un campo oculto
+para que guardar su descripción no lo borre. Sin cambios de persistencia o esquema.
+
+Verificación: 589 checks PHP, 116 JS, 614 PHP sin errores, build y 58,8 KB gzip.
+Interfaz local con datos ficticios: depósito y garaje consultan tipo correcto,
+enlace conserva la unidad y Datos básicos; CSS 390 px sin desbordamiento y consola
+sin errores. Cambios subidos a Git para actualización habitual del hosting.
