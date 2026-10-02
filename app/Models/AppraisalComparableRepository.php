@@ -23,7 +23,7 @@ final class AppraisalComparableRepository
         }, $query->fetchAll());
     }
 
-    public function saveAll(string $appraisalId, int $owner, array $rows, int $version): int
+    public function saveAll(string $appraisalId, int $owner, array $rows, int $version, ?array $excelImport = null): int
     {
         $this->db->beginTransaction();
         try {
@@ -38,6 +38,7 @@ final class AppraisalComparableRepository
                 if (!is_array($row) || !$this->meaningful($row)) continue;
                 $this->insert($appraisalId, $owner, $index + 1, $row + ($previous[$row['id'] ?? ''] ?? []));
             }
+            if ($excelImport !== null) \App\Services\ComparableExcelHistory::record($this->db, $appraisalId, $owner, $excelImport, $version + 1);
             $this->db->commit();
             return $version + 1;
         } catch (\Throwable $error) {

@@ -1,5 +1,10 @@
 # Crear y evolucionar la base sin SQL manual
 
+Excel M3: `202610020002_comparable_excel_history.php` agrega historial de última
+importación por unidad/banco. Se guardan fecha UTC, nombre de archivo y versión
+en la misma transacción que las muestras. UI presenta hora de Colombia.
+Aplicar mediante AUTO_MIGRATE o `php bin/console.php migrate`; no cambia muestras.
+
 Academia por unidad: cuatro subpestañas visibles en A del capítulo 8 y lectura contextual
 para PH, NPH, terreno y mejoras. Capítulo 1 guarda «Estructura del método» por unidad
 y anexo; capítulo 8 la consulta. Migración aditiva `202610020001_unit_method_structure.php`

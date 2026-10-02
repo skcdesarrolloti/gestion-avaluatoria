@@ -56,14 +56,22 @@ Excel (.xlsx) exporta todas las filas de la colección, no sólo la página/filt
 Tabla nativa con filtros, encabezados y primera columna inmovilizados, importes
 numéricos, fórmulas de negociación y pendientes amarillos. Texto externo es
 inlineStr, nunca fórmula. Generador OOXML del navegador, sin nuevas dependencias.
-La descarga espera confirmar el autoguardado. Importar Excel actualizado revisa
-el archivo exportado y presenta los cambios antes de aplicarlos y autoguardar.
+La descarga espera confirmar el autoguardado. El bloque Excel se muestra al inicio
+de la tabla, antes de filtros y explicaciones; permite descargas repetidas completas.
+Importar Excel actualizado revisa el archivo exportado y presenta los cambios.
+Guardar Excel actualizado revalida el archivo y versión en servidor y guarda
+datos y fecha de importación en la misma transacción. No usa el autoguardado
+para confirmar la carga. El nombre y fecha/hora de Colombia persisten por colección;
+seleccionar, cancelar o fallar no cambia la fecha. Excel idéntico también permite
+confirmar una nueva carga. Nombre de descarga incluye versión y momento UTC.
 La hoja oculta conserva expediente, unidad/banco, versión, campos y opciones;
 cada fila conserva ID. Reordenar no altera su identidad; omitir filas no elimina
 muestras. Se rechazan IDs ajenos, repetidos, otras colecciones o versiones antiguas.
 Campos calculados se recalculan en el módulo; fórmulas editables no se ejecutan.
 No se incorporan nuevas muestras desde este Excel: usar Nueva muestra o lectores.
 Archivo .xlsx hasta 5 MB; servidor requiere extensiones PHP ZIP y SimpleXML.
+Migración aditiva 202610020002_comparable_excel_history agrega historial por
+unidad/banco a appraisals. AUTO_MIGRATE o comando migrate aplica sin SQL manual.
 PH/NPH omite columnas específicas vacías del otro régimen en Excel; si tienen
 información previa, se conserva. No se borran muestras ni datos al cambiar vistas.
 

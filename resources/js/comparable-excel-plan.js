@@ -30,7 +30,10 @@ export function excelPlan(entries, rows) {
     }
     return changes;
 }
-export function applyExcelPlan(changes) {
+export function verifyExcelPlan(changes) {
     if (changes.some(change=>change.input.value !== change.before)) throw new Error('La tabla cambió durante la revisión. Vuelve a revisar el Excel.');
+}
+export function applyExcelPlan(changes) {
+    verifyExcelPlan(changes);
     for (const change of changes) change.input.value = change.value;
 }

@@ -549,3 +549,17 @@ Sin migración ni escritura de datos reales. Ver PH-M3-TABLA-NEGOCIACION.md.
 Validación: 642 PHP, 127 JS, lint, build 65,9 KB gzip. Navegador: ejemplo
 ficticio guardado/recargado 475 millones / 100 m² = 4.750.000 COP/m²;
 consola limpia y CSS móvil 390 px sin desbordamiento. 142 checks BD desechable 3363.
+
+## 2026-10-02 · Excel como flujo principal y fecha de carga
+
+Bloque Descargar tabla completa en Excel / Importar Excel actualizado al comienzo
+de M3 tabla. Descargas repetidas, nombres con versión y hora UTC. Confirmar
+Guardar Excel actualizado usa endpoint protegido nuevo: revalida archivo/versión
+y guarda datos y sello de importación en una transacción. La fecha de Colombia,
+nombre y versión persisten por unidad/banco, incluso al recargar. Cargas sin
+cambios pueden registrarse; selección o revisión no altera fecha. No crea filas.
+Migración aditiva 202610020002_comparable_excel_history; AUTO_MIGRATE o migrate.
+642 PHP, 129 JS, 152 BD desechable 3364 y ocho HTTP incluyendo CSRF, versión,
+persistencia de fecha y conservación de otra colección. Build 66,1 KB gzip.
+Prueba UI local muestra fecha y archivo guardados; carga mediante navegador sigue
+limitada por permiso de archivos de extensión Chrome. No se modificaron permisos.

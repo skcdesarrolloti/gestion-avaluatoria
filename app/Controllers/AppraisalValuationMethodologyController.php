@@ -81,16 +81,10 @@ final class AppraisalValuationMethodologyController
     { \App\Services\MarketPhScopeAction::save($this->appraisals, $this->user['id'], $id, $unitId); }
 
     public function previewExcel(string $id): never
-    {
-        $record = $this->appraisals->find($id, $this->user['id']);
-        $key = is_string($_POST['component_scope'] ?? null) ? $_POST['component_scope'] : '';
-        \App\Services\MethodologyWorkflow::validateKey($key, \App\Services\MethodologyWorkflow::components($record, $this->appraisals->units($id, $this->user['id'])));
-        $file = $_FILES['excel'] ?? [];
-        if (($file['error'] ?? -1) !== UPLOAD_ERR_OK || ($file['size'] ?? 0) > 5000000 || !is_uploaded_file($file['tmp_name'] ?? '')) throw new \App\Core\HttpException(422, 'Selecciona un Excel .xlsx de hasta 5 MB.');
-        $existing = \App\Services\MethodologyComparableScope::rows($this->comparables->forAppraisal($id, $this->user['id']), $key);
-        $rows = \App\Services\ComparableExcelInput::read($file['tmp_name'], $id, $key, (int) $record['comparables_version'], $existing);
-        Http::json(['ok'=>true, 'rows'=>$rows, 'version'=>(int) $record['comparables_version']]);
-    }
+    { \App\Services\ComparableExcelAction::run($this->appraisals,$this->comparables,$this->user['id'],$id); }
+
+    public function saveExcel(string $id): never
+    { \App\Services\ComparableExcelAction::run($this->appraisals,$this->comparables,$this->user['id'],$id,true); }
 
     public function assignComparables(string $id): never
     {

@@ -68,6 +68,7 @@ require __DIR__ . '/unit-structure-persistence.php';
 require __DIR__ . '/market-evidence-persistence.php';
 require __DIR__ . '/composition-method-persistence.php';
 require __DIR__ . '/appraiser-assignment-persistence.php';
+require __DIR__ . '/comparable-excel-persistence.php';
 // An applied migration must never be silently changed.
 $app->exec("UPDATE schema_migrations SET checksum = REPEAT('0', 64) WHERE version = '202609150002_add_observaciones.php'");
 $detected = false;

@@ -6,6 +6,8 @@
     data-module-autosave data-save-in-place data-comparable-json
     data-ph-subject="<?= !empty($guide['is_ph']) ? 'si' : 'no' ?>"
     data-appraisal-id="<?= e($record['id']) ?>" data-excel-preview-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/excel/revisar')) ?>"
+    data-excel-save-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/excel/guardar')) ?>"
+    data-excel-updated="<?= e(\App\Services\ComparableExcelHistory::display(\App\Services\ComparableExcelHistory::latest($record, $componentKey ?? ''))) ?>"
     data-subject-latitude="<?= e($subject['latitude'] ?? '') ?>" data-subject-longitude="<?= e($subject['longitude'] ?? '') ?>"
     data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/autoguardar')) ?>">
     <?= csrf_field() ?>
@@ -33,6 +35,7 @@
             <button type="button" @click="searchTab = 'captura'" class="btn-secondary min-h-11">Seguir capturando</button>
         </div>
     </div>
+    <?php require __DIR__ . '/methodology-excel-import.php'; ?>
     <div id="unit-price-help" x-show="searchTab === 'matriz'" class="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-6">
         <p><strong>Comparación en COP/m².</strong> Oferta y negociado por m² se calculan automáticamente; los importes originales se conservan como soporte. Se exige régimen, área positiva y fuente; en NPH/condominio también la base del área publicada. Descuento vacío queda pendiente; cero debe ser confirmado. Un precio ya publicado por m² no se divide nuevamente.</p>
         <p><strong>PH: cociente preliminar, pendiente de M4.</strong> Usa área privada construida, sin sumar áreas de garaje, depósito o áreas libres. Si el precio incluye estos componentes, hay que sustentar su depuración del comparable (art. 19.2.b); tener los mismos anexos que el sujeto no elimina esa revisión.</p>

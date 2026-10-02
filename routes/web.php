@@ -108,6 +108,7 @@ return [
     ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/comparables$#', 'valuationMethodology', 'saveComparables', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/comparables/autoguardar$#', 'valuationMethodology', 'autosaveComparables', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/comparables/excel/revisar$#', 'valuationMethodology', 'previewExcel', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/comparables/excel/guardar$#', 'valuationMethodology', 'saveExcel', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/comparables/leer-aviso$#', 'valuationMethodology', 'readComparable', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/comparables/buscar-zona$#', 'valuationMethodology', 'searchComparables', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/ampliaciones-entregable$#', 'reportNotes', 'show', true],

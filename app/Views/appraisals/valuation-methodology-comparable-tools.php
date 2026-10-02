@@ -38,11 +38,9 @@
         <button type="button" class="btn-secondary" @click="searchTab === 'mapa' ? moveMap(1) : (page++, render())" :disabled="page >= pages || mapBusy || photoBusy || photoRetry">Siguiente</button>
         <button type="button" class="btn-primary" x-show="searchTab === 'mapa' && mapIndex !== null" @click="openPhotos(mapIndex)" :disabled="mapBusy || photoBusy || photoRetry">Fotos de esta muestra</button>
         <button type="submit" class="btn-primary">Guardar ahora</button>
-        <button type="button" class="btn-secondary" @click="exportExcel()" :disabled="total === 0 || photoBusy || mapBusy || exportBusy || excelBusy" x-text="exportBusy ? 'Exportando…' : 'Exportar a Excel (.xlsx)'">Exportar a Excel (.xlsx)</button>
         <span class="text-xs" data-autosave-status aria-live="polite">Autoguardado activo</span>
     </div>
     <p class="mt-2 text-xs text-slate-600">La tabla es editable y autoguarda. Excel exporta todas las filas de esta unidad/banco, después de confirmar el guardado. Amarillo = por confirmar. Puedes importar el archivo actualizado y revisar los cambios antes de aplicarlos.</p>
-    <?php require __DIR__ . '/methodology-excel-import.php'; ?>
     <p x-show="searchTab === 'mapa'" role="status" class="mt-2 text-sm" x-text="mapMessage"></p>
     <div x-show="searchTab !== 'mapa'"><?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-removal.php'; ?></div>
     <p class="mt-2 rounded-lg bg-teal-50 p-3 text-sm" x-show="total === 0 && shown === 0">La matriz está vacía: no quedan muestras. Pulsa «Seguir capturando» para buscar avisos o «Nueva muestra» para diligenciar una manualmente.</p>
