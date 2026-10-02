@@ -1,6 +1,7 @@
 import { negotiation, capturePending, portalCounts, amount } from './comparable-negotiation.js';
 import { tableWorkbook } from './xlsx-table.js';
 import {unitPrice, unitFields, unitNumeric} from './comparable-unit-price.js';
+import {orderExcelColumns} from './comparable-excel-columns.js';
 
 const negotiationFields = [...unitFields, 'negotiation_discount', 'negotiated_amount', 'negotiation_percent', 'negotiation_kind', 'negotiation_source'];
 export function updateCapture(entries, form, state) {
@@ -71,7 +72,7 @@ export function exportCapture(entries, form) {
         }
         return row;
     });
-    const bytes = tableWorkbook(columns, rows, form.dataset.phSubject === 'si' ? 'Comparables PH' : 'Comparables NPH', {
+    const bytes = tableWorkbook(orderExcelColumns(columns), rows, form.dataset.phSubject === 'si' ? 'Comparables PH' : 'Comparables NPH', {
         appraisal:form.dataset.appraisalId,scope:form.querySelector('[name=component_scope]').value,version:Number(form.querySelector('[name=version]').value),exported_at:new Date().toISOString()});
     const url = URL.createObjectURL(new Blob([bytes], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
     const link = document.createElement('a'); link.href = url; link.download = `comparables-${form.dataset.phSubject === 'si' ? 'PH' : 'NPH'}-v${form.querySelector('[name=version]').value}-${new Date().toISOString().replaceAll(':','-').slice(0,19)}.xlsx`;

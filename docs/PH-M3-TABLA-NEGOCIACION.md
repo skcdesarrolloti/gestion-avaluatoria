@@ -58,6 +58,11 @@ numéricos, fórmulas de negociación y pendientes amarillos. Texto externo es
 inlineStr, nunca fórmula. Generador OOXML del navegador, sin nuevas dependencias.
 La descarga espera confirmar el autoguardado. El bloque Excel se muestra al inicio
 de la tabla, antes de filtros y explicaciones; permite descargas repetidas completas.
+El Excel prioriza fuente/enlace, ubicación, tipo/operación, oferta/unidad, área
+publicada, parqueaderos/depósito, contacto y datos habituales del aviso. Después
+presenta descuento y cocientes por m²; verificaciones, soportes y demás campos
+siguen disponibles, con pendientes e ID al final. Orden propio independiente
+del grupo seleccionado en pantalla, sin eliminar campos ni cambiar M4.
 Importar Excel actualizado revisa el archivo exportado y presenta los cambios.
 Guardar Excel actualizado revalida el archivo y versión en servidor y guarda
 datos y fecha de importación en la misma transacción. No usa el autoguardado

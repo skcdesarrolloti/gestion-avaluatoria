@@ -563,3 +563,16 @@ Migración aditiva 202610020002_comparable_excel_history; AUTO_MIGRATE o migrate
 persistencia de fecha y conservación de otra colección. Build 66,1 KB gzip.
 Prueba UI local muestra fecha y archivo guardados; carga mediante navegador sigue
 limitada por permiso de archivos de extensión Chrome. No se modificaron permisos.
+
+## 2026-10-02 · Columnas de Excel orientadas a captura desde portales
+
+Descargar Excel en M3 coloca primero fuente/enlace, ubicación, tipo/operación,
+oferta/unidad, área publicada, parqueaderos/depósito, contacto y datos del aviso.
+Descuento y cocientes por m² siguen; verificaciones y soportes permanecen después,
+con pendientes e ID al final. No elimina campos, oculta columnas ni modifica M4.
+El orden de captura no depende del grupo seleccionado en la matriz del navegador.
+Metadatos y fórmulas usan el mismo orden exportado; importación mantiene identidad.
+Sin migración ni escritura de datos reales. 642 checks PHP y 131 JS; build y
+check:size correctos. Prueba del exportador real verifica valores, ID, contexto
+y referencias de negociación después de mover columnas. Descargar de nuevo tras
+actualizar el hosting; archivos anteriores conservan compatibilidad de importación.
