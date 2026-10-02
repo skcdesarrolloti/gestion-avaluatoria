@@ -132,7 +132,7 @@ final class AppraisalController
                 $this->igacCodes(), $this->appraiserIds(), (string) ($this->appraisals->find($id, $this->user['id'])['appraiser_id'] ?? ''));
             $this->appraisals->saveChapterZero($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $data);
             $this->appraisals->saveUnitDefinitionsByKey($id, $this->user['id'],
-                AppraisalUnitDefinitionInput::rows($_POST['config_units'] ?? []));
+                AppraisalUnitDefinitionInput::rows($_POST['config_units'] ?? [], $data));
             $dossier = $this->createDossierIfRequested($id);
             if (!empty($_POST['convert_to_annex'])) $this->appraisals->convertUnitToAnnex($id, $this->user['id'], (string) $_POST['convert_to_annex'], (int) $_POST['version'] + 1);
             Session::flash('chapter_zero_message', $dossier ? 'Expediente ' . $dossier . ' creado correctamente.' : 'Expediente guardado correctamente.');
@@ -149,7 +149,7 @@ final class AppraisalController
                 $this->igacCodes(), $this->appraiserIds(), (string) ($this->appraisals->find($id, $this->user['id'])['appraiser_id'] ?? ''));
             $result = $this->appraisals->saveChapterZero($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $data);
             $this->appraisals->saveUnitDefinitionsByKey($id, $this->user['id'],
-                AppraisalUnitDefinitionInput::rows($_POST['config_units'] ?? []));
+                AppraisalUnitDefinitionInput::rows($_POST['config_units'] ?? [], $data));
             $dossier = $this->createDossierIfRequested($id);
             Http::json(['ok' => true, 'expediente_number' => $dossier, 'object_text' => \App\Services\AppraisalObjectText::build($data)] + $result);
         } catch (\Throwable $error) {

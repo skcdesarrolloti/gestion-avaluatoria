@@ -20,6 +20,8 @@ final class MethodologyWorkflow
         $principals = count(array_filter($units, static fn (array $unit): bool => ($unit['unit_kind'] ?? '') === 'property'));
         foreach ($units as $unit) {
             if (($unit['unit_kind'] ?? '') === 'common') continue;
+            $countKey = ($unit['unit_kind'] ?? '') === 'annex' ? 'igac_annex_units_count' : 'igac_property_units_count';
+            if (array_key_exists($countKey, $record) && (int) ($unit['unit_index'] ?? 0) > (int) $record[$countKey]) continue;
             $fallback = (($unit['unit_kind'] ?? '') === 'annex' ? 'Anexo ' : 'Unidad ') . (int) ($unit['unit_index'] ?? 0);
             $name = trim((string) ($unit['label'] ?? ''));
             if ($name === '' || preg_match('/^(?:Unidad|Anexo)\s+\d+$/iu', $name)) {

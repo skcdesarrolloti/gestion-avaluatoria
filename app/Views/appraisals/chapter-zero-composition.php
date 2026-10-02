@@ -43,7 +43,8 @@
                 <?php foreach ($unitDefinitionUnits as $unit): ?>
                     <?php $key = ($unit['unit_kind'] === 'annex' ? 'annex' : 'property') . '-' . (int) $unit['unit_index']; ?>
                     <?php $igacCategory = $igacCategoryValue($unit); ?>
-                    <article class="grid gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4 md:grid-cols-2"
+                    <fieldset class="min-w-0 grid gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4 md:grid-cols-2"
+                        :disabled="<?= ($unit['unit_kind'] ?? '') === 'annex' ? 'annexUnits' : 'propertyUnits' ?> < <?= e((string) (int) ($unit['unit_index'] ?? 0)) ?>"
                         x-show="<?= ($unit['unit_kind'] ?? '') === 'annex' ? 'annexUnits' : 'propertyUnits' ?> >= <?= e((string) (int) ($unit['unit_index'] ?? 0)) ?>"
                         x-data="{
                             unitKind: <?= e(json_encode((string) ($unit['unit_kind'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
@@ -163,7 +164,7 @@
                             <input class="input" name="config_units[<?= e($key) ?>][notes]" maxlength="2000"
                                 value="<?= e((string) ($unit['notes'] ?? '')) ?>" placeholder="Uso, independencia, restricciones o relación con el predio">
                         </label>
-                    </article>
+                    </fieldset>
                 <?php endforeach; ?>
             </div>
         <?php endif; ?>

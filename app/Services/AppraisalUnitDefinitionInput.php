@@ -8,13 +8,17 @@ use App\Support\AppraisalUnitValuationTreatmentCatalog;
 
 final class AppraisalUnitDefinitionInput
 {
-    public static function rows(array $posted): array
+    public static function rows(array $posted, ?array $composition = null): array
     {
         if (!is_array($posted)) return [];
         $rows = [];
         foreach ($posted as $key => $unit) {
             if (!is_string($key) || !is_array($unit)) continue;
             if (!preg_match('/^(property|annex)-([1-9][0-9]*)$/', $key, $match)) continue;
+            if ($composition !== null) {
+                $countKey = $match[1] === 'annex' ? 'igac_annex_units_count' : 'igac_property_units_count';
+                if ((int) $match[2] > (int) ($composition[$countKey] ?? 0)) continue;
+            }
             $propertyType = trim((string) ($unit['property_type'] ?? ''));
             if (!in_array($propertyType, AppraisalCatalog::allowedValues('tipo_inmueble'), true)) $propertyType = '';
             $constructionType = trim((string) ($unit['construction_type'] ?? ''));

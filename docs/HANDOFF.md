@@ -1,5 +1,13 @@
 # Entrega al responsable de la implementación
 
+Composición sin anexos: al indicar 0, la ficha del anexo queda oculta y sus campos
+deshabilitados; guardado manual y automático descartan definiciones fuera de las
+cantidades activas. Capítulo 8 también filtra colecciones anteriores por cantidad.
+Los datos históricos no se borran: reactivar recupera identidad y contenido.
+Validación: PHP 555, JS 113, BD desechable ga_test_app/ga_test_auth puerto 3354: 113,
+lint, build y tamaño 58,1 KB. Navegador local: 1→0, autoguardado, recarga y capítulos
+3.3/8 muestran solo Unidad 1. No se verificó el hosting. Sin migraciones nuevas.
+
 Numeral 1: [Oficinas en el buscador IGAC](OFICINAS-IGAC.md). Lista conjunta de
 Comerciales y Edificios, categoría original y selección conservada. Sin migraciones.
 

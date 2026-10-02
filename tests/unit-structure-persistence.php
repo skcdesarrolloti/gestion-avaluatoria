@@ -39,3 +39,19 @@ expect(count($officeComponents) === 1 && !in_array('Cerramiento', array_column($
 expectStatus(422, fn () => \App\Services\MethodologyWorkflow::validateKey($readStructure()['id'], $officeComponents), 'capítulo 8 rechaza anexo de otro avalúo del mismo usuario');
 $repo->ensureUnits($officeId, 1, 1, 1);
 expect(count($repo->units($officeId, 1)) === 1, 'anexo histórico fuera de cantidades guardadas no aparece como activo en capítulo 8');
+
+$activeBefore = $repo->units($structureId, 1);
+$withoutAnnex = array_replace($repo->find($structureId, 1), ['igac_annex_units_count' => 0]);
+$repo->saveChapterZero($structureId, 1, (int) $withoutAnnex['version'], $withoutAnnex);
+$inactivePost = \App\Services\AppraisalUnitDefinitionInput::rows([
+    'annex-1' => array_replace($inputStructure, ['label' => 'No sobrescribir']),
+], $withoutAnnex);
+$repo->saveUnitDefinitionsByKey($structureId, 1, $inactivePost);
+expect($inactivePost === [] && count($repo->units($structureId, 1)) === 1,
+    'cero anexos conserva solo principal y rechaza campos ocultos del anexo');
+expect(count(\App\Services\MethodologyWorkflow::components($withoutAnnex, $activeBefore)) === 1,
+    'capítulo 8 excluye anexos desactivados incluso con colección anterior');
+$withAnnex = array_replace($repo->find($structureId, 1), ['igac_annex_units_count' => 1]);
+$repo->saveChapterZero($structureId, 1, (int) $withAnnex['version'], $withAnnex);
+expect($readStructure()['id'] === $unitStructureBefore['id'] && $readStructure()['label'] === 'Cerramiento'
+    && $readStructure()['notes'] === 'Conservar', 'reactivar anexo recupera identidad y datos sin sobrescritura oculta');
