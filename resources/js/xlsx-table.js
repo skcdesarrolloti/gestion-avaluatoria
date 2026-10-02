@@ -1,5 +1,6 @@
 // Small OOXML export for the app: inline text never becomes an executable formula.
 import { addWorkbookContext } from './xlsx-context.js';
+import {unitFormula} from './xlsx-unit-formula.js';
 const encoder = new TextEncoder();
 const xml = value => String(value ?? '').replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '')
     .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
@@ -47,6 +48,8 @@ export function tableWorkbook(columns, rows, title = 'Comparables', context = nu
     const header = columns.map((column, i) => cell(`${columnName(i)}1`, column.label, 1)).join('');
     const body = rows.map((row, r) => `<row r="${r + 2}">${columns.map((column, c) => {
         const item = row[column.key] ?? {value: '', pending: true};
+        const unitCalculation=unitFormula(columns,r+2,column.key,columnName);
+        if (unitCalculation!==null) return `<c r="${columnName(c)}${r+2}" s="${column.numeric ? 2 : 0}"${typeof item.value === 'number' ? '' : ' t="str"'}><f>${xml(unitCalculation)}</f><v>${xml(item.value)}</v></c>`;
         const offerIndex = columns.findIndex(item => item.key === 'price_amount'), discountIndex = columns.findIndex(item => item.key === 'negotiation_discount');
         if (['negotiated_amount','negotiation_percent'].includes(column.key) && offerIndex >= 0 && discountIndex >= 0) {
             const offer = `${columnName(offerIndex)}${r+2}`, discount = `${columnName(discountIndex)}${r+2}`;

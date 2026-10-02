@@ -1,10 +1,16 @@
 import { negotiation, capturePending, portalCounts, amount } from './comparable-negotiation.js';
 import { tableWorkbook } from './xlsx-table.js';
+import {unitPrice, unitFields, unitNumeric} from './comparable-unit-price.js';
 
-const negotiationFields = ['negotiation_discount', 'negotiated_amount', 'negotiation_percent', 'negotiation_kind', 'negotiation_source'];
+const negotiationFields = [...unitFields, 'negotiation_discount', 'negotiated_amount', 'negotiation_percent', 'negotiation_kind', 'negotiation_source'];
 export function updateCapture(entries, form, state) {
     for (const entry of entries) {
         const result = negotiation(entry.data);
+        Object.assign(entry.data,unitPrice(entry.data));
+        for (const key of unitFields) {
+            const control=entry.controls.find(input=>input.name.endsWith(`[${key}]`));
+            if (control) {control.value=entry.data[key];control.dataset.ready=unitNumeric.includes(key) && entry.data[key]!=='';}
+        }
         entry.data.negotiated_amount = result.value;
         const offer = amount(entry.data.price_amount);
         entry.data.negotiation_percent = result.value === '' ? '' : (offer > 0 ? amount(entry.data.negotiation_discount) / offer * 100 : 0).toFixed(4);
@@ -51,7 +57,7 @@ export function exportCapture(entries, form) {
         const label = cell.querySelector('.comparable-field-label')?.textContent || headers[index].textContent.trim();
         const uniqueLabel = columns.some(column => column.label === label) ? `${label} (${columns.length})` : label;
         columns.push({key, label:uniqueLabel, options:input.tagName === 'SELECT' ? Object.fromEntries([...input.options].map(option=>[option.value,option.textContent.trim()])) : undefined,
-            numeric: input.type === 'number' || ['price_amount','admin_fee','negotiated_amount','negotiation_percent','area_m2'].includes(key)});
+            numeric: input.type === 'number' || [...unitNumeric,'price_amount','admin_fee','negotiated_amount','negotiation_percent','area_m2'].includes(key)});
     }
     const rows = used.map(entry => {
         const row = {id:{value:entry.data.id},capture_pending:{value: entry.capturePending.map(([,label]) => label).join('; '), pending:entry.capturePending.length > 0}};
@@ -60,7 +66,7 @@ export function exportCapture(entries, form) {
             const input = entry.controls.find(control => control.name.endsWith(`[${column.key}]`));
             let value = entry.data[column.key] ?? '';
             if (input?.tagName === 'SELECT' && value) value = input.options[input.selectedIndex].textContent;
-            if (column.numeric && value !== '') value = amount(value) ?? value;
+            if (column.numeric && value !== '') value = input?.type === 'number' ? Number(String(value).replace(',','.')) : amount(value) ?? value;
             row[column.key] = {value, pending:missing.has(column.key)};
         }
         return row;

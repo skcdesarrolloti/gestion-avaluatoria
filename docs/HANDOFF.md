@@ -536,3 +536,16 @@ desbordamiento y consola sin errores. Publicación Git para actualización del u
 ## 2026-10-02 · Retorno de Excel en M3
 
 Tabla editable prioritaria con autoguardado; Exportar a Excel e Importar Excel actualizado son opcionales. Importación por ID, con revisión antes de aplicar, versión de colección, aislamiento de expediente/unidad y filas omitidas conservadas. No se crean muestras desde Excel. Ver docs/PH-M3-TABLA-NEGOCIACION.md para pruebas y límites. PHP ZIP y SimpleXML requeridos en hosting. Sin migraciones ni cambios a datos reales o M4/M5.
+
+## 2026-10-02 · Valores por m² en M3
+
+Oferta y negociado por m² automáticos y preliminares, con área, base, unidad y
+estado visibles. PH usa área privada construida con fuente; NPH/condominio
+requiere identificar base publicada. No suma libres o anexos, no divide dos
+veces valores ya unitarios, ni convierte descuento desconocido en cero.
+Excel también recalcula área y cocientes con fórmulas. Art. 19.2.b y 36.2
+se explican por separado; no estima componentes ni cambia análisis M4/M5.
+Sin migración ni escritura de datos reales. Ver PH-M3-TABLA-NEGOCIACION.md.
+Validación: 642 PHP, 127 JS, lint, build 65,9 KB gzip. Navegador: ejemplo
+ficticio guardado/recargado 475 millones / 100 m² = 4.750.000 COP/m²;
+consola limpia y CSS móvil 390 px sin desbordamiento. 142 checks BD desechable 3363.

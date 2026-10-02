@@ -38,7 +38,7 @@ final class ComparableExcelInput
             $row = [];
             foreach ($map as $index => $column) {
                 $key = $column['key'];
-                if (in_array($key, ['capture_pending','negotiated_amount','negotiation_percent','component_key'], true)) continue;
+                if (in_array($key, ['capture_pending','negotiated_amount','negotiation_percent','component_key', ...array_keys(ComparableUnitPrice::fields())], true)) continue;
                 $cell = $cells[$index] ?? ['value'=>'', 'formula'=>false, 'type'=>'inlineStr'];
                 if ($cell['formula']) throw new HttpException(422, 'Sólo se admiten fórmulas en las columnas calculadas de negociación. Pega valores en los campos editables.');
                 $value = trim($cell['value']);

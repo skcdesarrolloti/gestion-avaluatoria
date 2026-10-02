@@ -15,6 +15,7 @@ final class AppraisalComparableRepository
         return array_map(static function (array $row): array {
             $detail = json_decode($row['capture_details'] ?? '{}', true, 8, JSON_THROW_ON_ERROR);
             $row += is_array($detail) ? $detail : [];
+            $row = array_replace($row, \App\Services\ComparableUnitPrice::values($row));
             $row['negotiated_amount'] = \App\Services\ComparableNegotiation::value($row) ?? '';
             $offer = \App\Services\ComparableNegotiation::amount($row['price_amount'] ?? '');
             $row['negotiation_percent'] = $row['negotiated_amount'] === '' ? '' : number_format($offer > 0 ? (float) $row['negotiation_discount'] / $offer * 100 : 0, 4, '.', '');

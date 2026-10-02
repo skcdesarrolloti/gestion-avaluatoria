@@ -10,10 +10,10 @@ import { flushModuleAutosaves } from './module-autosave.js';
 
 const groups = {
     capture: ['source_type', 'source_name', 'source_url', 'market_data_kind', 'operation', 'property_type', 'market_city', 'neighborhood',
-        'project_name', 'ph_regime', 'price_amount', 'price_unit', ...negotiationFields, 'area_m2', 'land_m2', 'built_m2', 'annexes_detail', 'consulted_at', 'contact_name', 'contact_phone'],
+        'project_name', 'ph_regime', ...negotiationFields, 'price_amount', 'price_unit', 'area_m2', 'land_m2', 'built_m2', 'annexes_detail', 'consulted_at', 'contact_name', 'contact_phone'],
     location: ['source_name', 'source_url', 'consulted_at', 'market_city', 'neighborhood', 'address_hint', 'project_name', ...mapFields],
     composition: ['ph_regime', 'ph_special', 'area_m2', 'area_basis', 'private_built_m2', 'private_free_m2', 'ph_units_detail', 'land_m2', 'built_m2', 'annexes_detail', 'areas_source'],
-    ph: ['source_name', 'source_url', 'consulted_at', 'market_data_kind', 'operation', 'property_type', 'market_city', 'neighborhood', 'project_name', 'price_amount', 'price_unit', ...negotiationFields, 'ph_regime', 'ph_special',
+    ph: ['source_name', 'source_url', 'consulted_at', 'market_data_kind', 'operation', 'property_type', 'market_city', 'neighborhood', 'project_name', ...negotiationFields, 'price_amount', 'price_unit', 'ph_regime', 'ph_special',
         'area_m2', 'area_basis', 'private_built_m2', 'private_free_m2', 'areas_source', 'parking_spaces',
         'ph_parking_presence', 'ph_parking_in_price', 'ph_parking_nature', 'ph_deposit_presence', 'ph_deposit_count',
         'ph_deposit_in_price', 'ph_deposit_nature', 'ph_parking_area_m2', 'ph_deposit_area_m2', 'ph_other_components', 'ph_units_detail', 'ph_components_source', 'contact_name', 'contact_phone', 'evidence_detail', 'verification_detail'],

@@ -25,7 +25,7 @@ final class ComparableCaptureDetail
             'market_services' => ['Servicios públicos y dotación urbana: descripción y fuente', 'text', 'shared'],
             'market_access' => ['Accesos, vías, transporte e infraestructura: descripción y fuente', 'text', 'shared'],
             'market_planning' => ['Normatividad urbanística aplicable: referencia y fuente', 'text', 'shared'],
-        ] + ComparablePhCapture::fields() + ComparableNegotiation::fields();
+        ] + ComparablePhCapture::fields() + ComparableNegotiation::fields() + ComparableUnitPrice::fields();
     }
     public static function options(string $key): array
     {

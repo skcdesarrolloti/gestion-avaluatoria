@@ -21,7 +21,23 @@ no atribuye ese régimen a todas las muestras ni cambia la descripción del suje
 
 Un resultado numérico no acredita negociación real ni suficiencia de su soporte.
 M4 mantiene sus estadísticos previos: no adopta negociado como depurado.
-La depuración de componentes y valores unitarios privados sigue pendiente.
+La depuración monetaria de componentes sigue pendiente en M4. M3 ahora muestra
+área del cociente, base, oferta/m², negociado/m², unidad monetaria y estado.
+PH ordinaria usa área privada construida con fuente, sin sumar libre/anexos.
+NPH/condominio usa área publicada con base y fuente expresas, como cociente
+preliminar integral, sin reemplazar desagregación o análisis. Si régimen, área,
+base o fuente faltan, no se calcula. No divide otra vez precio ya en valor/m²;
+canon muestra COP/m²/mes. Sin descuento confirmado no hay negociado/m².
+Estos cocientes no alimentan aún estadísticas ni valores adoptados de M4/M5.
+Servidor y navegador recalculan; valores derivados enviados no se persisten.
+Excel exporta fórmulas de área y cocientes y descarta sus valores al importar,
+recalculándolos en el módulo a partir de campos originales editables.
+
+Distinción explícita: art. 19.2.b exige depurar componentes del comparable,
+incluidos comunes de uso exclusivo. Art. 36.2 trata el sujeto: común de uso
+exclusivo implícito, sin liquidación independiente; matrícula separada exige
+mercado/restricciones. Privado en misma matrícula no se presume común.
+No inventa precio de garaje/depósito ni aplica porcentajes fijos por falta de ofertas.
 
 ## Portales y tabla
 
