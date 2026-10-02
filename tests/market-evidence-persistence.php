@@ -32,3 +32,24 @@ $marketAfter = (new \App\Services\MarketSubjectChecklist())->build(array_replace
 $afterRows = array_column($marketAfter['rows'], null, 'key');
 expect($afterRows['area']['state'] === 'ok', 'actualizar vuelve a leer área privada autoguardada en numeral 3');
 expect(\App\Services\MarketSubjectEvidence::decode($repo->units($marketId, 1)[1]) === $marketPosted, 'guardar área no borra soportes ni otra unidad');
+$parentId = $marketUnits[0]['id'];
+$patch = \App\Services\MarketPhScope::input(['parent_unit_id'=>$parentId, 'area_in_parent'=>'incluida',
+    'parent_area_source'=>'Reglamento pág. 10', 'legal_nature'=>'integrada', 'parent_area_note'=>'Incluido en área privada oficina']);
+expect($repo->saveMarketEvidence($marketId, 1, $marketUnitId, 1, $patch) === 2, 'M2 guarda parcialmente vínculo PH con versión de evidencia');
+$linked = \App\Services\MarketSubjectEvidence::decode($repo->units($marketId, 1)[1]);
+expect($linked['observed_use'] === 'parqueo' && $linked['parent_unit_id'] === $parentId && $linked['legal_source'] === 'CTL garaje', 'M2 conserva usos documentos y matrícula del numeral 3');
+$repo->saveMarketEvidence($marketId, 1, $marketUnitId, 2, $marketPosted);
+$linked = \App\Services\MarketSubjectEvidence::decode($repo->units($marketId, 1)[1]);
+expect($linked['parent_unit_id'] === $parentId && $linked['area_in_parent'] === 'incluida', 'cliente anterior de numeral 3 conserva vínculo y composición omitidos');
+expectStatus(409, fn () => $repo->saveMarketEvidence($marketId, 1, $marketUnitId, 2, $patch), 'M1 M2 y numeral 3 rechazan versiones antiguas sin sobrescribir');
+expectStatus(422, fn () => $repo->saveMarketEvidence($marketId, 1, $marketUnitId, 3, ['parent_unit_id'=>$marketUnitId]), 'M2 rechaza anexo como principal');
+expectStatus(422, fn () => $repo->saveMarketEvidence($marketId, 1, $parentId, 0, ['parent_unit_id'=>$parentId]), 'M2 rechaza padre propio de principal');
+$foreignId = $repo->create(1);
+$app->prepare('UPDATE appraisals SET igac_property_units_count = 1 WHERE id = ?')->execute([$foreignId]);
+$repo->ensureUnits($foreignId, 1, 1, 0);
+$foreignParent = $repo->units($foreignId, 1)[0]['id'];
+expectStatus(422, fn () => $repo->saveMarketEvidence($marketId, 1, $marketUnitId, 3, ['parent_unit_id'=>$foreignParent]), 'M2 impide vínculos hacia otro expediente');
+$app->prepare('UPDATE appraisals SET igac_property_units_count = 0 WHERE id = ?')->execute([$marketId]);
+expectStatus(422, fn () => $repo->saveMarketEvidence($marketId, 1, $marketUnitId, 3, $patch), 'M2 impide seleccionar principal inactiva');
+$app->prepare('UPDATE appraisals SET igac_property_units_count = 1 WHERE id = ?')->execute([$marketId]);
+expect((int) $repo->units($marketId, 1)[1]['market_evidence_version'] === 3, 'vínculos rechazados conservan datos y versión');

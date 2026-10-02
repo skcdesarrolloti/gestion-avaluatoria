@@ -44,7 +44,7 @@ final class MarketSubjectEvidence
             || self::number($data['coefficient']) < 0 || self::number($data['coefficient']) > 100)) {
             throw new HttpException(422, 'El coeficiente debe estar entre 0 y 100 %, sin texto adicional.');
         }
-        return $data;
+        return $data + MarketPhScope::input(array_intersect_key($posted, array_flip(['parent_unit_id','area_in_parent','parent_area_source','parent_area_note'])));
     }
 
     public static function number(mixed $value): ?float

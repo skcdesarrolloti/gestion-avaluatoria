@@ -12,10 +12,15 @@ final class MarketSubjectEvidenceRepository
     {
         $repo = new AppraisalRepository($this->db);
         $repo->find($appraisalId, $owner);
-        if (!in_array($unitId, array_column($repo->units($appraisalId, $owner), 'id'), true)) {
+        $units = $repo->units($appraisalId, $owner);
+        $indexed = array_column($units, null, 'id');
+        if (!isset($indexed[$unitId])) {
             throw new HttpException(404, 'No se encontró una unidad activa del expediente.');
         }
         if ($version < 0) throw new HttpException(422, 'Falta la versión del soporte de Mercado.');
+        \App\Services\MarketPhScope::validateParent($data, $indexed[$unitId], $units);
+        // Partial M2 edits and older chapter 3 clients preserve fields omitted from their forms.
+        $data += \App\Services\MarketSubjectEvidence::decode($indexed[$unitId]);
         $query = $this->db->prepare('UPDATE appraisal_units SET market_evidence_json = ?,
             market_evidence_version = market_evidence_version + 1, updated_at = ?
             WHERE id = ? AND appraisal_id = ? AND owner_id = ? AND market_evidence_version = ?');

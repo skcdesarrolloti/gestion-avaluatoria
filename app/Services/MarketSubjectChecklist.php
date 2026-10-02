@@ -117,6 +117,7 @@ final class MarketSubjectChecklist
             $scopeState = 'difference'; $scopeMessage = 'El tratamiento registrado en la composición y el adoptado en capítulo 8 difieren. Revisa qué unidad comprende cada valor.';
         }
         $add('scope', 'Componentes incluidos y tratamiento', $scope ?: 'Sin alcance documentado', '3.1 · ' . ($scopeSource ?: 'Sin soporte'), $scopeState, $scopeMessage);
+        if ($phRegime === 'si') $rows = MarketPhChecklist::apply($rows, $unit, $units, $subject, $ph, $flow);
         return ['rows'=>$rows, 'ok'=>count(array_filter($rows, static fn ($row) => $row['state'] === 'ok')),
             'missing'=>count(array_filter($rows, static fn ($row) => $row['state'] === 'missing')),
             'differences'=>count(array_filter($rows, static fn ($row) => $row['state'] === 'difference')),

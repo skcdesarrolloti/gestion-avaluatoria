@@ -1,5 +1,14 @@
 # Entrega al responsable de la implementación
 
+M1 y M2 PH: vínculo explícito de anexo a principal activa, naturaleza jurídica y
+composición del área en M2. Los campos viven en market_evidence_json existente;
+edición parcial conserva los soportes del numeral 3 y la versión compartida impide
+sobrescrituras. No hay migración. Ver PH-VINCULO-M1-M2.md para recorrido y controles.
+M1 diferencia unidades independientes, partes privadas integradas y comunes de uso
+exclusivo. Confronte contradicciones sin borrar áreas, matrícula o coeficientes.
+Validación: PHP 606, JS 116, BD desechable 3360: 139, HTTP local: 7, lint, build y
+59,0 KB gzip; navegador, autoguardado/recarga y móvil CSS 390 px. Git para hosting.
+
 Consulta y tabla PH: instrucciones específicas de búsqueda/captura y grupo propio
 con presencia de parqueaderos/depósitos, cantidad, inclusión en precio, naturaleza
 jurídica y soporte. Misma matriz, lectores y fotos conservados; datos nuevos en

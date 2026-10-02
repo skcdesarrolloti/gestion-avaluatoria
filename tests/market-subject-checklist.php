@@ -13,15 +13,18 @@ declare(strict_types=1);
     $data = ['identity_scope'=>'propia', 'legal_nature'=>'privada', 'registry'=>'060-200', 'legal_source'=>'CTL garaje pág. 1',
         'observed_use'=>'parqueadero', 'approved_use'=>'Parqueadero', 'use_source'=>'Reglamento pág. 15',
         'coefficient'=>'0,25', 'coefficient_source'=>'Reglamento cuadro garaje',
-        'included_components'=>'Garaje 12 sin depósito', 'scope_source'=>'Escritura de garaje'];
+        'included_components'=>'Garaje 12 sin depósito', 'scope_source'=>'Escritura de garaje',
+        'parent_unit_id'=>str_repeat('c',32), 'area_in_parent'=>'excluida', 'parent_area_source'=>'Cuadro de áreas reglamento'];
     $unit += ['notes'=>'Celda 12 cubierta en sótano, con acceso por rampa.', 'construction_type'=>'parqueo',
         'market_evidence_json'=>json_encode($data), 'area_private_m2'=>'12.50', 'surface_source'=>'Escritura pág. 2',
         'area_adopted_m2'=>'12.50', 'construction_state'=>'completa',
         'conservation_result_json'=>json_encode(['state_global_adopted'=>'2', 'items'=>[['state_adopted'=>'2','evidence'=>'Foto garaje 12']]])];
-    $complete = $service->build($record, $subject, $unit, $ph);
+    $parent = ['id'=>str_repeat('c',32), 'unit_kind'=>'property', 'label'=>'Oficina',
+        'market_evidence_json'=>json_encode(['legal_nature'=>'privada','identity_scope'=>'propia','registry'=>'060-100','legal_source'=>'CTL Oficina'])];
+    $complete = $service->build($record, $subject, $unit, $ph, ['treatment'=>'separado'], [$unit,$parent]);
     expect($complete['missing'] === 0 && $complete['differences'] === 0 && $complete['na'] === 0,
         'semáforo distingue controles completos de faltantes diferencias y no aplicables');
-    expect($complete['pending'] === 0 && $complete['ok'] === 9, 'datos propios completos confrontan sin copiar los de oficina');
+    expect($complete['pending'] === 0 && $complete['ok'] === 10, 'datos propios y vínculo PH completos confrontan sin copiar los de oficina');
     $missingDescription = array_replace($unit, ['notes'=>'']);
     $descriptionStatus = \App\Services\MarketUnitDescriptionCheck::row($missingDescription);
     expect($descriptionStatus['type_ready'] && $descriptionStatus['message'] === 'Falta: descripción física propia (3.1).',
@@ -59,6 +62,23 @@ declare(strict_types=1);
     $data['legal_nature'] = 'comun_exclusivo'; $unit['market_evidence_json'] = json_encode($data);
     $common = $byKey($service->build($record, $subject, $unit, $ph, ['treatment'=>'separado']));
     expect($common['scope']['state'] === 'difference' && $common['coefficient']['state'] === 'na', 'común exclusivo confronta valor separado sin inventar coeficiente propio');
+    expect($common['area']['state'] === 'difference', 'común exclusivo con área inscrita como privada advierte inconsistencia');
+    $unit['area_private_m2'] = ''; $data['registry'] = ''; $data['area_in_parent'] = 'no_aplica';
+    $unit['market_evidence_json'] = json_encode($data);
+    $common = $byKey($service->build($record, $subject, $unit, $ph, ['treatment'=>'integrado'], [$unit,$parent]));
+    expect($common['area']['state'] === 'na' && $common['coefficient']['state'] === 'na' && $common['registry']['state'] === 'ok'
+        && $common['ph_scope']['state'] === 'ok', 'común documentado vincula principal sin exigir matrícula coeficiente o área privada propios');
+    $data['legal_nature'] = 'integrada'; $data['area_in_parent'] = 'incluida';
+    $unit = array_replace($before, ['market_evidence_json'=>json_encode($data)]);
+    $integrated = $byKey($service->build($record, $subject, $unit, $ph, ['treatment'=>'integrado'], [$unit,$parent]));
+    expect($integrated['registry']['state'] === 'ok' && $integrated['coefficient']['state'] === 'na' && $integrated['ph_scope']['state'] === 'ok',
+        'parte privada integrada conserva área propia pero consulta matrícula vinculada sin coeficiente independiente');
+    $data['registry'] = '060-999'; $unit['market_evidence_json'] = json_encode($data);
+    expect($byKey($service->build($record, $subject, $unit, $ph, ['treatment'=>'integrado'], [$unit,$parent]))['registry']['state'] === 'difference', 'matrícula distinta confronta declaración de parte integrada');
+    expect(\App\Services\MarketPhScope::row($before, [])['state'] === 'missing', 'principal desactivada no acredita vínculo PH');
+    expectStatus(422, fn () => \App\Services\MarketPhScope::validateParent(['parent_unit_id'=>$before['id']], $before, [$before,$parent]), 'PH impide vincular anexo consigo mismo');
+    expectStatus(422, fn () => \App\Services\MarketPhScope::validateParent(['parent_unit_id'=>$before['id']], $parent, [$before,$parent]), 'principal no puede adoptar un anexo como padre');
+    expectStatus(422, fn () => \App\Services\MarketPhScope::input(['area_in_parent'=>'inventada']), 'PH valida catálogo de inclusión de área');
     expectStatus(422, fn () => \App\Services\MarketSubjectEvidence::input(['coefficient'=>'101']), 'coeficiente superior a 100 se rechaza');
     expectStatus(422, fn () => \App\Services\MarketSubjectEvidence::input(['registry'=>['texto']]), 'campo estructurado malicioso se rechaza');
     expectStatus(422, fn () => \App\Services\MarketSubjectEvidence::input(['legal_nature'=>'inventado']), 'naturaleza no definida se rechaza');

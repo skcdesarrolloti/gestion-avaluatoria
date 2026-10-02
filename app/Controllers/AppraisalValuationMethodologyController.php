@@ -77,6 +77,9 @@ final class AppraisalValuationMethodologyController
         Http::redirect('avaluos/' . $id . '/metodologia-valuatoria?component=' . rawurlencode($key) . '&stage=2');
     }
 
+    public function savePhScope(string $id, string $unitId): never
+    { \App\Services\MarketPhScopeAction::save($this->appraisals, $this->user['id'], $id, $unitId); }
+
     public function assignComparables(string $id): never
     {
         $record = $this->appraisals->find($id, $this->user['id']);

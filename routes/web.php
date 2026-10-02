@@ -119,6 +119,7 @@ return [
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/preclasificacion$#', 'subject', 'savePreclassification', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/preclasificacion/autoguardar$#', 'subject', 'autosavePreclassification', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/unidades/([a-f0-9]{32})/mercado$#', 'subject', 'saveMarketEvidence', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/unidades/([a-f0-9]{32})/alcance-ph$#', 'valuationMethodology', 'savePhScope', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/unidades$#', 'subject', 'saveUnits', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/unidades/autoguardar$#', 'subject', 'autosaveUnits', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/superficies$#', 'subject', 'saveSurfaces', true],

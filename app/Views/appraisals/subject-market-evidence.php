@@ -13,6 +13,9 @@ $marketSelectedId = \App\Services\SubjectUnitNavigation::selected($marketUnits);
         <?php endforeach; ?>
     </nav>
     <?php foreach ($marketUnits as $marketUnit): $marketData = \App\Services\MarketSubjectEvidence::decode($marketUnit); ?>
+    <?php if (($record['regimen_ph'] ?? '') === 'si'): ?>
+    <p class="mt-3 text-sm" x-show="marketUnit === <?= e(json_encode($marketUnit['id'])) ?>" x-cloak>PH: el vínculo con la principal y la inclusión del área se definen en <a class="inline-flex min-h-11 items-center font-semibold text-blue-800 underline" href="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria?stage=2&component=' . $marketUnit['id'] . '#alcance-ph')) ?>">M2 · vínculo y composición de <?= e($marketUnit['label']) ?></a>. Se conservan junto con estos soportes.</p>
+    <?php endif; ?>
     <form class="mt-4 grid min-w-0 gap-4 md:grid-cols-2" method="post"
         x-show="marketUnit === <?= e(json_encode($marketUnit['id'])) ?>" x-cloak
         action="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto/unidades/' . $marketUnit['id'] . '/mercado')) ?>"
