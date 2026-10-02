@@ -2,7 +2,7 @@
 $marketUnits = array_values(array_filter($units, static fn ($row) => ($row['unit_kind'] ?? '') !== 'common'));
 $marketSelectedId = \App\Services\SubjectUnitNavigation::selected($marketUnits);
 ?>
-<section class="rounded-xl border border-teal-200 bg-teal-50 p-4" x-init="$nextTick(() => { if (<?= isset($_GET['market_check']) && ($_GET['section'] ?? '') === 'tipologias' ? 'true' : 'false' ?>) $el.scrollIntoView() })" x-data="{ marketUnit: <?= e(json_encode($marketSelectedId)) ?> }">
+<section class="rounded-xl border border-teal-200 bg-teal-50 p-4" x-init="$nextTick(() => { if (<?= isset($_GET['market_check']) && $_GET['market_check'] !== 'description' && ($_GET['section'] ?? '') === 'tipologias' ? 'true' : 'false' ?>) $el.scrollIntoView() })" x-data="{ marketUnit: <?= e(json_encode($marketSelectedId)) ?> }">
     <h3 class="text-lg font-semibold">Datos y soportes de cada unidad para Mercado</h3>
     <p class="mt-2 text-sm">Estos campos alimentan la verificación del capítulo 8. Guarda aquí el dato y su soporte; la lista se actualiza al consultarla de nuevo.</p>
     <?php require __DIR__ . '/methodology-return.php'; ?>

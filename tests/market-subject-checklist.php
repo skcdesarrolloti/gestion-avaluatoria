@@ -14,11 +14,21 @@ declare(strict_types=1);
         'observed_use'=>'parqueadero', 'approved_use'=>'Parqueadero', 'use_source'=>'Reglamento pág. 15',
         'coefficient'=>'0,25', 'coefficient_source'=>'Reglamento cuadro garaje',
         'included_components'=>'Garaje 12 sin depósito', 'scope_source'=>'Escritura de garaje'];
-    $unit += ['market_evidence_json'=>json_encode($data), 'area_private_m2'=>'12.50', 'surface_source'=>'Escritura pág. 2',
+    $unit += ['notes'=>'Celda 12 cubierta en sótano, con acceso por rampa.', 'construction_type'=>'parqueo',
+        'market_evidence_json'=>json_encode($data), 'area_private_m2'=>'12.50', 'surface_source'=>'Escritura pág. 2',
         'area_adopted_m2'=>'12.50', 'construction_state'=>'completa',
         'conservation_result_json'=>json_encode(['state_global_adopted'=>'2', 'items'=>[['state_adopted'=>'2','evidence'=>'Foto garaje 12']]])];
     $complete = $service->build($record, $subject, $unit, $ph);
-    expect($complete['pending'] === 0 && $complete['ok'] === 8, 'datos propios completos confrontan sin copiar los de oficina');
+    expect($complete['pending'] === 0 && $complete['ok'] === 9, 'datos propios completos confrontan sin copiar los de oficina');
+    $missingDescription = array_replace($unit, ['notes'=>'']);
+    expect($byKey($service->build($record, $subject, $missingDescription, $ph))['description']['state'] === 'missing',
+        'anexo sin descripción propia queda pendiente aunque tiene soportes jurídicos');
+    expect(\App\Services\MarketUnitDescriptionCheck::row(array_replace($unit, ['construction_type'=>'deposito']))['state'] === 'difference',
+        'nombre garaje y clasificación depósito requieren confrontación');
+    expect(\App\Services\MarketUnitDescriptionCheck::row(array_replace($unit, ['label'=>'Celda de parqueo 12']))['state'] === 'ok',
+        'celda de parqueo corresponde al tipo parqueo sin cambiar clasificación');
+    expect(\App\Services\MarketUnitDescriptionCheck::row(array_replace($unit, ['label'=>'Anexo 1']))['state'] === 'missing',
+        'nombre genérico del anexo no acredita identificación propia');
     $duplicate = array_replace($unit, ['id'=>str_repeat('b',32), 'label'=>'Otra unidad independiente']);
     expect($byKey($service->build($record, $subject, $unit, $ph, [], [$unit,$duplicate]))['registry']['state'] === 'difference',
         'dos unidades independientes con misma matrícula se confrontan como diferencia');

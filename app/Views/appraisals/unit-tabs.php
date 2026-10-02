@@ -161,7 +161,8 @@ foreach ($visibleUnits as $unit) $labelMap[$unit['id']] = $labelInput($unit);
                         </div>
                     </label>
                     <label class="label md:col-span-2">
-                        Descripción editable para el informe
+                        Descripción física propia de <?= e($labelInput($unit) ?: $unitLabel($unit)) ?>
+                        <span class="mt-1 block text-xs font-normal text-slate-600">Describe ubicación interna, acceso, uso y características observadas. Para garaje: número o celda, nivel y si es cubierto; para depósito: identificación, cerramiento y condiciones propias. El texto IGAC es sólo una base para contrastar.</span>
                         <?php if ($hasPhotos): ?>
                             <span class="mt-3 block rounded-xl border border-emerald-50 bg-emerald-50 p-3 text-xs leading-5 text-emerald-800"
                                 x-show="selectedItem(category, hint)">

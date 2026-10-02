@@ -11,7 +11,7 @@ final class MarketSubjectChecklist
         $inherit = ($own['identity_scope'] ?? '') === 'sujeto';
         $phRegime = (string) ($record['regimen_ph'] ?? '');
         $nature = $data['legal_nature'] ?? '';
-        $rows = [];
+        $rows = [MarketUnitDescriptionCheck::row($unit)];
         $add = static function (string $key, string $label, string $value, string $source, string $state,
             string $message, string $section = 'tipologias', string $detail = '') use (&$rows): void {
             $rows[] = compact('key', 'label', 'value', 'source', 'state', 'message', 'section', 'detail');

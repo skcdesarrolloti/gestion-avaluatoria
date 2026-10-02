@@ -14,6 +14,7 @@ $sourceTreatments = \App\Support\AppraisalUnitValuationTreatmentCatalog::options
         <a class="btn-secondary" href="<?= e($flowUrl('3', 'mercado', '')) ?>">Banco sin asignar (<?= $unassignedCount ?>)</a>
     </div>
     <?php if ($components === []): ?><p role="status" class="mt-5 rounded-xl border border-dashed p-5">Todavía no hay unidades ni anexos registrados. Completa la composición del predio en el capítulo 1 y su estudio en el capítulo 3; aparecerán aquí al guardar.</p><?php endif; ?>
+    <?php if ($components !== [] && in_array($stage, ['components', '1'], true)): require __DIR__ . '/methodology-unit-check-coverage.php'; endif; ?>
     <div class="mt-5 space-y-4">
     <?php foreach ($components as $key => $component):
         if ($stage !== 'integration' && $key !== ($componentKey ?: array_key_first($components))) continue;

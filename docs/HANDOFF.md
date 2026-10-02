@@ -453,3 +453,29 @@ Validación: 580 checks PHP, 116 JS, 610 PHP sin errores, build y tamaño 58,8 K
 Vista local aislada con datos ficticios: cuadro visible al abrir y al pasar a
 Insumos mínimos; consola sin errores y ancho CSS 390 px sin desbordamiento.
 No se certifica la actualización del hosting a partir del push a Git.
+
+## 2026-10-02 · Descripción y cobertura de todos los anexos
+
+M1 muestra resumen de todas las unidades activas con nombre, clasificación,
+descripción propia de 3.1, estado y conteo de controles para Mercado, incluso
+cuando la academia seleccionada es otra unidad. Cada fila abre su numeral 3 o
+sus controles. Checklist pasa a nueve controles: añade nombre, tipo y descripción
+propios. Nombre genérico, descripción vacía o clasificación pendiente no son OK;
+nombre de garaje/depósito con clasificación contradictoria muestra Diferencia.
+No se modifica automáticamente identidad, clasificación o contenido técnico.
+OK registra presencia del texto, no valida que una base IGAC describa la visita.
+
+3.1 mantiene el campo notes y su autoguardado existente; aclara descripción física
+por unidad y orienta ubicación interna, acceso y condiciones observadas. Enlaces
+de descripción conservan unidad y evitan desplazamiento al soporte jurídico.
+Sin columnas, migraciones ni modificaciones al método de costo o a comparables.
+
+Revisión de sólo lectura en hosting: oficina, Deposito y Garaje con notes vacío
+en 3.1; en 3.3 tipos oficina, deposito y parqueo respectivamente. No se rellenaron
+campos ni se guardaron cambios del expediente. Depósito tiene referencia IGAC,
+pero eso no completa la descripción física editable.
+
+Validación: 585 checks PHP, 116 JS, 612 archivos PHP sin errores, build y 58,8 KB
+gzip. UI aislada con datos ficticios: tres filas, depósito sin descripción pendiente,
+enlace abre controles del garaje, sin errores de consola; CSS 390 px sin
+desbordamiento de página. El push publica código en Git; usuario actualiza hosting.

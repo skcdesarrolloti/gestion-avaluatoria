@@ -25,6 +25,9 @@ declare(strict_types=1);
         expect(str_contains($html, 'Camino del expediente:') && str_contains($html, 'Siguiente paso')
             && str_contains($html, 'Muestras sin asignar (1)') && !str_contains($html, 'aria-label="Etapas de Mercado"'), 'contexto general sin mezclar etapas de un componente no elegido en ' . $stage);
         if ($stage === 'components') {
+            expect(str_contains($html, 'Verificación de la unidad principal y los anexos')
+                && str_contains($html, 'Ver controles de Depósito de oficina') && str_contains($html, 'Sin descripción propia'),
+                'resumen incluye anexo y su descripción pendiente aunque la academia visible es oficina');
             $checkPosition = strpos($html, 'Verificación de datos guardados');
             $navPosition = strpos($html, 'aria-label="Apartados académicos');
             expect($checkPosition !== false && $navPosition !== false && $checkPosition < $navPosition
