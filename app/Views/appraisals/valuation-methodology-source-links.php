@@ -6,6 +6,9 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
 <section id="capture-sources" class="mb-6 rounded-xl border border-blue-100 bg-blue-50 p-4" x-data="{ sourceTab: 0 }">
     <h3 class="text-lg font-semibold text-blue-950" x-text="'Captura en ' + <?= e(json_encode(array_column($sourceTabs, 'label'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>[sourceTab]">Captura en <?= e($sourceTabs[0]['label'] ?? 'la fuente seleccionada') ?></h3>
     <p class="mt-2 text-sm leading-6">Trabaja con esta fuente. Cada aviso que agregues se suma a tu tabla. Conservamos la lectura por portal, el pegado de avisos y la revisión de repetidos.</p>
+    <?php if (($guide['type_label'] ?? '') === 'Tipología pendiente'): ?>
+        <p class="mt-2 rounded-lg bg-amber-50 p-3 text-sm text-amber-950">Falta definir el tipo de esta unidad en los capítulos 1 o 3. Por ahora la búsqueda es general de inmuebles; completa su tipo para obtener comparables pertinentes.</p>
+    <?php endif; ?>
     <p class="mt-2 text-sm leading-6">Si el portal no permite lectura directa, copia su contenido con Ctrl+A y Ctrl+C y pégalo con Ctrl+V en el lector de esa fuente. Revisa los inmuebles reconocidos antes de incorporarlos. Los datos que el portal no publique se completan manualmente o quedan pendientes; no se inventan.</p>
     <div class="mt-3 flex flex-wrap items-center gap-3 text-sm">
         <strong><span x-text="total"><?= count($comparableRows ?? []) ?></span> muestras en la tabla</strong>

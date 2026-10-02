@@ -44,7 +44,11 @@ final class ComparablePortalLinks
                 $sources[$index]['kind'] = 'Filtros del portal';
                 $sources[$index]['instruction'] = 'Venta, oficina y Cartagena aplicados. Comprueba el barrio «' . $neighborhood . '» en el portal; no está filtrado en este enlace.';
             }
-            $sources[2]['instruction'] = 'Venta y oficina aplicados. Pulsa Enter en el campo del barrio dentro del portal; comprueba que los resultados correspondan a ' . $neighborhood . ', ' . $city . '. Después copia la página completa para preparar los avisos juntos.';
+            if ($this->slug($neighborhood) === 'bocagrande') {
+                $sources[1]['url'] .= 'bocagrande/';
+                $sources[1]['instruction'] = 'Oficinas en venta en Bocagrande, Cartagena. Comprueba la ubicación de cada aviso y copia los resultados para preparar el lote.';
+            }
+            $sources[2]['instruction'] = 'Venta y oficina aplicados. En «Ciudad, barrio, sector o sitio» escribe ' . ($neighborhood ?: $city) . ' si aparece vacío y pulsa Enter. Comprueba que los resultados correspondan a ' . $neighborhood . ', ' . $city . '. Después copia la página completa para preparar los avisos juntos.';
         }
         return $sources;
     }

@@ -38,8 +38,7 @@ final class AppraisalValuationMethodologyController
         if (!isset(\App\Services\MethodologyWorkflow::METHODS[$method])) $method = 'mercado';
         $stage = is_string($_GET['stage'] ?? null) ? $_GET['stage'] : 'components';
         if (!in_array($stage, ['components', 'integration', 'decision', 'report', '1', '2', '3', '4', '5'], true)) $stage = 'components';
-        $searchRecord = $record;
-        if ($componentKey !== '') $searchRecord['tipo_inmueble'] = $components[$componentKey]['unit']['property_type'] ?? $record['tipo_inmueble'];
+        $searchRecord = \App\Services\ComparableSearchContext::record($record, $units, $componentKey);
         $methodologyChapter = (new AppraisalMethodologyChapterReport())->build($record, $subject, $units);
         $marketNeighborhoods = array_map(static function (array $row): array {
             try { $url = \App\Services\FincaraizAreaSearch::url((string) $row['name']); }

@@ -190,7 +190,7 @@ final class AppraisalComparableSearchGuide
 
     private function typeKey(string $value): string
     {
-        return array_key_exists($value, AppraisalCatalog::selectFields()['tipo_inmueble'][4] ?? []) ? $value : '';
+        return ComparableSearchContext::type($value);
     }
 
     private function propertyTypeLabel(string $type): string

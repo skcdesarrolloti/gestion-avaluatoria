@@ -284,3 +284,22 @@ Verificación: 491 comprobaciones PHP, 113 pruebas JS, lint PHP, build y
 región visible y ancho contenido comprobados en vista móvil. La captura móvil
 del navegador agotó su tiempo; la comprobación móvil se limitó al DOM.
 No se ejecutaron pruebas de BD: cambio de contenido y vistas, sin persistencia.
+
+
+## 2026-10-02 · Recuperación del tipo para búsquedas de comparables
+
+Corregido el reemplazo del tipo del expediente por un property_type vacío al
+seleccionar componente. ComparableSearchContext conserva el tipo explícito de la
+unidad; solo la única unidad principal puede heredar el tipo del capítulo 1.
+Los anexos y las unidades ambiguas no heredan esa clasificación. Normaliza claves
+y etiquetas del catálogo. Una tipología desconocida ya no envía «tipología
+pendiente» a Google; presenta búsqueda general y aviso para completar el tipo.
+Metrocuadrado incorpora ruta de oficinas en venta en Bocagrande verificada en
+navegador. Mercado Libre mostró 3 resultados y Ciencuadras 29 tras escribir el
+barrio y pulsar Enter; estos conteos son observaciones, no inventario garantizado.
+Ciencuadras requiere confirmar el barrio en su portal; se aclara en la ayuda.
+No cambia lectores, pegado por lote, duplicados, filas guardadas ni esquema.
+Validación: 500 comprobaciones PHP, 113 JS, lint PHP, build y 58.1 KB gzip.
+Pruebas de regresión: principal sin tipo, anexo sin tipo, varias unidades,
+clasificación explícita diferente y recuperación de enlaces directos.
+No se ejecutó prueba de base de datos porque no cambió persistencia ni esquema.

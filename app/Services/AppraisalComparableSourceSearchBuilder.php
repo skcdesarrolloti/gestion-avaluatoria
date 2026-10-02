@@ -123,6 +123,7 @@ final class AppraisalComparableSourceSearchBuilder
 
     private function typeTerms(string $type, string $label): string
     {
+        if ($type === '') return 'inmueble';
         return match ($type) {
             'oficina' => 'oficina',
             'consultorio' => 'consultorio',
