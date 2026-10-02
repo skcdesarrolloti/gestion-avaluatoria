@@ -15,6 +15,7 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
         <span data-autosave-status>Consulta el estado de guardado al incorporar.</span>
     </div>
     <?php require __DIR__ . '/methodology-capture-reading.php'; ?>
+    <?php require __DIR__ . '/methodology-source-buttons.php'; ?>
     <details class="mt-3" x-ref="sourcePicker">
         <summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold text-blue-800">Cambiar de fuente</summary>
         <label for="market-source-choice" class="block text-sm font-semibold">Elige el portal o la inmobiliaria para continuar</label>

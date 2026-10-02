@@ -4,9 +4,10 @@
     <p class="font-semibold">A · Comprueba que aparecen los inmuebles y anexos estudiados.</p>
     <a class="btn-primary mt-3" href="<?= e($flowUrl('decision')) ?>">Siguiente: B · Matriz y método →</a>
 <?php elseif ($stage === 'decision' || ($componentKey === '' && !in_array($stage, ['integration','report'], true))): ?>
-    <p class="font-semibold">Siguiente: C · Elige el inmueble o anexo que vas a analizar.</p>
+    <p class="font-semibold"><?= $stage === '4' ? 'D · Elige el inmueble cuyas muestras vas a analizar.' : 'C · Elige el inmueble para continuar con sus insumos y comparables.' ?></p>
     <div class="mt-3 flex flex-wrap gap-3"><?php foreach ($components as $key => $component): ?>
-        <a class="btn-primary" href="<?= e($flowUrl('1', ($flow[$key]['method'] ?? '') ?: 'mercado', $key)) ?>">Analizar <?= e($component['label']) ?> → Academia</a>
+        <?php $hasMethod = !empty($flow[$key]['method']); $targetStage = $hasMethod ? ($stage === '4' ? '4' : '3') : '2'; ?>
+        <a class="btn-primary" href="<?= e($flowUrl($targetStage, ($flow[$key]['method'] ?? '') ?: 'mercado', $key)) ?>"><?= e($component['label']) ?> → <?= !$hasMethod ? 'Definir método en B' : ($targetStage === '4' ? 'Análisis' : 'Insumos y comparables') ?></a>
     <?php endforeach; ?></div>
 <?php elseif ($stage === 'integration'): ?>
     <p>Revisa la cobertura y las conclusiones de todos los componentes antes de continuar.</p>
@@ -27,7 +28,7 @@
     <div class="mt-3 flex flex-wrap gap-3">
         <?php if ((int) $stage > 1): ?><a class="btn-secondary" href="<?= e($flowUrl((string) ((int) $stage - 1))) ?>">← <?= e($prefix . ((int) $stage - 1)) ?> Anterior</a><?php endif; ?>
         <?php if ($stage !== '2' && (int) $stage < 5): ?><a class="btn-primary" href="<?= e($flowUrl((string) ((int) $stage + 1))) ?>">Siguiente: <?= e($prefix . ((int) $stage + 1) . ' ' . Workflow::STAGES[(int) $stage + 1]) ?> →</a><?php endif; ?>
-        <?php if ($stage === '5'): ?><a class="btn-secondary" href="<?= e($flowUrl('components')) ?>">Analizar otro inmueble</a><a class="btn-primary" href="<?= e($flowUrl('integration')) ?>">Siguiente: D · Integración →</a><?php endif; ?>
+        <?php if ($stage === '5'): ?><a class="btn-secondary" href="<?= e($flowUrl('components')) ?>">Analizar otro inmueble</a><a class="btn-primary" href="<?= e($flowUrl('integration')) ?>">Siguiente: E · Integración →</a><?php endif; ?>
     </div>
 <?php endif; ?>
 </section>

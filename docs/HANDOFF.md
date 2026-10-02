@@ -253,3 +253,17 @@ de los estadísticos. Sin modificaciones a importadores, guardado, esquema o dat
 Validación: 471 comprobaciones PHP, 113 pruebas JS, lint, build y 58.1 KB gzip.
 Revisión local del acordeón en navegador de escritorio y visibilidad en ancho
 móvil. No se ejecutó prueba de BD: cambio exclusivo de ayuda en vistas.
+
+## 2026-10-02 · Recorrido A–E y fuentes visibles
+
+Menú: A Inmuebles, B Matriz y método, C Insumos y comparables (etapa 3),
+D Análisis de las muestras (etapa 4), E Integración y texto del numeral 8.
+Los enlaces conservan componente y método. Sin componente, D pide elegirlo;
+el siguiente paso de B dirige a selección si falta método, o a los insumos si existe.
+Portales e inmobiliarias del catálogo aparecen como botones en C. Mantiene
+buscadores, filtros soportados, lectores por fuente, pegado y duplicados.
+No se agregaron integraciones nuevas a inmobiliarias: las que abren el sitio
+siguen requiriendo filtros manuales, tal como se indica en su panel.
+Verificado: PHP 471, JS 113, lint de vistas, build y 58.1 KB gzip; navegador local
+con cambio de FincaRaíz a Araújo & Segovia y recorrido visible A–E; acceso C
+visible en ancho móvil. Sin cambios de base de datos ni pruebas de portales en vivo.
