@@ -101,3 +101,10 @@ de negocio ni trasladar el controlador monolítico. No modificar InversKC al tra
 - Verificar interfaz móvil/escritorio cuando cambien las vistas; no introducir pruebas
   triviales que solo repitan implementación.
 - Documentar cambios, comandos, configuración nueva, validación ejecutada y limitaciones.
+
+## Continuidad de captura de comparables
+
+Antes de modificar el módulo C o sus lectores, leer
+`docs/CAPTURA-COMPARABLES-CONTINUIDAD.md` y conservar el pegado por portal,
+conteos, selección sin coincidencias y matriz compartida. Reorganizar la interfaz
+no autoriza eliminar esas funciones ni las muestras existentes.

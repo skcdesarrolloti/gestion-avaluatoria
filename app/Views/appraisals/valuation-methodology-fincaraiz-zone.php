@@ -97,7 +97,7 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
     </div>
 </section>
 <?php endif; ?>
-<details class="mt-4" <?= !$zoneSupported ? 'open' : '' ?>>
+<details class="mt-4" open>
     <summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Capturar un enlace individual o pegar texto</summary>
     <?php if (!$zoneSupported): ?><a href="<?= e($source['url']) ?>" target="_blank" rel="noopener" class="btn-secondary min-h-11">Abrir búsqueda en <?= e($zonePortal) ?></a><?php endif; ?>
     <?php if (empty($isMetrocuadrado)) require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-url.php'; ?>

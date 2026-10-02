@@ -4,7 +4,7 @@
         <span x-text="duplicates"></span> con enlace repetido
     </p>
     <p class="mt-1 text-xs text-slate-600">Control operativo de captura. No certifica cumplimiento NTS ni suficiencia de la muestra. Los datos sin publicar quedan pendientes de verificación.</p>
-    <p class="mt-2 text-sm">Completa las muestras existentes sin borrarlas. En «4. Mapas y evidencia» registra latitud, longitud, precisión, fuente y soporte de cada muestra. Art. 17: georreferenciación aproximada; si la fuente limita la ubicación, indica la mayor precisión disponible. No inventes coordenadas.</p>
+    <p class="mt-2 text-sm">Completa las muestras existentes sin borrarlas. En «Mapas, coordenadas y fotos» registra latitud, longitud, precisión, fuente y soporte de cada muestra. Art. 17: georreferenciación aproximada; si la fuente limita la ubicación, indica la mayor precisión disponible. No inventes coordenadas.</p>
     <p class="mb-2 text-xs">PH del inmueble avaluado: <strong><?= e(['si' => 'Sí', 'no' => 'No', 'no_aplica' => 'No aplica'][$record['regimen_ph'] ?? ''] ?? 'Por verificar') ?></strong>. Clasifica las muestras por separado.</p>
         <div class="mt-3 grid gap-3 sm:grid-cols-2 lg:grid-cols-4" @input.stop @change.stop>
         <label class="label">Propiedad horizontal

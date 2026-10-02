@@ -11,13 +11,17 @@
     <input type="hidden" name="version" value="<?= (int) ($record['comparables_version'] ?? 0) ?>">
     <div x-show="searchTab === 'captura'"><?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-links.php'; ?></div>
     <section x-show="['matriz', 'mapa'].includes(searchTab)" x-effect="if (['matriz', 'mapa'].includes(searchTab)) $nextTick(() => syncWidth())">
+    <div class="mb-4 flex flex-wrap items-center gap-2" aria-label="Vistas de las muestras">
+        <button type="button" class="btn-secondary min-h-11" :aria-pressed="searchTab === 'matriz'" @click="searchTab = 'matriz'">Tabla de muestras (<span x-text="total"></span>)</button>
+        <button type="button" class="btn-secondary min-h-11" :aria-pressed="searchTab === 'mapa'" @click="searchTab = 'mapa'">Mapas, coordenadas y fotos</button>
+    </div>
     <div id="capture-review" x-show="searchTab === 'matriz'" class="scroll-mt-6 flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Tabla madre de comparables</p>
             <h3 class="mt-2 text-xl font-semibold">Matriz de datos</h3>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Diligencia una fila por cada oferta, transacción o dato de mercado. El sujeto queda fuera de esta tabla:
-                aquí se preparan las muestras que se analizarán en M4. Completa ubicación y soporte en «4. Mapas y evidencia».
+                aquí se preparan las muestras que se analizarán en M4. Completa ubicación y soporte en «Mapas, coordenadas y fotos».
                 Un inmueble por fila y sus datos por columnas. Sin límite de cantidad de muestras; revisa los pendientes, PH y fotos por inmueble.
             </p>
         </div>

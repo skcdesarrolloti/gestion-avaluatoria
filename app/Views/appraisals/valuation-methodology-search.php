@@ -18,14 +18,16 @@ $formulaFamilies = [
     ['Residual', 'Valor del suelo = ingresos esperados del producto menos costos directos, indirectos, financieros, utilidad, tiempos y riesgos del desarrollo.'],
     ['Costo', 'Valor = terreno + costo de reposición nuevo menos depreciación física, funcional y económica, con soporte de cantidades y precios.'],
 ];
-$searchTabs = [
-    'buscar' => '1. Buscar',
-    'captura' => '2. Portales y pegado',
-    'matriz' => '3. Matriz de datos',
-    'mapa' => '4. Mapas y evidencia',
-];
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ searchTab: 'captura' }">
+    <nav class="mb-6 flex flex-wrap gap-2 rounded-xl bg-slate-100 p-2" aria-label="Subpestañas de C · Insumos y comparables">
+        <button type="button" class="min-h-11 rounded-lg px-4 py-2 font-semibold" :aria-pressed="searchTab === 'captura'"
+            :class="searchTab === 'captura' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
+            @click="searchTab = 'captura'">1. Buscar inmuebles</button>
+        <button type="button" class="min-h-11 rounded-lg px-4 py-2 font-semibold" :aria-pressed="searchTab !== 'captura'"
+            :class="searchTab !== 'captura' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
+            @click="searchTab = 'matriz'">2. Tabla de muestras</button>
+    </nav>
     <div class="mb-6">
         <p class="eyebrow">M3 Desarrollo operativo del método de mercado</p>
         <h2 class="mt-2 text-2xl font-semibold">Investigación, muestra y trazabilidad de mercado</h2>
@@ -36,6 +38,7 @@ $searchTabs = [
         </p>
     </div>
 
+    <details class="mb-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer py-3 font-semibold">Ver contexto del inmueble y reglas de captura</summary>
     <div class="grid gap-4 lg:grid-cols-3">
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p class="eyebrow">Activo sujeto</p>
@@ -59,16 +62,12 @@ $searchTabs = [
         Las muestras pertenecen al componente indicado arriba. Revisa su comparabilidad antes de analizarlas en M4.
     </div>
 
-    <nav class="mt-6 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Pestañas del desarrollo M3">
-        <?php foreach ($searchTabs as $key => $label): ?>
-            <button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
-                :class="searchTab === '<?= e($key) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
-                @click="searchTab = '<?= e($key) ?>'"><?= e($label) ?></button>
-        <?php endforeach; ?>
-    </nav>
-
+    </details>
     <div class="mt-6">
-        <div x-show="searchTab === 'buscar'">
+        <div id="captura-83" class="scroll-mt-6">
+            <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-captura.php'; ?>
+        </div>
+        <details x-show="searchTab === 'captura'" class="mt-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer py-3 font-semibold">Preparar criterios, filtros y diseño de muestra (consulta opcional)</summary>
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-diseno.php'; ?>
             <div class="mt-6">
                 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-buscador.php'; ?>
@@ -76,10 +75,7 @@ $searchTabs = [
             <div class="mt-6">
                 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-filtros.php'; ?>
             </div>
-        </div>
-        <div id="captura-83" class="scroll-mt-6" x-show="['captura', 'matriz', 'mapa'].includes(searchTab)">
-            <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-captura.php'; ?>
-        </div>
+        </details>
 
     </div>
 </section>

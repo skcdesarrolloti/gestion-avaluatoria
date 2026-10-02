@@ -28,7 +28,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
             <h3 class="mt-2 text-xl font-semibold text-teal-950">Aquí no se calcula todavía: aquí construyes la muestra de mercado</h3>
             <p class="mt-2 max-w-4xl text-sm leading-6 text-teal-950"><?= e($nextAction) ?></p>
             <p class="mt-1 max-w-4xl text-xs font-semibold leading-5 text-teal-800">
-                Flujo simple: 1. Buscar fuentes, 2. Capturar comparables, 3. Matriz de datos, 4. Mapas.
+                Flujo simple: 1. Buscar inmuebles y pegar resultados; 2. Tabla de muestras, con mapas y evidencia.
             </p>
         </div>
         <span class="rounded-full bg-white px-3 py-1 text-xs font-bold text-teal-800"><?= e((string) $usableCount) ?> muestras</span>

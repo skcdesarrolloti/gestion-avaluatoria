@@ -303,3 +303,14 @@ Validación: 500 comprobaciones PHP, 113 JS, lint PHP, build y 58.1 KB gzip.
 Pruebas de regresión: principal sin tipo, anexo sin tipo, varias unidades,
 clasificación explícita diferente y recuperación de enlaces directos.
 No se ejecutó prueba de base de datos porque no cambió persistencia ni esquema.
+
+
+## 2026-10-02 · C: búsqueda y tabla separadas
+
+Dos subpestañas: Buscar inmuebles y Tabla de muestras. Mapas dentro de muestras;
+criterios y academia se conservan plegables. Pegado de FincaRaíz/Metrocuadrado
+abierto, lectores por lote elegidos según unidad; conteos y selección conservados.
+Ver CAPTURA-COMPARABLES-CONTINUIDAD.md, también referenciado desde AGENTS.md.
+Validado con 505 comprobaciones PHP, 113 JS, lint, build y tamaño 58.1 KB gzip.
+Navegador local: lector visible, cambio entre vistas y texto pendiente conservado.
+Sin cambios de persistencia ni prueba de BD; no valida datos del hosting.

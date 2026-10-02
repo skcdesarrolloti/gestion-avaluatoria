@@ -17,7 +17,6 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
         <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'mapa'">Completar ubicación y soportes</button>
         <span data-autosave-status>Consulta el estado de guardado al incorporar.</span>
     </div>
-    <?php require __DIR__ . '/methodology-capture-reading.php'; ?>
     <?php require __DIR__ . '/methodology-source-buttons.php'; ?>
     <details class="mt-3" x-ref="sourcePicker">
         <summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold text-blue-800">Cambiar de fuente</summary>
@@ -68,10 +67,11 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
             <?php if ($isFincaraiz): ?><details class="mt-3"><summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Si la lectura falla: pegar enlace y texto</summary><?php endif; ?>
             <?php
             $batchPortal = ['Ciencuadras' => 'ciencuadras', 'Properati' => 'properati', 'Mercado Libre Inmuebles' => 'mercadolibre'][$source['label']] ?? '';
-            require BASE_PATH . '/app/Views/appraisals/' . ($batchPortal && ($record['tipo_inmueble'] ?? '') === 'oficina' && ($record['tipo_negocio'] ?? '') === 'venta'
+            require BASE_PATH . '/app/Views/appraisals/' . ($batchPortal && ($guide['type_label'] ?? '') === 'Oficina' && ($record['tipo_negocio'] ?? '') === 'venta'
                 ? 'valuation-methodology-' . $batchPortal . '-paste.php' : 'valuation-methodology-source-paste.php'); ?>
             <?php if ($isFincaraiz): ?></details><?php endif; ?>
             <?php endif; ?>
         </section>
     <?php endforeach; ?>
+    <?php require __DIR__ . '/methodology-capture-reading.php'; ?>
 </section>

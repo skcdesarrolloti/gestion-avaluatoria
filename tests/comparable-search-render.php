@@ -30,4 +30,16 @@ declare(strict_types=1);
         'fuentes de captura renderizan consulta concatenada tras academia');
     expect(str_contains($html, e($portalSources[0]['url'])),
         'enlace del portal conserva los criterios del expediente tras academia');
+    $record = ['id' => str_repeat('a', 32), 'tipo_inmueble' => 'lote', 'tipo_negocio' => 'venta'];
+    $subject = []; $comparableRows = []; $marketNeighborhoods = []; $componentKey = '';
+    $_SESSION['csrf'] ??= 'test-capture-tabs';
+    ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search.php'; $html = ob_get_clean();
+    expect(str_contains($html, '1. Buscar inmuebles') && str_contains($html, '2. Tabla de muestras')
+        && str_contains($html, 'aria-label="Vistas de las muestras"'), 'C mantiene dos entradas y mapas dentro de las muestras');
+    foreach (['ciencuadrasPaste', 'properatiPaste', 'mercadolibrePaste'] as $reader) {
+        expect(str_contains($html, 'x-data="' . $reader . '"'), 'captura de oficina seleccionada mantiene lector ' . $reader);
+    }
+    expect(str_contains($html, 'Agregar sugeridos sin coincidencias') && str_contains($html, 'Ctrl+V')
+        && str_contains($html, 'Pega la página de resultados') && substr_count($html, 'id="tabla-madre-83"') === 1,
+        'pegado, selección sin repetidos y única matriz persisten al reorganizar C');
 })();
