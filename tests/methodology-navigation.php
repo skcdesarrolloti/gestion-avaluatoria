@@ -25,6 +25,8 @@ declare(strict_types=1);
         expect(str_contains($html, 'Camino del expediente:') && str_contains($html, 'Siguiente paso')
             && str_contains($html, 'Muestras sin asignar (1)') && !str_contains($html, 'aria-label="Etapas de Mercado"'), 'contexto general sin mezclar etapas de un componente no elegido en ' . $stage);
         if ($stage === 'components') {
+            expect(str_contains($html, '1. Revisión') && str_contains($html, '4. Antes de continuar')
+                && str_contains($html, 'Leer artículo 27 completo'), 'apartados visibles y lectura contextual de mejoras');
             expect(str_contains($html, 'orientación para Mercado') && str_contains($html, 'Leer artículo 36 completo')
                 && str_contains($html, 'Leer artículo 19 completo') && !str_contains($html, '→ Academia'),
                 'unidad sin método abre orientación de Mercado en sitio con PH y comparables diferenciados');
@@ -44,6 +46,12 @@ declare(strict_types=1);
                 . '<meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="/public/assets/app.css">'
                 . '<body class="bg-slate-50"><main class="mx-auto max-w-7xl p-5">' . $html . '</main></body></html>');
         }
+    }
+    foreach ([['lote', 'property', 'solo_terreno', 31], ['casa', 'property', 'lote_construccion', 18], ['', 'annex', 'solo_construccion', 27]] as [$type, $kind, $structure, $article]) {
+        $unit = ['unit_kind' => $kind, 'method_structure' => $structure];
+        $component = ['label' => 'Componente de prueba']; $orientationPh = 'no';
+        ob_start(); require BASE_PATH . '/app/Views/appraisals/methodology-unit-reading.php'; $reading = ob_get_clean();
+        expect(str_contains($reading, 'Leer artículo ' . $article . ' completo'), 'lectura según componente ' . $structure);
     }
     $componentKey = 'office'; $stage = '1';
     ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php'; $html = ob_get_clean();

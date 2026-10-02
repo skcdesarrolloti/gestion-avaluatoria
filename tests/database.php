@@ -64,6 +64,7 @@ require __DIR__ . '/judicial-persistence.php';
 require __DIR__ . '/analyst-access-persistence.php';
 require __DIR__ . '/unit-reclassification-persistence.php';
 require __DIR__ . '/methodology-persistence.php';
+require __DIR__ . '/unit-structure-persistence.php';
 // An applied migration must never be silently changed.
 $app->exec("UPDATE schema_migrations SET checksum = REPEAT('0', 64) WHERE version = '202609150002_add_observaciones.php'");
 $detected = false;

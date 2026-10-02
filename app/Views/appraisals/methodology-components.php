@@ -20,7 +20,7 @@ $sourceTreatments = \App\Support\AppraisalUnitValuationTreatmentCatalog::options
         $item = $flow[$key] ?? [];
         $samples = \App\Services\MethodologyComparableScope::rows($allComparableRows, $key);
         $unit = $component['unit'];
-        $type = ($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'] ?? '');
+        $type = \App\Services\ComparableSearchContext::record($record, $units, (string) $key)['tipo_inmueble'] ?? '';
     ?>
         <article class="rounded-xl border border-slate-200 p-5">
             <p class="text-sm text-slate-600"><?= ($unit['unit_kind'] ?? '') === 'annex' ? 'Anexo' : 'Inmueble' ?> · capítulos 1 y 3</p>
@@ -30,6 +30,7 @@ $sourceTreatments = \App\Support\AppraisalUnitValuationTreatmentCatalog::options
                 <div><dt class="font-semibold">Tipo de construcción</dt><dd><?= e($constructionTypes[$unit['construction_type'] ?? ''] ?? 'Por definir') ?></dd></div>
                 <div><dt class="font-semibold">Tipología IGAC registrada</dt><dd class="break-words"><?= e(($unit['igac_typology_hint'] ?? '') ?: 'Por definir') ?></dd></div>
                 <div><dt class="font-semibold">Tratamiento registrado en el expediente</dt><dd><?= e($sourceTreatments[$unit['valuation_treatment'] ?? ''] ?? 'Por definir') ?></dd></div>
+                <div><dt class="font-semibold">Estructura del método de esta unidad</dt><dd><?= e(\App\Support\UnitMethodStructure::options()[($unit['method_structure'] ?? '') ?: 'por_definir'] ?? 'Por definir') ?></dd></div>
             </dl>
             <?php if (!empty($unit['notes'])): ?><details class="mt-3"><summary class="min-h-11 cursor-pointer font-semibold">Descripción registrada</summary><p class="whitespace-pre-wrap break-words text-sm"><?= e($unit['notes']) ?></p></details><?php endif; ?>
             <p class="mt-2">Método: <strong><?= e($methods[$item['method'] ?? ''] ?? 'Por seleccionar') ?></strong></p>
@@ -41,7 +42,7 @@ $sourceTreatments = \App\Support\AppraisalUnitValuationTreatmentCatalog::options
                 <p class="mt-2 font-semibold text-amber-800">Las muestras cambiaron: revisa la conclusión.</p>
                 <?php endif; ?>
             <?php endif; ?>
-            <?php if ($stage === 'components' && in_array($item['method'] ?? '', ['', 'mercado'], true)): ?>
+            <?php if ($stage === 'components'): ?>
                 <?php require __DIR__ . '/methodology-market-orientation.php'; ?>
             <?php else: ?>
                 <a class="btn-primary mt-4" href="<?= e($flowUrl('1', ($item['method'] ?? '') ?: 'mercado', $key)) ?>">Analizar <?= e($component['label']) ?> → Academia</a>

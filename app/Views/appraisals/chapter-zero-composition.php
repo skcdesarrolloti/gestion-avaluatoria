@@ -132,8 +132,16 @@
                                 <?php endforeach; ?>
                             </select>
                             <span class="mt-1 block text-xs leading-5 text-slate-500">
-                                Parqueaderos y depósitos suelen integrarse al comparable del apartamento; sepáralos solo por decisión técnica.
+                                Comprueba naturaleza jurídica y cobertura. En PH distingue la liquidación del sujeto (art. 36) de la depuración de muestras (art. 19).
                             </span>
+                        </label>
+                        <label class="label">Estructura del método de esta unidad o anexo
+                            <select class="input" name="config_units[<?= e($key) ?>][method_structure]">
+                                <?php foreach (\App\Support\UnitMethodStructure::options() as $value => $text): ?>
+                                    <option value="<?= e($value) ?>" <?= ($unit['method_structure'] ?? '') === $value ? 'selected' : '' ?>><?= e($text) ?></option>
+                                <?php endforeach; ?>
+                            </select>
+                            <span class="mt-1 block text-xs text-slate-500">Define qué comprende este componente. No selecciona automáticamente Mercado, Costo ni otro método. Ejemplo: placa vial o cerramiento, solo construcción o mejora.</span>
                         </label>
                         <label class="label md:col-span-2">Descripción base
                             <input class="input" name="config_units[<?= e($key) ?>][notes]" maxlength="2000"

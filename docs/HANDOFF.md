@@ -1,5 +1,13 @@
 # Entrega al responsable de la implementación
 
+Academia por unidad: cuatro subpestañas visibles en A del capítulo 8 y lectura contextual
+para PH, NPH, terreno y mejoras. Capítulo 1 guarda «Estructura del método» por unidad
+y anexo; capítulo 8 la consulta. Migración aditiva `202610020001_unit_method_structure.php`
+mediante `php bin/console.php migrate` o `AUTO_MIGRATE=true` al acceder autenticado.
+Los registros anteriores quedan por definir; no se asigna un método automáticamente.
+Validación: PHP, JavaScript, compilación, tamaño y BD local desechable; persistencia,
+propietario ajeno, formulario anterior y migración repetida. No desarrolla otros métodos.
+
 Capítulo 8 por componente: [flujo Mercado y conservación](CAPITULO-8-COMPONENTES.md).
 Aplicar migración `202610010008_methodology_workflow.php`. Muestras previas en
 banco sin asignar; M1–M5 y asignación segregada. Costo se desarrolla después.

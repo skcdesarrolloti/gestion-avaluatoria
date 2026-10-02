@@ -26,6 +26,7 @@ final class AppraisalUnitDefinitionInput
             $igacCategory = AppraisalConstructionTypeCatalog::igacCategoryFor($constructionType)
                 ?: mb_substr(trim((string) ($unit['igac_category'] ?? '')), 0, 40);
             $rows[] = [
+                'method_structure' => self::structure($unit),
                 'unit_kind' => $match[1],
                 'unit_index' => (int) $match[2],
                 'label' => mb_substr(trim((string) ($unit['label'] ?? '')), 0, 120),
@@ -38,5 +39,15 @@ final class AppraisalUnitDefinitionInput
             ];
         }
         return $rows;
+    }
+
+    private static function structure(array $unit): ?string
+    {
+        if (!array_key_exists('method_structure', $unit)) return null;
+        $value = $unit['method_structure'];
+        if (!is_string($value) || !array_key_exists($value, \App\Support\UnitMethodStructure::options())) {
+            throw new \InvalidArgumentException('Revisa la estructura del método de la unidad o anexo.');
+        }
+        return $value;
     }
 }
