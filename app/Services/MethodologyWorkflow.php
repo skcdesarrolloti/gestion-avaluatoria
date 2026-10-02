@@ -17,15 +17,11 @@ final class MethodologyWorkflow
     public static function components(array $record, array $units): array
     {
         $out = [];
-        usort($units, static fn ($a, $b) => (($a['unit_kind'] ?? '') === 'annex') <=> (($b['unit_kind'] ?? '') === 'annex'));
         foreach ($units as $unit) {
             if (($unit['unit_kind'] ?? '') === 'common') continue;
-            $out[(string) $unit['id']] = ['label' => trim($unit['label'] ?? '') ?: 'Componente ' . ($unit['unit_index'] ?? ''), 'unit' => $unit];
+            $fallback = (($unit['unit_kind'] ?? '') === 'annex' ? 'Anexo ' : 'Unidad ') . (int) ($unit['unit_index'] ?? 0);
+            $out[(string) $unit['id']] = ['label' => trim($unit['label'] ?? '') ?: $fallback, 'unit' => $unit];
         }
-        if ($out === []) $out['principal'] = ['label' => 'Inmueble principal', 'unit' => []];
-        // Optional analysis component: never automatically assigned or added to a total.
-        $hasLand = count(array_filter($out, static fn ($c) => ($c['unit']['property_type'] ?? '') === 'lote')) > 0;
-        if (!$hasLand || isset(self::saved($record)['terreno'])) $out['terreno'] = ['label' => 'Terreno separado (si corresponde)', 'unit' => ['property_type' => 'lote']];
         return $out;
     }
 

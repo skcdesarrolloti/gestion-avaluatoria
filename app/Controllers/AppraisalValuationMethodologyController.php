@@ -82,11 +82,12 @@ final class AppraisalValuationMethodologyController
         $key = is_string($_POST['component'] ?? null) ? $_POST['component'] : '';
         \App\Services\MethodologyWorkflow::validateKey($key, $components);
         $source = is_string($_POST['source_scope'] ?? null) ? $_POST['source_scope'] : '';
-        \App\Services\MethodologyWorkflow::validateKey($source, $components);
         if ($source === $key) throw new \App\Core\HttpException(422, 'Selecciona un destino distinto.');
         $ids = $_POST['samples'] ?? [];
         if (!is_array($ids) || $ids === []) throw new \App\Core\HttpException(422, 'Marca las muestras que deseas asignar.');
         $rows = $this->comparables->forAppraisal($id, $this->user['id']);
+        // An old synthetic or inactive source may be recovered only from this owned collection.
+        if ($source !== '' && \App\Services\MethodologyComparableScope::rows($rows, $source) === []) throw new \App\Core\HttpException(422, 'La asignación anterior no contiene muestras de este expediente.');
         $found = [];
         foreach ($rows as &$row) if (in_array($row['id'], $ids, true)) {
             if (($row['component_key'] ?? '') !== $source) throw new \App\Core\HttpException(409, 'La muestra cambió de componente. Recarga para revisar.');

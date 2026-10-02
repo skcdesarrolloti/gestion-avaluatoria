@@ -20,8 +20,12 @@ No se ejecutaron pruebas de BD en esta corrección de vistas ni se verificaron
 los datos o el despliegue en producción.
 
 Primero se asigna un método a cada componente. Consultar una pestaña no cambia
-la elección guardada. Unidades y anexos conservan sus IDs. El terreno separado
-es opcional y nunca se asigna ni suma automáticamente.
+la elección guardada. Unidades y anexos conservan sus IDs y el orden de lectura
+del capítulo 3. El capítulo 8 refleja exclusivamente las unidades activas de
+appraisal_units definidas en capítulos 1 y 3: no crea terreno virtual ni principal
+de respaldo. Si no hay unidades, muestra instrucciones para completarlas en origen.
+La primera pestaña muestra clasificación, tratamiento, tipología y descripción
+registrados, sin sustituirlos por sugerencias de métodos. Matriz y método no cambia.
 
 ## Recorrido y alcance
 
@@ -48,6 +52,9 @@ No borra muestras, fotos, tablas ni usuarios.
 
 Muestras anteriores: Banco sin asignar. Marcar y asignar expresamente;
 pueden devolverse al banco o reasignarse, sin duplicación y conservando IDs.
+Las muestras vinculadas a terreno virtual o unidades que dejaron de estar activas
+siguen visibles en Muestras sin asignar como asignación anterior para reasignación
+explícita. Las selecciones anteriores permanecen almacenadas sin generar unidades.
 Las nuevas capturas llevan component_key dentro de capture_details existente.
 Guardar un componente preserva el resto de la colección. Se conserva versión
 optimista global de muestras y se rechazan IDs de otros componentes.
@@ -58,11 +65,12 @@ Cambios en muestras generan aviso de revisión de la redacción anterior.
 
 ## Verificación
 
-- PHP: 456 verificaciones; JS: 112 pruebas; lint PHP y build correctos.
+- PHP: 469 verificaciones; JS: 112 pruebas; lint PHP y build correctos.
 - MariaDB local desechable puerto 3319, ga_test_app/ga_test_auth: 93 verificaciones,
   migración repetida, conservación, aislamiento y conflictos.
-- HTTP: 34 verificaciones, render de todas las etapas, CSRF, asignación y retorno
-  al banco y recuperación de la identidad de muestras.
+- HTTP: 44 verificaciones, render de todas las etapas, CSRF, asignación y retorno
+  al banco, recuperación de muestras de unidad inactiva y reflejo de nombres y
+  descripción guardados en capítulo 3. Rechazo de componente virtual en servidor.
 - CSS + JS: 58.1 KB gzip.
 - Navegador local: terreno y dos anexos, selección y autoguardado antes de navegar,
   asignación de una muestra anterior, M4, redacción M5 e integración.

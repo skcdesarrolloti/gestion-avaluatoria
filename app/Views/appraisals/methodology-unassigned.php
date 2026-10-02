@@ -1,10 +1,14 @@
 <?php
 $assignmentPools = ['' => \App\Services\MethodologyComparableScope::rows($allComparableRows, '')];
+foreach ($allComparableRows as $sample) {
+    $savedKey = $sample['component_key'] ?? '';
+    if ($savedKey !== '' && !isset($components[$savedKey])) $assignmentPools[$savedKey][] = $sample;
+}
 if ($componentKey !== '') $assignmentPools[$componentKey] = $comparableRows;
 ?>
 <?php foreach ($assignmentPools as $sourceScope => $bank): if ($bank === []) continue; ?>
 <details class="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4" <?= $componentKey === '' ? 'open' : '' ?>>
-    <summary class="min-h-11 cursor-pointer font-semibold"><?= $sourceScope === '' ? count($bank) . ' muestras conservadas sin asignación' : 'Reasignar muestras de este componente' ?></summary>
+    <summary class="min-h-11 cursor-pointer font-semibold"><?= $sourceScope === '' ? count($bank) . ' muestras conservadas sin asignación' : (isset($components[$sourceScope]) ? 'Reasignar muestras de este componente' : count($bank) . ' muestras con asignación anterior: vincular a una unidad registrada') ?></summary>
     <p class="mt-2 text-sm">Marca las muestras que corresponden al componente. Conservan sus datos y fotos; esta acción no las duplica ni las incorpora automáticamente al análisis.</p>
     <form method="post" action="<?= e(url($basePath . '/asignar-muestras')) ?>" class="mt-4">
         <?= csrf_field() ?>

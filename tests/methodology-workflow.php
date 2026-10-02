@@ -3,7 +3,11 @@ declare(strict_types=1);
 (static function (): void {
     $units = [['id' => 'unit-a', 'label' => 'Principal', 'unit_kind' => 'property'], ['id' => 'unit-b', 'label' => 'Cerramiento', 'unit_kind' => 'annex']];
     $components = \App\Services\MethodologyWorkflow::components([], $units);
-    expect(isset($components['unit-a'], $components['unit-b'], $components['terreno']), 'flujo conserva identidades y ofrece terreno sin asignar método');
+    expect(array_keys($components) === ['unit-a', 'unit-b'] && $components['unit-b']['unit'] === $units[1], 'capítulo 8 refleja solo unidades registradas con identidad y datos intactos');
+    expect(\App\Services\MethodologyWorkflow::components(['methodology_workflow' => '{"terreno":{"method":"mercado"}}'], []) === [], 'sin unidades registradas no inventa principal ni resucita terreno virtual');
+    $sourceUnits = [$units[1], ['id' => 'common', 'unit_kind' => 'common'], $units[0]];
+    expect(array_keys(\App\Services\MethodologyWorkflow::components([], $sourceUnits)) === ['unit-b', 'unit-a'], 'respeta el orden de capítulos 1 y 3 y excluye ficha común');
+    expectStatus(422, fn () => \App\Services\MethodologyWorkflow::validateKey('terreno', $components), 'no permite guardar metodología en componentes inventados');
     expectStatus(422, fn () => \App\Services\MethodologyWorkflow::validateKey('foreign', $components), 'flujo rechaza componente ajeno o inactivo');
     $a = ['id' => 'a', 'component_key' => 'unit-a', 'price_amount' => 100];
     $b = ['id' => 'b', 'component_key' => 'unit-b', 'price_amount' => 200];
