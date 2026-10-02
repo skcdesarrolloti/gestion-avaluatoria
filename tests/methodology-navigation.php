@@ -25,6 +25,9 @@ declare(strict_types=1);
         expect(str_contains($html, 'Camino del expediente:') && str_contains($html, 'Siguiente paso')
             && str_contains($html, 'Muestras sin asignar (1)') && !str_contains($html, 'aria-label="Etapas de Mercado"'), 'contexto general sin mezclar etapas de un componente no elegido en ' . $stage);
         if ($stage === 'components') {
+            expect(str_contains($html, 'orientación para Mercado') && str_contains($html, 'Leer artículo 36 completo')
+                && str_contains($html, 'Leer artículo 19 completo') && !str_contains($html, '→ Academia'),
+                'unidad sin método abre orientación de Mercado en sitio con PH y comparables diferenciados');
             expect(str_contains($html, 'Oficina &lt;principal&gt;') && str_contains($html, 'Depósito de oficina')
                 && str_contains($html, 'Integrado al inmueble principal'), 'entrada conserva inmuebles, anexos y tratamiento previo escapados');
             expect(str_contains($html, 'component=annex') && str_contains($html, 'component=office'), 'etapas enlazan la identidad de cada inmueble y anexo');

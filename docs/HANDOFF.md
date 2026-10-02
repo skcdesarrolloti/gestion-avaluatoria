@@ -314,3 +314,16 @@ Ver CAPTURA-COMPARABLES-CONTINUIDAD.md, también referenciado desde AGENTS.md.
 Validado con 505 comprobaciones PHP, 113 JS, lint, build y tamaño 58.1 KB gzip.
 Navegador local: lector visible, cambio entre vistas y texto pendiente conservado.
 Sin cambios de persistencia ni prueba de BD; no valida datos del hosting.
+
+
+## 2026-10-02 · Paso 1: orientación de Mercado junto a la unidad
+
+En A, unidades sin método o con Mercado abren orientación en su propia ficha.
+Distingue inmueble sujeto (36) y comparables (19.2); incluye lectura completa de
+16–21 y 36, comprobaciones, límites y advertencia de no seleccionar automáticamente.
+Mantiene el enlace a selección existente con identidad de unidad. No modifica
+selección, otros métodos, importadores, capturas ni datos. Es un primer paso de
+revisión con el usuario, no una revisión exhaustiva de todos los casos especiales.
+Fuente contrastada: Diario Oficial reproducido por Camacol, artículo 36, página 9.
+Validación: 506 comprobaciones PHP, 113 JS, lint de archivos cambiados, build,
+58.1 KB gzip; apertura en la misma ficha y lectura visible en ancho móvil.

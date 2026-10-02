@@ -41,7 +41,11 @@ $sourceTreatments = \App\Support\AppraisalUnitValuationTreatmentCatalog::options
                 <p class="mt-2 font-semibold text-amber-800">Las muestras cambiaron: revisa la conclusión.</p>
                 <?php endif; ?>
             <?php endif; ?>
-            <a class="btn-primary mt-4" href="<?= e($flowUrl('1', ($item['method'] ?? '') ?: 'mercado', $key)) ?>">Analizar <?= e($component['label']) ?> → Academia</a>
+            <?php if ($stage === 'components' && in_array($item['method'] ?? '', ['', 'mercado'], true)): ?>
+                <?php require __DIR__ . '/methodology-market-orientation.php'; ?>
+            <?php else: ?>
+                <a class="btn-primary mt-4" href="<?= e($flowUrl('1', ($item['method'] ?? '') ?: 'mercado', $key)) ?>">Analizar <?= e($component['label']) ?> → Academia</a>
+            <?php endif; ?>
         </article>
     <?php endforeach; ?>
     </div>
