@@ -24,7 +24,6 @@
     </div>
     <div id="unidades-capitulo-1" class="scroll-mt-6 rounded-xl border border-slate-200 bg-white p-4 md:col-span-2"
         x-init="$nextTick(() => { if (<?= ($_GET['from'] ?? '') === 'metodologia' ? 'true' : 'false' ?>) $el.scrollIntoView() })">
-        <?php require __DIR__ . '/methodology-return.php'; ?>
         <div class="flex flex-wrap items-start justify-between gap-3">
             <div>
                 <p class="eyebrow">Definición temprana de unidades y anexos</p>

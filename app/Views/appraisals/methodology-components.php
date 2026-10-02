@@ -10,7 +10,6 @@ $sourceTreatments = \App\Support\AppraisalUnitValuationTreatmentCatalog::options
     <h2 class="text-2xl font-semibold"><?= $stage === 'integration' ? 'Integración y control de cobertura' : 'Inmuebles y anexos del expediente' ?></h2>
     <p class="mt-3 text-slate-600">Estas son las mismas unidades y anexos registrados en el capítulo 1 y estudiados en el capítulo 3. Aquí se consultan para su análisis; los nombres, la composición y la tipología se actualizan en esos capítulos.</p>
     <div class="mt-4 flex flex-wrap gap-3">
-        <a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/expediente?config_tab=metodo&from=metodologia#unidades-capitulo-1')) ?>">Ver capítulo 1 · Composición</a>
         <a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto?section=tipologias&from=metodologia#unidades-capitulo-3')) ?>">Ver capítulo 3 · Bien sujeto</a>
         <a class="btn-secondary" href="<?= e($flowUrl('3', 'mercado', '')) ?>">Banco sin asignar (<?= $unassignedCount ?>)</a>
     </div>

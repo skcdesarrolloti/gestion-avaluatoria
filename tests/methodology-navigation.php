@@ -33,7 +33,7 @@ declare(strict_types=1);
             expect(str_contains($html, 'Oficina &lt;principal&gt;') && str_contains($html, 'Depósito de oficina')
                 && !str_contains($html, 'Revisar Depósito de oficina'), 'entrada conserva inmuebles, anexos y tratamiento previo escapados');
             expect(str_contains($html, 'component=annex') && str_contains($html, 'component=office'), 'etapas enlazan la identidad de cada inmueble y anexo');
-            expect(str_contains($html, '#unidades-capitulo-1') && str_contains($html, 'config_tab=metodo') && str_contains($html, '#unidades-capitulo-3') && str_contains($html, 'section=tipologias'), 'enlaces de origen apuntan a subsección y ancla exactas');
+            expect(!str_contains($html, 'Ver capítulo 1 · Composición') && str_contains($html, '#unidades-capitulo-3') && str_contains($html, 'section=tipologias'), 'sin retorno redundante al capítulo 1; consulta del capítulo 3 conserva destino exacto');
         }
         if ($stage === 'decision') expect(str_contains($html, 'Composición metodológica del predio')
             && str_contains($html, 'Ver matriz técnica de soporte') && !str_contains($html, "methodologyTab ="), 'matriz restaurada con navegación funcional sin estado Alpine eliminado');

@@ -1,5 +1,13 @@
 # Entrega al responsable de la implementación
 
+Retiro puntual solicitado: sin bloque «Volver al capítulo 8» en composición del
+numeral 1 ni botón «Ver capítulo 1 · Composición» en el 8. Se mantienen selección
+del método, datos y navegación general. Fieldsets con x-cloak evitan mostrar
+unidades inactivas antes de inicializar Alpine. No se borró Unidad 2: la captura
+no permite determinar la cantidad registrada y la pestaña del hosting no estaba
+disponible. La exclusión por cantidad guardada sigue vigente.
+Verificación: lint, PHP, JavaScript, build y límite de tamaño. Sin migración.
+
 Composición: principales primero y bloque separado de anexos; contador distingue
 ambos. Capítulos 3.2, 3.3 y 3.4 muestran el nombre registrado, no solo «Anexo N».
 Cada ficha del numeral 1 muestra «Cómo se va a valorar», método guardado y enlace

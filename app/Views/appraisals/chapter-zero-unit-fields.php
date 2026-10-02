@@ -1,4 +1,4 @@
-                    <fieldset class="min-w-0 grid gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4 md:grid-cols-2"
+                    <fieldset x-cloak class="min-w-0 grid gap-4 rounded-lg border border-slate-200 bg-slate-50 p-4 md:grid-cols-2"
                         :disabled="<?= ($unit['unit_kind'] ?? '') === 'annex' ? 'annexUnits' : 'propertyUnits' ?> < <?= e((string) (int) ($unit['unit_index'] ?? 0)) ?>"
                         x-show="<?= ($unit['unit_kind'] ?? '') === 'annex' ? 'annexUnits' : 'propertyUnits' ?> >= <?= e((string) (int) ($unit['unit_index'] ?? 0)) ?>"
                         x-data="{
