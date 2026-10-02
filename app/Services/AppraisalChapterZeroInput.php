@@ -6,7 +6,7 @@ use App\Support\AppraisalCatalog;
 
 final class AppraisalChapterZeroInput
 {
-    public static function chapterZeroData(int $version, array $igacCodes, array $appraiserIds): array
+    public static function chapterZeroData(int $version, array $igacCodes, array $appraiserIds, string $currentAppraiserId = ''): array
     {
         if ($version < 1) throw new HttpException(422, 'La versión del borrador no es válida.');
         $input = ['version' => $version];
@@ -16,11 +16,12 @@ final class AppraisalChapterZeroInput
         foreach (['appraiser_id', 'igac_category', 'igac_typology_hint', 'inspection_notes'] as $field) {
             $extra[$field] = trim((string) ($_POST[$field] ?? ''));
         }
-        if ($extra['appraiser_id'] === '' && count($appraiserIds) === 1) $extra['appraiser_id'] = (string) $appraiserIds[0];
+        if ($extra['appraiser_id'] === '') $extra['appraiser_id'] = $currentAppraiserId !== ''
+            ? $currentAppraiserId : (count($appraiserIds) === 1 ? (string) $appraiserIds[0] : '');
         $extra['igac_property_units_count'] = self::boundedCount('igac_property_units_count');
         $extra['igac_annex_units_count'] = self::boundedCount('igac_annex_units_count');
         $extra['configuration_status'] = 'borrador';
-        if ($extra['appraiser_id'] !== '' && !in_array($extra['appraiser_id'], $appraiserIds, true)) {
+        if ($extra['appraiser_id'] !== '' && $extra['appraiser_id'] !== $currentAppraiserId && !in_array($extra['appraiser_id'], $appraiserIds, true)) {
             throw new HttpException(422, 'Selecciona un perito válido.');
         }
         self::assertIgacCategory($extra['igac_category'], $igacCodes);

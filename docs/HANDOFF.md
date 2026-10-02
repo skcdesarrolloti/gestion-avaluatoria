@@ -1,5 +1,9 @@
 # Entrega al responsable de la implementación
 
+Corrección vigente: [responsable asignado y vigencia RAA](PERITO-ASIGNADO-VIGENCIA.md).
+El capítulo 1 conserva visible y al guardar el perito ya asignado aunque deje de
+ser elegible para nuevas asignaciones. Sin cambios de certificados ni migraciones.
+
 Actualización vigente: [recorrido por unidad y conservación](RECORRIDO-POR-UNIDAD.md).
 Una unidad visible, método registrado, academia íntegra e insumos propios.
 

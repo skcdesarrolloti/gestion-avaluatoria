@@ -24,6 +24,24 @@ final class AppraiserRepository
         return $query->fetchAll();
     }
 
+    public function forExistingAssignment(string $currentId): array
+    {
+        $rows = $this->eligibleForAssignment();
+        if ($currentId === '' || in_array($currentId, array_column($rows, 'id'), true)) return $rows;
+        try { $current = $this->find($currentId); }
+        catch (HttpException $error) {
+            if ($error->status !== 404) throw $error;
+            $rows[] = ['id' => $currentId, 'code' => '', 'full_name' => 'Responsable registrado pendiente de verificar',
+                'assignment_notice' => 'No se encontró su ficha en Maestros. Se conserva la asignación del expediente; el titular debe verificarla.'];
+            return $rows;
+        }
+        $reason = ($current['active'] ?? '') !== 'Si' ? 'El perito figura inactivo en Maestros.'
+            : (empty($current['raa_expires_at']) ? 'El certificado RAA no tiene fecha de vigencia registrada.'
+                : 'La fecha de vigencia registrada del certificado RAA es ' . $current['raa_expires_at'] . '.');
+        $rows[] = $current + ['assignment_notice' => $reason . ' Se conserva como responsable de este expediente. El titular debe revisar el certificado en Maestros.'];
+        return $rows;
+    }
+
     public function findByRaaIdentity(string $identification, string $raaNumber): ?array
     {
         $query = $this->db->prepare('SELECT * FROM valuation_appraisers

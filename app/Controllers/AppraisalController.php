@@ -70,7 +70,7 @@ final class AppraisalController
         $record = $this->appraisals->find($id, $this->user['id']); $units = $this->appraisals->units($id, $this->user['id']);
         $dossierSearch = trim((string) ($_GET['expediente_q'] ?? '')); $reportNotes = $this->reportNotes?->byChapter($id, $this->user['id'], '1') ?? [];
         view('appraisals/chapter-zero', ['title' => 'Expediente valuatorio', 'record' => $record,
-            'appraisers' => $this->appraisers->eligibleForAssignment(), 'units' => $units,
+            'appraisers' => $this->appraisers->forExistingAssignment((string) ($record['appraiser_id'] ?? '')), 'units' => $units,
             'igacCategories' => $this->typologies->categories(), 'igacTypologiesByCategory' => $this->typologies->optionsByCategory(),
             'dossierSearch' => $dossierSearch,
             'dossierRows' => array_slice($this->appraisals->recent($this->user['id'], 1, $dossierSearch, true), 0, 12),
@@ -129,7 +129,7 @@ final class AppraisalController
     {
         try {
             $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
-                $this->igacCodes(), $this->appraiserIds());
+                $this->igacCodes(), $this->appraiserIds(), (string) ($this->appraisals->find($id, $this->user['id'])['appraiser_id'] ?? ''));
             $this->appraisals->saveChapterZero($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $data);
             $this->appraisals->saveUnitDefinitionsByKey($id, $this->user['id'],
                 AppraisalUnitDefinitionInput::rows($_POST['config_units'] ?? []));
@@ -146,7 +146,7 @@ final class AppraisalController
     {
         try {
             $data = AppraisalChapterZeroInput::chapterZeroData((int) ($_POST['version'] ?? 0),
-                $this->igacCodes(), $this->appraiserIds());
+                $this->igacCodes(), $this->appraiserIds(), (string) ($this->appraisals->find($id, $this->user['id'])['appraiser_id'] ?? ''));
             $result = $this->appraisals->saveChapterZero($id, $this->user['id'], (int) ($_POST['version'] ?? 0), $data);
             $this->appraisals->saveUnitDefinitionsByKey($id, $this->user['id'],
                 AppraisalUnitDefinitionInput::rows($_POST['config_units'] ?? []));
