@@ -25,6 +25,11 @@ declare(strict_types=1);
         expect(str_contains($html, 'Camino del expediente:') && str_contains($html, 'Siguiente paso')
             && str_contains($html, 'Muestras sin asignar (1)') && !str_contains($html, 'aria-label="Etapas de Mercado"'), 'contexto general sin mezclar etapas de un componente no elegido en ' . $stage);
         if ($stage === 'components') {
+            $checkPosition = strpos($html, 'Verificación de datos guardados');
+            $navPosition = strpos($html, 'aria-label="Apartados académicos');
+            expect($checkPosition !== false && $navPosition !== false && $checkPosition < $navPosition
+                && substr_count($html, 'Verificación de datos guardados') === 1,
+                'verificación de Mercado visible antes de las pestañas académicas y sin duplicados');
             expect(str_contains($html, '1. Revisión') && str_contains($html, 'Antes de continuar')
                 && str_contains($html, 'Leer artículo 16 completo'), 'apartados visibles y lectura contextual de mejoras');
             expect(str_contains($html, 'orientación para Mercado') && str_contains($html, 'Leer artículo 36 completo')

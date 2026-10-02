@@ -6,7 +6,6 @@ $contextArticles = [];
 ?>
 <section class="mt-4 rounded-lg border bg-white p-3 text-sm leading-6">
     <h4 class="font-semibold">Datos y confrontaciones para <?= e($component['label']) ?></h4>
-    <?php if (($academicMethod ?? 'mercado') === 'mercado'): require __DIR__ . '/methodology-subject-checklist.php'; endif; ?>
     <?php if ($isAnnexReading || $unitStructure === 'solo_construccion'): $contextArticles = [27, 28, 29, 30]; ?>
         <p class="mt-2">Esta orientación corresponde al componente seleccionado, registrado en este expediente. Verifica su naturaleza, cantidades, unidad de medida, materiales, edad, estado y vínculo con el inmueble principal. Su clasificación como anexo no implica que sea un terreno independiente ni que deba sumarse nuevamente el suelo.</p>
         <p class="mt-2">Si corresponde valorar una construcción o mejora por separado, consulta los arts. 27–30 para evaluar Costo: reposición o reproducción, vida útil y depreciación. Esta es orientación académica; no cambia el método ni calcula valores. Verifica antes si el componente ya está incluido en otro valor y, si es PH, aplica las reglas jurídicas de abajo.</p>

@@ -441,3 +441,15 @@ PHP, 116 JS, 129 de persistencia y 58 HTTP en MySQL desechable (puerto 3357);
 de oficina completada en 3.2, autoguardado, retorno y actualización a 8 OK;
 identificación de garaje sólo completa sus propios controles. Viewport CSS 390 px
 sin desbordamiento de página y consola sin errores. Pendiente publicar en hosting.
+
+## 2026-10-02 · Verificación visible en M1
+
+Corrección de ubicación: el cuadro había quedado dentro del apartado 2 (unidad),
+aunque se indicó al usuario entrar al 1. Se mueve antes de la navegación académica
+de Mercado, fuera de paneles x-show/x-cloak. Está visible en M1 con cualquier
+apartado seleccionado, sin duplicarse ni cambiar controles o persistencia.
+Regresión comprueba orden antes de pestañas y una sola instancia por unidad.
+Validación: 580 checks PHP, 116 JS, 610 PHP sin errores, build y tamaño 58,8 KB.
+Vista local aislada con datos ficticios: cuadro visible al abrir y al pasar a
+Insumos mínimos; consola sin errores y ancho CSS 390 px sin desbordamiento.
+No se certifica la actualización del hosting a partir del push a Git.

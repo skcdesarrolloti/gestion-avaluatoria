@@ -10,6 +10,7 @@ $academyTabs['continuar'] = 'Antes de continuar';
 <section class="mt-5 rounded-xl border border-teal-200 bg-teal-50 p-4" x-data="{ academyPart: '<?= ($_GET['academy'] ?? '') === 'unidad' ? 'unidad' : 'revision' ?>', academicKeys: <?= e(json_encode(array_keys($academyTabs))) ?> }">
     <h4 class="font-semibold">Revisar <?= e($component['label']) ?> · orientación para <?= e($methods[$academicMethod]) ?></h4>
     <?php if (empty($item['method'])): ?><p class="mt-2 text-sm">Método aún por seleccionar. Esta consulta de academia no registra una decisión.</p><?php endif; ?>
+    <?php if ($academicMethod === 'mercado'): require __DIR__ . '/methodology-subject-checklist.php'; endif; ?>
     <p class="mt-2 text-sm"><?= count($academyTabs) ?> apartados disponibles. Desplaza la fila para ver todos o usa Anterior y Siguiente.</p>
     <nav class="mt-3 flex gap-2 overflow-x-auto pb-2" aria-label="Apartados académicos de <?= e($component['label']) ?>">
         <?php $academicNumber = 0; foreach ($academyTabs as $tabKey => $tabTitle): $academicNumber++; ?>
