@@ -240,3 +240,16 @@ Validación: PHP 471, JS 113, lint PHP, build y tamaño 58.1 KB gzip.
 Navegador local con datos sintéticos: entrada directa a portales, apertura del
 lector de enlace/texto y ficha manual. No se probó descarga real de los portales
 ni guardado en hosting en esta revisión. No se cambió el esquema de BD.
+
+## 2026-10-02 · Ayuda PH en Mercado
+
+Acordeón compartido en M3 (portales y matriz), M4 y M5: captura original,
+pendientes de investigación, depuración de comparables según 19.2.b,
+liquidación según naturaleza jurídica (36.2), áreas privadas diferenciadas,
+condominios y prevención de doble conteo. Artículo 19 completo y enlace al
+artículo 36 del Diario Oficial; artículo 17 ya disponible en captura.
+La ayuda no pasa al informe ni calcula descuentos; advierte el alcance actual
+de los estadísticos. Sin modificaciones a importadores, guardado, esquema o datos.
+Validación: 471 comprobaciones PHP, 113 pruebas JS, lint, build y 58.1 KB gzip.
+Revisión local del acordeón en navegador de escritorio y visibilidad en ancho
+móvil. No se ejecutó prueba de BD: cambio exclusivo de ayuda en vistas.

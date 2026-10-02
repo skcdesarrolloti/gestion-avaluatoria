@@ -8,3 +8,4 @@
     <p class="my-3">Si la fuente no informa un área o no confirma PH, deja el dato pendiente y registra la salvedad. Al cambiar el régimen se conservan los datos ya escritos; M4 deberá revisar cuál tratamiento corresponde.</p>
     <?php foreach ([18, 19] as $readingNumber) require __DIR__ . '/valuation-methodology-article-reading.php'; ?>
 </details>
+<?php require __DIR__ . '/methodology-ph-guidance.php'; ?>

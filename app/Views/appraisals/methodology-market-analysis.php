@@ -4,6 +4,7 @@ $stale = !empty($selected['analysis']) && ($selected['evidence_hash'] ?? '') !==
 ?>
 <section class="rounded-2xl border bg-white p-5 sm:p-8">
     <h2 class="text-2xl font-semibold">M<?= e($stage) ?> <?= $stage === '4' ? 'Análisis' : 'Entregable' ?> · <?= e($componentLabel) ?></h2>
+    <?php require __DIR__ . '/methodology-ph-guidance.php'; ?>
     <?php if ($componentKey === '' || ($selected['method'] ?? '') !== 'mercado'): ?>
         <p class="mt-4 rounded-xl bg-amber-50 p-4">Selecciona Mercado para un componente en M2 antes de documentar su análisis. Las muestras siguen conservadas.</p>
     <?php else: ?>

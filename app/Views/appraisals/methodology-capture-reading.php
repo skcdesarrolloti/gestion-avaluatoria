@@ -5,3 +5,4 @@
     <p class="mt-2 text-sm leading-6">M4 es la etapa de negociación justificada, depuración, cálculos y decisión técnica. El artículo contiene requisitos tanto de captura como de análisis; su lectura aquí no traslada los cálculos a M3.</p>
     <?php $readingNumber = 17; require __DIR__ . '/valuation-methodology-article-reading.php'; ?>
 </details>
+<?php require __DIR__ . '/methodology-ph-guidance.php'; ?>
