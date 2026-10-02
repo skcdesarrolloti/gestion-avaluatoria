@@ -7,6 +7,10 @@
     </a>
     <div class="min-w-0">
         <p class="text-anywhere text-sm font-semibold text-slate-950" x-text="selectedTypology(igacCategory, igacHint)?.label"></p>
-        <p class="text-anywhere mt-1 line-clamp-3 text-xs leading-5 text-slate-600" x-text="selectedTypology(igacCategory, igacHint)?.description"></p>
     </div>
+        <details class="mt-1 text-xs leading-5 text-slate-600 sm:col-span-2">
+            <summary class="min-h-11 cursor-pointer py-3 font-semibold">Leer descripción y especificaciones completas</summary>
+            <p class="text-anywhere" x-text="selectedTypology(igacCategory, igacHint)?.description"></p>
+            <p class="text-anywhere mt-2" x-text="selectedTypology(igacCategory, igacHint)?.specifications"></p>
+        </details>
 </article>

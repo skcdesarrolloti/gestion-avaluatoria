@@ -20,8 +20,7 @@ $treatmentValue = static function (array $unit): string {
         ?: \App\Support\AppraisalUnitValuationTreatmentCatalog::defaultFor((string) ($unit['unit_kind'] ?? ''), (string) ($unit['construction_type'] ?? '')));
 };
 $igacCategoryValue = static fn (array $unit): string =>
-    \App\Support\AppraisalConstructionTypeCatalog::igacCategoryFor((string) ($unit['construction_type'] ?? ''))
-        ?: (($unit['unit_kind'] ?? '') === 'annex' ? 'ANEXOS' : (string) ($unit['igac_category'] ?? ''));
+    \App\Support\AppraisalConstructionTypeCatalog::categoryForUnit($unit);
 $igacOptionsFor = static fn (string $category): array => $igacTypologiesByCategory[$category] ?? [];
 $igacSearchPlaceholder = static fn (array $unit): string =>
     ($unit['unit_kind'] ?? '') === 'annex' ? 'Buscar anexo IGAC: piscina, depósito, kiosco...' : 'Buscar tipología IGAC de la unidad principal';

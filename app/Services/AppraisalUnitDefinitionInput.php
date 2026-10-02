@@ -23,8 +23,10 @@ final class AppraisalUnitDefinitionInput
             if (!in_array($treatment, AppraisalUnitValuationTreatmentCatalog::allowed(), true)) {
                 $treatment = AppraisalUnitValuationTreatmentCatalog::defaultFor($match[1], $constructionType);
             }
-            $igacCategory = AppraisalConstructionTypeCatalog::igacCategoryFor($constructionType)
-                ?: mb_substr(trim((string) ($unit['igac_category'] ?? '')), 0, 40);
+            $igacCategory = AppraisalConstructionTypeCatalog::categoryForUnit([
+                'unit_kind' => $match[1], 'construction_type' => $constructionType,
+                'igac_category' => $unit['igac_category'] ?? '',
+            ]);
             $rows[] = [
                 'method_structure' => self::structure($unit),
                 'unit_kind' => $match[1],

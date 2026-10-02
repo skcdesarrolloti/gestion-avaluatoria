@@ -61,4 +61,13 @@ final class AppraisalConstructionTypeCatalog
     {
         return self::igacCategories()[$type] ?? '';
     }
+
+    public static function categoryForUnit(array $unit): string
+    {
+        $selected = trim((string) ($unit['igac_category'] ?? ''));
+        $suggested = self::igacCategoryFor((string) ($unit['construction_type'] ?? ''));
+        if (($unit['unit_kind'] ?? '') === 'annex') return $suggested ?: 'ANEXOS';
+        return in_array($selected, ['RESIDENCIALES', 'COMERCIALES', 'INDUSTRIALES', 'INSTITUCIONALES', 'EDIFICIOS', 'ANEXOS'], true)
+            ? $selected : $suggested;
+    }
 }

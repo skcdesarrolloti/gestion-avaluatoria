@@ -1,5 +1,27 @@
 # Recorrido por unidad — 02/10/2026
 
+## Oficinas IGAC y aislamiento de expedientes
+
+La categoría elegida para una unidad principal se conserva al abrir y guardar el
+capítulo 1. Antes, `oficina` imponía COMERCIALES tanto en PHP como al iniciar Alpine,
+ocultando selecciones de EDIFICIOS. Los anexos conservan su filtro constructivo.
+La ayuda remite a las referencias ED.Servicios_Tipo_1/2/3 del catálogo local; no
+adopta una tipología por el analista. Descripción y especificaciones se leen completas
+en un desplegable. Se quitaron ejemplos fijos de placa/cerramiento de la orientación
+genérica del capítulo 8 para evitar confundirlos con componentes de otro expediente.
+
+Pruebas MySQL locales: dos avalúos del mismo propietario mantienen unidades separadas,
+un ID de anexo ajeno se rechaza, y los anexos históricos fuera de las cantidades
+guardadas no aparecen activos. No se verificaron ni alteraron datos de producción.
+Un aviso de sesión vencida significa que el formulario no tiene guardado confirmado;
+las capturas con ese estado no demuestran que cambió la composición persistida.
+
+Validación: 543 PHP, 113 JS, 101 BD (ga_test_app/ga_test_auth, puerto desechable 3351),
+lint, build y 58.1 KB gzip. Navegador: categoría y tipología conservadas al recargar,
+desplegable completo en escritorio, DOM estrecho sin desbordamiento (562 px efectivos).
+La captura móvil falló dos veces por tiempo de espera; no se afirma revisión visual
+móvil completa. Imágenes IGAC ausentes en el entorno local de prueba. Sin migraciones.
+
 Nombres de las pestañas: se conserva el nombre personalizado guardado en el campo
 «Nombre del componente» del capítulo 1. Si sigue vacío o genérico (Unidad N / Anexo N),
 el capítulo 8 lo identifica con el tipo registrado y su número, por ejemplo

@@ -56,7 +56,7 @@
                                 if (!(typologies[this.igacCategory] || []).some(item => item.value === this.igacHint)) this.igacHint = ''
                             }
                         }"
-                        x-init="syncIgacFromConstruction()">
+                        x-init="if (unitKind === 'annex' || !igacCategory) syncIgacFromConstruction()">
                         <label class="label">Nombre del componente
                             <input class="input" name="config_units[<?= e($key) ?>][label]" maxlength="120"
                                 value="<?= e($unitDisplay($unit)) ?>" placeholder="Ej. Casa principal, Piscina, Parqueadero 1">
@@ -119,6 +119,9 @@
                                     <option :value="item.value" x-text="item.label"></option>
                                 </template>
                             </select>
+                            <span class="mt-2 block text-sm font-normal leading-6 text-teal-900" x-show="constructionType === 'oficina'" x-cloak>
+                                En el catálogo cargado, las oficinas también aparecen en <strong>Edificios</strong>, como ED.Servicios_Tipo_1, Tipo_2 y Tipo_3. Cambia la categoría para consultarlas y revisa la descripción completa antes de elegir. La selección corresponde al analista; no cambia el tipo de inmueble.
+                            </span>
                             <span class="mt-1 block text-xs leading-5 text-slate-500" x-show="igacCategory">
                                 <span x-text="(typologies[igacCategory] || []).length"></span>
                                 referencia(s) IGAC disponibles para esta búsqueda.
@@ -141,7 +144,7 @@
                                     <option value="<?= e($value) ?>" <?= ($unit['method_structure'] ?? '') === $value ? 'selected' : '' ?>><?= e($text) ?></option>
                                 <?php endforeach; ?>
                             </select>
-                            <span class="mt-1 block text-xs text-slate-500">Define qué comprende este componente. No selecciona automáticamente Mercado, Costo ni otro método. Ejemplo: placa vial o cerramiento, solo construcción o mejora.</span>
+                            <span class="mt-1 block text-xs text-slate-500">Define qué comprende este componente según sus datos registrados. No selecciona automáticamente Mercado, Costo ni otro método.</span>
                         </label>
                         <label class="label md:col-span-2">Descripción base
                             <input class="input" name="config_units[<?= e($key) ?>][notes]" maxlength="2000"
