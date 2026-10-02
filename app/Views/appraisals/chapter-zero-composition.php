@@ -50,10 +50,21 @@
                             constructionType: <?= e(json_encode((string) ($unit['construction_type'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
                             igacCategory: <?= e(json_encode($igacCategory, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
                             igacHint: <?= e(json_encode((string) ($unit['igac_typology_hint'] ?? ''), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
+                            get igacOptions() {
+                                const categories = this.constructionType === 'oficina'
+                                    ? [...new Set(['COMERCIALES', 'EDIFICIOS', this.igacCategory])] : [this.igacCategory]
+                                return categories.flatMap(category => (typologies[category] || []).map(item => ({...item, category,
+                                    label: item.label + (this.constructionType === 'oficina' ? ' · ' + category : '')})))
+                            },
+                            selectIgacCategory() {
+                                const selected = this.igacOptions.find(item => item.value === this.igacHint)
+                                if (selected) this.igacCategory = selected.category
+                            },
                             syncIgacFromConstruction() {
+                                if (this.constructionType === 'oficina' && this.igacHint) { this.selectIgacCategory(); return }
                                 const next = constructionIgacCategories[this.constructionType] || (this.unitKind === 'annex' ? 'ANEXOS' : '')
                                 if (next && next !== this.igacCategory) this.igacCategory = next
-                                if (!(typologies[this.igacCategory] || []).some(item => item.value === this.igacHint)) this.igacHint = ''
+                                if (!this.igacOptions.some(item => item.value === this.igacHint)) this.igacHint = ''
                             }
                         }"
                         x-init="if (unitKind === 'annex' || !igacCategory) syncIgacFromConstruction()">
@@ -90,9 +101,10 @@
                             </select>
                         </label>
                         <?php if (($unit['unit_kind'] ?? '') === 'property'): ?>
-                            <label class="label">Buscador IGAC para unidad principal
+                            <label class="label"><span x-text="constructionType === 'oficina' ? 'Categoría de la referencia IGAC' : 'Buscador IGAC para unidad principal'">Buscador IGAC para unidad principal</span>
                                 <select class="input" name="config_units[<?= e($key) ?>][igac_category]" x-model="igacCategory"
-                                    @change="if (!(typologies[igacCategory] || []).some(item => item.value === igacHint)) igacHint = ''">
+                                    :disabled="constructionType === 'oficina'"
+                                    @change="if (!igacOptions.some(item => item.value === igacHint)) igacHint = ''; else selectIgacCategory()">
                                     <option value="">Selecciona categoría constructiva</option>
                                     <?php foreach ($igacCategories as $category): ?>
                                         <option value="<?= e((string) $category['code']) ?>" <?= $igacCategory === (string) $category['code'] ? 'selected' : '' ?>><?= e((string) $category['name']) ?> · <?= e((string) $category['count']) ?></option>
@@ -108,22 +120,23 @@
                         <?php endif; ?>
                         <label class="label">Tipología IGAC de apoyo
                             <select class="input" name="config_units[<?= e($key) ?>][igac_typology_hint]" x-model="igacHint"
+                                @change="selectIgacCategory()"
                                 :disabled="!igacCategory" x-init="$el.querySelectorAll('[data-fallback-option]').forEach(option => option.remove())">
                                 <option value="" x-text="igacCategory ? '<?= e($igacSearchPlaceholder($unit)) ?>' : 'Selecciona primero categoría IGAC'"></option>
-                                <?php foreach ($igacOptionsFor($igacCategory) as $option): ?>
+                                <?php foreach (\App\Support\AppraisalConstructionTypeCatalog::optionsForUnit($unit, $igacTypologiesByCategory) as $option): ?>
                                     <option data-fallback-option value="<?= e((string) $option['value']) ?>" <?= (string) ($unit['igac_typology_hint'] ?? '') === (string) $option['value'] ? 'selected' : '' ?>>
                                         <?= e((string) $option['label']) ?>
                                     </option>
                                 <?php endforeach; ?>
-                                <template x-for="item in (typologies[igacCategory] || [])" :key="item.value">
+                                <template x-for="item in igacOptions" :key="item.value">
                                     <option :value="item.value" x-text="item.label"></option>
                                 </template>
                             </select>
                             <span class="mt-2 block text-sm font-normal leading-6 text-teal-900" x-show="constructionType === 'oficina'" x-cloak>
-                                En el catálogo cargado, las oficinas también aparecen en <strong>Edificios</strong>, como ED.Servicios_Tipo_1, Tipo_2 y Tipo_3. Cambia la categoría para consultarlas y revisa la descripción completa antes de elegir. La selección corresponde al analista; no cambia el tipo de inmueble.
+                                Para Oficina, esta lista reúne <strong>Comerciales y Edificios</strong>, incluidos ED.Servicios_Tipo_1, Tipo_2 y Tipo_3. Cada referencia indica su categoría original. Revisa su descripción y especificaciones antes de elegir; no todas corresponden a tu oficina. La tipología la decide el analista.
                             </span>
                             <span class="mt-1 block text-xs leading-5 text-slate-500" x-show="igacCategory">
-                                <span x-text="(typologies[igacCategory] || []).length"></span>
+                                <span x-text="igacOptions.length"></span>
                                 referencia(s) IGAC disponibles para esta búsqueda.
                             </span>
                             <?php require BASE_PATH . '/app/Views/appraisals/chapter-zero-igac-preview.php'; ?>

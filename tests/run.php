@@ -2747,6 +2747,7 @@ Certificado de tradicion.",
     (new RateLimiter($blockedDirectory))->consume(bin2hex(random_bytes(8)), 2);
     expect(true, 'rate limit usa temporal si storage falla');
     unlink($blockedDirectory);
+    require __DIR__ . '/office-igac.php';
     report();
 } finally {
     session_destroy();

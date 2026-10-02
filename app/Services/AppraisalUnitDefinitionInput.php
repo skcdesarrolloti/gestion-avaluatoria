@@ -26,6 +26,7 @@ final class AppraisalUnitDefinitionInput
             $igacCategory = AppraisalConstructionTypeCatalog::categoryForUnit([
                 'unit_kind' => $match[1], 'construction_type' => $constructionType,
                 'igac_category' => $unit['igac_category'] ?? '',
+                'igac_typology_hint' => $unit['igac_typology_hint'] ?? '',
             ]);
             $rows[] = [
                 'method_structure' => self::structure($unit),

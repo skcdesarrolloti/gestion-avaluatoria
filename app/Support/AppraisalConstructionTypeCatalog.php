@@ -65,9 +65,31 @@ final class AppraisalConstructionTypeCatalog
     public static function categoryForUnit(array $unit): string
     {
         $selected = trim((string) ($unit['igac_category'] ?? ''));
+        if (($unit['construction_type'] ?? '') === 'oficina') {
+            foreach ((new \App\Models\IgacTypologyRepository())->optionsByCategory() as $category => $options) {
+                foreach ($options as $option) {
+                    if ($option['value'] === ($unit['igac_typology_hint'] ?? '')) return $category;
+                }
+            }
+            if (in_array($selected, ['COMERCIALES', 'EDIFICIOS'], true)) return $selected;
+        }
         $suggested = self::igacCategoryFor((string) ($unit['construction_type'] ?? ''));
         if (($unit['unit_kind'] ?? '') === 'annex') return $suggested ?: 'ANEXOS';
         return in_array($selected, ['RESIDENCIALES', 'COMERCIALES', 'INDUSTRIALES', 'INSTITUCIONALES', 'EDIFICIOS', 'ANEXOS'], true)
             ? $selected : $suggested;
+    }
+
+    public static function optionsForUnit(array $unit, array $catalog): array
+    {
+        $category = self::categoryForUnit($unit);
+        if (($unit['construction_type'] ?? '') !== 'oficina') return $catalog[$category] ?? [];
+        $categories = array_unique(['COMERCIALES', 'EDIFICIOS', $category]);
+        $options = [];
+        foreach ($categories as $code) {
+            foreach ($catalog[$code] ?? [] as $option) {
+                $options[] = array_replace($option, ['label' => $option['label'] . ' · ' . $code]);
+            }
+        }
+        return $options;
     }
 }
