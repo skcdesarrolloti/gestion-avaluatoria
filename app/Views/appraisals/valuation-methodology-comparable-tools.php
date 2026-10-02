@@ -3,6 +3,9 @@
         <span x-text="total"></span> registradas · <span x-text="pending"></span> con datos básicos pendientes ·
         <span x-text="duplicates"></span> con enlace repetido
     </p>
+    <p class="mt-2 text-sm"><span x-text="capturePendingCount"></span> muestras con negociación, componentes o soportes por confirmar. Las celdas pendientes se resaltan en amarillo.</p>
+    <?php require __DIR__ . '/methodology-portal-counts.php'; ?>
+    <p id="negotiation-help" class="mt-2 rounded-lg bg-teal-50 p-3 text-sm">Valor negociado = precio ofertado − descuento de negociación. El descuento se registra en la misma unidad del precio, con tipo (otorgado o estimado) y soporte. Vacío = pendiente; 0 = sin descuento confirmado. Este resultado todavía requiere la depuración por componentes en M4; no es el valor adoptado del avalúo.</p>
     <p class="mt-1 text-xs text-slate-600">Control operativo de captura. No certifica cumplimiento NTS ni suficiencia de la muestra. Los datos sin publicar quedan pendientes de verificación.</p>
     <p class="mt-2 text-sm">Completa las muestras existentes sin borrarlas. En «Mapas, coordenadas y fotos» registra latitud, longitud, precisión, fuente y soporte de cada muestra. Art. 17: georreferenciación aproximada; si la fuente limita la ubicación, indica la mayor precisión disponible. No inventes coordenadas.</p>
     <p class="mb-2 text-xs">PH del inmueble avaluado: <strong><?= e(['si' => 'Sí', 'no' => 'No', 'no_aplica' => 'No aplica'][$record['regimen_ph'] ?? ''] ?? 'Por verificar') ?></strong>. Clasifica las muestras por separado.</p>
@@ -16,7 +19,7 @@
             <span id="comparable-view-help" class="mt-1 block text-xs font-normal text-slate-600">Fichas para diligenciar; tabla para comparar varias muestras.</span>
         </label>
         <label class="label" x-show="searchTab !== 'mapa'">Campos a revisar
-            <select :disabled="mapBusy || photoBusy || photoRetry" class="input" :value="group" @change="group = $event.target.value; if (['composition', 'ph'].includes(group)) mode = 'cards'; render()" aria-describedby="comparable-group-help"><option value="capture">1. Captura básica</option><option value="ph">2. PH · área privada, parqueaderos y depósitos</option><option value="composition">3. Áreas y componentes · NPH / condominio</option><option value="attributes">4. Atributos del inmueble</option><option value="review">5. Revisión y selección</option><option value="all">Todos los campos</option></select>
+            <select :disabled="mapBusy || photoBusy || photoRetry" class="input" :value="group" @change="group = $event.target.value; render()" aria-describedby="comparable-group-help"><option value="capture">1. Captura básica</option><option value="ph">2. PH · área privada, parqueaderos y depósitos</option><option value="composition">3. Áreas y componentes · NPH / condominio</option><option value="attributes">4. Atributos del inmueble</option><option value="review">5. Revisión y selección</option><option value="all">Todos los campos</option></select>
             <span id="comparable-group-help" class="mt-1 block text-xs font-normal text-slate-600" x-text="groupHelp"></span>
         </label>
         <label class="label">Mostrar
@@ -35,8 +38,10 @@
         <button type="button" class="btn-secondary" @click="searchTab === 'mapa' ? moveMap(1) : (page++, render())" :disabled="page >= pages || mapBusy || photoBusy || photoRetry">Siguiente</button>
         <button type="button" class="btn-primary" x-show="searchTab === 'mapa' && mapIndex !== null" @click="openPhotos(mapIndex)" :disabled="mapBusy || photoBusy || photoRetry">Fotos de esta muestra</button>
         <button type="submit" class="btn-primary">Guardar ahora</button>
+        <button type="button" class="btn-secondary" @click="exportExcel()" :disabled="total === 0 || photoBusy || mapBusy">Descargar Excel (.xlsx)</button>
         <span class="text-xs" data-autosave-status aria-live="polite">Autoguardado activo</span>
     </div>
+    <p class="mt-2 text-xs text-slate-600">Excel descarga todas las filas de esta unidad o banco, incluidos campos fuera del filtro visible y cambios escritos aún sin guardar. Amarillo = confirmar. La edición en Excel no se devuelve automáticamente al módulo; completa aquí para autoguardar.</p>
     <p x-show="searchTab === 'mapa'" role="status" class="mt-2 text-sm" x-text="mapMessage"></p>
     <div x-show="searchTab !== 'mapa'"><?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-removal.php'; ?></div>
     <p class="mt-2 rounded-lg bg-teal-50 p-3 text-sm" x-show="total === 0 && shown === 0">La matriz está vacía: no quedan muestras. Pulsa «Seguir capturando» para buscar avisos o «Nueva muestra» para diligenciar una manualmente.</p>

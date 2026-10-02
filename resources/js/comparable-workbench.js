@@ -4,19 +4,20 @@ import { comparablePhotos } from './comparable-photos.js';
 import { comparableMapNavigation } from './comparable-map-navigation.js';
 import { comparableRemoval } from './comparable-removal.js';
 import { hasComparableData, missingComparableFields, comparableUrlKey } from './comparable-review.js';
+import { updateCapture, arrangeSheet, exportCapture, negotiationFields } from './comparable-sheet.js';
 
 const groups = {
-    capture: ['source_type', 'source_name', 'source_url', 'operation', 'property_type', 'neighborhood',
-        'project_name', 'ph_regime', 'price_amount', 'price_unit', 'area_m2', 'consulted_at', 'contact_name', 'contact_phone'],
-    location: ['source_name', 'source_url', 'consulted_at', 'neighborhood', 'address_hint', 'project_name', ...mapFields],
+    capture: ['source_type', 'source_name', 'source_url', 'market_data_kind', 'operation', 'property_type', 'market_city', 'neighborhood',
+        'project_name', 'ph_regime', 'price_amount', 'price_unit', ...negotiationFields, 'area_m2', 'land_m2', 'built_m2', 'annexes_detail', 'consulted_at', 'contact_name', 'contact_phone'],
+    location: ['source_name', 'source_url', 'consulted_at', 'market_city', 'neighborhood', 'address_hint', 'project_name', ...mapFields],
     composition: ['ph_regime', 'ph_special', 'area_m2', 'area_basis', 'private_built_m2', 'private_free_m2', 'ph_units_detail', 'land_m2', 'built_m2', 'annexes_detail', 'areas_source'],
-    ph: ['source_name', 'source_url', 'consulted_at', 'price_amount', 'price_unit', 'ph_regime', 'ph_special',
+    ph: ['source_name', 'source_url', 'consulted_at', 'market_data_kind', 'operation', 'property_type', 'market_city', 'neighborhood', 'project_name', 'price_amount', 'price_unit', ...negotiationFields, 'ph_regime', 'ph_special',
         'area_m2', 'area_basis', 'private_built_m2', 'private_free_m2', 'areas_source', 'parking_spaces',
         'ph_parking_presence', 'ph_parking_in_price', 'ph_parking_nature', 'ph_deposit_presence', 'ph_deposit_count',
-        'ph_deposit_in_price', 'ph_deposit_nature', 'ph_other_components', 'ph_units_detail', 'ph_components_source'],
+        'ph_deposit_in_price', 'ph_deposit_nature', 'ph_parking_area_m2', 'ph_deposit_area_m2', 'ph_other_components', 'ph_units_detail', 'ph_components_source', 'contact_name', 'contact_phone', 'evidence_detail', 'verification_detail'],
     attributes: ['ph_regime', 'admin_fee', 'vat_applies', 'bedrooms', 'bathrooms', 'parking_spaces', 'floor_level', 'stratum',
         'age_years', 'building_condition', 'conservation_state', 'view_quality', 'finish_quality', 'elevator',
-        'amenities', 'security_features', 'power_plant', 'parking_relation', 'balcony_terrace', 'noise_humidity_sun'],
+        'amenities', 'security_features', 'power_plant', 'parking_relation', 'balcony_terrace', 'noise_humidity_sun', 'market_services', 'market_access', 'market_planning'],
     review: ['active', 'status', 'analysis_factor', 'query_used', 'listing_code', 'listing_date',
         'legal_relation_notes', 'comparability_notes', 'rejection_reason'],
 };
@@ -25,7 +26,7 @@ export function comparableWorkbench() {
     let entries = [], resize, form, createRow, prepare, grow;
     return {
         ...comparablePhotos(), ...comparableMapNavigation(), ...comparableRemoval(), phFilter: 'all', mode: 'table', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
-        pending: 0, duplicates: 0, shown: 0, usedIndexes: [], mapPoints: [],
+        pending: 0, duplicates: 0, shown: 0, usedIndexes: [], mapPoints: [], portalSummary: [], capturePendingCount: 0,
         get groupHelp() {
             return {
                 capture: 'Fuente, enlace, precio, área y contacto del aviso.',
@@ -41,9 +42,8 @@ export function comparableWorkbench() {
             form = this.$el;
             if (form.dataset.phSubject === 'si') this.group = 'ph';
             this.initPhotos(form);
-            const headers = [...form.querySelectorAll('thead th')].map(th => th.childNodes[0].textContent.trim());
-            createRow = rowFactory(form);
             prepare = (tr, index) => {
+                const headers = [...form.querySelectorAll('thead th')].map(th => th.childNodes[0].textContent.trim());
                 const controls = [...tr.querySelectorAll('[name]')];
                 for (const [column, cell] of [...tr.cells].entries()) {
                     const input = cell.querySelector('input:not([type=hidden]),select,textarea');
@@ -64,6 +64,8 @@ export function comparableWorkbench() {
                 return { tr, controls, summary, index, opened: false, used: false, missing: [], data: {} };
             };
             entries = [...form.querySelectorAll('tbody tr')].map(prepare);
+            arrangeSheet(entries, form, groups[this.group]);
+            createRow = rowFactory(form);
             grow = event => { for (let i = 0; i < event.detail; i++) this.appendRow(); };
             form.addEventListener('comparable-grow', grow);
             this.initRemoval(form, entries);
@@ -100,6 +102,7 @@ export function comparableWorkbench() {
             this.usedIndexes = entries.filter(e => e.used).map(e => String(e.index));
             this.removalSelection = this.removalSelection.filter(index => this.usedIndexes.includes(index));
             this.pending = entries.filter(e => e.used && e.missing.length).length;
+            updateCapture(entries, form, this);
             this.duplicates = entries.filter(e => e.used && e.duplicate).length;
             this.mapPoints = locationPoints(entries.map(e => e.data), {latitude:form.dataset.subjectLatitude, longitude:form.dataset.subjectLongitude});
             this.render();
@@ -107,7 +110,7 @@ export function comparableWorkbench() {
         render() {
             const query = this.search.toLocaleLowerCase('es').trim();
             const eligible = entries.filter(e => (this.phFilter === 'all' || (e.data.ph_regime || 'por_verificar') === this.phFilter) && (e.used || e.opened) &&
-                (this.filter !== 'pending' || e.missing.length) && (this.filter !== 'duplicates' || e.duplicate) &&
+                (this.filter !== 'pending' || e.missing.length || e.capturePending?.length) && (this.filter !== 'duplicates' || e.duplicate) &&
                 (!query || Object.values(e.data).join(' ').toLocaleLowerCase('es').includes(query)));
             const mapMode = this.searchTab === 'mapa', pageSize = mapMode ? 1 : 10;
             this.pages = Math.max(1, Math.ceil(eligible.length / pageSize));
@@ -131,17 +134,18 @@ export function comparableWorkbench() {
         add() {
             const entry = entries.find(e => !e.used && !e.opened) || this.appendRow();
             entry.opened = true;
-            this.phFilter = 'all'; this.filter = 'all'; this.search = ''; this.group = 'capture';
+            this.phFilter = 'all'; this.filter = 'all'; this.search = ''; this.group = form.dataset.phSubject === 'si' ? 'ph' : 'capture';
             this.page = Math.ceil(entries.filter(e => e.used || e.opened).indexOf(entry) / 10 + 0.1);
             this.render();
             this.$nextTick(() => entry.tr.querySelector('select')?.focus());
         },
         showImported(index) {
-            this.phFilter = 'all'; this.filter = 'all'; this.search = ''; this.group = 'capture';
+            this.phFilter = 'all'; this.filter = 'all'; this.search = ''; this.group = form.dataset.phSubject === 'si' ? 'ph' : 'capture';
             const entry = entries[index];
             this.page = Math.floor(entries.filter(e => e.used || e.opened).indexOf(entry) / 10) + 1;
             this.render();
         },
         syncWidth() { this.$refs.track.style.width = `${this.$refs.grid.scrollWidth}px`; },
+        exportExcel() { this.refresh(); exportCapture(entries, form); },
     };
 }

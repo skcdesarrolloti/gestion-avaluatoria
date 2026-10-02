@@ -23,6 +23,8 @@
 [data-comparable-mode="table"] .comparable-grid .comparable-field-label { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
 [data-comparable-mode="table"] .comparable-grid th:first-child { position: sticky; left: 0; background: #f8fafc; z-index: 3; }
 .comparable-grid { position: relative; max-width: 100%; }
+.comparable-grid td.capture-pending { background: #fef3c7; }
+.comparable-grid .capture-calculated[data-ready="true"] { background: #d1fae5; color: #065f46; }
 
 @media (max-width: 767px) {
     [data-comparable-mode="table"] td:first-child { min-width: 100px; max-width: 120px; }

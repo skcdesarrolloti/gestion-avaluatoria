@@ -37,9 +37,11 @@ Una pantalla anterior conserva los campos omitidos por ID. Vacío significa dato
 no publicado o pendiente; no se transforma en ausencia ni se infiere matrícula.
 Las áreas y naturaleza detalladas anteriores siguen disponibles en ph_units_detail.
 
-M4 conserva estadísticos descriptivos existentes: esta entrega no calcula precio
-negociado, descuentos, valor depurado ni valores adoptados del sujeto. Eso requiere
-desarrollar la memoria y sus soportes. El tratamiento de comunes de uso exclusivo
+Actualización M3: [negociación y Excel](PH-M3-TABLA-NEGOCIACION.md) agrega descuento
+monetario y oferta menos descuento, con tipo y soporte, conteos e instrucciones
+por portal. M4 conserva estadísticos descriptivos existentes: no calcula aún
+valor depurado ni valores adoptados del sujeto. Eso requiere desarrollar la memoria
+y sus soportes. El tratamiento de comunes de uso exclusivo
 del sujeto (art. 36.2) sigue distinto del descuento del comparable (art. 19.2.b).
 
 Validación: 598 checks PHP, 116 JavaScript y 130 checks BD local desechable en

@@ -1,0 +1,63 @@
+# PH: captura, negociación y Excel en M3
+
+Ruta: capítulo 8, unidad o banco sin asignar, M3, Tabla de muestras.
+PH abre columnas de área privada y componentes; NPH conserva terreno/construcción.
+La matriz, importadores, fotos y autoguardado siguen compartidos. Seleccionar PH
+no atribuye ese régimen a todas las muestras ni cambia la descripción del sujeto.
+
+## Captura y negociación
+
+- Municipio/fuente, tipo de dato (oferta/transacción/arriendo) y contexto urbano.
+- Áreas construidas/libres privadas, parqueaderos y depósitos: presencia,
+  cantidad, área, inclusión en precio, naturaleza y soporte. Vacío es pendiente.
+- Descuento monetario en la misma unidad del precio, tipo otorgado/estimado,
+  contacto, fecha y justificación. No se aplica un porcentaje estándar.
+- Valor negociado = oferta menos descuento. % = descuento / oferta × 100.
+  Oferta cero y descuento cero producen cero y 0%; no se divide por cero.
+- Servidor valida descuento no negativo ni superior a oferta y recalcula el
+  derivado. Los resultados enviados por el cliente nunca se persisten.
+- Datos nuevos en capture_details existente; sin cambio de esquema ni migración.
+  Clientes anteriores conservan campos omitidos por ID; CSRF/owner/version intactos.
+
+Un resultado numérico no acredita negociación real ni suficiencia de su soporte.
+M4 mantiene sus estadísticos previos: no adopta negociado como depurado.
+La depuración de componentes y valores unitarios privados sigue pendiente.
+
+## Portales y tabla
+
+Cada fuente tiene instrucciones copiables con su lector y campos PH/NPH.
+FincaRaíz/Metrocuadrado conservan búsqueda y enlace/texto; Ciencuadras,
+Properati/Mercado Libre conservan resultados HTML para oficinas en venta.
+Ctrl+A/C/V prepara candidatos; se incorporan con Agregar sugeridos y Guardado.
+La guía no hace que un portal acepte un prompt ni inventa datos ausentes.
+
+Conteos visibles por fuente de las filas de la unidad/banco actual, incluidos
+cambios aún sin guardar. No se suman las colecciones de otras unidades.
+Pendientes se resaltan en amarillo y se listan por muestra; filtro incluye éstos.
+Controles operativos no son una certificación normativa.
+
+Excel (.xlsx) exporta todas las filas de la colección, no sólo la página/filtro.
+Tabla nativa con filtros, encabezados y primera columna inmovilizados, importes
+numéricos, fórmulas de negociación y pendientes amarillos. Texto externo es
+inlineStr, nunca fórmula. Generador OOXML del navegador, sin nuevas dependencias.
+La descarga puede incluir borradores no guardados. Ediciones externas no se
+reimportan automáticamente: completar el módulo para persistir.
+PH/NPH omite columnas específicas vacías del otro régimen en Excel; si tienen
+información previa, se conserva. No se borran muestras ni datos al cambiar vistas.
+
+## Cobertura normativa
+
+Control plegable fuera del formulario (no introducir otras filas en su tbody).
+Contrasta arts. 16–21, 27–28, 36–37 y anexo técnico de estudio de mercado.
+Identifica captura disponible y pendientes M4/M5. En particular faltan memoria
+monetaria de componentes, COP/m² privado depurado, suficiencia/validación y adopción.
+No aplicar homologación por factores: Factor M4 señala una variable de estudio.
+No certifica la resolución completa ni altera los otros métodos/informes.
+
+Bocagrande es admisible como dato de prueba por instrucción del usuario en el
+expediente de oficina. No se cambió la ubicación física ni el avalúo Zona Franca.
+
+Validación: 615 checks PHP, 120 JS, 142 BD desechable 3361; lint, build y
+63,3 KB gzip. Navegador: edición, guardado y recarga de 500 millones menos
+25 millones = 475 millones (5%), conteo FincaRaíz 1, móvil CSS 390 sin overflow.
+Excel: lectura con openpyxl/ZIP/XML valida tabla, panes, fórmulas, caché y estilos.

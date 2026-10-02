@@ -19,7 +19,7 @@
     <div id="capture-review" x-show="searchTab === 'matriz'" class="scroll-mt-6 flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Tabla madre de comparables</p>
-            <h3 class="mt-2 text-xl font-semibold">Matriz de datos</h3>
+            <h3 class="mt-2 text-xl font-semibold"><?= !empty($guide['is_ph']) ? 'Tabla de comparables PH · áreas privadas y componentes' : 'Tabla de comparables · terreno y construcción NPH' ?></h3>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Diligencia una fila por cada oferta, transacción o dato de mercado. El sujeto queda fuera de esta tabla:
                 aquí se preparan las muestras que se analizarán en M4. Completa ubicación y soporte en «Mapas, coordenadas y fotos».

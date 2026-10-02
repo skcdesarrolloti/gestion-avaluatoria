@@ -12,5 +12,5 @@
 <section class="my-4 rounded-xl border border-teal-200 bg-teal-50 p-4">
     <h4 class="font-semibold">Tabla PH · composición del precio y área privada</h4>
     <p class="mt-2 text-sm">En «Campos a revisar» selecciona «PH · área privada, parqueaderos y depósitos». Registra por separado presencia, cantidad, inclusión en el precio y naturaleza jurídica. Usa «Por verificar» si el aviso no lo informa; tener parqueaderos no acredita propiedad ni matrícula independiente.</p>
-    <p class="mt-2 text-sm">Conserva el precio integral del aviso. Aunque sujeto y comparable tengan los mismos anexos, el art. 19.2.b exige depurar su incidencia del valor negociado para el análisis. Esta captura no calcula descuentos ni adopta valores. La liquidación del sujeto se revisa aparte conforme al art. 36; un común de uso exclusivo no se liquida independientemente.</p>
+    <p class="mt-2 text-sm">Conserva el precio integral del aviso. Aunque sujeto y comparable tengan los mismos anexos, el art. 19.2.b exige depurar su incidencia del valor negociado para el análisis. Aquí calculamos oferta menos descuento de negociación; la depuración monetaria de anexos y la adopción de valores quedan para M4. La liquidación del sujeto se revisa aparte conforme al art. 36; un común de uso exclusivo no se liquida independientemente.</p>
 </section>

@@ -1,5 +1,10 @@
 # Entrega al responsable de la implementación
 
+M3 PH: tabla diferenciada, descuento y negociado calculado, instrucciones por
+portal, conteos por fuente y descarga XLSX con pendientes. Datos JSON sin migración.
+Ver PH-M3-TABLA-NEGOCIACION.md: controles normativos y pendientes reales de M4.
+Conserva lectores, matriz, versiones y fotos; no modifica datos de Zona Franca.
+
 M1 y M2 PH: vínculo explícito de anexo a principal activa, naturaleza jurídica y
 composición del área en M2. Los campos viven en market_evidence_json existente;
 edición parcial conserva los soportes del numeral 3 y la versión compartida impide

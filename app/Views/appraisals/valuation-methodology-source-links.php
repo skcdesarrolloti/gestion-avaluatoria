@@ -18,6 +18,7 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
         <span data-autosave-status>Consulta el estado de guardado al incorporar.</span>
     </div>
     <?php require __DIR__ . '/methodology-source-buttons.php'; ?>
+    <?php require __DIR__ . '/methodology-portal-counts.php'; ?>
     <details class="mt-3" x-ref="sourcePicker">
         <summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold text-blue-800">Cambiar de fuente</summary>
         <label for="market-source-choice" class="block text-sm font-semibold">Elige el portal o la inmobiliaria para continuar</label>
@@ -43,6 +44,7 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
     ?>
         <section id="source-panel-<?= $sourceIndex ?>" aria-label="<?= e($source['label']) ?>"
             x-show="sourceTab === <?= $sourceIndex ?>" <?= $sourceIndex ? 'x-cloak' : '' ?> class="mt-4 rounded-xl bg-white p-4">
+            <?php require __DIR__ . '/methodology-portal-prompt.php'; ?>
             <?php if (($isFincaraiz || $isMetrocuadrado) && isset($record['id'])): ?>
                 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-fincaraiz-zone.php'; ?>
             <?php else: ?>

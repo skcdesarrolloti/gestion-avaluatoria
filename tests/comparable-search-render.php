@@ -52,4 +52,8 @@ declare(strict_types=1);
     expect(str_contains($html, '[ph_deposit_count]') && str_contains($html, 'PH · área privada, parqueaderos y depósitos')
         && str_contains($html, 'data-ph-subject="si"') && substr_count($html, 'id="tabla-madre-83"') === 1,
         'PH tiene campos estructurados y entrada propia en la misma matriz');
+    preg_match('/<form id="tabla-madre-83".*?<\/form>/s', $html, $matrix);
+    expect(substr_count($matrix[0] ?? '', '<tbody') === 1, 'tabla normativa fuera del formulario no interfiere con filas matriz/importación');
+    expect(str_contains($html, '[negotiation_discount]') && str_contains($html, 'Descargar Excel (.xlsx)')
+        && str_contains($html, 'Instrucciones precisas para Properati'), 'PH presenta negociación descarga e instrucciones por portal');
 })();

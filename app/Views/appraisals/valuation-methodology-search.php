@@ -29,6 +29,7 @@ $formulaFamilies = [
             @click="searchTab = 'matriz'">2. Tabla de muestras</button>
     </nav>
     <?php require __DIR__ . '/methodology-search-prompt.php'; ?>
+    <div x-show="searchTab === 'matriz'"><?php require __DIR__ . '/methodology-market-coverage.php'; ?></div>
     <div class="mb-6">
         <p class="eyebrow"><?= e(($prefix ?? 'M') . '3 · Insumos del método ' . ($methods[$method ?? 'mercado'] ?? 'Mercado')) ?></p>
         <h2 class="mt-2 text-2xl font-semibold">Investigación, muestra y trazabilidad de mercado</h2>
