@@ -64,6 +64,7 @@ $tabs = [
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-data="{
         activeTab: (() => {
+            if (<?= ($_GET['section'] ?? '') === 'tipologias' ? 'true' : 'false' ?>) return 'tipologias';
             const hash = location.hash.slice(1);
             if (hash === 'midas') return 'registro';
             return ['identificacion','tipologias','ubicacion','registro','fuentes','referencia','entorno','acceso','usos','servicios','cierre'].includes(hash) ? hash : 'identificacion';

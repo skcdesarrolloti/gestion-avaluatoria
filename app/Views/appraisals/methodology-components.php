@@ -10,8 +10,8 @@ $sourceTreatments = \App\Support\AppraisalUnitValuationTreatmentCatalog::options
     <h2 class="text-2xl font-semibold"><?= $stage === 'integration' ? 'Integración y control de cobertura' : 'Inmuebles y anexos del expediente' ?></h2>
     <p class="mt-3 text-slate-600">Estas son las mismas unidades y anexos registrados en el capítulo 1 y estudiados en el capítulo 3. Aquí se consultan para su análisis; los nombres, la composición y la tipología se actualizan en esos capítulos.</p>
     <div class="mt-4 flex flex-wrap gap-3">
-        <a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/expediente')) ?>">Ver capítulo 1 · Composición</a>
-        <a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto')) ?>">Ver capítulo 3 · Bien sujeto</a>
+        <a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/expediente?config_tab=metodo&from=metodologia#unidades-capitulo-1')) ?>">Ver capítulo 1 · Composición</a>
+        <a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto?section=tipologias&from=metodologia#unidades-capitulo-3')) ?>">Ver capítulo 3 · Bien sujeto</a>
         <a class="btn-secondary" href="<?= e($flowUrl('3', 'mercado', '')) ?>">Banco sin asignar (<?= $unassignedCount ?>)</a>
     </div>
     <?php if ($components === []): ?><p role="status" class="mt-5 rounded-xl border border-dashed p-5">Todavía no hay unidades ni anexos registrados. Completa la composición del predio en el capítulo 1 y su estudio en el capítulo 3; aparecerán aquí al guardar.</p><?php endif; ?>
@@ -41,12 +41,7 @@ $sourceTreatments = \App\Support\AppraisalUnitValuationTreatmentCatalog::options
                 <p class="mt-2 font-semibold text-amber-800">Las muestras cambiaron: revisa la conclusión.</p>
                 <?php endif; ?>
             <?php endif; ?>
-            <a class="btn-primary mt-4" href="<?= e($flowUrl('2', ($item['method'] ?? '') ?: 'mercado', $key)) ?>">Seleccionar método y continuar</a>
-            <div class="mt-3 flex flex-wrap gap-2" aria-label="Etapas de <?= e($component['label']) ?>">
-            <?php foreach (\App\Services\MethodologyWorkflow::STAGES as $number => $label): ?>
-                <a class="btn-secondary" href="<?= e($flowUrl((string) $number, ($item['method'] ?? '') ?: 'mercado', $key)) ?>"><?= e(\App\Services\MethodologyWorkflow::PREFIXES[($item['method'] ?? '') ?: 'mercado'] . $number . ' ' . $label) ?></a>
-            <?php endforeach; ?>
-            </div>
+            <a class="btn-primary mt-4" href="<?= e($flowUrl('1', ($item['method'] ?? '') ?: 'mercado', $key)) ?>">Analizar <?= e($component['label']) ?> → Academia</a>
         </article>
     <?php endforeach; ?>
     </div>

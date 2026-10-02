@@ -79,3 +79,22 @@ Cambios en muestras generan aviso de revisión de la redacción anterior.
   no se declara verificación visual completa a 390 px.
 
 Publicar código no equivale a verificar la actualización del hosting.
+
+## Recorrido guiado (2026-10-02)
+
+- A: inmuebles; B: matriz orientativa; C: elegir componente y recorrer M1–M5;
+  D: integrar y revisar texto. Los métodos y sus etapas se muestran al trabajar
+  un componente; las muestras anteriores son una herramienta de apoyo plegable.
+- Botones de siguiente/anterior y ayudas «?» accesibles con teclado o toque.
+  M2 conserva el enlace dinámico del formulario para seguir el método elegido.
+- Enlaces a capítulo 1: config_tab=metodo y #unidades-capitulo-1; capítulo 3:
+  section=tipologias y #unidades-capitulo-3. Apertura inicial desde parámetros del
+  servidor y desplazamiento tras mostrar la pestaña. Retorno al 8 en ambos bloques.
+- Sin cambios de esquema ni datos. No cambia las reglas de Matriz y método.
+- Verificado: 471 pruebas PHP, 113 JS, 44 HTTP, lint y build; 58.1 KB gzip.
+  Navegador: ida por fetch a ambos bloques visibles a 24 px del borde superior,
+  vuelta al capítulo 8 conservando expediente. Se divide composición en parcial
+  propio para respetar 16 KB por archivo.
+
+La navegación fetch conserva el fragmento de enlaces GET al mismo destino, sin
+trasladarlo a redirecciones de login. Prueba de regresión incluida.

@@ -22,12 +22,13 @@ declare(strict_types=1);
             require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php';
             $html = ob_get_contents();
         } finally { ob_end_clean(); }
-        expect(str_contains($html, 'M1 Academia') && str_contains($html, 'M5 Entregable')
-            && str_contains($html, 'Muestras sin asignar (1)'), 'navegación completa y muestras anteriores visibles en ' . $stage);
+        expect(str_contains($html, 'Camino del expediente:') && str_contains($html, 'Siguiente paso')
+            && str_contains($html, 'Muestras sin asignar (1)') && !str_contains($html, 'aria-label="Etapas de Mercado"'), 'contexto general sin mezclar etapas de un componente no elegido en ' . $stage);
         if ($stage === 'components') {
             expect(str_contains($html, 'Oficina &lt;principal&gt;') && str_contains($html, 'Depósito de oficina')
                 && str_contains($html, 'Integrado al inmueble principal'), 'entrada conserva inmuebles, anexos y tratamiento previo escapados');
             expect(str_contains($html, 'component=annex') && str_contains($html, 'component=office'), 'etapas enlazan la identidad de cada inmueble y anexo');
+            expect(str_contains($html, '#unidades-capitulo-1') && str_contains($html, 'config_tab=metodo') && str_contains($html, '#unidades-capitulo-3') && str_contains($html, 'section=tipologias'), 'enlaces de origen apuntan a subsección y ancla exactas');
         }
         if ($stage === 'decision') expect(str_contains($html, 'Composición metodológica del predio')
             && str_contains($html, 'Ver matriz técnica de soporte') && !str_contains($html, "methodologyTab ="), 'matriz restaurada con navegación funcional sin estado Alpine eliminado');
@@ -41,4 +42,7 @@ declare(strict_types=1);
                 . '<body class="bg-slate-50"><main class="mx-auto max-w-7xl p-5">' . $html . '</main></body></html>');
         }
     }
+    $componentKey = 'office'; $stage = '1';
+    ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php'; $html = ob_get_clean();
+    expect(str_contains($html, 'aria-label="Etapas de Mercado"') && str_contains($html, 'Siguiente: M2 Selección del método') && str_contains($html, 'component=office'), 'al elegir componente aparecen etapas y siguiente paso conserva identidad');
 })();

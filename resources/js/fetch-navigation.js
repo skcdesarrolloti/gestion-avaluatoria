@@ -1,9 +1,7 @@
 const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 const flushAutosaves = () => typeof window.gaFlushAutosaves === 'function' ? window.gaFlushAutosaves() : Promise.resolve(true);
 let busyTimer = null;
-
 export function syncFormToken(body, token = csrfToken()) { if (body instanceof FormData && token) body.set('_token', token); return body; }
-
 export function isFetchableUrl(href, currentHref = window.location.href) {
     let url; let current;
     try {
@@ -15,14 +13,12 @@ export function isFetchableUrl(href, currentHref = window.location.href) {
     if (!['http:', 'https:'].includes(url.protocol) || url.origin !== current.origin) return false;
     return !(url.pathname === current.pathname && url.search === current.search && url.hash);
 }
-
 export function shouldHandleLink(link, event, currentHref = window.location.href) {
     if (event.defaultPrevented || event.button !== 0) return false;
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return false;
     if (link.target || link.hasAttribute('download') || link.closest?.('[data-no-fetch]')) return false;
     return isFetchableUrl(link.href, currentHref);
 }
-
 function setBusy(active, text = 'Cargando...') {
     const loader = document.getElementById('app-loader');
     document.documentElement.dataset.fetchBusy = active ? 'true' : 'false';
@@ -81,7 +77,11 @@ async function refreshCsrf() {
 
 export function redirectedUrl(responseUrl, fallbackUrl, body = null, currentHref = window.location.href) {
     const url = new URL(responseUrl || fallbackUrl, currentHref);
-    if (!(body instanceof FormData)) return url.toString();
+    if (!(body instanceof FormData)) {
+        const requested = new URL(fallbackUrl, currentHref);
+        if (requested.origin === url.origin && requested.pathname === url.pathname && requested.search === url.search && requested.hash) url.hash = requested.hash;
+        return url.toString();
+    }
     const targetSector = sectorAnchor(body.get('target_sector'));
     if (targetSector) {
         url.hash = targetSector;

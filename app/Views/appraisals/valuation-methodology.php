@@ -23,13 +23,7 @@ $componentLabel = $components[$componentKey]['label'] ?? 'Banco de muestras sin 
 <?php foreach (['methodology_message', 'methodology_error'] as $flash): $notice = \App\Core\Session::pullFlash($flash); if (!$notice) continue; ?>
     <p role="status" class="mt-4 rounded-xl border p-4"><?= e($notice) ?></p>
 <?php endforeach; ?>
-<nav class="mt-6 flex flex-wrap gap-3" aria-label="Organización del capítulo 8">
-    <a class="btn-secondary" href="<?= e($flowUrl('components')) ?>">Inmuebles y anexos</a>
-    <a class="btn-secondary" href="<?= e($flowUrl('decision')) ?>">Matriz y método</a>
-    <a class="btn-secondary" href="<?= e($flowUrl('3', 'mercado', '')) ?>">Muestras sin asignar (<?= count(\App\Services\MethodologyComparableScope::rows($allComparableRows, '')) ?>)</a>
-    <a class="btn-secondary" href="<?= e($flowUrl('integration')) ?>">Integración del avalúo</a>
-    <a class="btn-secondary" href="<?= e($flowUrl('report')) ?>">Texto del numeral 8</a>
-</nav>
+<?php require __DIR__ . '/methodology-navigation.php'; ?>
 <?php if ($componentKey !== ''): ?>
 <section class="mt-6 rounded-xl border border-teal-200 bg-teal-50 p-4">
     <p class="font-semibold">Componente en trabajo: <?= e($componentLabel) ?></p>
@@ -44,6 +38,7 @@ $componentLabel = $components[$componentKey]['label'] ?? 'Banco de muestras sin 
     </details>
 </section>
 <?php endif; ?>
+<?php if ($componentKey !== '' && in_array($stage, ['1','2','3','4','5'], true)): ?>
 <nav class="mt-4 flex flex-wrap gap-2 rounded-xl bg-slate-100 p-2" aria-label="Métodos de valoración">
     <?php foreach ($methods as $key => $label): ?>
     <a class="min-h-11 rounded-xl px-4 py-3 font-semibold <?= $key === $method ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600' ?>"
@@ -56,6 +51,7 @@ $componentLabel = $components[$componentKey]['label'] ?? 'Banco de muestras sin 
        <?= (string) $key === $stage ? 'aria-current="page"' : '' ?> href="<?= e($flowUrl((string) $key)) ?>"><?= e($prefix . $key . ' ' . $label) ?></a>
     <?php endforeach; ?>
 </nav>
+<?php endif; ?>
 <div class="mt-6">
 <?php if ($stage === 'components' || $stage === 'integration'): ?>
     <?php require __DIR__ . '/methodology-components.php'; ?>
@@ -66,7 +62,6 @@ $componentLabel = $components[$componentKey]['label'] ?? 'Banco de muestras sin 
 <?php elseif ($stage === '1'): ?>
     <?php require __DIR__ . '/valuation-methodology-method-guides.php'; ?>
 <?php elseif ($stage === '2'): ?>
-    <?php require __DIR__ . '/valuation-methodology-decision.php'; ?>
     <?php require __DIR__ . '/methodology-selection.php'; ?>
 <?php elseif ($method !== 'mercado'): ?>
     <section class="rounded-xl border bg-white p-6"><h2 class="text-xl font-semibold"><?= e($prefix . $stage . ' ' . Workflow::STAGES[$stage]) ?></h2>
@@ -78,3 +73,5 @@ $componentLabel = $components[$componentKey]['label'] ?? 'Banco de muestras sin 
     <?php require __DIR__ . '/methodology-market-analysis.php'; ?>
 <?php endif; ?>
 </div>
+
+<?php require __DIR__ . '/methodology-next.php'; ?>

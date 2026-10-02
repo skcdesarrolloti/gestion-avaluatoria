@@ -41,7 +41,7 @@ $currentStep = 'expediente';
         data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/expediente/autoguardar')) ?>"
         data-autosave-topic="<?= e('appraisal:' . $record['id'] . ':chapter-zero') ?>"
         x-data="{
-            busy: false, active: window.location.hash === '#identificacion' || (window.location.hash === '' && <?= $hasDossierNumber ? 'true' : 'false' ?>) ? 'identificacion' : 'configuracion',
+            busy: false, active: <?= ($_GET['config_tab'] ?? '') === 'metodo' ? 'true' : 'false' ?> ? 'configuracion' : window.location.hash === '#identificacion' || (window.location.hash === '' && <?= $hasDossierNumber ? 'true' : 'false' ?>) ? 'identificacion' : 'configuracion',
             chapterOneTab: 'solicitud',
             configTab: '<?= ($_GET['config_tab'] ?? '') === 'metodo' ? 'metodo' : 'expediente' ?>',
             notes: <?= e(json_encode($initial['notes'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,

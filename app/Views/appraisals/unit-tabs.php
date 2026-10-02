@@ -10,7 +10,8 @@ $labelInput = static fn (array $unit): string => (string) $unit['label'] === $un
 $labelMap = [];
 foreach ($visibleUnits as $unit) $labelMap[$unit['id']] = $labelInput($unit);
 ?>
-<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
+<section id="unidades-capitulo-3" class="scroll-mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
+    x-init="$nextTick(() => { if (<?= ($_GET['section'] ?? '') === 'tipologias' ? 'true' : 'false' ?>) $el.scrollIntoView() })"
     x-data="{
         active: '<?= e($visibleUnits[0]['id'] ?? '') ?>',
         labels: <?= e(json_encode($labelMap, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
@@ -26,6 +27,7 @@ foreach ($visibleUnits as $unit) $labelMap[$unit['id']] = $labelInput($unit);
                 .filter(Boolean).join('\n\n')
         }
     }">
+    <?php require __DIR__ . '/methodology-return.php'; ?>
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Unidades del predio</p>

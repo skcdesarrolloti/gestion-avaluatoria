@@ -213,3 +213,10 @@ test('implicit enter submit in module autosave forms does not navigate', () => {
     assert.equal(prevented, true);
     Object.assign(globalThis, originals);
 });
+
+test('GET preserves exact requested fragment but never carries it to a login redirect', () => {
+    const current = 'https://example.test/public/avaluos/abc/metodologia-valuatoria';
+    const target = 'https://example.test/public/avaluos/abc/expediente?config_tab=metodo';
+    assert.equal(redirectedUrl(target, target + '#unidades-capitulo-1', null, current), target + '#unidades-capitulo-1');
+    assert.equal(redirectedUrl('https://example.test/public/login', target + '#unidades-capitulo-1', null, current), 'https://example.test/public/login');
+});
