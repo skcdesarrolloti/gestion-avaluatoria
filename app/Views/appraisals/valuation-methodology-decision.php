@@ -69,6 +69,7 @@ $firstComponent = (string) ($componentItems[0]['id'] ?? '');
             </div>
             <?php if ($normativeNotice !== ''): ?>
                 <p class="mt-3 rounded-lg bg-blue-50 p-3 text-sm leading-6 text-blue-950"><?= e($normativeNotice) ?></p>
+                <?php $readingNumber = 15; require __DIR__ . '/valuation-methodology-article-reading.php'; ?>
             <?php endif; ?>
             <?php if ($normativeInputItems !== []): ?>
                 <div class="mt-4 grid gap-3 md:grid-cols-2">
@@ -87,6 +88,10 @@ $firstComponent = (string) ($componentItems[0]['id'] ?? '');
                                 <p class="text-xs font-bold uppercase text-blue-700"><?= e((string) ($article['number'] ?? 'Artículo')) ?></p>
                                 <h4 class="mt-1 font-semibold text-slate-950"><?= e((string) ($article['title'] ?? '')) ?></h4>
                                 <p class="mt-2 text-slate-700"><?= e((string) ($article['summary'] ?? '')) ?></p>
+                                <?php
+                                $readingNumber = (int) preg_replace('/\D/', '', (string) ($article['number'] ?? ''));
+                                require __DIR__ . '/valuation-methodology-article-reading.php';
+                                ?>
                                 <?php if ($highlights !== []): ?>
                                     <div class="mt-3 flex flex-wrap gap-2">
                                         <?php foreach ($highlights as $highlight): ?>

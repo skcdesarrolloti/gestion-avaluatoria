@@ -14,4 +14,5 @@
             href="https://camacol.co/sites/default/files/descargables/IGAC-Resolucion-2026-N0000941_20260731_Diario_Oficial-N053573_20260801.pdf#page=9">Consultar artículo 36 · Diario Oficial, reproducción publicada por Camacol</a>
     </div>
     <?php $readingNumber = 19; require __DIR__ . '/valuation-methodology-article-reading.php'; ?>
+    <?php $readingNumber = 36; require __DIR__ . '/valuation-methodology-article-reading.php'; ?>
 </details>

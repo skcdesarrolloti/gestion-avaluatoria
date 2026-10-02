@@ -13,6 +13,6 @@
         <p class="mt-2 text-xs leading-5 text-slate-600">Resolución IGAC 941 de 2026 · páginas <?= e($articleReading['pages']) ?>.
             Transcripción para consulta; se conserva el contenido y se adapta el formato. Cierra la flecha para ocultarlo.</p>
         <a href="<?= e($articleReading['url']) ?>" target="_blank" rel="noopener" data-no-fetch
-            class="inline-flex min-h-11 items-center text-sm font-semibold text-indigo-800 underline">Ver original del IGAC</a>
+            class="inline-flex min-h-11 items-center text-sm font-semibold text-indigo-800 underline"><?= e($articleReading['source'] ?? 'Ver original del IGAC') ?></a>
     </details>
 <?php endif; ?>

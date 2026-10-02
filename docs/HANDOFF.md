@@ -267,3 +267,20 @@ siguen requiriendo filtros manuales, tal como se indica en su panel.
 Verificado: PHP 471, JS 113, lint de vistas, build y 58.1 KB gzip; navegador local
 con cambio de FincaRaíz a Araújo & Segovia y recorrido visible A–E; acceso C
 visible en ancho móvil. Sin cambios de base de datos ni pruebas de portales en vivo.
+
+
+## 2026-10-02 · Lectura completa en Matriz y método
+
+Las tarjetas de Matriz y método reutilizan el acordeón de la academia para
+los artículos 16–34 de Mercado, Renta, Costo y Residual. Se conservan resumen,
+resaltados, lectura por teclado, altura limitada y enlace a la fuente.
+La selección incorpora el artículo 15; la ayuda de PH incorpora el 36 completo,
+con sus cuatro numerales y dos parágrafos. Estos dos textos proceden del Diario
+Oficial reproducido por Camacol (páginas PDF 5 y 9), identificado en el enlace.
+La revisión transversal por rangos de artículos conserva su resumen existente.
+Sin cambios en importadores, comparables, fotos, guardado ni base de datos.
+Verificación: 491 comprobaciones PHP, 113 pruebas JS, lint PHP, build y
+58.1 KB gzip. Apertura del art. 17 comprobada en navegador local de escritorio;
+región visible y ancho contenido comprobados en vista móvil. La captura móvil
+del navegador agotó su tiempo; la comprobación móvil se limitó al DOM.
+No se ejecutaron pruebas de BD: cambio de contenido y vistas, sin persistencia.

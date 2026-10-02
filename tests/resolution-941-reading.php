@@ -31,4 +31,19 @@ declare(strict_types=1);
     foreach (range(16, 34) as $number) expect(str_contains($html, "Leer artículo $number completo"), "Guías muestran lectura íntegra art. $number");
     foreach (['Mercado', 'Renta', 'Costo', 'Residual'] as $method)
         expect(str_contains($html, "Revisión de $method · requisitos y pendientes"), "Revisión diferenciada de $method");
+    $flowUrl = static fn (string $step): string => '/preview?stage=' . $step;
+    $methodologyDecisionRows = [];
+    foreach ($methodologyGuides as $methodGuide) {
+        $methodologyDecision = ['normative_inputs' => ['article_cards' => $methodGuide['article_cards']]];
+        ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology-decision.php'; $html = ob_get_clean();
+        foreach ($methodGuide['article_cards'] as $card) {
+            $number = (int) preg_replace('/\D/', '', $card['number']);
+            expect(str_contains($html, "Leer artículo $number completo"), "Matriz permite leer completo el artículo $number");
+        }
+    }
+    $reading = \App\Services\Resolution941Reading::article(36);
+    $text = implode("\n", $reading['paragraphs']);
+    expect(str_contains($text, 'Parágrafo 2°') && str_contains($text, '4. Usos:')
+        && str_contains($text, 'no se liquidarán de manera independiente')
+        && str_contains($reading['source'], 'Diario Oficial'), 'Artículo 36 completo conserva parágrafos y distingue su fuente');
 })();
