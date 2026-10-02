@@ -17,10 +17,23 @@ final class MethodologyWorkflow
     public static function components(array $record, array $units): array
     {
         $out = [];
+        $principals = count(array_filter($units, static fn (array $unit): bool => ($unit['unit_kind'] ?? '') === 'property'));
         foreach ($units as $unit) {
             if (($unit['unit_kind'] ?? '') === 'common') continue;
             $fallback = (($unit['unit_kind'] ?? '') === 'annex' ? 'Anexo ' : 'Unidad ') . (int) ($unit['unit_index'] ?? 0);
-            $out[(string) $unit['id']] = ['label' => trim($unit['label'] ?? '') ?: $fallback, 'unit' => $unit];
+            $name = trim((string) ($unit['label'] ?? ''));
+            if ($name === '' || preg_match('/^(?:Unidad|Anexo)\s+\d+$/iu', $name)) {
+                $isAnnex = ($unit['unit_kind'] ?? '') === 'annex';
+                $type = ComparableSearchContext::type((string) ($unit['property_type'] ?? ''));
+                if (!$isAnnex && $type === '' && $principals === 1) $type = ComparableSearchContext::type((string) ($record['tipo_inmueble'] ?? ''));
+                $construction = trim((string) ($unit['construction_type'] ?? ''));
+                $description = $isAnnex
+                    ? (\App\Support\AppraisalConstructionTypeCatalog::types()[$construction] ?? '')
+                    : (\App\Support\AppraisalCatalog::selectFields()['tipo_inmueble'][4][$type] ?? '');
+                if ($isAnnex && $construction === '') $description = '';
+                $name = $description !== '' ? $description . ' · ' . $fallback : $fallback;
+            }
+            $out[(string) $unit['id']] = ['label' => $name, 'unit' => $unit];
         }
         return $out;
     }

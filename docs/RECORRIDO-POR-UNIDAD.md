@@ -1,5 +1,15 @@
 # Recorrido por unidad — 02/10/2026
 
+Nombres de las pestañas: se conserva el nombre personalizado guardado en el campo
+«Nombre del componente» del capítulo 1. Si sigue vacío o genérico (Unidad N / Anexo N),
+el capítulo 8 lo identifica con el tipo registrado y su número, por ejemplo
+«Cerramiento · Anexo 1». El tipo general solo se usa para una única unidad principal;
+nunca se hereda a anexos ni a múltiples unidades sin clasificación propia.
+Esta presentación se comparte con el encabezado y el recorrido del componente;
+no renombra filas, cambia identificadores ni requiere migración. El menú general
+conserva integración, texto del numeral y acceso a las herramientas del expediente.
+Validación de este ajuste: 543 comprobaciones PHP, 113 JS, lint, build y tamaño.
+
 Cada unidad o anexo tiene una pestaña principal. Solo se renderiza su ficha a todo
 el ancho; su identidad, orden y definición se conservan desde capítulos 1 y 3.
 El método guardado prevalece sobre el parámetro de un enlace antiguo. Consultar

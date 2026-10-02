@@ -4,6 +4,17 @@ declare(strict_types=1);
     $units = [['id' => 'unit-a', 'label' => 'Principal', 'unit_kind' => 'property'], ['id' => 'unit-b', 'label' => 'Cerramiento', 'unit_kind' => 'annex']];
     $components = \App\Services\MethodologyWorkflow::components([], $units);
     expect(array_keys($components) === ['unit-a', 'unit-b'] && $components['unit-b']['unit'] === $units[1], 'capítulo 8 refleja solo unidades registradas con identidad y datos intactos');
+    $namedUnits = [
+        ['id' => 'main', 'unit_kind' => 'property', 'unit_index' => 1, 'label' => 'Unidad 1'],
+        ['id' => 'wall', 'unit_kind' => 'annex', 'unit_index' => 1, 'label' => 'Anexo 1', 'construction_type' => 'cerramiento'],
+        ['id' => 'custom', 'unit_kind' => 'annex', 'unit_index' => 2, 'label' => 'Placa vial norte', 'construction_type' => 'placa'],
+        ['id' => 'unknown', 'unit_kind' => 'annex', 'unit_index' => 3, 'label' => 'Anexo 3'],
+    ];
+    $named = \App\Services\MethodologyWorkflow::components(['tipo_inmueble' => 'oficina'], $namedUnits);
+    expect(array_column($named, 'label') === ['Oficina · Unidad 1', 'Cerramiento · Anexo 1', 'Placa vial norte', 'Anexo 3'], 'nombres propios del capítulo 1 prevalecen y nombres genéricos se identifican con su tipo registrado');
+    expect(array_column($named, 'unit') === $namedUnits, 'identificar pestañas no renombra ni modifica unidades almacenadas');
+    $namedUnits[] = ['id' => 'other', 'unit_kind' => 'property', 'unit_index' => 2, 'label' => 'Unidad 2'];
+    expect(\App\Services\MethodologyWorkflow::components(['tipo_inmueble' => 'oficina'], $namedUnits)['other']['label'] === 'Unidad 2', 'no atribuye el tipo general a múltiples unidades sin clasificación propia');
     expect(\App\Services\MethodologyWorkflow::components(['methodology_workflow' => '{"terreno":{"method":"mercado"}}'], []) === [], 'sin unidades registradas no inventa principal ni resucita terreno virtual');
     $sourceUnits = [$units[1], ['id' => 'common', 'unit_kind' => 'common'], $units[0]];
     expect(array_keys(\App\Services\MethodologyWorkflow::components([], $sourceUnits)) === ['unit-b', 'unit-a'], 'respeta el orden de capítulos 1 y 3 y excluye ficha común');
