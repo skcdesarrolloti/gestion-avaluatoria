@@ -16,7 +16,7 @@ final class AppraisalComparableSampleDesignGuide
                 'Base comparable' => 'Arranca con muestras de la misma operación, ciudad, barrio o microsector, tipología, derecho y unidad de comparación.',
                 'Ampliación controlada' => 'Si no hay datos suficientes, amplía por anillos: mismo barrio, barrios sustitutos, misma ciudad y fuente regional, dejando trazabilidad.',
                 'Depuración' => 'Clasifica cada dato como preseleccionado, usado o descartado. No mezcles ofertas sin verificar con transacciones o fuentes confirmadas.',
-                'Cierre para 8.4' => 'Entrega registros depurados con sus soportes y salvedades. La cantidad de filas no acredita suficiencia por sí sola.',
+                'Cierre para M4' => 'Entrega registros depurados con sus soportes y salvedades. La cantidad de filas no acredita suficiencia por sí sola.',
             ],
             'protocol' => [
                 'Definir primero los factores que realmente inciden en el bien sujeto; no abrir variables que no serán analizadas.',
@@ -33,7 +33,7 @@ final class AppraisalComparableSampleDesignGuide
                 'Documentar valores atípicos y motivos de exclusión. El anexo 2.1 excluye la homologación mediante factores, sea manual o automática.',
             ],
             'next_84' => [
-                '8.4 debe recibir muestras depuradas, factor asignado, unidad de comparación y observación técnica.',
+                'M4 debe recibir muestras depuradas, factor asignado, unidad de comparación y observación técnica.',
                 'Desarrollo pendiente: memoria reproducible, estadísticos pertinentes y justificación del valor conforme a los arts. 17–21.',
             ],
         ];
@@ -69,7 +69,7 @@ final class AppraisalComparableSampleDesignGuide
             ['Art. 18', 'En NPH el análisis integral es complementario: exige documentar y justificar relaciones comparables entre áreas de terreno y construcción.'],
             ['Art. 19', 'En PH se analiza el valor por m² privado tras descontar las unidades complementarias del dato negociado; revisar las excepciones y la liquidación del art. 36.'],
             ['Art. 20', 'La depuración debe preparar medidas robustas, dispersión, outliers y modelos auditables cuando aplique.'],
-            ['Art. 21', 'La adopción posterior debe justificar el estadístico usado y la dispersión observada; 8.3 deja trazabilidad para esa decisión.'],
+            ['Art. 21', 'La adopción posterior debe justificar el estadístico usado y la dispersión observada; M3 deja trazabilidad para esa decisión.'],
         ];
     }
 

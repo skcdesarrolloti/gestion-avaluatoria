@@ -7,6 +7,7 @@
     data-subject-latitude="<?= e($subject['latitude'] ?? '') ?>" data-subject-longitude="<?= e($subject['longitude'] ?? '') ?>"
     data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/autoguardar')) ?>">
     <?= csrf_field() ?>
+    <input type="hidden" name="component_scope" value="<?= e($componentKey ?? '') ?>">
     <input type="hidden" name="version" value="<?= (int) ($record['comparables_version'] ?? 0) ?>">
     <div x-show="searchTab === 'captura'"><?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-links.php'; ?></div>
     <section x-show="['matriz', 'mapa'].includes(searchTab)" x-effect="if (['matriz', 'mapa'].includes(searchTab)) $nextTick(() => syncWidth())">
@@ -16,7 +17,7 @@
             <h3 class="mt-2 text-xl font-semibold">Matriz de datos</h3>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Diligencia una fila por cada oferta, transacción o dato de mercado. El sujeto queda fuera de esta tabla:
-                aquí se preparan las muestras que se analizarán en 8.4. Completa ubicación y soporte en «4. Mapas y evidencia».
+                aquí se preparan las muestras que se analizarán en M4. Completa ubicación y soporte en «4. Mapas y evidencia».
                 Un inmueble por fila y sus datos por columnas. Sin límite de cantidad de muestras; revisa los pendientes, PH y fotos por inmueble.
             </p>
         </div>

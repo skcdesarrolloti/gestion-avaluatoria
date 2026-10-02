@@ -18,7 +18,8 @@ final class AppraisalMethodologyChapterReport
         $this->resolutionGuide ??= new AppraisalMethodologyResolution941Guide();
         $decision = $this->decision($record, $units);
         $sections = array_merge($this->academic->sections(), [
-            ['8.2 Selección y justificación de la metodología aplicada', $this->selectionText($record, $units, $decision)],
+            ['8.2 Selección y justificación de la metodología aplicada', array_key_exists('methodology_workflow', $record)
+                ? MethodologyWorkflowReport::text($record, $units) : $this->selectionText($record, $units, $decision)],
         ]);
         return [
             'sections' => $sections,

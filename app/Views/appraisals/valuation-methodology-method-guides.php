@@ -8,26 +8,16 @@ $firstMethodPart = (string) ($methodologyGuides[0]['parts'][0]['key'] ?? 'compre
         <div class="flex flex-wrap items-start justify-between gap-3">
             <div>
                 <p class="text-xs font-bold uppercase text-indigo-700">Guía amplia para el analista</p>
-                <h3 class="mt-2 text-xl font-semibold text-slate-950">Métodos de la Resolución IGAC 941</h3>
+                <h3 class="mt-2 text-xl font-semibold text-slate-950"><?= e(($prefix ?? '') . '1 Academia · ' . ($methods[$method ?? ''] ?? 'Resolución IGAC 941')) ?></h3>
                 <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                     Lectura operativa por método. Esta guía no reemplaza el criterio profesional; ordena artículos,
-                    insumos y controles antes de pasar a la selección del numeral 8.2.
+                    insumos y controles antes de pasar a la selección del método.
                 </p>
             </div>
             <a class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-800"
                 href="<?= e(\App\Support\IgacDocumentLibrary::urlFor('resolucion-igac-941-2026')) ?>">Resolución 941</a>
         </div>
         <?php require __DIR__ . '/valuation-methodology-normative-review.php'; ?>
-        <nav class="mt-4 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Métodos Resolución 941">
-            <?php foreach ($methodologyGuides as $methodGuide): ?>
-                <?php $guideKey = (string) ($methodGuide['key'] ?? ''); ?>
-                <button type="button" class="min-h-11 shrink-0 rounded-lg px-4 py-2 text-sm font-semibold"
-                    :class="methodGuideTab === '<?= e($guideKey) ?>' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
-                    @click="methodGuideTab = '<?= e($guideKey) ?>'; methodGuidePart = 'comprende'">
-                    <?= e((string) ($methodGuide['label'] ?? 'Método')) ?>
-                </button>
-            <?php endforeach; ?>
-        </nav>
         <?php foreach ($methodologyGuides as $methodGuide): ?>
             <?php
             $guideKey = (string) ($methodGuide['key'] ?? '');

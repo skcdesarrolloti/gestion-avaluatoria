@@ -22,7 +22,7 @@
         </ul>
     </details>
     <p class="mt-3"><strong>Cierre (arts. 57–61):</strong> conservar trazabilidad para revisión/impugnación, verificar entrega de información al OIC según el procedimiento aplicable y revisar transición, vigencia y derogaciones. No se envía información automáticamente.</p>
-    <p class="mt-3"><strong>Estado del aplicativo:</strong> hay captura de comparables y módulos de apoyo; faltan el desarrollo numérico completo de los métodos, rutas especiales y cierre integral del informe. En mercado, 8.4 analiza la matriz creada en 8.3.</p>
+    <p class="mt-3"><strong>Estado del aplicativo:</strong> hay captura de comparables y módulos de apoyo; faltan el desarrollo numérico completo de los métodos, rutas especiales y cierre integral del informe. En mercado, M4 analiza la matriz creada en M3.</p>
     <a class="inline-flex min-h-11 items-center font-semibold underline"
         href="<?= e(\App\Support\IgacDocumentLibrary::urlFor('anexo-tecnico-resolucion-igac-941-2026')) ?>">Consultar anexo técnico en la biblioteca</a>
 </details>

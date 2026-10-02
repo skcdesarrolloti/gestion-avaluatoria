@@ -1,5 +1,9 @@
 # Entrega al responsable de la implementación
 
+Capítulo 8 por componente: [flujo Mercado y conservación](CAPITULO-8-COMPONENTES.md).
+Aplicar migración `202610010008_methodology_workflow.php`. Muestras previas en
+banco sin asignar; M1–M5 y asignación segregada. Costo se desarrolla después.
+
 Objeto 1.5 visible y tabla documental 1.11: aplicar migración
 `202610010006_assignment_document_table.php`; conserva datos anteriores.
 Ver [expediente](EXPEDIENTE-SOLICITANTE.md).

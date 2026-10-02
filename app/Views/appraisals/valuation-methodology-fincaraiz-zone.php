@@ -10,7 +10,7 @@ if (!empty($isMetrocuadrado)) {
     unset($zoneItem);
 }
 $zoneCity = mb_strtolower(trim((string) ($sourceSearch['city'] ?? $guide['source_search']['city'] ?? $record['municipio'] ?? '')));
-$zoneSupported = ($record['tipo_inmueble'] ?? '') === 'oficina' && ($record['tipo_negocio'] ?? '') === 'venta'
+$zoneSupported = ($guide['type_label'] ?? '') === 'Oficina' && ($record['tipo_negocio'] ?? '') === 'venta'
     && in_array($zoneCity, ['cartagena', 'cartagena de indias'], true);
 $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_search']['neighborhood'] ?? '');
 ?>

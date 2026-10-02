@@ -1,7 +1,7 @@
 <thead class="bg-slate-50 text-xs font-bold uppercase text-slate-500">
     <tr>
         <th class="px-3 py-3">#</th><th class="px-3 py-3">Usar</th><th class="px-3 py-3">Estado</th>
-        <th class="px-3 py-3">Factor 8.4 <?= $tip('Origen: factores sugeridos por la tipología del bien sujeto y la matriz de variables. Aquí marcas para qué variable servirá esta muestra en el análisis 8.4.') ?></th>
+        <th class="px-3 py-3">Factor M4 <?= $tip('Origen: factores sugeridos por la tipología del bien sujeto y la matriz de variables. Aquí marcas para qué variable servirá esta muestra en el análisis M4.') ?></th>
         <th class="px-3 py-3">Tipo fuente</th><th class="px-3 py-3">Fuente</th><th class="px-3 py-3">Enlace</th>
         <th class="px-3 py-3">Consulta</th><th class="px-3 py-3">Operación</th><th class="px-3 py-3">Tipo inmueble</th>
         <th class="px-3 py-3">Barrio/sector</th><th class="px-3 py-3">Dirección</th><th class="px-3 py-3">Edificio/proyecto</th>

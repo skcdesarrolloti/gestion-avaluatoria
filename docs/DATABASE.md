@@ -1,5 +1,9 @@
 # Crear y evolucionar la base sin SQL manual
 
+Capítulo 8: `202610010008_methodology_workflow.php` agrega documento de selección
+y versión optimista, sin modificar filas ni fotos existentes. Ver
+[flujo por componentes](CAPITULO-8-COMPONENTES.md).
+
 Tabla 1.11: `202610010006_assignment_document_table.php` agrega el detalle
 documental sin reemplazar marcas ni observaciones anteriores.
 

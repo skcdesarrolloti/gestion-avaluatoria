@@ -1,12 +1,12 @@
 <section class="space-y-4 rounded-xl border border-slate-200 bg-white p-4">
-    <p class="eyebrow">8.3 · misma matriz, misma muestra</p>
+    <p class="eyebrow">M3 · misma matriz, misma muestra</p>
     <h3 class="text-xl font-semibold">Mapas y evidencia</h3>
     <p>Completa aquí la ubicación y el soporte de cada inmueble. Las fichas de abajo son las mismas filas de la matriz; no debes importar ni escribir de nuevo las muestras.</p>
     <p>Trabaja una muestra a la vez. Abre «Fotos de esta muestra», pega sus imágenes y pulsa «Continuar con la siguiente muestra». También puedes recorrer las fichas con Anterior y Siguiente.</p>
     <ol class="list-decimal space-y-2 pl-5 text-sm">
         <li>Registra latitud, longitud, precisión y fuente. Si el portal solo ubica el sector, conserva esa salvedad; no inventes un punto exacto.</li>
         <li>Pulsa «Fotos y soporte» en la muestra y pega una captura con URL, precio, áreas y ubicación. Escribe qué evidencia conservaste y su fecha; una foto decorativa no basta.</li>
-        <li>Registra quién corroboró la información, cuándo y con qué resultado. Espera la confirmación de autoguardado. En 8.4 se decidirá su comparabilidad y tratamiento.</li>
+        <li>Registra quién corroboró la información, cuándo y con qué resultado. Espera la confirmación de autoguardado. En M4 se decidirá su comparabilidad y tratamiento.</li>
     </ol>
     <p class="text-sm"><strong x-text="mapPoints.filter(p => p.n !== 'S').length"></strong> muestras activas con coordenadas válidas. «S» identifica al bien sujeto cuando tiene coordenadas. Este esquema se actualiza al editar; el estado de guardado indica si los cambios ya llegaron a la base.</p>
     <details class="rounded-lg border p-3" x-show="mapPoints.length">

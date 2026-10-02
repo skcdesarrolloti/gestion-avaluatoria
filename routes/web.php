@@ -100,6 +100,8 @@ return [
     ['POST', '#^/avaluos/([a-f0-9]{32})/condiciones-restrictivas$#', 'narrativeChapters', 'saveRestrictiveConditions', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/condiciones-restrictivas/autoguardar$#', 'narrativeChapters', 'autosaveRestrictiveConditions', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria$#', 'valuationMethodology', 'show', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/flujo$#', 'valuationMethodology', 'saveWorkflow', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/asignar-muestras$#', 'valuationMethodology', 'assignComparables', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/comparables/([a-f0-9]{32})/fotos$#', 'comparablePhotos', 'index', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/comparables/([a-f0-9]{32})/fotos$#', 'comparablePhotos', 'upload', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/comparables/([a-f0-9]{32})/fotos/([a-f0-9]{32})$#', 'comparablePhotos', 'show', true],

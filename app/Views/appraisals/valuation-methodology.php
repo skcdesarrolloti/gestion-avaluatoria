@@ -1,109 +1,67 @@
 <?php
+use App\Services\MethodologyWorkflow as Workflow;
 $currentStep = 'metodologia';
-$captured = $guide['captured'] ?? [];
+$methods = Workflow::METHODS;
+$prefix = Workflow::PREFIXES[$method];
 $factorGroups = $guide['factor_groups'] ?? [];
-$methodologyChapterData = is_array($methodologyChapter ?? null) ? $methodologyChapter : ['sections' => [], 'text' => '', 'references' => []];
-$methodologyText = (string) ($methodologyChapterData['text'] ?? '');
-$methodologySections = is_array($methodologyChapterData['sections'] ?? null) ? $methodologyChapterData['sections'] : [];
-$methodologyReferences = is_array($methodologyChapterData['references'] ?? null) ? $methodologyChapterData['references'] : [];
-$methodologyGuides = is_array($methodologyChapterData['method_guides'] ?? null) ? $methodologyChapterData['method_guides'] : [];
-$methodologyDecision = is_array($methodologyChapterData['decision'] ?? null) ? $methodologyChapterData['decision'] : ['rows' => []];
-$methodologyDecisionRows = is_array($methodologyDecision['rows'] ?? null) ? $methodologyDecision['rows'] : [];
-$methodologyMessage = \App\Core\Session::pullFlash('methodology_message');
-$methodologyError = \App\Core\Session::pullFlash('methodology_error');
+$methodologyGuides = array_values(array_filter($methodologyChapter['method_guides'], static fn ($item) => $item['key'] === $method));
+$methodologyDecision = $methodologyChapter['decision'];
+$basePath = 'avaluos/' . $record['id'] . '/metodologia-valuatoria';
+$flowUrl = static fn ($step, $m = null, $key = null) => url($basePath . '?' . http_build_query([
+    'method' => $m ?? $method, 'stage' => $step, 'component' => $key ?? $componentKey]));
+$componentLabel = $components[$componentKey]['label'] ?? 'Banco de muestras sin asignar';
 ?>
-<a href="<?= e(url('valuaciones')) ?>" class="inline-flex min-h-11 items-center text-sm font-medium text-teal-800">← Valuaciones</a>
-<div class="mt-3 flex flex-wrap items-start justify-between gap-5">
-    <div>
-        <p class="eyebrow">Numeral 8 · Metodología valuatoria</p>
-        <h1 class="mt-2 text-3xl font-semibold">Marco académico y selección metodológica</h1>
-        <p class="mt-3 max-w-3xl text-slate-600">
-            Primero se ambienta al lector con la academia normativa vigente. Después se desarrolla el método
-            seleccionado para el caso; la búsqueda de comparables o insumos queda en el desarrollo del 8.3.
-        </p>
-    </div>
-    <span class="rounded-full bg-emerald-50 px-3 py-1 text-sm font-semibold text-emerald-800">Numeral 8</span>
-</div>
-<?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
-<?php if ($methodologyMessage): ?>
-    <p class="mt-4 rounded-xl border border-emerald-200 bg-emerald-50 p-4 text-sm font-semibold text-emerald-800"><?= e($methodologyMessage) ?></p>
-<?php endif; ?>
-<?php if ($methodologyError): ?>
-    <p class="mt-4 rounded-xl border border-red-200 bg-red-50 p-4 text-sm font-semibold text-red-800"><?= e($methodologyError) ?></p>
-<?php endif; ?>
-
-<div class="mt-8" x-data="{ methodologyTab: '81' }"
-    data-refresh-on-save-topic="<?= e('appraisal:' . $record['id'] . ':chapter-zero,appraisal:' . $record['id'] . ':subject-units') ?>">
-    <p class="hidden rounded-xl bg-emerald-50 p-4 text-sm font-semibold text-emerald-800" data-refresh-message>
-        Se actualizó información que alimenta el numeral 8.2. Recargando metodología con la información guardada...
-    </p>
-    <div class="rounded-2xl bg-slate-100 p-2">
-        <div class="flex gap-2 overflow-x-auto">
-            <button type="button" class="min-h-11 shrink-0 rounded-xl px-4 py-2 text-sm font-semibold"
-                :class="methodologyTab === '81' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
-                @click="methodologyTab = '81'">8.1 Marco académico</button>
-            <button type="button" class="min-h-11 shrink-0 rounded-xl px-4 py-2 text-sm font-semibold"
-                :class="methodologyTab === '82' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
-                @click="methodologyTab = '82'">8.2 Matriz y método</button>
-            <button type="button" class="min-h-11 shrink-0 rounded-xl px-4 py-2 text-sm font-semibold"
-                :class="methodologyTab === '83' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
-                @click="methodologyTab = '83'">8.3 Desarrollo operativo</button>
-            <button type="button" class="min-h-11 shrink-0 rounded-xl px-4 py-2 text-sm font-semibold"
-                :class="methodologyTab === 'entregable' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
-                @click="methodologyTab = 'entregable'">Entregable</button>
+<p class="eyebrow">Capítulo 8 · Metodología valuatoria</p>
+<h1 class="mt-2 text-3xl font-semibold">Métodos por componente del predio</h1>
+<p class="mt-3 text-slate-600">Identifica qué se valora, asigna su método y desarrolla cada componente por separado. Consultar un método no cambia la selección guardada.</p>
+<?php require __DIR__ . '/step-nav.php'; ?>
+<?php foreach (['methodology_message', 'methodology_error'] as $flash): $notice = \App\Core\Session::pullFlash($flash); if (!$notice) continue; ?>
+    <p role="status" class="mt-4 rounded-xl border p-4"><?= e($notice) ?></p>
+<?php endforeach; ?>
+<nav class="mt-6 flex flex-wrap gap-3" aria-label="Organización del capítulo 8">
+    <a class="btn-secondary" href="<?= e($flowUrl('components')) ?>">Componentes y métodos</a>
+    <a class="btn-secondary" href="<?= e($flowUrl('integration')) ?>">Integración del avalúo</a>
+</nav>
+<?php if ($stage === 'components' || $stage === 'integration'): ?>
+    <?php require __DIR__ . '/methodology-components.php'; ?>
+<?php else: ?>
+<section class="mt-6 rounded-xl border border-teal-200 bg-teal-50 p-4">
+    <p class="font-semibold">Componente en trabajo: <?= e($componentLabel) ?></p>
+    <?php if ($stage !== '2'): ?><p class="mt-2 text-sm">Método guardado: <?= e($methods[$selected['method'] ?? ''] ?? 'Pendiente de selección') ?></p><?php endif; ?>
+    <details class="mt-3"><summary class="min-h-11 cursor-pointer">Cambiar componente</summary>
+        <div class="flex flex-wrap gap-2">
+        <?php foreach ($components as $key => $component): ?>
+            <a class="btn-secondary" href="<?= e($flowUrl($stage, ($flow[$key]['method'] ?? '') ?: 'mercado', $key)) ?>"><?= e($component['label']) ?></a>
+        <?php endforeach; ?>
+        <a class="btn-secondary" href="<?= e($flowUrl('3', 'mercado', '')) ?>">Banco sin asignar</a>
         </div>
-    </div>
-
-<section x-show="methodologyTab === '81'" class="mt-6 rounded-2xl border border-indigo-100 bg-indigo-50 p-6 shadow-sm sm:p-8">
-    <div class="flex flex-wrap items-start justify-between gap-4">
-        <div>
-            <p class="eyebrow">8.1 Academia valuatoria</p>
-            <h2 class="mt-2 text-2xl font-semibold text-indigo-950">Marco académico para decidir</h2>
-            <p class="mt-2 max-w-3xl text-sm leading-6 text-indigo-900">
-                Actualizado con Resolución IGAC 941 de 2026. La Resolución 620 queda como antecedente, no como
-                regla principal. IVS, NIIF y NTS se citan como marco complementario según la finalidad del encargo.
-            </p>
-        </div>
-        <a class="rounded-full bg-white px-4 py-2 text-sm font-bold text-indigo-800" target="_blank" rel="noopener" href="https://www.igac.gov.co/node/53595">Fuente IGAC 941</a>
-    </div>
-    <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-method-guides.php'; ?>
-    <button type="button" class="btn-secondary mt-5 min-h-11" @click="methodologyTab = 'entregable'">
-        Ver texto en Entregable
-    </button>
+    </details>
 </section>
-
-<div x-show="methodologyTab === '82'" class="mt-6 space-y-8">
-<?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-decision.php'; ?>
+<nav class="mt-4 flex flex-wrap gap-2 rounded-xl bg-slate-100 p-2" aria-label="Métodos de valoración">
+    <?php foreach ($methods as $key => $label): ?>
+    <a class="min-h-11 rounded-xl px-4 py-3 font-semibold <?= $key === $method ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600' ?>"
+       <?= $key === $method ? 'aria-current="page"' : '' ?> href="<?= e($flowUrl('1', $key)) ?>"><?= e($label) ?></a>
+    <?php endforeach; ?>
+</nav>
+<nav class="mt-3 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Etapas de <?= e($methods[$method]) ?>">
+    <?php foreach (Workflow::STAGES as $key => $label): ?>
+    <a class="min-h-11 shrink-0 rounded-xl px-4 py-3 text-sm font-semibold <?= (string) $key === $stage ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600' ?>"
+       <?= (string) $key === $stage ? 'aria-current="page"' : '' ?> href="<?= e($flowUrl((string) $key)) ?>"><?= e($prefix . $key . ' ' . $label) ?></a>
+    <?php endforeach; ?>
+</nav>
+<div class="mt-6">
+<?php if ($stage === '1'): ?>
+    <?php require __DIR__ . '/valuation-methodology-method-guides.php'; ?>
+<?php elseif ($stage === '2'): ?>
+    <?php require __DIR__ . '/methodology-selection.php'; ?>
+<?php elseif ($method !== 'mercado'): ?>
+    <section class="rounded-xl border bg-white p-6"><h2 class="text-xl font-semibold"><?= e($prefix . $stage . ' ' . Workflow::STAGES[$stage]) ?></h2>
+    <p class="mt-3">El método puede asignarse al componente y su academia está disponible. Su desarrollo operativo se realizará en la siguiente etapa. No se han calculado ni adoptado valores.</p></section>
+<?php elseif ($stage === '3'): ?>
+    <?php require __DIR__ . '/methodology-unassigned.php'; ?>
+    <?php require __DIR__ . '/valuation-methodology-search.php'; ?>
+<?php else: ?>
+    <?php require __DIR__ . '/methodology-market-analysis.php'; ?>
+<?php endif; ?>
 </div>
-
-<div x-show="methodologyTab === '83'" class="mt-6 space-y-8">
-<?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search.php'; ?>
-<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8">
-    <div class="flex flex-wrap items-start justify-between gap-4">
-        <div>
-            <p class="eyebrow">Insumos disponibles</p>
-            <h2 class="mt-2 text-2xl font-semibold">Datos del sujeto que ya orientan la búsqueda</h2>
-        </div>
-        <a class="btn-secondary min-h-11" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto')) ?>">Revisar bien sujeto</a>
-    </div>
-    <?php if ($captured === []): ?>
-        <p class="mt-5 rounded-xl border border-dashed border-slate-300 p-4 text-sm text-slate-600">
-            Aún faltan datos del sujeto para convertirlos en criterios de búsqueda. Completa el numeral 3.
-        </p>
-    <?php else: ?>
-        <div class="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
-            <?php foreach ($captured as $item): ?>
-                <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
-                    <p class="text-xs font-semibold uppercase text-slate-500"><?= e($item['label']) ?></p>
-                    <p class="mt-1 text-sm font-semibold text-slate-900"><?= e($item['value']) ?></p>
-                </div>
-            <?php endforeach; ?>
-        </div>
-    <?php endif; ?>
-</section>
-</div>
-
-<div x-show="methodologyTab === 'entregable'" class="mt-6 space-y-8">
-<?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-deliverable-preview.php'; ?>
-</div>
-</div>
+<?php endif; ?>

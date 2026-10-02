@@ -3,7 +3,7 @@ $captureNext = [
     'Captura muestras verificables hasta acercarte a la meta de 15 observaciones por cada factor que realmente vas a analizar.',
     'Descarta duplicados, avisos sin datos mínimos o inmuebles con uso, derecho o escala no comparable.',
     'Registra enlace, fecha, fuente, precio, área, administración, IVA si aplica y observaciones verificables.',
-    'Con las muestras depuradas, pasa a variables y prepara el análisis estadístico robusto del numeral 8.4.',
+    'Con las muestras depuradas, pasa a variables y prepara el análisis estadístico robusto del numeral M4.',
 ];
 $minimumFields = [
     'Fuente y enlace del aviso',
@@ -14,7 +14,7 @@ $minimumFields = [
     'Barrio, sector o dirección aproximada',
     'Administración e IVA si aplica',
     'Teléfono, contacto o inmobiliaria',
-    'Factor que soporta para el análisis 8.4',
+    'Factor que soporta para el análisis M4',
     'Observación de comparabilidad',
 ];
 $baseQuery = trim((string) ($sourceSearch['query'] ?? ''));
@@ -25,7 +25,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
     <summary class="cursor-pointer text-sm font-bold text-slate-700">Ver protocolo y ficha mínima de soporte</summary>
     <div class="mt-4 grid gap-6 lg:grid-cols-2">
         <section class="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
-        <p class="text-xs font-bold uppercase text-emerald-800">Protocolo de captura <?= $tip('Origen: método seleccionado en 8.2, tipología del bien y diseño de muestra de 8.3. Sirve para decidir si una oferta entra: comparable, verificable y con datos mínimos.') ?></p>
+        <p class="text-xs font-bold uppercase text-emerald-800">Protocolo de captura <?= $tip('Origen: método seleccionado en M2, tipología del bien y diseño de muestra de M3. Sirve para decidir si una oferta entra: comparable, verificable y con datos mínimos.') ?></p>
         <?php if ($captureProtocol === []): ?>
             <p class="mt-3 text-sm leading-6 text-emerald-950">
                 Si este protocolo aún no aparece, no te detengas: usa la ficha mínima y empieza por la tabla madre.
@@ -40,7 +40,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
         <?php endif; ?>
         </section>
         <section class="rounded-xl border border-slate-200 bg-white p-4">
-        <p class="text-xs font-bold uppercase text-slate-500">Qué haces después de buscar <?= $tip('Origen: flujo operativo de 8.3. Después de abrir fuentes, vuelves a esta pestaña, registras una fila por oferta y descartas lo no comparable o sin soporte.') ?></p>
+        <p class="text-xs font-bold uppercase text-slate-500">Qué haces después de buscar <?= $tip('Origen: flujo operativo de M3. Después de abrir fuentes, vuelves a esta pestaña, registras una fila por oferta y descartas lo no comparable o sin soporte.') ?></p>
         <ol class="mt-3 space-y-2 text-sm leading-6 text-slate-700">
             <?php foreach ($captureNext as $index => $step): ?>
                 <li><strong><?= e((string) ($index + 1)) ?>.</strong> <?= e($step) ?></li>

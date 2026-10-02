@@ -16,7 +16,7 @@ $explorationSteps = [
 $tip = static fn (string $text): string => '<span class="help-dot" title="' . e($text) . '">?</span>';
 ?>
 <div class="rounded-xl border border-blue-100 bg-blue-50 p-4">
-    <p class="text-xs font-bold uppercase text-blue-800">Buscador 8.3 asistido por el bien sujeto <?= $tip('Origen: datos del expediente, bien sujeto y selección metodológica. Genera una consulta base; no descarga datos automáticamente. Luego diligencias resultados en 2. Capturar.') ?></p>
+    <p class="text-xs font-bold uppercase text-blue-800">Buscador M3 asistido por el bien sujeto <?= $tip('Origen: datos del expediente, bien sujeto y selección metodológica. Genera una consulta base; no descarga datos automáticamente. Luego diligencias resultados en 2. Capturar.') ?></p>
     <h3 class="mt-2 text-xl font-semibold text-blue-950">Consulta base para portales e inmobiliarias</h3>
     <p class="mt-2 text-sm leading-6 text-blue-950">
         La consulta se arma con operación, tipología, barrio, localidad y ciudad del inmueble. Primero revisa

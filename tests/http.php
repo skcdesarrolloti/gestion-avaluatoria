@@ -56,6 +56,7 @@ try {
     $page = request($path);
     expect($page['status'] === 200 && !str_contains($page['body'], '<script>alert(1)</script>'), 'XSS escapado al recuperar');
     require __DIR__ . '/ph-http.php';
+    require __DIR__ . '/methodology-http.php';
     expect(request('/logout')['status'] === 405, 'logout GET rechazado');
     expect(request('/logout', http_build_query(['_token' => $token]))['status'] === 303, 'logout POST');
     // Get a fresh anonymous token, then verify expired auth returns JSON, not a login page.

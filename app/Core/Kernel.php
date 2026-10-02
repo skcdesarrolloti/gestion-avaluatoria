@@ -139,7 +139,7 @@ final class Kernel
                 'urbanNormative' => new \App\Controllers\AppraisalUrbanNormController(new AppraisalRepository($db, $user),
                     new \App\Models\AppraisalUrbanNormRepository($db), new \App\Models\UrbanNormativeRepository($db), new AppraisalSubjectRepository($db), $user, new \App\Models\AppraisalReportNoteRepository($db)),
                 'comparablePhotos' => new \App\Controllers\ComparablePhotoController(new AppraisalRepository($db, $user), new \App\Models\ComparablePhotoRepository($db), $user),
-                'valuationMethodology' => new \App\Controllers\AppraisalValuationMethodologyController(new AppraisalRepository($db, $user), new AppraisalSubjectRepository($db), new \App\Models\AppraisalPhRepository($db), new \App\Models\AppraisalComparableRepository($db), new \App\Services\AppraisalComparableSearchGuide(), $user, new GeoMasterRepository($db)),
+                'valuationMethodology' => new \App\Controllers\AppraisalValuationMethodologyController(new AppraisalRepository($db, $user), new AppraisalSubjectRepository($db), new \App\Models\AppraisalPhRepository($db), new \App\Models\AppraisalComparableRepository($db), new \App\Services\AppraisalComparableSearchGuide(), $user, new GeoMasterRepository($db), new \App\Models\MethodologyWorkflowRepository($db)),
                 'narrativeChapters' => new \App\Controllers\AppraisalNarrativeController(new AppraisalRepository($db, $user), new \App\Models\AppraisalNarrativeChapterRepository($db), $user, new MidasDocumentRepository($db)),
                 'subject' => new AppraisalSubjectController(new AppraisalRepository($db, $user), $user,
                     new IgacTypologyRepository(), new AppraisalSubjectRepository($db), new GeoMasterRepository($db),

@@ -7,6 +7,7 @@ final class ComparableCaptureDetail
     public static function fields(): array
     {
         return [
+            'component_key' => ['Componente de la muestra', 'text', 'internal'],
             'area_basis' => ['Qué área publica la fuente', 'text', 'shared'],
             'private_built_m2' => ['Área privada construida (m²)', 'number', 'ph'],
             'private_free_m2' => ['Área privada libre (m²)', 'number', 'ph'],

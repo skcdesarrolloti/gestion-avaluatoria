@@ -11,7 +11,7 @@ $bulkQuery = trim((string) ($baseQuery ?? ''));
             <li><strong>3. Cargar:</strong> pulsa «Cargar en filas vacías». Se prellenan los datos que el lector reconozca; lo no reconocido se revisa en la ficha. Para varios avisos, separa cada uno con una línea vacía.</li>
             <li><strong>3. Matriz de datos:</strong> recorre Captura básica, Ubicación, Atributos y Revisión. Son grupos de la misma muestra. No completes con suposiciones datos que el aviso no informa.</li>
             <li><strong>5. Conservar soporte:</strong> guarda una captura o PDF del aviso donde se vean precio, ubicación, áreas y características, junto con URL y fecha. Una foto del inmueble sola no documenta el precio anunciado. Esta captura de datos todavía no adjunta imágenes ni PDF a la muestra.</li>
-            <li><strong>6. Preparar 8.4:</strong> verifica vigencia y duplicados, documenta la selección y los descartes. Los atributos describen la muestra; no se aplican coeficientes de homologación desde esta pantalla.</li>
+            <li><strong>6. Preparar M4:</strong> verifica vigencia y duplicados, documenta la selección y los descartes. Los atributos describen la muestra; no se aplican coeficientes de homologación desde esta pantalla.</li>
         </ol>
     </details>
     <div class="grid gap-4 lg:grid-cols-[1fr_320px]">

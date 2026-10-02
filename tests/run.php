@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require dirname(__DIR__) . '/bootstrap.php';
 require __DIR__ . '/support.php';
+require __DIR__ . '/methodology-workflow.php';
 require __DIR__ . '/comparable-capture-detail.php';
 require __DIR__ . '/judicial-expert.php';
 require __DIR__ . '/judicial-render.php';

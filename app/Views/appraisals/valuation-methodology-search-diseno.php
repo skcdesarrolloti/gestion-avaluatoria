@@ -54,9 +54,9 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
             <p class="mt-1 text-xs leading-5 text-slate-500">Se llena en: 2. Capturar.</p>
         </div>
         <div class="rounded-lg bg-white px-3 py-2">
-            <p class="text-xs font-bold uppercase text-slate-500">Con factor 8.4 <?= $tip('Origen: columna Factor 8.4 en 3. Matriz de datos. Se cuenta cuando marcas para qué variable servirá cada muestra en el análisis estadístico de 8.4.') ?></p>
+            <p class="text-xs font-bold uppercase text-slate-500">Con factor M4 <?= $tip('Origen: columna Factor M4 en 3. Matriz de datos. Se cuenta cuando marcas para qué variable servirá cada muestra en el análisis estadístico de M4.') ?></p>
             <p class="font-semibold text-slate-950"><?= e((string) array_sum($factorCounts)) ?></p>
-            <p class="mt-1 text-xs leading-5 text-slate-500">Se llena en: columna Factor 8.4.</p>
+            <p class="mt-1 text-xs leading-5 text-slate-500">Se llena en: columna Factor M4.</p>
         </div>
         <div class="rounded-lg bg-white px-3 py-2">
             <p class="text-xs font-bold uppercase text-slate-500">Con coordenadas <?= $tip('Origen: columnas Latitud y Longitud en 3. Matriz de datos. Se cuenta cuando una fila activa tiene ambas coordenadas y alimenta el mapa del paso 4.') ?></p>
@@ -73,13 +73,13 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
 
 <div class="mt-6 grid gap-6 xl:grid-cols-[1.05fr_0.95fr]">
     <section class="rounded-xl border border-blue-100 bg-blue-50 p-4">
-        <p class="text-xs font-bold uppercase text-blue-800">Diseño de muestra para 8.3 <?= $tip('Origen: se genera con la tipología del bien sujeto, la selección metodológica de 8.2 y la guía interna del método de mercado. Se trabaja en 1. Buscar y se diligencia en 2. Capturar.') ?></p>
+        <p class="text-xs font-bold uppercase text-blue-800">Diseño de muestra para M3 <?= $tip('Origen: se genera con la tipología del bien sujeto, la selección metodológica de M2 y la guía interna del método de mercado. Se trabaja en 1. Buscar y se diligencia en 2. Capturar.') ?></p>
         <h3 class="mt-2 text-xl font-semibold text-blue-950">Antes de capturar, decide qué factores vas a probar</h3>
         <p class="mt-3 text-sm leading-6 text-blue-950"><?= e((string) ($sampleDesign['minimum_message'] ?? '')) ?></p>
         <div class="mt-3 rounded-lg border border-blue-200 bg-blue-100 p-3 text-sm leading-6 text-blue-950">
             <p class="text-xs font-bold uppercase text-blue-800">Guía generada automáticamente, no editable</p>
             <p class="mt-1">
-                Sale de la tipología del bien sujeto, los factores disponibles para 8.4 y la guía interna de muestra.
+                Sale de la tipología del bien sujeto, los factores disponibles para M4 y la guía interna de muestra.
                 Para trabajarla, ve al sitio de diligenciamiento y registra las ofertas reales.
             </p>
             <button type="button" class="btn-secondary mt-3 min-h-9 text-xs" x-on:click="searchTab = 'captura'; $nextTick(() => document.getElementById('captura-83')?.scrollIntoView({ behavior: 'smooth', block: 'start' }))">
@@ -93,7 +93,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
         </div>
     </section>
     <section class="rounded-xl border border-emerald-100 bg-emerald-50 p-4">
-        <p class="text-xs font-bold uppercase text-emerald-800">Puente hacia 8.4 <?= $tip('Origen: guía estadística del método y muestras capturadas en 8.3. Se activa con datos depurados, variables marcadas y muestra suficiente para tendencia central, dispersión e intervalos en 8.4.') ?></p>
+        <p class="text-xs font-bold uppercase text-emerald-800">Puente hacia M4 <?= $tip('Origen: guía estadística del método y muestras capturadas en M3. Se activa con datos depurados, variables marcadas y muestra suficiente para tendencia central, dispersión e intervalos en M4.') ?></p>
         <h3 class="mt-2 text-xl font-semibold text-emerald-950">Análisis estadístico robusto</h3>
         <ul class="mt-3 space-y-2 text-sm leading-6 text-emerald-950">
             <?php foreach (($sampleDesign['statistics'] ?? []) as $item): ?>
@@ -114,7 +114,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
             <p class="text-xs font-bold uppercase text-indigo-800">Cumplimiento Resolución 941 <?= $tip('Origen: biblioteca normativa IGAC del aplicativo y lectura operativa de los artículos del método de mercado. No reemplaza la norma; sirve como lista de control antes del cálculo.') ?></p>
             <h3 class="mt-2 text-xl font-semibold text-indigo-950">Artículos que gobiernan el método de mercado</h3>
             <p class="mt-2 text-sm leading-6 text-indigo-950">
-                Usa estas tarjetas como lista de control antes de pasar a 8.4. No son transcripción literal:
+                Usa estas tarjetas como lista de control antes de pasar a M4. No son transcripción literal:
                 son una lectura operativa para que la investigación de mercado quede soportada.
             </p>
         </div>
@@ -134,7 +134,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
 
 <section class="mt-6 grid gap-4 lg:grid-cols-[0.9fr_1.1fr]">
     <div class="rounded-xl border border-orange-100 bg-orange-50 p-4">
-        <p class="text-xs font-bold uppercase text-orange-800">Construcción de la muestra <?= $tip('Origen: guía interna de muestra para 8.3. Es una meta de banco de investigación; se diligencia en 2. Capturar y luego se depura para usar solo comparables válidos.') ?></p>
+        <p class="text-xs font-bold uppercase text-orange-800">Construcción de la muestra <?= $tip('Origen: guía interna de muestra para M3. Es una meta de banco de investigación; se diligencia en 2. Capturar y luego se depura para usar solo comparables válidos.') ?></p>
         <h3 class="mt-2 text-xl font-semibold text-orange-950">Comparables como banco de investigación</h3>
         <div class="mt-3 grid gap-2">
             <?php foreach (($sampleDesign['sample_plan'] ?? []) as $label => $text): ?>
@@ -161,7 +161,7 @@ $tip = static fn (string $text): string => '<span class="help-dot" title="' . e(
 <section class="mt-6 rounded-xl border border-slate-200 bg-white p-4">
     <div class="flex flex-wrap items-start justify-between gap-3">
         <div>
-            <p class="text-xs font-bold uppercase text-slate-500">Factores de análisis <?= $tip('Origen: campo Factor 8.4 de cada fila en 3. Matriz de datos. El tablero suma observaciones por variable para saber si hay soporte suficiente.') ?></p>
+            <p class="text-xs font-bold uppercase text-slate-500">Factores de análisis <?= $tip('Origen: campo Factor M4 de cada fila en 3. Matriz de datos. El tablero suma observaciones por variable para saber si hay soporte suficiente.') ?></p>
             <h3 class="mt-2 text-xl font-semibold text-slate-950">Meta de muestra por factor</h3>
             <p class="mt-2 text-sm leading-6 text-slate-600">
                 Cada muestra capturada se marca con un factor. El tablero ayuda a ver si la investigación ya soporta
