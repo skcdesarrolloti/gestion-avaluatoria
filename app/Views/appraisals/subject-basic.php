@@ -183,5 +183,6 @@ $tabs = [
     <div class="mt-5 space-y-5" x-show="activeTab === 'tipologias'">
         <?php require BASE_PATH . '/app/Views/appraisals/preclassification.php'; ?>
         <?php require BASE_PATH . '/app/Views/appraisals/unit-tabs.php'; ?>
+        <?php require BASE_PATH . '/app/Views/appraisals/subject-market-evidence.php'; ?>
     </div>
 </section>

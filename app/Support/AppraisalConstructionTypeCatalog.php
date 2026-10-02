@@ -23,7 +23,7 @@ final class AppraisalConstructionTypeCatalog
             'muro' => 'Muro perimetral',
             'porton' => 'Portón / acceso vehicular',
             'placa' => 'Placa de concreto',
-            'parqueo' => 'Parqueo',
+            'parqueo' => 'Garaje / parqueadero / celda de parqueo',
             'piscina' => 'Piscina',
             'otro' => 'Otro',
         ];
@@ -82,7 +82,10 @@ final class AppraisalConstructionTypeCatalog
     public static function optionsForUnit(array $unit, array $catalog): array
     {
         $category = self::categoryForUnit($unit);
-        if (($unit['construction_type'] ?? '') !== 'oficina') return $catalog[$category] ?? [];
+        if (($unit['construction_type'] ?? '') !== 'oficina') {
+            return IgacTypologyFilter::options($catalog[$category] ?? [], (string) ($unit['construction_type'] ?? ''),
+                (string) ($unit['igac_typology_hint'] ?? ''));
+        }
         $categories = array_unique(['COMERCIALES', 'EDIFICIOS', $category]);
         $options = [];
         foreach ($categories as $code) {

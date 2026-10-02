@@ -12,7 +12,7 @@ $builtAreaFields = [
 ?>
 <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="activeConstruction === '<?= e($unitId) ?>'"
     x-data="{
-        activeConstructionDetail: 'basicos',
+        activeConstructionDetail: '<?= e(\App\Services\SubjectUnitNavigation::detail(['basicos', 'pisos', 'area', 'vetustez', 'funcionales', 'estado', 'conservacion'], 'basicos')) ?>',
         yearBuilt: '<?= e($cv($unit, 'construction_year')) ?>',
         age: '<?= e($cv($unit, 'construction_age_years')) ?>',
         apparentAge: '<?= e($cv($unit, 'construction_apparent_age_years')) ?>',

@@ -1,4 +1,5 @@
 import Alpine from 'alpinejs';
+import { igacUnitSelector } from './igac-unit-selector.js';
 import { appraisalForm } from './appraisal-form.js';
 import { installFetchNavigation } from './fetch-navigation.js';
 import { installModuleAutosave } from './module-autosave.js';
@@ -24,6 +25,7 @@ import { properatiPaste } from './properati-paste.js';
 import { mercadolibrePaste } from './mercadolibre-paste.js';
 
 window.Alpine = Alpine;
+Alpine.data('igacUnitSelector', igacUnitSelector);
 Alpine.data('ciencuadrasPaste', ciencuadrasPaste);
 Alpine.data('properatiPaste', properatiPaste);
 Alpine.data('mercadolibrePaste', mercadolibrePaste);

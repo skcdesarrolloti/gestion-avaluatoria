@@ -172,3 +172,17 @@ Si no hay pendientes, solo lee el registro; no ejecuta CREATE/ALTER en cada form
   ejecuta el migrador con credenciales de despliegue mediante variables de entorno.
 - No se conectó esta entrega a las bases reales ni se copiaron secretos de otros proyectos.
 
+## 6. Evidencia de Mercado por unidad (202610020002)
+
+La migración `202610020002_unit_market_evidence.php` añade a `appraisal_units`
+`market_evidence_json` (LONGTEXT nullable) y `market_evidence_version` (entero,
+predeterminado 0). Guarda identidad/vínculo, naturaleza, matrícula, usos y su
+contraste, coeficiente y alcance con sus soportes desde 3.1. No almacena estados
+del checklist: éstos se calculan al consultar capítulo 8.
+
+Cada autoguardado valida propietario, expediente y unidad activa; incrementa la
+versión mediante actualización condicionada. Una versión antigua devuelve 409
+para evitar sobrescribir otro guardado. Desactivar/reactivar conserva la evidencia.
+Área privada y fuente usan columnas existentes; no requieren otra migración.
+Publicar con el migrador habitual (`php bin/console.php migrate` o AUTO_MIGRATE).
+

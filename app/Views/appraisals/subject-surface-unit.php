@@ -19,7 +19,7 @@ $boundaries = [
 ?>
 <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="activeSurface === '<?= e($unitId) ?>'"
     x-data="{
-        activeSurfaceDetail: 'fisicas',
+        activeSurfaceDetail: '<?= e(\App\Services\SubjectUnitNavigation::detail(['fisicas', 'superficie', 'fondo', 'relacion', 'dinamicas'], 'fisicas')) ?>',
         areaAdopted: '<?= e($surfaceValue($unit, 'area_adopted_m2')) ?>',
         front: '<?= e($surfaceValue($unit, 'front_length_m')) ?>',
         equivalentDepth: '<?= e($surfaceValue($unit, 'equivalent_depth_m')) ?>',
@@ -88,6 +88,16 @@ $boundaries = [
     <div class="mt-5 space-y-5" x-show="activeSurfaceDetail === 'superficie'">
         <div class="rounded-xl bg-sky-50 p-4 text-sm leading-6 text-sky-950">
             Registra todas las fuentes disponibles. La superficie adoptada es la que se usará para el fondo equivalente.
+        </div>
+        <div class="mb-4 grid gap-4 md:grid-cols-2">
+            <label class="label">Área privada de esta unidad (m²)
+                <input class="input" name="unit_surfaces[<?= e($unitId) ?>][area_private_m2]" inputmode="decimal"
+                    value="<?= e($surfaceValue($unit, 'area_private_m2')) ?>" placeholder="Ej. 85,20">
+            </label>
+            <label class="label">Soporte del área privada
+                <input class="input" name="unit_surfaces[<?= e($unitId) ?>][surface_source]" maxlength="120"
+                    value="<?= e($surfaceValue($unit, 'surface_source')) ?>" placeholder="Ej. Escritura No. 123, fecha y página">
+            </label>
         </div>
         <div class="grid gap-5 md:grid-cols-3">
             <?php foreach ($areaFields as $key => [$label, $help]): ?>

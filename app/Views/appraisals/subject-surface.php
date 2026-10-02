@@ -39,7 +39,7 @@ $dynamicOptions = [
 ];
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
-    x-data="{ activeSurface: '<?= e($surfaceUnits[0]['id'] ?? '') ?>', busySurface: false }">
+    x-data="{ activeSurface: '<?= e(\App\Services\SubjectUnitNavigation::selected($surfaceUnits)) ?>', busySurface: false }">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">3.2 Datos de la superficie</p>
@@ -55,6 +55,7 @@ $dynamicOptions = [
         </span>
     </div>
     <?php $academyModule = '3.2'; require BASE_PATH . '/app/Views/appraisals/subject-normative-academy.php'; ?>
+    <?php if (($_GET['from'] ?? '') === 'metodologia'): require __DIR__ . '/methodology-return.php'; endif; ?>
     <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/superficies')) ?>"
         data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/superficies/autoguardar')) ?>"
         @submit="busySurface = true">

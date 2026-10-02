@@ -96,7 +96,7 @@ $typologyUsefulLife = static function (array $unit) use ($typologyLookup): strin
 };
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
-    x-data="{ activeConstruction: '<?= e($constructionUnits[0]['id'] ?? '') ?>' }">
+    x-data="{ activeConstruction: '<?= e(\App\Services\SubjectUnitNavigation::selected($constructionUnits)) ?>' }">
     <div class="flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">3.3 Datos de la construcción</p>
@@ -109,6 +109,7 @@ $typologyUsefulLife = static function (array $unit) use ($typologyLookup): strin
         <span class="rounded-full bg-slate-100 px-3 py-1 text-xs font-semibold text-slate-600"><?= count($constructionUnits) ?> unidad(es)</span>
     </div>
     <?php $academyModule = '3.3'; require BASE_PATH . '/app/Views/appraisals/subject-normative-academy.php'; ?>
+    <?php if (($_GET['from'] ?? '') === 'metodologia'): require __DIR__ . '/methodology-return.php'; endif; ?>
     <form class="mt-6" method="post" action="<?= e(url($subjectActionBase . '/construcciones')) ?>"
         data-module-autosave data-autosave-endpoint="<?= e(url($subjectActionBase . '/construcciones/autoguardar')) ?>"
         data-save-in-place>

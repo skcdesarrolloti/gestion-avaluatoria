@@ -107,6 +107,9 @@ final class AppraisalRepository
         return ['version' => $version + 1, 'saved_at' => str_replace(' ', 'T', $now) . 'Z'];
     }
 
+    public function saveMarketEvidence(string $id, int $owner, string $unitId, int $version, array $data): int
+    { return (new MarketSubjectEvidenceRepository($this->db))->save($id, $owner, $unitId, $version, $data); }
+
     public function saveUnits(string $id, int $owner, array $units): void
     {
         $now = gmdate('Y-m-d H:i:s');

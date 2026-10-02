@@ -386,3 +386,58 @@ revisión con el usuario, no una revisión exhaustiva de todos los casos especia
 Fuente contrastada: Diario Oficial reproducido por Camacol, artículo 36, página 9.
 Validación: 506 comprobaciones PHP, 113 JS, lint de archivos cambiados, build,
 58.1 KB gzip; apertura en la misma ficha y lectura visible en ancho móvil.
+
+
+## 2026-10-02 · Capítulo 1: búsqueda IGAC de garaje y depósito
+
+Alcance solicitado: oficina con garaje/celda de parqueo y depósito, referencias
+constructivas IGAC y continuidad de la unidad en el capítulo 8. No se cambiaron
+comparables, cálculos, métodos adoptados, normativa ni datos del expediente.
+Garaje/parqueadero/celda de parqueo comparten búsqueda; Parqueo conserva su clave
+persistida. Filtro por familia (PHP y Alpine) más consulta textual y opción de
+ampliar a toda la categoría. Se conserva la referencia seleccionada al buscar.
+Garaje ofrece 4 referencias relacionadas publicadas (2 sótanos y 2 pavimentos),
+sin crear una tipología ficticia de celda. Depósito ofrece Anexos.Depósitos_1,
+sin confundir cuarto útil con silos o depósitos de líquidos. Las estaciones que
+excluyen estacionamiento en especificaciones no se proponen para garaje.
+Las búsquedas de UI no activan autoguardado; elegir la referencia sigue el flujo
+existente. Oficina conserva Comerciales + Edificios.
+Ficha: unidad, vida útil en años y página real de la fuente, descripción,
+especificaciones, imagen y acceso a biblioteca IGAC. El JSON cargado no contiene
+costos de reposición ni fecha base: se informa expresamente, sin inventar importes
+ni actualización. Queda pendiente incorporar una fuente de costos identificada,
+con fecha, ubicación y alcance antes de ofrecer costos históricos o actualizados.
+Capítulo 8: matriz abre la unidad solicitada; la tarjeta muestra el tratamiento
+registrado en capítulo 1 y diferencia la confirmación pendiente del analista.
+Verificación: 564 comprobaciones PHP, 116 JS, lint completo, build y 58,8 KB gzip.
+Interfaz local: búsqueda garaje/celda, selección conservada ante consulta sin
+coincidencias, catálogo ampliado (136 anexos), ficha visible en escritorio y
+viewport CSS de 390 px sin desbordamiento. Sin cambios de esquema/persistencia;
+no se requiere migración. No desplegado ni probado contra registros del hosting.
+
+## 2026-10-02 · Mercado: confrontación automática con numeral 3
+
+Capítulo 8 sustituye la recomendación genérica de revisar variables por una tabla
+de ocho controles por unidad: identificación/naturaleza, área, uso, estado de obra,
+conservación, matrícula, coeficiente y componentes/tratamiento. Lee datos guardados;
+no persiste casillas manuales. Estados OK, Diligenciar, Diferencia y No aplica.
+Los enlaces abren 3.1/3.2/3.3 en la unidad y panel pertinentes. El retorno conserva
+la unidad y abre su academia. Actualizar vuelve a consultar; respuesta sin caché.
+
+3.1 incorpora soporte de Mercado por unidad con autoguardado y versión optimista.
+El vínculo con ficha general/PH debe declararse expresamente; los anexos no heredan
+automáticamente matrícula, coeficiente ni uso de la oficina. 3.2 expone área privada
+y fuente ya existentes en esquema. Se detectan diferencias de áreas, matrícula y
+coeficiente vinculados, matrícula repetida entre unidades independientes, usos y
+tratamientos. Resolver usos distintos exige compatibilidad explícita y explicación.
+La conservación requiere estado adoptado y evidencia; texto generado no basta.
+OK constata datos/soportes registrados y comparaciones, no certifica documentos ni
+comparabilidad del precio. No modifica comparables, valores o método de costo.
+
+Aplicar migración nueva 202610020002_unit_market_evidence.php al publicar. No se
+editaron migraciones previas ni se accedió a bases reales. Validación: 579 checks
+PHP, 116 JS, 129 de persistencia y 58 HTTP en MySQL desechable (puerto 3357);
+610 archivos PHP sin errores de sintaxis, build y 58,8 KB gzip. UI: área pendiente
+de oficina completada en 3.2, autoguardado, retorno y actualización a 8 OK;
+identificación de garaje sólo completa sus propios controles. Viewport CSS 390 px
+sin desbordamiento de página y consola sin errores. Pendiente publicar en hosting.

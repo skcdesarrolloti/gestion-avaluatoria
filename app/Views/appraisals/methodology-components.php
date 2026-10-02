@@ -20,6 +20,9 @@ $sourceTreatments = \App\Support\AppraisalUnitValuationTreatmentCatalog::options
         $item = $flow[$key] ?? [];
         $samples = \App\Services\MethodologyComparableScope::rows($allComparableRows, $key);
         $unit = $component['unit'];
+        $sourceTreatment = $sourceTreatments[$unit['valuation_treatment'] ?? ''] ?? '';
+        $treatmentLabel = $treatments[$item['treatment'] ?? ''] ?? ($sourceTreatment !== ''
+            ? $sourceTreatment . ' · registrado en capítulo 1; pendiente confirmar en capítulo 8' : 'Tratamiento pendiente');
         $type = \App\Services\ComparableSearchContext::record($record, $units, (string) $key)['tipo_inmueble'] ?? '';
     ?>
         <article class="rounded-xl border border-slate-200 p-5">
@@ -35,7 +38,7 @@ $sourceTreatments = \App\Support\AppraisalUnitValuationTreatmentCatalog::options
             </dl></details>
             <?php if (!empty($unit['notes'])): ?><details class="mt-3"><summary class="min-h-11 cursor-pointer font-semibold">Descripción registrada</summary><p class="whitespace-pre-wrap break-words text-sm"><?= e($unit['notes']) ?></p></details><?php endif; ?>
             <p class="mt-2">Método: <strong><?= e($methods[$item['method'] ?? ''] ?? 'Por seleccionar') ?></strong></p>
-            <p class="mt-2 text-sm"><?= e($treatments[$item['treatment'] ?? ''] ?? 'Tratamiento pendiente') ?> · <?= count($samples) ?> muestras asignadas</p>
+            <p class="mt-2 text-sm"><?= e($treatmentLabel) ?> · <?= count($samples) ?> muestras asignadas</p>
             <p class="mt-2 whitespace-pre-wrap text-sm"><?= e($item['coverage'] ?? 'Falta definir el alcance y los elementos incluidos.') ?></p>
             <?php if ($stage === 'integration'): ?>
                 <p class="mt-3 whitespace-pre-wrap text-sm"><?= e(($item['method'] ?? '') === 'mercado' ? ($item['conclusion'] ?? 'Conclusión pendiente.') : 'Desarrollo del método pendiente; no hay valor adoptado automáticamente.') ?></p>

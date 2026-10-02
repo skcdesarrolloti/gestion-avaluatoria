@@ -21,3 +21,26 @@ expect(\App\Support\AppraisalConstructionTypeCatalog::categoryForUnit($officeUni
 expect(\App\Support\AppraisalConstructionTypeCatalog::optionsForUnit([
     'unit_kind' => 'annex', 'construction_type' => 'piscina'], $officeCatalog) === $officeCatalog['ANEXOS'],
     'búsqueda de piscina conserva su catálogo');
+
+$garageUnit = ['unit_kind' => 'annex', 'construction_type' => 'parqueo'];
+$garageOptions = \App\Support\AppraisalConstructionTypeCatalog::optionsForUnit($garageUnit, $officeCatalog);
+expect(count($garageOptions) > 0 && count($garageOptions) < count($officeCatalog['ANEXOS']),
+    'garaje reduce anexos a referencias relacionadas con parqueo');
+expect(in_array('Anexos.Sótano_Sencillo', array_column($garageOptions, 'value'), true)
+    && !in_array('Anexos.Depósitos_1', array_column($garageOptions, 'value'), true),
+    'garaje ofrece sótano relacionado sin incluir depósito ajeno');
+$depositOptions = \App\Support\AppraisalConstructionTypeCatalog::optionsForUnit([
+    'unit_kind' => 'annex', 'construction_type' => 'deposito'], $officeCatalog);
+expect(in_array('Anexos.Depósitos_1', array_column($depositOptions, 'value'), true)
+    && count($depositOptions) < count($officeCatalog['ANEXOS']), 'depósito filtra denominaciones y especificaciones');
+$garageUnit['igac_typology_hint'] = 'Anexos.Depósitos_1';
+expect(in_array('Anexos.Depósitos_1', array_column(\App\Support\AppraisalConstructionTypeCatalog::optionsForUnit(
+    $garageUnit, $officeCatalog), 'value'), true), 'filtro conserva referencia previa sin sustituirla');
+$reference = $garageOptions[0];
+expect($reference['unit'] !== '' && $reference['source_page'] !== '' && array_key_exists('useful_life', $reference),
+    'selector lleva unidad vida útil y página real de fuente');
+
+expect(!in_array('Anexos.Estacion_Sistema_Transporte_Sencilla_Tipo_20', array_column($garageOptions, 'value'), true),
+    'garaje no propone estaciones que expresamente excluyen estacionamiento');
+expect(count($depositOptions) === 1 && $depositOptions[0]['value'] === 'Anexos.Depósitos_1',
+    'cuarto útil no se confunde con depósito de líquidos ni silo');

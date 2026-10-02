@@ -22,6 +22,7 @@ final class AppraisalValuationMethodologyController
 
     public function show(string $id): void
     {
+        header('Cache-Control: no-store');
         $record = $this->appraisals->find($id, $this->user['id']);
         $subject = $this->subjects->find($id, $this->user['id']);
         $units = $this->appraisals->units($id, $this->user['id']);

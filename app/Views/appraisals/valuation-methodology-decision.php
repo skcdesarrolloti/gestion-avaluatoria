@@ -7,7 +7,8 @@ $normativeInputs = is_array($methodologyDecision['normative_inputs'] ?? null) ? 
 $normativeInputItems = is_array($normativeInputs['items'] ?? null) ? $normativeInputs['items'] : [];
 $normativeArticles = is_array($normativeInputs['article_cards'] ?? null) ? $normativeInputs['article_cards'] : [];
 $normativeNotice = (string) ($methodologyDecision['normative_notice'] ?? '');
-$firstComponent = (string) ($componentItems[0]['id'] ?? '');
+$firstComponent = in_array((string) ($componentKey ?? ''), array_column($componentItems, 'id'), true)
+    ? (string) $componentKey : (string) ($componentItems[0]['id'] ?? '');
 ?>
 <section class="rounded-2xl border border-emerald-100 bg-emerald-50 p-6 shadow-sm sm:p-8">
     <div class="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">

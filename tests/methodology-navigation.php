@@ -56,4 +56,11 @@ declare(strict_types=1);
     $componentKey = 'office'; $stage = '1';
     ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php'; $html = ob_get_clean();
     expect(str_contains($html, 'aria-label="Etapas de Mercado"') && str_contains($html, 'Siguiente: definir método y alcance') && str_contains($html, 'component=office'), 'al elegir componente aparecen etapas y siguiente paso conserva identidad');
+    $componentKey = 'annex'; $stage = 'decision';
+    ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php'; $html = ob_get_clean();
+    expect(str_contains($html, "componentTab: 'annex'"), 'matriz abre componente solicitado en lugar de primera unidad');
+    $stage = '1';
+    ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php'; $html = ob_get_clean();
+    expect(str_contains($html, 'registrado en capítulo 1; pendiente confirmar en capítulo 8'),
+        'tratamiento de origen visible sin fingir adopción del analista');
 })();

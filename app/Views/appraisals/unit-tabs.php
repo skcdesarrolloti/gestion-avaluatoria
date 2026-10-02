@@ -13,7 +13,7 @@ foreach ($visibleUnits as $unit) $labelMap[$unit['id']] = $labelInput($unit);
 <section id="unidades-capitulo-3" class="scroll-mt-6 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8"
     x-init="$nextTick(() => { if (<?= ($_GET['section'] ?? '') === 'tipologias' ? 'true' : 'false' ?>) $el.scrollIntoView() })"
     x-data="{
-        active: '<?= e($visibleUnits[0]['id'] ?? '') ?>',
+        active: '<?= e(\App\Services\SubjectUnitNavigation::selected($visibleUnits)) ?>',
         labels: <?= e(json_encode($labelMap, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         typologies: <?= e(json_encode($typologyOptions, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
         imageBase: <?= e(json_encode(url('assets/tipologias-igac/images'), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,

@@ -44,6 +44,9 @@ final class IgacTypologyRepository
                 'description' => $item['description'],
                 'specifications' => $item['specifications'],
                 'image' => $item['image_filename'],
+                'unit' => $item['unit'],
+                'useful_life' => $item['useful_life'],
+                'source_page' => $item['source_page'],
             ];
         }
         return $options;
@@ -114,6 +117,7 @@ final class IgacTypologyRepository
             'specifications' => (string) ($item['especificaciones'] ?? ''),
             'useful_life' => (string) ($item['vidaUtil'] ?? ''),
             'unit' => (string) ($item['unidad'] ?? ''),
+            'source_page' => (string) ($item['paginaFuente'] ?? ''),
             'image_filename' => $image,
         ];
     }

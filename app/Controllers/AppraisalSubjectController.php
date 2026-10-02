@@ -75,6 +75,9 @@ final class AppraisalSubjectController
     { $this->saveSubjectData($id, fn () => $this->subjects->save($id, $this->user['id'], $_POST), 'Ficha básica del sujeto guardada correctamente.', '#ficha-basica'); }
     public function autosaveBasic(string $id): never
     { $this->appraisals->find($id, $this->user['id']); $this->subjects->save($id, $this->user['id'], $_POST); $this->savedJson(); }
+    public function saveMarketEvidence(string $id, string $unitId): never
+    { \App\Services\MarketSubjectEvidenceAction::save($this->appraisals, $this->user['id'], $id, $unitId); }
+
     public function saveUnits(string $id): never
     { $this->saveUnitsAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }
     public function autosaveUnits(string $id): never

@@ -47,6 +47,7 @@ foreach (['costo', 'renta'] as $index => $chosen) {
     expect(str_contains($inputsPage, $chosen === 'renta' ? 'Consulta preparada para esta unidad · Arriendo' : 'Insumos de Costo'),
         'HTTP prepara insumos adecuados a ' . $chosen);
 }
+require __DIR__ . '/market-evidence-http.php';
 $setup = array_replace($setup, ['version' => 4, 'igac_property_units_count' => 0, 'igac_annex_units_count' => 0]);
 expect(request($path . '/bien-sujeto/preclasificacion/autoguardar', http_build_query($setup), $jsonHeaders)['status'] === 200, 'HTTP actualiza composición desde origen');
 $recovery = request($flowPath . '?stage=3')['body'];
