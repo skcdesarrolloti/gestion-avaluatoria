@@ -31,14 +31,16 @@ final class AppraisalValuationMethodologyController
         $components = \App\Services\MethodologyWorkflow::components($record, $units);
         $componentKey = is_string($_GET['component'] ?? '') ? ($_GET['component'] ?? '') : '';
         \App\Services\MethodologyWorkflow::validateKey($componentKey, $components);
+        $stage = is_string($_GET['stage'] ?? null) ? $_GET['stage'] : 'components';
+        if ($componentKey === '' && in_array($stage, ['components', '1', '2'], true)) $componentKey = (string) (array_key_first($components) ?? '');
         $comparableRows = \App\Services\MethodologyComparableScope::rows($allComparableRows, $componentKey);
         $flow = \App\Services\MethodologyWorkflow::saved($record);
         $selected = $flow[$componentKey] ?? [];
-        $method = is_string($_GET['method'] ?? null) ? $_GET['method'] : 'mercado';
+        $method = ($selected['method'] ?? '') ?: (is_string($_GET['method'] ?? null) ? $_GET['method'] : 'mercado');
         if (!isset(\App\Services\MethodologyWorkflow::METHODS[$method])) $method = 'mercado';
         $stage = is_string($_GET['stage'] ?? null) ? $_GET['stage'] : 'components';
         if (!in_array($stage, ['components', 'integration', 'decision', 'report', '1', '2', '3', '4', '5'], true)) $stage = 'components';
-        $searchRecord = \App\Services\ComparableSearchContext::record($record, $units, $componentKey);
+        $searchRecord = \App\Services\ComparableSearchContext::forMethod($record, $units, $componentKey, $method);
         $methodologyChapter = (new AppraisalMethodologyChapterReport())->build($record, $subject, $units);
         $marketNeighborhoods = array_map(static function (array $row): array {
             try { $url = \App\Services\FincaraizAreaSearch::url((string) $row['name']); }
@@ -149,6 +151,10 @@ final class AppraisalValuationMethodologyController
     {
         $record = $this->appraisals->find($id, $this->user['id']);
         $subject = $this->subjects->find($id, $this->user['id']);
+        $key = is_string($_POST['component'] ?? null) ? $_POST['component'] : '';
+        $units = $this->appraisals->units($id, $this->user['id']);
+        $savedMethod = \App\Services\MethodologyWorkflow::saved($record)[$key]['method'] ?? 'mercado';
+        $record = \App\Services\ComparableSearchContext::forMethod($record, $units, $key, $savedMethod);
         (new \App\Services\RateLimiter(BASE_PATH . '/storage/rate-limits'))->consume('comparable-search:' . $this->user['id'], 30, 900);
         try {
             $city = mb_strtolower(trim((string) ($subject['city_name'] ?? '')) ?: trim((string) ($record['municipio'] ?? '')));

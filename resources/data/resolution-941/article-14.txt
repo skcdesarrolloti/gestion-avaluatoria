@@ -1,0 +1,111 @@
+Artículo 14. Informe técnico de avalúo. El informe técnico de avalúo deberá contener,  como mínimo, los siguientes elementos:
+
+1. Información general o información básica del inmueble:
+
+a) Datos del solicitante (Entidad, cargo, despacho judicial, o nombre de quien solicita el avalúo).
+
+b) Marco Jurídico del encargo valuatorio, o descripción del alcance de la valuación  (señalar la norma que enmarca los fines jurídicos y técnicos del avalúo).
+
+c) Tipo de inmueble. (Lote, Edificio, Casa Lote, Finca, etc.)
+
+d) Tipo de avalúo (comercial urbano, comercial rural). En caso de avalúo retroactivo se deberá indicar la fecha para la cual se estimó el valor.
+
+e) Departamento y Municipio, donde se ubica el inmueble.
+
+f) Localidad/Comuna/Barrio/Urbanización, si es urbano; o Corregimiento/Vereda,  si es rural.
+
+g) Dirección/Nombre/o Nomenclatura del inmueble o mejora.
+
+h) Fecha(s) de visita técnica.
+
+i) Fecha del informe técnico de avalúo.
+
+j) Firma del avaluador
+
+2.) Información catastral básica del inmueble: relacionar el Número Predial Nacional (NPN) (cuando esté disponible).
+
+3. Documentos soporte del proceso y de la valoración:  relacionar los documentos suministrados por el solicitante y los consultados por el avaluador con fechas  y fuentes.
+
+4. Información jurídica y títulos del inmueble:
+
+a) Número de la Matrícula Inmobiliaria del inmueble.
+
+b) Nombre del propietario.
+
+c) Datos del título de adquisición. Si el inmueble está sometido al régimen de propiedad horizontal citar adicionalmente, los datos del reglamento de Propiedad  Horizontal y coeficientes de copropiedad.
+
+d) Observaciones Jurídicas (relacionar las anotaciones - afectaciones, gravámenes,  limitaciones de dominio, embargos, hipotecas, cambios de áreas, servidumbres,  entre otros) que, al momento de la verificación del certificado de tradición, se  encuentren vigentes.
+
+5. Descripción general del sector donde se localiza el inmueble:
+
+a) Delimitación.
+
+b) Actividades y usos predominantes.
+
+c) Vías de acceso con sus características, condiciones y estados de conservación.
+
+d) Infraestructura de servicios públicos, edificaciones importantes y sitios de interés.
+
+e) Tipo de edificaciones o condiciones de desarrollo de la zona.
+
+f) Estratificación socioeconómica en zona urbana, cuando aplique.
+
+g) Descripción de servicios comunales en zona rural.
+
+6. Normatividad urbanística vigente que le aplica al inmueble (es obligatoria  su descripción completa, clara y precisa):
+
+a) Relacionar el número y fecha del decreto, acuerdo, o acto administrativo que  reglamentan el uso del suelo (POT, PBOT, EOT).
+
+b) Clase de suelo (según clasificación de la Ley 388 de 1997).
+
+c) Régimen de usos y parámetros de edificabilidad.
+
+d) Normas superiores (ambientales, afectaciones, restricciones, declaratorias, etc.).
+
+e) Citar la(s) certificación(es) de uso del suelo (si aplica).
+
+f) Licencias urbanísticas y/o de construcción (si cuenta o no cuenta).
+
+7. Descripción del inmueble:
+
+a) Coordenadas del centroide del inmueble, indicando el sistema de referencia, tomadas en sitio.
+
+b) Área total de terreno (Si se trata de una parte del inmueble, citar el área parcial  objeto de avalúo).
+
+c) Linderos y dimensiones del área total del inmueble (si se trata de una parte del  inmueble, citar los linderos y dimensiones del área parcial objeto de avalúo).
+
+d) Topografía y relieve.
+
+e) Vías de acceso al inmueble, con sus características y estado actual.
+
+f) Servicios públicos domiciliarios.
+
+g) Características físicas de la propiedad horizontal.
+
+h) Enunciar las condiciones que restringen el uso del inmueble si las hubiere. (Ej.  servidumbres, cesiones, afectaciones viales, invasiones, seguridad y demás limitantes  físicas y/o jurídicas).
+
+i) Destinación económica, cobertura, uso, explotación económica, posibilidades de  desarrollos, adecuación y/o mecanización.
+
+j) Para inmuebles rurales: describir las características y condiciones de los suelos.  Para ello se debe tener en cuenta la clasificación por su capacidad de uso (clases  agrológicas) e información asociada a las Áreas Homogéneas de Tierra (AHT).  Debe registrar la distancia en kilómetros desde la cabecera municipal hasta el  sitio de acceso al inmueble, señalando el tipo de vía y estado sobre la cual se  hace el recorrido; en los casos en que se requiera más de un medio de transporte,  deberán relacionarse las distancias en cada uno de ellos.
+
+8. Características y especificaciones de las construcciones, anexos constructivos y cultivos:
+
+a) Relacionar las áreas(s) construida(s) y anexos constructivos en metros cuadrados  del Sistema Internacional de Unidades (SIU), y fuentes y descripción de sus características constructivas.
+
+b) Describir la distribución interna de cada una de las construcciones, relacionando  en caso de existir las instalaciones especiales.
+
+c) Para inmuebles rurales relacionar, describir y citar las especificaciones de los  cultivos.
+
+9. Métodos valuatorios aplicados: relacionar los métodos valuatorios aplicados  para la obtención del valor del inmueble.  10  Aplicación de los métodos valuatorios: realizar una completa descripción de  la aplicación de los métodos y de la investigación económica desarrollada, señalando:
+
+a) Los datos de mercado, transacciones y demás datos de la investigación, citando  fuentes y datos de contacto.
+
+b) Valores de referencia, tasas, índices, porcentajes, tipologías constructivas, y demás cifras adoptadas, citando fuentes verificables.
+
+c) Cálculos y resultados en la depuración y análisis de los datos. Para ello se debe  incluir la memoria de cálculo del avalúo la cual debe contener todas las ecuaciones con sus variables, índices, tasas, datos, cálculos y resultados.
+
+d) Descripción de la aplicación de los métodos utilizados con sus debidas conclusiones y sustentos técnicos. 11  Consideraciones generales: relacionar los aspectos relevantes que atañen al  avalúo, incluyendo las ventajas y desventajas del inmueble, tanto en sus aspectos  físicos, jurídicos y normativos; fortalezas y debilidades comerciales; comporta - miento económico (positivas o negativas intrínsecas y extrínsecas). Mencionar  todas las características consideradas para definir el valor e incluir todas las notas  aclaratorias que no se incluyeron en puntos anteriores.
+
+12.  Resultado del avalúo: señalar la liquidación de valores unitarios, parciales y  valor total del avalúo, firmas y fecha.
+
+13.  Anexos: relacionar y adjuntar al informe técnico de Avalúo los anexos, tales  como: la solicitud de avalúo, fotografías, imágenes, documentales (incluir la fecha de expedición y/o generación), soportes, planos, etc. Para las ofertas, cuando sean tomadas de páginas web: el enlace URL, captura de pantalla dónde se  observe la información del inmueble como ubicación valor de pedido y datos  como áreas de terreno y construcción y otros aspectos que describen o detallan la  propiedad y fecha de consulta. Para las ofertas y/o transacciones recopiladas en  campo: fotografía, descripción de las características del inmueble, áreas (por unidad de medida), fecha de captura, etc. Incluir el certificado del Registro Abierto  de Avaluador (RAA) Vigente, donde conste que el avaluador cuenta con la(s)  categoría(s) requerida(s) para el avalúo.

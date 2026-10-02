@@ -2,6 +2,14 @@
 declare(strict_types=1);
 
 (static function (): void {
+    foreach (array_keys(\App\Services\Resolution941CommonReading::articles()) as $number) {
+        $common = \App\Services\Resolution941Reading::article($number);
+        expect($common !== null && count($common['paragraphs']) > 0 && str_contains($common['source'], 'Diario Oficial'), 'lectura transversal completa y fuente ' . $number);
+    }
+    foreach ([37 => ['VTI = (APE × VI) − CA', 'APE = (ATC − ACE)', 'no deberá agregarse nuevamente'], 38 => ['r = A × i', '2. Mediante']] as $number => $phrases) {
+        $full = implode(' ', \App\Services\Resolution941Reading::article($number)['paragraphs']);
+        foreach ($phrases as $phrase) expect(str_contains($full, $phrase), 'lectura conserva fórmula o condición del artículo ' . $number);
+    }
     $reading = \App\Services\Resolution941Reading::article(21);
     $text = implode("\n", $reading['paragraphs']);
     expect(str_contains($text, '7.50%') && str_contains($text, '10.0%')

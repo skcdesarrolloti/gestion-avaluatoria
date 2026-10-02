@@ -25,13 +25,13 @@ declare(strict_types=1);
         expect(str_contains($html, 'Camino del expediente:') && str_contains($html, 'Siguiente paso')
             && str_contains($html, 'Muestras sin asignar (1)') && !str_contains($html, 'aria-label="Etapas de Mercado"'), 'contexto general sin mezclar etapas de un componente no elegido en ' . $stage);
         if ($stage === 'components') {
-            expect(str_contains($html, '1. Revisión') && str_contains($html, '4. Antes de continuar')
-                && str_contains($html, 'Leer artículo 27 completo'), 'apartados visibles y lectura contextual de mejoras');
+            expect(str_contains($html, '1. Revisión') && str_contains($html, 'Antes de continuar')
+                && str_contains($html, 'Leer artículo 16 completo'), 'apartados visibles y lectura contextual de mejoras');
             expect(str_contains($html, 'orientación para Mercado') && str_contains($html, 'Leer artículo 36 completo')
                 && str_contains($html, 'Leer artículo 19 completo') && !str_contains($html, '→ Academia'),
                 'unidad sin método abre orientación de Mercado en sitio con PH y comparables diferenciados');
             expect(str_contains($html, 'Oficina &lt;principal&gt;') && str_contains($html, 'Depósito de oficina')
-                && str_contains($html, 'Integrado al inmueble principal'), 'entrada conserva inmuebles, anexos y tratamiento previo escapados');
+                && !str_contains($html, 'Revisar Depósito de oficina'), 'entrada conserva inmuebles, anexos y tratamiento previo escapados');
             expect(str_contains($html, 'component=annex') && str_contains($html, 'component=office'), 'etapas enlazan la identidad de cada inmueble y anexo');
             expect(str_contains($html, '#unidades-capitulo-1') && str_contains($html, 'config_tab=metodo') && str_contains($html, '#unidades-capitulo-3') && str_contains($html, 'section=tipologias'), 'enlaces de origen apuntan a subsección y ancla exactas');
         }
@@ -55,5 +55,5 @@ declare(strict_types=1);
     }
     $componentKey = 'office'; $stage = '1';
     ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php'; $html = ob_get_clean();
-    expect(str_contains($html, 'aria-label="Etapas de Mercado"') && str_contains($html, 'Siguiente: M2 Selección del método') && str_contains($html, 'component=office'), 'al elegir componente aparecen etapas y siguiente paso conserva identidad');
+    expect(str_contains($html, 'aria-label="Etapas de Mercado"') && str_contains($html, 'Siguiente: definir método y alcance') && str_contains($html, 'component=office'), 'al elegir componente aparecen etapas y siguiente paso conserva identidad');
 })();

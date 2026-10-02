@@ -28,13 +28,14 @@ $formulaFamilies = [
             :class="searchTab !== 'captura' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
             @click="searchTab = 'matriz'">2. Tabla de muestras</button>
     </nav>
+    <?php require __DIR__ . '/methodology-search-prompt.php'; ?>
     <div class="mb-6">
-        <p class="eyebrow">M3 Desarrollo operativo del método de mercado</p>
+        <p class="eyebrow"><?= e(($prefix ?? 'M') . '3 · Insumos del método ' . ($methods[$method ?? 'mercado'] ?? 'Mercado')) ?></p>
         <h2 class="mt-2 text-2xl font-semibold">Investigación, muestra y trazabilidad de mercado</h2>
         <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-            Este bloque queda enfocado en comparación o mercado. Primero prepara la consulta conforme a los
-            artículos 16 a 21 de la Resolución 941; luego ordena filtros, captura, georreferenciación,
-            variables, fórmulas y criterios antes de pasar al análisis estadístico de M4.
+            Captura las referencias de la operación indicada para esta unidad. En comparación o mercado, consulta los
+            artículos 16 a 21; para renta, los artículos 22 a 26 y 38. Conserva filtros, captura, georreferenciación,
+            variables, fórmulas y criterios antes de pasar al análisis del método.
         </p>
     </div>
 

@@ -1,0 +1,16 @@
+Artículo 38. Determinación del canon de arrendamiento de un inmueble . Para
+la determinación del canon o valor de arrendamiento de un inmueble se podrá utilizar
+cualquiera de los métodos valuatorios descritos en la presente resolución, considerando
+los siguientes aspectos:
+1. Deberá realizarse una investigación económica y de mercado, que le permita
+obtener la tasa de capitalización de la renta, para ser aplicada al valor comercial
+del inmueble, tal como se indica en la siguiente ecuación.
+r = A × i
+
+En donde:
+r = Arrendamiento
+A = Avalúo o valor comercial del inmueble.
+i = Tasa de capitalización de la renta.
+2. Mediante la aplicación del método de comparación o de mercado, obtener un
+estudio de mercado de arriendos (alquiler) de inmuebles similares o comparables
+al avaluado.

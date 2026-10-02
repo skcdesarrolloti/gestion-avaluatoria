@@ -58,6 +58,7 @@ export function fincaraizAreaSearch() {
                 const body = new FormData();
                 body.set('neighborhood_id', this.neighborhoodId); body.set('page', String(page));
                 body.set('portal', panel.dataset.portal || 'fincaraiz');
+                body.set('component', panel.dataset.component || '');
                 const token = form.querySelector('[name="_token"]')?.value || document.querySelector('meta[name="csrf-token"]')?.content || '';
                 body.set('_token', token);
                 const response = await fetch(panel.dataset.endpoint, { method: 'POST', body, signal: abort.signal, headers: { Accept: 'application/json', 'X-CSRF-Token': token } });

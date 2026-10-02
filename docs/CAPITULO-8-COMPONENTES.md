@@ -1,5 +1,8 @@
 # Capítulo 8: componentes y recorrido de Mercado
 
+Actualización vigente: [recorrido por unidad y conservación](RECORRIDO-POR-UNIDAD.md).
+Una unidad visible, método registrado, academia íntegra e insumos propios.
+
 ## Corrección de navegación del 02/10/2026
 
 La entrada vuelve a mostrar inmuebles y anexos, la ruta derivada de los datos

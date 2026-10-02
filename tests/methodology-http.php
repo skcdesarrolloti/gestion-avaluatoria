@@ -34,6 +34,19 @@ $assign = ['_token' => $token, 'version' => 1, 'component' => $unitId, 'samples'
 expect(request($flowPath . '/asignar-muestras', http_build_query($assign))['status'] === 303, 'HTTP asigna muestra sin duplicar');
 $response = request($flowPath . '?component=' . $unitId . '&stage=3');
 expect(str_contains($response['body'], $sampleId) && str_contains($response['body'], 'Muestra HTTP conservada'), 'HTTP recupera ID y datos en componente destino');
+$annexIds = array_values(array_filter(array_column($unitMatches, 1), static fn ($key) => $key !== $unitId));
+foreach (['costo', 'renta'] as $index => $chosen) {
+    $saved = request($flowPath . '/flujo', http_build_query(['_token' => $token, 'version' => $index + 1,
+        'component' => $annexIds[$index], 'method' => $chosen, 'treatment' => 'separado']), $jsonHeaders);
+    expect($saved['status'] === 200, 'HTTP guarda método distinto para anexo ' . $chosen);
+    $unitPage = request($flowPath . '?component=' . $annexIds[$index] . '&stage=components&method=mercado')['body'];
+    expect(str_contains($unitPage, 'orientación para ' . ucfirst($chosen))
+        && !str_contains($unitPage, 'Revisar Terreno industrial'), 'HTTP método guardado prevalece sobre enlace anterior y solo abre su unidad');
+    $inputsPage = request($flowPath . '?component=' . $annexIds[$index] . '&stage=3')['body'];
+    expect(!str_contains($inputsPage, $sampleId), 'HTTP insumos no mezclan muestras de otro componente');
+    expect(str_contains($inputsPage, $chosen === 'renta' ? 'Consulta preparada para esta unidad · Arriendo' : 'Insumos de Costo'),
+        'HTTP prepara insumos adecuados a ' . $chosen);
+}
 $setup = array_replace($setup, ['version' => 4, 'igac_property_units_count' => 0, 'igac_annex_units_count' => 0]);
 expect(request($path . '/bien-sujeto/preclasificacion/autoguardar', http_build_query($setup), $jsonHeaders)['status'] === 200, 'HTTP actualiza composición desde origen');
 $recovery = request($flowPath . '?stage=3')['body'];

@@ -22,6 +22,16 @@ final class ComparableSearchContext
         return $record;
     }
 
+    public static function forMethod(array $record, array $units, string $key, string $method): array
+    {
+        $context = self::record($record, $units, $key);
+        if ($method === 'renta') $context['tipo_negocio'] = 'arriendo';
+        if ($key !== '' && !empty(MethodologyWorkflow::components($record, $units)[$key]['unit']['method_structure'])) {
+            $context['estructura_metodo'] = MethodologyWorkflow::components($record, $units)[$key]['unit']['method_structure'];
+        }
+        return $context;
+    }
+
     public static function type(string $value): string
     {
         $value = mb_strtolower(trim($value));

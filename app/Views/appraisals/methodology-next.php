@@ -1,8 +1,9 @@
 <?php use App\Services\MethodologyWorkflow as Workflow; ?>
 <section id="elegir-componente" class="mt-6 scroll-mt-6 rounded-xl border border-teal-200 bg-teal-50 p-5" aria-label="Siguiente paso">
-<?php if ($stage === 'components'): ?>
-    <p class="font-semibold">A · Comprueba que aparecen los inmuebles y anexos estudiados.</p>
-    <a class="btn-primary mt-3" href="<?= e($flowUrl('decision')) ?>">Siguiente: B · Matriz y método →</a>
+<?php if (in_array($stage, ['components', '1'], true) && $componentKey !== ''): ?>
+    <p class="font-semibold"><?= e($componentLabel) ?> · Después de revisar la academia</p>
+    <?php $nextUnitStep = empty($selected['method']) ? '2' : '3'; ?>
+    <a class="btn-primary mt-3" href="<?= e($flowUrl($nextUnitStep)) ?>">Siguiente: <?= empty($selected['method']) ? 'definir método y alcance' : 'insumos del método registrado' ?> →</a>
 <?php elseif ($stage === 'decision' || ($componentKey === '' && !in_array($stage, ['integration','report'], true))): ?>
     <p class="font-semibold"><?= $stage === '4' ? 'D · Elige el inmueble cuyas muestras vas a analizar.' : 'C · Elige el inmueble para continuar con sus insumos y comparables.' ?></p>
     <div class="mt-3 flex flex-wrap gap-3"><?php foreach ($components as $key => $component): ?>

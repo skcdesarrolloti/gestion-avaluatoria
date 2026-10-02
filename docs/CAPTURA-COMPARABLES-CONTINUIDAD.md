@@ -1,5 +1,8 @@
 # Flujo que debe conservarse en C
 
+Actualización vigente: [recorrido por unidad y conservación](RECORRIDO-POR-UNIDAD.md).
+Una unidad visible, método registrado, academia íntegra e insumos propios.
+
 C tiene dos entradas: Buscar inmuebles y Tabla de muestras. Mapas, coordenadas
 y fotos son una vista de las mismas muestras dentro de la segunda entrada.
 Los criterios y academia permanecen plegables; no desplazan el lector de portales.

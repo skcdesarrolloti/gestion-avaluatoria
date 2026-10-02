@@ -1,0 +1,41 @@
+Artículo 37. Avalúos de inmuebles no sometidos al régimen de propiedad horizontal
+que presentan características físicas de una copropiedad. Cuando el inmueble no esté
+sometido al régimen de propiedad horizontal, pero por su uso y conformación se asimile a
+estos (oficinas, locales, apartamentos, entre otros), y la investigación de mercado se haya
+realizado para inmuebles que sí están sometidos al régimen de propiedad horizontal, el
+avaluador deberá realizar la correcta liquidación, empleando la siguiente ecuación:
+VTI = (APE × VI) − CA
+
+En donde:
+VTI = Valor Total del Inmueble.
+APE = Área Privada Estimada.
+VI = Valor Integral por metro cuadrado.
+CA = Costo Total de Adecuación.
+Para el cálculo del Área privada estimada, se emplea la siguiente ecuación:
+
+APE = (ATC − ACE)
+
+En donde:
+APE = Área Privada Estimada.
+ATC = Área Total Construida.
+ACE = Área Común Estimada.
+Cuando el inmueble requiera adecuaciones, obras o modificaciones constructivas
+para asimilarse funcional o normativamente a una propiedad horizontal, así como
+inversiones adicionales necesarias para su formalización jurídica y técnica, tales como
+licencias, permisos, impuestos, trámites en curaduría urbana y la elaboración y registro
+del reglamento de propiedad horizontal, dichos costos de adecuación deberán descontarse
+del Valor Total del Inmueble (VTI) obtenido, de conformidad con el principio de valor
+comercial.
+Los valores unitarios investigados (valor integral) ya incluyen el valor del terreno,
+por lo tanto, el resultado obtenido para el VTI corresponde al valor comercial de todo el
+inmueble, por lo cual no deberá agregarse nuevamente el valor del terreno.
+La investigación de mercado comparable utilizada para el cálculo deberá relacionar
+las áreas privadas de las unidades tomadas como referencia, y el valor integral deberá
+calcularse en función de esta.
+Cuando los garajes o parqueaderos de los datos de mercado presenten servidumbres o
+restricciones de uso, sus valores unitarios no podrán asimilarse a aquellos que no presenten
+tales limitaciones.
+Para efectos de la presentación del avalúo, el Valor Total del Inmueble (VTI) se deberá
+discriminar entre el terreno y construcción. Para ello, se deberá apoyar en la aplicación de
+los métodos de mercado y de costo, de manera que le permita obtener los valores unitarios
+correspondientes a cada componente.
