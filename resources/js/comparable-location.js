@@ -2,7 +2,7 @@ export const mapFields = ['latitude', 'longitude', 'location_precision', 'map_no
 const phFields = ['private_built_m2', 'private_free_m2', 'ph_units_detail'];
 const nphFields = ['land_m2', 'built_m2', 'annexes_detail', 'crops_detail'];
 export function compositionVisible(key, row) {
-    if (phFields.includes(key)) return row.ph_regime === 'si' && row.ph_special !== 'condominio';
+    if (phFields.includes(key) || (key.startsWith('ph_') && key !== 'ph_special' && key !== 'ph_regime')) return row.ph_regime === 'si' && row.ph_special !== 'condominio';
     if (nphFields.includes(key)) return row.ph_regime === 'no' || (row.ph_regime === 'si' && row.ph_special === 'condominio');
     return key !== 'ph_special' || row.ph_regime === 'si';
 }

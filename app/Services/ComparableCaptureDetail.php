@@ -20,7 +20,7 @@ final class ComparableCaptureDetail
             'location_source' => ['Fuente de las coordenadas y fecha', 'text', 'map'],
             'evidence_detail' => ['Evidencia del aviso: referencia y contenido conservado', 'text', 'map'],
             'verification_detail' => ['Corroboración: responsable, fecha y resultado', 'text', 'map'],
-        ];
+        ] + ComparablePhCapture::fields();
     }
     public static function normalize(array $row): array
     {
@@ -30,6 +30,10 @@ final class ComparableCaptureDetail
             if (!is_scalar($value) && $value !== null) throw new HttpException(422, "Formato inválido: $label.");
             $value = trim((string) $value);
             if (mb_strlen($value) > 1600) throw new HttpException(422, "$label: máximo 1600 caracteres.");
+            if ($type === 'choice' && !array_key_exists($value, ComparablePhCapture::options($key)))
+                throw new HttpException(422, "$label: selecciona una opción válida.");
+            if ($type === 'integer' && $value !== '' && (!preg_match('/^\d{1,3}$/D', $value)))
+                throw new HttpException(422, "$label: usa una cantidad entera entre 0 y 999.");
             if ($type === 'number' && $value !== '') {
                 $value = str_replace(',', '.', $value);
                 if (!preg_match('/^\d+(\.\d{1,4})?$/D', $value) || (float) $value > 100000000000)

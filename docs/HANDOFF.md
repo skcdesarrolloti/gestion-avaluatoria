@@ -1,5 +1,13 @@
 # Entrega al responsable de la implementación
 
+Consulta y tabla PH: instrucciones específicas de búsqueda/captura y grupo propio
+con presencia de parqueaderos/depósitos, cantidad, inclusión en precio, naturaleza
+jurídica y soporte. Misma matriz, lectores y fotos conservados; datos nuevos en
+capture_details existente, sin migración. Ver CAPTURA-COMPARABLES-CONTINUIDAD.md.
+No interpreta anexos iguales como excepción al art. 19.2.b; no calcula depuración
+monetaria ni modifica estadísticos existentes de M4. Pruebas: PHP 598, JS 116,
+BD desechable 3358: 130, lint, build, 59,0 KB gzip; escritorio y CSS 390 px.
+
 Composición simplificada (vigente): cada ficha permite definir unidad, método de
 valoración y referencia IGAC. El selector Mercado/Costo/Renta/Residual se guarda
 ahora en el numeral 1, sobre el mismo methodology_workflow del capítulo 8.

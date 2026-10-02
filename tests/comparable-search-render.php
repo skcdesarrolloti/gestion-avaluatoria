@@ -42,4 +42,14 @@ declare(strict_types=1);
     expect(str_contains($html, 'Agregar sugeridos sin coincidencias') && str_contains($html, 'Ctrl+V')
         && str_contains($html, 'Pega la página de resultados') && substr_count($html, 'id="tabla-madre-83"') === 1,
         'pegado, selección sin repetidos y única matriz persisten al reorganizar C');
+    $guide = (new \App\Services\AppraisalComparableSearchGuide())->build(
+        ['tipo_inmueble'=>'oficina', 'regimen_ph'=>'si', 'tipo_negocio'=>'venta'], [], [], []);
+    ob_start(); require BASE_PATH . '/app/Views/appraisals/methodology-search-prompt.php'; $prompt = ob_get_clean();
+    expect(str_contains($prompt, 'celda de parqueo') && str_contains($prompt, 'misma matrícula')
+        && str_contains($prompt, 'no exime de la depuración'), 'consulta PH verifica composición sin eximir descuento por anexos similares');
+    $comparableRows = [['source_name'=>'Prueba PH', 'ph_regime'=>'si', 'ph_parking_nature'=>'comun_exclusivo']];
+    ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search.php'; $html = ob_get_clean();
+    expect(str_contains($html, '[ph_deposit_count]') && str_contains($html, 'PH · área privada, parqueaderos y depósitos')
+        && str_contains($html, 'data-ph-subject="si"') && substr_count($html, 'id="tabla-madre-83"') === 1,
+        'PH tiene campos estructurados y entrada propia en la misma matriz');
 })();

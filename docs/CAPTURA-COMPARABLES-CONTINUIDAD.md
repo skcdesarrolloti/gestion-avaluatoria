@@ -21,6 +21,31 @@ Los criterios y academia permanecen plegables; no desplazan el lector de portale
 No afirmar que cada portal admite lectura de resultados para todas las tipologías.
 El lector depende de la unidad seleccionada, no del tipo global del expediente.
 
+## Captura PH por composición (2026-10-02)
+
+La consulta preparada añade instrucciones PH cuando el contexto del sujeto confirma
+ese régimen: área privada, sinónimos de parqueadero y depósito, cantidades,
+inclusión en precio, naturaleza jurídica y soporte. Es una guía copiable; no un
+filtro nuevo impuesto a los portales ni extracción automática de derechos jurídicos.
+La igualdad de anexos no elimina la depuración prevista en el art. 19.2.b.
+
+La misma matriz ofrece «PH · área privada, parqueaderos y depósitos» como grupo
+propio y lo selecciona inicialmente en expedientes PH. Mantiene captura básica,
+NPH/condominio, tabla/fichas, mapas, fotos y lectores. ComparablePhCapture define
+campos estructurados persistidos en capture_details; no hay migración nueva.
+Una pantalla anterior conserva los campos omitidos por ID. Vacío significa dato
+no publicado o pendiente; no se transforma en ausencia ni se infiere matrícula.
+Las áreas y naturaleza detalladas anteriores siguen disponibles en ph_units_detail.
+
+M4 conserva estadísticos descriptivos existentes: esta entrega no calcula precio
+negociado, descuentos, valor depurado ni valores adoptados del sujeto. Eso requiere
+desarrollar la memoria y sus soportes. El tratamiento de comunes de uso exclusivo
+del sujeto (art. 36.2) sigue distinto del descuento del comparable (art. 19.2.b).
+
+Validación: 598 checks PHP, 116 JavaScript y 130 checks BD local desechable en
+puerto 3358, lint PHP, build y 59,0 KB gzip. Navegador con ejemplo ficticio en
+escritorio y CSS 390 px sin desbordamiento ni errores de consola.
+
 ## Archivos y comprobaciones antes de reorganizar
 
 Vistas: valuation-methodology-search.php, valuation-methodology-source-links.php,

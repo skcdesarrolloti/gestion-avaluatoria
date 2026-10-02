@@ -10,6 +10,10 @@ const groups = {
         'project_name', 'ph_regime', 'price_amount', 'price_unit', 'area_m2', 'consulted_at', 'contact_name', 'contact_phone'],
     location: ['source_name', 'source_url', 'consulted_at', 'neighborhood', 'address_hint', 'project_name', ...mapFields],
     composition: ['ph_regime', 'ph_special', 'area_m2', 'area_basis', 'private_built_m2', 'private_free_m2', 'ph_units_detail', 'land_m2', 'built_m2', 'annexes_detail', 'areas_source'],
+    ph: ['source_name', 'source_url', 'consulted_at', 'price_amount', 'price_unit', 'ph_regime', 'ph_special',
+        'area_m2', 'area_basis', 'private_built_m2', 'private_free_m2', 'areas_source', 'parking_spaces',
+        'ph_parking_presence', 'ph_parking_in_price', 'ph_parking_nature', 'ph_deposit_presence', 'ph_deposit_count',
+        'ph_deposit_in_price', 'ph_deposit_nature', 'ph_other_components', 'ph_units_detail', 'ph_components_source'],
     attributes: ['ph_regime', 'admin_fee', 'vat_applies', 'bedrooms', 'bathrooms', 'parking_spaces', 'floor_level', 'stratum',
         'age_years', 'building_condition', 'conservation_state', 'view_quality', 'finish_quality', 'elevator',
         'amenities', 'security_features', 'power_plant', 'parking_relation', 'balcony_terrace', 'noise_humidity_sun'],
@@ -26,6 +30,7 @@ export function comparableWorkbench() {
             return {
                 capture: 'Fuente, enlace, precio, área y contacto del aviso.',
                 composition: 'Áreas originales y sus soportes según PH/no PH. La desagregación de valores y los cálculos corresponden a 8.4.',
+                ph: 'PH: área privada, parqueaderos y depósitos, inclusión en el precio y naturaleza jurídica. Vacío significa por verificar; no equivale a No. Para condominio usa Áreas y componentes.',
                 location: 'Sector, dirección y coordenadas; indica si la ubicación es aproximada.',
                 attributes: 'Alcobas, baños, parqueaderos, edad, estado y dotaciones publicadas.',
                 review: 'Estado, variable de análisis y razones para incluir o descartar. No aplica factores de ajuste.',
@@ -34,6 +39,7 @@ export function comparableWorkbench() {
         },
         init() {
             form = this.$el;
+            if (form.dataset.phSubject === 'si') this.group = 'ph';
             this.initPhotos(form);
             const headers = [...form.querySelectorAll('thead th')].map(th => th.childNodes[0].textContent.trim());
             createRow = rowFactory(form);

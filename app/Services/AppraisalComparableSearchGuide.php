@@ -20,6 +20,7 @@ final class AppraisalComparableSearchGuide
         $factorGroups = AppraisalFunctionalVariableCatalog::factorGroupsFor($type);
         $this->sampleDesign ??= new AppraisalComparableSampleDesignGuide();
         return [
+            'is_ph' => $this->isPh($record, $phProfile),
             'type_label' => $typeLabel,
             'business_label' => $businessLabel,
             'right_label' => $this->label('tipo_derecho', (string) ($record['tipo_derecho'] ?? '')),

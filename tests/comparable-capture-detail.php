@@ -11,4 +11,11 @@ declare(strict_types=1);
     expectStatus(422, fn () => \App\Services\ComparableCaptureDetail::normalize(['land_m2' => '-20']), 'captura rechaza área negativa');
     expectStatus(422, fn () => \App\Services\ComparableCaptureDetail::normalize(['built_m2' => '1.200,50']), 'captura exige área sin separadores de miles');
     expect(\App\Services\ComparableCaptureDetail::normalize([])['private_built_m2'] === '', 'área desconocida no se convierte en cero');
+    $ph = \App\Services\ComparableCaptureDetail::normalize(['ph_parking_presence'=>'si', 'ph_parking_in_price'=>'',
+        'ph_parking_nature'=>'comun_exclusivo', 'ph_deposit_presence'=>'no', 'ph_deposit_count'=>'0']);
+    expect($ph['ph_parking_in_price'] === '' && $ph['ph_deposit_count'] === '0', 'PH distingue precio desconocido de ausencia confirmada y conserva cero informado');
+    expectStatus(422, fn () => \App\Services\ComparableCaptureDetail::normalize(['ph_deposit_count'=>'1.5']), 'PH rechaza cantidad fraccionaria');
+    expectStatus(422, fn () => \App\Services\ComparableCaptureDetail::normalize(['ph_parking_nature'=>'privado']), 'PH no acepta naturaleza fuera del catálogo');
+    $http = \App\Services\AppraisalComparableInput::rows(['comparable_rows_json'=>json_encode([['source_name'=>'PH'] + $ph])])[0];
+    expect($http['ph_parking_nature'] === 'comun_exclusivo' && $http['ph_deposit_presence'] === 'no', 'transporte HTTP conserva componentes PH estructurados');
 })();

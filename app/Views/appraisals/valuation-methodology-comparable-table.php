@@ -4,6 +4,7 @@
     x-data="comparableWorkbench" :data-comparable-mode="searchTab === 'mapa' ? 'cards' : mode" @input="refresh()" @change="refresh()"
     @comparable-imported="showImported($event.detail)"
     data-module-autosave data-save-in-place data-comparable-json
+    data-ph-subject="<?= !empty($guide['is_ph']) ? 'si' : 'no' ?>"
     data-subject-latitude="<?= e($subject['latitude'] ?? '') ?>" data-subject-longitude="<?= e($subject['longitude'] ?? '') ?>"
     data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/autoguardar')) ?>">
     <?= csrf_field() ?>
@@ -91,7 +92,7 @@
                         <td class="px-3 py-3"><textarea class="input mt-0 min-h-24 min-w-64" name="<?= e($base) ?>[comparability_notes]" placeholder="Por qué sirve o qué ajuste requiere"><?= e((string) $row['comparability_notes']) ?></textarea></td>
                         <td class="px-3 py-3"><textarea class="input mt-0 min-h-24 min-w-56" name="<?= e($base) ?>[rejection_reason]" placeholder="Motivo si se descarta"><?= e((string) $row['rejection_reason']) ?></textarea></td>
                         <?php foreach (\App\Services\ComparableCaptureDetail::fields() as $field => [$label, $type, $scope]): ?>
-                            <td class="px-3 py-3"><?php if ($type === 'number'): ?><input type="number" min="0" step="0.0001" class="input min-w-36" name="<?= e($base . '[' . $field . ']') ?>" value="<?= e($row[$field] ?? '') ?>" placeholder="m²; sin separadores de miles"><?php else: ?><textarea class="input min-w-52" name="<?= e($base . '[' . $field . ']') ?>" maxlength="1600" rows="3" placeholder="<?= e($label) ?>; indica lo pendiente de verificar."><?= e($row[$field] ?? '') ?></textarea><?php endif; ?></td>
+                            <?php require __DIR__ . '/valuation-methodology-capture-field.php'; ?>
                         <?php endforeach; ?>
                         <td class="px-3 py-3"><?php $select($base . '[ph_special]', $row['ph_special'] ?? '', ['' => 'Sin tratamiento especial confirmado', 'condominio' => 'Condominio / PH asimilable a NPH (art. 19.2.c)']); ?></td>
                     </tr>

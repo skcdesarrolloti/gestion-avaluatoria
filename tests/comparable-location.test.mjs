@@ -8,6 +8,9 @@ test('PH y NPH exponen sus áreas sin deducir régimen ni confundir condominio',
     assert.equal(compositionVisible('land_m2', {ph_regime:'por_verificar'}), false);
     assert.equal(compositionVisible('land_m2', {ph_regime:'si', ph_special:'condominio'}), true);
     assert.equal(compositionVisible('private_built_m2', {ph_regime:'si', ph_special:'condominio'}), false);
+    assert.equal(compositionVisible('ph_parking_nature', {ph_regime:'no'}), false);
+    assert.equal(compositionVisible('ph_deposit_count', {ph_regime:'si'}), true);
+    assert.equal(compositionVisible('ph_components_source', {ph_regime:'por_verificar'}), false);
 });
 test('mapa conserva número de fila, admite cero y excluye vacíos, inválidos o descartados', () => {
     const p = locationPoints([{latitude:'',longitude:''},{latitude:'0',longitude:'0'},

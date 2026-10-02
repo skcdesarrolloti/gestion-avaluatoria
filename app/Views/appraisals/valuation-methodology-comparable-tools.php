@@ -16,7 +16,7 @@
             <span id="comparable-view-help" class="mt-1 block text-xs font-normal text-slate-600">Fichas para diligenciar; tabla para comparar varias muestras.</span>
         </label>
         <label class="label" x-show="searchTab !== 'mapa'">Campos a revisar
-            <select :disabled="mapBusy || photoBusy || photoRetry" class="input" :value="group" @change="group = $event.target.value; if (group === 'composition') mode = 'cards'; render()" aria-describedby="comparable-group-help"><option value="capture">1. Captura básica</option><option value="composition">2. Áreas y componentes PH / no PH</option><option value="attributes">3. Atributos del inmueble</option><option value="review">4. Revisión y selección</option><option value="all">Todos los campos</option></select>
+            <select :disabled="mapBusy || photoBusy || photoRetry" class="input" :value="group" @change="group = $event.target.value; if (['composition', 'ph'].includes(group)) mode = 'cards'; render()" aria-describedby="comparable-group-help"><option value="capture">1. Captura básica</option><option value="ph">2. PH · área privada, parqueaderos y depósitos</option><option value="composition">3. Áreas y componentes · NPH / condominio</option><option value="attributes">4. Atributos del inmueble</option><option value="review">5. Revisión y selección</option><option value="all">Todos los campos</option></select>
             <span id="comparable-group-help" class="mt-1 block text-xs font-normal text-slate-600" x-text="groupHelp"></span>
         </label>
         <label class="label">Mostrar
