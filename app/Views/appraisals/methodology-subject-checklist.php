@@ -13,7 +13,8 @@ $checkRefresh = url('avaluos/' . $record['id'] . '/metodologia-valuatoria?' . ht
         <h5 class="font-semibold">Verificación de datos guardados · <?= e($component['label']) ?></h5>
         <a class="btn-secondary min-h-11" href="<?= e($checkRefresh) ?>">Actualizar verificación</a>
     </div>
-    <p class="mt-2 text-sm" role="status"><?= $subjectChecks['ok'] ?> controles OK · <?= $subjectChecks['pending'] ?> pendientes o diferencias. Consulta realizada: <?= e(date('Y-m-d H:i:s')) ?>.</p>
+    <?php $trafficChecks = $subjectChecks; require __DIR__ . '/methodology-check-traffic.php'; ?>
+    <p class="mt-2 text-xs text-slate-600">Consulta realizada: <?= e(date('Y-m-d H:i:s')) ?>. Se cuentan controles completos, no campos individuales diligenciados.</p>
     <p class="mt-2 text-xs text-slate-600">OK indica dato y soporte registrados y coincidencias automáticas donde son comparables. No certifica validez documental ni comparabilidad del precio. Completa el campo en el numeral 3, espera «Guardado», vuelve y actualiza.</p>
     <div class="mt-3 overflow-x-auto">
         <table class="w-full min-w-[42rem] text-left text-sm">

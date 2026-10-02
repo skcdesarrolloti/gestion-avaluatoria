@@ -495,3 +495,18 @@ Verificación: 589 checks PHP, 116 JS, 614 PHP sin errores, build y 58,8 KB gzip
 Interfaz local con datos ficticios: depósito y garaje consultan tipo correcto,
 enlace conserva la unidad y Datos básicos; CSS 390 px sin desbordamiento y consola
 sin errores. Cambios subidos a Git para actualización habitual del hosting.
+
+## 2026-10-02 · Semáforo y significado del conteo
+
+Resumen y detalle muestran controles completos/aplicables, datos faltantes en rojo,
+diferencias en amarillo y controles completos en verde (cero usa tono neutro).
+Tipo registrado se muestra en verde independientemente de descripción pendiente;
+mensaje de descripción identifica sólo campos realmente faltantes. No se marca
+todo completo por haber llenado uno de los campos de un control compuesto.
+Lectura actual en hosting: oficina sigue sin descripción propia y 0 controles
+completos; clasificación sí registrada. No se escribieron datos del expediente.
+La detección de nombre de anexo conserva separadores para confrontar «Depósito 8»
+o «Celda de parqueo 12» con el tipo, incluyendo acentos y números.
+Sin cambios de BD. Validación: 592 checks PHP, 116 JS, 615 PHP sin errores, build,
+58,8 KB gzip. Vista aislada ficticia prueba verde/rojo/amarillo, CSS 390 px sin
+desbordamiento y consola sin errores. Publicación Git para actualización del usuario.

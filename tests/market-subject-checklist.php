@@ -19,8 +19,13 @@ declare(strict_types=1);
         'area_adopted_m2'=>'12.50', 'construction_state'=>'completa',
         'conservation_result_json'=>json_encode(['state_global_adopted'=>'2', 'items'=>[['state_adopted'=>'2','evidence'=>'Foto garaje 12']]])];
     $complete = $service->build($record, $subject, $unit, $ph);
+    expect($complete['missing'] === 0 && $complete['differences'] === 0 && $complete['na'] === 0,
+        'semáforo distingue controles completos de faltantes diferencias y no aplicables');
     expect($complete['pending'] === 0 && $complete['ok'] === 9, 'datos propios completos confrontan sin copiar los de oficina');
     $missingDescription = array_replace($unit, ['notes'=>'']);
+    $descriptionStatus = \App\Services\MarketUnitDescriptionCheck::row($missingDescription);
+    expect($descriptionStatus['type_ready'] && $descriptionStatus['message'] === 'Falta: descripción física propia (3.1).',
+        'tipo registrado se conserva completo mientras sólo la descripción está pendiente');
     expect($byKey($service->build($record, $subject, $missingDescription, $ph))['description']['state'] === 'missing',
         'anexo sin descripción propia queda pendiente aunque tiene soportes jurídicos');
     expect(\App\Services\MarketUnitDescriptionCheck::row(array_replace($unit, ['construction_type'=>'deposito']))['state'] === 'difference',
@@ -29,6 +34,8 @@ declare(strict_types=1);
         'celda de parqueo corresponde al tipo parqueo sin cambiar clasificación');
     expect(\App\Services\MarketUnitDescriptionCheck::row(array_replace($unit, ['label'=>'Anexo 1']))['state'] === 'missing',
         'nombre genérico del anexo no acredita identificación propia');
+    expect(\App\Services\MarketUnitDescriptionCheck::row(array_replace($unit, ['label'=>'Depósito 8']))['state'] === 'difference',
+        'depósito con acento y número confronta su tipo parqueo sin perder separación de palabras');
     $duplicate = array_replace($unit, ['id'=>str_repeat('b',32), 'label'=>'Otra unidad independiente']);
     expect($byKey($service->build($record, $subject, $unit, $ph, [], [$unit,$duplicate]))['registry']['state'] === 'difference',
         'dos unidades independientes con misma matrícula se confrontan como diferencia');

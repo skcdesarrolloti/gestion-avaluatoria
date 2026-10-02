@@ -15,9 +15,14 @@ final class MarketUnitDescriptionCheck
         $named = $name !== '' && !preg_match('/^(?:Unidad|Anexo)\s+\d+$/iu', $name);
         $classified = $type !== '' && isset($types[$type]);
         $state = $named && $description !== '' && $classified ? 'ok' : 'missing';
-        $message = $state === 'ok' ? 'Nombre y descripción propios registrados. OK no confirma que un texto base IGAC corresponda a la visita.'
-            : 'Diligencia nombre y descripción física propios en 3.1; para anexos, define también el tipo en 3.3.';
-        $normalizedName = MarketSubjectEvidence::normalized($name);
+        $missing = [];
+        if (!$named) $missing[] = 'nombre propio (3.1)';
+        if (!$classified) $missing[] = 'tipo de esta unidad (3.3)';
+        if ($description === '') $missing[] = 'descripción física propia (3.1)';
+        $message = $state === 'ok' ? 'Nombre, tipo y descripción propios registrados. OK no confirma que un texto base IGAC corresponda a la visita.'
+            : 'Falta: ' . implode(', ', $missing) . '.';
+        $normalizedName = strtr(mb_strtolower($name), ['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ñ'=>'n']);
+        $normalizedName = trim(preg_replace('/[^a-z0-9]+/', ' ', $normalizedName) ?? '');
         $expected = preg_match('/^(garaje|parqueadero|celda de parqueo)\b/', $normalizedName) ? 'parqueo'
             : (preg_match('/^(deposito|cuarto util)\b/', $normalizedName) ? 'deposito' : '');
         $mismatch = $annex && $expected !== '' && $type !== '' && $type !== $expected;
@@ -30,7 +35,7 @@ final class MarketUnitDescriptionCheck
         return ['key'=>'description', 'label'=>'Nombre, tipo y descripción física de esta unidad',
             'value'=>($name ?: 'Sin nombre propio') . ' · ' . ($type !== '' ? ($types[$type] ?? $type) : 'Tipo sin definir')
                 . ' · ' . ($description ?: 'Sin descripción propia'),
-            'type_label'=>$type !== '' ? ($types[$type] ?? $type) : 'Sin definir',
+            'type_label'=>$type !== '' ? ($types[$type] ?? $type) : 'Sin definir', 'type_ready'=>$classified,
             'source'=>'3.1 · Nombre, tipo de inmueble y descripción / 3.3 · Tipo de construcción o anexo',
             'state'=>$state, 'message'=>$message,
             'section'=>$classificationPending ? 'construction' : 'tipologias',

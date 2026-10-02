@@ -118,6 +118,9 @@ final class MarketSubjectChecklist
         }
         $add('scope', 'Componentes incluidos y tratamiento', $scope ?: 'Sin alcance documentado', '3.1 · ' . ($scopeSource ?: 'Sin soporte'), $scopeState, $scopeMessage);
         return ['rows'=>$rows, 'ok'=>count(array_filter($rows, static fn ($row) => $row['state'] === 'ok')),
+            'missing'=>count(array_filter($rows, static fn ($row) => $row['state'] === 'missing')),
+            'differences'=>count(array_filter($rows, static fn ($row) => $row['state'] === 'difference')),
+            'na'=>count(array_filter($rows, static fn ($row) => $row['state'] === 'na')),
             'pending'=>count(array_filter($rows, static fn ($row) => in_array($row['state'], ['missing','difference'], true)))];
     }
 }
