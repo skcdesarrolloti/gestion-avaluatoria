@@ -50,6 +50,11 @@ escritorio y CSS 390 px sin desbordamiento ni errores de consola.
 
 ## Archivos y comprobaciones antes de reorganizar
 
+M3 tabla editable prioritaria con autoguardado. Excel opcional: exportación espera
+guardar; importación revisa diferencias por ID y exige archivo de misma colección
+y versión antes de aplicar y guardar. No elimina filas omitidas ni crea muestras.
+Ver PH-M3-TABLA-NEGOCIACION.md para límites y pruebas de retorno.
+
 Vistas: valuation-methodology-search.php, valuation-methodology-source-links.php,
 valuation-methodology-portal-results-paste.php y valuation-methodology-comparable-table.php.
 Mantener lectores resources/js/*-paste.js y pruebas de importación y duplicados.

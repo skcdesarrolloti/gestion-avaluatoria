@@ -532,3 +532,7 @@ o «Celda de parqueo 12» con el tipo, incluyendo acentos y números.
 Sin cambios de BD. Validación: 592 checks PHP, 116 JS, 615 PHP sin errores, build,
 58,8 KB gzip. Vista aislada ficticia prueba verde/rojo/amarillo, CSS 390 px sin
 desbordamiento y consola sin errores. Publicación Git para actualización del usuario.
+
+## 2026-10-02 · Retorno de Excel en M3
+
+Tabla editable prioritaria con autoguardado; Exportar a Excel e Importar Excel actualizado son opcionales. Importación por ID, con revisión antes de aplicar, versión de colección, aislamiento de expediente/unidad y filas omitidas conservadas. No se crean muestras desde Excel. Ver docs/PH-M3-TABLA-NEGOCIACION.md para pruebas y límites. PHP ZIP y SimpleXML requeridos en hosting. Sin migraciones ni cambios a datos reales o M4/M5.

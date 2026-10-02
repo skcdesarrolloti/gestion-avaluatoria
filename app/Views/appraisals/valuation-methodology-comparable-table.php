@@ -5,6 +5,7 @@
     @comparable-imported="showImported($event.detail)"
     data-module-autosave data-save-in-place data-comparable-json
     data-ph-subject="<?= !empty($guide['is_ph']) ? 'si' : 'no' ?>"
+    data-appraisal-id="<?= e($record['id']) ?>" data-excel-preview-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/excel/revisar')) ?>"
     data-subject-latitude="<?= e($subject['latitude'] ?? '') ?>" data-subject-longitude="<?= e($subject['longitude'] ?? '') ?>"
     data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/autoguardar')) ?>">
     <?= csrf_field() ?>

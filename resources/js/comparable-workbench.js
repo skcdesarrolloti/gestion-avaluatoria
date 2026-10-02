@@ -5,6 +5,8 @@ import { comparableMapNavigation } from './comparable-map-navigation.js';
 import { comparableRemoval } from './comparable-removal.js';
 import { hasComparableData, missingComparableFields, comparableUrlKey } from './comparable-review.js';
 import { updateCapture, arrangeSheet, exportCapture, negotiationFields } from './comparable-sheet.js';
+import { comparableExcel } from './comparable-excel.js';
+import { flushModuleAutosaves } from './module-autosave.js';
 
 const groups = {
     capture: ['source_type', 'source_name', 'source_url', 'market_data_kind', 'operation', 'property_type', 'market_city', 'neighborhood',
@@ -25,7 +27,7 @@ const groups = {
 export function comparableWorkbench() {
     let entries = [], resize, form, createRow, prepare, grow;
     return {
-        ...comparablePhotos(), ...comparableMapNavigation(), ...comparableRemoval(), phFilter: 'all', mode: 'table', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
+        ...comparablePhotos(), ...comparableMapNavigation(), ...comparableRemoval(), ...comparableExcel(), phFilter: 'all', mode: 'table', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
         pending: 0, duplicates: 0, shown: 0, usedIndexes: [], mapPoints: [], portalSummary: [], capturePendingCount: 0,
         get groupHelp() {
             return {
@@ -69,6 +71,7 @@ export function comparableWorkbench() {
             grow = event => { for (let i = 0; i < event.detail; i++) this.appendRow(); };
             form.addEventListener('comparable-grow', grow);
             this.initRemoval(form, entries);
+            this.initExcel(form, entries);
             this.refresh();
             this.$watch('searchTab', () => { this.page = 1; this.render(); });
             resize = new ResizeObserver(() => this.syncWidth());
@@ -146,6 +149,11 @@ export function comparableWorkbench() {
             this.render();
         },
         syncWidth() { this.$refs.track.style.width = `${this.$refs.grid.scrollWidth}px`; },
-        exportExcel() { this.refresh(); exportCapture(entries, form); },
+        async exportExcel() {
+            this.exportBusy=true;
+            try { if (!await flushModuleAutosaves()) throw new Error('Confirma el guardado antes de exportar.'); this.refresh(); exportCapture(entries, form); this.excelMessage='Excel exportado. Conserva ID y encabezados para importar actualizaciones.'; }
+            catch(error) { this.excelMessage=error.message; }
+            finally {this.exportBusy=false;}
+        },
     };
 }

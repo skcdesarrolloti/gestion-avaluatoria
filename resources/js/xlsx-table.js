@@ -1,4 +1,5 @@
 // Small OOXML export for the app: inline text never becomes an executable formula.
+import { addWorkbookContext } from './xlsx-context.js';
 const encoder = new TextEncoder();
 const xml = value => String(value ?? '').replace(/[\x00-\x08\x0b\x0c\x0e-\x1f]/g, '')
     .replaceAll('&', '&amp;').replaceAll('<', '&lt;').replaceAll('>', '&gt;').replaceAll('"', '&quot;');
@@ -36,7 +37,7 @@ function zip(files) {
     for (const chunk of [...chunks, ...directory, end]) { result.set(chunk, position); position += chunk.length; }
     return result;
 }
-export function tableWorkbook(columns, rows, title = 'Comparables') {
+export function tableWorkbook(columns, rows, title = 'Comparables', context = null) {
     const ns = 'http://schemas.openxmlformats.org/spreadsheetml/2006/main';
     const rel = 'http://schemas.openxmlformats.org/package/2006/relationships';
     const range = `A1:${columnName(columns.length - 1)}${rows.length + 1}`;
@@ -67,5 +68,5 @@ export function tableWorkbook(columns, rows, title = 'Comparables') {
         'xl/worksheets/_rels/sheet1.xml.rels': `<Relationships xmlns="${rel}"><Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/table" Target="../tables/table1.xml"/></Relationships>`,
         'xl/tables/table1.xml': `<table xmlns="${ns}" id="1" name="Muestras" displayName="Muestras" ref="${range}" totalsRowShown="0"><autoFilter ref="${range}"/><tableColumns count="${columns.length}">${columns.map((column,i) => `<tableColumn id="${i+1}" name="${xml(column.label)}"/>`).join('')}</tableColumns><tableStyleInfo name="TableStyleMedium2" showFirstColumn="0" showLastColumn="0" showRowStripes="1" showColumnStripes="0"/></table>`,
     };
-    return zip(files);
+    return zip(addWorkbookContext(files, context, columns, title));
 }

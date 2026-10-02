@@ -40,8 +40,14 @@ Excel (.xlsx) exporta todas las filas de la colección, no sólo la página/filt
 Tabla nativa con filtros, encabezados y primera columna inmovilizados, importes
 numéricos, fórmulas de negociación y pendientes amarillos. Texto externo es
 inlineStr, nunca fórmula. Generador OOXML del navegador, sin nuevas dependencias.
-La descarga puede incluir borradores no guardados. Ediciones externas no se
-reimportan automáticamente: completar el módulo para persistir.
+La descarga espera confirmar el autoguardado. Importar Excel actualizado revisa
+el archivo exportado y presenta los cambios antes de aplicarlos y autoguardar.
+La hoja oculta conserva expediente, unidad/banco, versión, campos y opciones;
+cada fila conserva ID. Reordenar no altera su identidad; omitir filas no elimina
+muestras. Se rechazan IDs ajenos, repetidos, otras colecciones o versiones antiguas.
+Campos calculados se recalculan en el módulo; fórmulas editables no se ejecutan.
+No se incorporan nuevas muestras desde este Excel: usar Nueva muestra o lectores.
+Archivo .xlsx hasta 5 MB; servidor requiere extensiones PHP ZIP y SimpleXML.
 PH/NPH omite columnas específicas vacías del otro régimen en Excel; si tienen
 información previa, se conserva. No se borran muestras ni datos al cambiar vistas.
 
@@ -57,7 +63,13 @@ No certifica la resolución completa ni altera los otros métodos/informes.
 Bocagrande es admisible como dato de prueba por instrucción del usuario en el
 expediente de oficina. No se cambió la ubicación física ni el avalúo Zona Franca.
 
-Validación: 615 checks PHP, 120 JS, 142 BD desechable 3361; lint, build y
+Validación previa: 615 checks PHP, 120 JS, 142 BD desechable 3361; lint, build y
 63,3 KB gzip. Navegador: edición, guardado y recarga de 500 millones menos
 25 millones = 475 millones (5%), conteo FincaRaíz 1, móvil CSS 390 sin overflow.
 Excel: lectura con openpyxl/ZIP/XML valida tabla, panes, fórmulas, caché y estilos.
+
+Importación: 629 checks PHP, 124 JS, 142 BD desechable 3362 y seis HTTP de
+sesión, CSRF, revisión sin escritura y aislamiento de unidad. Archivo del generador
+reescrito con openpyxl conserva hoja oculta y se lee por HTTP. Navegador verifica
+herramientas visibles y consola limpia. Carga UI completa no probada: extensión
+Chrome no permite archivos locales; no se cambiaron sus permisos.

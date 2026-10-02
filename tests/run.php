@@ -7,6 +7,7 @@ require __DIR__ . '/market-subject-checklist.php';
 require __DIR__ . '/subject-unit-kind.php';
 require __DIR__ . '/methodology-navigation.php';
 require __DIR__ . '/comparable-capture-detail.php';
+require __DIR__ . '/comparable-excel.php';
 require __DIR__ . '/judicial-expert.php';
 require __DIR__ . '/judicial-render.php';
 require __DIR__ . '/resolution-941-reading.php';

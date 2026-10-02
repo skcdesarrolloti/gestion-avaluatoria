@@ -40,7 +40,7 @@ export function exportCapture(entries, form) {
     const used = entries.filter(entry => entry.used);
     if (!used.length) return;
     const first = entries[0], headers = [...form.querySelectorAll('thead th')];
-    const columns = [{key:'capture_pending', label:'Pendientes por confirmar', numeric:false}];
+    const columns = [{key:'id', label:'ID de muestra (conservar)',numeric:false}, {key:'capture_pending', label:'Pendientes por confirmar', numeric:false}];
     for (const [index, cell] of [...first.tr.cells].entries()) {
         const input = cell.querySelector('[name]'), key = input?.name.match(/\[([^\]]+)\]$/)?.[1];
         if (!key || ['id','component_key'].includes(key)) continue;
@@ -50,12 +50,13 @@ export function exportCapture(entries, form) {
             !used.some(entry => String(entry.data[key] ?? '').trim())) continue;
         const label = cell.querySelector('.comparable-field-label')?.textContent || headers[index].textContent.trim();
         const uniqueLabel = columns.some(column => column.label === label) ? `${label} (${columns.length})` : label;
-        columns.push({key, label:uniqueLabel, numeric: input.type === 'number' || ['price_amount','admin_fee','negotiated_amount','negotiation_percent','area_m2'].includes(key)});
+        columns.push({key, label:uniqueLabel, options:input.tagName === 'SELECT' ? Object.fromEntries([...input.options].map(option=>[option.value,option.textContent.trim()])) : undefined,
+            numeric: input.type === 'number' || ['price_amount','admin_fee','negotiated_amount','negotiation_percent','area_m2'].includes(key)});
     }
     const rows = used.map(entry => {
-        const row = {capture_pending:{value: entry.capturePending.map(([,label]) => label).join('; '), pending:entry.capturePending.length > 0}};
+        const row = {id:{value:entry.data.id},capture_pending:{value: entry.capturePending.map(([,label]) => label).join('; '), pending:entry.capturePending.length > 0}};
         const missing = new Set(entry.capturePending.map(([key]) => key));
-        for (const column of columns.slice(1)) {
+        for (const column of columns.slice(2)) {
             const input = entry.controls.find(control => control.name.endsWith(`[${column.key}]`));
             let value = entry.data[column.key] ?? '';
             if (input?.tagName === 'SELECT' && value) value = input.options[input.selectedIndex].textContent;
@@ -64,7 +65,8 @@ export function exportCapture(entries, form) {
         }
         return row;
     });
-    const bytes = tableWorkbook(columns, rows, form.dataset.phSubject === 'si' ? 'Comparables PH' : 'Comparables NPH');
+    const bytes = tableWorkbook(columns, rows, form.dataset.phSubject === 'si' ? 'Comparables PH' : 'Comparables NPH', {
+        appraisal:form.dataset.appraisalId,scope:form.querySelector('[name=component_scope]').value,version:Number(form.querySelector('[name=version]').value)});
     const url = URL.createObjectURL(new Blob([bytes], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
     const link = document.createElement('a'); link.href = url; link.download = `comparables-${form.dataset.phSubject === 'si' ? 'PH' : 'NPH'}-${new Date().toISOString().slice(0,10)}.xlsx`;
     link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);
