@@ -585,3 +585,10 @@ Ver COSTO-C1-C2-INVENTARIO.md para catálogos, relaciones, limitaciones y ruta s
 JSON metodología existente, sin migración ni escritura de expedientes reales.
 655 PHP, 131 JS, 156 BD desechable 3365; build/size 66,3 KB gzip.
 Chrome local: alcance guardado y conservado al recargar, semáforo actualizado C1.
+
+## 2026-10-02 · Academia exclusiva C1 del costo
+Trece temas visibles antes del checklist; vida de referencia/remanente/prolongada,
+procedencia90%/EC2,5–4,5, tablas y ejemplos, Ross continuo, patrimonio y etapas.
+100 años sigue como referencia de permanentes; sin vida/estado adoptados por defecto.
+Sin Fitto en C1, ni cambios C2–C5 o importación de catálogos. Ver COSTO-C1-ACADEMIA.md.
+Lint, PHP655, JS131, build y size66,3KB; UI local de consulta. Sin migración.
