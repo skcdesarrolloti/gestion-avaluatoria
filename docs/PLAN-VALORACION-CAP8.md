@@ -116,3 +116,9 @@ pestañas y conservación del texto. Sin cambios del esquema ni del cálculo.
 Las sugerencias se ocultan cuando el campo tiene contenido para evitar repetirlo.
 Ancho móvil CSS367/scroll367, sin desbordamiento global. Capturas de pestañas y
 ayudas conservadas; autoguardado confirmado y texto recuperado al cambiar de unidad.
+
+El ejemplo plegable aparece después de las pestañas y corresponde a la unidad
+activa: PH, anexo, terreno, construcción o terreno/construcción NPH según los
+datos registrados. Si falta contexto, se identifica expresamente como genérico.
+No adopta métodos ni altera datos. PHP685, JS131, lint/build y 66,4KB gzip;
+Chrome local: oficina PH y cambio al depósito; móvil CSS367/scroll367.

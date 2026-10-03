@@ -3,6 +3,7 @@ $planMethods=\App\Services\MethodologyWorkflow::METHODS;
 $planUnits=array_filter($components,static fn($c)=>!isset($c['parent_key']) && !isset($c['comparison_key']));
 $planActive=$components[$componentKey]['unit']['id'] ?? $componentKey;
 if (!isset($planUnits[$planActive])) $planActive=(string)(array_key_first($planUnits) ?? '');
+$planExample=\App\Services\MethodologySelectionHelp::example($record,$planUnits[$planActive] ?? null);
 ?>
 <section class="rounded-2xl border bg-white p-5 sm:p-8" aria-labelledby="plan-valoracion-titulo" data-ph-section>
     <p class="eyebrow">Configuración</p>
@@ -12,10 +13,6 @@ if (!isset($planUnits[$planActive])) $planActive=(string)(array_key_first($planU
         <?php require __DIR__.'/valuation-methodology-decision.php'; ?>
     </details>
     <a class="inline-flex min-h-11 items-center font-semibold text-blue-800 underline" href="<?= e($flowUrl('1','costo','').'&consult_method=costo') ?>">Consultar academia C1 · Costo sin asignarlo</a>
-    <details class="mt-4 rounded-xl border bg-teal-50 p-4">
-        <summary class="min-h-11 cursor-pointer font-semibold">Ejemplo: casa con terreno por Mercado y construcción por Costo</summary>
-        <p class="mt-2 text-sm leading-6">La casa conserva una sola ficha. Puedes estudiar el inmueble completo o separar terreno y construcción cuando corresponda. Mercado y Renta del mismo inmueble son estimaciones alternativas; no se suman. Terreno y construcción son partes diferentes: documenta su cobertura antes de integrarlas. Si faltan ofertas de lotes, Costo no obtiene automáticamente el terreno por diferencia; sustenta el procedimiento y sus datos antes de adoptarlo.</p>
-    </details>
     <?php if ($components===[]): ?><p class="mt-4 rounded-xl border border-dashed p-4">Registra primero las unidades del predio en capítulos 1 y 3. La academia puede consultarse sin asignar un método.</p><?php endif; ?>
     <?php if ($planUnits!==[]): ?>
     <nav class="mt-5 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Unidades en configuración">
@@ -24,6 +21,10 @@ if (!isset($planUnits[$planActive])) $planActive=(string)(array_key_first($planU
         <?php endforeach; ?>
     </nav>
     <?php endif; ?>
+    <details class="mt-4 rounded-xl border bg-teal-50 p-4">
+        <summary class="min-h-11 cursor-pointer font-semibold"><?= e($planExample[0]) ?></summary>
+        <p class="mt-2 text-sm leading-6"><?= e($planExample[1]) ?></p>
+    </details>
     <div class="mt-5 space-y-5">
     <?php foreach ($components as $planKey=>$planUnit): if (isset($planUnit['parent_key']) || isset($planUnit['comparison_key'])) continue;
         if ($planKey!==$planActive) continue;

@@ -4,6 +4,26 @@ namespace App\Services;
 
 final class MethodologySelectionHelp
 {
+    public static function example(array $record, ?array $component): array
+    {
+        if ($component===null) return ['Ejemplo genérico: un bien y varios métodos',
+            'Un mismo bien puede estudiarse con Mercado y, si tiene ingresos sustentables, con Renta. Sus resultados se contrastan, no se suman. Al elegir una unidad, el ejemplo se adapta a su alcance.'];
+        $unit=$component['unit']; $label=$component['label'];
+        if (($unit['unit_kind'] ?? '')==='annex') return ['Ejemplo para '.$label.' · anexo',
+            'Si este anexo está incluido en el valor de la unidad principal, documenta su inclusión sin sumarlo otra vez. Si corresponde valorarlo por separado, verifica sus derechos y el soporte del método elegido. Mercado requiere evidencia comparable; Costo requiere costos y depreciación sustentados cuando correspondan. El nombre del anexo no determina su naturaleza jurídica.'];
+        if (($record['regimen_ph'] ?? '')==='si') return ['Ejemplo para '.$label.' · PH',
+            'Puedes estudiar esta unidad por Mercado si cuentas con ofertas o transacciones comparables, y contrastarla por Renta si sus ingresos pueden sustentarse. Son estimaciones del mismo alcance y no se suman. Precisa las áreas privadas y derechos registrados, y si el precio o el canon incluyen garajes, depósitos u otros anexos.'];
+        if (($unit['method_structure'] ?? '')==='solo_terreno' || ($unit['property_type'] ?? '')==='lote') return ['Ejemplo para '.$label.' · terreno',
+            'Si existen ofertas o transacciones de terrenos comparables, puedes estudiar Mercado. Otra posibilidad es Residual, cuando exista un proyecto viable y sus supuestos puedan sustentarse. El analista elige la técnica según la evidencia; no se agrega una construcción que no forme parte del alcance.'];
+        if (($unit['method_structure'] ?? '')==='solo_construccion') return ['Ejemplo para '.$label.' · construcción',
+            'Para estudiar la construcción por Costo, sustenta el costo a nuevo, los costos directos e indirectos y la depreciación que corresponda. Identifica el terreno o las partidas consideradas en otros estudios para no incluirlas otra vez.'];
+        if (($record['regimen_ph'] ?? '')==='no' && (($unit['method_structure'] ?? '')==='lote_construccion'
+            || in_array($unit['property_type'] ?? $record['tipo_inmueble'] ?? '',['casa','finca'],true))) return ['Ejemplo para '.$label.' · terreno y construcción',
+            'Puedes estudiar el inmueble completo o separar terreno y construcción cuando corresponda. Por ejemplo, Mercado para el terreno y Costo para la construcción, si cada estimación tiene soporte. Sus coberturas deben ser distintas antes de integrarlas. Costo no obtiene automáticamente el terreno por diferencia cuando faltan ofertas de lotes.'];
+        return ['Ejemplo genérico para '.$label,
+            'Elige el método según los derechos, el alcance y la evidencia disponible. Si estudias el mismo alcance con más de un método, contrasta los resultados sin sumarlos. Este ejemplo es general porque no se ha identificado un caso específico con los datos registrados.'];
+    }
+
     public static function methods(string $label): array
     {
         $subject='Se estudia '.$label;
