@@ -1,5 +1,11 @@
 # Entrega al responsable de la implementación
 
+Insumos: cada panel de portal/inmobiliaria muestra búsqueda breve de la unidad
+actual, botón copiar, filtros orientativos y alternativa Google con dominio.
+Garajes incluyen sinónimos; lectura extensa existente se conserva debajo plegada.
+No promete capacidades del buscador, no cambia extracción ni muestras. Contexto
+heredado de ComparableSearchContext (tipo por unidad, renta/venta por recorrido).
+
 Academia centralizada: eliminado el bloque repetido «Artículos completos para este
 paso» de las etapas operativas. Mercado conserva íntegros 16–21 en Academia; PH36
 en General. Insumos, Análisis y Entregable mantienen el acceso Academia. El aviso

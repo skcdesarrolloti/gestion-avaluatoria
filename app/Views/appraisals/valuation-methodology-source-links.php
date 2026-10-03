@@ -44,6 +44,7 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
     ?>
         <section id="source-panel-<?= $sourceIndex ?>" aria-label="<?= e($source['label']) ?>"
             x-show="sourceTab === <?= $sourceIndex ?>" <?= $sourceIndex ? 'x-cloak' : '' ?> class="mt-4 rounded-xl bg-white p-4">
+            <?php require __DIR__ . '/methodology-portal-search-prompt.php'; ?>
             <?php require __DIR__ . '/methodology-portal-prompt.php'; ?>
             <?php if (($isFincaraiz || $isMetrocuadrado) && isset($record['id'])): ?>
                 <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-fincaraiz-zone.php'; ?>
