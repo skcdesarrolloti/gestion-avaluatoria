@@ -24,6 +24,7 @@ declare(strict_types=1);
         } finally { ob_end_clean(); }
         expect(str_contains($html, '>Configuración</a>') && !str_contains($html, 'Herramientas y consultas del expediente')
             && !str_contains($html, 'aria-label="Etapas de Mercado"'), 'navegación común sin menús duplicados en ' . $stage);
+        foreach (['Insumos','Análisis','Entregable'] as $label) expect(str_contains($html,'>'.$label.'</a>'), 'paso visible incluso sin recorrido en '.$stage.': '.$label);
         if ($stage==='plan') {
             expect(str_contains($html,'Configuración de la valoración') && !str_contains($html,'Verificación de datos guardados')
                 && !str_contains($html,'Resolución 941 · Artículos completos para este paso') && str_contains($html,'academy=general'), 'configuración remite artículos generales a academia sin desplegar checklist');
@@ -81,4 +82,12 @@ declare(strict_types=1);
     ob_start(); require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php'; $html=ob_get_clean();
     expect(str_contains($html,'Método y alcance · Depósito de oficina') && !str_contains($html,'Método y alcance · Oficina &lt;principal&gt;'),
         'pestaña de anexo abre sus campos propios sin formularios de la oficina');
+    $flow=['office'=>['method'=>'mercado'], 'annex'=>['method'=>'costo']];
+    $stage='1'; $componentKey=''; $method='mercado'; $_GET['academy']='general';
+    ob_start(); require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php'; $html=ob_get_clean();
+    expect(str_contains($html,'method=mercado&amp;stage=3&amp;component=office'), 'academia general abre insumos del recorrido de Mercado registrado');
+    $method='costo';
+    ob_start(); require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php'; $html=ob_get_clean();
+    expect(str_contains($html,'method=costo&amp;stage=3&amp;component=annex'), 'academia general conserva el método al abrir insumos de Costo');
+    unset($_GET['academy']);
 })();

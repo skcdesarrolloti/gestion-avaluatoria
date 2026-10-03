@@ -1,5 +1,10 @@
 # Entrega al responsable de la implementación
 
+Corrección de navegación: los cinco pasos permanecen visibles en Academia General
+y Configuración. Sin componente actual, continúa el primer recorrido activo del
+método consultado (o primer método activo), anunciado en pantalla. Sin métodos,
+remite a Configuración. No cambia asignaciones ni muestras. PHP858/JS136/build68,1KB.
+
 REQUISITO PERMANENTE: advertir contradicciones/incumplimientos de artículos en
 Análisis, con artículo, evidencia, incidencia y acción pendiente. Aviso visible
 actual; motor de detección integral pendiente. Leer CONTROL-NORMATIVO-ANALISIS.md
