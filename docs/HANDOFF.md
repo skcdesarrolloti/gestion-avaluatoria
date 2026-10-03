@@ -1,5 +1,11 @@
 # Entrega al responsable de la implementación
 
+C1 consultado desde Mercado muestra sólo academia, sin revisión ni recorrido
+operativo de esa unidad. Pestañas filtradas a unidades con Costo guardado.
+La revisión reaparece para cada componente efectivamente asignado a Costo.
+Sin escritura de métodos/datos. PHP660, JS131, lint/build/66,4KB y navegador
+escritorio/móvil. Ver COSTO-C1-ACADEMIA.md. Push no confirma hosting.
+
 C1 costo: temas cerrados al entrar y consulta completa plegable de artículos
 27–30 más anexo 2.3, páginas oficiales 22–39. PDF local original con 18 páginas,
 lector, descarga y enlace al documento íntegro. Desplegar también

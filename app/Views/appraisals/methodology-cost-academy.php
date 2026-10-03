@@ -1,12 +1,13 @@
 <?php
 
 use App\Services\CostMethodReview;
+require __DIR__.'/methodology-cost-academy-reading.php';
+if (($selected['method'] ?? '') !== 'costo' || $componentKey === '') return;
 $costUnit=$components[$componentKey]['unit'] ?? [];
 $costChecks=CostMethodReview::checks($costUnit,$selected);
 $costOk=count(array_filter($costChecks,static fn($row)=>$row['state']==='ok'));
 $costPending=count(array_filter($costChecks,static fn($row)=>$row['state']==='missing'));
 ?>
-<?php require __DIR__.'/methodology-cost-academy-reading.php'; ?>
 <section class="rounded-2xl border bg-white p-5 sm:p-8">
     <p class="eyebrow">C1 · Academia y revisión del costo</p>
     <h2 class="mt-2 text-2xl font-semibold"><?= e($componentLabel) ?></h2>

@@ -15,6 +15,8 @@ $basePath = 'avaluos/' . $record['id'] . '/metodologia-valuatoria';
 $flowUrl = static fn ($step, $m = null, $key = null) => url($basePath . '?' . http_build_query([
     'method' => $m ?? $method, 'stage' => $step, 'component' => $key ?? $componentKey]));
 $componentLabel = $components[$componentKey]['label'] ?? 'Banco de muestras sin asignar';
+$costAcademy = $method === 'costo' && in_array($stage, ['1', 'components'], true);
+$costAcademyTheoryOnly = $costAcademy && ($selected['method'] ?? '') !== 'costo';
 ?>
 <p class="eyebrow">Capítulo 8 · Metodología valuatoria</p>
 <h1 class="mt-2 text-3xl font-semibold">Metodología valuatoria</h1>
@@ -26,7 +28,7 @@ $componentLabel = $components[$componentKey]['label'] ?? 'Banco de muestras sin 
 <?php require __DIR__ . '/methodology-navigation.php'; ?>
 <?php require __DIR__ . '/methodology-unit-tabs.php'; ?>
 <div class="mt-6">
-<?php if (in_array($stage,['1','components'],true) && $method === 'costo' && $componentKey!==''): ?>
+<?php if ($costAcademy): ?>
     <?php require __DIR__ . '/methodology-cost-academy.php'; ?>
 <?php elseif ($stage === 'components' || $stage === 'integration'): ?>
     <?php require __DIR__ . '/methodology-components.php'; ?>
@@ -53,4 +55,4 @@ $componentLabel = $components[$componentKey]['label'] ?? 'Banco de muestras sin 
 <?php endif; ?>
 </div>
 
-<?php require __DIR__ . '/methodology-next.php'; ?>
+<?php if (!$costAcademyTheoryOnly): require __DIR__ . '/methodology-next.php'; endif; ?>

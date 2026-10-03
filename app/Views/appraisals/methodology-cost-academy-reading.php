@@ -1,7 +1,7 @@
 <?php $costTopics=\App\Services\CostMethodAcademy::topics(); ?>
 <section class="mb-5 rounded-2xl border bg-teal-50 p-5 sm:p-8" aria-labelledby="costo-academia-titulo">
     <h2 id="costo-academia-titulo" class="text-2xl font-semibold">Academia C1 · Método del costo</h2>
-    <p class="mt-3 text-sm leading-6">Lectura por unidad. Aprende a distinguir costo a nuevo, depreciación, vida de referencia, vida remanente y vida prolongada antes de adoptar parámetros.</p>
+    <p class="mt-3 text-sm leading-6">Aprende a distinguir costo a nuevo, depreciación, vida de referencia, vida remanente y vida prolongada antes de adoptar parámetros.</p>
     <p class="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-4 text-sm"><strong>Los 100 años siguen como referencia para ciertas construcciones permanentes.</strong> No son una vida universal. La vida remanente y la prolongada requieren verificar sus condiciones; no se asignan automáticamente.</p>
     <p class="mt-3 text-sm">Elige un tema para ubicarlo y abre su flecha para leerlo.</p>
     <nav class="mt-4 flex flex-wrap gap-2" aria-label="Temas de academia C1">

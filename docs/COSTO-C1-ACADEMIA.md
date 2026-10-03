@@ -59,3 +59,14 @@ y tabla de conservación. PHP 657, JS 131, lint y build; tamaño CSS+JS 66,4 KB.
 HTTP local PDF 200 application/pdf. Chrome: cerrado al entrar, abrir/cerrar,
 lector visible con 18 páginas; móvil CSS390/documento367/lector251.
 Sin cambios de datos, C2–C5 ni otros métodos. Push no confirma despliegue en hosting.
+
+## Academia sin unidad de costo
+
+Consultar C1 desde una unidad registrada por Mercado muestra sólo teoría y fuentes.
+No genera checklist, pendientes, enlaces de corrección ni siguiente paso operativo
+para esa unidad. Las pestañas de C1 incluyen exclusivamente componentes activos
+con método Costo registrado; no presume Costo por abrir la academia.
+Al entrar por una unidad con Costo guardado reaparece su revisión propia.
+No cambia métodos ni datos del capítulo 1 o 3. La selección sigue en C2.
+Validación: PHP660, JS131, lint/build/66,4KB; Chrome verifica consulta teórica con
+Mercado y revisión con Costo. Móvil CSS390/documento367 sin desbordamiento global.

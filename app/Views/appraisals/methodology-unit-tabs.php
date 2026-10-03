@@ -1,6 +1,10 @@
-<?php if ($components !== [] && !in_array($stage, ['integration', 'report'], true)): ?>
+<?php
+$tabComponents = ($costAcademy ?? false)
+    ? array_filter($components, static fn ($key) => ($flow[$key]['method'] ?? '') === 'costo', ARRAY_FILTER_USE_KEY)
+    : $components;
+if ($tabComponents !== [] && !in_array($stage, ['integration', 'report'], true)): ?>
 <nav class="mt-5 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Unidades y anexos del predio">
-    <?php foreach ($components as $unitKey => $unitComponent):
+    <?php foreach ($tabComponents as $unitKey => $unitComponent):
         $unitMethod = ($flow[$unitKey]['method'] ?? '') ?: 'mercado';
         $activeUnit = $componentKey ?: array_key_first($components);
     ?>
@@ -9,7 +13,7 @@
         href="<?= e($flowUrl('components', $unitMethod, $unitKey)) ?>"><?= e($unitComponent['label']) ?></a>
     <?php endforeach; ?>
 </nav>
-<?php if ($componentKey !== ''): ?>
+<?php if ($componentKey !== '' && !($costAcademyTheoryOnly ?? false)): ?>
 <p class="mt-3 font-semibold"><?= e($componentLabel) ?> · Método registrado: <?= e($methods[$selected['method'] ?? ''] ?? 'Por seleccionar') ?></p>
 <?php if ($method==='costo' && ($selected['method'] ?? '')!=='costo'): ?><p class="mt-2 text-sm text-teal-800">Consulta de academia Costo. Para trabajar C2, selecciona Costo en «Método del componente»; esta lectura conserva el método registrado.</p><?php endif; ?>
 <nav class="mt-3 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Etapas de <?= e($methods[$method]) ?>">

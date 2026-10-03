@@ -36,6 +36,15 @@ use App\Services\{CostMethodScope,CostMethodReview};
     expect(str_contains($html,'assets/normativa/igac-941-anexo-costo.pdf') && str_contains($html,'Páginas 22–39'),'C1 permite consultar el apartado original completo de costo');
     expect(!preg_match('/<details[^>]*\sopen(?:\s|>)/',$html),'C1 mantiene las lecturas cerradas al entrar');
     expect(str_contains($html,'Garaje &lt;propio&gt;') && !str_contains($html,'Garaje <propio>'),'academia del costo escapa nombre de unidad');
+    $selected=['method'=>'mercado']; $flow=['garage'=>$selected];
+    ob_start();try{require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php';$html=ob_get_contents();}finally{ob_end_clean();}
+    expect(str_contains($html,'Academia C1 · Método del costo') && str_contains($html,'Leer artículo 30 completo') && !str_contains($html,'Descripción propia') && !str_contains($html,'Garaje &lt;propio&gt;'),'consulta C1 con unidad de Mercado conserva teoría sin inmueble ni controles de costo');
+    expect(!str_contains($html,'aria-label="Siguiente paso"') && !str_contains($html,'aria-label="Etapas de Costo"'),'consulta teórica no envía una unidad de Mercado a insumos de costo');
+    $flow['cost-deposit']=['method'=>'costo'];
+    $components['cost-deposit']=['label'=>'Depósito costo','unit'=>['id'=>'cost-deposit']];
+    ob_start();try{require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php';$html=ob_get_contents();}finally{ob_end_clean();}
+    expect(str_contains($html,'Depósito costo') && !str_contains($html,'Garaje &lt;propio&gt;') && !str_contains($html,'Descripción propia'),'C1 lista sólo unidades con Costo registrado y no revisa el componente de Mercado consultado');
+    unset($components['cost-deposit']); $selected=['method'=>'costo','cost_scope'=>$scope]; $flow=['garage'=>$selected];
     $stage='2';ob_start();try{require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php';$html=ob_get_contents();}finally{ob_end_clean();}
     expect(str_contains($html,'name="cost_scope[indirect_scope]"') && str_contains($html,'name="cost_scope[removal_scope]"'),'C2 ofrece directos indirectos y retiro dentro del autoguardado');
 })();
