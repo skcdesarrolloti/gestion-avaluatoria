@@ -1,4 +1,5 @@
 import { portalResultsPaste } from './portal-results-paste.js';
+import { publishedDetails } from './comparable-published-details.js';
 
 const normalize = value => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 export function ciencuadrasUrl(value) {
@@ -22,7 +23,7 @@ export function parseCiencuadrasCards(cards, city) {
         if (!url || seen.has(url) || !/^oficina en (?:arriendo o )?venta/.test(heading)
             || !expected || location[0] !== expected || !price || !area) return [];
         seen.add(url);
-        return [{ source_type: 'portal', source_name: 'Ciencuadras', source_url: url,
+        return [{ ...publishedDetails(card.text), source_type: 'portal', source_name: 'Ciencuadras', source_url: url,
             operation: 'Venta', property_type: 'Oficina', price_amount: price, price_unit: 'precio_total',
             area_m2: area.replace('.', ','), neighborhood: location.at(-1), ph_regime: 'por_verificar',
             comparability_notes: `Resumen copiado de Ciencuadras; ubicación publicada: ${location.join(', ')}. Área y PH por verificar.` }];

@@ -10,7 +10,7 @@ if ($tabComponents !== [] && !in_array($stage, ['plan', 'integration', 'report']
     ?>
     <a class="btn-secondary shrink-0 <?= $unitKey === $activeUnit ? 'bg-white text-orange-600 shadow-sm' : '' ?>"
         <?= $unitKey === $activeUnit ? 'aria-current="page"' : '' ?>
-        href="<?= e($flowUrl('components', $unitMethod, $unitKey)) ?>"><?= e($unitComponent['label']) ?></a>
+        href="<?= e($flowUrl(in_array($stage, ['3', '4', '5'], true) ? $stage : 'components', $unitMethod, $unitKey)) ?>"><?= e($unitComponent['label']) ?></a>
     <?php endforeach; ?>
 </nav>
 <?php if ($componentKey !== '' && !($costAcademyTheoryOnly ?? false)): ?>

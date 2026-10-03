@@ -60,6 +60,7 @@ expect($ph->profile($id, 1)['ph_name'] === 'PH editada', 'PH MySQL conserva edic
 expect($ph->profile($id, 2)['ph_name'] === '', 'PH MySQL aísla propietario');
 require __DIR__ . '/comparable-persistence.php';
 require __DIR__ . '/comparable-detail-persistence.php';
+require __DIR__ . '/comparable-intake-persistence.php';
 require __DIR__ . '/judicial-persistence.php';
 require __DIR__ . '/analyst-access-persistence.php';
 require __DIR__ . '/unit-reclassification-persistence.php';

@@ -16,6 +16,7 @@
     <div x-show="results.length" x-cloak class="mt-3">
         <p class="mb-3 text-sm font-semibold" x-text="results.length + ' avisos leídos en esta página · ' + suggestedCount + ' sugeridos para agregar · ' + registeredCount + ' ya registrados · ' + reviewCount + ' posibles coincidencias omitidas del lote sugerido'"></p>
         <div class="flex flex-wrap gap-2">
+            <button type="button" class="btn-primary min-h-11" :disabled="busy || !results.length" @click="captureAll()">Recoger nuevos y complementar existentes</button>
             <button type="button" class="btn-primary min-h-11" :disabled="busy || !suggestedCount" @click="addSuggested()" x-text="'Agregar sugeridos sin coincidencias (' + suggestedCount + ')'">Agregar sugeridos sin coincidencias</button>
             <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'matriz'">Ver Matriz de datos</button>
         </div>

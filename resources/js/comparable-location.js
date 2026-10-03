@@ -1,4 +1,4 @@
-export const mapFields = ['latitude', 'longitude', 'location_precision', 'map_notes', 'location_source', 'evidence_detail', 'verification_detail'];
+export const mapFields = ['latitude', 'longitude', 'location_precision', 'map_notes', 'location_source', 'evidence_detail', 'verification_detail', 'location_verification'];
 const phFields = ['private_built_m2', 'private_free_m2', 'ph_units_detail'];
 const nphFields = ['land_m2', 'built_m2', 'annexes_detail', 'crops_detail'];
 export function compositionVisible(key, row) {

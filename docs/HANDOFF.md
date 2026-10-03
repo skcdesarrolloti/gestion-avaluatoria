@@ -649,3 +649,16 @@ procedencia90%/EC2,5–4,5, tablas y ejemplos, Ross continuo, patrimonio y etapa
 100 años sigue como referencia de permanentes; sin vida/estado adoptados por defecto.
 Sin Fitto en C1, ni cambios C2–C5 o importación de catálogos. Ver COSTO-C1-ACADEMIA.md.
 Lint, PHP655, JS131, build y size66,3KB; UI local de consulta. Sin migración.
+
+## 2026-10-03 · Bandeja de insumos Mercado
+Tarjetas por inmueble confirmado, anuncios originales separados por fuente,
+selección para Análisis, vinculación/separación reversible y comparación de diferencias.
+Captura ampliada de descripción/atributos rotulados y lectura posterior del mismo
+enlace completa vacíos sin sustituir precios; diferencias y último texto conservados.
+Coordenadas sólo verificadas manualmente en M4 con precisión/fuente/soporte; mapa
+después del guardado. No desarrolla depuración estadística ni adopción de valores.
+Ver MERCADO-INSUMOS-BANDEJA.md. JSON aditivo, sin migraciones ni datos reales alterados.
+PHP835, JS135, BD168 más cinco nuevas de persistencia, lint665PHP, build68KB gzip.
+Chrome local: vincular y seleccionar dos anuncios, recepción como un inmueble,
+captura85,5m²/2garajes/1depósito, relectura150→155 conserva150 y advierte diferencia,
+punto aproximado confirmado y recargado; CSS390px sin desbordamiento lateral.

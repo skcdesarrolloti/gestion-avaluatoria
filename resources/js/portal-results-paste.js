@@ -37,6 +37,7 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
             this.selected = this.selected.filter(url => this.results.some(item => item.row.source_url === url && item.tone !== 'registered'));
         },
         selectAll() { this.refresh(); this.selected = this.results.filter(item => item.tone !== 'registered').map(item => item.row.source_url); },
+        captureAll() { this.selected = this.results.map(item => item.row.source_url); this.add(true); },
         addSuggested() {
             if (this.busy) return;
             this.refresh();
@@ -44,15 +45,17 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
             if (!this.selected.length) { this.message = 'No hay sugeridos nuevos: los avisos ya están registrados o tienen coincidencias pendientes de revisión.'; return; }
             this.add();
         },
-        add() {
+        add(includeRegistered = false) {
             if (this.busy || !this.selected.length) return;
             this.busy = true;
             try {
+                const requested = [...this.selected];
                 this.refresh();
+                if (includeRegistered) this.selected = requested;
                 const rows = this.results.filter(item => this.selected.includes(item.row.source_url)).map(item => item.row);
                 const result = fillRows(form, rows, panel.dataset.query || '', undefined, { deferDuplicateReview: true });
                 this.selected = []; this.refresh();
-                this.message = `${result.count} avisos incorporados como por verificar. ${result.duplicates} enlaces ya registrados omitidos. ${result.overflow} sin cargar por un problema al crear la fila. Revisa el estado de guardado en la matriz.`;
+                this.message = `${result.count} avisos nuevos por revisar. ${result.enriched || 0} anuncios existentes complementados. ${result.duplicates} enlaces ya registrados sin duplicar. ${result.overflow} sin cargar. Revisa la bandeja y el guardado.`;
             } finally { this.busy = false; }
         },
     };

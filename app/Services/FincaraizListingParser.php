@@ -39,6 +39,8 @@ final class FincaraizListingParser
             // The portal's title states the use even where schema.org only says Place.
             if (preg_match('/^(Oficina|Consultorio|Local|Bodega|Lote|Parqueadero) en (Venta|Arriendo)\b/u', $item['name'] ?? '', $match)) $row['property_type'] = $match[1];
             $row['address_hint'] = $this->text($entity['address']['streetAddress'] ?? '');
+            if (is_numeric($entity['geo']['latitude'] ?? null) && is_numeric($entity['geo']['longitude'] ?? null))
+                $row['published_location'] = (string) $entity['geo']['latitude'] . ', ' . (string) $entity['geo']['longitude'] . ' · FincaRaíz; sin verificar.';
             $posted = $item['datePosted'] ?? '';
             if (is_string($posted) && preg_match('/^\d{4}-\d{2}-\d{2}$/D', $posted)) $row['listing_date'] = $posted;
             foreach ($items as $breadcrumb) {
@@ -50,7 +52,14 @@ final class FincaraizListingParser
                     }
                 }
             }
-            return ['row' => array_filter($row, static fn ($v) => $v !== ''),
+            $description = is_string($item['description'] ?? null) ? $item['description'] : '';
+            $description .= is_string($entity['description'] ?? null) ? ' ' . $entity['description'] : '';
+            foreach ($entity['additionalProperty'] ?? [] as $attribute) {
+                if (is_array($attribute) && is_scalar($attribute['name'] ?? null) && is_scalar($attribute['value'] ?? null))
+                    $description .= ' ' . $attribute['name'] . ': ' . $attribute['value'] . ';';
+            }
+            $row = array_filter($row, static fn ($v) => $v !== '') + ComparablePublishedDetails::parse($description);
+            return ['row' => $row,
                 'title' => $this->text($item['name'] ?? 'Aviso'),
                 'warning' => 'Revisa ubicación, uso y clase de área. El aviso puede discrepar de los filtros. No se descargaron fotos ni PDF; los campos ausentes siguen pendientes.'];
         }

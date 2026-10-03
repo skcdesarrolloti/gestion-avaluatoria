@@ -26,7 +26,7 @@ $formulaFamilies = [
             @click="searchTab = 'captura'">1. Buscar inmuebles</button>
         <button type="button" class="min-h-11 rounded-lg px-4 py-2 font-semibold" :aria-pressed="searchTab !== 'captura'"
             :class="searchTab !== 'captura' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
-            @click="searchTab = 'matriz'">2. Tabla de muestras</button>
+            @click="searchTab = 'matriz'">2. Inmuebles recogidos</button>
     </nav>
     <?php require __DIR__ . '/methodology-search-prompt.php'; ?>
     <div x-show="searchTab === 'matriz'"><?php require __DIR__ . '/methodology-market-coverage.php'; ?></div>

@@ -38,7 +38,7 @@ export function installComparableUrlImport() {
             const result = previews.get(panel);
             if (!result) return;
             const counts = fillRows(form, [result.row], panel.dataset.defaultQuery ?? '');
-            message.textContent = counts.count ? 'Muestra agregada a la tabla. Puedes pegar el siguiente enlace aquí. Revisa los campos y el estado de guardado abajo.'
+            message.textContent = counts.enriched ? 'Anuncio existente complementado. Se conservaron sus importes y se registraron las diferencias; revisa la bandeja y el guardado.' : counts.count ? 'Muestra agregada a la tabla. Puedes pegar el siguiente enlace aquí. Revisa los campos y el estado de guardado abajo.'
                 : counts.duplicates ? 'Este enlace ya está en la captura. Revisa la muestra existente.'
                     : counts.suspected ? 'Posible duplicado: no se agregó. Revisa las muestras indicadas en la tabla; la vista previa se conserva.' : 'No se pudo crear la fila. Conserva el aviso y reintenta.';
             if (counts.suspected) return;

@@ -34,7 +34,7 @@ declare(strict_types=1);
     $subject = []; $comparableRows = []; $marketNeighborhoods = []; $componentKey = '';
     $_SESSION['csrf'] ??= 'test-capture-tabs';
     ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search.php'; $html = ob_get_clean();
-    expect(str_contains($html, '1. Buscar inmuebles') && str_contains($html, '2. Tabla de muestras')
+    expect(str_contains($html, '1. Buscar inmuebles') && str_contains($html, '2. Inmuebles recogidos')
         && str_contains($html, 'aria-label="Vistas de las muestras"'), 'C mantiene dos entradas y mapas dentro de las muestras');
     foreach (['ciencuadrasPaste', 'properatiPaste', 'mercadolibrePaste'] as $reader) {
         expect(str_contains($html, 'x-data="' . $reader . '"'), 'captura de oficina seleccionada mantiene lector ' . $reader);

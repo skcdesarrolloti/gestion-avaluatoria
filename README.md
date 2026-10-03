@@ -3,6 +3,8 @@
 Capítulo 8: [plan de valoración y artículos por paso](docs/PLAN-VALORACION-CAP8.md).
 
 Recorrido simplificado: Configuración → Academia → Insumos → Análisis → Entregable.
+Mercado: [bandeja de inmuebles y anuncios](docs/MERCADO-INSUMOS-BANDEJA.md),
+captura complementaria por fuente y ubicación verificada manualmente en Análisis.
 Academia compartida por método: una pestaña por método activo y sus alcances,
 artículos completos plegables y verificaciones particulares por unidad.
 Academia General reúne reglas comunes y casos de aplicación. Requisito del análisis:

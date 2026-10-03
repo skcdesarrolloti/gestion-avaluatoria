@@ -1,5 +1,5 @@
 import { fillRows } from './comparable-bulk-import.js';
-import { candidateMatches, matrixRows, unresolvedCandidates, candidateSuggestions } from './comparable-candidate-review.js';
+import { candidateMatches, matrixRows, candidateSuggestions } from './comparable-candidate-review.js';
 
 export function fincaraizAreaSearch() {
     let panel, form;
@@ -72,20 +72,20 @@ export function fincaraizAreaSearch() {
             } catch (error) { this.message = error.name === 'AbortError' ? 'El portal tardó demasiado. Reintenta o abre la búsqueda.' : error.message; }
             finally { clearTimeout(timer); this.busy = false; }
         },
-        incorporate() {
+        incorporate(includeRegistered = false) {
             if (this.busy || !this.selected.length) return;
-            this.refreshDuplicates();
-            const pending = unresolvedCandidates(this.results, this.selected);
-            if (pending.length) {
-                this.message = `Revisa los avisos resaltados: ${pending.map(item => item.number).join(', ')}. Desmárcalos o confirma que son inmuebles distintos. Todavía no se agregó ninguno.`;
-                panel.querySelector('[data-duplicate-warning]')?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                return;
-            }
+            const requested = [...this.selected]; this.refreshDuplicates();
+            if (includeRegistered) this.selected = requested;
             const rows = this.results.filter(item => this.selected.includes(item.row.source_url)).map(item => ({ ...item.row }));
-            const counts = fillRows(form, rows, this.resultUrl, data => this.results.some(item => item.row.source_url === data.source_url && item.distinct));
-            this.message = `${counts.count} agregados por verificar; ${counts.duplicates} enlaces repetidos omitidos; ${counts.suspected} posibles duplicados sin agregar; ${counts.overflow} sin espacio. Comprueba el estado de guardado.`;
+            const counts = fillRows(form, rows, this.resultUrl, undefined, {deferDuplicateReview:true});
+            this.message = `${counts.count} anuncios nuevos; ${counts.enriched || 0} existentes complementados; ${counts.duplicates} enlaces ya registrados sin duplicar. Comprueba diferencias y guardado en la bandeja.`;
             this.selected = [];
             this.refreshDuplicates();
+        },
+        captureAll() {
+            this.refreshDuplicates();
+            this.selected = this.visibleResults.map(item => item.row.source_url);
+            this.incorporate(true);
         },
     };
 }

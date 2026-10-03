@@ -8,7 +8,12 @@ final class MarketComponentReview
     public static function build(array $rows): array
     {
         $groups = []; $pending = 0; $excluded = 0;
+        $linked = array_count_values(array_filter(array_column($rows, 'property_group')));
         foreach ($rows as $row) {
+            $intake = $row['intake_state'] ?? '';
+            if ($intake !== '' && !in_array($intake, ['selected','selected_pending'], true)) { $pending++; continue; }
+            // Linked source observations are not independent samples. Resolve the adopted observation in analysis first.
+            if (($linked[$row['property_group'] ?? ''] ?? 0) > 1) { $pending++; continue; }
             if (($row['active'] ?? '') === 'no' || ($row['status'] ?? '') === 'descartada') { $excluded++; continue; }
             $price = (float) ($row['price_amount'] ?? 0);
             $area = (float) ($row['area_m2'] ?? 0);

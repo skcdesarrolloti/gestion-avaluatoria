@@ -1,4 +1,5 @@
 import { portalResultsPaste } from './portal-results-paste.js';
+import { publishedDetails } from './comparable-published-details.js';
 
 const normalize = value => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 export function mercadolibreUrl(value) {
@@ -28,7 +29,7 @@ export function copiedMercadolibreRows(html, city) {
         if (!url || seen.has(id) || normalize(text('.poly-component__headline')) !== 'oficina en venta'
             || !expected || cityIndex < 0 || !amount || areas.length !== 1) return [];
         seen.add(id);
-        return [{ source_type: 'portal', source_name: 'Mercado Libre Inmuebles', source_url: url,
+        return [{ ...publishedDetails(card.textContent), listing_code:'MCO-' + id, source_type: 'portal', source_name: 'Mercado Libre Inmuebles', source_url: url,
             operation: 'Venta', property_type: 'Oficina', price_amount: amount, price_unit: 'precio_total',
             area_m2: areas[0][1].replace('.', ','), neighborhood: cityIndex > 0 ? location[cityIndex - 1] : '',
             ph_regime: 'por_verificar', comparability_notes: `Mercado Libre, publicación MCO-${id}. Ubicación publicada: ${location.join(', ')}. Área publicada: ${areas[0][0]}; verificar clase de área y PH. Resumen copiado del portal.` }];

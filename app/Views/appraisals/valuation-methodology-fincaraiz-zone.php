@@ -48,7 +48,8 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
         <p class="mb-3 text-xs">El portal no confirma PH en estos resúmenes. Verifica y clasifica cada aviso; este filtro actúa sobre los resultados cargados, no sobre todo el portal.</p>
         <p x-show="!visibleResults.length" class="mb-3 text-sm">No hay avisos clasificados con este régimen en la página. Revisa «Por verificar» o muestra todos.</p>
         <div class="flex flex-wrap items-center gap-3">
-            <button type="button" class="btn-primary min-h-11" @click="selectSuggested()">Seleccionar sugeridos</button>
+            <button type="button" class="btn-primary min-h-11" @click="captureAll()" :disabled="busy">Recoger nuevos y complementar existentes</button>
+            <button type="button" class="btn-secondary min-h-11" @click="selectSuggested()">Seleccionar sugeridos</button>
             <button type="button" class="btn-secondary min-h-11" @click="refreshDuplicates(); selected = visibleResults.filter(item => item.tone !== 'registered').map(item => item.row.source_url)">Seleccionar todos los disponibles</button>
             <button type="button" class="btn-secondary min-h-11" @click="selected = []" :disabled="!selected.length">Desmarcar todos</button>
             <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'matriz'">Ver en matriz (<span x-text="total"></span>)</button>

@@ -14,7 +14,7 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
         <strong><span x-text="total"><?= count($comparableRows ?? []) ?></span> muestras en la tabla</strong>
         <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'matriz'">Ver Matriz de datos</button>
         <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'matriz'; mode = 'cards'; add()">Capturar muestra manual</button>
-        <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'mapa'">Completar ubicación y soportes</button>
+        <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'matriz'; mode = 'intake'">Revisar anuncios y soportes</button>
         <span data-autosave-status>Consulta el estado de guardado al incorporar.</span>
     </div>
     <?php require __DIR__ . '/methodology-source-buttons.php'; ?>

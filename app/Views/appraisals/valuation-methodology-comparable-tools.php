@@ -15,7 +15,7 @@
             <span class="mt-1 block text-xs font-normal">Separa PH de amenidades. Completa el régimen con soporte; no se deduce del precio de administración.</span>
         </label>
         <label class="label" x-show="searchTab !== 'mapa'">Vista
-            <select :disabled="mapBusy || photoBusy || photoRetry" class="input" :value="mode" @change="mode = $event.target.value; render()" aria-describedby="comparable-view-help"><option value="cards">Fichas sin desplazamiento lateral</option><option value="table">Tabla comparativa</option></select>
+            <select :disabled="mapBusy || photoBusy || photoRetry" class="input" :value="mode" @change="mode = $event.target.value; render()" aria-describedby="comparable-view-help"><option value="intake">Bandeja por inmueble</option><option value="cards">Todos los campos por anuncio</option><option value="table">Tabla de respaldo</option></select>
             <span id="comparable-view-help" class="mt-1 block text-xs font-normal text-slate-600">Fichas para diligenciar; tabla para comparar varias muestras.</span>
         </label>
         <label class="label" x-show="searchTab !== 'mapa'">Campos a revisar

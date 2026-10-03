@@ -7,6 +7,13 @@ final class ComparableCaptureDetail
     public static function fields(): array
     {
         return [
+            'intake_state' => ['Decisión de captura', 'choice', 'shared'],
+            'property_group' => ['Identificador de inmueble confirmado', 'text', 'internal'],
+            'intake_note' => ['Pendientes o motivo de selección', 'text', 'shared'],
+            'source_updates' => ['Lecturas posteriores del mismo anuncio · diferencias conservadas', 'text', 'shared'],
+            'latest_source_excerpt' => ['Último texto leído del anuncio · contrastar con captura original', 'text', 'shared'],
+            'location_verification' => ['Verificación manual de ubicación', 'choice', 'map'],
+            'published_location' => ['Coordenadas originales publicadas · referencia sin verificar', 'text', 'map'],
             'component_key' => ['Componente de la muestra', 'text', 'internal'],
             'area_basis' => ['Qué área publica la fuente', 'text', 'shared'],
             'market_data_kind' => ['Tipo de dato: oferta, transacción o arriendo', 'choice', 'shared'],
@@ -29,6 +36,8 @@ final class ComparableCaptureDetail
     }
     public static function options(string $key): array
     {
+        if ($key === 'intake_state') return [''=>'Por revisar','review'=>'Por revisar','selected'=>'Seleccionado para análisis','selected_pending'=>'Seleccionado con pendientes','not_selected'=>'No seleccionado'];
+        if ($key === 'location_verification') return [''=>'Sin verificación manual','exact'=>'Ubicación exacta verificada manualmente','approximate'=>'Ubicación aproximada verificada manualmente'];
         if ($key === 'market_data_kind') return [''=>'Por confirmar','oferta'=>'Oferta de venta','transaccion'=>'Transacción de venta','arriendo'=>'Oferta / dato de arriendo'];
         return $key === 'negotiation_kind' ? ComparableNegotiation::options() : ComparablePhCapture::options($key);
     }
@@ -40,6 +49,8 @@ final class ComparableCaptureDetail
             $value = $row[$key] ?? '';
             if (!is_scalar($value) && $value !== null) throw new HttpException(422, "Formato inválido: $label.");
             $value = trim((string) $value);
+            if ($key === 'property_group' && $value !== '' && !preg_match('/^[a-f0-9]{32}$/D', $value))
+                throw new HttpException(422, 'Identificador de inmueble inválido.');
             if (mb_strlen($value) > 1600) throw new HttpException(422, "$label: máximo 1600 caracteres.");
             if ($type === 'choice' && !array_key_exists($value, self::options($key)))
                 throw new HttpException(422, "$label: selecciona una opción válida.");
@@ -53,6 +64,11 @@ final class ComparableCaptureDetail
             $out[$key] = $value;
         }
         $out['ph_special'] = ($row['ph_special'] ?? '') === 'condominio' ? 'condominio' : '';
+        if (($out['location_verification'] ?? '') !== '' &&
+            (!is_numeric($row['latitude'] ?? '') || !is_numeric($row['longitude'] ?? '')
+            || abs((float) $row['latitude']) > 90 || abs((float) $row['longitude']) > 180
+            || ($out['location_source'] ?? '') === '' || ($out['verification_detail'] ?? '') === ''))
+            throw new HttpException(422, 'Para confirmar ubicación registra coordenadas válidas, fuente y responsable/fecha/soporte.');
         ComparableNegotiation::value($out + $row);
         return $out;
     }

@@ -67,7 +67,8 @@ final class MetrocuadradoResultsParser
             'neighborhood' => $neighborhood, 'project_name' => $this->text($item['mnombreproyecto'] ?? '', 180),
             'contact_name' => $this->text($item['data']['mnombrevisitor'] ?? '', 120), 'contact_phone' => $this->text($item['contactPhone'] ?? '', 80),
             'bathrooms' => $this->number($item['mnrobanos'] ?? null), 'parking_spaces' => $this->number($item['mnrogarajes'] ?? null),
-            'ph_regime' => 'por_verificar', 'consulted_at' => date('Y-m-d'), 'comparability_notes' => $notes];
+            'ph_regime' => 'por_verificar', 'consulted_at' => date('Y-m-d'), 'comparability_notes' => $notes]
+            + ComparablePublishedDetails::parse($this->text($item['description'] ?? $item['mdescripcion'] ?? $item['data']['mdescripcion'] ?? '', 10000));
     }
 
     private function text(mixed $value, int $limit): string { return is_scalar($value) ? mb_substr(trim((string) $value), 0, $limit) : ''; }

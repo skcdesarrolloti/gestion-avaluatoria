@@ -1,5 +1,9 @@
 # Flujo que debe conservarse en C
 
+Actualización 2026-10-03: [bandeja por inmueble y anuncios](MERCADO-INSUMOS-BANDEJA.md).
+Tarjetas como vista principal, tabla/Excel conservados; selección para Análisis,
+vinculación explícita de fuentes y verificación manual de ubicación en M4.
+
 Actualización vigente: [recorrido por unidad y conservación](RECORRIDO-POR-UNIDAD.md).
 Una unidad visible, método registrado, academia íntegra e insumos propios.
 

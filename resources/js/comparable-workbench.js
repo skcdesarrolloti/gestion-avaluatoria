@@ -7,6 +7,7 @@ import { hasComparableData, missingComparableFields, comparableUrlKey } from './
 import { updateCapture, arrangeSheet, exportCapture, negotiationFields } from './comparable-sheet.js';
 import { comparableExcel } from './comparable-excel.js';
 import { flushModuleAutosaves } from './module-autosave.js';
+import { comparableIntake } from './comparable-intake.js';
 
 const groups = {
     capture: ['source_type', 'source_name', 'source_url', 'market_data_kind', 'operation', 'property_type', 'market_city', 'neighborhood',
@@ -27,7 +28,7 @@ const groups = {
 export function comparableWorkbench() {
     let entries = [], resize, form, createRow, prepare, grow;
     return {
-        ...comparablePhotos(), ...comparableMapNavigation(), ...comparableRemoval(), ...comparableExcel(), phFilter: 'all', mode: 'table', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
+        ...comparablePhotos(), ...comparableMapNavigation(), ...comparableRemoval(), ...comparableExcel(), ...comparableIntake(() => entries, () => form), phFilter: 'all', mode: 'intake', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
         pending: 0, duplicates: 0, shown: 0, usedIndexes: [], mapPoints: [], portalSummary: [], capturePendingCount: 0,
         get groupHelp() {
             return {
@@ -107,6 +108,7 @@ export function comparableWorkbench() {
             this.pending = entries.filter(e => e.used && e.missing.length).length;
             updateCapture(entries, form, this);
             this.duplicates = entries.filter(e => e.used && e.duplicate).length;
+            this.rebuildIntake();
             this.mapPoints = locationPoints(entries.map(e => e.data), {latitude:form.dataset.subjectLatitude, longitude:form.dataset.subjectLongitude});
             this.render();
         },

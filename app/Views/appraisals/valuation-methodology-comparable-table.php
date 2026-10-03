@@ -16,17 +16,17 @@
     <div x-show="searchTab === 'captura'"><?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-links.php'; ?></div>
     <section x-show="['matriz', 'mapa'].includes(searchTab)" x-effect="if (['matriz', 'mapa'].includes(searchTab)) $nextTick(() => syncWidth())">
     <div class="mb-4 flex flex-wrap items-center gap-2" aria-label="Vistas de las muestras">
-        <button type="button" class="btn-secondary min-h-11" :aria-pressed="searchTab === 'matriz'" @click="searchTab = 'matriz'">Tabla de muestras (<span x-text="total"></span>)</button>
-        <button type="button" class="btn-secondary min-h-11" :aria-pressed="searchTab === 'mapa'" @click="searchTab = 'mapa'">Mapas, coordenadas y fotos</button>
+        <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'matriz'; mode = 'intake'">Inmuebles recogidos (<span x-text="intakeCount"></span>)</button>
+        <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'matriz'; mode = 'table'">Tabla y Excel · respaldo</button>
     </div>
     <div id="capture-review" x-show="searchTab === 'matriz'" class="scroll-mt-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">Tabla madre de comparables</p>
-            <h3 class="mt-2 text-xl font-semibold"><?= !empty($guide['is_ph']) ? 'Tabla de comparables PH · áreas privadas y componentes' : 'Tabla de comparables · terreno y construcción NPH' ?></h3>
+            <p class="eyebrow">Bandeja de captura · Mercado</p>
+            <h3 class="mt-2 text-xl font-semibold">Inmuebles y anuncios recogidos</h3>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                Diligencia una fila por cada oferta, transacción o dato de mercado. El sujeto queda fuera de esta tabla:
-                aquí se preparan las muestras que se analizarán en M4. Completa ubicación y soporte en «Mapas, coordenadas y fotos».
-                Un inmueble por fila y sus datos por columnas. Sin límite de cantidad de muestras; revisa los pendientes, PH y fotos por inmueble.
+                Cada anuncio conserva su fuente, código, precio y datos originales. Confirma cuáles corresponden al mismo inmueble:
+                sus diferencias se conservan. Seleccionar significa enviarlo a estudio; no acredita comparabilidad.
+                La ubicación y sus coordenadas se verificarán manualmente en Análisis.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
@@ -35,17 +35,18 @@
             <button type="button" @click="searchTab = 'captura'" class="btn-secondary min-h-11">Seguir capturando</button>
         </div>
     </div>
-    <?php require __DIR__ . '/methodology-excel-import.php'; ?>
-    <div id="unit-price-help" x-show="searchTab === 'matriz'" class="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-6">
+    <details class="mt-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Excel · descargar o actualizar anuncios (opcional)</summary><?php require __DIR__ . '/methodology-excel-import.php'; ?></details>
+    <?php require __DIR__ . '/methodology-intake-cards.php'; ?>
+    <div id="unit-price-help" x-show="searchTab === 'matriz' && mode !== 'intake'" class="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-6">
         <p><strong>Comparación en COP/m².</strong> Oferta y negociado por m² se calculan automáticamente; los importes originales se conservan como soporte. Se exige régimen, área positiva y fuente; en NPH/condominio también la base del área publicada. Descuento vacío queda pendiente; cero debe ser confirmado. Un precio ya publicado por m² no se divide nuevamente.</p>
         <p><strong>PH: cociente preliminar, pendiente de M4.</strong> Usa área privada construida, sin sumar áreas de garaje, depósito o áreas libres. Si el precio incluye estos componentes, hay que sustentar su depuración del comparable (art. 19.2.b); tener los mismos anexos que el sujeto no elimina esa revisión.</p>
         <p><strong>Garaje y depósito del sujeto.</strong> Matrícula independiente: revisar valoración global o por m² según mercado y restricciones. Común de uso exclusivo: su incidencia queda implícita en la unidad principal y no se liquida independientemente (art. 36.2). Privado en la misma matrícula: documentar composición y áreas, sin asumir que equivale a bien común ni duplicar su valor. Sin evidencia para estimar el componente, queda pendiente; no se asignan porcentajes ni valores automáticos.</p>
     </div>
-    <div x-show="searchTab === 'matriz'"><?php require __DIR__ . '/valuation-methodology-capture-areas.php'; ?></div>
+    <div x-show="searchTab === 'matriz' && mode !== 'intake'"><?php require __DIR__ . '/valuation-methodology-capture-areas.php'; ?></div>
     <div x-show="searchTab === 'mapa'"><?php require __DIR__ . '/valuation-methodology-search-map.php'; ?></div>
-    <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-tools.php'; ?>
+    <div x-show="mode !== 'intake'"><?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-tools.php'; ?></div>
     <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-photos.php'; ?>
-    <div class="comparable-grid mt-4 overflow-x-auto rounded-xl border border-slate-200" x-ref="grid" x-show="shown > 0"
+    <div class="comparable-grid mt-4 overflow-x-auto rounded-xl border border-slate-200" x-ref="grid" x-show="shown > 0 && mode !== 'intake'"
         @scroll="$refs.topScroll.scrollLeft = $el.scrollLeft">
         <table class="min-w-[4700px] divide-y divide-slate-200 text-left text-sm">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-table-head.php'; ?>

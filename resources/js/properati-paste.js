@@ -1,5 +1,6 @@
 import { portalResultsPaste } from './portal-results-paste.js';
 import { properatiClipboardCards } from './properati-clipboard.js';
+import { publishedDetails } from './comparable-published-details.js';
 
 const normalize = value => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 export function properatiUrl(value) {
@@ -23,7 +24,7 @@ export function parseProperatiCards(cards, city) {
         if (!url || seen.has(url) || !/^oficina en venta en\s/.test(normalize(card.heading))
             || !expected || cityIndex < 0 || !price || !area) return [];
         seen.add(url);
-        return [{ source_type: 'portal', source_name: 'Properati', source_url: url,
+        return [{ ...publishedDetails(card.text || card.heading), source_type: 'portal', source_name: 'Properati', source_url: url,
             operation: 'Venta', property_type: 'Oficina', price_amount: price, price_unit: 'precio_total',
             area_m2: area.replace('.', ','), neighborhood: cityIndex > 0 ? places[0] : '', ph_regime: 'por_verificar',
             contact_name: String(card.agency || '').trim(),
@@ -41,7 +42,7 @@ export function copiedProperatiRows(html, city) {
         return { url: title?.getAttribute('href') || share?.getAttribute('url'),
             heading: text('snippet__title') || share?.getAttribute('title'),
             location: text('snippet__location'), price: text('snippet__price'),
-            area: text('area-value'), agency: text('agency-name') };
+            area: text('area-value'), agency: text('agency-name'), text:article.textContent };
     });
     return parseProperatiCards([...cards, ...properatiClipboardCards(template.content, properatiUrl)], city);
 }

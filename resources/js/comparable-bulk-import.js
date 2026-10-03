@@ -1,5 +1,6 @@
 import { comparableUrlKey, hasComparableData } from './comparable-review.js';
-import { checkComparableDuplicates } from './comparable-duplicates.js';
+import { publishedDetails } from './comparable-published-details.js';
+import { sourceUpdate } from './comparable-source-update.js';
 
 export function parseComparableBlock(block) {
     const text = String(block ?? '').replace(/\r/g, '').trim();
@@ -16,6 +17,7 @@ export function parseComparableBlock(block) {
     const priceUnit = operation === 'Arriendo' ? 'canon_mensual' : (price ? 'precio_total' : '');
     const project = text.split('\n').find(line => /edificio|conjunto|proyecto|condominio|torre/i.test(line)) ?? '';
     return {
+        ...publishedDetails(text),
         source_type: url ? 'portal' : 'otro',
         source_name: hostname ? titleFromHost(hostname) : '',
         source_url: url,
@@ -86,7 +88,7 @@ function setField(row, key, value) {
     const input = field(row, key);
     if (!input || value === undefined || value === null || String(value).trim() === '') return;
     if (input.tagName === 'SELECT' && ![...input.options].some(option => option.value === value)) return;
-    input.value = value;
+    input.value = input.type === 'number' ? String(value).replace(',', '.') : value;
 }
 
 export function fillRows(form, rows, defaultQuery, confirmDistinct, options = {}) {
@@ -96,12 +98,21 @@ export function fillRows(form, rows, defaultQuery, confirmDistinct, options = {}
     const known = new Set([...form.querySelectorAll('tbody tr')]
         .map(row => comparableUrlKey(field(row, 'source_url')?.value)).filter(Boolean));
     let count = 0, firstRow = null;
-    let duplicates = 0, overflow = 0, suspected = 0;
+    let duplicates = 0, overflow = 0, suspected = 0, enriched = 0;
     rows.forEach(data => {
         const key = comparableUrlKey(data.source_url);
-        if (key && known.has(key)) { duplicates++; return; }
-        const review = options.deferDuplicateReview ? { blocked: false }
-            : checkComparableDuplicates(data, existing, confirmDistinct ? message => confirmDistinct(data, message) : undefined);
+        if (key && known.has(key)) {
+            const matching = [...form.querySelectorAll('tbody tr')].find(tr => comparableUrlKey(field(tr,'source_url')?.value) === key);
+            const prior = existing[matching.sectionRowIndex];
+            const changes = sourceUpdate(prior,data);
+            if (Object.keys(changes).length) {
+                Object.entries(changes).forEach(([name,value]) => setField(matching,name,value));
+                existing[matching.sectionRowIndex] = {...prior,...changes}; enriched++;
+            }
+            duplicates++; return;
+        }
+        // Cross-source suspicions belong in the intake tray, not in a blocking import dialog.
+        const review = { blocked: false };
         if (review.blocked) { review.exact ? duplicates++ : suspected++; return; }
         const row = targets.shift() || (() => {
             form.dispatchEvent(new CustomEvent('comparable-grow', { detail: 1 }));
@@ -116,13 +127,15 @@ export function fillRows(form, rows, defaultQuery, confirmDistinct, options = {}
         setField(row, 'query_used', defaultQuery);
         setField(row, 'active', 'si');
         setField(row, 'status', 'por_verificar');
+        setField(row, 'intake_state', 'review');
+        if (!data.consulted_at) setField(row, 'consulted_at', new Intl.DateTimeFormat('en-CA',{timeZone:'America/Bogota'}).format(new Date()));
         count++;
     });
-    if (count > 0) {
+    if (count > 0 || enriched > 0) {
         form.dispatchEvent(new Event('input', { bubbles: true }));
-        form.dispatchEvent(new CustomEvent('comparable-imported', { detail: firstRow }));
+        if (firstRow !== null) form.dispatchEvent(new CustomEvent('comparable-imported', { detail: firstRow }));
     }
-    return { count, duplicates, overflow, suspected };
+    return { count, duplicates, overflow, suspected, enriched };
 }
 
 export function installComparableBulkImport() {
@@ -136,7 +149,7 @@ export function installComparableBulkImport() {
         const rows = parseComparableText(input?.value ?? '');
         const result = form ? fillRows(form, rows, panel?.dataset?.defaultQuery ?? '') : { count: 0, duplicates: 0, overflow: 0 };
         if (message) message.textContent = rows.length
-            ? `${result.count} muestra(s) cargada(s). ${result.duplicates} enlace(s) repetido(s) omitido(s). ${result.suspected || 0} posible(s) duplicado(s) sin agregar: revisa la tabla. ${result.overflow} sin cargar por un problema al crear la fila. El texto original se conserva; consulta el estado de guardado.`
+            ? `${result.count} anuncios nuevos. ${result.enriched || 0} anuncios existentes complementados sin reemplazar valores registrados. ${result.duplicates} enlaces ya registrados; no se duplican. ${result.overflow} sin cargar. Revisa diferencias y guardado en la bandeja.`
             : 'Pega enlaces, texto de avisos o filas con datos antes de cargar.';
         form?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     });
