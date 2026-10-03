@@ -59,3 +59,10 @@ Móvil CSS390/documento367/plan327, sin desbordamiento global. Capturas guardada
 de navegación y plan con ambos métodos. Consulta general C1 conserva sólo teoría,
 sin revisión o siguiente paso de una unidad, incluso con casa desagregada.
 Push no prueba publicación en hosting. Desplegar archivos PHP y CSS actualizado.
+
+Cada artículo del lector compartido muestra junto a su número una frase breve
+que explica su utilidad. Es ayuda editorial; el texto normativo completo permanece
+intacto y cerrado hasta que se despliega. Aplica también a las academias del capítulo 8.
+Validación: lint PHP, PHP678, JS131, build y 66,4KB gzip; vista de escritorio
+comprobada en Chrome y ancho móvil 367px sin desbordamiento global. La captura
+móvil no estuvo disponible por timeout del navegador. Sin cambios de persistencia.

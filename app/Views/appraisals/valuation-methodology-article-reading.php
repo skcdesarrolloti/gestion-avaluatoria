@@ -3,6 +3,7 @@
     <details class="mt-3 border-t border-indigo-100 pt-1">
         <summary class="min-h-11 cursor-pointer py-3 font-semibold text-indigo-800 focus-visible:outline-2 focus-visible:outline-indigo-700">
             Leer artículo <?= e((string) $readingNumber) ?> completo
+            <span class="font-normal text-slate-600"> · <?= e($articleReading['purpose']) ?></span>
         </summary>
         <div class="max-h-96 overflow-y-auto rounded-lg bg-slate-50 p-3 text-sm leading-6 text-slate-800"
             tabindex="0" role="region" aria-label="Texto completo del artículo <?= e((string) $readingNumber) ?>">
