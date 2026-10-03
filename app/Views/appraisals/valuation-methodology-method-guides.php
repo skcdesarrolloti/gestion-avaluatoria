@@ -11,7 +11,7 @@ $firstMethodPart = (string) ($methodologyGuides[0]['parts'][0]['key'] ?? 'compre
                 <h3 class="mt-2 text-xl font-semibold text-slate-950"><?= e(($prefix ?? '') . '1 Academia · ' . ($methods[$method ?? ''] ?? 'Resolución IGAC 941')) ?></h3>
                 <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                     Lectura operativa por método. Esta guía no reemplaza el criterio profesional; ordena artículos,
-                    insumos y controles antes de pasar a la selección del método.
+                    insumos y controles antes de preparar los datos del método elegido.
                 </p>
             </div>
             <a class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-800"

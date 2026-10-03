@@ -1,5 +1,11 @@
 # Entrega al responsable de la implementación
 
+Academia capítulo 8 agrupada por métodos activos, incluidos contrastes, sin repetir
+teoría por unidad. Academia accesible desde Configuración; cada pestaña anuncia
+unidades/alcances. Reutiliza guías existentes y C1 completo; lectura PH compartida
+plegable y controles por unidad en apartado cerrado. Sin esquema ni datos nuevos.
+PHP690, JS131, lint/build/66,4KB, navegador escritorio/móvil y lectura completa.
+
 Configuración del 8 por pestañas de unidad: sólo se renderizan los formularios de
 la unidad elegida; navegación conserva identidad y recuperación del borrador.
 Conceptos dinámicos para organización, método y tratamiento. Ambas alternativas

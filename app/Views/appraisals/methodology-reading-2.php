@@ -1,4 +1,4 @@
-<?php require __DIR__ . '/methodology-unit-reading.php'; ?>
+<?php if (empty($sharedAcademyContext)) require __DIR__ . '/methodology-unit-reading.php'; ?>
     <?php if ($orientationPh === 'si'): ?>
     <h4 class="mt-4 font-semibold">2. PH: dos decisiones distintas que no deben confundirse</h4>
     <p class="mt-2 text-sm leading-6"><?= $orientationPh === 'si' ? 'El expediente está marcado como PH: revisa estas reglas antes de decidir el tratamiento.' : 'Consulta estas reglas si esta unidad o las muestras están sometidas a PH; confirma primero el régimen.' ?></p>

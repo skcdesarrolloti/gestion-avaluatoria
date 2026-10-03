@@ -122,3 +122,18 @@ activa: PH, anexo, terreno, construcción o terreno/construcción NPH según los
 datos registrados. Si falta contexto, se identifica expresamente como genérico.
 No adopta métodos ni altera datos. PHP685, JS131, lint/build y 66,4KB gzip;
 Chrome local: oficina PH y cambio al depósito; móvil CSS367/scroll367.
+
+Academia compartida por método: la barra muestra Academia desde Configuración.
+Una pestaña por método efectivamente elegido en los recorridos activos, incluyendo
+contrastes; muestra sus unidades/alcances sin repetir la teoría para cada anexo.
+Reutiliza las guías de Mercado, Renta y Residual, y los temas y anexo íntegro C1.
+Artículos completos plegables, con utilidad breve. La lectura PH y el art. 15 se
+consultan en un apartado común. La aplicación particular queda plegada, muestra
+sólo los datos y controles de la unidad elegida y conserva vínculos a sus insumos.
+La consulta de Costo sin asignación sigue siendo teoría. URLs antiguas de academia
+`stage=components` resuelven a esta lectura compartida. No modifica métodos,
+muestras, valores, JSON ni esquema; no implementa etapas posteriores.
+
+Validación: PHP690, JS131, lint, build y 66,4KB gzip. Chrome local: tres unidades
+PH con Mercado y una sola academia; caso NPH con Mercado/Costo/Renta, cambio entre
+academias, lector completo abre/cierra; móvil CSS367/scroll367 sin desbordamiento.

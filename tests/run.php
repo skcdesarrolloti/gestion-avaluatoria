@@ -8,6 +8,7 @@ require __DIR__ . '/cost-method.php';
 require __DIR__ . '/market-subject-checklist.php';
 require __DIR__ . '/subject-unit-kind.php';
 require __DIR__ . '/methodology-navigation.php';
+require __DIR__ . '/methodology-academy.php';
 require __DIR__ . '/comparable-capture-detail.php';
 require __DIR__ . '/comparable-unit-price.php';
 require __DIR__ . '/comparable-excel.php';

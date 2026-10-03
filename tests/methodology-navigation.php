@@ -69,14 +69,14 @@ declare(strict_types=1);
     }
     $componentKey = 'office'; $stage = '1';
     ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php'; $html = ob_get_clean();
-    expect(!str_contains($html, 'aria-label="Etapas de Mercado"') && str_contains($html, 'Siguiente: definir método y alcance') && str_contains($html, 'component=office'), 'al elegir componente navegación común y siguiente paso conservan identidad');
+    expect(!str_contains($html, 'aria-label="Etapas de Mercado"') && str_contains($html, 'Una academia por método') && str_contains($html, 'component=office') && !str_contains($html,'Verificación de datos guardados'), 'academia sin método asignado ofrece teoría sin fingir controles de una unidad');
     $componentKey = 'annex'; $stage = 'decision';
     ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php'; $html = ob_get_clean();
     expect(str_contains($html, "componentTab: 'annex'"), 'matriz abre componente solicitado en lugar de primera unidad');
     $stage = '1';
     ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php'; $html = ob_get_clean();
-    expect(str_contains($html, 'registrado en capítulo 1; pendiente confirmar en capítulo 8'),
-        'tratamiento de origen visible sin fingir adopción del analista');
+    expect(str_contains($html, 'Ninguna unidad tiene este método asignado'),
+        'academia sin asignación no presenta un tratamiento adoptado');
     $stage='plan'; $componentKey='annex';
     ob_start(); require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php'; $html=ob_get_clean();
     expect(str_contains($html,'Método y alcance · Depósito de oficina') && !str_contains($html,'Método y alcance · Oficina &lt;principal&gt;'),

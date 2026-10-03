@@ -27,11 +27,12 @@ $costAcademyTheoryOnly = $costAcademy && ($selected['method'] ?? '') !== 'costo'
     <p role="status" class="mt-4 rounded-xl border p-4"><?= e($notice) ?></p>
 <?php endforeach; ?>
 <?php require __DIR__ . '/methodology-navigation.php'; ?>
-<?php require __DIR__ . '/methodology-unit-tabs.php'; ?>
-<?php require __DIR__.'/methodology-step-articles.php'; ?>
+<?php if ($stage!=='1'): require __DIR__ . '/methodology-unit-tabs.php'; require __DIR__.'/methodology-step-articles.php'; endif; ?>
 <div class="mt-6">
 <?php if ($stage === 'plan'): ?>
     <?php require __DIR__.'/methodology-plan.php'; ?>
+<?php elseif ($stage==='1'): ?>
+    <?php require __DIR__.'/methodology-academy.php'; ?>
 <?php elseif ($costAcademy): ?>
     <?php require __DIR__ . '/methodology-cost-academy.php'; ?>
 <?php elseif ($stage === 'components' || $stage === 'integration'): ?>
@@ -40,8 +41,6 @@ $costAcademyTheoryOnly = $costAcademy && ($selected['method'] ?? '') !== 'costo'
     <?php require __DIR__ . '/valuation-methodology-decision.php'; ?>
 <?php elseif ($stage === 'report'): ?>
     <?php require __DIR__ . '/valuation-methodology-deliverable-preview.php'; ?>
-<?php elseif ($stage === '1'): ?>
-    <?php require __DIR__ . '/methodology-components.php'; ?>
 <?php elseif ($stage === '2'): ?>
     <?php require __DIR__ . '/methodology-selection.php'; ?>
 <?php elseif ($stage === '3' && $method === 'renta'): ?>
@@ -59,4 +58,4 @@ $costAcademyTheoryOnly = $costAcademy && ($selected['method'] ?? '') !== 'costo'
 <?php endif; ?>
 </div>
 
-<?php if (!$costAcademyTheoryOnly && $stage!=='plan'): require __DIR__ . '/methodology-next.php'; endif; ?>
+<?php if (!$costAcademyTheoryOnly && !in_array($stage,['plan','1'],true)): require __DIR__ . '/methodology-next.php'; endif; ?>

@@ -1,7 +1,7 @@
 <?php
 
 use App\Services\CostMethodReview;
-require __DIR__.'/methodology-cost-academy-reading.php';
+if (empty($academySharedTheory)) require __DIR__.'/methodology-cost-academy-reading.php';
 if (($selected['method'] ?? '') !== 'costo' || $componentKey === '') return;
 $costUnit=$components[$componentKey]['unit'] ?? [];
 $costChecks=CostMethodReview::checks($costUnit,$selected);

@@ -43,6 +43,7 @@ final class AppraisalValuationMethodologyController
         $method = ($selected['method'] ?? '') ?: (is_string($_GET['method'] ?? null) ? $_GET['method'] : 'mercado');
         if (!isset(\App\Services\MethodologyWorkflow::METHODS[$method])) $method = 'mercado';
         $stage = is_string($_GET['stage'] ?? null) ? $_GET['stage'] : 'plan';
+        if ($stage==='components') $stage='1';
         if (!in_array($stage, ['plan', 'components', 'integration', 'decision', 'report', '1', '2', '3', '4', '5'], true)) $stage = 'plan';
         if (!empty($components[$componentKey]['container']) && in_array($stage, ['components','1','2','3','4','5'], true)) $stage = 'plan';
         if ($stage==='1' && ($_GET['consult_method'] ?? '')==='costo') $method='costo';
