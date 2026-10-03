@@ -23,6 +23,10 @@ test('building coincidence proposes review without merging distinct offices', ()
         {id:'b',project_name:'Torre Uno',neighborhood:'Centro',property_type:'Oficina',operation:'Venta'}]);
     assert.equal(groups.length,2); assert.equal(groups[0].candidates[0].key,'b');
 });
+test('previously used observations show their existing selection while new imports remain for review', () => {
+    const groups=intakeGroups([{id:'a',status:'usada'},{id:'b',status:'por_verificar'}]);
+    assert.equal(groups[0].state,'selected_pending'); assert.equal(groups[1].state,'review');
+});
 test('captures explicit private area and annexes but never invents rights or exact coordinates', () => {
     const row=publishedDetails('Área privada construida: 85,5 m². 2 parqueaderos y 1 depósito. Administración: $ 600.000. Celular: 3001234567');
     assert.equal(row.private_built_m2,'85,5'); assert.equal(row.parking_spaces,'2');

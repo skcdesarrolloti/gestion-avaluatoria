@@ -21,7 +21,7 @@
     </div>
     <div id="capture-review" x-show="searchTab === 'matriz'" class="scroll-mt-6 flex flex-wrap items-start justify-between gap-4">
         <div>
-            <p class="eyebrow">Bandeja de captura · Mercado</p>
+            <p class="eyebrow">Bandeja de captura · <?= e($methods[$method ?? 'mercado'] ?? 'Mercado') ?></p>
             <h3 class="mt-2 text-xl font-semibold">Inmuebles y anuncios recogidos</h3>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Cada anuncio conserva su fuente, código, precio y datos originales. Confirma cuáles corresponden al mismo inmueble:

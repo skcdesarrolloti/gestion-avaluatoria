@@ -9,7 +9,7 @@ export function intakeGroups(rows) {
         groups.get(key).rows.push(row);
     });
     return [...groups.values()].map(group => {
-        const states = new Set(group.rows.map(row => row.intake_state || 'review'));
+        const states = new Set(group.rows.map(row => row.intake_state || (row.status === 'usada' ? 'selected_pending' : 'review')));
         group.state = states.size === 1 ? [...states][0] : 'review';
         group.conflicts = ['price_amount','area_m2','parking_spaces','ph_deposit_count'].filter(key =>
             new Set(group.rows.map(row => normalize(row[key])).filter(Boolean)).size > 1);

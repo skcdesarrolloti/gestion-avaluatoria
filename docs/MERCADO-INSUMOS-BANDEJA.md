@@ -38,7 +38,7 @@ El mapa Google se muestra únicamente con confirmación y soporte guardados. No 
 distancias ni se verifican direcciones automáticamente. Referencias anteriores se conservan
 en published_location al confirmar manualmente. No desarrolla exclusión de datos atípicos.
 
-Sin cambio de esquema; metadata aditiva en JSON existente. Pruebas: PHP835, JS135,
+Sin cambio de esquema; metadata aditiva en JSON existente. Pruebas: PHP835, JS136,
 BD168 más cinco nuevas de persistencia, lint y build; 68 KB gzip dentro de 80 KB.
 Chrome local con datos ficticios: vincular precios100/110 y áreas80/82, seleccionar un grupo,
 recepción sólo del grupo, punto aproximado guardado/recargado, captura85,5m²/2garajes/1depósito.

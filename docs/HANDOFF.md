@@ -658,7 +658,7 @@ enlace completa vacíos sin sustituir precios; diferencias y último texto conse
 Coordenadas sólo verificadas manualmente en M4 con precisión/fuente/soporte; mapa
 después del guardado. No desarrolla depuración estadística ni adopción de valores.
 Ver MERCADO-INSUMOS-BANDEJA.md. JSON aditivo, sin migraciones ni datos reales alterados.
-PHP835, JS135, BD168 más cinco nuevas de persistencia, lint665PHP, build68KB gzip.
+PHP835, JS136, BD168 más cinco nuevas de persistencia, lint665PHP, build68KB gzip.
 Chrome local: vincular y seleccionar dos anuncios, recepción como un inmueble,
 captura85,5m²/2garajes/1depósito, relectura150→155 conserva150 y advierte diferencia,
 punto aproximado confirmado y recargado; CSS390px sin desbordamiento lateral.
