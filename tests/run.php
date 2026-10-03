@@ -5,6 +5,7 @@ require __DIR__ . '/support.php';
 require __DIR__ . '/methodology-workflow.php';
 require __DIR__ . '/methodology-plan.php';
 require __DIR__ . '/cost-method.php';
+require __DIR__ . '/cost-academy-render.php';
 require __DIR__ . '/market-subject-checklist.php';
 require __DIR__ . '/subject-unit-kind.php';
 require __DIR__ . '/methodology-navigation.php';

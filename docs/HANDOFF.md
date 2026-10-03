@@ -1,5 +1,10 @@
 # Entrega al responsable de la implementación
 
+C1 homogéneo con las otras academias: tarjetas de artículos 27–30, trece temas
+íntegros en seis apartados y subpestañas dependientes. Tablas, ejemplos y PDF original
+conservados. Sólo presentación de academia. PHP817/JS131/lint/build/66,4KB;
+Chrome escritorio y móvil. Ver COSTO-C1-ACADEMIA.md.
+
 Academia capítulo 8 agrupada por métodos activos, incluidos contrastes, sin repetir
 teoría por unidad. Academia accesible desde Configuración; cada pestaña anuncia
 unidades/alcances. Reutiliza guías existentes y C1 completo; lectura PH compartida

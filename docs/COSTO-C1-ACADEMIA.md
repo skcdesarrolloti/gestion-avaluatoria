@@ -1,5 +1,18 @@
 # C1 · Academia del costo · revisión 2026-10-02
 
+Actualización 2026-10-03: C1 usa el mismo contenedor, revisión normativa y tarjetas
+de artículos que Mercado/Renta/Residual. Los artículos 27–30 se leen completos
+desde sus tarjetas, con propósito breve; sin segundo juego de lectores.
+Los trece temas originales se conservan íntegros, organizados en seis apartados:
+alcance/costo a nuevo, fuentes/indirectos, vidas, depreciación, situaciones
+especiales y cierre/documentos. Cada apartado muestra sólo sus subpestañas y
+el tema seleccionado. Conserva tablas, fórmulas, ejemplos y fuentes originales;
+la precisión técnica no se modifica. Anexo íntegro, lector y descarga bajo
+Cierre y documentos → Documentos completos. Sin datos, cálculos o esquema nuevos.
+PHP817 (incluye conservación de todos los textos y celdas), JS131, lint/build y
+66,4KB gzip. Chrome escritorio: grupos/subtemas, remanente, conservación, Ross,
+retiro y enlace de descarga; móvil CSS367/scroll367 sin desbordamiento global.
+
 Alcance exclusivo: material de consulta C1. C2–C5, datos, catálogos y motores intactos.
 Academia primero, antes del checklist. Trece apartados, índice por anclas, lectura
 colapsable, tablas de referencia/conservación, ejemplos y enlaces por tema.

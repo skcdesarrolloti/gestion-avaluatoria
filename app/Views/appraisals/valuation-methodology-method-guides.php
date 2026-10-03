@@ -34,7 +34,7 @@ $firstMethodPart = (string) ($methodologyGuides[0]['parts'][0]['key'] ?? 'compre
                     </div>
                 </div>
                 <?php if ($articleCards !== []): ?>
-                    <div class="mt-4 grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+                    <div class="mt-4 grid gap-3 md:grid-cols-2 <?= $guideKey==='costo'?'xl:grid-cols-2':'xl:grid-cols-3' ?>">
                         <?php foreach ($articleCards as $article): ?>
                             <?php $highlights = is_array($article['highlights'] ?? null) ? $article['highlights'] : []; ?>
                             <section class="rounded-xl border border-indigo-100 bg-white p-4 text-sm leading-6">
@@ -55,6 +55,7 @@ $firstMethodPart = (string) ($methodologyGuides[0]['parts'][0]['key'] ?? 'compre
                     </div>
                 <?php endif; ?>
                 <?php require __DIR__ . '/valuation-methodology-method-review.php'; ?>
+                <?php if ($guideKey==='costo'): require __DIR__.'/methodology-cost-academy-topics.php'; else: ?>
                 <nav class="mt-4 flex gap-2 overflow-x-auto" aria-label="Detalle del método">
                     <?php foreach ($parts as $part): ?>
                         <?php $partKey = (string) ($part['key'] ?? ''); ?>
@@ -76,6 +77,7 @@ $firstMethodPart = (string) ($methodologyGuides[0]['parts'][0]['key'] ?? 'compre
                         </ul>
                     </div>
                 <?php endforeach; ?>
+                <?php endif; ?>
             </article>
         <?php endforeach; ?>
     </section>
