@@ -24,8 +24,12 @@ declare(strict_types=1);
         } finally { ob_end_clean(); }
         expect(str_contains($html, '>Configuración</a>') && !str_contains($html, 'Herramientas y consultas del expediente')
             && !str_contains($html, 'aria-label="Etapas de Mercado"'), 'navegación común sin menús duplicados en ' . $stage);
-        if ($stage==='plan') expect(str_contains($html,'Configuración de la valoración') && !str_contains($html,'Verificación de datos guardados')
-            && str_contains($html,'Resolución 941 · Artículos completos para este paso'), 'plan inicial orienta decisiones sin desplegar academias o checklist por cada inmueble');
+        if ($stage==='plan') {
+            expect(str_contains($html,'Configuración de la valoración') && !str_contains($html,'Verificación de datos guardados')
+                && str_contains($html,'Resolución 941 · Artículos completos para este paso'), 'plan inicial orienta decisiones sin desplegar academias o checklist por cada inmueble');
+            expect(str_contains($html,'aria-label="Unidades en configuración"') && str_contains($html,'Método y alcance · Oficina &lt;principal&gt;')
+                && !str_contains($html,'Método y alcance · Depósito de oficina'),'configuración muestra pestañas pero sólo formularios de la unidad elegida');
+        }
         if ($stage === 'components') {
             expect(str_contains($html, 'Verificación de la unidad principal y los anexos')
                 && str_contains($html, 'Ver controles de Depósito de oficina') && str_contains($html, 'Sin descripción propia'),
@@ -73,4 +77,8 @@ declare(strict_types=1);
     ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php'; $html = ob_get_clean();
     expect(str_contains($html, 'registrado en capítulo 1; pendiente confirmar en capítulo 8'),
         'tratamiento de origen visible sin fingir adopción del analista');
+    $stage='plan'; $componentKey='annex';
+    ob_start(); require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php'; $html=ob_get_clean();
+    expect(str_contains($html,'Método y alcance · Depósito de oficina') && !str_contains($html,'Método y alcance · Oficina &lt;principal&gt;'),
+        'pestaña de anexo abre sus campos propios sin formularios de la oficina');
 })();

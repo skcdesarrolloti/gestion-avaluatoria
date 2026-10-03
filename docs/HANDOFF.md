@@ -1,5 +1,13 @@
 # Entrega al responsable de la implementación
 
+Configuración del 8 por pestañas de unidad: sólo se renderizan los formularios de
+la unidad elegida; navegación conserva identidad y recuperación del borrador.
+Conceptos dinámicos para organización, método y tratamiento. Ambas alternativas
+de organización son visibles; separación NPH deshabilitada en PH/anexos.
+Textos sugeridos por método/tratamiento para justificación y alcance, aplicables
+sólo a campos vacíos mediante decisión explícita. No acreditan evidencia ni se
+guardan automáticamente al consultar. Sin esquema ni nuevas reglas de cálculo.
+
 Capítulo 8 simplificado: Configuración y una única barra Academia/Insumos/Análisis/
 Entregable por recorrido. Selección y alcance se editan en Configuración; las rutas
 anteriores siguen funcionando. Matriz y sugerencias plegadas allí, banco en Insumos,

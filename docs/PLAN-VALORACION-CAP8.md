@@ -95,3 +95,24 @@ Validación: PHP683, JS131, BD168 en instancia nueva desechable3367, lint/build 
 conflictos y aislamiento de propietario; UI local guardar Mercado+Renta y recargar.
 Chrome: barra común y academia del contraste verificadas en escritorio. Ancho
 móvil CSS367/scroll367 sin desbordamiento; captura móvil indisponible por timeout.
+
+## Ayudas y pestañas por unidad
+
+Configuración muestra una pestaña por ficha original, incluidos anexos. El servidor
+renderiza únicamente su unidad activa, conservando ambas partes de una casa cuando
+la organización guardada es terreno/construcción. Los enlaces de actualización
+mantienen la unidad elegida; datos y contrastes inactivos no se modifican.
+
+Las listas de organización muestran ambas opciones, con separación deshabilitada
+si no corresponde a NPH principal. El concepto cambia bajo la opción seleccionada.
+Método y tratamiento muestran ayuda dinámica y accesible. Justificación y alcance
+ofrecen borradores contextuales, con aplicación explícita sólo si el campo está
+vacío. El borrador es editable y autoguardado como el texto normal; consultar ayudas
+no rellena ni sustituye texto guardado. No asegura evidencia disponible o valores.
+
+Validación: PHP685, JS131, lint/build y 66,4KB gzip. Navegador local sobre oficina
+PH ficticia con depósito y garaje: conceptos, aplicación y guardado de sugerencias,
+pestañas y conservación del texto. Sin cambios del esquema ni del cálculo.
+Las sugerencias se ocultan cuando el campo tiene contenido para evitar repetirlo.
+Ancho móvil CSS367/scroll367, sin desbordamiento global. Capturas de pestañas y
+ayudas conservadas; autoguardado confirmado y texto recuperado al cambiar de unidad.
