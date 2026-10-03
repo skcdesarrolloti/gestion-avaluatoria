@@ -9,7 +9,7 @@
     </nav>
     <div class="mt-5 space-y-3">
         <?php foreach ($costTopics as $topic): ?>
-        <details id="costo-academia-<?= e($topic['id']) ?>" class="scroll-mt-5 rounded-xl border bg-white p-4" <?= $topic['id']==='vidas'?'open':'' ?>>
+        <details id="costo-academia-<?= e($topic['id']) ?>" class="scroll-mt-5 rounded-xl border bg-white p-4">
             <summary class="min-h-11 cursor-pointer font-semibold focus-visible:outline-2 focus-visible:outline-blue-700"><?= e($topic['title']) ?></summary>
             <p class="mt-2 text-xs font-semibold text-teal-800"><?= e($topic['reference']) ?></p>
             <ul class="mt-3 list-disc space-y-3 pl-5 text-sm leading-6"><?php foreach ($topic['items'] as $bullet): ?><li><?= e($bullet) ?></li><?php endforeach; ?></ul>
@@ -26,9 +26,10 @@
         </details>
         <?php endforeach; ?>
     </div>
-    <details class="mt-4 rounded-xl border bg-white p-4"><summary class="min-h-11 cursor-pointer font-semibold">Consultar artículos 27–30 de la Resolución 941</summary>
+    <details class="mt-4 rounded-xl border bg-white p-4"><summary class="min-h-11 cursor-pointer font-semibold">Texto completo · Método del costo · Artículos 27–30 de la Resolución 941</summary>
         <?php foreach ([27,28,29,30] as $readingNumber): require __DIR__.'/valuation-methodology-article-reading.php'; endforeach; ?>
     </details>
+    <?php require __DIR__.'/methodology-cost-academy-full-reading.php'; ?>
     <p class="mt-3 text-xs leading-5">Referencia principal: Resolución IGAC 941 de 2026 y anexo técnico 2.3, tablas 2–7. Ejemplos didácticos sin adopción en el expediente. Fuentes editoriales: <a class="font-semibold text-blue-800 underline" href="https://www.sispac.com.co/empresa" target="_blank" rel="noopener" data-no-fetch>SISPAC</a>.</p>
 </section>
 

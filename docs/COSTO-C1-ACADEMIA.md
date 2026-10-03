@@ -39,3 +39,23 @@ Sin migración o cambio de persistencia: no corresponde repetir pruebas BD.
 Git/push no confirma publicación en hosting.
 Prueba móvil: viewport CSS390, documento367, academia327 (sin desbordamiento global).
 Captura móvil no disponible por timeout CDP; captura de escritorio conservada.
+
+## Lectura completa y plegable
+
+C1 inicia con sus 13 temas y fuentes completos cerrados. El lector existente
+conserva los artículos 27–30 completos, dentro de otro bloque plegable.
+Se incorpora el apartado íntegro 2.3 del anexo: páginas originales 22–39,
+18 páginas extraídas sin modificar texto, tablas, fórmulas ni numeración.
+Archivo público: `public/assets/normativa/igac-941-anexo-costo.pdf` (1.024.635 bytes).
+SHA256: `9768257f03c0c13916ef5769905a9ee2fdae97abb2771cb1de2e7abd47c209fd`.
+Descargado del enlace oficial del anexo citado arriba. El PDF completo de 62
+páginas sigue enlazado. No se agrega contenido de residual al apartado de costo.
+Lector PDF nativo, apertura en otra pestaña y descarga como alternativa móvil.
+El router de desarrollo admite PDF estático bajo `/assets/`; no cambia cabeceras
+de protección de las páginas de la aplicación. En hosting sirve la regla de
+archivos estáticos existente. Incluir el PDF al desplegar.
+Verificación: 18 páginas y texto idéntico al original; render de primera, última
+y tabla de conservación. PHP 657, JS 131, lint y build; tamaño CSS+JS 66,4 KB.
+HTTP local PDF 200 application/pdf. Chrome: cerrado al entrar, abrir/cerrar,
+lector visible con 18 páginas; móvil CSS390/documento367/lector251.
+Sin cambios de datos, C2–C5 ni otros métodos. Push no confirma despliegue en hosting.

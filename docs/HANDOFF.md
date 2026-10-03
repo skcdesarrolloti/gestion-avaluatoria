@@ -1,5 +1,12 @@
 # Entrega al responsable de la implementación
 
+C1 costo: temas cerrados al entrar y consulta completa plegable de artículos
+27–30 más anexo 2.3, páginas oficiales 22–39. PDF local original con 18 páginas,
+lector, descarga y enlace al documento íntegro. Desplegar también
+`public/assets/normativa/igac-941-anexo-costo.pdf`.
+Validación: PHP657, JS131, lint/build/66,4KB; HTTP PDF200, Chrome escritorio y
+móvil. Sin esquema/datos ni cambios C2–C5. Ver COSTO-C1-ACADEMIA.md.
+
 M3 PH: tabla diferenciada, descuento y negociado calculado, instrucciones por
 portal, conteos por fuente y descarga XLSX con pendientes. Datos JSON sin migración.
 Ver PH-M3-TABLA-NEGOCIACION.md: controles normativos y pendientes reales de M4.
