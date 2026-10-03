@@ -27,7 +27,9 @@ $costAcademyTheoryOnly = $costAcademy && ($selected['method'] ?? '') !== 'costo'
     <p role="status" class="mt-4 rounded-xl border p-4"><?= e($notice) ?></p>
 <?php endforeach; ?>
 <?php require __DIR__ . '/methodology-navigation.php'; ?>
-<?php if ($stage!=='1'): require __DIR__ . '/methodology-unit-tabs.php'; require __DIR__.'/methodology-step-articles.php'; endif; ?>
+<?php if ($stage!=='1'): require __DIR__ . '/methodology-unit-tabs.php'; endif; ?>
+<?php if ($stage!=='1' && $stage!=='plan'): require __DIR__.'/methodology-step-articles.php'; endif; ?>
+<?php if ($stage==='4'): require __DIR__.'/methodology-normative-notice.php'; endif; ?>
 <div class="mt-6">
 <?php if ($stage === 'plan'): ?>
     <?php require __DIR__.'/methodology-plan.php'; ?>

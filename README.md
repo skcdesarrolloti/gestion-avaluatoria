@@ -5,6 +5,8 @@ Capítulo 8: [plan de valoración y artículos por paso](docs/PLAN-VALORACION-CA
 Recorrido simplificado: Configuración → Academia → Insumos → Análisis → Entregable.
 Academia compartida por método: una pestaña por método activo y sus alcances,
 artículos completos plegables y verificaciones particulares por unidad.
+Academia General reúne reglas comunes y casos de aplicación. Requisito del análisis:
+[advertir discrepancias normativas](docs/CONTROL-NORMATIVO-ANALISIS.md).
 Un alcance puede estudiarse con varios métodos; los contrastes tienen datos propios
 y no son partidas sumables. La configuración conserva las sugerencias del analista.
 

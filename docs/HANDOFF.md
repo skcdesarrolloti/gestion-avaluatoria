@@ -1,5 +1,12 @@
 # Entrega al responsable de la implementación
 
+REQUISITO PERMANENTE: advertir contradicciones/incumplimientos de artículos en
+Análisis, con artículo, evidencia, incidencia y acción pendiente. Aviso visible
+actual; motor de detección integral pendiente. Leer CONTROL-NORMATIVO-ANALISIS.md
+antes de ampliar análisis/conclusiones. No confundir academia con certificación.
+Academia General centraliza artículos y lectura PH; Configuración ya no muestra
+el bloque de artículos. Subtemas generales siempre disponibles, con o sin métodos.
+
 C1 homogéneo con las otras academias: tarjetas de artículos 27–30, trece temas
 íntegros en seis apartados y subpestañas dependientes. Tablas, ejemplos y PDF original
 conservados. Sólo presentación de academia. PHP817/JS131/lint/build/66,4KB;

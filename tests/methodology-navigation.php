@@ -26,7 +26,7 @@ declare(strict_types=1);
             && !str_contains($html, 'aria-label="Etapas de Mercado"'), 'navegación común sin menús duplicados en ' . $stage);
         if ($stage==='plan') {
             expect(str_contains($html,'Configuración de la valoración') && !str_contains($html,'Verificación de datos guardados')
-                && str_contains($html,'Resolución 941 · Artículos completos para este paso'), 'plan inicial orienta decisiones sin desplegar academias o checklist por cada inmueble');
+                && !str_contains($html,'Resolución 941 · Artículos completos para este paso') && str_contains($html,'academy=general'), 'configuración remite artículos generales a academia sin desplegar checklist');
             expect(str_contains($html,'aria-label="Unidades en configuración"') && str_contains($html,'Método y alcance · Oficina &lt;principal&gt;')
                 && !str_contains($html,'Método y alcance · Depósito de oficina'),'configuración muestra pestañas pero sólo formularios de la unidad elegida');
         }
@@ -69,14 +69,14 @@ declare(strict_types=1);
     }
     $componentKey = 'office'; $stage = '1';
     ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php'; $html = ob_get_clean();
-    expect(!str_contains($html, 'aria-label="Etapas de Mercado"') && str_contains($html, 'Una academia por método') && str_contains($html, 'component=office') && !str_contains($html,'Verificación de datos guardados'), 'academia sin método asignado ofrece teoría sin fingir controles de una unidad');
+    expect(!str_contains($html, 'aria-label="Etapas de Mercado"') && str_contains($html, 'Una academia por método') && str_contains($html, 'academy=general') && !str_contains($html,'Verificación de datos guardados'), 'academia sin método asignado ofrece teoría sin fingir controles de una unidad');
     $componentKey = 'annex'; $stage = 'decision';
     ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php'; $html = ob_get_clean();
     expect(str_contains($html, "componentTab: 'annex'"), 'matriz abre componente solicitado en lugar de primera unidad');
     $stage = '1';
     ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php'; $html = ob_get_clean();
-    expect(str_contains($html, 'Ninguna unidad tiene este método asignado'),
-        'academia sin asignación no presenta un tratamiento adoptado');
+    expect(str_contains($html, 'Academia General · Resolución 941') && !str_contains($html,'Verificación de datos guardados'),
+        'academia general disponible sin asignación ni tratamiento adoptado');
     $stage='plan'; $componentKey='annex';
     ob_start(); require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php'; $html=ob_get_clean();
     expect(str_contains($html,'Método y alcance · Depósito de oficina') && !str_contains($html,'Método y alcance · Oficina &lt;principal&gt;'),

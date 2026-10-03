@@ -17,7 +17,7 @@ $firstMethodPart = (string) ($methodologyGuides[0]['parts'][0]['key'] ?? 'compre
             <a class="rounded-full bg-indigo-50 px-3 py-1 text-xs font-bold text-indigo-800"
                 href="<?= e(\App\Support\IgacDocumentLibrary::urlFor('resolucion-igac-941-2026')) ?>">Resolución 941</a>
         </div>
-        <?php require __DIR__ . '/valuation-methodology-normative-review.php'; ?>
+        <?php if (empty($academyCentralized)): require __DIR__ . '/valuation-methodology-normative-review.php'; endif; ?>
         <?php foreach ($methodologyGuides as $methodGuide): ?>
             <?php
             $guideKey = (string) ($methodGuide['key'] ?? '');

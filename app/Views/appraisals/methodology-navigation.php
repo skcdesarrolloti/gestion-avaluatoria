@@ -2,13 +2,14 @@
 $navigationKey = empty($components[$componentKey]['container']) ? $componentKey : '';
 $navigationWorking = $stage!=='plan' && $navigationKey!=='' && isset($components[$navigationKey]);
 $navigationConfig=in_array($stage,['plan','2','decision'],true);
+$navigationGeneral=$stage==='1' && (($_GET['academy'] ?? '')==='general' || (\App\Services\MethodologyAcademy::groups($components,$flow)===[] && !($costAcademyTheoryOnly ?? false)));
 ?>
 <section class="mt-5 rounded-xl border bg-white p-4" aria-label="Camino del capítulo 8">
     <p class="font-semibold">Configura el alcance y los métodos; después sigue academia → insumos → análisis → entregable.</p>
     <nav class="mt-3 flex flex-wrap gap-3" aria-label="Organización del capítulo 8">
         <a class="btn-secondary <?= $navigationConfig?'bg-teal-50 text-teal-900':'' ?>" href="<?= e($flowUrl('plan',null,'')) ?>">Configuración</a>
-        <a class="btn-secondary <?= $stage==='1'?'bg-teal-50 text-teal-900':'' ?>" href="<?= e($flowUrl('1',null,$navigationKey)) ?>">Academia</a>
-        <?php foreach (!$navigationWorking || ($costAcademyTheoryOnly ?? false) ? [] : ['3'=>'Insumos','4'=>'Análisis','5'=>'Entregable'] as $navStep=>$navLabel): ?>
+        <a class="btn-secondary <?= $stage==='1'?'bg-teal-50 text-teal-900':'' ?>" href="<?= e($navigationConfig || $navigationGeneral?$flowUrl('1',null,'').'&academy=general':$flowUrl('1',null,$navigationKey)) ?>">Academia</a>
+        <?php foreach (!$navigationWorking || $navigationGeneral || ($costAcademyTheoryOnly ?? false) ? [] : ['3'=>'Insumos','4'=>'Análisis','5'=>'Entregable'] as $navStep=>$navLabel): ?>
         <a class="btn-secondary <?= $stage===(string)$navStep?'bg-teal-50 text-teal-900':'' ?>" href="<?= e($flowUrl($navigationWorking ? (string)$navStep : 'plan',null,$navigationKey)) ?>"><?= e($navLabel) ?></a>
         <?php endforeach; ?>
     </nav>
