@@ -7,7 +7,7 @@ final class MethodologyWorkflowReport
     {
         $saved = MethodologyWorkflow::saved($record);
         $lines = [];
-        foreach (MethodologyWorkflow::components($record, $units) as $key => $component) {
+        foreach (MethodologyValuationPlan::working(MethodologyWorkflow::components($record, $units)) as $key => $component) {
             $item = $saved[$key] ?? [];
             if (($item['method'] ?? '') === '') continue;
             if ($item['method'] !== 'mercado') unset($item['analysis'], $item['conclusion']);

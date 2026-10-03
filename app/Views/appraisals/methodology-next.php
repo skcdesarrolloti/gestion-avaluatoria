@@ -5,10 +5,10 @@
     <?php $nextUnitStep = empty($selected['method']) ? '2' : '3'; ?>
     <a class="btn-primary mt-3" href="<?= e($flowUrl($nextUnitStep)) ?>">Siguiente: <?= empty($selected['method']) ? 'definir método y alcance' : 'insumos del método registrado' ?> →</a>
 <?php elseif ($stage === 'decision' || ($componentKey === '' && !in_array($stage, ['integration','report'], true))): ?>
-    <p class="font-semibold"><?= $stage === '4' ? 'D · Elige el inmueble cuyas muestras vas a analizar.' : 'C · Elige el inmueble para continuar con sus insumos y comparables.' ?></p>
-    <div class="mt-3 flex flex-wrap gap-3"><?php foreach ($components as $key => $component): ?>
+    <p class="font-semibold"><?= $stage === '4' ? 'Elige la unidad o parte cuyo análisis vas a desarrollar.' : 'Elige la unidad o parte para continuar con su método e insumos.' ?></p>
+    <div class="mt-3 flex flex-wrap gap-3"><?php foreach (\App\Services\MethodologyValuationPlan::working($components) as $key => $component): ?>
         <?php $hasMethod = !empty($flow[$key]['method']); $targetStage = $hasMethod ? ($stage === '4' ? '4' : '3') : '2'; ?>
-        <a class="btn-primary" href="<?= e($flowUrl($targetStage, ($flow[$key]['method'] ?? '') ?: 'mercado', $key)) ?>"><?= e($component['label']) ?> → <?= !$hasMethod ? 'Definir método en B' : ($targetStage === '4' ? 'Análisis' : 'Insumos y comparables') ?></a>
+        <a class="btn-primary" href="<?= e($flowUrl($targetStage, ($flow[$key]['method'] ?? '') ?: 'mercado', $key)) ?>"><?= e($component['label']) ?> → <?= !$hasMethod ? 'Definir método y alcance' : ($targetStage === '4' ? 'Análisis' : 'Insumos del método') ?></a>
     <?php endforeach; ?></div>
 <?php elseif ($stage === 'integration'): ?>
     <p>Revisa la cobertura y las conclusiones de todos los componentes antes de continuar.</p>

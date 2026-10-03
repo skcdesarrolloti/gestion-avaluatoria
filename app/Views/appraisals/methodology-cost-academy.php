@@ -23,7 +23,7 @@ $costPending=count(array_filter($costChecks,static fn($row)=>$row['state']==='mi
             <p class="mt-1 whitespace-pre-wrap break-words text-sm"><?= e($check['value'] ?: 'Sin dato') ?></p>
             <p class="mt-1 text-xs"><?= e($check['source'].' · '.$check['help']) ?></p>
             <a class="mt-2 inline-flex min-h-11 items-center font-semibold text-blue-800 underline" href="<?= e($check['destination']==='scope'
-                ? $flowUrl('2') : url('avaluos/'.$record['id'].'/bien-sujeto?'.http_build_query(['section'=>$check['destination'],'unit'=>$componentKey,'from'=>'metodologia']).'#unidades-capitulo-3')) ?>"><?= $ok?'Consultar':'Diligenciar / corregir' ?> en <?= e($check['source']) ?></a>
+                ? $flowUrl('2') : url('avaluos/'.$record['id'].'/bien-sujeto?'.http_build_query(['section'=>$check['destination'],'unit'=>$sourceUnitKey ?? $componentKey,'from'=>'metodologia','check_component'=>$componentKey]).'#unidades-capitulo-3')) ?>"><?= $ok?'Consultar':'Diligenciar / corregir' ?> en <?= e($check['source']) ?></a>
         </article>
         <?php endforeach; ?>
     </div>

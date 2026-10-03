@@ -16,14 +16,16 @@ declare(strict_types=1);
     $flow = $selected = $comparableRows = $marketNeighborhoods = $phProfile = [];
     $allComparableRows = [['id' => 'legacy', 'source_name' => 'Muestra anterior']];
     $method = 'mercado';
-    foreach (['components', 'decision', 'report', '1', '2', 'integration'] as $stage) {
+    foreach (['plan', 'components', 'decision', 'report', '1', '2', 'integration'] as $stage) {
         ob_start();
         try {
             require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php';
             $html = ob_get_contents();
         } finally { ob_end_clean(); }
-        expect(str_contains($html, 'Camino del expediente:') && str_contains($html, 'Siguiente paso')
-            && str_contains($html, 'Muestras sin asignar (1)') && !str_contains($html, 'aria-label="Etapas de Mercado"'), 'contexto general sin mezclar etapas de un componente no elegido en ' . $stage);
+        expect(str_contains($html, '1 · Plan de valoración') && str_contains($html, '4 · Consolidación')
+            && str_contains($html, '1 sin asignar') && !str_contains($html, 'aria-label="Etapas de Mercado"'), 'contexto general sin mezclar etapas de un componente no elegido en ' . $stage);
+        if ($stage==='plan') expect(str_contains($html,'Plan de valoración del inmueble') && !str_contains($html,'Verificación de datos guardados')
+            && str_contains($html,'Resolución 941 · Artículos completos para este paso'), 'plan inicial orienta decisiones sin desplegar academias o checklist por cada inmueble');
         if ($stage === 'components') {
             expect(str_contains($html, 'Verificación de la unidad principal y los anexos')
                 && str_contains($html, 'Ver controles de Depósito de oficina') && str_contains($html, 'Sin descripción propia'),

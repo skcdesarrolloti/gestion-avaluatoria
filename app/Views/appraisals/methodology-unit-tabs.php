@@ -1,8 +1,8 @@
 <?php
 $tabComponents = ($costAcademy ?? false)
-    ? array_filter($components, static fn ($key) => ($flow[$key]['method'] ?? '') === 'costo', ARRAY_FILTER_USE_KEY)
-    : $components;
-if ($tabComponents !== [] && !in_array($stage, ['integration', 'report'], true)): ?>
+    ? array_filter(\App\Services\MethodologyValuationPlan::working($components), static fn ($key) => ($flow[$key]['method'] ?? '') === 'costo', ARRAY_FILTER_USE_KEY)
+    : \App\Services\MethodologyValuationPlan::working($components);
+if ($tabComponents !== [] && !in_array($stage, ['plan', 'integration', 'report'], true)): ?>
 <nav class="mt-5 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Unidades y anexos del predio">
     <?php foreach ($tabComponents as $unitKey => $unitComponent):
         $unitMethod = ($flow[$unitKey]['method'] ?? '') ?: 'mercado';

@@ -10,7 +10,7 @@ final class ComparableExcelAction
     {
         $record=$appraisals->find($id,$owner);
         $key=is_string($_POST['component_scope'] ?? null)?$_POST['component_scope']:'';
-        MethodologyWorkflow::validateKey($key,MethodologyWorkflow::components($record,$appraisals->units($id,$owner)));
+        MethodologyValuationPlan::validateWorkKey($key,MethodologyWorkflow::components($record,$appraisals->units($id,$owner)));
         $file=$_FILES['excel'] ?? [];
         if (($file['error'] ?? -1)!==UPLOAD_ERR_OK || ($file['size'] ?? 0)>5000000 || !is_uploaded_file($file['tmp_name'] ?? '')) throw new HttpException(422,'Selecciona un Excel .xlsx de hasta 5 MB.');
         $all=$comparables->forAppraisal($id,$owner);

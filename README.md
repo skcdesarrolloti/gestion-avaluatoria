@@ -1,7 +1,9 @@
 # Gestión avaluatoria · SuCasa
 
-Actualización vigente: [recorrido por unidad y conservación](docs/RECORRIDO-POR-UNIDAD.md).
-Una unidad visible, método registrado, academia íntegra e insumos propios.
+Capítulo 8: [plan de valoración y artículos por paso](docs/PLAN-VALORACION-CAP8.md).
+
+Lectura y conservación: [recorrido por unidad](docs/RECORRIDO-POR-UNIDAD.md).
+Una ficha original, recorridos de valoración explícitos e insumos propios.
 
 Academia por unidad: cuatro subpestañas visibles en A del capítulo 8 y lectura contextual
 para PH, NPH, terreno y mejoras. Capítulo 1 guarda «Estructura del método» por unidad

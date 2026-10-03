@@ -117,6 +117,13 @@ final class MarketSubjectChecklist
             $scopeState = 'difference'; $scopeMessage = 'El tratamiento registrado en la composición y el adoptado en capítulo 8 difieren. Revisa qué unidad comprende cada valor.';
         }
         $add('scope', 'Componentes incluidos y tratamiento', $scope ?: 'Sin alcance documentado', '3.1 · ' . ($scopeSource ?: 'Sin soporte'), $scopeState, $scopeMessage);
+        if (($unit['method_structure'] ?? '')==='solo_terreno') {
+            foreach ($rows as &$row) if (in_array($row['key'],['work_state','conservation'],true)) {
+                $row['state']='na'; $row['value']='No aplica al terreno';
+                $row['message']='La construcción se estudia en su propio recorrido; no completa ni condiciona este control del terreno.';
+            }
+            unset($row);
+        }
         if ($phRegime === 'si') $rows = MarketPhChecklist::apply($rows, $unit, $units, $subject, $ph, $flow);
         return ['rows'=>$rows, 'ok'=>count(array_filter($rows, static fn ($row) => $row['state'] === 'ok')),
             'missing'=>count(array_filter($rows, static fn ($row) => $row['state'] === 'missing')),

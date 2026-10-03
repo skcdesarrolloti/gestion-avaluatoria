@@ -32,15 +32,19 @@ final class AppraisalValuationMethodologyController
         $components = \App\Services\MethodologyWorkflow::components($record, $units);
         $componentKey = is_string($_GET['component'] ?? '') ? ($_GET['component'] ?? '') : '';
         \App\Services\MethodologyWorkflow::validateKey($componentKey, $components);
-        $stage = is_string($_GET['stage'] ?? null) ? $_GET['stage'] : 'components';
-        if ($componentKey === '' && in_array($stage, ['components', '1', '2'], true)) $componentKey = (string) (array_key_first($components) ?? '');
+        $stage = is_string($_GET['stage'] ?? null) ? $_GET['stage'] : 'plan';
+        if ($componentKey === '' && in_array($stage, ['components', '1', '2'], true)
+            && !($stage==='1' && ($_GET['consult_method'] ?? '')==='costo')) {
+            $componentKey = (string)(array_key_first(\App\Services\MethodologyValuationPlan::working($components)) ?? '');
+        }
         $comparableRows = \App\Services\MethodologyComparableScope::rows($allComparableRows, $componentKey);
         $flow = \App\Services\MethodologyWorkflow::saved($record);
         $selected = $flow[$componentKey] ?? [];
         $method = ($selected['method'] ?? '') ?: (is_string($_GET['method'] ?? null) ? $_GET['method'] : 'mercado');
         if (!isset(\App\Services\MethodologyWorkflow::METHODS[$method])) $method = 'mercado';
-        $stage = is_string($_GET['stage'] ?? null) ? $_GET['stage'] : 'components';
-        if (!in_array($stage, ['components', 'integration', 'decision', 'report', '1', '2', '3', '4', '5'], true)) $stage = 'components';
+        $stage = is_string($_GET['stage'] ?? null) ? $_GET['stage'] : 'plan';
+        if (!in_array($stage, ['plan', 'components', 'integration', 'decision', 'report', '1', '2', '3', '4', '5'], true)) $stage = 'plan';
+        if (!empty($components[$componentKey]['container']) && in_array($stage, ['components','1','2','3','4','5'], true)) $stage = 'plan';
         if ($stage==='1' && ($_GET['consult_method'] ?? '')==='costo') $method='costo';
         $searchRecord = \App\Services\ComparableSearchContext::forMethod($record, $units, $componentKey, $method);
         $methodologyChapter = (new AppraisalMethodologyChapterReport())->build($record, $subject, $units);
@@ -68,6 +72,10 @@ final class AppraisalValuationMethodologyController
         $version = filter_var($_POST['version'] ?? null, FILTER_VALIDATE_INT);
         if ($version === false || $version === null || $version < 0) throw new \App\Core\HttpException(422, 'Versión inválida.');
         $changes = \App\Services\MethodologyWorkflow::input($_POST);
+        if (isset($changes['plan_parts'])) {
+            if (count($changes) !== 1) throw new \App\Core\HttpException(422, 'Guarda la organización antes de definir el método de cada parte.');
+            \App\Services\MethodologyValuationPlan::validateParts($record, $components[$key], $changes['plan_parts']);
+        } else \App\Services\MethodologyValuationPlan::validateWorkKey($key, $components);
         if (isset($changes['analysis']) || isset($changes['conclusion'])) {
             if ((\App\Services\MethodologyWorkflow::saved($record)[$key]['method'] ?? '') !== 'mercado') throw new \App\Core\HttpException(422, 'Selecciona Mercado antes de guardar su análisis.');
             $rows = \App\Services\MethodologyComparableScope::rows($this->comparables->forAppraisal($id, $this->user['id']), $key);
@@ -75,7 +83,7 @@ final class AppraisalValuationMethodologyController
         }
         $next = $this->workflow->save($id, $this->user['id'], $version, $key, $changes);
         if (str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json')) \App\Core\Http::json(['ok' => true, 'version' => $next, 'saved_at' => gmdate('c')]);
-        Http::redirect('avaluos/' . $id . '/metodologia-valuatoria?component=' . rawurlencode($key) . '&stage=2');
+        Http::redirect('avaluos/' . $id . '/metodologia-valuatoria?component=' . rawurlencode($key) . '&stage=' . (isset($changes['plan_parts']) ? 'plan' : '2'));
     }
 
     public function savePhScope(string $id, string $unitId): never
@@ -92,7 +100,7 @@ final class AppraisalValuationMethodologyController
         $record = $this->appraisals->find($id, $this->user['id']);
         $components = \App\Services\MethodologyWorkflow::components($record, $this->appraisals->units($id, $this->user['id']));
         $key = is_string($_POST['component'] ?? null) ? $_POST['component'] : '';
-        \App\Services\MethodologyWorkflow::validateKey($key, $components);
+        \App\Services\MethodologyValuationPlan::validateWorkKey($key, $components);
         $source = is_string($_POST['source_scope'] ?? null) ? $_POST['source_scope'] : '';
         if ($source === $key) throw new \App\Core\HttpException(422, 'Selecciona un destino distinto.');
         $ids = $_POST['samples'] ?? [];
@@ -137,7 +145,7 @@ final class AppraisalValuationMethodologyController
         if ($version === false || $version === null || $version < 0) throw new \App\Core\HttpException(422, 'Falta la versión de la matriz. Recarga antes de guardar.');
         $key = is_string($_POST['component_scope'] ?? null) ? $_POST['component_scope'] : '';
         $components = \App\Services\MethodologyWorkflow::components($this->appraisals->find($id, $this->user['id']), $this->appraisals->units($id, $this->user['id']));
-        \App\Services\MethodologyWorkflow::validateKey($key, $components);
+        \App\Services\MethodologyValuationPlan::validateWorkKey($key, $components);
         $rows = \App\Services\MethodologyComparableScope::merge($this->comparables->forAppraisal($id, $this->user['id']), AppraisalComparableInput::rows($_POST), $key);
         return $this->comparables->saveAll($id, $this->user['id'], $rows, $version);
     }

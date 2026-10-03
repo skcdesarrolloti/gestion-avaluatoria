@@ -1,5 +1,14 @@
 # Entrega al responsable de la implementación
 
+Capítulo 8 inicia en Plan de valoración: organizar → métodos/alcances → recorrido
+por parte → consolidación. Casa NPH permite terreno y construcción vinculados
+a una sola ficha, por decisión explícita. JSON existente, sin migración, claves
+estables y muestras anteriores conservadas; unidad completa no se suma con partes.
+Artículos completos plegables por etapa y método antes de su contenido.
+Ver PLAN-VALORACION-CAP8.md para recorrido, preservación, controles y límites.
+PHP678, JS131, BD163 (instancia nueva3366), lint/build/66,4KB y navegador local.
+Consolidación monetaria de costo sigue pendiente; no se adoptan valores automáticos.
+
 C1 consultado desde Mercado muestra sólo academia, sin revisión ni recorrido
 operativo de esa unidad. Pestañas filtradas a unidades con Costo guardado.
 La revisión reaparece para cada componente efectivamente asignado a Costo.

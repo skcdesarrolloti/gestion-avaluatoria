@@ -8,7 +8,7 @@
     <?= csrf_field() ?>
     <input type="hidden" name="component" value="<?= e($componentKey) ?>">
     <input type="hidden" name="version" value="<?= (int) ($record['methodology_version'] ?? 0) ?>">
-    <h2 class="text-2xl font-semibold"><?= e($prefix) ?>2 Selección del método · <?= e($componentLabel) ?></h2>
+    <h2 class="text-2xl font-semibold">2 · Definir método y alcance · <?= e($componentLabel) ?></h2>
     <p class="mt-3 text-sm text-slate-600">La selección es del perito. Un terreno no se asigna automáticamente a Residual; la evidencia y la finalidad determinan el método.</p>
     <div class="mt-5 grid gap-5 sm:grid-cols-2">
         <label class="block font-semibold">Método del componente

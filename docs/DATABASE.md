@@ -1,5 +1,10 @@
 # Crear y evolucionar la base sin SQL manual
 
+Plan capítulo 8: `plan_parts` y métodos de partes se guardan en JSON existente
+`methodology_workflow`, con versión compartida; no hay migración ni nuevas filas
+de unidades. Claves de muestras/Excel por parte son independientes y estables.
+Ver PLAN-VALORACION-CAP8.md para preservación y controles de organización.
+
 Excel M3: `202610020002_comparable_excel_history.php` agrega historial de última
 importación por unidad/banco. Se guardan fecha UTC, nombre de archivo y versión
 en la misma transacción que las muestras. UI presenta hora de Colombia.

@@ -12,6 +12,7 @@ $coverageTones = ['ok'=>'bg-emerald-100 text-emerald-950', 'missing'=>'bg-red-10
             <thead><tr><th class="p-2">Unidad</th><th class="p-2">Descripción registrada en 3.1</th><th class="p-2">Verificación</th><th class="p-2">Acción</th></tr></thead>
             <tbody class="divide-y divide-slate-200">
             <?php foreach ($components as $coverageKey=>$coverageComponent):
+                if (!empty($coverageComponent['container'])) continue;
                 $coverageUnit = $coverageComponent['unit'];
                 $coverageFlow = $flow[$coverageKey] ?? [];
                 $coverageMethod = ($coverageFlow['method'] ?? '') ?: 'mercado';
@@ -19,7 +20,7 @@ $coverageTones = ['ok'=>'bg-emerald-100 text-emerald-950', 'missing'=>'bg-red-10
                 $coverageMarket = $coverageMethod === 'mercado' ? $coverageChecks->build($record, $subject ?? [], $coverageUnit, $phProfile ?? [], $coverageFlow, $units ?? []) : null;
                 $coverageSection = $coverageDescription['section'];
                 $coverageLink = url('avaluos/' . $record['id'] . '/bien-sujeto?' . http_build_query([
-                    'section'=>$coverageSection === 'tipologias' ? 'tipologias' : '', 'unit'=>$coverageKey,
+                    'section'=>$coverageSection === 'tipologias' ? 'tipologias' : '', 'unit'=>$coverageComponent['parent_key'] ?? $coverageKey,
                     'detail'=>$coverageDescription['detail'], 'from'=>'metodologia', 'check_component'=>$coverageKey,
                     'market_check'=>'description']) . '#' . ($coverageSection === 'construction' ? 'construccion' : 'ficha-basica'));
             ?>

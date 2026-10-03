@@ -19,6 +19,7 @@ final class ComparableSearchContext
             $type = self::type((string) ($record['tipo_inmueble'] ?? ''));
         }
         $record['tipo_inmueble'] = $type;
+        if (($components[$componentKey]['part'] ?? '') === 'terreno') $record['regimen_ph'] = 'no';
         return $record;
     }
 

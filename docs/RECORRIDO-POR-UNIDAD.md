@@ -1,5 +1,9 @@
 # Recorrido por unidad — 02/10/2026
 
+La entrada vigente del capítulo 8 es el [plan de valoración](PLAN-VALORACION-CAP8.md).
+La ficha y sus datos siguen conservados; una decisión explícita puede abrir partes
+de terreno/construcción para una unidad NPH, sin crear nuevas unidades inmobiliarias.
+
 ## Oficinas IGAC y aislamiento de expedientes
 
 La categoría elegida para una unidad principal se conserva al abrir y guardar el

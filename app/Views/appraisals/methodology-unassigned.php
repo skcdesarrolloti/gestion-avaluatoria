@@ -2,7 +2,7 @@
 $assignmentPools = ['' => \App\Services\MethodologyComparableScope::rows($allComparableRows, '')];
 foreach ($allComparableRows as $sample) {
     $savedKey = $sample['component_key'] ?? '';
-    if ($savedKey !== '' && !isset($components[$savedKey])) $assignmentPools[$savedKey][] = $sample;
+    if ($savedKey !== '' && (!isset($components[$savedKey]) || !empty($components[$savedKey]['container']))) $assignmentPools[$savedKey][] = $sample;
 }
 if ($componentKey !== '') $assignmentPools[$componentKey] = $comparableRows;
 ?>
@@ -16,7 +16,7 @@ if ($componentKey !== '') $assignmentPools[$componentKey] = $comparableRows;
         <input type="hidden" name="version" value="<?= (int) ($record['comparables_version'] ?? 0) ?>">
         <label class="block font-semibold">Componente destino
             <select name="component" class="input"><option value="">Banco sin asignar</option>
-            <?php foreach ($components as $key => $component): if ($key === $sourceScope) continue; ?>
+            <?php foreach (\App\Services\MethodologyValuationPlan::working($components) as $key => $component): if ($key === $sourceScope) continue; ?>
                 <option value="<?= e($key) ?>" <?= $key === $componentKey ? 'selected' : '' ?>><?= e($component['label']) ?></option>
             <?php endforeach; ?>
             </select>
