@@ -28,6 +28,14 @@ declare(strict_types=1);
         && str_contains($html,'academy=general') && str_contains($html,'Oficina &lt;principal&gt;')
         && substr_count($html,'Verificación de datos guardados')===1,
         'artículos del método y enlace a reglas comunes conservados con revisión sólo de la unidad elegida');
+    foreach ([16,17,18,19] as $number) expect(str_contains($html,'Leer artículo '.$number.' completo'), 'artículo de captura '.$number.' disponible en Academia Mercado');
+    foreach (['3','4','5'] as $inputStage) {
+        $stage=$inputStage;
+        ob_start();require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php';$inputHtml=ob_get_clean();
+        expect(!str_contains($inputHtml,'id="articulos-del-paso"') && !str_contains($inputHtml,'Artículos completos para este paso'), 'etapa '.$stage.' no repite la academia');
+        expect(str_contains($inputHtml,'>Academia</a>'), 'etapa '.$stage.' conserva acceso a Academia');
+    }
+    $stage='1';
     $componentKey='office:metodo:renta';$selected=$flow[$componentKey];$method='renta';
     ob_start();require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php';$html=ob_get_clean();
     expect(str_contains($html,'Leer artículo 22 completo') && str_contains($html,'Leer artículo 26 completo')

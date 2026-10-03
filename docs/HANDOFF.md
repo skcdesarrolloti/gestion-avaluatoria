@@ -1,5 +1,10 @@
 # Entrega al responsable de la implementación
 
+Academia centralizada: eliminado el bloque repetido «Artículos completos para este
+paso» de las etapas operativas. Mercado conserva íntegros 16–21 en Academia; PH36
+en General. Insumos, Análisis y Entregable mantienen el acceso Academia. El aviso
+de discrepancias en Análisis sigue vigente, sin repetir teoría en la captura.
+
 Corrección de navegación: los cinco pasos permanecen visibles en Academia General
 y Configuración. Sin componente actual, continúa el primer recorrido activo del
 método consultado (o primer método activo), anunciado en pantalla. Sin métodos,
