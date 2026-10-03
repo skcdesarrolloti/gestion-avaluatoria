@@ -72,6 +72,10 @@ final class AppraisalValuationMethodologyController
         $version = filter_var($_POST['version'] ?? null, FILTER_VALIDATE_INT);
         if ($version === false || $version === null || $version < 0) throw new \App\Core\HttpException(422, 'Versión inválida.');
         $changes = \App\Services\MethodologyWorkflow::input($_POST);
+        if (isset($components[$key]['alternate_method'])) {
+            if (isset($changes['additional_methods']) || (isset($changes['method']) && $changes['method']!==$components[$key]['alternate_method']))
+                throw new \App\Core\HttpException(422, 'Configura los métodos desde el alcance original; este recorrido conserva su método de contraste.');
+        }
         if (isset($changes['plan_parts'])) {
             if (count($changes) !== 1) throw new \App\Core\HttpException(422, 'Guarda la organización antes de definir el método de cada parte.');
             \App\Services\MethodologyValuationPlan::validateParts($record, $components[$key], $changes['plan_parts']);

@@ -1,5 +1,14 @@
 # Entrega al responsable de la implementación
 
+Capítulo 8 simplificado: Configuración y una única barra Academia/Insumos/Análisis/
+Entregable por recorrido. Selección y alcance se editan en Configuración; las rutas
+anteriores siguen funcionando. Matriz y sugerencias plegadas allí, banco en Insumos,
+texto y revisión de resultados en Entregable. C1 teórico continúa sin unidad.
+El analista puede activar métodos adicionales del mismo alcance (PH incluido).
+Claves estables `:metodo:renta`, etc., JSON existente, guardado/versionado atómico,
+insumos separados y memoria conservada al desactivar. No sumar estimaciones alternativas.
+Sin nuevas fórmulas ni migración. Detalle en PLAN-VALORACION-CAP8.md.
+
 Capítulo 8 inicia en Plan de valoración: organizar → métodos/alcances → recorrido
 por parte → consolidación. Casa NPH permite terreno y construcción vinculados
 a una sola ficha, por decisión explícita. JSON existente, sin migración, claves

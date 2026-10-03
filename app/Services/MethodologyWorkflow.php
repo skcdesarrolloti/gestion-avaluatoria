@@ -57,6 +57,7 @@ final class MethodologyWorkflow
         if (isset($out['method']) && $out['method'] !== '' && !isset(self::METHODS[$out['method']])) throw new HttpException(422, 'Método inválido.');
         if (isset($out['treatment']) && !in_array($out['treatment'], ['', 'separado', 'integrado', 'descriptivo'], true)) throw new HttpException(422, 'Tratamiento inválido.');
         if (array_key_exists('cost_scope',$post)) $out['cost_scope']=CostMethodScope::input($post['cost_scope']);
+        if (isset($post['additional_methods_present'])) $out['additional_methods']=MethodologyAlternativeMethods::input($post['additional_methods'] ?? []);
         if (array_key_exists('plan_parts', $post)) {
             if (!is_string($post['plan_parts']) || !in_array($post['plan_parts'], ['whole', 'land_building'], true)) throw new HttpException(422, 'Selecciona cómo organizar la valoración.');
             $out['plan_parts'] = $post['plan_parts'];

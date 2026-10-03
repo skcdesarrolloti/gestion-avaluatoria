@@ -22,9 +22,9 @@ declare(strict_types=1);
             require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php';
             $html = ob_get_contents();
         } finally { ob_end_clean(); }
-        expect(str_contains($html, '1 · Plan de valoración') && str_contains($html, '4 · Consolidación')
-            && str_contains($html, '1 sin asignar') && !str_contains($html, 'aria-label="Etapas de Mercado"'), 'contexto general sin mezclar etapas de un componente no elegido en ' . $stage);
-        if ($stage==='plan') expect(str_contains($html,'Plan de valoración del inmueble') && !str_contains($html,'Verificación de datos guardados')
+        expect(str_contains($html, '>Configuración</a>') && !str_contains($html, 'Herramientas y consultas del expediente')
+            && !str_contains($html, 'aria-label="Etapas de Mercado"'), 'navegación común sin menús duplicados en ' . $stage);
+        if ($stage==='plan') expect(str_contains($html,'Configuración de la valoración') && !str_contains($html,'Verificación de datos guardados')
             && str_contains($html,'Resolución 941 · Artículos completos para este paso'), 'plan inicial orienta decisiones sin desplegar academias o checklist por cada inmueble');
         if ($stage === 'components') {
             expect(str_contains($html, 'Verificación de la unidad principal y los anexos')
@@ -65,7 +65,7 @@ declare(strict_types=1);
     }
     $componentKey = 'office'; $stage = '1';
     ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php'; $html = ob_get_clean();
-    expect(str_contains($html, 'aria-label="Etapas de Mercado"') && str_contains($html, 'Siguiente: definir método y alcance') && str_contains($html, 'component=office'), 'al elegir componente aparecen etapas y siguiente paso conserva identidad');
+    expect(!str_contains($html, 'aria-label="Etapas de Mercado"') && str_contains($html, 'Siguiente: definir método y alcance') && str_contains($html, 'component=office'), 'al elegir componente navegación común y siguiente paso conservan identidad');
     $componentKey = 'annex'; $stage = 'decision';
     ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php'; $html = ob_get_clean();
     expect(str_contains($html, "componentTab: 'annex'"), 'matriz abre componente solicitado en lugar de primera unidad');

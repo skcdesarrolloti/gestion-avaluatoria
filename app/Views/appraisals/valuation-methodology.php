@@ -21,7 +21,7 @@ $costAcademyTheoryOnly = $costAcademy && ($selected['method'] ?? '') !== 'costo'
 ?>
 <p class="eyebrow">Capítulo 8 · Metodología valuatoria</p>
 <h1 class="mt-2 text-3xl font-semibold">Metodología valuatoria</h1>
-<p class="mt-3 text-slate-600">Organiza qué vas a valorar, define el método de cada parte, desarrolla sus insumos y consolida los resultados.</p>
+<p class="mt-3 text-slate-600">Configura qué vas a valorar y elige uno o varios métodos. Cada recorrido conserva sus propios insumos, análisis y entregable.</p>
 <?php require __DIR__ . '/step-nav.php'; ?>
 <?php foreach (['methodology_message', 'methodology_error'] as $flash): $notice = \App\Core\Session::pullFlash($flash); if (!$notice) continue; ?>
     <p role="status" class="mt-4 rounded-xl border p-4"><?= e($notice) ?></p>

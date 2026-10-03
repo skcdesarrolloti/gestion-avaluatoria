@@ -29,4 +29,16 @@ declare(strict_types=1);
         && isset(App\Services\MethodologyWorkflow::saved($ar->find($id,1))[$key.':construccion']), 'desactivar desagregación conserva historial de partes para reactivación explícita');
     $workflow->save($id,1,5,$key,['plan_parts'=>'land_building']);
     expect(App\Services\MethodologyWorkflow::saved($ar->find($id,1))[$key.':construccion']['method']==='costo' && $cr->forAppraisal($id,1)===$oldRows,'reactivar partes recupera métodos propios y preserva banco original');
+    $workflow->save($id,1,6,$key.':terreno',['additional_methods'=>['renta']]);
+    $alt=$key.':terreno:metodo:renta';
+    expect(isset(App\Services\MethodologyWorkflow::components($ar->find($id,1),$beforeUnits)[$alt]),'método alternativo persiste atómicamente junto a su activación');
+    $workflow->save($id,1,7,$alt,['coverage'=>'Ingreso del terreno sustentado']);
+    expectStatus(409,fn()=>$workflow->save($id,1,7,$key.':terreno',['additional_methods'=>[]]),'configuración obsoleta no desactiva un contraste editado');
+    expectStatus(404,fn()=>$workflow->save($id,2,8,$key.':terreno',['additional_methods'=>[]]),'métodos alternativos rechazan propietario ajeno');
+    $workflow->save($id,1,8,$key.':terreno',['additional_methods'=>[]]);
+    expect(!isset(App\Services\MethodologyWorkflow::components($ar->find($id,1),$beforeUnits)[$alt])
+        && App\Services\MethodologyWorkflow::saved($ar->find($id,1))[$alt]['coverage']==='Ingreso del terreno sustentado','desactivar contraste conserva su memoria sin presentarlo activo');
+    $workflow->save($id,1,9,$key.':terreno',['additional_methods'=>['renta']]);
+    expect(App\Services\MethodologyWorkflow::saved($ar->find($id,1))[$alt]['coverage']==='Ingreso del terreno sustentado'
+        && $cr->forAppraisal($id,1)===$oldRows,'reactivar contraste mantiene soporte y muestras originales');
 })();

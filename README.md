@@ -2,6 +2,10 @@
 
 Capítulo 8: [plan de valoración y artículos por paso](docs/PLAN-VALORACION-CAP8.md).
 
+Recorrido simplificado: Configuración → Academia → Insumos → Análisis → Entregable.
+Un alcance puede estudiarse con varios métodos; los contrastes tienen datos propios
+y no son partidas sumables. La configuración conserva las sugerencias del analista.
+
 Lectura y conservación: [recorrido por unidad](docs/RECORRIDO-POR-UNIDAD.md).
 Una ficha original, recorridos de valoración explícitos e insumos propios.
 

@@ -26,7 +26,7 @@ final class MethodologyValuationPlan
                     'parent_key'=>$key, 'part'=>$part, 'parent_label'=>$component['label']];
             }
         }
-        return $result;
+        return MethodologyAlternativeMethods::expand($result, $saved);
     }
 
     public static function validateParts(array $record, array $component, string $parts): void

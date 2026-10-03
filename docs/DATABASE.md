@@ -1,5 +1,10 @@
 # Crear y evolucionar la base sin SQL manual
 
+Contrastes por método: `additional_methods` activa claves `:metodo:<método>` dentro
+del mismo `methodology_workflow`. Se guardan junto al método en una actualización
+optimista; desactivar conserva sus datos. Muestras vinculadas por clave de recorrido,
+sin copiar las originales. No requiere migración ni nuevas unidades inmobiliarias.
+
 Plan capítulo 8: `plan_parts` y métodos de partes se guardan en JSON existente
 `methodology_workflow`, con versión compartida; no hay migración ni nuevas filas
 de unidades. Claves de muestras/Excel por parte son independientes y estables.

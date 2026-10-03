@@ -32,4 +32,17 @@ use App\Services\{MethodologyWorkflow,MethodologyValuationPlan,MethodologyStepAr
     foreach (['mercado','costo','renta','residual'] as $m) foreach (['plan','1','2','3','4','5','integration'] as $s)
         foreach (MethodologyStepArticles::forStep($s,$m,true)[1] as $n) if (App\Services\Resolution941Reading::article($n)===null) throw new RuntimeException('Falta artículo '.$n);
     expect(true,'todas las lecturas por método y etapa tienen texto completo disponible');
+    $alternatives=App\Services\MethodologyAlternativeMethods::save([], 'apto', ['method'=>'mercado','additional_methods'=>['renta','mercado']]);
+    $alternatives['apto:metodo:renta']['coverage']='Renta del mismo apartamento';
+    $ph=['regimen_ph'=>'si','methodology_workflow'=>json_encode($alternatives)];
+    $apto=['id'=>'apto','unit_kind'=>'property','property_type'=>'apartamento','label'=>'Apartamento'];
+    $studies=MethodologyWorkflow::components($ph,[$apto]);
+    expect(array_keys($studies)===['apto','apto:metodo:renta'] && $studies['apto:metodo:renta']['comparison_key']==='apto'
+        && $studies['apto:metodo:renta']['unit']===$apto,'PH admite Mercado y Renta como estudios del mismo bien sin crear suelo ni duplicar unidades');
+    expect(ComparableSearchContext::forMethod($ph,[$apto],'apto:metodo:renta','renta')['tipo_negocio']==='arriendo', 'contraste Renta conserva búsqueda propia de arriendo');
+    $disabled=App\Services\MethodologyAlternativeMethods::save($alternatives,'apto',['additional_methods'=>[]]);
+    $again=App\Services\MethodologyAlternativeMethods::save($disabled,'apto',['additional_methods'=>['renta']]);
+    expect($again['apto:metodo:renta']['coverage']==='Renta del mismo apartamento','desactivar y reactivar un contraste conserva su soporte');
+    expectStatus(422,fn()=>App\Services\MethodologyAlternativeMethods::input(['inventado']),'contraste rechaza métodos fuera del catálogo');
+    expect(str_contains(App\Services\MethodologyWorkflowReport::text($ph,[$apto]),'estimación alternativa; no sumable'), 'informe diferencia contraste de partidas sumables');
 })();

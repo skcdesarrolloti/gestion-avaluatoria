@@ -66,3 +66,32 @@ intacto y cerrado hasta que se despliega. Aplica también a las academias del ca
 Validación: lint PHP, PHP678, JS131, build y 66,4KB gzip; vista de escritorio
 comprobada en Chrome y ancho móvil 367px sin desbordamiento global. La captura
 móvil no estuvo disponible por timeout del navegador. Sin cambios de persistencia.
+
+## Recorrido simplificado (3 de octubre de 2026)
+
+La configuración reúne organización, método principal, métodos de contraste,
+alcance y justificación. Las recomendaciones existentes quedan plegadas. Se retiran
+la barra de cuatro macropasos y el segundo menú de etapas. Al abrir un recorrido
+aparece una única barra: Configuración, Academia, Insumos, Análisis y Entregable.
+No hay botones de etapas sin destino en la configuración: se abre la academia del
+método elegido. Se conservan números internos y enlaces anteriores por compatibilidad.
+
+Mercado y Renta sobre un apartamento PH son estudios alternativos del mismo alcance.
+Los métodos adicionales viven en JSON con clave estable `base:metodo:<método>` y
+conservan método, justificación, insumos y memoria propios. No se crean fichas
+inmobiliarias. Desactivar oculta el recorrido sin borrar muestras ni texto; reactivar
+recupera su contenido. No hay copia o traslado automático de muestras entre métodos.
+La actualización principal y activación de contrastes comparten versión optimista.
+Los controles de propietario y componente siguen siendo obligatorios.
+
+Terreno y construcción siguen siendo partes distintas cuando NPH está confirmado;
+el terreno no se convierte automáticamente a Costo si no se hallan ofertas. Estimar
+por diferencia exige sustento específico: este cambio no implementa ese cálculo.
+Los métodos alternativos se identifican como no sumables en revisión e informe.
+No se implementan cálculos de Costo, Renta o Residual pendientes ni se adoptan valores.
+
+Validación: PHP683, JS131, BD168 en instancia nueva desechable3367, lint/build y
+66,4KB gzip. Activación/desactivación/reactivación de contrastes, preservación,
+conflictos y aislamiento de propietario; UI local guardar Mercado+Renta y recargar.
+Chrome: barra común y academia del contraste verificadas en escritorio. Ancho
+móvil CSS367/scroll367 sin desbordamiento; captura móvil indisponible por timeout.

@@ -11,7 +11,7 @@ $sourceTreatments = \App\Support\AppraisalUnitValuationTreatmentCatalog::options
     <p class="mt-3 text-slate-600">Estas son las mismas unidades y anexos registrados en el capítulo 1 y estudiados en el capítulo 3. Aquí se consultan para su análisis; los nombres, la composición y la tipología se actualizan en esos capítulos.</p>
     <div class="mt-4 flex flex-wrap gap-3">
         <a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto?section=tipologias&from=metodologia#unidades-capitulo-3')) ?>">Ver capítulo 3 · Bien sujeto</a>
-        <a class="btn-secondary" href="<?= e($flowUrl('3', 'mercado', '')) ?>">Banco sin asignar (<?= $unassignedCount ?>)</a>
+        <?php if ($stage==='integration'): ?><a class="btn-secondary" href="<?= e($flowUrl('3', 'mercado', '')) ?>">Banco sin asignar (<?= $unassignedCount ?>)</a><?php endif; ?>
     </div>
     <?php if ($components === []): ?><p role="status" class="mt-5 rounded-xl border border-dashed p-5">Todavía no hay unidades ni anexos registrados. Completa la composición del predio en el capítulo 1 y su estudio en el capítulo 3; aparecerán aquí al guardar.</p><?php endif; ?>
     <?php if ($components !== [] && in_array($stage, ['components', '1'], true)): require __DIR__ . '/methodology-unit-check-coverage.php'; endif; ?>
@@ -30,6 +30,7 @@ $sourceTreatments = \App\Support\AppraisalUnitValuationTreatmentCatalog::options
         <article class="rounded-xl border border-slate-200 p-5">
             <p class="text-sm text-slate-600"><?= e(isset($component['parent_key']) ? 'Parte de valoración de '.$component['parent_label'] : (($unit['unit_kind'] ?? '') === 'annex' ? 'Anexo' : 'Inmueble')) ?> · capítulos 1 y 3</p>
             <h3 class="text-lg font-semibold"><?= e($component['label']) ?></h3>
+            <?php if (isset($component['comparison_key'])): ?><p class="mt-2 rounded-lg bg-amber-50 p-3 text-sm">Estimación alternativa del mismo alcance: contrastar con el método principal. No sumar este resultado como otro inmueble o componente.</p><?php endif; ?>
             <details class="mt-3"><summary class="min-h-11 cursor-pointer py-3 font-semibold"><?= isset($component['parent_key'])?'Datos de la ficha y alcance de esta parte':'Características registradas en capítulos 1 y 3' ?></summary>
             <dl class="mt-3 grid gap-3 text-sm sm:grid-cols-2 lg:grid-cols-3">
                 <div><dt class="font-semibold"><?= isset($component['parent_key'])?'Tipo para la valoración de esta parte':'Tipo de inmueble' ?></dt><dd><?= e($propertyTypes[$type] ?? ($type ?: 'Por definir')) ?></dd></div>

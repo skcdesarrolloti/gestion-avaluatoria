@@ -11,7 +11,7 @@ final class MethodologyWorkflowReport
             $item = $saved[$key] ?? [];
             if (($item['method'] ?? '') === '') continue;
             if ($item['method'] !== 'mercado') unset($item['analysis'], $item['conclusion']);
-            $lines[] = $component['label'] . ': ' . MethodologyWorkflow::METHODS[$item['method']] . '. '
+            $lines[] = $component['label'] . (isset($component['comparison_key']) ? ' (estimación alternativa; no sumable)' : '') . ': ' . MethodologyWorkflow::METHODS[$item['method']] . '. '
                 . ($item['reason'] ?? '') . "\nAlcance: " . (($item['coverage'] ?? '') ?: 'Pendiente de documentar.')
                 . "\nAnálisis: " . (($item['analysis'] ?? '') ?: 'Pendiente.')
                 . "\nConclusión: " . (($item['conclusion'] ?? '') ?: 'Pendiente; no se ha adoptado un valor.');

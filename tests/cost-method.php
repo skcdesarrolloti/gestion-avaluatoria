@@ -31,7 +31,7 @@ use App\Services\{CostMethodScope,CostMethodReview};
     $methodologyChapter=(new App\Services\AppraisalMethodologyChapterReport())->build($record,$subject,$units);
     $guide=(new App\Services\AppraisalComparableSearchGuide())->build($record,$subject,$units,[]);
     ob_start();try{ require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php';$html=ob_get_contents(); }finally{ob_end_clean();}
-    expect(str_contains($html,'C1 · Academia y revisión del costo') && str_contains($html,'C3 · Insumos y presupuesto') && !str_contains($html,'M3 · Insumos y comparables'),'recorrido de costo usa C1–C5 y academia propia');
+    expect(str_contains($html,'C1 · Academia y revisión del costo') && str_contains($html,'>Insumos</a>') && !str_contains($html,'M3 · Insumos y comparables'),'recorrido de costo conserva academia propia y navegación común sin duplicar menús');
     expect(str_contains($html,'Leer artículo 30 completo') && str_contains($html,'Ross–Heideck'),'C1 mantiene consulta normativa y depreciación vigente');
     expect(str_contains($html,'assets/normativa/igac-941-anexo-costo.pdf') && str_contains($html,'Páginas 22–39'),'C1 permite consultar el apartado original completo de costo');
     expect(!preg_match('/<details[^>]*\sopen(?:\s|>)/',$html),'C1 mantiene las lecturas cerradas al entrar');

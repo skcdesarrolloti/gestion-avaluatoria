@@ -27,9 +27,9 @@
         }) ?></p>
     </details>
     <div class="mt-3 flex flex-wrap gap-3">
-        <?php if ((int) $stage > 1): ?><a class="btn-secondary" href="<?= e($flowUrl((string) ((int) $stage - 1))) ?>">← <?= e($prefix . ((int) $stage - 1)) ?> Anterior</a><?php endif; ?>
+        <?php if ((int) $stage > 1): ?><a class="btn-secondary" href="<?= e($flowUrl($stage==='3'?'1':(string)((int)$stage-1))) ?>">← Anterior</a><?php endif; ?>
         <?php if ($stage !== '2' && (int) $stage < 5): ?><a class="btn-primary" href="<?= e($flowUrl((string) ((int) $stage + 1))) ?>">Siguiente: <?= e($prefix . ((int) $stage + 1) . ' ' . Workflow::STAGES[(int) $stage + 1]) ?> →</a><?php endif; ?>
-        <?php if ($stage === '5'): ?><a class="btn-secondary" href="<?= e($flowUrl('components')) ?>">Analizar otro inmueble</a><a class="btn-primary" href="<?= e($flowUrl('integration')) ?>">Siguiente: E · Integración →</a><?php endif; ?>
+        <?php if ($stage === '5'): ?><a class="btn-secondary" href="<?= e($flowUrl('plan',null,'')) ?>">Elegir otro recorrido</a><a class="btn-primary" href="<?= e($flowUrl('integration')) ?>">Revisar resultados del expediente</a><a class="btn-secondary" href="<?= e($flowUrl('report')) ?>">Texto del numeral 8</a><?php endif; ?>
     </div>
 <?php endif; ?>
 </section>
