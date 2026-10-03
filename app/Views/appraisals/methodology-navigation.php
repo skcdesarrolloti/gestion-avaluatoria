@@ -8,6 +8,7 @@
     <details class="mt-3"><summary class="min-h-11 cursor-pointer text-teal-800">Herramientas del expediente · matriz y muestras anteriores</summary>
         <p class="mb-3 text-sm">La matriz técnica sigue disponible. El banco conserva las muestras anteriores para asignarlas expresamente a una unidad.</p>
         <a class="btn-secondary" href="<?= e($flowUrl('decision')) ?>">Matriz y método · consulta general</a>
+        <?php if ($componentKey!==''): ?><a class="btn-secondary" href="<?= e($flowUrl('1','costo'). '&consult_method=costo') ?>">Consultar C1 · Academia del costo</a><?php endif; ?>
         <a class="btn-secondary" href="<?= e($flowUrl('3', 'mercado', '')) ?>">Muestras sin asignar (<?= count(\App\Services\MethodologyComparableScope::rows($allComparableRows, '')) ?>)</a>
     </details>
 </section>

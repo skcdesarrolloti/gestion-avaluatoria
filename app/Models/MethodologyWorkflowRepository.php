@@ -16,6 +16,8 @@ final class MethodologyWorkflowRepository
         $row = $query->fetch();
         if (!$row) throw new HttpException(404, 'No se encontró el expediente.');
         $saved = MethodologyWorkflow::saved($row);
+        \App\Services\CostMethodScope::validate($changes,$saved[$key] ?? []);
+        if (isset($changes['cost_scope'])) $changes['cost_scope']=array_replace($saved[$key]['cost_scope'] ?? [],$changes['cost_scope']);
         $saved[$key] = array_replace($saved[$key] ?? [], $changes);
         $update = $this->db->prepare('UPDATE appraisals SET methodology_workflow = ?, methodology_version = methodology_version + 1 WHERE id = ? AND owner_id = ? AND methodology_version = ?');
         $update->execute([json_encode($saved, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR), $id, $owner, $version]);

@@ -26,7 +26,9 @@ $componentLabel = $components[$componentKey]['label'] ?? 'Banco de muestras sin 
 <?php require __DIR__ . '/methodology-navigation.php'; ?>
 <?php require __DIR__ . '/methodology-unit-tabs.php'; ?>
 <div class="mt-6">
-<?php if ($stage === 'components' || $stage === 'integration'): ?>
+<?php if (in_array($stage,['1','components'],true) && $method === 'costo' && $componentKey!==''): ?>
+    <?php require __DIR__ . '/methodology-cost-academy.php'; ?>
+<?php elseif ($stage === 'components' || $stage === 'integration'): ?>
     <?php require __DIR__ . '/methodology-components.php'; ?>
 <?php elseif ($stage === 'decision'): ?>
     <?php require __DIR__ . '/valuation-methodology-decision.php'; ?>

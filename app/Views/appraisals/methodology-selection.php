@@ -29,6 +29,7 @@
     <label class="mt-5 block font-semibold">Alcance y control de doble conteo
         <textarea name="coverage" maxlength="2000" class="input" rows="4" placeholder="Indica qué incluye y excluye el valor; si está integrado, identifica el componente que lo contiene."><?= e($selected['coverage'] ?? '') ?></textarea>
     </label>
+    <?php require __DIR__.'/methodology-cost-scope.php'; ?>
     <p class="mt-3 text-sm" data-autosave-status>Autoguardado activo · máximo 2000 caracteres por explicación.</p>
     <button type="submit" class="btn-primary mt-4">Guardar ahora</button>
     <a class="btn-secondary mt-4" href="<?= e($flowUrl('3')) ?>" :href="<?= e(json_encode(url($basePath) . '?stage=3&component=' . rawurlencode($componentKey) . '&method=')) ?> + chosenMethod">Continuar a insumos del método elegido</a>

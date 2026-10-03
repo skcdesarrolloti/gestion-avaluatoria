@@ -41,6 +41,7 @@ final class AppraisalValuationMethodologyController
         if (!isset(\App\Services\MethodologyWorkflow::METHODS[$method])) $method = 'mercado';
         $stage = is_string($_GET['stage'] ?? null) ? $_GET['stage'] : 'components';
         if (!in_array($stage, ['components', 'integration', 'decision', 'report', '1', '2', '3', '4', '5'], true)) $stage = 'components';
+        if ($stage==='1' && ($_GET['consult_method'] ?? '')==='costo') $method='costo';
         $searchRecord = \App\Services\ComparableSearchContext::forMethod($record, $units, $componentKey, $method);
         $methodologyChapter = (new AppraisalMethodologyChapterReport())->build($record, $subject, $units);
         $marketNeighborhoods = array_map(static function (array $row): array {

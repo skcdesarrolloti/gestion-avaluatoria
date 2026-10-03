@@ -27,7 +27,7 @@ $firstComponent = in_array((string) ($componentKey ?? ''), array_column($compone
                     <?= e((string) ($nextStep[1] ?? '')) ?>
                 </div>
                 <a class="btn-primary mt-4 min-h-11" href="<?= e($flowUrl('3')) ?>">
-                    Ir a M3 · Insumos y comparables
+                    Ir a <?= e(\App\Services\MethodologyWorkflow::PREFIXES[$method ?? 'mercado'] ?? 'M') ?>3 · <?= ($method ?? '')==='costo'?'Insumos y presupuesto':'Insumos y comparables' ?>
                 </a>
             </div>
         </div>

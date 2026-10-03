@@ -3,6 +3,7 @@ declare(strict_types=1);
 require dirname(__DIR__) . '/bootstrap.php';
 require __DIR__ . '/support.php';
 require __DIR__ . '/methodology-workflow.php';
+require __DIR__ . '/cost-method.php';
 require __DIR__ . '/market-subject-checklist.php';
 require __DIR__ . '/subject-unit-kind.php';
 require __DIR__ . '/methodology-navigation.php';

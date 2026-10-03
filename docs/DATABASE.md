@@ -191,3 +191,10 @@ para evitar sobrescribir otro guardado. Desactivar/reactivar conserva la evidenc
 Área privada y fuente usan columnas existentes; no requieren otra migración.
 Publicar con el migrador habitual (`php bin/console.php migrate` o AUTO_MIGRATE).
 
+
+## C2 · alcance del costo (2026-10-02)
+Sin migración. Guarda cost_scope anidado en methodology_workflow[component].
+Edición parcial conserva campos previos; sólo permite alcance cuando método efectivo
+es costo. Usa methodology_version y propietario existentes (409 si obsoleto).
+C1 consulta datos de appraisal_units y alcance; estados se calculan, no se almacenan.
+No importa catálogos de InversKC ni crea tablas presupuestales en esta entrega.

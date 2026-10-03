@@ -56,6 +56,7 @@ final class MethodologyWorkflow
         }
         if (isset($out['method']) && $out['method'] !== '' && !isset(self::METHODS[$out['method']])) throw new HttpException(422, 'Método inválido.');
         if (isset($out['treatment']) && !in_array($out['treatment'], ['', 'separado', 'integrado', 'descriptivo'], true)) throw new HttpException(422, 'Tratamiento inválido.');
+        if (array_key_exists('cost_scope',$post)) $out['cost_scope']=CostMethodScope::input($post['cost_scope']);
         return $out;
     }
 

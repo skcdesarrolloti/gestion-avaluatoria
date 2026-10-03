@@ -576,3 +576,12 @@ Sin migración ni escritura de datos reales. 642 checks PHP y 131 JS; build y
 check:size correctos. Prueba del exportador real verifica valores, ID, contexto
 y referencias de negociación después de mover columnas. Descargar de nuevo tras
 actualizar el hosting; archivos anteriores conservan compatibilidad de importación.
+
+## 2026-10-02 · C1/C2 costo e inventario InversKC
+Academia y revisión por unidad en C1; alcance directos/indirectos/remanente/retiro
+con autoguardado C2. Ross–Heideck continuo como método nuevo; Fitto sólo antecedente.
+Consultar C1 desde herramientas no reclasifica Mercado. C3–C5 todavía no calculan.
+Ver COSTO-C1-C2-INVENTARIO.md para catálogos, relaciones, limitaciones y ruta siguiente.
+JSON metodología existente, sin migración ni escritura de expedientes reales.
+655 PHP, 131 JS, 156 BD desechable 3365; build/size 66,3 KB gzip.
+Chrome local: alcance guardado y conservado al recargar, semáforo actualizado C1.
