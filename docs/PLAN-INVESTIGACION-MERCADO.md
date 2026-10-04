@@ -154,3 +154,18 @@ Evidencia pública de dimensiones distintas: FincaRaíz 193606578 describe una u
 como vista exterior y esquinera; sus listados de casas con vista panorámica de
 Bucaramanga describen panorama urbano. Panorama no acredita paisaje natural.
 Pruebas: 1046 PHP, 152 JS, 181 BD nueva instancia desechable3373, build y 71,3KB gzip.
+
+## 2026-10-04 · Simplificación acordada de Vista (vigente)
+Por indicación del usuario, Vista vuelve a un único factor con cuatro clases fijas:
+Sin vista / Interior / Exterior: calles y avenidas / Exterior: paisajística.
+La selección describe la vista predominante desde el espacio principal. No asigna
+una prima de precio ni intervalos numéricos iguales; el tratamiento del modelo
+queda para Análisis. Esquinera sigue siendo posición física, fuera de Vista.
+Paisaje y panorama dejan de proponerse como factores separados en catálogos y
+planes nuevos. Si ya pertenecían a un plan guardado, permanecen visibles y
+admisibles dentro de su tipo para conservar calificaciones y soportes. Sus claves
+siguen reconocidas; no se borran registros. Escalas anteriores de Vista requieren
+restauración y adopción explícita. Exterior genérico no se asigna automáticamente
+a calles o paisaje. Falta de información no equivale a Sin vista.
+Validación: 1047 PHP, 152 JS, 181 BD desechable3374, lint/build, 71,3KB gzip;
+restauración del catálogo con confirmación y recarga en navegador local.

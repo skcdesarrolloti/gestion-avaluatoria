@@ -69,3 +69,6 @@ Una reorganización no autoriza borrar muestras ni sustituir importadores por fo
 Vista: orientación, paisaje, panorama y esquina se investigan por separado;
 la revisión queda documentada en PLAN-INVESTIGACION-MERCADO.md (2026-10-04).
 No confundir restaurar catálogo con adoptar escala y revisar calificaciones del plan.
+
+Vista vigente se simplifica a cuatro clases del usuario; véase la sección final
+2026-10-04 de PLAN-INVESTIGACION-MERCADO.md. Conserva información anterior.

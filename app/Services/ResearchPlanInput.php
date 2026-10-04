@@ -49,7 +49,7 @@ final class ResearchPlanInput
     public static function validateScope(array $plan,string $type,string $method,string $part=''): void
     {
         if (!in_array($method,['mercado','renta'],true)) throw new HttpException(422,'El plan de investigación corresponde a Mercado o Renta.');
-        foreach ($plan['factors'] as $key=>$item) if (!isset(ResearchFactorCatalog::forType($type,$part)[$key]))
+        foreach ($plan['factors'] as $key=>$item) if (!isset(ResearchFactorCatalog::forType($type,$part,false,true)[$key]))
             throw new HttpException(422,'El factor no corresponde al tipo actual. Revisa el plan de esta unidad.');
     }
 }

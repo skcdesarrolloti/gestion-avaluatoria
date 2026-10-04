@@ -2,7 +2,7 @@
 declare(strict_types=1);
 (static function(): void {
     expectStatus(422,fn()=>\App\Services\ResearchPlanInput::input('{"factors":{"area":{"decision":"model"}}}'),'área no aumenta los candidatos ni la meta');
-    $scale=\App\Services\ResearchFactorScaleInput::input(['factor_key'=>'view','kind'=>'categorical','categories'=>"Sin vista relevante\nInterior\nExterior"]);
+    $scale=\App\Services\ResearchFactorScaleInput::input(['factor_key'=>'view','kind'=>'categorical','categories'=>"Sin vista\nInterior\nExterior: calles y avenidas\nExterior: paisajística"]);
     expect($scale['kind']==='categorical','vista guarda clases sin forzar una jerarquía económica');
     expectStatus(422,fn()=>\App\Services\ResearchFactorScaleInput::input(['factor_key'=>'access','kind'=>'ordinal','categories'=>"Peatonal\nVehicular\nRestringido"]),'rechaza que restringido se convierta en un nivel superior');
     expectStatus(422,fn()=>\App\Services\ResearchFactorScaleInput::input(['factor_key'=>'view','kind'=>'ordinal','categories'=>"Interior\nPanorámica\nSin vista"]),'rechaza orden arbitrario de tipos de vista');

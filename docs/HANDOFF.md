@@ -829,3 +829,9 @@ quedan advertidas y excluidas de preparación; originales intactos. Restauració
 explícita del catálogo tiene endpoint y confirmación, luego adopción por recorrido.
 1046 PHP, 152 JS, 181 BD3373, build/71,3KB. Navegador local confirma restauración,
 recarga y separación de vista. No se implementa regresión ni despliega Hostinger.
+
+Vista vigente: Sin vista / Interior / Exterior: calles y avenidas / Exterior:
+paisajística, factor categórico único. Sustituye la propuesta de dimensiones
+separadas. Paisaje/panorama sólo se conservan en planes previos; validateScope
+mantiene compatibilidad por tipo, sin extenderla a bodega u otros tipos.
+1047 PHP, 152 JS, 181 BD3374, lint/build/71,3KB; navegador local guardar/recargar.

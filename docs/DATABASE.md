@@ -256,3 +256,8 @@ calificaciones nuevas; agregar atributos no cambia el dato original ni borra sop
 Vista (2026-10-04): orientación nominal fija, paisaje/panorama/esquina separados.
 Sin DDL; registros originales y calificaciones históricas permanecen. Las escalas
 mixtas requieren revisión y adopción explícita; no se recodifican al desplegar.
+
+Vista simplificada por el usuario: cuatro clases en un único factor. Catálogos
+nuevos omiten paisaje/panorama separados; planes anteriores los conservan por
+compatibilidad, incluyendo calificaciones/soporte. Escalas Vista anteriores deben
+revisarse/adoptarse expresamente. Sin DDL ni recodificación automática.
