@@ -135,3 +135,22 @@ Pruebas: 1020 PHP, 149 JS, 181 BD contra nueva instancia desechable 3371, lint/b
 y tamaño 71,0KB gzip. Navegador local: editor Vista guarda/recarga; Planta Parcial
 código1 guarda/recarga con soporte, fuentes No/Parcial/Total intactas; pantalla
 estrecha sin desbordamiento de página (tabla con scroll propio), consola sin errores.
+
+## 2026-10-04 · Vista: separar atributos antes de modelar
+Orientación de la vista usa clases fijas Sin vista relevante / Interior / Exterior,
+sin puntaje ni orden económico. Vista paisajística, amplitud panorámica y ubicación
+esquinera son atributos independientes de presencia No=0/Sí=1; desconocido queda
+pendiente. No se traduce una antigua etiqueta Esquinera a Paisajística, ni Panorámica
+a Exterior. Se conserva el registro original de capítulos y anuncios.
+Las escalas anteriores que mezclaban dimensiones, incluso nominales, se conservan
+pero quedan advertidas y fuera de códigos/conteos listos. Restaurar el catálogo
+requiere acción explícita, guardado confirmado y adopción en cada plan; las
+calificaciones previas se revisan, no se recodifican automáticamente.
+Para regresión futura, clases nominales requieren contrastes/indicadoras; usar
+0,1,2… como una sola variable continua impondría intervalos iguales. Los códigos
+binarios representan presencia, no primas de valor garantizadas. Esta etapa no
+ajusta modelos. Referencia: https://www.statsmodels.org/stable/contrasts.html.
+Evidencia pública de dimensiones distintas: FincaRaíz 193606578 describe una unidad
+como vista exterior y esquinera; sus listados de casas con vista panorámica de
+Bucaramanga describen panorama urbano. Panorama no acredita paisaje natural.
+Pruebas: 1046 PHP, 152 JS, 181 BD nueva instancia desechable3373, build y 71,3KB gzip.

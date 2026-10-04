@@ -821,3 +821,11 @@ Análisis. Pruebas: 1043 PHP, 151 JS, 181 BD nueva instancia desechable3372,
 lint/build y 71,3KB gzip. Navegador: búsqueda de acceso en Bodega, advertencia Vista
 anterior, pantalla estrecha contenida, Planta Parcial histórica conservada; atributo
 nuevo Aire acondicionado Sí con soporte guarda/recarga sin tocar los anuncios.
+
+Revisión Vista 2026-10-04: orientación nominal fija sin puntaje; panorámica,
+paisajística y esquina separados. Nuevo panoramic_view en oficina/consultorio,
+apartamento/casa/hotel/finca/edificio. Escalas mixtas antiguas, incluso nominales,
+quedan advertidas y excluidas de preparación; originales intactos. Restauración
+explícita del catálogo tiene endpoint y confirmación, luego adopción por recorrido.
+1046 PHP, 152 JS, 181 BD3373, build/71,3KB. Navegador local confirma restauración,
+recarga y separación de vista. No se implementa regresión ni despliega Hostinger.

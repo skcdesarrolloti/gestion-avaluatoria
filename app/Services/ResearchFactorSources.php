@@ -10,13 +10,13 @@ final class ResearchFactorSources
         $rows=[
             'apartamento'=>[
                 ['https://www.fincaraiz.com.co/venta/apartamentos/bucaramanga/santander/usados',['pool','gym','security','covered_parking']],
-                ['https://www.fincaraiz.com.co/venta/apartamentos/con-ascensor',['balcony','air_conditioning','landscape_view']],
+                ['https://www.fincaraiz.com.co/venta/apartamentos/con-ascensor',['balcony','air_conditioning','landscape_view','panoramic_view']],
             ],
             'local'=>[['https://www.fincaraiz.com.co/venta/locales',['shopfront']]],
             'bodega'=>[['https://www.fincaraiz.com.co/venta/bodegas?addeletedid=11103858',['frontage','depth','vehicle_access','loading_access','loading_bays','mezzanine','security']]],
             'lote'=>[['https://www.fincaraiz.com.co/venta/lotes/tolima',['topography','corner']]],
             'finca'=>[['https://www.fincaraiz.com.co/venta/fincas/caldas',['irrigation','terrace']]],
-            'edificio'=>[['https://www.fincaraiz.com.co/venta/edificios/bogota/bogota-dc/con-cochera',['covered_parking','security','balcony','landscape_view']]],
+            'edificio'=>[['https://www.fincaraiz.com.co/venta/edificios/bogota/bogota-dc/con-cochera',['covered_parking','security','balcony','panoramic_view']]],
         ];
         $out=[];
         foreach ($rows[$type] ?? [] as [$url,$keys]) if (in_array($key,$keys,true)) {

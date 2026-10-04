@@ -214,3 +214,6 @@ Referencias: [instalación de Alpine](https://alpinejs.dev/essentials/installati
 
 Investigación de factores: [plan por unidad y método](docs/PLAN-INVESTIGACION-MERCADO.md).
 
+
+Vista y sus dimensiones separadas: véase la revisión de 2026-10-04 en
+[plan de investigación](docs/PLAN-INVESTIGACION-MERCADO.md).

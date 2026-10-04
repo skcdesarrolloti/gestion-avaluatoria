@@ -252,3 +252,7 @@ factores/calificaciones toman el tamaño del catálogo; candidatos continúan en
 Clasificaciones anteriores siguen guardadas, con advertencia si no cumplen la pauta.
 Huella original compatible para calificaciones antiguas y huella por factor para
 calificaciones nuevas; agregar atributos no cambia el dato original ni borra soporte.
+
+Vista (2026-10-04): orientación nominal fija, paisaje/panorama/esquina separados.
+Sin DDL; registros originales y calificaciones históricas permanecen. Las escalas
+mixtas requieren revisión y adopción explícita; no se recodifican al desplegar.

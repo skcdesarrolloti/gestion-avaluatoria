@@ -25,7 +25,7 @@ final class ResearchFactorReference
             'stratum'=>'/estrato/iu','deposit'=>'/depósito|almacenamiento/iu','generator'=>'/planta eléctrica/iu',default=>'/$^/',
             'balcony'=>'/balc[oó]n/iu','terrace'=>'/terraza/iu','pool'=>'/piscina/iu','gym'=>'/gimnasio/iu',
             'security'=>'/vigilancia/iu','air_conditioning'=>'/aire acondicionado|climatizaci[oó]n/iu',
-            'corner'=>'/esquiner/iu','landscape_view'=>'/vista paisaj[ií]stica|vista panor[aá]mica/iu',
+            'corner'=>'/esquiner/iu','landscape_view'=>'/vista paisaj[ií]stica/iu','panoramic_view'=>'/vista panor[aá]mica/iu',
             'covered_parking'=>'/parqueadero(s)? cubierto/iu','independent_parking'=>'/parqueadero(s)? independiente/iu',
             'frontage'=>'/frente.*metro|frente.*m²/iu','depth'=>'/fondo.*metro|fondo.*m²/iu',
             'loading_bays'=>'/muelles|bah[ií]as de cargue/iu','power'=>'/potencia el[eé]ctrica/iu',

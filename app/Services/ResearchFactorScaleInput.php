@@ -17,7 +17,7 @@ final class ResearchFactorScaleInput
         $labels=array_map(static fn($v)=>mb_strtolower(trim($v)),explode("\n",$scale['categories']));
         if (count(array_unique($labels))!==count($labels) || array_intersect($labels,['desconocido','pendiente','no publicado','no verificado','por verificar'])) throw new HttpException(422,'No repitas clases ni incluyas desconocido como nivel.');
         if (count($labels)<2) throw new HttpException(422,'Define al menos dos clases o niveles.');
-        if (!ResearchScalePolicy::valid($key,$scale)) throw new HttpException(422,'Conserva los niveles definidos y su orden de menor a mayor. No se permite invertir la escala.');
+        if (!ResearchScalePolicy::valid($key,$scale)) throw new HttpException(422,'Conserva la clasificación definida. No mezcles orientación de vista, paisaje, amplitud y esquina ni inviertas niveles ordenados.');
         return ['kind'=>$kind,'categories'=>$scale['categories'],'definition'=>$base['why']];
     }
     public static function catalog(array $catalog,array $scales): array
@@ -30,6 +30,7 @@ final class ResearchFactorScaleInput
             $factor['scale_help']=ResearchScalePolicy::help($key);
             $base=ResearchFactorCatalog::all()[$key];
             $factor['policy_kind']=$base['kind']; $factor['policy_categories']=$base['categories'];
+            $factor['policy_fixed']=$key==='view' || $base['kind']==='ordinal';
         }
         return $catalog;
     }

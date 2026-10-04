@@ -27,6 +27,17 @@ test('reversing fixed coverage is flagged while categorical classes remain unord
     assert.equal(researchCode('Sí',{kind:'binary'},'restricted_access'),'Código: 1');
     assert.equal(researchCode('Mixta',{kind:'categorical',categories:'Plana\nMixta'},'topography'),'Clase: Mixta · sin jerarquía');
 });
+
+test('mixed view classes cannot enter the research count even without an ordinal score',()=>{
+    const factor={...numeric,kind:'categorical',categories:'Interior\nExterior\nPanorámica\nEsquinera\nSin vista relevante'};
+    const policy={policy_kind:'categorical',policy_categories:'Sin vista relevante\nInterior\nExterior',policy_fixed:true};
+    const evidence={subjects:{view:'Interior'},groups:[group('a',[ad('FR',{view:'Interior'})])],scalePolicies:{view:policy}};
+    const result=researchSummary({target_ratio:10,factors:{view:factor}},evidence);
+    assert.equal(result.stats.view.ready.length,0);
+    assert.equal(validResearchScale(factor,policy),false);
+    assert.equal(validResearchScale({...factor,categories:policy.policy_categories},policy),true);
+    assert.equal(researchCode('Sin vista relevante',{kind:'categorical',categories:policy.policy_categories},'view'),'Clase: Sin vista relevante · sin jerarquía');
+});
 test('unknown is not zero and ranges are not exact ages', () => {
     assert.equal(researchValue('',binary,'elevator'),null);
     assert.equal(researchValue('No',binary,'elevator'),0);

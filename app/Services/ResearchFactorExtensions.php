@@ -21,6 +21,7 @@ final class ResearchFactorExtensions
             'restricted_access'=>['Restricción de acceso','0 = sin restricción comprobada; 1 = con restricción comprobada. No investigado queda pendiente; presencia no significa mejor.'],
             'corner'=>['Ubicación esquinera','Posición física de la unidad o lote; no es un nivel de vista.'],
             'landscape_view'=>['Vista paisajística','Confirmar paisaje visible desde la unidad; describirlo y conservar evidencia.'],
+            'panoramic_view'=>['Vista panorámica','Confirmar amplitud del campo visual desde la unidad, con evidencia; no implica paisaje natural ni posición esquinera.'],
             'covered_parking'=>['Parqueo cubierto','Confirmar cobertura del espacio estudiado; no inferirla de parqueaderos del edificio.'],
             'independent_parking'=>['Parqueo sin bloqueo por otra celda','Independencia de maniobra, no matrícula independiente ni propiedad privada.'],
             'water'=>['Agua con servicio operativo','Red frente al lote no acredita conexión operativa; verificar fuente y continuidad.'],
@@ -55,17 +56,17 @@ final class ResearchFactorExtensions
     public static function keys(string $type): array
     {
         $common=['security','accessible'];
-        $residential=['balcony','terrace','pool','gym','air_conditioning','corner','landscape_view','covered_parking','independent_parking','finish_quality'];
+        $residential=['balcony','terrace','pool','gym','air_conditioning','corner','landscape_view','panoramic_view','covered_parking','independent_parking','finish_quality'];
         $terrain=['frontage','depth','topography','slope','vehicle_access','restricted_access','water','electricity','sewer','corner'];
         return match($type) {
             'apartamento'=>array_merge($common,$residential),
             'casa'=>array_merge($common,$residential,['vehicle_access','restricted_access']),
-            'oficina','consultorio'=>array_merge($common,['air_conditioning','corner','landscape_view','covered_parking','independent_parking','finish_quality']),
+            'oficina','consultorio'=>array_merge($common,['air_conditioning','corner','landscape_view','panoramic_view','covered_parking','independent_parking','finish_quality']),
             'local'=>array_merge($common,['frontage','shopfront','mezzanine','height','air_conditioning','corner','loading_access','finish_quality']),
             'bodega'=>array_merge($common,['frontage','depth','loading_access','vehicle_access','restricted_access','loading_bays','power','floor_load','mezzanine','finish_quality']),
             'lote'=>$terrain,
-            'finca'=>array_merge($terrain,['irrigation','pool','terrace','landscape_view','finish_quality']),
-            'edificio'=>array_merge($common,['units_count','air_conditioning','loading_bays','vehicle_access','covered_parking','finish_quality']),
+            'finca'=>array_merge($terrain,['irrigation','pool','terrace','landscape_view','panoramic_view','finish_quality']),
+            'edificio'=>array_merge($common,['units_count','air_conditioning','loading_bays','vehicle_access','covered_parking','finish_quality','panoramic_view']),
             'hotel'=>array_merge($common,$residential,['guest_capacity']),
             'parqueadero'=>['security','vehicle_access','restricted_access','covered_parking','independent_parking','frontage','depth','height'],
             'deposito'=>['security','accessible','vehicle_access','restricted_access','humidity','height'],

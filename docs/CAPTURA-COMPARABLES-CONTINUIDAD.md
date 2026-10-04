@@ -65,3 +65,7 @@ Mantener lectores resources/js/*-paste.js y pruebas de importación y duplicados
 Prueba de integración de vistas: tests/comparable-search-render.php.
 Ejecutar php tests/run.php, npm test, build, check:size y revisión del navegador.
 Una reorganización no autoriza borrar muestras ni sustituir importadores por formularios básicos.
+
+Vista: orientación, paisaje, panorama y esquina se investigan por separado;
+la revisión queda documentada en PLAN-INVESTIGACION-MERCADO.md (2026-10-04).
+No confundir restaurar catálogo con adoptar escala y revisar calificaciones del plan.
