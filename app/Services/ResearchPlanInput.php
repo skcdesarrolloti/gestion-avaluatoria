@@ -12,7 +12,7 @@ final class ResearchPlanInput
         catch (\JsonException) { throw new HttpException(422,'El plan de investigación llegó incompleto.'); }
         if (!is_array($data) || !is_array($data['factors'] ?? null) || count($data['factors'])>20) throw new HttpException(422,'Revisa los factores del plan.');
         $ratio=$data['target_ratio'] ?? 10;
-        if (!is_int($ratio) || $ratio<1 || $ratio>100) throw new HttpException(422,'La referencia de inmuebles por coeficiente debe estar entre 1 y 100.');
+        if (!is_int($ratio) || $ratio<1 || $ratio>100) throw new HttpException(422,'La referencia de inmuebles por factor debe estar entre 1 y 100.');
         $out=['target_ratio'=>$ratio,'factors'=>[],'updated_at'=>gmdate('c')];
         foreach ($data['factors'] as $key=>$factor) {
             if (!isset(ResearchFactorCatalog::all()[$key]) || !is_array($factor)) throw new HttpException(422,'Factor desconocido.');
@@ -31,6 +31,8 @@ final class ResearchPlanInput
             $item['categories']=implode("\n",$lines);
             $out['factors'][$key]=$item;
         }
+        if (count(array_filter($out['factors'],static fn($item)=>$item['decision']==='model'))>4)
+            throw new HttpException(422,'Selecciona como máximo cuatro factores candidatos para el modelo. Puedes investigar todos los demás.');
         return $out;
     }
     public static function validateScope(array $plan,string $type,string $method,string $part=''): void

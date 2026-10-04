@@ -45,7 +45,7 @@ export function factorEvidence(key, factor, groups) {
     return { ready, missing, conflicts, formats, context, variation: new Set(values).size, portals };
 }
 export function researchSummary(plan, evidence) {
-    const selected = Object.entries(plan.factors).filter(([, f]) => ['model', 'investigate'].includes(f.decision));
+    const selected = Object.entries(plan.factors).filter(([, f]) => f.decision === 'model');
     const stats = Object.fromEntries(Object.entries(plan.factors).map(([key, f]) => [key, factorEvidence(key, f, evidence.groups)]));
     let parameters = 0; const warnings = [];
     for (const [key, f] of selected) {
@@ -60,7 +60,8 @@ export function researchSummary(plan, evidence) {
     if (areaKey) stats[areaKey] = factorEvidence(areaKey,{kind:'numeric'},evidence.groups);
     const areaReady = areaKey ? stats[areaKey].ready.length : 0;
     const joint = selected.length ? evidence.groups.filter(group => (!areaKey || stats[areaKey].ready.includes(group.id)) && selected.every(([key]) => stats[key].ready.includes(group.id))).length : 0;
-    return { stats, areaKey, areaReady, selected: selected.length, parameters, joint, target: parameters * plan.target_ratio, warnings };
+    if (selected.length > 4) warnings.push('modelo: reduce la selección a cuatro factores como máximo.');
+    return { stats, areaKey, areaReady, selected: selected.length, parameters, joint, target: selected.length * plan.target_ratio, coefficientTarget: parameters * plan.target_ratio, warnings };
 }
 export function comparisonState(key, factor, ads) {
     const known = ads.filter(ad => !unknown(ad.values[key]));
@@ -81,12 +82,10 @@ export function researchPlan(config) {
     return {
         plan: config.plan, evidence: config.evidence, catalog: config.catalog,
         comparisonId: config.evidence.groups[0]?.id || '',
-        get comparisonGroup() { return this.evidence.groups.find(g => g.id === this.comparisonId); },
+        get comparisonGroup() { return this.evidence.groups.find(g => g.id === this.comparisonId) || {ads:[],contextPending:false}; },
         get comparisonKeys() {
             const area = ['area','built','land'].find(key => this.plan.factors[key]);
-            const selected = Object.keys(this.plan.factors).filter(k => ['model','investigate'].includes(this.plan.factors[k].decision));
-            const keys = selected.length ? selected : ['bathrooms','bedrooms','parking','deposit','age','floor','elevator','view'];
-            return [...new Set([area,...keys].filter(k => k && this.plan.factors[k]))];
+            return [...new Set([area,...Object.keys(this.plan.factors)].filter(Boolean))];
         },
         get publishedAreaState() { return publishedAreaState(this.comparisonGroup?.ads || []); },
         get publishedAreaLabel() { return ({difference:'Diferencia',review:'Base / dato por revisar',incomplete:'Datos incompletos',equal:'Coinciden con misma base',single:'Una fuente',missing:'Sin dato'})[this.publishedAreaState]; },
@@ -100,8 +99,10 @@ export function researchPlan(config) {
         comparisonValue(key,ad) { return unknown(ad.values[key]) ? 'No publicado' : ad.values[key]; },
         get summary() { return researchSummary(this.plan, this.evidence); },
         get payload() { return JSON.stringify(this.plan); },
+        get modelCount() { return Object.values(this.plan.factors).filter(f => f.decision === 'model').length; },
+        modelUnavailable(key) { return this.modelCount >= 4 && this.plan.factors[key].decision !== 'model'; },
         subjectLabel(key) { return this.evidence.subjects[key] || 'Pendiente en numeral 3'; },
         factorLabel(key) { return this.catalog[key]?.label || key; },
-        warningLabel(text) { const index = text.indexOf(':'); return `${this.factorLabel(text.slice(0, index))}${text.slice(index)}`; },
+        warningLabel(text) { const index = text.indexOf(':'); return `${text.startsWith('modelo:') ? 'Modelo' : this.factorLabel(text.slice(0, index))}${text.slice(index)}`; },
     };
 }

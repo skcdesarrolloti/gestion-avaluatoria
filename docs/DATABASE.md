@@ -215,3 +215,10 @@ JSON aditivo methodology_workflow[component].research_plan: target_ratio, factor
 Sin migración; guardado con owner_id y methodology_version, 409 ante conflicto.
 No modifica appraisal_comparables ni la agrupación de anuncios.
 
+
+## Factores de investigación ampliados (2026-10-04)
+ComparableCaptureDetail admite research_generator, research_destination, research_levels,
+research_service, research_height y research_access en el JSON de captura existente.
+Campos opcionales y sólo explícitos; sin DDL. research_plan permite investigar todos
+los factores pero limita decision=model a cuatro. target_ratio referencia inmuebles
+por factor (no por coeficiente). Persistencia y controles de versión existentes intactos.

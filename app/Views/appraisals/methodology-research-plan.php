@@ -41,18 +41,21 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
                 <?= (int)$researchEvidence['excluded'] ?> grupos no seleccionados o descartados quedan fuera.</p>
             <p class="mt-2 font-semibold" x-text="`${summary.selected} factores candidatos · ${summary.parameters} coeficientes previstos · ${summary.joint} inmuebles con datos conjuntos legibles`"></p>
             <p class="mt-2 text-sm" x-text="`${summary.areaReady} inmuebles con área compatible en m² y contexto legible. El conteo conjunto exige esa área aunque no se elija como factor del modelo.`"></p>
-            <label class="mt-3 block text-sm font-semibold">Referencia de inmuebles por coeficiente
+            <label class="mt-3 block text-sm font-semibold">Referencia de inmuebles por factor
                 <input type="number" min="1" max="100" x-model.number="plan.target_ratio" class="input mt-2 max-w-40" placeholder="Ej. 10">
             </label>
             <p class="mt-2 text-sm" x-text="`Meta orientativa: ${summary.target} inmuebles. Faltan ${Math.max(0,summary.target-summary.joint)} respecto a esa referencia.`"></p>
-            <p class="mt-2 text-sm">La regla de 10 es una referencia de planificación configurable. Una categoría con k clases prevé k−1 coeficientes; no es una exigencia de la resolución ni garantiza un modelo válido. En Análisis se revisarán precio, área, depuración PH, calidad, independencia y diagnóstico estadístico.</p>
+            <p class="mt-2 text-sm">Puedes investigar todos los factores y elegir como máximo cuatro candidatos para el modelo. Con diez inmuebles por factor: uno requiere una meta de 10; cuatro, de 40. Son inmuebles diferentes con los datos conjuntos, no anuncios duplicados.</p>
+            <p class="mt-2 text-sm">Es una meta de planificación configurable, no una exigencia normativa ni garantía estadística. Las categorías pueden generar varios coeficientes; su suficiencia y codificación se revisarán en Análisis. Aquí todavía no se ajusta una regresión.</p>
             <details class="mt-3" x-show="summary.warnings.length"><summary class="min-h-11 cursor-pointer font-semibold text-amber-800">Pendientes de la configuración</summary>
                 <ul class="list-disc pl-5 text-sm"><template x-for="warning in summary.warnings" :key="warning"><li x-text="warningLabel(warning)"></li></template></ul>
             </details>
         </div>
         <p class="my-4 text-sm">Datos de las muestras guardadas al abrir esta consulta. Guarda la captura antes de <a class="font-semibold text-blue-700 underline" href="<?= e(url($basePath.'?component='.rawurlencode($componentKey).'&stage=3&research=1')) ?>">Actualizar consulta</a>.
             Los conteos son de disponibilidad, no de comparables aprobados ni valores adoptados.</p>
-        <div class="grid gap-4 lg:grid-cols-2">
+        <details class="rounded-xl border p-4">
+        <summary class="min-h-11 cursor-pointer font-semibold">Clasificar factores y preparar el modelo · máximo cuatro candidatos</summary>
+        <div class="mt-4 grid gap-4 lg:grid-cols-2">
         <?php foreach ($researchCatalog as $key=>$factor): ?>
             <article class="rounded-xl border p-4">
                 <h3 class="font-semibold"><?= e($factor['label']) ?> · <?= e($factor['unit']) ?></h3>
@@ -66,7 +69,7 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
                 <label class="mt-3 block text-sm font-semibold">Uso propuesto
                     <select class="input mt-1" x-model="plan.factors.<?= e($key) ?>.decision"><option value="">Selecciona el uso</option>
                         <option value="filter">Filtro de contexto</option><option value="investigate">Investigar disponibilidad</option>
-                        <option value="model">Candidato para el modelo</option><option value="defer">Dejar pendiente</option>
+                        <option value="model" :disabled="modelUnavailable('<?= e($key) ?>')">Candidato para el modelo · máximo 4</option><option value="defer">Dejar pendiente</option>
                     </select>
                 </label>
                 <details class="mt-3"><summary class="min-h-11 cursor-pointer text-sm font-semibold">Dónde hay datos y cómo definir el factor</summary>
@@ -84,6 +87,7 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
             </article>
         <?php endforeach; ?>
         </div>
+        </details>
         <div class="mt-5 flex flex-wrap items-center gap-3"><button type="submit" class="button-primary min-h-11">Guardar plan ahora</button>
             <span data-autosave-status role="status" class="text-sm">Autoguardado activo · el plan se guarda por unidad y método.</span></div>
     </form>

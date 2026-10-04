@@ -718,3 +718,14 @@ por defecto. Metadatos de fuente en snapshot de lectura; sin esquema o persisten
 Validación: 985 PHP, 142 JS, build 69,7 KB gzip. Navegador local con ejemplo ficticio
 3/3/2 baños amarillo y 80 m² misma base verde; móvil con scroll contenido y sin errores.
 No se alteraron datos de producción. Ver PLAN-INVESTIGACION-MERCADO.md.
+
+## 2026-10-04 · Sujeto como referencia y máximo cuatro factores
+Plan de investigación: factores en filas; sujeto propio del numeral 3 como primera
+columna de datos, anuncios por portal y validación al final. Todos los factores del
+tipo permanecen visibles. Planta eléctrica y destinación añadidas; ausencia no es cero.
+Clasificación conservada en bloque cerrado. Hasta cuatro candidatos al modelo; investigar
+no consume cupos. Meta orientativa 10 inmuebles distintos por factor, sin garantía de
+suficiencia estadística ni regresión ejecutada. Área compatible obligatoria para el conteo.
+Campos opcionales explícitos en capture_details_json, sin migración ni extracción global.
+Validación: 988 PHP, 143 JS; build 69,8 KB gzip. UI local 3/3/2 amarillo, 80 m² verde,
+sujeto separado y quinto candidato deshabilitado. Commit/push; sin acceso a Hostinger.

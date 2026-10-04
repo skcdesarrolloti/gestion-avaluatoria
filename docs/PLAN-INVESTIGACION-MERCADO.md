@@ -17,8 +17,9 @@ unidad, parte y método; no ejecuta regresión, depuración ni adopta valores.
   discordantes/desconocidos quedan pendientes del contexto; no cuentan como listos.
 - Cantidad conjunta de inmuebles con todos los factores candidatos legibles.
   Se muestran variación y pendientes del sujeto, definición y justificación.
-- Referencia configurable: 10 inmuebles por coeficiente, no requisito normativo
-  ni suficiencia estadística. Categorías con k clases prevén k−1 coeficientes.
+- Referencia configurable: 10 inmuebles por factor candidato (máximo cuatro), no
+  requisito normativo ni suficiencia estadística. Categorías con k clases prevén
+  k−1 coeficientes; el conteo de coeficientes se conserva para revisión posterior.
   No introduce ponderaciones económicas del analista ni trata códigos como distancias.
 
 Datos sólo consultados: no modifica anuncios, precios, áreas, fotos, selección,
@@ -31,20 +32,33 @@ del servidor, propietario, CSRF y methodology_version. No requiere migración.
 Autoguardado 800 ms y confirmación del servidor; versión obsoleta devuelve 409.
 Actualizar consulta usa la navegación existente después de guardar la captura.
 
-Límites: altura/acceso/servicio/niveles sin campo estructurado en las muestras siguen
-pendientes, aunque estén en su descripción original. Ascensores en la ficha del sujeto
+Límites: altura/acceso/servicio/niveles requieren un dato estructurado explícito en
+la captura; no se deducen de texto ambiguo. Ascensores en la ficha del sujeto
 pueden estar calificados por nivel; esa clase no se transforma en presencia sí/no.
 La identidad no confirmada entre portales mantiene inmuebles potenciales separados.
 Validación estadística, corroboración y control normativo corresponden a M4.
 ## 2026-10-04 · Cuadro por inmueble y portal
-En Plan de investigación: selector de un inmueble vinculado y tabla con portal/aviso
-en filas y factores candidatos o por investigar en columnas. Sin selección de factores,
-se muestran los más frecuentes del tipo. Área compatible y publicada siempre visibles,
+En Plan de investigación: selector de un inmueble vinculado y tabla con todos los
+factores aplicables en filas. Columnas: factor, sujeto desde su numeral 3, cada anuncio
+por portal y validación entre fuentes. El sujeto es referencia, no participa en la
+comparación de coincidencias entre anuncios. Área compatible y publicada siempre visibles,
 con unidad m² y base original; no hay equivalencia automática total/privada/construida.
 Verde sólo si dos o más anuncios tienen datos legibles iguales, sin pendientes de formato
 ni relectura. Amarillo ante diferencia o revisión; gris para faltantes/una fuente.
 No se comparan propiedades distintas ni se sustituyen datos. Dos avisos del mismo portal
-conservan filas separadas, código y enlace. El cuadro no genera datos desde la referencia.
+conservan columnas separadas, código y enlace. El cuadro no genera datos desde la referencia.
 El conteo conjunto exige área positiva compatible independientemente de su selección como
 predictor; el área obligatoria no agrega un coeficiente si no se elige para el modelo.
 El ratio de planificación sigue orientativo, no requisito normativo ni regresión.
+
+## 2026-10-04 · Sujeto, catálogo completo y cuatro candidatos
+Planta eléctrica y destinación/uso observado amplían el catálogo según tipo.
+Se conservan campos explícitos opcionales de captura para estos factores y para
+niveles, servicio, altura y acceso en el JSON existente; no se promete extracción
+automática completa desde todos los portales. Datos ausentes permanecen pendientes.
+Investigar no consume cupos: sólo Candidato al modelo cuenta para el máximo cuatro.
+Cliente deshabilita un quinto candidato y servidor rechaza más de cuatro sin borrar
+configuraciones anteriores. Meta = factores candidatos × referencia (por defecto 10).
+El conteo conjunto considera inmuebles distintos, factores legibles y área compatible;
+duplicados vinculados no aumentan la muestra. La clasificación queda en un bloque
+cerrado para dar prioridad al resumen, sin retirar definiciones ni justificaciones.

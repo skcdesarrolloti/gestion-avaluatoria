@@ -30,6 +30,12 @@ final class ComparableCaptureDetail
             'evidence_detail' => ['Evidencia del aviso: referencia y contenido conservado', 'text', 'map'],
             'verification_detail' => ['Corroboración: responsable, fecha y resultado', 'text', 'map'],
             'market_services' => ['Servicios públicos y dotación urbana: descripción y fuente', 'text', 'shared'],
+            'research_generator' => ['Planta eléctrica: presencia y alcance publicados', 'text', 'shared'],
+            'research_destination' => ['Destinación / uso descrito en la fuente', 'text', 'shared'],
+            'research_levels' => ['Niveles del inmueble publicados', 'integer', 'shared'],
+            'research_service' => ['Alcoba / baño de servicio publicados', 'text', 'shared'],
+            'research_height' => ['Altura libre publicada (m)', 'number', 'shared'],
+            'research_access' => ['Tipo de acceso publicado', 'text', 'shared'],
             'market_access' => ['Accesos, vías, transporte e infraestructura: descripción y fuente', 'text', 'shared'],
             'market_planning' => ['Normatividad urbanística aplicable: referencia y fuente', 'text', 'shared'],
         ] + ComparablePhCapture::fields() + ComparableNegotiation::fields() + ComparableUnitPrice::fields();

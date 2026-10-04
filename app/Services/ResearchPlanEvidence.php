@@ -16,6 +16,13 @@ final class ResearchPlanEvidence
             if ($key==='stratum' && (MarketSubjectEvidence::decode($unit)['identity_scope'] ?? '')==='sujeto') $raw=$subject['stratum'] ?? '';
             if ($key==='floor') $raw=\App\Support\AppraisalSpecialAttributeOptions::floor()[$attributes['piso_altura']['value'] ?? ''] ?? '';
             if ($key==='elevator') $raw=\App\Support\AppraisalSpecialAttributeOptions::level()[$attributes['ascensores']['value'] ?? $attributes['ascensores_edificio']['value'] ?? ''] ?? '';
+            if ($key==='generator') {
+                $attribute=match(ComparablePortalProfiles::defaultType((string)($context['tipo_inmueble'] ?? ''))) {
+                    'apartamento','casa'=>'planta_electrica_vivienda','hotel'=>'planta_electrica_hotel',default=>'planta_electrica_oficina',
+                };
+                $raw=\App\Support\AppraisalSpecialAttributeOptions::yesPartial()[$attributes[$attribute]['value'] ?? ''] ?? '';
+            }
+            if ($key==='destination') $raw=MarketSubjectEvidence::decode($unit)['observed_use'] ?? '';
             if (isset($definitions[$factor['subject']]['options'])) $raw=$definitions[$factor['subject']]['options'][$raw] ?? $raw;
             $subjects[$key]=(string)($raw ?? '');
         }
