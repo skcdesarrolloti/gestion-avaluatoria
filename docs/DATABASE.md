@@ -261,3 +261,9 @@ Vista simplificada por el usuario: cuatro clases en un único factor. Catálogos
 nuevos omiten paisaje/panorama separados; planes anteriores los conservan por
 compatibilidad, incluyendo calificaciones/soporte. Escalas Vista anteriores deben
 revisarse/adoptarse expresamente. Sin DDL ni recodificación automática.
+
+Factores del sujeto: migración aditiva 202610040002_subject_factor_capture.php
+agrega subject_factors_json y subject_factors_version a appraisal_units.
+Cada factor conserva value, support, scale_kind, scale_categories y saved_at UTC.
+Sin backfill: originales intactos. CAS por unidad, propietario y versión; campos
+nuevos vacíos no sustituyen datos previos. Véase FACTORES-SUJETO-CAPITULO-3.md.

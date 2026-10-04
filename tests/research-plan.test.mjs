@@ -8,6 +8,16 @@ const binary = {...numeric,kind:'binary'};
 const ad = (portal,values,revision=false) => ({portal,values,revision});
 const group = (id,ads,contextPending=false) => ({id,ads,contextPending});
 
+test('chapter 3 subject captures cannot be replaced by a different manual research grade',()=>{
+    const factor={...numeric,kind:'binary',categories:'No\nSí'};
+    const evidence={subjects:{elevator:''},subjectCaptureKeys:['elevator'],subjectSignature:'a',groups:[]};
+    const plan={target_ratio:10,factors:{elevator:factor},assessments:{subject:{elevator:{value:'Sí',support:'Otro dato',basis:'a',scale_kind:'binary',scale_categories:'No\nSí'}}}};
+    assert.ok(researchSummary(plan,evidence).warnings.some(w=>w.includes('dato del sujeto')));
+    evidence.groups=[group('group',[])];
+    const ui=researchPlan({plan,catalog:{elevator:factor},evidence});
+    assert.deepEqual(ui.assessmentTargets('elevator'),['group']);
+});
+
 test('an old access hierarchy stays stored without presenting restricted as a higher code or ready data',()=>{
     const factor={...numeric,kind:'ordinal',categories:'Peatonal\nVehicular\nRestringido'};
     const policy={policy_kind:'categorical',policy_categories:factor.categories};

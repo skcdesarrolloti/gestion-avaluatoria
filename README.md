@@ -216,4 +216,4 @@ Investigación de factores: [plan por unidad y método](docs/PLAN-INVESTIGACION-
 
 
 Vista simplificada a cuatro clases: véase la revisión de 2026-10-04 en
-[plan de investigación](docs/PLAN-INVESTIGACION-MERCADO.md).
+[plan de investigación](docs/PLAN-INVESTIGACION-MERCADO.md). [Captura del sujeto](docs/FACTORES-SUJETO-CAPITULO-3.md).

@@ -79,7 +79,7 @@ export function researchSummary(plan, evidence) {
         if (f.kind === 'categorical' && categories.length < 2) warnings.push(`${key}: define al menos dos categorías.`);
         if (f.kind === 'ordinal' && categories.length < 2) warnings.push(`${key}: define al menos dos niveles de menor a mayor.`);
         if (!f.reason.trim() || !f.definition.trim()) warnings.push(`${key}: completa definición y justificación.`);
-        const subjectGrade=plan.assessments?.subject?.[key];
+        const subjectGrade=evidence.subjectCaptureKeys?.includes(key)?null:plan.assessments?.subject?.[key];
         const subjectRaw=subjectGrade?.value ? (usableAssessment(subjectGrade,f,subjectBasis(evidence,key))?subjectGrade.value:'') : evidence.subjects[key];
         if (researchValue(subjectRaw, f, key) === null) warnings.push(`${key}: completa o concilia el dato del sujeto.`);
         if (stats[key].variation < 2) warnings.push(`${key}: no hay variación suficiente observada.`);

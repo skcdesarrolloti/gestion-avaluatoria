@@ -34,7 +34,7 @@ $safeSubjectPartial = static function (string $path, string $label, array $conte
 <?php require BASE_PATH . '/app/Views/appraisals/step-nav.php'; ?>
 
 <div class="mt-7"
-    x-data="{ activeSubject: 'basic', syncSubject() { this.activeSubject = location.hash === '#superficies' ? 'surface' : (location.hash === '#construccion' ? 'construction' : (location.hash === '#atributos' ? 'attributes' : (location.hash === '#ph' ? 'ph' : (location.hash === '#obsolescencias' ? 'obsolescence' : (location.hash.startsWith('#fotos') ? 'photos' : 'basic'))))) } }"
+    x-data="{ activeSubject: 'basic', syncSubject() { this.activeSubject = location.hash === '#factores' ? 'factors' : (location.hash === '#superficies' ? 'surface' : (location.hash === '#construccion' ? 'construction' : (location.hash === '#atributos' ? 'attributes' : (location.hash === '#ph' ? 'ph' : (location.hash === '#obsolescencias' ? 'obsolescence' : (location.hash.startsWith('#fotos') ? 'photos' : 'basic')))))) } }"
     x-init="syncSubject()" @hashchange.window="syncSubject()">
     <div class="mb-3 flex flex-wrap justify-end">
         <button class="btn-secondary" type="button" aria-disabled="true"
@@ -61,6 +61,12 @@ $safeSubjectPartial = static function (string $path, string $label, array $conte
                 :class="activeSubject === 'construction' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:border-blue-700'">
                 <span class="block text-base">3.3 Datos de la construcción</span>
                 <span class="block text-xs font-medium opacity-80">Áreas, vetustez, estado y conservación</span>
+            </button>
+            <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
+                @click="activeSubject = 'factors'; history.replaceState(null, '', '#factores')"
+                :class="activeSubject === 'factors' ? 'bg-blue-700 text-white shadow-sm' : 'bg-white text-blue-800 hover:border-blue-700'">
+                <span class="block text-base">Factores del sujeto</span>
+                <span class="block text-xs font-medium opacity-80">Mismas clases que los comparables</span>
             </button>
             <button class="min-h-12 shrink-0 rounded-lg px-5 py-3 text-left font-semibold" type="button"
                 @click="activeSubject = 'attributes'; history.replaceState(null, '', '#atributos')"
@@ -99,6 +105,9 @@ $safeSubjectPartial = static function (string $path, string $label, array $conte
     </div>
     <div class="mt-7" x-show="activeSubject === 'attributes'">
         <?php $safeSubjectPartial('subject-attributes.php', '3.4 Diferenciales valuatorios', get_defined_vars()); ?>
+    </div>
+    <div class="mt-7" x-show="activeSubject === 'factors'">
+        <?php $safeSubjectPartial('subject-factors.php', 'Factores del sujeto', get_defined_vars()); ?>
     </div>
     <div class="mt-7" x-show="activeSubject === 'ph'">
         <?php $safeSubjectPartial('subject-ph.php', '3.5 Propiedad horizontal', get_defined_vars()); ?>

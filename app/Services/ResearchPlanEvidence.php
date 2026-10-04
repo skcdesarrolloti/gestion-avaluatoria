@@ -9,7 +9,7 @@ final class ResearchPlanEvidence
     {
         $definitions=\App\Support\AppraisalFunctionalVariableCatalog::definitions();
         $attributes=json_decode((string)($unit['special_attributes_json'] ?? '{}'),true) ?: [];
-        $subjects=[];
+        $subjects=[]; $captured=SubjectFactorCapture::decode($unit);
         foreach ($catalog as $key=>$factor) {
             $raw=$unit[$factor['subject']] ?? '';
             if (in_array($key,['built','area'],true) && $factor['subject']==='built_area_adopted_m2' && ($raw==='' || $raw===null)) $raw=$unit['area_built_m2'] ?? '';
@@ -24,6 +24,11 @@ final class ResearchPlanEvidence
             }
             if ($key==='destination') $raw=MarketSubjectEvidence::decode($unit)['observed_use'] ?? '';
             if (isset($definitions[$factor['subject']]['options'])) $raw=$definitions[$factor['subject']]['options'][$raw] ?? $raw;
+            if (isset($captured[$key])) {
+                $item=$captured[$key];
+                $raw=SubjectFactorCapture::compatible($item,$factor) && trim((string)($item['support'] ?? ''))!==''
+                    && SubjectFactorCapture::validValue((string)($item['value'] ?? ''),$factor)?$item['value']:'';
+            }
             $subjects[$key]=(string)($raw ?? '');
         }
         $groups=[];
@@ -61,8 +66,10 @@ final class ResearchPlanEvidence
                 'ads'=>$items,'signature'=>hash('sha256',json_encode($legacyItems,JSON_THROW_ON_ERROR)),'factorSignatures'=>$signatures,'contextPending'=>$contextPending];
         }
         $subjectSignatures=[];
-        foreach ($subjects as $key=>$value) $subjectSignatures[$key]=hash('sha256',json_encode([$key=>$value],JSON_THROW_ON_ERROR));
-        return ['subjectSignature'=>hash('sha256',json_encode(array_intersect_key($subjects,$legacy),JSON_THROW_ON_ERROR)),
-            'subjectFactorSignatures'=>$subjectSignatures,'subjects'=>$subjects,'groups'=>$groups,'excluded'=>$excluded,'operation'=>$operation];
+        foreach ($subjects as $key=>$value) $subjectSignatures[$key]=hash('sha256',json_encode(isset($captured[$key])?[$key=>$value,'capture'=>$captured[$key]]:[$key=>$value],JSON_THROW_ON_ERROR));
+        $subjectBasis=array_intersect_key($subjects,$legacy);
+        if ($captured!==[]) $subjectBasis['capture']=$captured;
+        return ['subjectSignature'=>hash('sha256',json_encode($subjectBasis,JSON_THROW_ON_ERROR)),
+            'subjectFactorSignatures'=>$subjectSignatures,'subjectCaptureKeys'=>array_keys($captured),'subjects'=>$subjects,'groups'=>$groups,'excluded'=>$excluded,'operation'=>$operation];
     }
 }

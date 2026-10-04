@@ -74,6 +74,7 @@ return [
     ['POST', '#^/avaluos/([a-f0-9]{32})/sector/midas/archivos/([a-f0-9]{32})/eliminar$#', 'sectorMidas', 'deleteSupport', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/sector/fotos$#', 'sector', 'uploadPhotos', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/bien-sujeto$#', 'subject', 'show', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/bien-sujeto/unidades/([a-f0-9]{32})/factores$#', 'subjectFactors', 'save', true],
     ['GET', '#^/avaluos/([a-f0-9]{32})/juridicas$#', 'legalCharacteristics', 'show', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/juridicas$#', 'legalCharacteristics', 'save', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/juridicas/autoguardar$#', 'legalCharacteristics', 'autosave', true],

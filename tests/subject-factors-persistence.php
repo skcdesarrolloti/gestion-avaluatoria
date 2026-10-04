@@ -1,0 +1,26 @@
+<?php
+declare(strict_types=1);
+(static function(PDO $app): void {
+    $repo=new \App\Models\AppraisalRepository($app); $id=$repo->create(1);
+    $app->prepare('UPDATE appraisals SET tipo_inmueble="oficina",igac_property_units_count=1,igac_annex_units_count=1 WHERE id=?')->execute([$id]);
+    $repo->ensureUnits($id,1,1,1); $units=$repo->units($id,1); $unit=$units[0]; $annex=$units[1];
+    $app->prepare('UPDATE appraisal_units SET functional_bathrooms_count=2,construction_type="deposito" WHERE id=?')->execute([$annex['id']]);
+    $factors=new \App\Models\SubjectFactorRepository($app);
+    $catalog=\App\Services\SubjectFactorCapture::catalog($unit,['tipo_inmueble'=>'oficina']);
+    $entry=['value'=>'Sí','support'=>'Visita documentada','scale_kind'=>'binary','scale_categories'=>"No\nSí"];
+    expect($factors->save($id,1,$unit['id'],0,['air_conditioning'=>$entry])===1,'factores de sujeto autoguardan con versión propia');
+    $saved=$repo->units($id,1);
+    expect(\App\Services\SubjectFactorCapture::decode($saved[0])['air_conditioning']['value']==='Sí' && empty($saved[1]['subject_factors_json']),'recarga mantiene factor en su unidad sin copiarlo al anexo');
+    expectStatus(409,fn()=>$factors->save($id,1,$unit['id'],0,['air_conditioning'=>$entry]),'otra pestaña no sobrescribe factores del sujeto');
+    expectStatus(404,fn()=>$factors->save($id,2,$unit['id'],1,[]),'factores del sujeto aíslan propietario');
+    expectStatus(404,fn()=>$factors->save($id,1,str_repeat('f',32),0,[]),'rechaza unidad ajena o inexistente');
+    expectStatus(422,fn()=>$factors->save($id,1,$annex['id'],0,['air_conditioning'=>$entry]),'depósito no recibe automáticamente factores de oficina');
+    $entry['value']='No';
+    expect($factors->save($id,1,$annex['id'],0,['humidity'=>$entry])===1,'anexo conserva captura propia y No explícito');
+    $reload=$repo->units($id,1);
+    expect((float)$reload[1]['functional_bathrooms_count']===2.0 && \App\Services\SubjectFactorCapture::decode($reload[0])['air_conditioning']['value']==='Sí','guardar factores no borra campos previos ni otra unidad');
+    $evidence=\App\Services\ResearchPlanEvidence::build($catalog,$reload[0],[],['tipo_inmueble'=>'oficina']);
+    expect($evidence['subjects']['air_conditioning']==='Sí','lectura persistida de capítulo 3 alimenta capítulo 8');
+    $app->prepare('UPDATE appraisals SET igac_annex_units_count=0 WHERE id=?')->execute([$id]);
+    expectStatus(404,fn()=>$factors->save($id,1,$annex['id'],1,[]),'anexo inactivo no se modifica');
+})($app);

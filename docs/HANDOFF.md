@@ -835,3 +835,10 @@ paisajística, factor categórico único. Sustituye la propuesta de dimensiones
 separadas. Paisaje/panorama sólo se conservan en planes previos; validateScope
 mantiene compatibilidad por tipo, sin extenderla a bodega u otros tipos.
 1047 PHP, 152 JS, 181 BD3374, lint/build/71,3KB; navegador local guardar/recargar.
+
+Capítulo 3 → Factores del sujeto (2026-10-04): captura compartida con comparables
+por unidad/tipo, soporte obligatorio para datos conocidos, desconocidos pendientes.
+Capítulo 8 consulta la captura y evita otra calificación manual del mismo sujeto.
+Migración aditiva 202610040002, CAS/CSRF/propietario. Sin regresión ni recodificar
+escalas antiguas. 1073 PHP, 153 JS, 191 BD nueva instancia3377; navegador local
+guardar/recargar Vista y Ascensor. Detalles: FACTORES-SUJETO-CAPITULO-3.md.

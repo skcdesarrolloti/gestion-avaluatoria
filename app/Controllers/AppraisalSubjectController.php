@@ -11,7 +11,8 @@ final class AppraisalSubjectController
     public function __construct(
         private AppraisalRepository $appraisals, private array $user, private IgacTypologyRepository $typologies,
         private AppraisalSubjectRepository $subjects, private GeoMasterRepository $geo, private AppraisalPhRepository $ph,
-        private \App\Models\AppraisalObsolescenceRepository $obsolescence, private ?AppraisalReportNoteRepository $reportNotes = null
+        private \App\Models\AppraisalObsolescenceRepository $obsolescence, private ?AppraisalReportNoteRepository $reportNotes = null,
+        private ?\App\Models\ResearchFactorScaleRepository $factorScales = null
     ) {}
     public function show(string $id): void
     {
@@ -22,7 +23,7 @@ final class AppraisalSubjectController
         $this->appraisals->ensureUnits($id, $this->user['id'],
             (int) ($record['igac_property_units_count'] ?? 0), (int) ($record['igac_annex_units_count'] ?? 0));
         view('appraisals/subject', ['title' => 'Bien sujeto', 'record' => $record,
-            'subject' => $subject,
+            'subject' => $subject, 'factorScales' => $this->factorScales?->all($this->user['id']) ?? [],
             'obsolescenceProfile' => $this->obsolescence->find($id, $this->user['id']),
             'geo' => ['departments' => $this->geo->departments(), 'cities' => $this->geo->cities(),
                 'neighborhoods' => $this->geo->neighborhoods()],
@@ -77,7 +78,6 @@ final class AppraisalSubjectController
     { $this->appraisals->find($id, $this->user['id']); $this->subjects->save($id, $this->user['id'], $_POST); $this->savedJson(); }
     public function saveMarketEvidence(string $id, string $unitId): never
     { \App\Services\MarketSubjectEvidenceAction::save($this->appraisals, $this->user['id'], $id, $unitId); }
-
     public function saveUnits(string $id): never
     { $this->saveUnitsAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }
     public function autosaveUnits(string $id): never

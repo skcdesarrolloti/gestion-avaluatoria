@@ -1,0 +1,39 @@
+<?php
+$captureItem=$captureSaved[$captureKey] ?? [];
+$captureValue=(string)($captureItem['value'] ?? '');
+$captureStale=$captureItem!==[] && !\App\Services\SubjectFactorCapture::compatible($captureItem,$captureFactor);
+$captureOptions=explode("\n",$captureFactor['categories']);
+$captureName='factors['.$captureKey.']';
+$captureOriginal=(string)($captureExisting[$captureKey] ?? '');
+if (in_array(mb_strtolower(trim($captureOriginal)),['no verificado','por verificar','pendiente','no publicado'],true)) $captureOriginal='';
+$captureCodeMap=[];
+foreach ($captureOptions as $optionLabel) $captureCodeMap[$optionLabel]=\App\Services\SubjectFactorCapture::code($optionLabel,$captureFactor);
+?>
+<fieldset class="rounded-xl border p-4" x-show="<?= e(json_encode(mb_strtolower($captureFactor['label']),JSON_UNESCAPED_UNICODE)) ?>.includes(factorSearch.toLowerCase())" x-data="{ captureValue: <?= e(json_encode($captureValue,JSON_UNESCAPED_UNICODE)) ?> }">
+    <legend class="px-1 font-semibold"><?= e($captureFactor['label']) ?> · <?= e($captureFactor['unit']) ?></legend>
+    <p class="text-xs"><?= e($captureFactor['why']) ?></p>
+    <p class="mt-2 text-sm font-semibold"><?= e(\App\Services\ResearchFactorReference::scale($captureFactor)) ?></p>
+    <?php if ($captureOriginal!==''): ?><p class="mt-2 rounded bg-slate-50 p-2 text-xs">Dato ya registrado en el capítulo 3: <?= e($captureOriginal) ?>. Verifica que corresponda a esta clasificación.</p>
+        <?php if ($captureFactor['scale_valid'] && \App\Services\SubjectFactorCapture::validValue($captureOriginal,$captureFactor)): ?><button type="button" class="btn-secondary mt-2" @click="captureValue=<?= e(json_encode($captureOriginal,JSON_UNESCAPED_UNICODE)) ?>; $nextTick(() => $el.closest('fieldset').querySelector('[name$=&quot;[value]&quot;]').dispatchEvent(new Event('change', { bubbles: true })))">Usar dato existente · completar soporte</button><?php endif; ?>
+    <?php endif; ?>
+    <?php if ($captureStale): ?><p class="mt-2 rounded bg-amber-50 p-2 text-xs">Clasificación anterior conservada: <?= e($captureValue ?: 'Pendiente') ?>. Revisa el dato y confirma expresamente su clasificación actual.</p><?php endif; ?>
+    <input type="hidden" name="<?= e($captureName) ?>[scale_kind]" value="<?= e($captureFactor['kind']) ?>">
+    <input type="hidden" name="<?= e($captureName) ?>[scale_categories]" value="<?= e($captureFactor['categories']) ?>">
+    <label class="mt-3 block text-sm font-semibold">Dato de <?= e($captureFactor['label']) ?> · sujeto
+    <?php if ($captureFactor['kind']==='numeric'): ?>
+        <input class="input" type="text" inputmode="decimal" name="<?= e($captureName) ?>[value]" value="<?= e($captureValue) ?>" maxlength="120" placeholder="Medida en <?= e($captureFactor['unit']) ?>; vacío si se desconoce" x-model="captureValue">
+    <?php else: ?>
+        <select class="input" name="<?= e($captureName) ?>[value]" x-model="captureValue">
+            <option value="">Pendiente de verificar</option>
+            <?php if ($captureValue!=='' && !in_array($captureValue,$captureOptions,true)): ?><option value="<?= e($captureValue) ?>" selected>Anterior por revisar: <?= e($captureValue) ?></option><?php endif; ?>
+            <?php foreach ($captureOptions as $optionIndex=>$optionLabel): ?>
+                <option value="<?= e($optionLabel) ?>" <?= $captureValue===$optionLabel?'selected':'' ?>><?= e(in_array($captureFactor['kind'],['binary','ordinal'],true)?$optionIndex.' = '.$optionLabel:$optionLabel) ?></option>
+            <?php endforeach; ?>
+        </select>
+    <?php endif; ?>
+    </label>
+    <label class="mt-3 block text-sm font-semibold">Soporte de <?= e($captureFactor['label']) ?><textarea class="input" name="<?= e($captureName) ?>[support]" rows="2" maxlength="600" placeholder="Ej. Inspección, fecha, foto o documento y página"><?= e($captureItem['support'] ?? '') ?></textarea></label>
+    <?php if ($captureStale): ?><label class="mt-2 flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" name="<?= e($captureName) ?>[confirm_scale]" value="1">Confirmo el dato con la clasificación actual</label><?php endif; ?>
+    <p class="mt-1 text-xs" x-text="<?= $captureFactor['kind']==='numeric'?'captureValue === &quot;&quot; ? &quot;Pendiente&quot; : &quot;Medida: &quot; + captureValue':e(json_encode($captureCodeMap,JSON_UNESCAPED_UNICODE)).'[captureValue] || &quot;Pendiente&quot;' ?>"></p>
+    <?php if (!$captureFactor['scale_valid']): ?><p class="mt-2 text-xs text-amber-900">Corrige primero esta escala en Configuración → Catálogo de factores del capítulo 8.</p><?php endif; ?>
+</fieldset>

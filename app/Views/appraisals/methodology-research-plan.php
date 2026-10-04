@@ -21,6 +21,7 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
 <div x-show="searchTab === 'investigacion'" x-cloak>
     <h2 class="text-2xl font-semibold">Plan de investigación · <?= e($componentLabel ?? 'Selecciona una unidad') ?></h2>
     <p class="mt-3 text-sm leading-6">Define qué investigar, dónde hay datos y por qué cada factor puede servir. El sujeto es la referencia; esta configuración prepara el análisis posterior.</p>
+    <a class="mt-2 inline-flex min-h-11 items-center font-semibold text-teal-800" href="<?= e(url('avaluos/'.$record['id'].'/bien-sujeto#factores')) ?>">Completar factores del sujeto en el capítulo 3</a>
     <p class="mt-2 text-sm">Los usos «Filtro» e «Investigar» documentan la intención del analista: no cambian la captura ni descartan anuncios. Consulta la investigación por portal en la pestaña 3.</p>
     <p class="mt-2 text-sm">Si un dato sólo está descrito en texto o el sujeto usa otra clasificación, queda por conciliar. Por ejemplo, «piso alto» no se convierte automáticamente en un número de piso.</p>
     <p class="mt-2 text-sm"><strong><?= count($researchFactors) ?> atributos para <?= e($guide['type_label'] ?? $researchType) ?>.</strong> Consulta el listado en «Clasificar factores». Prioriza datos publicados; puedes investigar manualmente atributos que no aparezcan en los portales.</p>

@@ -6,7 +6,7 @@ export function usableAssessment(item, factor, basis) {
 export const assessmentBasis = (group,key) => [group?.factorSignatures?.[key],group?.signature].filter(Boolean);
 export const subjectBasis = (evidence,key) => [evidence.subjectFactorSignatures?.[key],evidence.subjectSignature].filter(Boolean);
 export const assessmentMethods = {
-    assessmentTargets() { return ['subject',this.comparisonGroup.id].filter(Boolean); },
+    assessmentTargets(key) { return [this.evidence.subjectCaptureKeys?.includes(key)?null:'subject',this.comparisonGroup.id].filter(Boolean); },
     assessment(id,key) { return this.plan.assessments?.[id]?.[key] || {value:'',support:''}; },
     gradeOptions(key) { return String(this.plan.factors[key].categories || '').split('\n').filter(Boolean).map((label,i)=>({label,value:label,caption:this.scaleValid(key) && this.plan.factors[key].kind==='ordinal'?`${i} = ${label}`:label})); },
     setAssessment(id,key,field,value) {

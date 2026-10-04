@@ -72,3 +72,9 @@ No confundir restaurar catálogo con adoptar escala y revisar calificaciones del
 
 Vista vigente se simplifica a cuatro clases del usuario; véase la sección final
 2026-10-04 de PLAN-INVESTIGACION-MERCADO.md. Conserva información anterior.
+
+Referencia del sujeto: capítulo 3, pestaña Factores del sujeto, comparte catálogo
+y clasificaciones con los comparables. Insumos consulta valor/soporte de esa captura;
+no la sustituye con otra calificación manual. Escalas anteriores requieren revisión
+explícita. No cambia lectura de portales ni integra regresión. Véase
+FACTORES-SUJETO-CAPITULO-3.md.
