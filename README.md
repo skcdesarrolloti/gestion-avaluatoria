@@ -19,6 +19,8 @@ Lote: seis atributos aprobados; frentes y servicios agrupados con jerarquías 0�
 verificación documentada y capturas anteriores conservadas.
 Consultorio comparte los factores y escalas de Oficina, más Rampa de acceso
 (0 No / 1 Sí), con captura en capítulos 3 y 8.
+Edificio completo: nueve atributos aprobados, ascensores operativos por cantidad
+y parqueo agrupado; capturas compartidas entre capítulos 3 y 8.
 Academia compartida por método: una pestaña por método activo y sus alcances,
 artículos completos plegables y verificaciones particulares por unidad.
 Academia General reúne reglas comunes y casos de aplicación. Requisito del análisis:

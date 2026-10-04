@@ -281,3 +281,5 @@ Bodega aprobada (2026-10-04): sin DDL. Doce atributos usan captura JSON existent
 Lote aprobado (2026-10-04): sin DDL. front_exposure y public_services usan captura JSON y plan existentes. Esquina y servicios individuales anteriores se conservan sin inferir las nuevas clasificaciones.
 
 Consultorio (2026-10-04): sin DDL; access_ramp es binario No/Sí en JSON existente de sujeto y plan. No se infiere rampa desde accesibilidad ni se sustituyen datos históricos.
+
+Edificio (2026-10-04): sin DDL. elevator_count usa cantidad en JSON existente de sujeto y plan; elevator binario previo se conserva sin inferir cantidad ni operación.

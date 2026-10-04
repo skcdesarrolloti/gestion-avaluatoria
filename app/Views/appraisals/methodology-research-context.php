@@ -10,6 +10,7 @@ if ($researchType==='local') $researchCatalog=\App\Services\LocalResearchFactors
 if ($researchType==='bodega') $researchCatalog=\App\Services\WarehouseResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
 if ($researchType==='lote') $researchCatalog=\App\Services\LandResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
 if ($researchType==='consultorio') $researchCatalog=\App\Services\ConsultingResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
+if ($researchType==='edificio') $researchCatalog=\App\Services\BuildingResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
 $researchCatalog=\App\Services\UserResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
 $researchUnit=$components[$componentKey]['unit'] ?? [];
 $researchPart=$components[$componentKey]['part'] ?? '';
