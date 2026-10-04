@@ -231,3 +231,7 @@ sin cobertura detallada. Niveles duplicados equivalentes/desconocidos se rechaza
 ordinal. Datos originales de anuncios intactos; códigos calculados sólo como consulta.
 
 research_plan.factors.collection: portal/manual/mixed (default mixed). Destinación mantiene clave histórica, pero sólo acepta filtro/pendiente; sin migración.
+
+Catálogo permanente (2026-10-04): sin DDL. Al guardar research_plan, definición,
+kind y categories deben coincidir con el plan histórico o, en su ausencia, el catálogo
+común. Elegir uso, obtención y motivo no modifica escalas. Guardado propietario/versionado intacto.

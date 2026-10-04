@@ -80,6 +80,7 @@ final class AppraisalValuationMethodologyController
             \App\Services\ResearchPlanInput::validateScope($changes['research_plan'],
                 \App\Services\ComparablePortalProfiles::defaultType((string)($scopeRecord['tipo_inmueble'] ?? '')),
                 \App\Services\MethodologyWorkflow::saved($record)[$key]['method'] ?? '',$components[$key]['part'] ?? '');
+            \App\Services\ResearchFactorReference::validateFixed($changes['research_plan'],\App\Services\MethodologyWorkflow::saved($record)[$key]['research_plan'] ?? []);
         }
         if (isset($components[$key]['alternate_method'])) {
             if (isset($changes['additional_methods']) || (isset($changes['method']) && $changes['method']!==$components[$key]['alternate_method']))

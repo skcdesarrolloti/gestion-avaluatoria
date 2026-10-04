@@ -22,6 +22,7 @@ require __DIR__ . '/comparable-search-render.php';
 require __DIR__ . '/comparable-portal-search-prompt.php';
 require __DIR__ . '/comparable-portal-profiles.php';
 require __DIR__ . '/research-plan.php';
+require __DIR__ . '/research-factor-reference.php';
 require __DIR__ . '/comparable-url-reader.php';
 require __DIR__ . '/comparable-search-context.php';
 require __DIR__ . '/comparable-area-search.php';

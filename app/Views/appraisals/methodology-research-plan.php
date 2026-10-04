@@ -10,7 +10,7 @@ if (($researchContext['regimen_ph'] ?? '')!=='si' && isset($researchCatalog['are
 }
 $researchPlan=['target_ratio'=>$selected['research_plan']['target_ratio'] ?? 10,'factors'=>[]];
 foreach ($researchCatalog as $key=>$factor) $researchPlan['factors'][$key]=array_replace(
-    ['decision'=>$key==='destination'?'filter':'','kind'=>$factor['kind'],'collection'=>'mixed','reason'=>'','definition'=>'','categories'=>$factor['categories']],$selected['research_plan']['factors'][$key] ?? []);
+    ['decision'=>$key==='destination'?'filter':'','kind'=>$factor['kind'],'collection'=>'mixed','reason'=>'','definition'=>$factor['why'],'categories'=>$factor['categories']],$selected['research_plan']['factors'][$key] ?? []);
 $researchFactors=array_diff_key($researchCatalog,['destination'=>true]);
 $researchEvidence=\App\Services\ResearchPlanEvidence::build($researchCatalog,$researchUnit,$comparableRows,$researchContext,$subject);
 $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$researchEvidence];
@@ -88,15 +88,13 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
                 <label class="mt-3 block text-sm font-semibold">Cómo obtener el dato<select class="input mt-1" x-model="plan.factors.<?= e($key) ?>.collection">
                     <option value="mixed">Portal y verificación manual cuando falte</option><option value="portal">Priorizar información publicada en portales</option><option value="manual">Investigación manual comparable por comparable</option>
                 </select></label>
-                <details class="mt-3"><summary class="min-h-11 cursor-pointer text-sm font-semibold">Dónde hay datos y cómo definir el factor</summary>
+                <details class="mt-3"><summary class="min-h-11 cursor-pointer text-sm font-semibold">Dónde conseguir el dato y consultar su clasificación</summary>
                     <div class="text-sm"><template x-for="(counts,portal) in summary.stats.<?= e($key) ?>.portals" :key="portal">
                         <p class="mt-2" x-text="`${portal}: ${counts.present}/${counts.ads} anuncios con dato; ${counts.readable} legibles con esta definición.`"></p>
                     </template></div>
                     <p class="mt-2 text-xs">Los anuncios por portal pueden pertenecer a un mismo inmueble. Si falta este atributo, consíguelo por contacto, visita o documento y registra dato, fuente, fecha y soporte en su ficha de captura. No publicado no significa inexistente. Esta elección planifica la obtención; no completa ni verifica datos automáticamente.</p>
-                    <label class="mt-3 block text-sm font-semibold">Tipo de variable<select class="input mt-1" x-model="plan.factors.<?= e($key) ?>.kind">
-                        <option value="numeric">Numérica: cantidad o medida</option><option value="binary">Binaria: no=0, sí=1</option><option value="ordinal">Ordinal: niveles de menor a mayor</option><option value="categorical">Nominal: clases sin jerarquía</option></select></label>
-                    <label class="mt-3 block text-sm font-semibold">Definición y forma de medición<textarea class="input mt-1" maxlength="600" rows="2" x-model="plan.factors.<?= e($key) ?>.definition" placeholder="Ej. Número de baños privados; misma definición en sujeto y muestras"></textarea></label>
-                    <label class="mt-3 block text-sm font-semibold" x-show="['categorical','ordinal'].includes(plan.factors.<?= e($key) ?>.kind)">Clases o niveles: una etiqueta por línea<textarea class="input mt-1" maxlength="1200" rows="3" x-model="plan.factors.<?= e($key) ?>.categories" placeholder="Ej. No&#10;Parcial&#10;Total"></textarea></label>
+                    <p class="mt-3 text-sm font-semibold">Clasificación permanente · consulta</p>
+                    <p class="mt-2 text-sm" x-text="plan.factors.<?= e($key) ?>.definition || catalog.<?= e($key) ?>.why"></p>
                     <p class="mt-2 text-xs" x-text="scaleLabel('<?= e($key) ?>')"></p>
                     <p class="mt-2 text-xs">Ordinal: primera línea = 0 y siguientes = 1, 2… siempre de menor a mayor cobertura, dotación o calidad según la definición. Esa misma escala se aplica al sujeto y a todos los portales. Desconocido queda pendiente. Un «Sí» sin detalle no significa «Total». El orden no demuestra distancias iguales ni efecto sobre el precio; correlación y regresión se revisarán en Análisis.</p>
                     <label class="mt-3 block text-sm font-semibold">Por qué se propone este uso<textarea class="input mt-1" maxlength="600" rows="2" x-model="plan.factors.<?= e($key) ?>.reason" placeholder="Explica relevancia para esta unidad y posibilidad de conseguir datos"></textarea></label>

@@ -759,3 +759,21 @@ JSON aditivo, sin DDL. Vista sólo candidatos conserva consulta completa. Prueba
 1008 PHP, 145 JS, build 70,3 KB gzip. Navegador local con guardado y recarga de Vista
 manual y Destinación filtro; pantalla estrecha sin desbordamiento ni consola con errores.
 También pasan 176 verificaciones BD contra una instancia local desechable nueva (3368).
+
+## 2026-10-04 · Catálogo permanente de factores
+Configuración separa Métodos y alcances / Catálogo de factores. Consulta central
+por los doce tipos del catálogo existente, sin densificar los formularios de métodos.
+Muestra atributos, definición, escala y referencias de fichas públicas de cada portal
+y tipo. Referenciado significa mención documentada, no dato garantizado en cada anuncio
+ni extracción automática. Sin evidencia específica, propone investigación manual.
+Destinación sigue como filtro, fuera del catálogo de atributos.
+En Insumos se decide uso, obtención y motivo; definición/tipo/categorías son de consulta.
+El servidor rechaza cambios de clasificación desde el expediente. Los planes anteriores
+conservan su clasificación; no se sustituyen escalas ni recodifican datos en silencio.
+Vista mantiene Interior/Exterior/Panorámica/Esquinera/Sin vista relevante como clases
+nominales; no inventa una jerarquía ordinal. Planta No/Parcial/Total mantiene 0/1/2.
+El catálogo es código común de la aplicación, sin editor administrativo ni DDL nuevo.
+Una futura revisión general de escalas requiere versionado y tratamiento de históricos.
+Pruebas: 1014 PHP, 145 JS, 176 BD desechable nueva (3369), lint/build, 70,3KB gzip.
+Navegador local: métodos separados, oficina/apartamento/depósito, guardado confirmado
+y recarga; pantalla estrecha con desplazamiento limitado a la tabla, sin errores de consola.
