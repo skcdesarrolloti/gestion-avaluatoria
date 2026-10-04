@@ -11,6 +11,8 @@ con etiquetas publicadas, diferencias, fuentes y cruces pendientes de investigac
 atributos por tipo, jerarquías fijas y clases sin orden, con fuentes documentadas.
 [Crear y editar factores propios](docs/CATALOGO-FACTORES-USUARIO.md): un catálogo
 compartido por sujeto y comparables, asignable a varios tipos de inmueble.
+Local comercial: nueve atributos aprobados, fuerza comercial Baja/Media/Alta
+(0–2), parqueo agrupado y sin atributos de PH. Misma captura en capítulos 3 y 8.
 Academia compartida por método: una pestaña por método activo y sus alcances,
 artículos completos plegables y verificaciones particulares por unidad.
 Academia General reúne reglas comunes y casos de aplicación. Requisito del análisis:

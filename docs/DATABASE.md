@@ -273,3 +273,5 @@ agrega subject_factors_json y subject_factors_version a appraisal_units.
 Cada factor conserva value, support, scale_kind, scale_categories y saved_at UTC.
 Sin backfill: originales intactos. CAS por unidad, propietario y versión; campos
 nuevos vacíos no sustituyen datos previos. Véase FACTORES-SUJETO-CAPITULO-3.md.
+
+Local comercial (2026-10-04): sin cambios de esquema. commercial_strength usa captura JSON existente en sujeto y plan, escala ordinal Baja/Media/Alta (0-2). Atributos retirados con datos previos permanecen; no se eliminan ni se recodifican.

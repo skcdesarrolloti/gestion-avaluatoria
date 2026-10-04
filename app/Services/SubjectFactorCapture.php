@@ -19,6 +19,7 @@ final class SubjectFactorCapture
         if ($type==='apartamento') $catalog=ApartmentResearchFactors::preserve($catalog,$saved);
         if ($type==='casa') $catalog=HouseResearchFactors::preserve($catalog,$saved);
         if ($type==='oficina') $catalog=OfficeResearchFactors::preserve($catalog,$saved);
+        if ($type==='local') $catalog=LocalResearchFactors::preserve($catalog,$saved);
         $catalog=UserResearchFactors::preserve($catalog,$saved);
         foreach (['landscape_view','panoramic_view'] as $key) if (!isset($saved[$key])) unset($catalog[$key]);
         return ResearchFactorScaleInput::catalog(array_diff_key($catalog,array_flip(['area','built','land','destination'])),$scales);

@@ -30,7 +30,7 @@ final class ResearchFactorCatalog
             'deposit'=>$make('Depósitos','numeric','cantidad','research_deposit','ph_deposit_count','Investigar composición y derechos; no liquida su valor separado.','tipologias'),
             'generator'=>$make('Planta eléctrica','ordinal','alcance','research_generator','research_generator','Distinguir ausencia, respaldo parcial y total; un Sí sin cobertura no acredita Total.','attributes',"No\nParcial\nTotal"),
             'destination'=>$make('Destinación / uso observado','categorical','categoría','research_destination','research_destination','Registrar el uso descrito; no sustituye el uso aprobado ni se deduce del tipo de anuncio.','tipologias',"Residencial\nComercial\nOficina\nIndustrial\nMixto\nRural\nDotacional\nOtro"),
-        ] + ResearchFactorExtensions::all() + ApartmentResearchFactors::all() + HouseResearchFactors::all());
+        ] + ResearchFactorExtensions::all() + ApartmentResearchFactors::all() + HouseResearchFactors::all() + LocalResearchFactors::all());
     }
     public static function forType(string $type,string $part='',bool $legacyOnly=false,bool $retainPreviousViewFactors=false): array
     {
@@ -51,10 +51,16 @@ final class ResearchFactorCatalog
         if ($type==='apartamento' && !$legacyOnly) $keys=array_merge(ApartmentResearchFactors::keys(),$retainPreviousViewFactors?ApartmentResearchFactors::RETIRED:[]);
         if ($type==='casa' && !$legacyOnly) $keys=array_merge(HouseResearchFactors::keys(),$retainPreviousViewFactors?HouseResearchFactors::RETIRED:[]);
         if ($type==='oficina' && !$legacyOnly) $keys=array_merge(OfficeResearchFactors::keys(),$retainPreviousViewFactors?OfficeResearchFactors::RETIRED:[]);
+        if ($type==='local' && !$legacyOnly) $keys=array_merge(LocalResearchFactors::keys(),$retainPreviousViewFactors?LocalResearchFactors::RETIRED:[]);
         $catalog=array_intersect_key(self::all(),array_flip($keys));
-        if (in_array($type,['apartamento','casa','oficina'],true) && !$legacyOnly) {
+        if ($type==='local' && !$legacyOnly && empty($catalog['frontage']['customized'])) {
+            $catalog['frontage']['label']='Frente comercial';
+            $catalog['frontage']['why']='Medir en metros el frente del local hacia la circulación comercial; no confundir con frente del lote ni longitud de vitrina.';
+        }
+        if ($type==='local' && !$legacyOnly && empty($catalog['parking']['customized'])) $catalog['parking']['why']='Registrar cantidad de celdas vinculadas al local y, en su soporte, inclusión, derechos y características cubierto/independiente; sin factores adicionales de parqueo.';
+        if (in_array($type,['apartamento','casa','oficina','local'],true) && !$legacyOnly) {
             $catalog=array_replace(array_flip($keys),$catalog);
-            foreach ($catalog as $key=>&$factor) $factor['group']=match($type) { 'casa'=>HouseResearchFactors::group($key),'oficina'=>OfficeResearchFactors::group($key),default=>ApartmentResearchFactors::group($key) };
+            foreach ($catalog as $key=>&$factor) $factor['group']=match($type) { 'casa'=>HouseResearchFactors::group($key),'oficina'=>OfficeResearchFactors::group($key),'local'=>LocalResearchFactors::group($key),default=>ApartmentResearchFactors::group($key) };
             unset($factor);
         }
         if ($part==='terreno') $catalog=array_intersect_key($catalog,array_flip(array_merge(['land','access','stratum','house_access'],$legacyOnly?[]:ResearchFactorExtensions::keys('lote'))));

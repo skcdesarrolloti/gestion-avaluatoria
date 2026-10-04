@@ -6,6 +6,7 @@ foreach (['landscape_view','panoramic_view'] as $previousViewKey) if (!isset($se
 if ($researchType==='apartamento') $researchCatalog=\App\Services\ApartmentResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
 if ($researchType==='casa') $researchCatalog=\App\Services\HouseResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
 if ($researchType==='oficina') $researchCatalog=\App\Services\OfficeResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
+if ($researchType==='local') $researchCatalog=\App\Services\LocalResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
 $researchCatalog=\App\Services\UserResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
 $researchUnit=$components[$componentKey]['unit'] ?? [];
 $researchPart=$components[$componentKey]['part'] ?? '';

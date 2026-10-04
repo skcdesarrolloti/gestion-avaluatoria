@@ -870,3 +870,5 @@ huellas de definición requieren confirmar datos afectados por edición. Registr
 controladores y contexto de investigación extraídos para cumplir tamaño máximo.
 1106 PHP, 153 JS, 209 BD3383; UI local crear/editar/error/recarga/sujeto y móvil.
 Ver CATALOGO-FACTORES-USUARIO.md. Sigue revisión por chat de Local, no aprobada aún.
+
+Local comercial aprobado (2026-10-04): LocalResearchFactors define edad, altura libre, frente comercial, vitrina, mezanine, acabados, fuerza comercial, cargue/descargue y cantidad de celdas. Sin PH; parqueo agrupado con características en soporte. Fuerza comercial 0 Baja / 1 Media / 2 Alta exige evidencia de flujo potencial, visibilidad y actividad comercial con misma pauta sujeto/comparables. Capítulos 3 y 8 comparten catálogo; anteriores sólo se muestran si guardados o personalizados. Sin DDL ni regresión. Verificados 1109 PHP, 153 JS, 209 BD en instancia nueva3384; compilación/tamaño 71,3 KB. Próximo tipo para revisar por chat: Bodega. Cuadro por fuente existente en Insumos > 4 Plan de investigación; pendiente revisar visibilidad con el usuario al retomar muestras.
