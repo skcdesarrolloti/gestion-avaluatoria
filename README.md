@@ -15,6 +15,8 @@ Local comercial: nueve atributos aprobados, fuerza comercial Baja/Media/Alta
 (0–2), parqueo agrupado y sin atributos de PH. Misma captura en capítulos 3 y 8.
 Bodega: doce atributos aprobados, parqueo agrupado y magnitudes técnicas con
 sus unidades originales; terreno y construcción siguen como bases separadas.
+Lote: seis atributos aprobados; frentes y servicios agrupados con jerarquías 0–2,
+verificación documentada y capturas anteriores conservadas.
 Academia compartida por método: una pestaña por método activo y sus alcances,
 artículos completos plegables y verificaciones particulares por unidad.
 Academia General reúne reglas comunes y casos de aplicación. Requisito del análisis:

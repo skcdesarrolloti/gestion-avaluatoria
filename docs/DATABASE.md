@@ -277,3 +277,5 @@ nuevos vacíos no sustituyen datos previos. Véase FACTORES-SUJETO-CAPITULO-3.md
 Local comercial (2026-10-04): sin cambios de esquema. commercial_strength usa captura JSON existente en sujeto y plan, escala ordinal Baja/Media/Alta (0-2). Atributos retirados con datos previos permanecen; no se eliminan ni se recodifican.
 
 Bodega aprobada (2026-10-04): sin DDL. Doce atributos usan captura JSON existente, con kW y kg/m² técnicos sin conversión automática. Anteriores se conservan; no se borran ni recodifican.
+
+Lote aprobado (2026-10-04): sin DDL. front_exposure y public_services usan captura JSON y plan existentes. Esquina y servicios individuales anteriores se conservan sin inferir las nuevas clasificaciones.
