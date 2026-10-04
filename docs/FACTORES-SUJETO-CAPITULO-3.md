@@ -7,7 +7,8 @@ Las áreas permanecen en Superficie y la destinación es un filtro, no un factor
 
 Cada atributo guarda valor o clase, soporte y clasificación vigente. Cantidades
 y edades conservan su medida; binarios y ordinales muestran su código compartido.
-Vista conserva cuatro clases nominales sin puntaje ni jerarquía. Un dato desconocido
+Vista usa la jerarquía aprobada: 0 Sin vista, 1 Interior, 2 Exterior: calles y avenidas,
+3 Exterior: paisajística. Estos códigos no son incrementos de precio. Un dato desconocido
 queda pendiente: nunca se convierte automáticamente en cero o «No».
 
 Los datos existentes se muestran para comprobarlos; «Usar dato existente» copia
@@ -38,3 +39,12 @@ si ya estaban capturados/en un plan anterior, con alcance por revisar. No cambia
 casa ni los demás tipos. En comparables se conserva fuente y se verifica el
 alcance común mediante calificación con soporte; no hay inferencia automática.
 Integración al modelo pendiente de Análisis. 1083 PHP, 153 JS, 194 BD3379.
+
+Casa aprobada: 19 datos privados, 3 de parqueo y 5 comunes PH disponibles si
+aplican. Agrega depósitos, jacuzzi propio y claves propias house_* para piscina,
+gimnasio, vigilancia, planta y acceso. No transforma registros ambiguos previos.
+Acabados/servicio unificados; aire y ruta accesible retirados del catálogo nuevo.
+Vista pasa a ordinal 0–3 por instrucción explícita del usuario; la escala anterior
+permanece y requiere restablecimiento en catálogo, adopción en Insumos y confirmación
+del sujeto. Una escala inválida o anterior sin confirmar no presenta código aplicado.
+No modifica coeficientes ni implementa Análisis. 1096 PHP, 153 JS, 196 BD3380.

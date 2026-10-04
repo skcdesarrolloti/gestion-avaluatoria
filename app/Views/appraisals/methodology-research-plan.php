@@ -4,6 +4,7 @@ $researchType=\App\Services\ComparablePortalProfiles::defaultType((string)($rese
 $researchCatalog=\App\Services\ResearchFactorScaleInput::catalog(\App\Services\ResearchFactorCatalog::forType($researchType,$components[$componentKey]['part'] ?? '',false,true),$factorScales ?? []);
 foreach (['landscape_view','panoramic_view'] as $previousViewKey) if (!isset($selected['research_plan']['factors'][$previousViewKey])) unset($researchCatalog[$previousViewKey]);
 if ($researchType==='apartamento') $researchCatalog=\App\Services\ApartmentResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
+if ($researchType==='casa') $researchCatalog=\App\Services\HouseResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
 $researchUnit=$components[$componentKey]['unit'] ?? [];
 $researchPart=$components[$componentKey]['part'] ?? '';
 if (($researchContext['regimen_ph'] ?? '')!=='si' && isset($researchCatalog['area'])) {

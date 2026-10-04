@@ -7,7 +7,7 @@ declare(strict_types=1);
         'definition'=>$catalog['view']['why'],'decision'=>'investigate',
     ]]];
     \App\Services\ResearchFactorReference::validateFixed($canonical,[]);
-    expect(str_contains(\App\Services\ResearchFactorReference::scale($catalog['view']),'sin orden numérico impuesto'),'Vista conserva clases sin inventar un orden');
+    expect(str_contains(\App\Services\ResearchFactorReference::scale($catalog['view']),'0 = Sin vista') && str_contains(\App\Services\ResearchFactorReference::scale($catalog['view']),'3 = Exterior: paisajística'),'Vista muestra jerarquía de cuatro niveles aprobada');
     $legacy=$canonical;
     $legacy['factors']['view']['kind']='ordinal';
     $legacy['factors']['view']['categories']="Sin vista\nInterior\nPanorámica";

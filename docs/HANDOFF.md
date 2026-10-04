@@ -848,3 +848,10 @@ compatibilidad histórica. Capítulo 3 agrupa privado/parqueo/PH plegable; capí
 identifica alcance en catálogo, comparación y preparación. ph_* no hereda valores
 ambiguos antiguos. Servicio binario, acabados únicos, piso preservado. Sin DDL ni
 regresión. 1083 PHP, 153 JS, 194 BD3379; navegador local captura PH.
+
+Casa y Vista 2026-10-04: usuario aprobó casa y ordenó Vista 0 Sin vista / 1 Interior /
+2 Exterior calles y avenidas / 3 Exterior paisajística. HouseResearchFactors separa
+propios/comunes y conserva anteriores; 22 datos de casa/parqueo + 5 PH. Sin DDL.
+Revisar/restablecer escalas Vista antiguas; datos anteriores no se recodifican.
+1096 PHP, 153 JS, 196 BD3380, lint/build/71,3KB. Navegador ficticio: restablecer
+Vista y confirmar dato anterior, captura casa. Siguiente tipo pendiente: oficina.

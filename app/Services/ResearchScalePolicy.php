@@ -14,7 +14,7 @@ final class ResearchScalePolicy
     public static function help(string $key): string
     {
         return match($key) {
-            'view'=>'Cuatro clases: Sin vista; Interior; Exterior: calles y avenidas; Exterior: paisajística. Se aplica la misma clasificación al sujeto y a los comparables. Esquinera no es una vista. No publicado queda pendiente; el orden de la lista no asigna incrementos de precio.',
+            'view'=>'0 = Sin vista · 1 = Interior · 2 = Exterior: calles y avenidas · 3 = Exterior: paisajística. Misma jerarquía para sujeto y comparables. Esquinera no es vista. No publicado queda pendiente; los códigos no fijan incrementos de precio. La codificación y el efecto se revisarán en Análisis.',
             'access'=>'Peatonal, vehicular y mixto describen modalidades. Cargue y restricciones son condiciones adicionales: califícalas por separado; restringido no es un nivel superior.',
             'finishes'=>'El catálogo anterior mezcla calidad y estado de ejecución. Usa Calidad de acabados terminados para la jerarquía; obra gris no recibe un grado de acabado terminado.',
             'service'=>'Alcoba y baño de servicio son dotaciones distintas; una no es automáticamente superior a la otra.',

@@ -1,0 +1,30 @@
+<?php
+declare(strict_types=1);
+(static function(): void {
+    $catalog=\App\Services\SubjectFactorCapture::catalog(['property_type'=>'casa'],[]);
+    expect(isset($catalog['deposit'],$catalog['house_jacuzzi'],$catalog['house_pool'],$catalog['house_gym']),'casa incorpora depósitos y amenidades propias explícitas');
+    expect(isset($catalog['house_generator'],$catalog['house_security'],$catalog['ph_generator'],$catalog['ph_security']),'casa distingue respaldo y vigilancia propios de servicios comunes');
+    expect(!isset($catalog['air_conditioning'],$catalog['accessible'],$catalog['vehicle_access'],$catalog['finishes'],$catalog['service'],$catalog['access']),'casa simplifica catálogo sin factores retirados ni acceso o acabados repetidos');
+    expect(isset($catalog['house_access'],$catalog['restricted_access']) && $catalog['house_access']['categories']==="Peatonal\nVehicular\nMixto",'modalidad de acceso no ordena restricciones como nivel superior');
+    expect($catalog['service_room']['kind']==='binary' && $catalog['finish_quality']['kind']==='ordinal','casa comparte servicio binario y jerarquía de acabados');
+    $terrain=\App\Services\ResearchFactorCatalog::forType('casa','terreno');
+    expect(isset($terrain['house_access'],$terrain['land']) && !isset($terrain['house_pool'],$terrain['ph_pool']),'separar terreno conserva acceso sin trasladar amenidades de construcción');
+    $old=['pool'=>['value'=>'Sí','support'=>'Registro anterior','scale_kind'=>'binary','scale_categories'=>"No\nSí"]];
+    $unit=['property_type'=>'casa','research_pool'=>'Sí','subject_factors_json'=>json_encode($old)];
+    $legacy=\App\Services\SubjectFactorCapture::catalog($unit,[]);
+    expect(isset($legacy['pool']) && $legacy['pool']['group']==='Datos anteriores · revisar alcance','piscina anterior se conserva sin presumir propiedad o uso común');
+    $evidence=\App\Services\ResearchPlanEvidence::build($legacy,$unit,[],['tipo_inmueble'=>'casa']);
+    expect($evidence['subjects']['pool']==='Sí' && $evidence['subjects']['house_pool']==='' && $evidence['subjects']['ph_pool']==='','captura ambigua no se copia a piscina propia ni común');
+    \App\Services\ResearchPlanInput::validateScope(['factors'=>['pool'=>[],'house_pool'=>[],'access'=>[],'house_access'=>[]]],'casa','mercado');
+    $view=$catalog['view'];
+    expect($view['kind']==='ordinal' && \App\Services\SubjectFactorCapture::code('Sin vista',$view)==='Código: 0' && \App\Services\SubjectFactorCapture::code('Exterior: paisajística',$view)==='Código: 3','Vista aplica los cuatro códigos aprobados al sujeto');
+    $previous=['value'=>'Interior','support'=>'Foto anterior','scale_kind'=>'categorical','scale_categories'=>$view['categories']];
+    expect(!\App\Services\SubjectFactorCapture::compatible($previous,$view),'Vista nominal anterior exige confirmación antes de aplicar jerarquía');
+    $saved=\App\Services\SubjectFactorCapture::input(['view'=>$previous+['confirm_scale'=>'']],$catalog,['view'=>$previous]);
+    expect($saved['view']===$previous,'guardar otros campos conserva la clasificación anterior de Vista');
+    $new=array_replace($previous,['scale_kind'=>'ordinal','confirm_scale'=>'1']);
+    $saved=\App\Services\SubjectFactorCapture::input(['view'=>$new],$catalog,['view'=>$previous]);
+    expect($saved['view']['scale_kind']==='ordinal' && $saved['view']['value']==='Interior','confirmar la nueva Vista conserva el dato y adopta la jerarquía explícitamente');
+    $view['scale_valid']=false;
+    expect(\App\Services\SubjectFactorCapture::code('Interior',$view)==='Pendiente','escala inválida no presenta códigos aplicados');
+})();

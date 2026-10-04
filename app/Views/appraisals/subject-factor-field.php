@@ -8,8 +8,10 @@ $captureOriginal=(string)($captureExisting[$captureKey] ?? '');
 if (in_array(mb_strtolower(trim($captureOriginal)),['no verificado','por verificar','pendiente','no publicado'],true)) $captureOriginal='';
 $captureCodeMap=[];
 foreach ($captureOptions as $optionLabel) $captureCodeMap[$optionLabel]=\App\Services\SubjectFactorCapture::code($optionLabel,$captureFactor);
+$captureLiveCode=$captureFactor['kind']==='numeric'?'captureValue === "" ? "Pendiente" : "Medida: " + captureValue':json_encode($captureCodeMap,JSON_UNESCAPED_UNICODE).'[captureValue] || "Pendiente"';
+if ($captureStale) $captureLiveCode='(!captureConfirmed && captureValue === '.json_encode($captureValue,JSON_UNESCAPED_UNICODE).') ? "Pendiente por cambio de clasificación" : ('.$captureLiveCode.')';
 ?>
-<fieldset class="rounded-xl border p-4" x-show="<?= e(json_encode(mb_strtolower($captureFactor['label']),JSON_UNESCAPED_UNICODE)) ?>.includes(factorSearch.toLowerCase())" x-data="{ captureValue: <?= e(json_encode($captureValue,JSON_UNESCAPED_UNICODE)) ?> }">
+<fieldset class="rounded-xl border p-4" x-show="<?= e(json_encode(mb_strtolower($captureFactor['label']),JSON_UNESCAPED_UNICODE)) ?>.includes(factorSearch.toLowerCase())" x-data="{ captureValue: <?= e(json_encode($captureValue,JSON_UNESCAPED_UNICODE)) ?>, captureConfirmed: <?= $captureStale?'false':'true' ?> }">
     <legend class="px-1 font-semibold"><?= e($captureFactor['label']) ?> · <?= e($captureFactor['unit']) ?></legend>
     <p class="text-xs"><?= e($captureFactor['why']) ?></p>
     <p class="mt-2 text-sm font-semibold"><?= e(\App\Services\ResearchFactorReference::scale($captureFactor)) ?></p>
@@ -33,7 +35,7 @@ foreach ($captureOptions as $optionLabel) $captureCodeMap[$optionLabel]=\App\Ser
     <?php endif; ?>
     </label>
     <label class="mt-3 block text-sm font-semibold">Soporte de <?= e($captureFactor['label']) ?><textarea class="input" name="<?= e($captureName) ?>[support]" rows="2" maxlength="600" placeholder="Ej. Inspección, fecha, foto o documento y página"><?= e($captureItem['support'] ?? '') ?></textarea></label>
-    <?php if ($captureStale): ?><label class="mt-2 flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" name="<?= e($captureName) ?>[confirm_scale]" value="1">Confirmo el dato con la clasificación actual</label><?php endif; ?>
-    <p class="mt-1 text-xs" x-text="<?= $captureFactor['kind']==='numeric'?'captureValue === &quot;&quot; ? &quot;Pendiente&quot; : &quot;Medida: &quot; + captureValue':e(json_encode($captureCodeMap,JSON_UNESCAPED_UNICODE)).'[captureValue] || &quot;Pendiente&quot;' ?>"></p>
+    <?php if ($captureStale): ?><label class="mt-2 flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" name="<?= e($captureName) ?>[confirm_scale]" value="1" x-model="captureConfirmed">Confirmo el dato con la clasificación actual</label><?php endif; ?>
+    <p class="mt-1 text-xs" x-text="<?= e($captureLiveCode) ?>"></p>
     <?php if (!$captureFactor['scale_valid']): ?><p class="mt-2 text-xs text-amber-900">Corrige primero esta escala en Configuración → Catálogo de factores del capítulo 8.</p><?php endif; ?>
 </fieldset>

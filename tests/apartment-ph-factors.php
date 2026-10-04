@@ -15,7 +15,7 @@ declare(strict_types=1);
     $ad=reset($evidence['groups'])['ads'][0];
     expect($ad['values']['ph_pool']==='' && $ad['values']['ph_elevator']==='','publicación sin alcance común explícito queda pendiente para verificación manual');
     \App\Services\ResearchPlanInput::validateScope(['factors'=>['pool'=>[],'ph_pool'=>[]]],'apartamento','mercado');
-    expect(isset(\App\Services\ResearchFactorCatalog::forType('casa')['pool']),'casa conserva piscina propia sin cambiar otros tipos');
+    expect(isset(\App\Services\ResearchFactorCatalog::forType('casa')['house_pool']),'casa identifica piscina propia explícitamente');
     $entry=['value'=>'Sí','support'=>'Reglamento PH, piscina común disponible para la unidad, página 7','scale_kind'=>'binary','scale_categories'=>"No\nSí"];
     $saved=\App\Services\SubjectFactorCapture::input(['ph_pool'=>$entry],$catalog,[]);
     $unit['subject_factors_json']=json_encode($saved);

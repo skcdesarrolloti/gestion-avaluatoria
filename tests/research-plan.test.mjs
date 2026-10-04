@@ -40,13 +40,14 @@ test('reversing fixed coverage is flagged while categorical classes remain unord
 
 test('mixed view classes cannot enter the research count even without an ordinal score',()=>{
     const factor={...numeric,kind:'categorical',categories:'Interior\nExterior\nPanorámica\nEsquinera\nSin vista relevante'};
-    const policy={policy_kind:'categorical',policy_categories:'Sin vista\nInterior\nExterior: calles y avenidas\nExterior: paisajística',policy_fixed:true};
+    const policy={policy_kind:'ordinal',policy_categories:'Sin vista\nInterior\nExterior: calles y avenidas\nExterior: paisajística',policy_fixed:true};
     const evidence={subjects:{view:'Interior'},groups:[group('a',[ad('FR',{view:'Interior'})])],scalePolicies:{view:policy}};
     const result=researchSummary({target_ratio:10,factors:{view:factor}},evidence);
     assert.equal(result.stats.view.ready.length,0);
     assert.equal(validResearchScale(factor,policy),false);
-    assert.equal(validResearchScale({...factor,categories:policy.policy_categories},policy),true);
-    assert.equal(researchCode('Sin vista',{kind:'categorical',categories:policy.policy_categories},'view'),'Clase: Sin vista · sin jerarquía');
+    assert.equal(validResearchScale({...factor,kind:'ordinal',categories:policy.policy_categories},policy),true);
+    assert.equal(researchCode('Sin vista',{kind:'ordinal',categories:policy.policy_categories},'view'),'Código: 0');
+    assert.equal(researchCode('Exterior: paisajística',{kind:'ordinal',categories:policy.policy_categories},'view'),'Código: 3');
 });
 test('unknown is not zero and ranges are not exact ages', () => {
     assert.equal(researchValue('',binary,'elevator'),null);

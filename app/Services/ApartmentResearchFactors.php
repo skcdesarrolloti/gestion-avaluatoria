@@ -10,7 +10,7 @@ final class ApartmentResearchFactors
     {
         $out=[];
         $definitions=[
-            'service_room'=>['Alcoba / cuarto de servicio','Presencia de alcoba o cuarto de servicio dentro del apartamento. Un baño de servicio por sí solo no acredita alcoba.','binary',"No\nSí",'Unidad privada'],
+            'service_room'=>['Alcoba / cuarto de servicio','Presencia de alcoba o cuarto de servicio dentro de la unidad privada. Un baño de servicio por sí solo no acredita alcoba.','binary',"No\nSí",'Unidad privada'],
             'ph_elevator'=>['Ascensor que sirve a la unidad · PH','Verificar que el ascensor del edificio sirve al piso de la unidad. Se registra separado del piso; su relación se estudiará en Análisis.','binary',"No\nSí",'Copropiedad PH'],
             'ph_pool'=>['Piscina común · PH','Disponibilidad de piscina de la copropiedad para esta unidad. No es piscina privada del apartamento.','binary',"No\nSí",'Copropiedad PH'],
             'ph_gym'=>['Gimnasio común · PH','Disponibilidad de gimnasio de la copropiedad para esta unidad. No es gimnasio privado del apartamento.','binary',"No\nSí",'Copropiedad PH'],

@@ -17,7 +17,8 @@ final class ResearchFactorReference
     public static function portals(string $type,string $key): array
     {
         $key=match($key) {
-            'ph_pool'=>'pool','ph_gym'=>'gym','ph_elevator'=>'elevator','ph_security'=>'security','ph_generator'=>'generator','service_room'=>'service',default=>$key,
+            'ph_pool'=>'pool','ph_gym'=>'gym','ph_elevator'=>'elevator','ph_security'=>'security','ph_generator'=>'generator','service_room'=>'service',
+            'house_pool'=>'pool','house_gym'=>'gym','house_security'=>'security','house_generator'=>'generator','house_access'=>'access',default=>$key,
         };
         $pattern=match($key) {
             'area','built'=>'/construid|privada|superficie/iu','land'=>'/terreno|lote/iu',

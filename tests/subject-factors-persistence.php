@@ -31,4 +31,8 @@ declare(strict_types=1);
     $apartmentEvidence=\App\Services\ResearchPlanEvidence::build($apartmentCatalog,$apartment,[],['tipo_inmueble'=>'apartamento']);
     expect($apartmentEvidence['subjects']['ph_pool']==='Sí' && $apartmentEvidence['subjects']['ph_elevator']==='Sí' && !isset(\App\Services\SubjectFactorCapture::decode($apartment)['floor']),'recarga lee amenidades PH sin inventar piso ni relacionarlo automáticamente');
     expect(\App\Services\SubjectFactorCapture::decode($apartment)['air_conditioning']['value']==='Sí','separar apartamento y PH conserva registros anteriores');
+    $app->prepare('UPDATE appraisal_units SET property_type="casa" WHERE id=?')->execute([$unit['id']]);
+    expect($factors->save($id,1,$unit['id'],2,['house_jacuzzi'=>$entry,'house_pool'=>$entry])===3,'casa guarda jacuzzi y piscina propios sin mezclar las claves PH');
+    $house=$repo->units($id,1)[0]; $houseSaved=\App\Services\SubjectFactorCapture::decode($house);
+    expect($houseSaved['house_pool']['value']==='Sí' && $houseSaved['ph_pool']['value']==='Sí' && $houseSaved['house_jacuzzi']['support']==='Visita documentada','recarga conserva por separado amenidades propias y comunes con soporte');
 })($app);

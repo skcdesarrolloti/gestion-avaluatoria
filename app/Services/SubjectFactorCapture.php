@@ -17,6 +17,7 @@ final class SubjectFactorCapture
         $catalog=ResearchFactorCatalog::forType($type,'',false,true);
         $saved=self::decode($unit);
         if ($type==='apartamento') $catalog=ApartmentResearchFactors::preserve($catalog,$saved);
+        if ($type==='casa') $catalog=HouseResearchFactors::preserve($catalog,$saved);
         foreach (['landscape_view','panoramic_view'] as $key) if (!isset($saved[$key])) unset($catalog[$key]);
         return ResearchFactorScaleInput::catalog(array_diff_key($catalog,array_flip(['area','built','land','destination'])),$scales);
     }
@@ -62,7 +63,7 @@ final class SubjectFactorCapture
     }
     public static function code(string $value,array $factor): string
     {
-        if ($value==='' || !self::validValue($value,$factor)) return 'Pendiente';
+        if (($factor['scale_valid'] ?? true)===false || $value==='' || !self::validValue($value,$factor)) return 'Pendiente';
         if ($factor['kind']==='numeric') return 'Medida: '.$value.' '.$factor['unit'];
         if ($factor['kind']==='categorical') return 'Clase: '.$value.' · sin jerarquía';
         return 'Código: '.array_search($value,explode("\n",$factor['categories']),true);
