@@ -26,9 +26,16 @@ $factorRecord=$record+['factor_principal_count'=>count(array_filter($factorUnits
         <form method="post" action="<?= e($captureEndpoint) ?>" data-module-autosave data-save-in-place data-autosave-endpoint="<?= e($captureEndpoint) ?>" x-data="{ factorSearch: '' }">
             <?= csrf_field() ?><input type="hidden" name="version" value="<?= (int)($factorUnit['subject_factors_version'] ?? 0) ?>">
             <label class="mt-4 block font-semibold">Buscar factor en <?= e($factorUnit['label'] ?: 'esta unidad') ?><input class="input" type="search" placeholder="Ej. Vista, baños, ascensor" x-model="factorSearch" @input.stop @change.stop></label>
-            <div class="mt-4 grid gap-3 lg:grid-cols-2">
-            <?php foreach ($captureCatalog as $captureKey=>$captureFactor): require __DIR__.'/subject-factor-field.php'; endforeach; ?>
-            </div>
+            <?php $captureGroups=[]; foreach ($captureCatalog as $captureKey=>$captureFactor) $captureGroups[$captureFactor['group'] ?? 'Características de la unidad'][$captureKey]=$captureFactor; ?>
+            <?php foreach ($captureGroups as $captureGroup=>$captureFields): ?>
+            <details class="mt-4 rounded-xl border p-3" <?= $captureGroup==='Copropiedad PH'?'':'open' ?>>
+                <summary class="min-h-11 cursor-pointer font-semibold"><?= e($captureGroup) ?> · <?= count($captureFields) ?> datos</summary>
+                <?php if ($captureGroup==='Copropiedad PH'): ?><p class="mt-2 text-sm">Atributos comunes que sirven a esta unidad. Conserva edificio, fuente y soporte; permiten investigar edificios similares. No se suman valores ni se asignan pesos aquí; su incorporación al modelo se resolverá en Análisis.</p><?php endif; ?>
+                <?php if ($captureGroup==='Celdas de parqueo'): ?><p class="mt-2 text-sm">Cantidad y características en un mismo apartado, con datos separados. No se convierten automáticamente en un puntaje compuesto.</p><?php endif; ?>
+                <?php if ($captureGroup==='Datos anteriores · revisar alcance'): ?><p class="mt-2 text-amber-900">Datos históricos conservados. No se trasladan automáticamente a la copropiedad ni a las nuevas clasificaciones; verifica su alcance.</p><?php endif; ?>
+                <div class="mt-4 grid gap-3 lg:grid-cols-2"><?php foreach ($captureFields as $captureKey=>$captureFactor): require __DIR__.'/subject-factor-field.php'; endforeach; ?></div>
+            </details>
+            <?php endforeach; ?>
             <button type="submit" class="btn-primary mt-4">Guardar factores de <?= e($factorUnit['label'] ?: 'esta unidad') ?></button>
             <span class="mt-2 block text-sm" data-autosave-status role="status">Autoguardado activo · espera la confirmación.</span>
         </form>

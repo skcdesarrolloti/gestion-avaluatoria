@@ -17,7 +17,7 @@ declare(strict_types=1);
     expectStatus(422,fn()=>\App\Services\ResearchPlanInput::input(json_encode(['factors'=>$five])),'servidor limita candidatos a cuatro sin eliminar factores');
     $five['view']['decision']='investigate';
     expect(count(\App\Services\ResearchPlanInput::input(json_encode(['factors'=>$five]))['factors'])===5,'se pueden investigar factores adicionales a cuatro candidatos');
-    expect(isset(\App\Services\ResearchFactorCatalog::forType('apartamento')['generator'],\App\Services\ResearchFactorCatalog::forType('apartamento')['destination']),'apartamento incluye planta eléctrica y destinación');
+    expect(isset(\App\Services\ResearchFactorCatalog::forType('apartamento')['ph_generator'],\App\Services\ResearchFactorCatalog::forType('apartamento')['destination']),'apartamento incluye planta eléctrica común PH y destinación');
     foreach (['apartamento','oficina','local','consultorio','casa','lote','bodega','finca','edificio','hotel','parqueadero','deposito'] as $type)
         expect(\App\Services\ResearchFactorCatalog::forType($type)!==[],'catálogo de factores propio para '.$type);
     expect(isset(\App\Services\ResearchFactorCatalog::forType('oficina')['bathrooms']) && !isset(\App\Services\ResearchFactorCatalog::forType('oficina')['bedrooms']),'oficina usa baños sin trasladar alcobas de apartamento');

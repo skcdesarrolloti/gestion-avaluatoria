@@ -29,7 +29,7 @@
                         <template x-for="key in comparisonKeys" :key="key"><tr class="border-t">
                             <th scope="row" class="sticky left-0 z-10 bg-white p-3 font-semibold"><span x-text="`${factorLabel(key)} · ${catalog[key].unit}`"></span>
                                 <span class="block text-xs font-normal" x-text="!isFactor(key)?'Base obligatoria de cálculo':({model:'Candidato al modelo',investigate:'Investigar',filter:'Filtro',defer:'Pendiente'})[plan.factors[key].decision] || 'Por clasificar'"></span>
-                                <span class="mt-2 block text-xs font-normal" x-text="scaleLabel(key)"></span></th>
+                                <span class="mt-2 block text-xs font-normal" x-text="scaleLabel(key)"></span><span class="mt-1 block text-xs font-normal text-teal-900" x-text="catalog[key].group || ''"></span></th>
                             <td class="bg-teal-50 p-3"><span x-text="subjectLabel(key)"></span><span class="mt-1 block text-xs font-semibold" x-text="codeLabel(key,evidence.subjects[key])"></span></td>
                             <template x-for="(ad,index) in comparisonGroup.ads" :key="ad.id || index"><td class="p-3" :class="comparisonClass(key,ad)"><span x-text="comparisonValue(key,ad)"></span><span class="mt-1 block text-xs font-semibold" x-text="codeLabel(key,ad.values[key])"></span></td></template>
                             <td class="p-3 font-semibold" x-text="comparisonLabel(key)"></td>

@@ -28,3 +28,13 @@ correlaciones ni selección estadística de factores.
 Verificación: 1073 comprobaciones PHP, 153 JS y 191 de persistencia en bases
 de prueba nuevas, puerto 3377; navegador local con datos ficticios, guardar/recargar
 Vista y Ascensor y consulta en capítulo 8. Lint, compilación y límite gzip verificados.
+
+Apartamento: unidad privada, celdas de parqueo y copropiedad PH en apartados
+plegables. Piscina/gimnasio, ascensor que sirve a la unidad, vigilancia y planta
+comunes tienen claves ph_* explícitas; publicaciones ambiguas no se reinterpretan.
+Alcoba de servicio es binaria; acabados terminados único factor ordinal. Piso
+y niveles internos permanecen distintos. Los factores retirados sólo se muestran
+si ya estaban capturados/en un plan anterior, con alcance por revisar. No cambia
+casa ni los demás tipos. En comparables se conserva fuente y se verifica el
+alcance común mediante calificación con soporte; no hay inferencia automática.
+Integración al modelo pendiente de Análisis. 1083 PHP, 153 JS, 194 BD3379.

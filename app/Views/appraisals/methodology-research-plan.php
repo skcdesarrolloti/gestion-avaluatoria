@@ -3,6 +3,7 @@ $researchContext=\App\Services\ComparableSearchContext::forMethod($record,$units
 $researchType=\App\Services\ComparablePortalProfiles::defaultType((string)($researchContext['tipo_inmueble'] ?? ''));
 $researchCatalog=\App\Services\ResearchFactorScaleInput::catalog(\App\Services\ResearchFactorCatalog::forType($researchType,$components[$componentKey]['part'] ?? '',false,true),$factorScales ?? []);
 foreach (['landscape_view','panoramic_view'] as $previousViewKey) if (!isset($selected['research_plan']['factors'][$previousViewKey])) unset($researchCatalog[$previousViewKey]);
+if ($researchType==='apartamento') $researchCatalog=\App\Services\ApartmentResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
 $researchUnit=$components[$componentKey]['unit'] ?? [];
 $researchPart=$components[$componentKey]['part'] ?? '';
 if (($researchContext['regimen_ph'] ?? '')!=='si' && isset($researchCatalog['area'])) {
@@ -76,6 +77,7 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
         <?php foreach ($researchFactors as $key=>$factor): $factorPortals=\App\Services\ResearchFactorReference::portals($researchType,$key); $factorUnreferenced=array_diff(array_values(\App\Services\ComparablePortalProfiles::portals()),array_column($factorPortals,'label')); ?>
             <article class="rounded-xl border p-4">
                 <h3 class="font-semibold"><?= e($factor['label']) ?> · <?= e($factor['unit']) ?></h3>
+                <?php if (isset($factor['group'])): ?><p class="mt-1 text-xs font-semibold text-teal-900"><?= e($factor['group']) ?> · integración estadística pendiente de Análisis</p><?php endif; ?>
                 <p class="mt-2 text-sm"><strong>Sujeto:</strong> <span x-text="subjectLabel('<?= e($key) ?>')"></span>.
                     <a class="text-blue-700 underline" href="<?= e(url('avaluos/'.$record['id'].'/bien-sujeto?'.http_build_query(['unit'=>$researchUnit['id'] ?? '',
                         'section'=>$factor['section']==='tipologias'?'tipologias':'','from'=>'metodologia','check_component'=>$componentKey]).

@@ -30,7 +30,7 @@ final class ResearchFactorCatalog
             'deposit'=>$make('Depósitos','numeric','cantidad','research_deposit','ph_deposit_count','Investigar composición y derechos; no liquida su valor separado.','tipologias'),
             'generator'=>$make('Planta eléctrica','ordinal','alcance','research_generator','research_generator','Distinguir ausencia, respaldo parcial y total; un Sí sin cobertura no acredita Total.','attributes',"No\nParcial\nTotal"),
             'destination'=>$make('Destinación / uso observado','categorical','categoría','research_destination','research_destination','Registrar el uso descrito; no sustituye el uso aprobado ni se deduce del tipo de anuncio.','tipologias',"Residencial\nComercial\nOficina\nIndustrial\nMixto\nRural\nDotacional\nOtro"),
-        ] + ResearchFactorExtensions::all();
+        ] + ResearchFactorExtensions::all() + ApartmentResearchFactors::all();
     }
     public static function forType(string $type,string $part='',bool $legacyOnly=false,bool $retainPreviousViewFactors=false): array
     {
@@ -48,7 +48,13 @@ final class ResearchFactorCatalog
         if (!$legacyOnly) $keys=array_unique(array_merge($keys,ResearchFactorExtensions::keys($type)));
         if (!$retainPreviousViewFactors) $keys=array_diff($keys,['landscape_view','panoramic_view']);
         if (!$legacyOnly && in_array($type,['edificio','hotel'],true)) $keys[]='view';
+        if ($type==='apartamento' && !$legacyOnly) $keys=array_merge(ApartmentResearchFactors::keys(),$retainPreviousViewFactors?ApartmentResearchFactors::RETIRED:[]);
         $catalog=array_intersect_key(self::all(),array_flip($keys));
+        if ($type==='apartamento' && !$legacyOnly) {
+            $catalog=array_replace(array_flip($keys),$catalog);
+            foreach ($catalog as $key=>&$factor) $factor['group']=ApartmentResearchFactors::group($key);
+            unset($factor);
+        }
         if ($part==='terreno') $catalog=array_intersect_key($catalog,array_flip(array_merge(['land','access','stratum'],$legacyOnly?[]:ResearchFactorExtensions::keys('lote'))));
         if ($part==='construccion') foreach (['land','topography','slope','irrigation'] as $key) unset($catalog[$key]);
         return $catalog;

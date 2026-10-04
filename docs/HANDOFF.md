@@ -842,3 +842,9 @@ Capítulo 8 consulta la captura y evita otra calificación manual del mismo suje
 Migración aditiva 202610040002, CAS/CSRF/propietario. Sin regresión ni recodificar
 escalas antiguas. 1073 PHP, 153 JS, 191 BD nueva instancia3377; navegador local
 guardar/recargar Vista y Ascensor. Detalles: FACTORES-SUJETO-CAPITULO-3.md.
+
+Apartamento/PH 2026-10-04: ApartmentResearchFactors define catálogo actual y
+compatibilidad histórica. Capítulo 3 agrupa privado/parqueo/PH plegable; capítulo 8
+identifica alcance en catálogo, comparación y preparación. ph_* no hereda valores
+ambiguos antiguos. Servicio binario, acabados únicos, piso preservado. Sin DDL ni
+regresión. 1083 PHP, 153 JS, 194 BD3379; navegador local captura PH.
