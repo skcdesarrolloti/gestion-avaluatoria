@@ -34,11 +34,13 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
         <input type="hidden" name="component" value="<?= e($componentKey) ?>">
         <input type="hidden" name="version" value="<?= (int)($record['methodology_version'] ?? 0) ?>">
         <input type="hidden" name="research_plan" :value="payload" value="<?= e(json_encode($researchPlan,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>">
+        <?php require __DIR__.'/methodology-research-comparison.php'; ?>
         <div class="rounded-xl border p-4">
             <h3 class="font-semibold">Viabilidad preliminar de la investigación</h3>
             <p class="mt-2 text-sm"><?= count($researchEvidence['groups']) ?> inmuebles potenciales; los anuncios sólo cuentan juntos si su identidad fue vinculada por el analista.
                 <?= (int)$researchEvidence['excluded'] ?> grupos no seleccionados o descartados quedan fuera.</p>
             <p class="mt-2 font-semibold" x-text="`${summary.selected} factores candidatos · ${summary.parameters} coeficientes previstos · ${summary.joint} inmuebles con datos conjuntos legibles`"></p>
+            <p class="mt-2 text-sm" x-text="`${summary.areaReady} inmuebles con área compatible en m² y contexto legible. El conteo conjunto exige esa área aunque no se elija como factor del modelo.`"></p>
             <label class="mt-3 block text-sm font-semibold">Referencia de inmuebles por coeficiente
                 <input type="number" min="1" max="100" x-model.number="plan.target_ratio" class="input mt-2 max-w-40" placeholder="Ej. 10">
             </label>

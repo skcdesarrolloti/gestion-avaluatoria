@@ -708,3 +708,13 @@ build y 69 KB gzip. Navegador local: Properati Oficina, cambio a Mercado Libre,
 detalle plegable y Depósito pendiente sin herencia; sin errores de consola.
 Viewport móvil solicitado 390 px, observado 585 px CSS por zoom del navegador;
 body 562 px sin desbordamiento. Sin cambio de base: no requiere migración.
+
+## 2026-10-04 · Comparación visual por fuente
+Cuadro por inmueble en el plan de investigación; anuncios en filas, factores elegidos
+en columnas, áreas siempre visibles. Diferencias/relecturas amarillo, coincidencia
+legible verde (no verificación), faltantes/una fuente gris. Sin adoptar ni modificar
+anuncios. Área positiva compatible requerida para conteo conjunto; no agrega parámetro
+por defecto. Metadatos de fuente en snapshot de lectura; sin esquema o persistencia nueva.
+Validación: 985 PHP, 142 JS, build 69,7 KB gzip. Navegador local con ejemplo ficticio
+3/3/2 baños amarillo y 80 m² misma base verde; móvil con scroll contenido y sin errores.
+No se alteraron datos de producción. Ver PLAN-INVESTIGACION-MERCADO.md.

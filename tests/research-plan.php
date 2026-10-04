@@ -14,6 +14,7 @@ declare(strict_types=1);
     $data=\App\Services\ResearchPlanEvidence::build($catalog,['functional_bathrooms_count'=>0],$rows,['tipo_inmueble'=>'oficina','tipo_negocio'=>'venta','regimen_ph'=>'si'],['stratum'=>6]);
     expect($data['subjects']['bathrooms']==='0' && $data['subjects']['stratum']==='', 'cero propio preservado; no hereda estrato global sin vínculo explícito');
     expect($data['groups'][0]['ads'][0]['values']['area']==='', 'área genérica PH no se adopta como privada');
+    expect($data['groups'][0]['ads'][0]['publishedArea']==='100' && $data['groups'][0]['ads'][0]['id']==='a', 'cuadro conserva área publicada genérica sin sustituir área compatible y mantiene anuncio');
     expect($data['groups'][0]['contextPending']===false && $data['groups'][0]['ads'][0]['values']['bathrooms']==='0','muestras propias preservan cero y contexto');
     $classified=\App\Services\ResearchPlanEvidence::build($catalog,['special_attributes_json'=>'{"piso_altura":{"value":"alto"},"ascensores":{"value":"medio"}}'],[],[]);
     expect($classified['subjects']['floor']==='Piso alto' && $classified['subjects']['elevator']==='Medio','clasificaciones propias se muestran sin inventar piso exacto ni presencia binaria');

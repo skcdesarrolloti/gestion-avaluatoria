@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { researchValue, factorEvidence, researchSummary } from '../resources/js/research-plan.js';
+import { researchValue, factorEvidence, researchSummary, comparisonState, researchPlan, publishedAreaState } from '../resources/js/research-plan.js';
 const numeric = {kind:'numeric',decision:'model',definition:'Cantidad',reason:'Dotación',categories:''};
 const binary = {...numeric,kind:'binary'};
 const ad = (portal,values,revision=false) => ({portal,values,revision});
@@ -13,6 +13,28 @@ test('unknown is not zero and ranges are not exact ages', () => {
     assert.equal(researchValue('16 a 30',numeric,'age'),null);
     assert.equal(researchValue('Sin vista', {kind:'categorical',categories:'Sin vista\nInterior'},'view'),'sin vista');
     assert.equal(researchValue('2',{kind:'categorical',categories:'Sin vista\nInterior'},'view'),null);
+});
+test('portal matrix warns on 3/3/2 without comparing unrelated properties or treating missing as zero',()=>{
+    assert.equal(comparisonState('bathrooms',numeric,[ad('FR',{bathrooms:'3'}),ad('CC',{bathrooms:'3'}),ad('ML',{bathrooms:'2'})]),'difference');
+    assert.equal(comparisonState('bathrooms',numeric,[ad('FR',{bathrooms:'3'}),ad('CC',{bathrooms:'3'})]),'equal');
+    assert.equal(comparisonState('bathrooms',numeric,[ad('FR',{bathrooms:'3'}),ad('CC',{bathrooms:''})]),'incomplete');
+    assert.equal(comparisonState('bathrooms',numeric,[ad('FR',{bathrooms:'0'}),ad('CC',{bathrooms:'0'})]),'equal');
+    assert.equal(comparisonState('age',numeric,[ad('FR',{age:'16 a 30'}),ad('CC',{age:'16 a 30'})]),'review');
+    const ui=researchPlan({plan:{target_ratio:10,factors:{area:{...numeric,decision:'defer'},bathrooms:numeric}},catalog:{},evidence:{subjects:{},groups:[group('a',[ad('FR',{area:'50',bathrooms:'3'})]),group('b',[ad('ML',{area:'50',bathrooms:'2'})])]}});
+    assert.equal(ui.comparisonState('bathrooms'),'single');
+    assert.deepEqual(ui.comparisonKeys,['area','bathrooms']);
+});
+test('area is required for joint research count even if excluded as regression predictor',()=>{
+    const plan={target_ratio:10,factors:{area:{...numeric,decision:'defer',kind:'categorical',categories:'0\n50'},bathrooms:numeric}};
+    const evidence={subjects:{bathrooms:'2'},groups:[group('a',[ad('FR',{area:'50',bathrooms:'2'})]),group('b',[ad('CC',{area:'',bathrooms:'3'})]),group('c',[ad('ML',{area:'0',bathrooms:'2'})])]};
+    const result=researchSummary(plan,evidence);
+    assert.equal(result.parameters,1); assert.equal(result.areaReady,1); assert.equal(result.joint,1);
+});
+test('published areas only coincide with same stated base and never fill PH private built area',()=>{
+    assert.equal(publishedAreaState([{publishedArea:'80',areaBasis:'Total'},{publishedArea:'80.0',areaBasis:'Total'}]),'equal');
+    assert.equal(publishedAreaState([{publishedArea:'80',areaBasis:'Total'},{publishedArea:'80',areaBasis:'Privada'}]),'review');
+    assert.equal(publishedAreaState([{publishedArea:'80',areaBasis:''},{publishedArea:'80',areaBasis:''}]),'review');
+    assert.equal(publishedAreaState([{publishedArea:'80',areaBasis:'Total'},{publishedArea:'82',areaBasis:'Total'}]),'difference');
 });
 test('linked sources complement but disagreement and re-read require reconciliation', () => {
     const result=factorEvidence('bathrooms',numeric,[

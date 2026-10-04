@@ -36,3 +36,15 @@ pendientes, aunque estén en su descripción original. Ascensores en la ficha de
 pueden estar calificados por nivel; esa clase no se transforma en presencia sí/no.
 La identidad no confirmada entre portales mantiene inmuebles potenciales separados.
 Validación estadística, corroboración y control normativo corresponden a M4.
+## 2026-10-04 · Cuadro por inmueble y portal
+En Plan de investigación: selector de un inmueble vinculado y tabla con portal/aviso
+en filas y factores candidatos o por investigar en columnas. Sin selección de factores,
+se muestran los más frecuentes del tipo. Área compatible y publicada siempre visibles,
+con unidad m² y base original; no hay equivalencia automática total/privada/construida.
+Verde sólo si dos o más anuncios tienen datos legibles iguales, sin pendientes de formato
+ni relectura. Amarillo ante diferencia o revisión; gris para faltantes/una fuente.
+No se comparan propiedades distintas ni se sustituyen datos. Dos avisos del mismo portal
+conservan filas separadas, código y enlace. El cuadro no genera datos desde la referencia.
+El conteo conjunto exige área positiva compatible independientemente de su selección como
+predictor; el área obligatoria no agrega un coeficiente si no se elige para el modelo.
+El ratio de planificación sigue orientativo, no requisito normativo ni regresión.

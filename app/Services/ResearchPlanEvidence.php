@@ -39,10 +39,15 @@ final class ResearchPlanEvidence
                     $values[$key]=(string)($raw ?? '');
                 }
                 $items[]=['portal'=>trim((string)($row['source_name'] ?? '')) ?: 'Fuente pendiente','values'=>$values,
+                    'id'=>(string)($row['id'] ?? ''),'code'=>(string)($row['listing_code'] ?? ''),
+                    'url'=>(string)($row['source_url'] ?? ''),'publishedArea'=>(string)($row['area_m2'] ?? ''),
+                    'areaBasis'=>(string)($row['area_basis'] ?? ''),
                     'revision'=>trim((string)($row['source_updates'] ?? ''))!==''];
             }
             if ($items===[]) { $excluded++; continue; }
-            $groups[]=['id'=>(string)$id,'ads'=>$items,'contextPending'=>$contextPending];
+            $first=$ads[0];
+            $groups[]=['id'=>(string)$id,'title'=>(string)(($first['project_name'] ?? '') ?: ($first['property_type'] ?? 'Inmueble')),
+                'ads'=>$items,'contextPending'=>$contextPending];
         }
         return ['subjects'=>$subjects,'groups'=>$groups,'excluded'=>$excluded,'operation'=>$operation];
     }
