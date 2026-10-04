@@ -22,7 +22,7 @@ final class ResearchFactorScaleInput
     }
     public static function catalog(array $catalog,array $scales): array
     {
-        foreach ($catalog as $key=>&$factor) if (isset($scales[$key])) {
+        foreach ($catalog as $key=>&$factor) if (isset($scales[$key]) && empty($factor['customized'])) {
             $factor['kind']=$scales[$key]['kind']; $factor['categories']=$scales[$key]['categories'];
         }
         foreach ($catalog as $key=>&$factor) {

@@ -59,7 +59,7 @@ final class ResearchPlanEvidence
             }
             if ($items===[]) { $excluded++; continue; }
             $first=$ads[0];
-            $legacyItems=array_map(static function($item) use($legacy) { $item['values']=array_intersect_key($item['values'],$legacy); return $item; },$items);
+            $legacyItems=array_map(static function($item) use($legacy) { $item['values']=array_replace(array_fill_keys(array_keys($legacy),''),array_intersect_key($item['values'],$legacy)); return $item; },$items);
             $signatures=[];
             foreach ($catalog as $key=>$factor) $signatures[$key]=hash('sha256',json_encode(array_map(static function($item) use($key) { $item['values']=[$key=>$item['values'][$key]]; return $item; },$items),JSON_THROW_ON_ERROR));
             $groups[]=['id'=>(string)$id,'title'=>(string)(($first['project_name'] ?? '') ?: ($first['property_type'] ?? 'Inmueble')),
@@ -67,7 +67,7 @@ final class ResearchPlanEvidence
         }
         $subjectSignatures=[];
         foreach ($subjects as $key=>$value) $subjectSignatures[$key]=hash('sha256',json_encode(isset($captured[$key])?[$key=>$value,'capture'=>$captured[$key]]:[$key=>$value],JSON_THROW_ON_ERROR));
-        $subjectBasis=array_intersect_key($subjects,$legacy);
+        $subjectBasis=array_replace(array_fill_keys(array_keys($legacy),''),array_intersect_key($subjects,$legacy));
         if ($captured!==[]) $subjectBasis['capture']=$captured;
         return ['subjectSignature'=>hash('sha256',json_encode($subjectBasis,JSON_THROW_ON_ERROR)),
             'subjectFactorSignatures'=>$subjectSignatures,'subjectCaptureKeys'=>array_keys($captured),'subjects'=>$subjects,'groups'=>$groups,'excluded'=>$excluded,'operation'=>$operation];

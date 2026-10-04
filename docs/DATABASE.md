@@ -1,5 +1,11 @@
 # Crear y evolucionar la base sin SQL manual
 
+Catálogo editable: 202610040003_user_research_factors.php agrega
+user_research_factors, clave compuesta owner_id/factor_key, definition_json,
+version y updated_at. Definiciones y asignaciones por propietario; CAS evita
+sobrescrituras. Las capturas de capítulo 3 mantienen su JSON original y su huella
+de definición, sin cambio de columnas. Ver CATALOGO-FACTORES-USUARIO.md.
+
 Contrastes por método: `additional_methods` activa claves `:metodo:<método>` dentro
 del mismo `methodology_workflow`. Se guardan junto al método en una actualización
 optimista; desactivar conserva sus datos. Muestras vinculadas por clave de recorrido,

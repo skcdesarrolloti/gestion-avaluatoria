@@ -20,6 +20,7 @@ if ($captureStale) $captureLiveCode='(!captureConfirmed && captureValue === '.js
     <?php endif; ?>
     <?php if ($captureStale): ?><p class="mt-2 rounded bg-amber-50 p-2 text-xs">Clasificación anterior conservada: <?= e($captureValue ?: 'Pendiente') ?>. Revisa el dato y confirma expresamente su clasificación actual.</p><?php endif; ?>
     <input type="hidden" name="<?= e($captureName) ?>[scale_kind]" value="<?= e($captureFactor['kind']) ?>">
+    <input type="hidden" name="<?= e($captureName) ?>[catalog_signature]" value="<?= e(\App\Services\SubjectFactorCapture::signature($captureFactor)) ?>">
     <input type="hidden" name="<?= e($captureName) ?>[scale_categories]" value="<?= e($captureFactor['categories']) ?>">
     <label class="mt-3 block text-sm font-semibold">Dato de <?= e($captureFactor['label']) ?> · sujeto
     <?php if ($captureFactor['kind']==='numeric'): ?>

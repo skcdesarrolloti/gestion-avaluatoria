@@ -36,7 +36,7 @@ final class HouseResearchFactors
     }
     public static function preserve(array $catalog,array $saved): array
     {
-        foreach (array_merge(self::RETIRED,['access']) as $key) if (!isset($saved[$key])) unset($catalog[$key]);
+        foreach (array_merge(self::RETIRED,['access']) as $key) if (!isset($saved[$key]) && empty($catalog[$key]['customized'])) unset($catalog[$key]);
         return $catalog;
     }
     public static function group(string $key): string

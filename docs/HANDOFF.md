@@ -861,3 +861,12 @@ una sola vez. Restablecer usa navegación fetch con respuesta HTML del servidor,
 de modo que desaparecen aviso y botón tras el guardado, sin refresco adicional
 manual. No modifica capturas ni escalas históricas de planes. Validación: 1096 PHP,
 153 JS, 196 BD3381, lint/build/71,3KB; prueba local restablecer y vista estrecha.
+
+Crear/editar catálogo 2026-10-04: user_research_factors por propietario y versión;
+una definición para varios tipos, editor plegable, escala visible y captura en #3.
+OfficeResearchFactors aplica 13 atributos aprobados, sin estrato/acceso/aire/ruta.
+Acabados ordinal 0–4, obra gris separada. Capturas y planes antiguos conservados,
+huellas de definición requieren confirmar datos afectados por edición. Registro de
+controladores y contexto de investigación extraídos para cumplir tamaño máximo.
+1106 PHP, 153 JS, 209 BD3383; UI local crear/editar/error/recarga/sujeto y móvil.
+Ver CATALOGO-FACTORES-USUARIO.md. Sigue revisión por chat de Local, no aprobada aún.

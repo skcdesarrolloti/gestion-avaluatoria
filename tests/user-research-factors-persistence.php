@@ -1,0 +1,38 @@
+<?php
+declare(strict_types=1);
+(static function(PDO $app):void {
+    $repo=new \App\Models\UserResearchFactorRepository($app);
+    $input=['label'=>'Respaldo privado de prueba','why'=>'Cobertura verificada de la unidad','unit'=>'nivel','kind'=>'ordinal','categories'=>"No\nParcial\nTotal",'group'=>'Unidad privada','types'=>['apartamento','oficina'],'version'=>0];
+    $key=$repo->save(1,$input);
+    expect(isset($repo->all(1)[$key]) && $repo->all(2)===[],'factor nuevo persiste solo para su propietario');
+    expect(isset(\App\Services\ResearchFactorCatalog::forType('oficina')[$key],\App\Services\ResearchFactorCatalog::forType('apartamento')[$key]) && !isset(\App\Services\ResearchFactorCatalog::forType('lote')[$key]),'una definición se asigna a varios tipos sin duplicarla');
+    $catalog=\App\Services\SubjectFactorCapture::catalog(['property_type'=>'oficina'],[]);
+    expect(\App\Services\SubjectFactorCapture::code('Parcial',$catalog[$key])==='Código: 1','sujeto usa códigos del factor creado por el usuario');
+    $plan=['factors'=>[$key=>['kind'=>'ordinal','categories'=>"No\nParcial\nTotal",'definition'=>$input['why']]]];
+    \App\Services\ResearchFactorReference::validateFixed($plan,[]);
+    \App\Services\ResearchPlanInput::validateScope($plan,'oficina','mercado');
+    expectStatus(422,fn()=>\App\Services\ResearchPlanInput::validateScope($plan,'lote','mercado'),'factor personalizado no invade tipos sin asignación');
+    $records=new \App\Models\AppraisalRepository($app); $recordId=$records->create(1);
+    $app->prepare('UPDATE appraisals SET tipo_inmueble="oficina",igac_property_units_count=1 WHERE id=?')->execute([$recordId]);
+    $records->ensureUnits($recordId,1,1,0); $unit=$records->units($recordId,1)[0];
+    $capture=['value'=>'Parcial','support'=>'Visita de prueba documentada','scale_kind'=>'ordinal','scale_categories'=>"No\nParcial\nTotal",'catalog_signature'=>\App\Services\SubjectFactorCapture::signature($catalog[$key])];
+    (new \App\Models\SubjectFactorRepository($app))->save($recordId,1,$unit['id'],0,[$key=>$capture]);
+    expect(\App\Services\SubjectFactorCapture::decode($records->units($recordId,1)[0])[$key]['value']==='Parcial','factor creado permite guardar valor y soporte del sujeto en base de datos');
+    expectStatus(422,fn()=>$repo->save(2,$input+['factor_key'=>$key]),'otro propietario no edita un factor ajeno');
+    $edit=array_replace($input,['factor_key'=>$key,'version'=>1,'types'=>['oficina'],'categories'=>"No\nLimitado\nParcial\nTotal"]);
+    $repo->save(1,$edit);
+    expectStatus(409,fn()=>$repo->save(1,$edit),'edición simultánea no sobrescribe escala nueva');
+    $current=\App\Services\SubjectFactorCapture::catalog(['property_type'=>'oficina'],[])[$key];
+    expect(!\App\Services\SubjectFactorCapture::compatible(['scale_kind'=>'ordinal','scale_categories'=>"No\nParcial\nTotal"],$current),'cambio de niveles exige revisar calificación anterior');
+    expect(\App\Services\SubjectFactorCapture::decode($records->units($recordId,1)[0])[$key]['scale_categories']==="No\nParcial\nTotal",'editar factor conserva valor y clasificación original de la captura');
+    expect(!isset(\App\Services\ResearchFactorCatalog::forType('apartamento')[$key]) && isset(\App\Services\ResearchFactorCatalog::forType('apartamento','',false,true)[$key]),'retirar asignación conserva compatibilidad de planes históricos');
+    \App\Services\ResearchFactorReference::validateFixed($plan,$plan);
+    expect(true,'editar catálogo no recodifica automáticamente un plan previo');
+    $base=\App\Services\ResearchFactorCatalog::all()['view'];
+    $repo->save(1,['factor_key'=>'view','version'=>0,'label'=>'Vista verificada','why'=>$base['why'],'unit'=>'nivel','kind'=>'ordinal','categories'=>$base['categories'],'group'=>'Unidad privada','types'=>['apartamento','oficina']]);
+    $override=\App\Services\ResearchFactorScaleInput::catalog(\App\Services\ResearchFactorCatalog::forType('oficina'),['view'=>['kind'=>'categorical','categories'=>'Vieja']]);
+    expect($override['view']['kind']==='ordinal' && $override['view']['scale_valid'],'edición vigente prevalece sobre escala anterior del propietario');
+    \App\Services\UserResearchFactors::load($repo->all(2));
+    expect(!isset(\App\Services\ResearchFactorCatalog::all()[$key]) && \App\Services\ResearchFactorCatalog::all()['view']['label']==='Vista','contexto de otro usuario no hereda definiciones ni escalas');
+    \App\Services\UserResearchFactors::load([]);
+})($app);

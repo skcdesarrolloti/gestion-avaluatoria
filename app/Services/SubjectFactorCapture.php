@@ -18,6 +18,8 @@ final class SubjectFactorCapture
         $saved=self::decode($unit);
         if ($type==='apartamento') $catalog=ApartmentResearchFactors::preserve($catalog,$saved);
         if ($type==='casa') $catalog=HouseResearchFactors::preserve($catalog,$saved);
+        if ($type==='oficina') $catalog=OfficeResearchFactors::preserve($catalog,$saved);
+        $catalog=UserResearchFactors::preserve($catalog,$saved);
         foreach (['landscape_view','panoramic_view'] as $key) if (!isset($saved[$key])) unset($catalog[$key]);
         return ResearchFactorScaleInput::catalog(array_diff_key($catalog,array_flip(['area','built','land','destination'])),$scales);
     }
@@ -31,7 +33,12 @@ final class SubjectFactorCapture
     public static function compatible(array $item,array $factor): bool
     {
         return ($factor['scale_valid'] ?? true) && ($item['scale_kind'] ?? '')===$factor['kind']
-            && ($item['scale_categories'] ?? '')===$factor['categories'];
+            && ($item['scale_categories'] ?? '')===$factor['categories']
+            && (empty($factor['customized']) || ($item['catalog_signature'] ?? '')===self::signature($factor));
+    }
+    public static function signature(array $factor): string
+    {
+        return empty($factor['customized'])?'':hash('sha256',json_encode(array_intersect_key($factor,array_flip(['kind','categories','unit','why','group'])),JSON_THROW_ON_ERROR));
     }
     public static function validValue(string $value,array $factor): bool
     {
@@ -44,7 +51,7 @@ final class SubjectFactorCapture
         $out=$previous;
         foreach ($posted as $key=>$item) {
             if (!isset($catalog[$key]) || !is_array($item)) throw new HttpException(422,'El factor no corresponde a esta unidad.');
-            foreach (['value'=>120,'support'=>600,'scale_kind'=>20,'scale_categories'=>1200] as $field=>$max) {
+            foreach (['value'=>120,'support'=>600,'scale_kind'=>20,'scale_categories'=>1200,'catalog_signature'=>64] as $field=>$max) {
                 if (!is_string($item[$field] ?? '') || mb_strlen($item[$field] ?? '')>$max) throw new HttpException(422,'Revisa el dato y soporte de '.$catalog[$key]['label'].'.');
                 $item[$field]=trim($item[$field] ?? '');
             }
@@ -57,7 +64,7 @@ final class SubjectFactorCapture
                 if (!self::validValue($item['value'],$catalog[$key])) throw new HttpException(422,'El dato de '.$catalog[$key]['label'].' no corresponde a la clasificación.');
                 if ($item['support']==='') throw new HttpException(422,'Indica el soporte de '.$catalog[$key]['label'].'.');
             }
-            $out[$key]=array_intersect_key($item,array_flip(['value','support','scale_kind','scale_categories']))+['saved_at'=>gmdate('c')];
+            $out[$key]=array_intersect_key($item,array_flip(['value','support','scale_kind','scale_categories','catalog_signature']))+['saved_at'=>gmdate('c')];
         }
         return $out;
     }

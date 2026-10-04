@@ -25,7 +25,7 @@ declare(strict_types=1);
     expect($ordinal['factors']['generator']['categories']==="No\nParcial\nTotal" && $ordinal['factors']['generator']['kind']==='ordinal','persistencia conserva orden explícito y tipo ordinal');
     expectStatus(422,fn()=>\App\Services\ResearchPlanInput::input(json_encode(['factors'=>['generator'=>['kind'=>'ordinal','categories'=>"No\nParcial\nPARCIAL"]]])),'no admite dos etiquetas equivalentes con códigos distintos');
     expectStatus(422,fn()=>\App\Services\ResearchPlanInput::input(json_encode(['factors'=>['generator'=>['kind'=>'ordinal','categories'=>"Pendiente\nParcial\nTotal"]]])),'no admite dato desconocido como cero de una escala');
-    $catalog=\App\Services\ResearchFactorCatalog::forType('oficina');
+    $catalog=\App\Services\ResearchFactorCatalog::forType('oficina','',false,true);
     $rows=[['id'=>'a','property_type'=>'Oficina','operation'=>'Venta','ph_regime'=>'si','private_built_m2'=>'','area_m2'=>100,'bathrooms'=>0,'source_name'=>'FR']];
     $data=\App\Services\ResearchPlanEvidence::build($catalog,['functional_bathrooms_count'=>0],$rows,['tipo_inmueble'=>'oficina','tipo_negocio'=>'venta','regimen_ph'=>'si'],['stratum'=>6]);
     expect($data['subjects']['bathrooms']==='0' && $data['subjects']['stratum']==='', 'cero propio preservado; no hereda estrato global sin vínculo explícito');

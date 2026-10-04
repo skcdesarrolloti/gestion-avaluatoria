@@ -9,6 +9,8 @@ Insumos: [configuración documentada por portal y tipo](docs/PORTALES-CAMPOS-POR
 con etiquetas publicadas, diferencias, fuentes y cruces pendientes de investigación.
 [Catálogo ampliado y pautas de calificación](docs/FACTORES-ESCALAS-INVESTIGACION.md):
 atributos por tipo, jerarquías fijas y clases sin orden, con fuentes documentadas.
+[Crear y editar factores propios](docs/CATALOGO-FACTORES-USUARIO.md): un catálogo
+compartido por sujeto y comparables, asignable a varios tipos de inmueble.
 Academia compartida por método: una pestaña por método activo y sus alcances,
 artículos completos plegables y verificaciones particulares por unidad.
 Academia General reúne reglas comunes y casos de aplicación. Requisito del análisis:
