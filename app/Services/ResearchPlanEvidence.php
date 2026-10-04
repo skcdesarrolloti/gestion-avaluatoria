@@ -54,8 +54,8 @@ final class ResearchPlanEvidence
             if ($items===[]) { $excluded++; continue; }
             $first=$ads[0];
             $groups[]=['id'=>(string)$id,'title'=>(string)(($first['project_name'] ?? '') ?: ($first['property_type'] ?? 'Inmueble')),
-                'ads'=>$items,'contextPending'=>$contextPending];
+                'ads'=>$items,'signature'=>hash('sha256',json_encode($items,JSON_THROW_ON_ERROR)),'contextPending'=>$contextPending];
         }
-        return ['subjects'=>$subjects,'groups'=>$groups,'excluded'=>$excluded,'operation'=>$operation];
+        return ['subjectSignature'=>hash('sha256',json_encode($subjects,JSON_THROW_ON_ERROR)),'subjects'=>$subjects,'groups'=>$groups,'excluded'=>$excluded,'operation'=>$operation];
     }
 }

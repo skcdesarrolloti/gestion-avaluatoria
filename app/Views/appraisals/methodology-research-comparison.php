@@ -1,4 +1,4 @@
-<section class="mb-5 min-w-0 rounded-xl border border-slate-200 bg-white p-4" @input.stop @change.stop>
+<section class="mb-5 min-w-0 rounded-xl border border-slate-200 bg-white p-4" >
     <h3 class="font-semibold">Comparar factores por portal</h3>
     <p class="mt-2 text-sm">Un inmueble a la vez; sus anuncios permanecen separados por fuente. Sólo se comparan juntos después de vincular su identidad en «Inmuebles recogidos».</p>
     <label class="mt-3 block text-sm font-semibold">Inmueble de la investigación
@@ -17,27 +17,28 @@
                 <table class="w-full text-left text-sm">
                     <caption class="sr-only">Factores publicados del mismo inmueble por anuncio y portal</caption>
                     <thead class="bg-slate-100"><tr>
-                        <th scope="col" class="min-w-44 p-3">Factor / unidad</th>
+                        <th scope="col" class="sticky left-0 z-10 min-w-44 bg-slate-100 p-3">Factor / unidad</th>
                         <th scope="col" class="min-w-40 bg-teal-50 p-3">Sujeto · referencia<br><span class="font-normal">Datos del numeral 3</span></th>
                         <template x-for="(ad,index) in comparisonGroup.ads" :key="ad.id || index"><th scope="col" class="min-w-36 p-3">
                             <span x-text="ad.portal"></span><span class="block font-normal" x-text="ad.code || 'Código pendiente'"></span>
                             <a x-show="/^https?:\/\//i.test(ad.url || '')" :href="/^https?:\/\//i.test(ad.url || '') ? ad.url : '#'" target="_blank" rel="noopener noreferrer" class="inline-flex min-h-11 items-center text-blue-700 underline">Consultar fuente</a>
                         </th></template>
-                        <th scope="col" class="min-w-36 p-3">Validación entre fuentes</th>
+                        <th scope="col" class="min-w-36 p-3">Validación entre fuentes</th><th scope="col" class="min-w-60 p-3">Calificación del analista</th>
                     </tr></thead>
                     <tbody>
                         <template x-for="key in comparisonKeys" :key="key"><tr class="border-t">
-                            <th scope="row" class="p-3 font-semibold"><span x-text="`${factorLabel(key)} · ${catalog[key].unit}`"></span>
-                                <span class="block text-xs font-normal" x-text="({model:'Candidato al modelo',investigate:'Investigar',filter:'Filtro',defer:'Pendiente'})[plan.factors[key].decision] || 'Por clasificar'"></span>
+                            <th scope="row" class="sticky left-0 z-10 bg-white p-3 font-semibold"><span x-text="`${factorLabel(key)} · ${catalog[key].unit}`"></span>
+                                <span class="block text-xs font-normal" x-text="!isFactor(key)?'Base obligatoria de cálculo':({model:'Candidato al modelo',investigate:'Investigar',filter:'Filtro',defer:'Pendiente'})[plan.factors[key].decision] || 'Por clasificar'"></span>
                                 <span class="mt-2 block text-xs font-normal" x-text="scaleLabel(key)"></span></th>
                             <td class="bg-teal-50 p-3"><span x-text="subjectLabel(key)"></span><span class="mt-1 block text-xs font-semibold" x-text="codeLabel(key,evidence.subjects[key])"></span></td>
                             <template x-for="(ad,index) in comparisonGroup.ads" :key="ad.id || index"><td class="p-3" :class="comparisonClass(key,ad)"><span x-text="comparisonValue(key,ad)"></span><span class="mt-1 block text-xs font-semibold" x-text="codeLabel(key,ad.values[key])"></span></td></template>
                             <td class="p-3 font-semibold" x-text="comparisonLabel(key)"></td>
+                            <td class="p-3"><?php require __DIR__.'/methodology-research-grade.php'; ?></td>
                         </tr></template>
-                        <tr class="border-t"><th scope="row" class="p-3">Área publicada · m²<br><span class="text-xs font-normal">Base original de cada aviso</span></th>
+                        <tr class="border-t"><th scope="row" class="sticky left-0 z-10 bg-white p-3">Área publicada · m²<br><span class="text-xs font-normal">Base original de cada aviso</span></th>
                             <td class="bg-teal-50 p-3">Consulta el área del sujeto arriba</td>
                             <template x-for="(ad,index) in comparisonGroup.ads" :key="ad.id || index"><td class="p-3" :class="publishedAreaClass(ad)"><span x-text="ad.publishedArea || 'No publicado'"></span><span class="block text-xs" x-text="ad.areaBasis || 'Base por confirmar'"></span></td></template>
-                            <td class="p-3 font-semibold" x-text="publishedAreaLabel"></td>
+                            <td class="p-3 font-semibold" x-text="publishedAreaLabel"></td><td class="p-3 text-xs">Dato obligatorio de cálculo; no se califica.</td>
                         </tr>
                     </tbody>
                 </table>
@@ -46,5 +47,5 @@
         </div>
     </template>
     <p class="mt-3 text-sm" x-show="!evidence.groups.length">No hay inmuebles disponibles para esta investigación. Recoge anuncios y revisa su selección primero.</p>
-    <p class="mt-3 text-xs text-slate-600">Cuadro de consulta: no promedia, corrige ni adopta valores. Los datos distintos se conservan para la revisión del analista.</p>
+    <p class="mt-3 text-xs text-slate-600">Los datos publicados permanecen intactos. La calificación se guarda aparte con su soporte; no resuelve identidad, no elimina diferencias ni ejecuta análisis estadístico. Si cambian las fuentes o la escala, requiere revisión.</p>
 </section>

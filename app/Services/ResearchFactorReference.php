@@ -34,11 +34,14 @@ final class ResearchFactorReference
         }
         return $out;
     }
-    public static function validateFixed(array $plan,array $previous): void
+    public static function validateFixed(array $plan,array $previous,array $scales=[]): void
     {
         foreach ($plan['factors'] as $key=>$item) {
-            $base=ResearchFactorCatalog::all()[$key];
+            $base=ResearchFactorScaleInput::catalog(ResearchFactorCatalog::all(),$scales)[$key];
             $old=$previous['factors'][$key] ?? [];
+            $matchesCatalog=true;
+            foreach (['kind','categories','definition'] as $field) $matchesCatalog=$matchesCatalog && $item[$field]===($field==='definition'?$base['why']:$base[$field]);
+            if ($matchesCatalog) continue;
             foreach (['kind','categories','definition'] as $field) {
                 $expected=$old[$field] ?? ($field==='definition'?$base['why']:$base[$field]);
                 if ($item[$field]!==$expected) throw new \App\Core\HttpException(422,'La definición y escala son permanentes. Elige el uso y la obtención sin cambiar la clasificación del factor.');

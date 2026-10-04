@@ -1,17 +1,18 @@
 <?php
 $researchContext=\App\Services\ComparableSearchContext::forMethod($record,$units ?? [],$componentKey,$method ?? 'mercado');
 $researchType=\App\Services\ComparablePortalProfiles::defaultType((string)($researchContext['tipo_inmueble'] ?? ''));
-$researchCatalog=\App\Services\ResearchFactorCatalog::forType($researchType,$components[$componentKey]['part'] ?? '');
+$researchCatalog=\App\Services\ResearchFactorScaleInput::catalog(\App\Services\ResearchFactorCatalog::forType($researchType,$components[$componentKey]['part'] ?? ''),$factorScales ?? []);
 $researchUnit=$components[$componentKey]['unit'] ?? [];
 $researchPart=$components[$componentKey]['part'] ?? '';
 if (($researchContext['regimen_ph'] ?? '')!=='si' && isset($researchCatalog['area'])) {
     $researchCatalog['area']['label']='Área construida de comparación';
     $researchCatalog['area']['subject']='built_area_adopted_m2';
 }
-$researchPlan=['target_ratio'=>$selected['research_plan']['target_ratio'] ?? 10,'factors'=>[]];
+$researchPlan=['target_ratio'=>$selected['research_plan']['target_ratio'] ?? 10,'factors'=>[],'assessments'=>$selected['research_plan']['assessments'] ?? []];
 foreach ($researchCatalog as $key=>$factor) $researchPlan['factors'][$key]=array_replace(
     ['decision'=>$key==='destination'?'filter':'','kind'=>$factor['kind'],'collection'=>'mixed','reason'=>'','definition'=>$factor['why'],'categories'=>$factor['categories']],$selected['research_plan']['factors'][$key] ?? []);
-$researchFactors=array_diff_key($researchCatalog,['destination'=>true]);
+foreach (['area','built','land'] as $areaKey) if (isset($researchPlan['factors'][$areaKey])) $researchPlan['factors'][$areaKey]['decision']='defer';
+$researchFactors=array_diff_key($researchCatalog,array_flip(['destination','area','built','land']));
 $researchEvidence=\App\Services\ResearchPlanEvidence::build($researchCatalog,$researchUnit,$comparableRows,$researchContext,$subject);
 $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$researchEvidence];
 ?>
@@ -69,7 +70,7 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
         <details class="rounded-xl border p-4">
         <summary class="min-h-11 cursor-pointer font-semibold">Clasificar factores y preparar el modelo · máximo cuatro candidatos</summary>
         <div class="mt-4 grid gap-4 lg:grid-cols-2">
-        <?php foreach ($researchFactors as $key=>$factor): ?>
+        <?php foreach ($researchFactors as $key=>$factor): $factorPortals=\App\Services\ResearchFactorReference::portals($researchType,$key); $factorUnreferenced=array_diff(array_values(\App\Services\ComparablePortalProfiles::portals()),array_column($factorPortals,'label')); ?>
             <article class="rounded-xl border p-4">
                 <h3 class="font-semibold"><?= e($factor['label']) ?> · <?= e($factor['unit']) ?></h3>
                 <p class="mt-2 text-sm"><strong>Sujeto:</strong> <span x-text="subjectLabel('<?= e($key) ?>')"></span>.
@@ -77,6 +78,10 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
                         'section'=>$factor['section']==='tipologias'?'tipologias':'','from'=>'metodologia','check_component'=>$componentKey]).
                         '#'.(['surface'=>'superficies','construction'=>'construccion','attributes'=>'atributos'][$factor['section']] ?? 'ficha-basica'))) ?>">Consultar / completar numeral 3</a></p>
                 <p class="mt-2 text-sm text-slate-600"><?= e($factor['why']) ?></p>
+                <a class="inline-flex min-h-11 items-center text-xs text-blue-700 underline" href="<?= e($flowUrl('plan',null,$componentKey).'&factor_catalog=1') ?>">Definir jerarquías en el catálogo</a>
+                <p class="mt-2 text-xs"><strong>Escala:</strong> <span x-text="scaleLabel('<?= e($key) ?>')"></span></p>
+                <p class="mt-2 text-xs"><strong>Portales documentados:</strong> <?= e($factorPortals?implode(' · ',array_column($factorPortals,'label')):'No documentado para este tipo; requiere investigación manual') ?>. Disponibilidad real: conteos debajo.</p>
+                <?php if ($factorUnreferenced): ?><p class="mt-1 text-xs">Sin evidencia documental para este tipo: <?= e(implode(' · ',$factorUnreferenced)) ?>. No significa ausencia en todos sus avisos.</p><?php endif; ?>
                 <p class="mt-2 text-sm" x-text="`${summary.stats.<?= e($key) ?>.ready.length} inmuebles legibles · ${summary.stats.<?= e($key) ?>.variation} valores o clases diferentes`"></p>
                 <p class="mt-1 text-sm text-amber-800" x-text="`${summary.stats.<?= e($key) ?>.missing} sin dato · ${summary.stats.<?= e($key) ?>.formats} por codificar/conciliar · ${summary.stats.<?= e($key) ?>.conflicts} diferencias o relecturas · ${summary.stats.<?= e($key) ?>.context} contextos por verificar`"></p>
                 <label class="mt-3 block text-sm font-semibold">Uso propuesto
@@ -93,9 +98,10 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
                         <p class="mt-2" x-text="`${portal}: ${counts.present}/${counts.ads} anuncios con dato; ${counts.readable} legibles con esta definición.`"></p>
                     </template></div>
                     <p class="mt-2 text-xs">Los anuncios por portal pueden pertenecer a un mismo inmueble. Si falta este atributo, consíguelo por contacto, visita o documento y registra dato, fuente, fecha y soporte en su ficha de captura. No publicado no significa inexistente. Esta elección planifica la obtención; no completa ni verifica datos automáticamente.</p>
-                    <p class="mt-3 text-sm font-semibold">Clasificación permanente · consulta</p>
+                    <p class="mt-3 text-sm font-semibold">Jerarquía / clases usadas en este recorrido</p>
                     <p class="mt-2 text-sm" x-text="plan.factors.<?= e($key) ?>.definition || catalog.<?= e($key) ?>.why"></p>
                     <p class="mt-2 text-xs" x-text="scaleLabel('<?= e($key) ?>')"></p>
+                    <button type="button" class="btn-secondary mt-2" @click="adoptScale('<?= e($key) ?>'); $dispatch('change')" x-show="plan.factors.<?= e($key) ?>.kind!==catalog.<?= e($key) ?>.kind || plan.factors.<?= e($key) ?>.categories!==catalog.<?= e($key) ?>.categories">Usar escala actual del catálogo y volver a calificar</button>
                     <p class="mt-2 text-xs">Ordinal: primera línea = 0 y siguientes = 1, 2… siempre de menor a mayor cobertura, dotación o calidad según la definición. Esa misma escala se aplica al sujeto y a todos los portales. Desconocido queda pendiente. Un «Sí» sin detalle no significa «Total». El orden no demuestra distancias iguales ni efecto sobre el precio; correlación y regresión se revisarán en Análisis.</p>
                     <label class="mt-3 block text-sm font-semibold">Por qué se propone este uso<textarea class="input mt-1" maxlength="600" rows="2" x-model="plan.factors.<?= e($key) ?>.reason" placeholder="Explica relevancia para esta unidad y posibilidad de conseguir datos"></textarea></label>
                 </details>

@@ -1,6 +1,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { researchValue, researchCode, researchScale, factorEvidence, researchSummary, comparisonState, researchPlan, publishedAreaState } from '../resources/js/research-plan.js';
+import { usableAssessment } from '../resources/js/research-assessments.js';
 const numeric = {kind:'numeric',decision:'model',definition:'Cantidad',reason:'Dotación',categories:''};
 const binary = {...numeric,kind:'binary'};
 const ad = (portal,values,revision=false) => ({portal,values,revision});
@@ -95,4 +96,39 @@ test('destination stays outside factor codes and sample targets; manual factors 
     assert.deepEqual(ui.comparisonKeys,['view']); ui.onlyCandidates=false;
     assert.deepEqual(ui.comparisonKeys,['view']); assert.equal(ui.modelCount,1);
     assert.equal(ui.summary.target,10); assert.equal(ui.summary.warnings.some(w=>w.startsWith('destination:')),true);
+});
+
+test('manual qualification needs support and current source/scale; portal disagreements stay visible',()=>{
+    const factor={...numeric,kind:'ordinal',categories:'No\nParcial\nTotal'};
+    const property={...group('a',[ad('FR',{generator:'No'}),ad('CC',{generator:'Total'})]),signature:'source-v1'};
+    const qualification={value:'Parcial',support:'Visita y fotografía',basis:'source-v1',scale_kind:'ordinal',scale_categories:factor.categories};
+    const plan={target_ratio:10,factors:{generator:factor},assessments:{a:{generator:qualification}}};
+    assert.equal(usableAssessment(qualification,factor,'source-v1'),true);
+    assert.deepEqual(researchSummary(plan,{subjects:{generator:'Parcial'},groups:[property]}).stats.generator.ready,['a']);
+    assert.equal(comparisonState('generator',factor,property.ads),'difference');
+    assert.equal(property.ads[0].values.generator,'No');
+    qualification.support=''; assert.equal(usableAssessment(qualification,factor,'source-v1'),false);
+    qualification.support='Visita'; property.signature='source-v2';
+    assert.equal(researchSummary(plan,{subjects:{generator:'Parcial'},groups:[property]}).joint,0);
+    assert.equal(usableAssessment(qualification,{...factor,categories:'No\nTotal'},'source-v1'),false);
+});
+
+test('legacy area candidate stays a calculation basis, outside factor count and sample target',()=>{
+    const result=researchSummary({target_ratio:10,factors:{area:{...numeric,decision:'model'},bathrooms:{...numeric,decision:'model'}}},{subjects:{bathrooms:'2'},groups:[]});
+    assert.equal(result.selected,1); assert.equal(result.target,10);
+});
+
+test('first manual qualification survives JSON payload when PHP initially emits empty array',()=>{
+    const ui=researchPlan({plan:{factors:{generator:{...numeric,kind:'ordinal',categories:'No\nParcial\nTotal'}},assessments:[],target_ratio:10},catalog:{},evidence:{subjectSignature:'subject-v1',subjects:{},groups:[{id:'a',signature:'source-v1',ads:[]}]}});
+    ui.setAssessment('a','generator','value','Parcial'); ui.setAssessment('a','generator','support','Visita');
+    assert.equal(JSON.parse(ui.payload).assessments.a.generator.value,'Parcial');
+    assert.equal(ui.assessmentStatus('a','generator'),'Registrado por el analista · soporte indicado');
+});
+
+test('adopting a new hierarchy retains prior qualification and support, pending recoding',()=>{
+    const old={...numeric,kind:'ordinal',categories:'No\nParcial\nTotal'};
+    const ui=researchPlan({plan:{factors:{generator:old},assessments:{subject:{generator:{value:'Parcial',support:'Registro anterior',basis:'s1',scale_kind:'ordinal',scale_categories:old.categories}}}},catalog:{generator:{kind:'ordinal',categories:'Sin respaldo\nParcial\nTotal',why:'Cobertura'}},evidence:{subjectSignature:'s1',subjects:{},groups:[]}});
+    ui.adoptScale('generator');
+    assert.equal(ui.plan.assessments.subject.generator.support,'Registro anterior');
+    assert.equal(ui.assessmentCode('subject','generator'),'Código: pendiente por cambio de escala');
 });

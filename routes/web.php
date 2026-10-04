@@ -12,6 +12,7 @@ return [
     ['GET', '#^/diagnostico/login$#', 'diagnostics', 'login', false],
     ['POST', '#^/logout$#', 'auth', 'logout', true],
     ['GET', '#^/valuaciones$#', 'valuations', 'index', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/escalas$#', 'valuationMethodology', 'saveFactorScale', true],
     ['GET', '#^/maestros$#', 'masters', 'index', true],
     ['GET', '#^/maestros/peritos/([a-f0-9]{32})/judicial$#', 'judicial', 'profile', true],
     ['POST', '#^/maestros/peritos/([a-f0-9]{32})/judicial$#', 'judicial', 'saveProfile', true],

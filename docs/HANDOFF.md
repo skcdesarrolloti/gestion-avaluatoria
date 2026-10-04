@@ -777,3 +777,28 @@ Una futura revisión general de escalas requiere versionado y tratamiento de his
 Pruebas: 1014 PHP, 145 JS, 176 BD desechable nueva (3369), lint/build, 70,3KB gzip.
 Navegador local: métodos separados, oficina/apartamento/depósito, guardado confirmado
 y recarga; pantalla estrecha con desplazamiento limitado a la tabla, sin errores de consola.
+
+## 2026-10-04 · Jerarquías y calificaciones de investigación
+El catálogo ya permite guardar clases nominales o niveles ordinales junto al factor;
+primera línea=0, siguientes=1,2… según orden definido por el analista. Cantidades
+y binarias conservan medida y No=0/Sí=1. No se impone orden económico a clases
+nominales ni se inventa una jerarquía de Vista. Catálogo por propietario: se reutiliza
+en sus avalúos y tipos que incluyan ese factor, sin modificar escalas de otro usuario.
+Migración aditiva 202610040001_research_factor_scales.php, versión optimista por escala.
+Los planes guardados conservan definición/categorías; botón explícito para adoptar
+catálogo actual y volver a calificar. No recodificación silenciosa de históricos.
+Área/terreno/construida son bases de cálculo y quedan fuera de candidatos/meta de
+muestras; una antigua selección se muestra como base, conservando datos almacenados.
+Insumos presenta escala y portales referenciados junto al factor; conteos reales por
+portal continúan disponibles. Ausencia documental no prueba que el portal no publique
+el dato. Investigación manual sigue disponible.
+Cuadro por inmueble: calificaciones del sujeto y grupo vinculado, etiqueta/medida,
+soporte y código derivado separados de valores publicados. Control plegable junto a
+cada factor, primera columna fija durante desplazamiento. Se guarda en research_plan
+assessments, sin nuevas columnas de comparables. Fuente cambiada, falta de soporte o
+escala distinta deja la calificación pendiente y fuera del conteo conjunto; mantiene
+las diferencias entre anuncios. No ejecuta correlación/regresión ni cambia Análisis.
+Pruebas: 1020 PHP, 149 JS, 181 BD contra nueva instancia desechable 3371, lint/build
+y tamaño 71,0KB gzip. Navegador local: editor Vista guarda/recarga; Planta Parcial
+código1 guarda/recarga con soporte, fuentes No/Parcial/Total intactas; pantalla
+estrecha sin desbordamiento de página (tabla con scroll propio), consola sin errores.

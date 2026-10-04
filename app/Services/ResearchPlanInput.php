@@ -7,7 +7,7 @@ final class ResearchPlanInput
 {
     public static function input(mixed $value): array
     {
-        if (!is_string($value) || strlen($value)>30000) throw new HttpException(422,'Revisa el formato del plan de investigación.');
+        if (!is_string($value) || strlen($value)>2000000) throw new HttpException(422,'Revisa el formato del plan de investigación.');
         try { $data=json_decode($value,true,8,JSON_THROW_ON_ERROR); }
         catch (\JsonException) { throw new HttpException(422,'El plan de investigación llegó incompleto.'); }
         if (!is_array($data) || !is_array($data['factors'] ?? null) || count($data['factors'])>20) throw new HttpException(422,'Revisa los factores del plan.');
@@ -19,6 +19,7 @@ final class ResearchPlanInput
             $decision=$factor['decision'] ?? '';
             if (!in_array($decision,['','filter','investigate','model','defer'],true)) throw new HttpException(422,'Decisión de factor inválida.');
             if ($key==='destination' && !in_array($decision,['','filter','defer'],true)) throw new HttpException(422,'Destinación es un filtro de investigación, no un factor candidato al modelo.');
+            if (in_array($key,['area','land','built'],true) && $decision==='model') throw new HttpException(422,'El área es base de cálculo, no un factor candidato.');
             $kind=$factor['kind'] ?? ResearchFactorCatalog::all()[$key]['kind'];
             if (!in_array($kind,['numeric','binary','categorical','ordinal'],true)) throw new HttpException(422,'Tipo de dato inválido.');
             $item=['decision'=>$decision,'kind'=>$kind];
@@ -42,6 +43,7 @@ final class ResearchPlanInput
         }
         if (count(array_filter($out['factors'],static fn($item)=>$item['decision']==='model'))>4)
             throw new HttpException(422,'Selecciona como máximo cuatro factores candidatos para el modelo. Puedes investigar todos los demás.');
+        $out['assessments']=ResearchAssessmentInput::input($data['assessments'] ?? [],$out['factors']);
         return $out;
     }
     public static function validateScope(array $plan,string $type,string $method,string $part=''): void

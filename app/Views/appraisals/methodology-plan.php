@@ -7,7 +7,7 @@ $planExample=\App\Services\MethodologySelectionHelp::example($record,$planUnits[
 $planReferenceUnit=$planUnits[$planActive]['unit'] ?? [];
 $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)($planReferenceUnit['property_type'] ?? (($planReferenceUnit['unit_kind'] ?? '')==='property'?($record['tipo_inmueble'] ?? ''):'')));
 ?>
-<section class="rounded-2xl border bg-white p-5 sm:p-8" aria-labelledby="plan-valoracion-titulo" data-ph-section x-data="{configTab:'methods'}">
+<section class="rounded-2xl border bg-white p-5 sm:p-8" aria-labelledby="plan-valoracion-titulo" x-data="{configTab:<?= e(json_encode(($_GET['factor_catalog'] ?? '')==='1'?'factors':'methods')) ?>}">
     <p class="eyebrow">Configuración</p>
     <h2 id="plan-valoracion-titulo" class="mt-2 text-2xl font-semibold">Configuración de la valoración</h2>
     <nav class="mt-4 flex flex-wrap gap-2" aria-label="Configuración de métodos y factores">
@@ -15,7 +15,7 @@ $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)(
         <button type="button" class="btn-secondary" @click="configTab='factors'" :aria-pressed="configTab==='factors'">Catálogo de factores</button>
     </nav>
     <?php require __DIR__.'/methodology-factor-reference.php'; ?>
-    <div x-show="configTab==='methods'">
+    <div x-show="configTab==='methods'" data-ph-section>
     <p class="mt-3 leading-6">Define el alcance y elige los métodos aquí. Después entra a la academia del recorrido elegido. Las unidades siguen siendo las registradas en los capítulos 1 y 3.</p>
     <details class="mt-3"><summary class="min-h-11 cursor-pointer font-semibold">Consultar las recomendaciones y su soporte técnico</summary>
         <?php require __DIR__.'/valuation-methodology-decision.php'; ?>

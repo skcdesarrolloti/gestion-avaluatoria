@@ -1,7 +1,6 @@
 <?php
 declare(strict_types=1);
 namespace App\Controllers;
-
 use App\Core\{Http, Session};
 use App\Models\AppraisalComparableRepository;
 use App\Models\AppraisalPhRepository;
@@ -18,7 +17,8 @@ final class AppraisalValuationMethodologyController
         private AppraisalComparableRepository $comparables,
         private AppraisalComparableSearchGuide $guide, private array $user,
         private \App\Models\GeoMasterRepository $geo,
-        private \App\Models\MethodologyWorkflowRepository $workflow) {}
+        private \App\Models\MethodologyWorkflowRepository $workflow,
+        private \App\Models\ResearchFactorScaleRepository $factorScales) {}
 
     public function show(string $id): void
     {
@@ -55,6 +55,7 @@ final class AppraisalValuationMethodologyController
             return $row + ['search_url' => $url];
         }, $this->geo->activeNeighborhoodsForCity((string) ($subject['city_id'] ?? '')));
         view('appraisals/valuation-methodology', ['title' => 'Metodología valuatoria',
+            'factorScales'=>$this->factorScales->all($this->user['id']),
             'record' => $record, 'subject' => $subject, 'units' => $units, 'phProfile' => $phProfile,
             'methodologyChapter' => $methodologyChapter, 'comparableRows' => $comparableRows,
             'marketNeighborhoods' => $marketNeighborhoods,
@@ -80,7 +81,8 @@ final class AppraisalValuationMethodologyController
             \App\Services\ResearchPlanInput::validateScope($changes['research_plan'],
                 \App\Services\ComparablePortalProfiles::defaultType((string)($scopeRecord['tipo_inmueble'] ?? '')),
                 \App\Services\MethodologyWorkflow::saved($record)[$key]['method'] ?? '',$components[$key]['part'] ?? '');
-            \App\Services\ResearchFactorReference::validateFixed($changes['research_plan'],\App\Services\MethodologyWorkflow::saved($record)[$key]['research_plan'] ?? []);
+            \App\Services\ResearchAssessmentInput::validateScope($changes['research_plan'],\App\Services\MethodologyComparableScope::rows($this->comparables->forAppraisal($id,$this->user['id']),$key),\App\Services\MethodologyWorkflow::saved($record)[$key]['research_plan'] ?? []);
+            \App\Services\ResearchFactorReference::validateFixed($changes['research_plan'],\App\Services\MethodologyWorkflow::saved($record)[$key]['research_plan'] ?? [],$this->factorScales->all($this->user['id']));
         }
         if (isset($components[$key]['alternate_method'])) {
             if (isset($changes['additional_methods']) || (isset($changes['method']) && $changes['method']!==$components[$key]['alternate_method']))
@@ -100,6 +102,9 @@ final class AppraisalValuationMethodologyController
         Http::redirect('avaluos/' . $id . '/metodologia-valuatoria?component=' . rawurlencode($key) . '&stage=' .
             (isset($changes['plan_parts']) ? 'plan' : (isset($changes['research_plan'])?'3&research=1':'2')));
     }
+
+    public function saveFactorScale(string $id): never
+    { \App\Services\ResearchFactorScaleAction::save($this->appraisals,$this->factorScales,$this->user['id'],$id); }
 
     public function savePhScope(string $id, string $unitId): never
     { \App\Services\MarketPhScopeAction::save($this->appraisals, $this->user['id'], $id, $unitId); }

@@ -235,3 +235,13 @@ research_plan.factors.collection: portal/manual/mixed (default mixed). Destinaci
 Catálogo permanente (2026-10-04): sin DDL. Al guardar research_plan, definición,
 kind y categories deben coincidir con el plan histórico o, en su ausencia, el catálogo
 común. Elegir uso, obtención y motivo no modifica escalas. Guardado propietario/versionado intacto.
+
+## Escalas reutilizables y calificaciones (2026-10-04)
+Migración 202610040001: research_factor_scales, PK(owner_id,factor_key),
+definition_json, version y updated_at UTC. Mutación protegida por sesión/CSRF,
+propietario del expediente y comparación de versión (409). No modifica catálogos
+de otro propietario. Actualización automática mediante migraciones existentes.
+research_plan.assessments: sujeto o grupo de inmueble, factor, value original,
+support, basis (huella de fuentes), scale_kind/scale_categories. Código derivado
+de la escala vigente en el recorrido; calificación manual no sobrescribe captura.
+Persisten históricos; cambio de catálogo se adopta expresamente en cada recorrido.

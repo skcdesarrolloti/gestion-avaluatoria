@@ -1,3 +1,4 @@
+import { assessmentMethods, usableAssessment, researchFactor } from './research-assessments.js';
 const normalize = value => String(value ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[_\s]+/g, ' ');
 const unknown = value => ['', 'no verificado', 'por verificar', 'desconocido', 'no publicado', 'pendiente'].includes(normalize(value));
 export function researchValue(raw, factor, key) {
@@ -29,7 +30,7 @@ export function researchScale(factor) {
     if (factor.kind === 'ordinal') return String(factor.categories ?? '').split('\n').filter(s => s.trim()).map((s, i) => `${i} = ${s.trim()}`).join(' · ') || 'Define el orden de menor a mayor.';
     return 'Clases sin orden; no se califican de menor a mayor.';
 }
-export function factorEvidence(key, factor, groups) {
+export function factorEvidence(key, factor, groups, assessments = {}) {
     const ready = [], values = [], portals = {};
     let missing = 0, conflicts = 0, formats = 0, context = 0;
     for (const group of groups) {
@@ -43,6 +44,12 @@ export function factorEvidence(key, factor, groups) {
             if (value !== null) { stats.readable++; present.push(value); }
             revision ||= ad.revision;
         }
+        const qualification=assessments[group.id]?.[key];
+        if (usableAssessment(qualification,factor,group.signature) && !group.contextPending) {
+            const value=researchValue(qualification.value,factor,key);
+            if (value!==null) { ready.push(group.id); values.push(value); continue; }
+        }
+        if (qualification?.value && !group.contextPending) { formats++; continue; }
         const distinct = [...new Set(present)];
         if (group.contextPending) { context++; continue; }
         if (distinct.length > 1 || revision) { conflicts++; continue; }
@@ -58,8 +65,8 @@ export function factorEvidence(key, factor, groups) {
     return { ready, missing, conflicts, formats, context, variation: new Set(values).size, portals };
 }
 export function researchSummary(plan, evidence) {
-    const selected = Object.entries(plan.factors).filter(([key, f]) => key !== 'destination' && f.decision === 'model');
-    const stats = Object.fromEntries(Object.entries(plan.factors).map(([key, f]) => [key, factorEvidence(key, f, evidence.groups)]));
+    const selected = Object.entries(plan.factors).filter(([key, f]) => researchFactor(key) && f.decision === 'model');
+    const stats = Object.fromEntries(Object.entries(plan.factors).map(([key, f]) => [key, factorEvidence(key, f, evidence.groups,plan.assessments)]));
     let parameters = 0; const warnings = [];
     if (plan.factors.destination && !['','filter','defer'].includes(plan.factors.destination.decision)) warnings.push('destination: es un filtro de investigación; corrige su uso anterior.');
     for (const [key, f] of selected) {
@@ -68,7 +75,9 @@ export function researchSummary(plan, evidence) {
         if (f.kind === 'categorical' && categories.length < 2) warnings.push(`${key}: define al menos dos categorías.`);
         if (f.kind === 'ordinal' && categories.length < 2) warnings.push(`${key}: define al menos dos niveles de menor a mayor.`);
         if (!f.reason.trim() || !f.definition.trim()) warnings.push(`${key}: completa definición y justificación.`);
-        if (researchValue(evidence.subjects[key], f, key) === null) warnings.push(`${key}: completa o concilia el dato del sujeto.`);
+        const subjectGrade=plan.assessments?.subject?.[key];
+        const subjectRaw=subjectGrade?.value ? (usableAssessment(subjectGrade,f,evidence.subjectSignature)?subjectGrade.value:'') : evidence.subjects[key];
+        if (researchValue(subjectRaw, f, key) === null) warnings.push(`${key}: completa o concilia el dato del sujeto.`);
         if (stats[key].variation < 2) warnings.push(`${key}: no hay variación suficiente observada.`);
     }
     const areaKey = ['area','built','land'].find(key => plan.factors[key]);
@@ -94,9 +103,11 @@ export function publishedAreaState(ads) {
     return bases.some(unknown) || new Set(bases).size > 1 ? 'review' : state;
 }
 export function researchPlan(config) {
+    if (Array.isArray(config.plan.assessments) || !config.plan.assessments) config.plan.assessments = {};
     return {
+        ...assessmentMethods,
         plan: config.plan, evidence: config.evidence, catalog: config.catalog,
-        onlyCandidates: Object.entries(config.plan.factors).some(([key,f]) => key !== 'destination' && f.decision === 'model'),
+        onlyCandidates: Object.entries(config.plan.factors).some(([key,f]) => researchFactor(key) && f.decision === 'model'),
         comparisonId: config.evidence.groups[0]?.id || '',
         get comparisonGroup() { return this.evidence.groups.find(g => g.id === this.comparisonId) || {ads:[],contextPending:false}; },
         get comparisonKeys() {
@@ -116,11 +127,12 @@ export function researchPlan(config) {
         comparisonValue(key,ad) { return unknown(ad.values[key]) ? 'No publicado' : ad.values[key]; },
         get summary() { return researchSummary(this.plan, this.evidence); },
         get payload() { return JSON.stringify(this.plan); },
-        get modelCount() { return Object.entries(this.plan.factors).filter(([key,f]) => key !== 'destination' && f.decision === 'model').length; },
+        get modelCount() { return Object.entries(this.plan.factors).filter(([key,f]) => researchFactor(key) && f.decision === 'model').length; },
         modelUnavailable(key) { return this.modelCount >= 4 && this.plan.factors[key].decision !== 'model'; },
+        isFactor(key) { return researchFactor(key); },
         subjectLabel(key) { return this.evidence.subjects[key] || 'Pendiente en numeral 3'; },
-        codeLabel(key,raw) { return researchCode(raw,this.plan.factors[key],key); },
-        scaleLabel(key) { return researchScale(this.plan.factors[key]); },
+        codeLabel(key,raw) { return researchCode(raw,['area','built','land'].includes(key)?{kind:'numeric'}:this.plan.factors[key],key); },
+        scaleLabel(key) { return researchScale(['area','built','land'].includes(key)?{kind:'numeric'}:this.plan.factors[key]); },
         factorLabel(key) { return this.catalog[key]?.label || key; },
         warningLabel(text) { const index = text.indexOf(':'); return `${text.startsWith('modelo:') ? 'Modelo' : this.factorLabel(text.slice(0, index))}${text.slice(index)}`; },
     };
