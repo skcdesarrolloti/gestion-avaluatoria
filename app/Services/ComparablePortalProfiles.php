@@ -29,7 +29,7 @@ final class ComparablePortalProfiles
     public static function all(): array
     {
         $profiles=[];
-        foreach (['fincaraiz','ciencuadras','otros'] as $file) {
+        foreach (['fincaraiz','ciencuadras','otros','ampliacion'] as $file) {
             $rows=require BASE_PATH.'/app/Services/portal-profiles/'.$file.'.php';
             foreach ($rows as $portal=>$types) foreach ($types as $type=>$row) $profiles[$portal][$type]=$row;
         }

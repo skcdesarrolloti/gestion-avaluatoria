@@ -8,10 +8,16 @@ declare(strict_types=1);
     }
     expect(str_contains(\App\Services\ComparablePortalProfiles::profile('ciencuadras','lote')['notes'][0],'171'), 'lote preserva diferencia terreno/construcción documentada');
     expect(str_contains(\App\Services\ComparablePortalProfiles::profile('fincaraiz','oficina')['notes'][0],'piso 19'), 'conserva contradicción interna de la oficina');
-    foreach ([['mercadolibre','oficina'],['ciencuadras','consultorio'],['fincaraiz','deposito']] as [$portal,$type]) {
+    foreach ([['mercadolibre','deposito'],['ciencuadras','consultorio'],['fincaraiz','deposito']] as [$portal,$type]) {
         $unknown=\App\Services\ComparablePortalProfiles::profile($portal,$type);
         expect($unknown['url']==='' && $unknown['basics']===[] && str_contains($unknown['status'],'Pendiente'), 'combinación sin evidencia no hereda esquema');
     }
+    foreach (['properati','metrocuadrado','mercadolibre'] as $portal) {
+        $office=\App\Services\ComparablePortalProfiles::profile($portal,'oficina');
+        expect($office['url']!=='' && $office['descriptive']!==[], 'los cinco portales tienen referencia para oficina');
+    }
+    expect(str_contains(implode(' ',\App\Services\ComparablePortalProfiles::profile('properati','oficina')['notes']),'consultorio'), 'Properati conserva discrepancia uso en texto/categoría');
+    expect(str_contains(implode(' ',\App\Services\ComparablePortalProfiles::profile('mercadolibre','oficina')['notes']),'C62610'), 'Mercado Libre separa código interno de publicación');
     expect(\App\Services\ComparablePortalProfiles::defaultType('Depósito / cuarto útil')==='deposito'
         && \App\Services\ComparablePortalProfiles::defaultType('Celda de parqueo')==='parqueadero'
         && \App\Services\ComparablePortalProfiles::defaultType('Tipología pendiente')==='', 'default reconoce anexos sin inventar tipo');

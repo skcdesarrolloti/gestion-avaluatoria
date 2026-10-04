@@ -696,3 +696,15 @@ por portal, diferencias y conteo conjunto. No ejecuta regresión ni altera anunc
 Ver PLAN-INVESTIGACION-MERCADO.md. PHP949, JS139, MySQL176, build69KB gzip.
 Prueba local: selección/definición/justificación, guardado y recuperación al recargar.
 
+
+## 2026-10-04 · Referencias pendientes y lectura breve
+15 perfiles públicos adicionales en Properati, Metrocuadrado y Mercado Libre;
+fuentes indexadas rotuladas y apartamento Mercado Libre parcial. Oficina documentada
+para los cinco portales. Otros cruces permanecen pendientes sin heredar datos.
+La consulta muestra cobertura y resumen; detalle y fuente plegados. Sin cambios
+de persistencia ni lectores. Ver PORTALES-CAMPOS-POR-TIPO.md para alcance y fuentes.
+Validación de ampliación: 984 checks PHP, 139 JavaScript, lint sin errores,
+build y 69 KB gzip. Navegador local: Properati Oficina, cambio a Mercado Libre,
+detalle plegable y Depósito pendiente sin herencia; sin errores de consola.
+Viewport móvil solicitado 390 px, observado 585 px CSS por zoom del navegador;
+body 562 px sin desbordamiento. Sin cambio de base: no requiere migración.

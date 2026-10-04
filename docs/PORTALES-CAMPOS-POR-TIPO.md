@@ -85,3 +85,23 @@ No cambia esquema ni escribe en configuración del expediente.
 
 Validación: PHP lint/tests, JavaScript, build/tamaño; navegador escritorio/móvil,
 selección documentada frente a pendiente, retorno a búsqueda/bandeja y datos intactos.
+
+## Ampliación 2026-10-04 y consulta breve
+Se agregan 15 referencias: Properati (oficina, apartamento, casa, lote),
+Metrocuadrado (apartamento, casa, lote, local, bodega) y Mercado Libre
+(oficina, apartamento parcial, casa, local, edificio, finca). Se mantienen las anteriores.
+Para oficina los cinco portales cuentan con referencia. No se anuncian todos los
+cruces portal/tipo como completos; los no documentados conservan estado pendiente.
+Cada referencia enlaza su propia ficha; no son comparables adoptados del expediente.
+
+Fuentes nuevas: contenido público indexado de páginas originales, con fechas de
+rastreo variables. El acceso directo devolvió 403 en varias fichas de Properati y
+Mercado Libre; no se sortearon bloqueos. Por eso su estado indica versión indexada
+y necesidad de confirmar vigencia, no inspección vigente del formulario privado.
+El apartamento Mercado Libre sólo tiene evidencia parcial del texto y atributos.
+No se extrapola la ficha de lote industrial de Properati a categoría bodega.
+
+Presentación: dos selectores, cobertura por tipo y resumen básico; características,
+contradicciones y fuente plegadas. El paso 3 sirve para consultar campos posibles;
+el paso 4 cuenta información realmente disponible en las muestras del expediente.
+Sin lectores nuevos, cambios de base, deduplicación automática ni adopción de valores.
