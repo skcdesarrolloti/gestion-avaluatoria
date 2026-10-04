@@ -1,5 +1,16 @@
 # Entrega al responsable de la implementación
 
+Insumos: tercera pestaña de consulta «Configuración por portal y tipo de inmueble».
+Evidencia pública fechada 2026-10-04: 20 perfiles, especialmente FincaRaíz/Ciencuadras.
+Combos no documentados siguen pendientes; no declara formularios privados ni APIs.
+Ver PORTALES-CAMPOS-POR-TIPO.md y app/Services/portal-profiles. Sin esquema, extracción
+nueva, cambios de identidad ni depuración. Próximo paso autorizado por separado:
+comparación campo/fuente, discrepancias internas y confirmación manual de identidad.
+Validado: PHP934/JS136/lint/build68,1KB gzip. Navegador: selección de portal/tipo,
+perfil observado y pendiente, regreso a bandeja conserva 3 inmuebles/4 anuncios;
+consulta estrecha sin desbordamiento ni errores de consola. Sin pruebas BD nuevas:
+esta entrega sólo consulta un catálogo estático y no añade persistencia.
+
 Insumos: cada panel de portal/inmobiliaria muestra búsqueda breve de la unidad
 actual, botón copiar, filtros orientativos y alternativa Google con dominio.
 Garajes incluyen sinónimos; lectura extensa existente se conserva debajo plegada.

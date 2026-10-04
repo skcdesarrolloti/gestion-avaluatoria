@@ -35,7 +35,8 @@ declare(strict_types=1);
     $_SESSION['csrf'] ??= 'test-capture-tabs';
     ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search.php'; $html = ob_get_clean();
     expect(str_contains($html, '1. Buscar inmuebles') && str_contains($html, '2. Inmuebles recogidos')
-        && str_contains($html, 'aria-label="Vistas de las muestras"'), 'C mantiene dos entradas y mapas dentro de las muestras');
+        && str_contains($html, 'aria-label="Vistas de las muestras"'), 'C mantiene captura y bandeja con mapas dentro de las muestras');
+    expect(str_contains($html,'3. Configuración por portal y tipo de inmueble') && str_contains($html,"searchTab === 'configuracion_portales'"), 'investigación por portal independiente de captura y bandeja');
     foreach (['ciencuadrasPaste', 'properatiPaste', 'mercadolibrePaste'] as $reader) {
         expect(str_contains($html, 'x-data="' . $reader . '"'), 'captura de oficina seleccionada mantiene lector ' . $reader);
     }

@@ -1,0 +1,45 @@
+<?php
+declare(strict_types=1);
+$base=['Código → identificador mostrado; guardar también ID del enlace, que puede ser distinto.',
+    'Precio / Gastos / administración aprox. → conservar importe y condición aproximada.',
+    'Título y localización → barrio y ciudad anunciados; barrios cercanos no son dirección.',
+    'Área privada / Área construida → conservar cada base; no presumir área privada construida.'];
+$shared=['El inmueble cuenta con → baños, parqueaderos, habitaciones, ascensores, cuando se publiquen.',
+    'Estrato / Antigüedad → dato anunciado; comprobar unidad y coherencia de la edad.',
+    'Detalles del inmueble / Características / Zonas comunes → texto y atributos con sección de origen.',
+    'Fotos y anunciante → soportes; la Dirección del perfil de la inmobiliaria no es la del inmueble.'];
+$row=static fn(string $path,array $extra,array $notes,string $status='Ficha pública documentada (venta)'):array=>[
+    'status'=>$status,'basics'=>$base,'descriptive'=>array_merge($shared,$extra),'notes'=>$notes,
+    'url'=>'https://www.ciencuadras.com/inmueble/'.$path];
+return ['ciencuadras'=>[
+    'oficina'=>$row('oficina-en-venta-en-medellin-medellin-3882002',
+        ['Descripción → cocineta, portería y estado; no todos aparecen en casillas.'],
+        ['Código visible 1068975-10417698 e ID de URL 3882002 son identificadores distintos. Antigüedad 46 años no es un intervalo.']),
+    'apartamento'=>$row('apartamento-en-venta-en-quinta-paredes-bogota-3346478',
+        ['Depósitos → cantidad publicada.', 'Habitaciones / baños / parqueaderos / ascensores → cantidades.'],
+        ['Parqueaderos: 1 en ficha, 2 garajes en descripción. El dato contradictorio requiere corroboración; no elegir automáticamente uno.']),
+    'casa'=>$row('casa-en-venta-en-rionegro-rionegro-3443494',
+        ['Descripción → lote, niveles, terraza y parqueaderos cubiertos.', 'Habitaciones → distinguir servicio de alcobas principales.'],
+        ['Terreno 1.670 m² está en texto; áreas privada 280 y construida 305 m² en ficha. Cuatro alcobas más servicio pueden explicar cinco habitaciones.']),
+    'lote'=>$row('lote-en-venta-en-nuevo-bosque-cartagena-3244209',
+        ['Descripción → área de terreno y construcción existente.'],
+        ['Ficha privada/construida 86 m²; descripción terreno 171 m² y construcción 86. Los 86 m² no deben convertirse en superficie del lote.']),
+    'local'=>$row('local-en-venta-en-usaquen-bogota-3375495',
+        ['Descripción → cocina, terraza y distribución por niveles.'],
+        ['Describe 215 m² y 45 m² de terraza común de uso exclusivo. Conservar naturaleza y área sin sumarla como privada construida.']),
+    'bodega'=>$row('bodega-en-venta-en-cundinamarca-bogota-3576516',
+        ['Descripción → terreno, almacenamiento, oficinas, altura bajo cercha/cumbrera, portón, potencia y carga del piso.'],
+        ['Áreas de terreno, almacenamiento y oficinas tienen significados distintos. Conservar unidades: m, m², KVA y toneladas/m².']),
+    'finca'=>$row('finca-en-venta-en-la-mesa-la-mesa-3430833',
+        ['Descripción → extensión del terreno, vivienda y características rurales.'],
+        ['Ficha privada y construida 2.750 m²; texto terreno 2.750 y construcción 235. Generar revisión futura, sin corregir el anuncio por deducción.']),
+    'edificio'=>$row('edificio-en-venta-en-chico-norte-bogota-3101625',
+        ['Descripción → pisos, sótanos, terrazas y áreas por uso.'],
+        ['29 parqueaderos en casillas y 58 en descripción: conservar discrepancia y alcance de cada cifra.']),
+    'parqueadero'=>$row('parqueadero-en-venta-en-altos-del-prado-barranquilla-2042105',
+        ['Características del inmueble → dimensiones 5,01 × 3,02 m.', 'Descripción → sótano y vehículos admitidos.'],
+        ['Ficha de celda individual, área construida 15 m². “Asignado” no prueba derechos o matrícula. URL dice venta, presentación incluye Remate: comprobar modalidad.'], 'Ficha pública documentada (remate / oferta)'),
+    'hotel'=>$row('edificio-en-venta-en-centro-espinal-3714728',
+        ['Descripción → hotel, habitaciones, eventos, piscina y operación.'],
+        ['El portal lo publica como Edificio con uso hotelero. No se ha confirmado categoría Hotel ni distinguir inmueble de venta del negocio solo por el título.'], 'Uso hotelero observado; categoría Edificio'),
+]];
