@@ -279,3 +279,5 @@ Local comercial (2026-10-04): sin cambios de esquema. commercial_strength usa ca
 Bodega aprobada (2026-10-04): sin DDL. Doce atributos usan captura JSON existente, con kW y kg/m² técnicos sin conversión automática. Anteriores se conservan; no se borran ni recodifican.
 
 Lote aprobado (2026-10-04): sin DDL. front_exposure y public_services usan captura JSON y plan existentes. Esquina y servicios individuales anteriores se conservan sin inferir las nuevas clasificaciones.
+
+Consultorio (2026-10-04): sin DDL; access_ramp es binario No/Sí en JSON existente de sujeto y plan. No se infiere rampa desde accesibilidad ni se sustituyen datos históricos.
