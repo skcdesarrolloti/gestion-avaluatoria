@@ -21,7 +21,7 @@ final class ResearchFactorCatalog
             'levels'=>$make('Niveles del inmueble','numeric','cantidad','construction_floors','research_levels','Distinguir niveles de la unidad y piso de ubicación.'),
             'floor'=>$make('Piso de ubicación','numeric','número','research_floor','floor_level','Examinar ubicación vertical, distinta de número de niveles.','attributes'),
             'elevator'=>$make('Ascensor','binary','sí/no','research_elevator','elevator','Comparar disponibilidad comprobada; desconocido no es ausencia.','attributes',"No\nSí"),
-            'view'=>$make('Vista','categorical','categoría','functional_view','view_quality','Examinar orientación visual sin imponer una escala de precio.','construction',$options('functional_view')),
+            'view'=>$make('Tipo de vista','categorical','categoría','functional_view','view_quality','Conservar la descripción de la vista; las clases no representan mejor o peor.','construction',$options('functional_view')),
             'finishes'=>$make('Acabados','categorical','categoría','functional_finish_quality','finish_quality','Definir clases observables; no atribuir pesos económicos.','construction',$options('functional_finish_quality')),
             'service'=>$make('Alcoba / baño de servicio','categorical','categoría','functional_service_room_bathroom','research_service','Distinguir alcoba, baño y ambos; no confundir dato desconocido.','construction',$options('functional_service_room_bathroom')),
             'height'=>$make('Altura libre','numeric','m','functional_clear_height_m','research_height','Investigar altura bajo un mismo punto de medición.'),
@@ -30,9 +30,9 @@ final class ResearchFactorCatalog
             'deposit'=>$make('Depósitos','numeric','cantidad','research_deposit','ph_deposit_count','Investigar composición y derechos; no liquida su valor separado.','tipologias'),
             'generator'=>$make('Planta eléctrica','ordinal','alcance','research_generator','research_generator','Distinguir ausencia, respaldo parcial y total; un Sí sin cobertura no acredita Total.','attributes',"No\nParcial\nTotal"),
             'destination'=>$make('Destinación / uso observado','categorical','categoría','research_destination','research_destination','Registrar el uso descrito; no sustituye el uso aprobado ni se deduce del tipo de anuncio.','tipologias',"Residencial\nComercial\nOficina\nIndustrial\nMixto\nRural\nDotacional\nOtro"),
-        ];
+        ] + ResearchFactorExtensions::all();
     }
-    public static function forType(string $type,string $part=''): array
+    public static function forType(string $type,string $part='',bool $legacyOnly=false): array
     {
         $keys=match($type) {
             'lote'=>['land','access'], 'parqueadero','deposito'=>['area','access'],
@@ -45,9 +45,10 @@ final class ResearchFactorCatalog
         };
         if ($keys!==[]) $keys[]='destination';
         if (in_array($type,['apartamento','casa','oficina','consultorio','local','bodega','edificio','hotel'],true)) $keys[]='generator';
+        if (!$legacyOnly) $keys=array_unique(array_merge($keys,ResearchFactorExtensions::keys($type)));
         $catalog=array_intersect_key(self::all(),array_flip($keys));
-        if ($part==='terreno') $catalog=array_intersect_key($catalog,array_flip(['land','access','stratum']));
-        if ($part==='construccion') unset($catalog['land']);
+        if ($part==='terreno') $catalog=array_intersect_key($catalog,array_flip(array_merge(['land','access','stratum'],$legacyOnly?[]:ResearchFactorExtensions::keys('lote'))));
+        if ($part==='construccion') foreach (['land','topography','slope','irrigation'] as $key) unset($catalog[$key]);
         return $catalog;
     }
 }

@@ -7,6 +7,7 @@ final class ResearchFactorReference
 {
     public static function scale(array $factor): string
     {
+        if (($factor['scale_valid'] ?? true)===false) return 'Escala anterior por revisar · etiquetas conservadas sin aplicar códigos: '.str_replace("\n",' · ',$factor['categories']);
         if ($factor['kind']==='numeric') return 'Medida original en '.$factor['unit'];
         if ($factor['kind']==='binary') return '0 = No · 1 = Sí';
         $levels=explode("\n",$factor['categories']);
@@ -22,6 +23,14 @@ final class ResearchFactorReference
             'elevator'=>'/ascensor/iu','view'=>'/vista/iu','finishes'=>'/acabados/iu',
             'service'=>'/servicio/iu','height'=>'/altura/iu','access'=>'/acceso/iu',
             'stratum'=>'/estrato/iu','deposit'=>'/depósito|almacenamiento/iu','generator'=>'/planta eléctrica/iu',default=>'/$^/',
+            'balcony'=>'/balc[oó]n/iu','terrace'=>'/terraza/iu','pool'=>'/piscina/iu','gym'=>'/gimnasio/iu',
+            'security'=>'/vigilancia/iu','air_conditioning'=>'/aire acondicionado|climatizaci[oó]n/iu',
+            'corner'=>'/esquiner/iu','landscape_view'=>'/vista paisaj[ií]stica|vista panor[aá]mica/iu',
+            'covered_parking'=>'/parqueadero(s)? cubierto/iu','independent_parking'=>'/parqueadero(s)? independiente/iu',
+            'frontage'=>'/frente.*metro|frente.*m²/iu','depth'=>'/fondo.*metro|fondo.*m²/iu',
+            'loading_bays'=>'/muelles|bah[ií]as de cargue/iu','power'=>'/potencia el[eé]ctrica/iu',
+            'mezzanine'=>'/mezanine|mezzanine/iu','shopfront'=>'/vitrina/iu','topography'=>'/topograf[ií]a/iu',
+            'finish_quality'=>'/acabados/iu',
         };
         static $catalog=null;
         $catalog ??= ComparablePortalProfiles::all();
@@ -32,7 +41,7 @@ final class ResearchFactorReference
             $text=implode(' ',array_merge($profile['basics'],$profile['descriptive']));
             if (preg_match($pattern,$text)) $out[]=['label'=>ComparablePortalProfiles::portals()[$portal] ?? $portal,'url'=>$profile['url'],'status'=>$profile['status']];
         }
-        return $out;
+        return $out ?: ResearchFactorSources::portals($type,$key);
     }
     public static function validateFixed(array $plan,array $previous,array $scales=[]): void
     {

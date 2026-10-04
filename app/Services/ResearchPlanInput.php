@@ -10,7 +10,7 @@ final class ResearchPlanInput
         if (!is_string($value) || strlen($value)>2000000) throw new HttpException(422,'Revisa el formato del plan de investigación.');
         try { $data=json_decode($value,true,8,JSON_THROW_ON_ERROR); }
         catch (\JsonException) { throw new HttpException(422,'El plan de investigación llegó incompleto.'); }
-        if (!is_array($data) || !is_array($data['factors'] ?? null) || count($data['factors'])>20) throw new HttpException(422,'Revisa los factores del plan.');
+        if (!is_array($data) || !is_array($data['factors'] ?? null) || count($data['factors'])>count(ResearchFactorCatalog::all())) throw new HttpException(422,'Revisa los factores del plan.');
         $ratio=$data['target_ratio'] ?? 10;
         if (!is_int($ratio) || $ratio<1 || $ratio>100) throw new HttpException(422,'La referencia de inmuebles por factor debe estar entre 1 y 100.');
         $out=['target_ratio'=>$ratio,'factors'=>[],'updated_at'=>gmdate('c')];

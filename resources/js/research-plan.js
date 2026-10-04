@@ -1,7 +1,9 @@
-import { assessmentMethods, usableAssessment, researchFactor } from './research-assessments.js';
+import { assessmentMethods, usableAssessment, researchFactor, assessmentBasis, subjectBasis } from './research-assessments.js';
+import { validResearchScale } from './research-scale-policy.js';
 const normalize = value => String(value ?? '').trim().toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[_\s]+/g, ' ');
 const unknown = value => ['', 'no verificado', 'por verificar', 'desconocido', 'no publicado', 'pendiente'].includes(normalize(value));
 export function researchValue(raw, factor, key) {
+    if (factor.scale_valid === false) return null;
     if (unknown(raw)) return null;
     const text = normalize(raw);
     if (factor.kind === 'numeric') {
@@ -19,6 +21,7 @@ export function researchValue(raw, factor, key) {
     return index < 0 ? null : factor.kind === 'ordinal' ? index : text;
 }
 export function researchCode(raw, factor, key) {
+    if (factor.scale_valid === false) return 'Código: pendiente por clasificación anterior';
     const value = researchValue(raw, factor, key);
     if (value === null) return 'Código: pendiente';
     if (factor.kind === 'categorical') return `Clase: ${raw} · sin jerarquía`;
@@ -45,7 +48,7 @@ export function factorEvidence(key, factor, groups, assessments = {}) {
             revision ||= ad.revision;
         }
         const qualification=assessments[group.id]?.[key];
-        if (usableAssessment(qualification,factor,group.signature) && !group.contextPending) {
+        if (usableAssessment(qualification,factor,assessmentBasis(group,key)) && !group.contextPending) {
             const value=researchValue(qualification.value,factor,key);
             if (value!==null) { ready.push(group.id); values.push(value); continue; }
         }
@@ -66,8 +69,9 @@ export function factorEvidence(key, factor, groups, assessments = {}) {
 }
 export function researchSummary(plan, evidence) {
     const selected = Object.entries(plan.factors).filter(([key, f]) => researchFactor(key) && f.decision === 'model');
-    const stats = Object.fromEntries(Object.entries(plan.factors).map(([key, f]) => [key, factorEvidence(key, f, evidence.groups,plan.assessments)]));
+    const stats = Object.fromEntries(Object.entries(plan.factors).map(([key, f]) => [key, factorEvidence(key, {...f,scale_valid:validResearchScale(f,evidence.scalePolicies?.[key])}, evidence.groups,plan.assessments)]));
     let parameters = 0; const warnings = [];
+    for (const [key,f] of Object.entries(plan.factors)) if (!validResearchScale(f,evidence.scalePolicies?.[key])) warnings.push(`${key}: clasificación anterior por revisar; corrige el catálogo y adopta su escala sin recodificar los datos históricos.`);
     if (plan.factors.destination && !['','filter','defer'].includes(plan.factors.destination.decision)) warnings.push('destination: es un filtro de investigación; corrige su uso anterior.');
     for (const [key, f] of selected) {
         const categories = [...new Set(String(f.categories ?? '').split('\n').map(normalize).filter(Boolean))];
@@ -76,7 +80,7 @@ export function researchSummary(plan, evidence) {
         if (f.kind === 'ordinal' && categories.length < 2) warnings.push(`${key}: define al menos dos niveles de menor a mayor.`);
         if (!f.reason.trim() || !f.definition.trim()) warnings.push(`${key}: completa definición y justificación.`);
         const subjectGrade=plan.assessments?.subject?.[key];
-        const subjectRaw=subjectGrade?.value ? (usableAssessment(subjectGrade,f,evidence.subjectSignature)?subjectGrade.value:'') : evidence.subjects[key];
+        const subjectRaw=subjectGrade?.value ? (usableAssessment(subjectGrade,f,subjectBasis(evidence,key))?subjectGrade.value:'') : evidence.subjects[key];
         if (researchValue(subjectRaw, f, key) === null) warnings.push(`${key}: completa o concilia el dato del sujeto.`);
         if (stats[key].variation < 2) warnings.push(`${key}: no hay variación suficiente observada.`);
     }
@@ -107,6 +111,7 @@ export function researchPlan(config) {
     return {
         ...assessmentMethods,
         plan: config.plan, evidence: config.evidence, catalog: config.catalog,
+        scaleValid(key) { return validResearchScale(this.plan.factors[key],this.catalog[key]); },
         onlyCandidates: Object.entries(config.plan.factors).some(([key,f]) => researchFactor(key) && f.decision === 'model'),
         comparisonId: config.evidence.groups[0]?.id || '',
         get comparisonGroup() { return this.evidence.groups.find(g => g.id === this.comparisonId) || {ads:[],contextPending:false}; },
@@ -118,7 +123,7 @@ export function researchPlan(config) {
         get publishedAreaState() { return publishedAreaState(this.comparisonGroup?.ads || []); },
         get publishedAreaLabel() { return ({difference:'Diferencia',review:'Base / dato por revisar',incomplete:'Datos incompletos',equal:'Coinciden con misma base',single:'Una fuente',missing:'Sin dato'})[this.publishedAreaState]; },
         publishedAreaClass(ad) { return unknown(ad.publishedArea) ? 'bg-slate-50 text-slate-600' : this.publishedAreaState === 'equal' ? 'bg-emerald-50 text-emerald-900' : ['difference','review'].includes(this.publishedAreaState) ? 'bg-amber-100 text-amber-900' : 'bg-slate-50 text-slate-700'; },
-        comparisonState(key) { return comparisonState(key,['area','built','land'].includes(key) ? {kind:'numeric'} : this.plan.factors[key],this.comparisonGroup?.ads || []); },
+        comparisonState(key) { return comparisonState(key,['area','built','land'].includes(key) ? {kind:'numeric'} : {...this.plan.factors[key],scale_valid:this.scaleValid(key)},this.comparisonGroup?.ads || []); },
         comparisonLabel(key) { return ({difference:'Diferencia',review:'Revisar formato / relectura',incomplete:'Datos incompletos',equal:'Coinciden',single:'Una fuente',missing:'Sin dato'})[this.comparisonState(key)]; },
         comparisonClass(key, ad) {
             if (unknown(ad.values[key])) return 'bg-slate-50 text-slate-600';
@@ -130,9 +135,9 @@ export function researchPlan(config) {
         get modelCount() { return Object.entries(this.plan.factors).filter(([key,f]) => researchFactor(key) && f.decision === 'model').length; },
         modelUnavailable(key) { return this.modelCount >= 4 && this.plan.factors[key].decision !== 'model'; },
         isFactor(key) { return researchFactor(key); },
-        subjectLabel(key) { return this.evidence.subjects[key] || 'Pendiente en numeral 3'; },
-        codeLabel(key,raw) { return researchCode(raw,['area','built','land'].includes(key)?{kind:'numeric'}:this.plan.factors[key],key); },
-        scaleLabel(key) { return researchScale(['area','built','land'].includes(key)?{kind:'numeric'}:this.plan.factors[key]); },
+        subjectLabel(key) { return this.evidence.subjects[key] || 'Pendiente: completar o calificar con soporte'; },
+        codeLabel(key,raw) { return researchCode(raw,['area','built','land'].includes(key)?{kind:'numeric'}:{...this.plan.factors[key],scale_valid:this.scaleValid(key)},key); },
+        scaleLabel(key) { return this.scaleValid(key)?researchScale(['area','built','land'].includes(key)?{kind:'numeric'}:this.plan.factors[key]):'Escala anterior pendiente de revisión · se conservan las etiquetas, sin aplicar códigos.'; },
         factorLabel(key) { return this.catalog[key]?.label || key; },
         warningLabel(text) { const index = text.indexOf(':'); return `${text.startsWith('modelo:') ? 'Modelo' : this.factorLabel(text.slice(0, index))}${text.slice(index)}`; },
     };

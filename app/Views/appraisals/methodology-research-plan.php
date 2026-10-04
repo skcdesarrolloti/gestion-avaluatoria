@@ -13,7 +13,8 @@ foreach ($researchCatalog as $key=>$factor) $researchPlan['factors'][$key]=array
     ['decision'=>$key==='destination'?'filter':'','kind'=>$factor['kind'],'collection'=>'mixed','reason'=>'','definition'=>$factor['why'],'categories'=>$factor['categories']],$selected['research_plan']['factors'][$key] ?? []);
 foreach (['area','built','land'] as $areaKey) if (isset($researchPlan['factors'][$areaKey])) $researchPlan['factors'][$areaKey]['decision']='defer';
 $researchFactors=array_diff_key($researchCatalog,array_flip(['destination','area','built','land']));
-$researchEvidence=\App\Services\ResearchPlanEvidence::build($researchCatalog,$researchUnit,$comparableRows,$researchContext,$subject);
+$researchEvidence=\App\Services\ResearchPlanEvidence::build($researchCatalog,$researchUnit,$comparableRows,$researchContext,$subject,$researchPart);
+$researchEvidence['scalePolicies']=$researchCatalog;
 $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$researchEvidence];
 ?>
 <div x-show="searchTab === 'investigacion'" x-cloak>
@@ -21,7 +22,7 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
     <p class="mt-3 text-sm leading-6">Define qué investigar, dónde hay datos y por qué cada factor puede servir. El sujeto es la referencia; esta configuración prepara el análisis posterior.</p>
     <p class="mt-2 text-sm">Los usos «Filtro» e «Investigar» documentan la intención del analista: no cambian la captura ni descartan anuncios. Consulta la investigación por portal en la pestaña 3.</p>
     <p class="mt-2 text-sm">Si un dato sólo está descrito en texto o el sujeto usa otra clasificación, queda por conciliar. Por ejemplo, «piso alto» no se convierte automáticamente en un número de piso.</p>
-    <p class="mt-2 text-sm"><strong>Factores para <?= e($guide['type_label'] ?? $researchType) ?>:</strong> <?= e(implode(' · ',array_column($researchFactors,'label'))) ?>. Prioriza datos publicados; puedes investigar manualmente atributos relevantes que no aparezcan en los portales.</p>
+    <p class="mt-2 text-sm"><strong><?= count($researchFactors) ?> atributos para <?= e($guide['type_label'] ?? $researchType) ?>.</strong> Consulta el listado en «Clasificar factores». Prioriza datos publicados; puedes investigar manualmente atributos que no aparezcan en los portales.</p>
     <?php if ($componentKey==='' || $researchCatalog===[] || empty($selected['method'])): ?>
     <p class="mt-4 rounded-xl bg-amber-50 p-4">Selecciona una unidad, confirma su tipo en el numeral 3 y guarda su método en Configuración para preparar su plan.</p>
     <?php else: ?>
@@ -80,6 +81,8 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
                 <p class="mt-2 text-sm text-slate-600"><?= e($factor['why']) ?></p>
                 <a class="inline-flex min-h-11 items-center text-xs text-blue-700 underline" href="<?= e($flowUrl('plan',null,$componentKey).'&factor_catalog=1') ?>">Definir jerarquías en el catálogo</a>
                 <p class="mt-2 text-xs"><strong>Escala:</strong> <span x-text="scaleLabel('<?= e($key) ?>')"></span></p>
+                <p class="mt-2 text-xs"><?= e($factor['scale_help']) ?></p>
+                <p class="mt-2 rounded bg-amber-50 p-2 text-sm text-amber-900" x-show="!scaleValid('<?= e($key) ?>')">Clasificación anterior por revisar. Se conserva; sus códigos no cuentan como datos listos hasta corregir el catálogo y adoptar su escala.</p>
                 <p class="mt-2 text-xs"><strong>Portales documentados:</strong> <?= e($factorPortals?implode(' · ',array_column($factorPortals,'label')):'No documentado para este tipo; requiere investigación manual') ?>. Disponibilidad real: conteos debajo.</p>
                 <?php if ($factorUnreferenced): ?><p class="mt-1 text-xs">Sin evidencia documental para este tipo: <?= e(implode(' · ',$factorUnreferenced)) ?>. No significa ausencia en todos sus avisos.</p><?php endif; ?>
                 <p class="mt-2 text-sm" x-text="`${summary.stats.<?= e($key) ?>.ready.length} inmuebles legibles · ${summary.stats.<?= e($key) ?>.variation} valores o clases diferentes`"></p>

@@ -245,3 +245,10 @@ research_plan.assessments: sujeto o grupo de inmueble, factor, value original,
 support, basis (huella de fuentes), scale_kind/scale_categories. Código derivado
 de la escala vigente en el recorrido; calificación manual no sobrescribe captura.
 Persisten históricos; cambio de catálogo se adopta expresamente en cada recorrido.
+
+Ampliación de factores y revisión de escalas (2026-10-04): sin DDL nuevo. Se conserva
+la tabla research_factor_scales y el JSON research_plan. Límites de cantidad de
+factores/calificaciones toman el tamaño del catálogo; candidatos continúan en cuatro.
+Clasificaciones anteriores siguen guardadas, con advertencia si no cumplen la pauta.
+Huella original compatible para calificaciones antiguas y huella por factor para
+calificaciones nuevas; agregar atributos no cambia el dato original ni borra soporte.

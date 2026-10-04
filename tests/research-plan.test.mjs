@@ -2,10 +2,31 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { researchValue, researchCode, researchScale, factorEvidence, researchSummary, comparisonState, researchPlan, publishedAreaState } from '../resources/js/research-plan.js';
 import { usableAssessment } from '../resources/js/research-assessments.js';
+import { validResearchScale } from '../resources/js/research-scale-policy.js';
 const numeric = {kind:'numeric',decision:'model',definition:'Cantidad',reason:'Dotación',categories:''};
 const binary = {...numeric,kind:'binary'};
 const ad = (portal,values,revision=false) => ({portal,values,revision});
 const group = (id,ads,contextPending=false) => ({id,ads,contextPending});
+
+test('an old access hierarchy stays stored without presenting restricted as a higher code or ready data',()=>{
+    const factor={...numeric,kind:'ordinal',categories:'Peatonal\nVehicular\nRestringido'};
+    const policy={policy_kind:'categorical',policy_categories:factor.categories};
+    const evidence={subjects:{access:'Restringido'},groups:[group('a',[ad('FR',{access:'Restringido'})])],scalePolicies:{access:policy}};
+    const plan={target_ratio:10,factors:{access:factor},assessments:{}};
+    const result=researchSummary(plan,evidence);
+    assert.equal(result.stats.access.ready.length,0);
+    assert.ok(result.warnings.some(w=>w.includes('clasificación anterior')));
+    const ui=researchPlan({plan,catalog:{access:policy},evidence});
+    assert.equal(ui.codeLabel('access','Restringido'),'Código: pendiente por clasificación anterior');
+    assert.equal(plan.factors.access.categories,'Peatonal\nVehicular\nRestringido');
+    assert.equal(validResearchScale({...factor,kind:'categorical'},policy),true);
+});
+
+test('reversing fixed coverage is flagged while categorical classes remain unordered',()=>{
+    assert.equal(validResearchScale({kind:'ordinal',categories:'Total\nParcial\nNo'},{policy_kind:'ordinal',policy_categories:'No\nParcial\nTotal'}),false);
+    assert.equal(researchCode('Sí',{kind:'binary'},'restricted_access'),'Código: 1');
+    assert.equal(researchCode('Mixta',{kind:'categorical',categories:'Plana\nMixta'},'topography'),'Clase: Mixta · sin jerarquía');
+});
 test('unknown is not zero and ranges are not exact ages', () => {
     assert.equal(researchValue('',binary,'elevator'),null);
     assert.equal(researchValue('No',binary,'elevator'),0);

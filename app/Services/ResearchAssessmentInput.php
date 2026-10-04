@@ -10,7 +10,7 @@ final class ResearchAssessmentInput
         $out=[];
         foreach ($items as $id=>$values) {
             if ($id!=='subject' && !preg_match('/^[a-f0-9]{32}$/D',(string)$id)) throw new HttpException(422,'Inmueble de calificación inválido.');
-            if (!is_array($values) || count($values)>20) throw new HttpException(422,'Revisa los factores calificados.');
+            if (!is_array($values) || count($values)>count(ResearchFactorCatalog::all())) throw new HttpException(422,'Revisa los factores calificados.');
             foreach ($values as $key=>$item) {
                 if (!isset($factors[$key]) || in_array($key,['area','land','built','destination'],true) || !is_array($item)) throw new HttpException(422,'Califica atributos; el área es base de cálculo y destinación es filtro.');
                 $out[$id][$key]=[];

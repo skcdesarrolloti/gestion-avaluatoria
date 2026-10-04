@@ -5,7 +5,7 @@ namespace App\Services;
 /** Read-only snapshot: no adoption of values, merging or statistical fitting. */
 final class ResearchPlanEvidence
 {
-    public static function build(array $catalog,array $unit,array $rows,array $context,array $subject=[]): array
+    public static function build(array $catalog,array $unit,array $rows,array $context,array $subject=[],string $part=''): array
     {
         $definitions=\App\Support\AppraisalFunctionalVariableCatalog::definitions();
         $attributes=json_decode((string)($unit['special_attributes_json'] ?? '{}'),true) ?: [];
@@ -30,6 +30,7 @@ final class ResearchPlanEvidence
         $excluded=0;
         $operation=($context['tipo_negocio'] ?? '')==='arriendo'?'Arriendo':'Venta';
         $type=ComparablePortalProfiles::defaultType((string)($context['tipo_inmueble'] ?? ''));
+        $legacy=ResearchFactorCatalog::forType($type,$part,true);
         foreach (ComparableIntake::groups($rows) as $id=>$ads) {
             $items=[]; $contextPending=false;
             foreach ($ads as $row) {
@@ -53,9 +54,15 @@ final class ResearchPlanEvidence
             }
             if ($items===[]) { $excluded++; continue; }
             $first=$ads[0];
+            $legacyItems=array_map(static function($item) use($legacy) { $item['values']=array_intersect_key($item['values'],$legacy); return $item; },$items);
+            $signatures=[];
+            foreach ($catalog as $key=>$factor) $signatures[$key]=hash('sha256',json_encode(array_map(static function($item) use($key) { $item['values']=[$key=>$item['values'][$key]]; return $item; },$items),JSON_THROW_ON_ERROR));
             $groups[]=['id'=>(string)$id,'title'=>(string)(($first['project_name'] ?? '') ?: ($first['property_type'] ?? 'Inmueble')),
-                'ads'=>$items,'signature'=>hash('sha256',json_encode($items,JSON_THROW_ON_ERROR)),'contextPending'=>$contextPending];
+                'ads'=>$items,'signature'=>hash('sha256',json_encode($legacyItems,JSON_THROW_ON_ERROR)),'factorSignatures'=>$signatures,'contextPending'=>$contextPending];
         }
-        return ['subjectSignature'=>hash('sha256',json_encode($subjects,JSON_THROW_ON_ERROR)),'subjects'=>$subjects,'groups'=>$groups,'excluded'=>$excluded,'operation'=>$operation];
+        $subjectSignatures=[];
+        foreach ($subjects as $key=>$value) $subjectSignatures[$key]=hash('sha256',json_encode([$key=>$value],JSON_THROW_ON_ERROR));
+        return ['subjectSignature'=>hash('sha256',json_encode(array_intersect_key($subjects,$legacy),JSON_THROW_ON_ERROR)),
+            'subjectFactorSignatures'=>$subjectSignatures,'subjects'=>$subjects,'groups'=>$groups,'excluded'=>$excluded,'operation'=>$operation];
     }
 }

@@ -2,8 +2,11 @@
 declare(strict_types=1);
 (static function(): void {
     expectStatus(422,fn()=>\App\Services\ResearchPlanInput::input('{"factors":{"area":{"decision":"model"}}}'),'área no aumenta los candidatos ni la meta');
-    $scale=\App\Services\ResearchFactorScaleInput::input(['factor_key'=>'view','kind'=>'ordinal','categories'=>"Sin vista\nInterior\nExterior\nPanorámica"]);
-    expect($scale['kind']==='ordinal' && str_starts_with($scale['categories'],'Sin vista'),'escala ordenada guarda los niveles definidos por el analista');
+    $scale=\App\Services\ResearchFactorScaleInput::input(['factor_key'=>'view','kind'=>'categorical','categories'=>"Sin vista\nInterior\nExterior\nPanorámica"]);
+    expect($scale['kind']==='categorical','vista guarda clases sin forzar una jerarquía económica');
+    expectStatus(422,fn()=>\App\Services\ResearchFactorScaleInput::input(['factor_key'=>'access','kind'=>'ordinal','categories'=>"Peatonal\nVehicular\nRestringido"]),'rechaza que restringido se convierta en un nivel superior');
+    expectStatus(422,fn()=>\App\Services\ResearchFactorScaleInput::input(['factor_key'=>'view','kind'=>'ordinal','categories'=>"Interior\nPanorámica\nSin vista"]),'rechaza orden arbitrario de tipos de vista');
+    expectStatus(422,fn()=>\App\Services\ResearchFactorScaleInput::input(['factor_key'=>'generator','kind'=>'ordinal','categories'=>"Total\nParcial\nNo"]),'no invierte la cobertura de planta eléctrica');
     expectStatus(422,fn()=>\App\Services\ResearchFactorScaleInput::input(['factor_key'=>'bathrooms','kind'=>'ordinal','categories'=>"No\nSí"]),'no sustituye cantidades por códigos');
     $factor=['kind'=>'ordinal','categories'=>"No\nParcial\nTotal"];
     $entry=['value'=>'Parcial','support'=>'Visita, 2026-10-04, evidencia de respaldo','basis'=>str_repeat('a',64),'scale_kind'=>'ordinal','scale_categories'=>$factor['categories']];

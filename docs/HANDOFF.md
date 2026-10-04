@@ -802,3 +802,22 @@ Pruebas: 1020 PHP, 149 JS, 181 BD contra nueva instancia desechable 3371, lint/b
 y tamaño 71,0KB gzip. Navegador local: editor Vista guarda/recarga; Planta Parcial
 código1 guarda/recarga con soporte, fuentes No/Parcial/Total intactas; pantalla
 estrecha sin desbordamiento de página (tabla con scroll propio), consola sin errores.
+
+## Catálogo ampliado y clasificación semántica (2026-10-04)
+
+Ver FACTORES-ESCALAS-INVESTIGACION.md: investigación primaria complementaria y
+atributos para 12 tipos (oficina19, apartamento25, casa25, lote11, local21,
+bodega19, consultorio19, edificio16, finca25, hotel21, parqueadero9, depósito7).
+Sin obligación de investigarlos todos. Catálogo con búsqueda por nombre; configuración
+de métodos, academia y captura permanecen separadas. No amplía lectores automáticos.
+ResearchScalePolicy conserva cantidades y presencia; ordinales definidos para planta
+y calidad de acabados terminados. Vista/acceso/servicio/relieve conservan clases, sin
+inventar jerarquías de precio. Acceso vehicular, cargue y restricción separados.
+Servidor rechaza clases→ordinal o niveles invertidos; escalas antiguas quedan guardadas
+y señaladas, fuera de códigos/conteos listos hasta revisión/adopción explícita.
+Huella histórica compatible evita invalidar calificaciones al ampliar el catálogo;
+nuevas huellas por factor detectan cambios específicos. Sin DDL ni modificación de
+Análisis. Pruebas: 1043 PHP, 151 JS, 181 BD nueva instancia desechable3372,
+lint/build y 71,3KB gzip. Navegador: búsqueda de acceso en Bodega, advertencia Vista
+anterior, pantalla estrecha contenida, Planta Parcial histórica conservada; atributo
+nuevo Aire acondicionado Sí con soporte guarda/recarga sin tocar los anuncios.
