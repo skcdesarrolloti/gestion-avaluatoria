@@ -1,0 +1,49 @@
+<?php
+declare(strict_types=1);
+namespace App\Services;
+
+final class ResearchFactorCatalog
+{
+    public static function all(): array
+    {
+        $definitions=\App\Support\AppraisalFunctionalVariableCatalog::definitions();
+        $make=static fn($label,$kind,$unit,$subject,$sample,$why,$section='construction',$categories='')=>
+            compact('label','kind','unit','subject','sample','why','section','categories');
+        $options=static fn($key)=>implode("\n",array_values(array_filter($definitions[$key]['options'] ?? [],static fn($v,$k)=>!in_array($k,['','no_verificado'],true),ARRAY_FILTER_USE_BOTH)));
+        return [
+            'area'=>$make('Área de comparación','numeric','m²','area_private_m2','private_built_m2','Comparar tamaño conservando la base del área.','surface'),
+            'land'=>$make('Área de terreno','numeric','m²','area_adopted_m2','land_m2','Distinguir extensión de terreno y construcción.','surface'),
+            'built'=>$make('Área construida','numeric','m²','built_area_adopted_m2','built_m2','Distinguir superficies construidas del terreno.','surface'),
+            'bathrooms'=>$make('Baños','numeric','cantidad','functional_bathrooms_count','bathrooms','Examinar diferencias de dotación y distribución.'),
+            'bedrooms'=>$make('Habitaciones','numeric','cantidad','functional_bedrooms_count','bedrooms','Examinar distribución; distinguir alcobas de ambientes.'),
+            'parking'=>$make('Celdas de parqueo','numeric','cantidad','functional_parking_spaces_count','parking_spaces','Investigar composición, inclusión y derechos; no asigna valor al anexo.'),
+            'age'=>$make('Edad','numeric','años','construction_age_years','age_years','Examinar antigüedad; intervalos no equivalen a edad exacta.'),
+            'levels'=>$make('Niveles del inmueble','numeric','cantidad','construction_floors','research_levels','Distinguir niveles de la unidad y piso de ubicación.'),
+            'floor'=>$make('Piso de ubicación','numeric','número','research_floor','floor_level','Examinar ubicación vertical, distinta de número de niveles.','attributes'),
+            'elevator'=>$make('Ascensor','binary','sí/no','research_elevator','elevator','Comparar disponibilidad comprobada; desconocido no es ausencia.','attributes',"No\nSí"),
+            'view'=>$make('Vista','categorical','categoría','functional_view','view_quality','Examinar orientación visual sin imponer una escala de precio.','construction',$options('functional_view')),
+            'finishes'=>$make('Acabados','categorical','categoría','functional_finish_quality','finish_quality','Definir clases observables; no atribuir pesos económicos.','construction',$options('functional_finish_quality')),
+            'service'=>$make('Alcoba / baño de servicio','categorical','categoría','functional_service_room_bathroom','research_service','Distinguir alcoba, baño y ambos; no confundir dato desconocido.','construction',$options('functional_service_room_bathroom')),
+            'height'=>$make('Altura libre','numeric','m','functional_clear_height_m','research_height','Investigar altura bajo un mismo punto de medición.'),
+            'access'=>$make('Tipo de acceso','categorical','categoría','functional_access_type','research_access','Investigar accesibilidad y condiciones operativas.','construction',$options('functional_access_type')),
+            'stratum'=>$make('Estrato','categorical','categoría','research_stratum','stratum','Puede delimitar el mercado; no presume distancia económica entre estratos.','tipologias',"1\n2\n3\n4\n5\n6"),
+            'deposit'=>$make('Depósitos','numeric','cantidad','research_deposit','ph_deposit_count','Investigar composición y derechos; no liquida su valor separado.','tipologias'),
+        ];
+    }
+    public static function forType(string $type,string $part=''): array
+    {
+        $keys=match($type) {
+            'lote'=>['land','access'], 'parqueadero','deposito'=>['area','access'],
+            'casa','finca'=>['land','built','bathrooms','bedrooms','parking','age','levels','view','finishes','service','access','stratum'],
+            'apartamento'=>['area','bathrooms','bedrooms','parking','deposit','age','levels','floor','elevator','view','finishes','service','stratum'],
+            'bodega'=>['land','built','bathrooms','parking','age','height','access','finishes'],
+            'edificio','hotel'=>['land','built','bathrooms','bedrooms','parking','age','levels','elevator','access'],
+            'oficina','consultorio','local'=>['area','bathrooms','parking','deposit','age','floor','elevator','view','finishes','access','stratum'],
+            default=>[],
+        };
+        $catalog=array_intersect_key(self::all(),array_flip($keys));
+        if ($part==='terreno') $catalog=array_intersect_key($catalog,array_flip(['land','access','stratum']));
+        if ($part==='construccion') unset($catalog['land']);
+        return $catalog;
+    }
+}

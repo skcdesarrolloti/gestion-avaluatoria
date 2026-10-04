@@ -1,0 +1,31 @@
+<?php
+declare(strict_types=1);
+(static function():void {
+    $plan=\App\Services\ResearchPlanInput::input(json_encode(['factors'=>['bathrooms'=>['decision'=>'model','reason'=>'Dotación','definition'=>'Baños de la unidad']]],JSON_THROW_ON_ERROR));
+    expect($plan['target_ratio']===10 && $plan['factors']['bathrooms']['kind']==='numeric' && isset($plan['updated_at']), 'plan valida borrador y registra fecha del servidor');
+    \App\Services\ResearchPlanInput::validateScope($plan,'oficina','mercado');
+    expectStatus(422,fn()=>\App\Services\ResearchPlanInput::validateScope($plan,'lote','mercado'),'no mezcla factores de oficina con terreno');
+    expectStatus(422,fn()=>\App\Services\ResearchPlanInput::validateScope($plan,'oficina','costo'),'plan no invade costo');
+    expectStatus(422,fn()=>\App\Services\ResearchPlanInput::validateScope(['factors'=>['land'=>[]]],'casa','mercado','construccion'),'parte construcción no usa factores del terreno');
+    expectStatus(422,fn()=>\App\Services\ResearchPlanInput::input('{invalid'),'JSON inválido no se guarda');
+    expectStatus(422,fn()=>\App\Services\ResearchPlanInput::input('{"target_ratio":0,"factors":{}}'),'referencia inválida rechazada');
+    $catalog=\App\Services\ResearchFactorCatalog::forType('oficina');
+    $rows=[['id'=>'a','property_type'=>'Oficina','operation'=>'Venta','ph_regime'=>'si','private_built_m2'=>'','area_m2'=>100,'bathrooms'=>0,'source_name'=>'FR']];
+    $data=\App\Services\ResearchPlanEvidence::build($catalog,['functional_bathrooms_count'=>0],$rows,['tipo_inmueble'=>'oficina','tipo_negocio'=>'venta','regimen_ph'=>'si'],['stratum'=>6]);
+    expect($data['subjects']['bathrooms']==='0' && $data['subjects']['stratum']==='', 'cero propio preservado; no hereda estrato global sin vínculo explícito');
+    expect($data['groups'][0]['ads'][0]['values']['area']==='', 'área genérica PH no se adopta como privada');
+    expect($data['groups'][0]['contextPending']===false && $data['groups'][0]['ads'][0]['values']['bathrooms']==='0','muestras propias preservan cero y contexto');
+    $classified=\App\Services\ResearchPlanEvidence::build($catalog,['special_attributes_json'=>'{"piso_altura":{"value":"alto"},"ascensores":{"value":"medio"}}'],[],[]);
+    expect($classified['subjects']['floor']==='Piso alto' && $classified['subjects']['elevator']==='Medio','clasificaciones propias se muestran sin inventar piso exacto ni presencia binaria');
+    $rows[0]['intake_state']='not_selected';
+    expect(\App\Services\ResearchPlanEvidence::build($catalog,[],$rows,[])['groups']===[], 'no seleccionados quedan fuera del conteo de planificación');
+    $db=new PDO('sqlite::memory:'); $db->setAttribute(PDO::ATTR_DEFAULT_FETCH_MODE,PDO::FETCH_ASSOC);
+    $db->exec('CREATE TABLE appraisals(id TEXT, owner_id INTEGER, methodology_workflow TEXT, methodology_version INTEGER)');
+    $db->prepare('INSERT INTO appraisals VALUES(?,?,?,0)')->execute(['a',1,json_encode(['unit'=>['method'=>'mercado','coverage'=>'Se conserva'],'annex'=>['method'=>'costo']])]);
+    $repo=new \App\Models\MethodologyWorkflowRepository($db);
+    expect($repo->save('a',1,0,'unit',['research_plan'=>$plan])===1,'plan persiste con versión de metodología');
+    $saved=\App\Services\MethodologyWorkflow::saved($db->query('SELECT * FROM appraisals')->fetch());
+    expect($saved['unit']['research_plan']['factors']['bathrooms']['reason']==='Dotación' && $saved['unit']['coverage']==='Se conserva' && $saved['annex']['method']==='costo','recarga conserva plan, alcance y otro método');
+    expectStatus(409,fn()=>$repo->save('a',1,0,'unit',['research_plan'=>$plan]),'versión obsoleta no sobrescribe plan');
+    expectStatus(404,fn()=>$repo->save('a',2,1,'unit',['research_plan'=>$plan]),'otro propietario no guarda plan');
+})();

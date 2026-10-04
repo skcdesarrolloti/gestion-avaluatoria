@@ -209,3 +209,6 @@ Los resultados y requisitos de las pruebas están en [validación](docs/VALIDATI
 
 Referencias: [instalación de Alpine](https://alpinejs.dev/essentials/installation) y
 [compilación de Tailwind](https://tailwindcss.com/docs/installation/tailwind-cli).
+
+Investigación de factores: [plan por unidad y método](docs/PLAN-INVESTIGACION-MERCADO.md).
+

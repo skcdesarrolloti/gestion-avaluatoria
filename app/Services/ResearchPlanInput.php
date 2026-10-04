@@ -1,0 +1,42 @@
+<?php
+declare(strict_types=1);
+namespace App\Services;
+use App\Core\HttpException;
+
+final class ResearchPlanInput
+{
+    public static function input(mixed $value): array
+    {
+        if (!is_string($value) || strlen($value)>30000) throw new HttpException(422,'Revisa el formato del plan de investigación.');
+        try { $data=json_decode($value,true,8,JSON_THROW_ON_ERROR); }
+        catch (\JsonException) { throw new HttpException(422,'El plan de investigación llegó incompleto.'); }
+        if (!is_array($data) || !is_array($data['factors'] ?? null) || count($data['factors'])>20) throw new HttpException(422,'Revisa los factores del plan.');
+        $ratio=$data['target_ratio'] ?? 10;
+        if (!is_int($ratio) || $ratio<1 || $ratio>100) throw new HttpException(422,'La referencia de inmuebles por coeficiente debe estar entre 1 y 100.');
+        $out=['target_ratio'=>$ratio,'factors'=>[],'updated_at'=>gmdate('c')];
+        foreach ($data['factors'] as $key=>$factor) {
+            if (!isset(ResearchFactorCatalog::all()[$key]) || !is_array($factor)) throw new HttpException(422,'Factor desconocido.');
+            $decision=$factor['decision'] ?? '';
+            if (!in_array($decision,['','filter','investigate','model','defer'],true)) throw new HttpException(422,'Decisión de factor inválida.');
+            $kind=$factor['kind'] ?? ResearchFactorCatalog::all()[$key]['kind'];
+            if (!in_array($kind,['numeric','binary','categorical'],true)) throw new HttpException(422,'Tipo de dato inválido.');
+            $item=['decision'=>$decision,'kind'=>$kind];
+            foreach (['reason'=>600,'definition'=>600,'categories'=>1200] as $field=>$max) {
+                $text=$factor[$field] ?? '';
+                if (!is_string($text) || mb_strlen($text)>$max) throw new HttpException(422,'Revisa definición, categorías o justificación: texto demasiado largo.');
+                $item[$field]=trim($text);
+            }
+            $lines=array_values(array_unique(array_filter(array_map('trim',explode("\n",$item['categories'])))));
+            if (count($lines)>15) throw new HttpException(422,'Usa hasta 15 categorías por factor.');
+            $item['categories']=implode("\n",$lines);
+            $out['factors'][$key]=$item;
+        }
+        return $out;
+    }
+    public static function validateScope(array $plan,string $type,string $method,string $part=''): void
+    {
+        if (!in_array($method,['mercado','renta'],true)) throw new HttpException(422,'El plan de investigación corresponde a Mercado o Renta.');
+        foreach ($plan['factors'] as $key=>$item) if (!isset(ResearchFactorCatalog::forType($type,$part)[$key]))
+            throw new HttpException(422,'El factor no corresponde al tipo actual. Revisa el plan de esta unidad.');
+    }
+}

@@ -19,7 +19,7 @@ $formulaFamilies = [
     ['Costo', 'Valor = terreno + costo de reposición nuevo menos depreciación física, funcional y económica, con soporte de cantidades y precios.'],
 ];
 ?>
-<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ searchTab: 'captura' }">
+<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ searchTab: '<?= ($_GET['research'] ?? '')==='1'?'investigacion':'captura' ?>' }">
     <nav class="mb-6 flex flex-wrap gap-2 rounded-xl bg-slate-100 p-2" aria-label="Subpestañas de C · Insumos y comparables">
         <button type="button" class="min-h-11 rounded-lg px-4 py-2 font-semibold" :aria-pressed="searchTab === 'captura'"
             :class="searchTab === 'captura' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
@@ -30,11 +30,15 @@ $formulaFamilies = [
         <button type="button" class="min-h-11 rounded-lg px-4 py-2 font-semibold" :aria-pressed="searchTab === 'configuracion_portales'"
             :class="searchTab === 'configuracion_portales' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
             @click="searchTab = 'configuracion_portales'">3. Configuración por portal y tipo de inmueble</button>
+        <button type="button" class="min-h-11 rounded-lg px-4 py-2 font-semibold" :aria-pressed="searchTab === 'investigacion'"
+            :class="searchTab === 'investigacion' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
+            @click="searchTab = 'investigacion'">4. Plan de investigación</button>
     </nav>
     <?php require __DIR__ . '/methodology-portal-profiles.php'; ?>
+    <?php require __DIR__ . '/methodology-research-plan.php'; ?>
     <?php require __DIR__ . '/methodology-search-prompt.php'; ?>
     <div x-show="searchTab === 'matriz'"><?php require __DIR__ . '/methodology-market-coverage.php'; ?></div>
-    <div class="mb-6" x-show="searchTab !== 'configuracion_portales'">
+    <div class="mb-6" x-show="searchTab !== 'configuracion_portales' && searchTab !== 'investigacion'">
         <p class="eyebrow"><?= e(($prefix ?? 'M') . '3 · Insumos del método ' . ($methods[$method ?? 'mercado'] ?? 'Mercado')) ?></p>
         <h2 class="mt-2 text-2xl font-semibold">Investigación, muestra y trazabilidad de mercado</h2>
         <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
@@ -44,7 +48,7 @@ $formulaFamilies = [
         </p>
     </div>
 
-    <details x-show="searchTab !== 'configuracion_portales'" class="mb-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer py-3 font-semibold">Ver contexto del inmueble y reglas de captura</summary>
+    <details x-show="searchTab !== 'configuracion_portales' && searchTab !== 'investigacion'" class="mb-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer py-3 font-semibold">Ver contexto del inmueble y reglas de captura</summary>
     <div class="grid gap-4 lg:grid-cols-3">
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p class="eyebrow">Activo sujeto</p>
@@ -69,7 +73,7 @@ $formulaFamilies = [
     </div>
 
     </details>
-    <div class="mt-6" x-show="searchTab !== 'configuracion_portales'">
+    <div class="mt-6" x-show="searchTab !== 'configuracion_portales' && searchTab !== 'investigacion'">
         <div id="captura-83" class="scroll-mt-6">
             <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search-captura.php'; ?>
         </div>

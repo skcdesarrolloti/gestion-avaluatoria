@@ -689,3 +689,10 @@ PHP835, JS136, BD168 más cinco nuevas de persistencia, lint665PHP, build68KB gz
 Chrome local: vincular y seleccionar dos anuncios, recepción como un inmueble,
 captura85,5m²/2garajes/1depósito, relectura150→155 conserva150 y advierte diferencia,
 punto aproximado confirmado y recargado; CSS390px sin desbordamiento lateral.
+
+## 2026-10-04 · Plan de investigación
+Cuarta pestaña de Insumos, por unidad/parte/método; datos del sujeto, factores y disponibilidad
+por portal, diferencias y conteo conjunto. No ejecuta regresión ni altera anuncios.
+Ver PLAN-INVESTIGACION-MERCADO.md. PHP949, JS139, MySQL176, build69KB gzip.
+Prueba local: selección/definición/justificación, guardado y recuperación al recargar.
+

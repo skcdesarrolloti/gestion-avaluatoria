@@ -73,6 +73,14 @@ final class AppraisalValuationMethodologyController
         $version = filter_var($_POST['version'] ?? null, FILTER_VALIDATE_INT);
         if ($version === false || $version === null || $version < 0) throw new \App\Core\HttpException(422, 'Versión inválida.');
         $changes = \App\Services\MethodologyWorkflow::input($_POST);
+        if (isset($changes['research_plan'])) {
+            if (count($changes)!==1) throw new \App\Core\HttpException(422,'Guarda el plan separado de la configuración del método.');
+            $scopeRecord=\App\Services\ComparableSearchContext::forMethod($record,$this->appraisals->units($id,$this->user['id']),$key,
+                \App\Services\MethodologyWorkflow::saved($record)[$key]['method'] ?? '');
+            \App\Services\ResearchPlanInput::validateScope($changes['research_plan'],
+                \App\Services\ComparablePortalProfiles::defaultType((string)($scopeRecord['tipo_inmueble'] ?? '')),
+                \App\Services\MethodologyWorkflow::saved($record)[$key]['method'] ?? '',$components[$key]['part'] ?? '');
+        }
         if (isset($components[$key]['alternate_method'])) {
             if (isset($changes['additional_methods']) || (isset($changes['method']) && $changes['method']!==$components[$key]['alternate_method']))
                 throw new \App\Core\HttpException(422, 'Configura los métodos desde el alcance original; este recorrido conserva su método de contraste.');
@@ -88,7 +96,8 @@ final class AppraisalValuationMethodologyController
         }
         $next = $this->workflow->save($id, $this->user['id'], $version, $key, $changes);
         if (str_contains($_SERVER['HTTP_ACCEPT'] ?? '', 'application/json')) \App\Core\Http::json(['ok' => true, 'version' => $next, 'saved_at' => gmdate('c')]);
-        Http::redirect('avaluos/' . $id . '/metodologia-valuatoria?component=' . rawurlencode($key) . '&stage=' . (isset($changes['plan_parts']) ? 'plan' : '2'));
+        Http::redirect('avaluos/' . $id . '/metodologia-valuatoria?component=' . rawurlencode($key) . '&stage=' .
+            (isset($changes['plan_parts']) ? 'plan' : (isset($changes['research_plan'])?'3&research=1':'2')));
     }
 
     public function savePhScope(string $id, string $unitId): never

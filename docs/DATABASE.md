@@ -208,3 +208,10 @@ Edición parcial conserva campos previos; sólo permite alcance cuando método e
 es costo. Usa methodology_version y propietario existentes (409 si obsoleto).
 C1 consulta datos de appraisal_units y alcance; estados se calculan, no se almacenan.
 No importa catálogos de InversKC ni crea tablas presupuestales en esta entrega.
+
+## Plan de investigación (2026-10-04)
+JSON aditivo methodology_workflow[component].research_plan: target_ratio, factors
+(decision/kind/definition/categories/reason) y updated_at UTC del servidor.
+Sin migración; guardado con owner_id y methodology_version, 409 ante conflicto.
+No modifica appraisal_comparables ni la agrupación de anuncios.
+
