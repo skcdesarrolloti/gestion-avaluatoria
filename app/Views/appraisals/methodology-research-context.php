@@ -7,6 +7,7 @@ if ($researchType==='apartamento') $researchCatalog=\App\Services\ApartmentResea
 if ($researchType==='casa') $researchCatalog=\App\Services\HouseResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
 if ($researchType==='oficina') $researchCatalog=\App\Services\OfficeResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
 if ($researchType==='local') $researchCatalog=\App\Services\LocalResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
+if ($researchType==='bodega') $researchCatalog=\App\Services\WarehouseResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
 $researchCatalog=\App\Services\UserResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
 $researchUnit=$components[$componentKey]['unit'] ?? [];
 $researchPart=$components[$componentKey]['part'] ?? '';
