@@ -222,3 +222,10 @@ research_service, research_height y research_access en el JSON de captura existe
 Campos opcionales y sólo explícitos; sin DDL. research_plan permite investigar todos
 los factores pero limita decision=model a cuatro. target_ratio referencia inmuebles
 por factor (no por coeficiente). Persistencia y controles de versión existentes intactos.
+
+## Escala ordinal (2026-10-04)
+research_plan.factors.kind admite ordinal y conserva el orden de categories para códigos
+0..n. No agrega columnas. No sustituye categorías ni códigos de planes históricos.
+Planta eléctrica admite total en special_attributes_json, conservando si como presencia
+sin cobertura detallada. Niveles duplicados equivalentes/desconocidos se rechazan para
+ordinal. Datos originales de anuncios intactos; códigos calculados sólo como consulta.

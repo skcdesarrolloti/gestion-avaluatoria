@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { researchValue, factorEvidence, researchSummary, comparisonState, researchPlan, publishedAreaState } from '../resources/js/research-plan.js';
+import { researchValue, researchCode, researchScale, factorEvidence, researchSummary, comparisonState, researchPlan, publishedAreaState } from '../resources/js/research-plan.js';
 const numeric = {kind:'numeric',decision:'model',definition:'Cantidad',reason:'Dotación',categories:''};
 const binary = {...numeric,kind:'binary'};
 const ad = (portal,values,revision=false) => ({portal,values,revision});
@@ -64,8 +64,27 @@ test('joint count counts confirmed properties, not advertisements or independent
 test('summary shows every factor and subject while limiting model to four, not investigation',()=>{
     const factors=Object.fromEntries(['area','bathrooms','parking','age','floor','view'].map(k=>[k,{...numeric,decision:k==='area'?'defer':k==='view'?'investigate':'model'}]));
     const ui=researchPlan({plan:{factors,target_ratio:10},catalog:{},evidence:{subjects:{bathrooms:'2'},groups:[]}});
+    assert.equal(ui.comparisonKeys.length,5); ui.onlyCandidates=false;
     assert.equal(ui.comparisonKeys.length,6); assert.equal(ui.subjectLabel('bathrooms'),'2');
     assert.equal(ui.comparisonGroup.ads.length,0); assert.equal(ui.modelUnavailable('view'),true);
     assert.equal(ui.modelUnavailable('bathrooms'),false); assert.equal(ui.summary.target,40);
     factors.floor.decision='investigate'; assert.equal(ui.summary.selected,3); assert.equal(ui.modelUnavailable('view'),false);
+});
+
+test('ordinal codes share one ascending scale; original yes does not imply total',()=>{
+    const ordinal={...numeric,decision:'model',kind:'ordinal',categories:'No\nParcial\nTotal'};
+    assert.equal(researchValue('No',ordinal,'generator'),0);
+    assert.equal(researchValue('Parcial',ordinal,'generator'),1);
+    assert.equal(researchValue('Total',ordinal,'generator'),2);
+    assert.equal(researchValue('Sí',ordinal,'generator'),null);
+    assert.equal(researchValue('',ordinal,'generator'),null);
+    assert.equal(researchCode('',ordinal,'generator'),'Código: pendiente');
+    assert.equal(researchScale(ordinal),'0 = No · 1 = Parcial · 2 = Total');
+    assert.equal(researchCode('Total',ordinal,'generator'),'Código: 2');
+    assert.equal(researchCode('Oficina',{kind:'categorical',categories:'Comercial\nOficina'},'destination'),'Clase: Oficina · sin jerarquía');
+    const ads=[ad('FR',{generator:'Total'}),ad('CC',{generator:'total'})];
+    assert.equal(comparisonState('generator',ordinal,ads),'equal');
+    assert.equal(comparisonState('generator',ordinal,[...ads,ad('ML',{generator:'Parcial'})]),'difference');
+    assert.equal(comparisonState('generator',ordinal,[...ads,ad('ML',{generator:'Sí'})]),'review');
+    assert.equal(researchSummary({target_ratio:10,factors:{generator:ordinal}},{subjects:{generator:'Total'},groups:[group('a',ads)]}).parameters,1);
 });

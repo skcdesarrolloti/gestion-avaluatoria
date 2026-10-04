@@ -19,6 +19,7 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
     <p class="mt-3 text-sm leading-6">Define qué investigar, dónde hay datos y por qué cada factor puede servir. El sujeto es la referencia; esta configuración prepara el análisis posterior.</p>
     <p class="mt-2 text-sm">Los usos «Filtro» e «Investigar» documentan la intención del analista: no cambian la captura ni descartan anuncios. Consulta la investigación por portal en la pestaña 3.</p>
     <p class="mt-2 text-sm">Si un dato sólo está descrito en texto o el sujeto usa otra clasificación, queda por conciliar. Por ejemplo, «piso alto» no se convierte automáticamente en un número de piso.</p>
+    <p class="mt-2 text-sm"><strong>Factores para <?= e($guide['type_label'] ?? $researchType) ?>:</strong> <?= e(implode(' · ',array_column($researchCatalog,'label'))) ?>. Catálogo inicial según tipo; no garantiza que los portales publiquen cada dato.</p>
     <?php if ($componentKey==='' || $researchCatalog===[] || empty($selected['method'])): ?>
     <p class="mt-4 rounded-xl bg-amber-50 p-4">Selecciona una unidad, confirma su tipo en el numeral 3 y guarda su método en Configuración para preparar su plan.</p>
     <?php else: ?>
@@ -78,10 +79,11 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
                     </template></div>
                     <p class="mt-2 text-xs">Los anuncios por portal pueden pertenecer a un mismo inmueble. Dato complementario no equivale a dato confirmado; un formato sin equivalencia definida queda pendiente.</p>
                     <label class="mt-3 block text-sm font-semibold">Tipo de variable<select class="input mt-1" x-model="plan.factors.<?= e($key) ?>.kind">
-                        <option value="numeric">Numérica: cantidad o medida</option><option value="binary">Binaria: sí=1, no=0</option><option value="categorical">Categorías: clases sin peso económico</option></select></label>
+                        <option value="numeric">Numérica: cantidad o medida</option><option value="binary">Binaria: no=0, sí=1</option><option value="ordinal">Ordinal: niveles de menor a mayor</option><option value="categorical">Nominal: clases sin jerarquía</option></select></label>
                     <label class="mt-3 block text-sm font-semibold">Definición y forma de medición<textarea class="input mt-1" maxlength="600" rows="2" x-model="plan.factors.<?= e($key) ?>.definition" placeholder="Ej. Número de baños privados; misma definición en sujeto y muestras"></textarea></label>
-                    <label class="mt-3 block text-sm font-semibold" x-show="plan.factors.<?= e($key) ?>.kind === 'categorical'">Categorías admitidas: una por línea<textarea class="input mt-1" maxlength="1200" rows="3" x-model="plan.factors.<?= e($key) ?>.categories" placeholder="Sin vista&#10;Interior&#10;Exterior"></textarea></label>
-                    <p class="mt-2 text-xs">Las categorías son etiquetas. Codificarlas 0, 1, 2… no les impone distancias de precio; su representación estadística se definirá en Análisis. Desconocido no significa cero.</p>
+                    <label class="mt-3 block text-sm font-semibold" x-show="['categorical','ordinal'].includes(plan.factors.<?= e($key) ?>.kind)">Clases o niveles: una etiqueta por línea<textarea class="input mt-1" maxlength="1200" rows="3" x-model="plan.factors.<?= e($key) ?>.categories" placeholder="Ej. No&#10;Parcial&#10;Total"></textarea></label>
+                    <p class="mt-2 text-xs" x-text="scaleLabel('<?= e($key) ?>')"></p>
+                    <p class="mt-2 text-xs">Ordinal: primera línea = 0 y siguientes = 1, 2… siempre de menor a mayor cobertura, dotación o calidad según la definición. Esa misma escala se aplica al sujeto y a todos los portales. Desconocido queda pendiente. Un «Sí» sin detalle no significa «Total». El orden no demuestra distancias iguales ni efecto sobre el precio; correlación y regresión se revisarán en Análisis.</p>
                     <label class="mt-3 block text-sm font-semibold">Por qué se propone este uso<textarea class="input mt-1" maxlength="600" rows="2" x-model="plan.factors.<?= e($key) ?>.reason" placeholder="Explica relevancia para esta unidad y posibilidad de conseguir datos"></textarea></label>
                 </details>
             </article>

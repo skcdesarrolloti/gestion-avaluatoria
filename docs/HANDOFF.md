@@ -729,3 +729,19 @@ suficiencia estadística ni regresión ejecutada. Área compatible obligatoria p
 Campos opcionales explícitos en capture_details_json, sin migración ni extracción global.
 Validación: 988 PHP, 143 JS; build 69,8 KB gzip. UI local 3/3/2 amarillo, 80 m² verde,
 sujeto separado y quinto candidato deshabilitado. Commit/push; sin acceso a Hostinger.
+
+## 2026-10-04 · Dato original y código de investigación
+Catálogos iniciales por 12 tipos (incluye oficina); no garantizan publicación de todos
+los factores. Tipo ordinal añadido: niveles por líneas en orden ascendente, códigos
+0, 1, 2... compartidos por sujeto y anuncios. Numérica conserva medida, binaria No=0
+Sí=1, nominal conserva clases sin imponer jerarquía. Orden no demuestra distancias
+iguales ni efecto en el precio. Regresión y correlación permanecen en Análisis futuro.
+Cada celda separa dato original de código. Planta: No=0, Parcial=1, Total=2; Sí sin
+cobertura queda pendiente. La ficha del sujeto permite Total sin alterar Sí anterior.
+Planes guardados conservan su tipo y categorías: el analista debe seleccionar Ordinal
+y definir sus niveles para cambiar una clasificación anterior. No se migra en silencio.
+Checkbox muestra sólo candidatos y área (inicial si hay candidatos), o todos los factores.
+Máximo cuatro candidatos; investigación ilimitada dentro del catálogo. Sin DDL.
+Pruebas: 1005 PHP, 144 JS, 176 BD en instancia desechable 3367, build 70,2 KB gzip.
+Navegador local: oficina, dato Parcial sujeto=1, portales No=0 Parcial=1 Total=2,
+guardado confirmado y recarga. Vista estrecha con scroll contenido, sin errores.

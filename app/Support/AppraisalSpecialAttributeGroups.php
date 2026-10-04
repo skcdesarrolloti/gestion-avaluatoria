@@ -50,7 +50,7 @@ final class AppraisalSpecialAttributeGroups
             'relacion_juridica_parqueadero_vivienda' => ['Relación jurídica del parqueadero', 'Indica si el parqueadero es privado, asignado, de uso exclusivo o común.', ['' => 'No verificado', 'privado' => 'Privado con matrícula', 'uso_exclusivo' => 'Uso exclusivo', 'asignado' => 'Asignado', 'comunal' => 'Comunal']],
             'ruido_humedad_asoleamiento' => ['Ruido, humedad o asoleamiento', 'Condiciones de confort que pueden castigar o premiar el valor.', AppraisalSpecialAttributeOptions::comfortRisk()],
             'amenidades_conjunto' => ['Amenidades del conjunto', 'Piscina, salón social, gimnasio, zonas verdes u otros comunes que inciden en mercado.', AppraisalSpecialAttributeOptions::level()],
-            'planta_electrica_vivienda' => ['Planta eléctrica del conjunto', 'Existencia y cobertura total o parcial para la unidad o zonas comunes.', AppraisalSpecialAttributeOptions::yesPartial()],
+            'planta_electrica_vivienda' => ['Planta eléctrica del conjunto', 'Confirma cobertura: No, Parcial o Total. Sí conserva presencia con cobertura pendiente; distingue respaldo de la unidad y de zonas comunes.', AppraisalSpecialAttributeOptions::generatorCoverage()],
         ];
     }
 
@@ -89,7 +89,7 @@ final class AppraisalSpecialAttributeGroups
             'banos_oficina' => ['Baños comunes o privados', 'Disponibilidad y suficiencia de baños propios o comunes para usuarios.', AppraisalSpecialAttributeOptions::yesPartial()],
             'parqueaderos_oficina' => ['Parqueaderos', 'Disponibilidad para usuarios, visitantes o propietarios.', AppraisalSpecialAttributeOptions::level()],
             'seguridad_control_acceso' => ['Seguridad y control de acceso', 'Vigilancia, portería, tarjetas o filtros de ingreso.', AppraisalSpecialAttributeOptions::level()],
-            'planta_electrica_oficina' => ['Planta eléctrica', 'Existencia y alcance para zonas comunes, ascensores o unidad privada.', AppraisalSpecialAttributeOptions::yesPartial()],
+            'planta_electrica_oficina' => ['Planta eléctrica', 'Confirma cobertura: No, Parcial o Total. Sí conserva presencia con cobertura pendiente; distingue respaldo de la unidad y de zonas comunes.', AppraisalSpecialAttributeOptions::generatorCoverage()],
             'salas_servicios_comunes_oficina' => ['Salas o servicios comunes', 'Salas de juntas, baños, cafetería, coworking u otros servicios compartidos.', AppraisalSpecialAttributeOptions::level()],
             'servicios_empresariales' => ['Cercanía a servicios empresariales', 'Entorno de bancos, notarías, comercio, transporte o apoyo profesional.', AppraisalSpecialAttributeOptions::level()],
         ];

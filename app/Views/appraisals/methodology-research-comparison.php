@@ -8,7 +8,8 @@
     </label>
     <p class="mt-3 text-sm">Verde: coinciden las fuentes. Amarillo: diferencia o revisión pendiente. Gris: una sola fuente, información incompleta o no publicada. Coincidencia no significa verificación.</p>
     <p class="mt-2 text-sm"><strong>Área en m² obligatoria para preparar COP/m²:</strong> conserva la base publicada y el área compatible con el alcance. En PH un área total no se convierte automáticamente en privada construida. Sin área positiva compatible, queda pendiente.</p>
-    <p class="mt-2 text-xs text-slate-600">Todos los factores aplicables permanecen visibles. El sujeto es la referencia; el semáforo compara únicamente los anuncios del mismo inmueble, no exige que sean iguales al sujeto.</p>
+    <label class="mt-3 flex min-h-11 items-center gap-2 text-sm"><input type="checkbox" x-model="onlyCandidates">Mostrar sólo candidatos al modelo y área obligatoria</label>
+    <p class="mt-2 text-xs text-slate-600">Desmarca para consultar todos los factores. Cada celda separa dato original y código. El sujeto es referencia; el semáforo compara los anuncios del mismo inmueble, no exige igualdad con el sujeto.</p>
     <template x-if="comparisonGroup">
         <div class="mt-4">
             <p class="mb-2 text-sm text-amber-800" x-show="comparisonGroup.contextPending">Tipo, operación o régimen por verificar; los colores sólo comparan datos publicados.</p>
@@ -27,9 +28,10 @@
                     <tbody>
                         <template x-for="key in comparisonKeys" :key="key"><tr class="border-t">
                             <th scope="row" class="p-3 font-semibold"><span x-text="`${factorLabel(key)} · ${catalog[key].unit}`"></span>
-                                <span class="block text-xs font-normal" x-text="({model:'Candidato al modelo',investigate:'Investigar',filter:'Filtro',defer:'Pendiente'})[plan.factors[key].decision] || 'Por clasificar'"></span></th>
-                            <td class="bg-teal-50 p-3" x-text="subjectLabel(key)"></td>
-                            <template x-for="(ad,index) in comparisonGroup.ads" :key="ad.id || index"><td class="p-3" :class="comparisonClass(key,ad)" x-text="comparisonValue(key,ad)"></td></template>
+                                <span class="block text-xs font-normal" x-text="({model:'Candidato al modelo',investigate:'Investigar',filter:'Filtro',defer:'Pendiente'})[plan.factors[key].decision] || 'Por clasificar'"></span>
+                                <span class="mt-2 block text-xs font-normal" x-text="scaleLabel(key)"></span></th>
+                            <td class="bg-teal-50 p-3"><span x-text="subjectLabel(key)"></span><span class="mt-1 block text-xs font-semibold" x-text="codeLabel(key,evidence.subjects[key])"></span></td>
+                            <template x-for="(ad,index) in comparisonGroup.ads" :key="ad.id || index"><td class="p-3" :class="comparisonClass(key,ad)"><span x-text="comparisonValue(key,ad)"></span><span class="mt-1 block text-xs font-semibold" x-text="codeLabel(key,ad.values[key])"></span></td></template>
                             <td class="p-3 font-semibold" x-text="comparisonLabel(key)"></td>
                         </tr></template>
                         <tr class="border-t"><th scope="row" class="p-3">Área publicada · m²<br><span class="text-xs font-normal">Base original de cada aviso</span></th>

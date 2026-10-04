@@ -20,7 +20,7 @@ final class ResearchPlanEvidence
                 $attribute=match(ComparablePortalProfiles::defaultType((string)($context['tipo_inmueble'] ?? ''))) {
                     'apartamento','casa'=>'planta_electrica_vivienda','hotel'=>'planta_electrica_hotel',default=>'planta_electrica_oficina',
                 };
-                $raw=\App\Support\AppraisalSpecialAttributeOptions::yesPartial()[$attributes[$attribute]['value'] ?? ''] ?? '';
+                $raw=\App\Support\AppraisalSpecialAttributeOptions::generatorCoverage()[$attributes[$attribute]['value'] ?? ''] ?? '';
             }
             if ($key==='destination') $raw=MarketSubjectEvidence::decode($unit)['observed_use'] ?? '';
             if (isset($definitions[$factor['subject']]['options'])) $raw=$definitions[$factor['subject']]['options'][$raw] ?? $raw;

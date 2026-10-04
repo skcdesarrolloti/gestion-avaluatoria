@@ -39,7 +39,8 @@ La identidad no confirmada entre portales mantiene inmuebles potenciales separad
 Validación estadística, corroboración y control normativo corresponden a M4.
 ## 2026-10-04 · Cuadro por inmueble y portal
 En Plan de investigación: selector de un inmueble vinculado y tabla con todos los
-factores aplicables en filas. Columnas: factor, sujeto desde su numeral 3, cada anuncio
+factores aplicables en filas (o sólo candidatos y área mediante checkbox). Columnas:
+factor, sujeto desde su numeral 3, cada anuncio
 por portal y validación entre fuentes. El sujeto es referencia, no participa en la
 comparación de coincidencias entre anuncios. Área compatible y publicada siempre visibles,
 con unidad m² y base original; no hay equivalencia automática total/privada/construida.
@@ -62,3 +63,19 @@ configuraciones anteriores. Meta = factores candidatos × referencia (por defect
 El conteo conjunto considera inmuebles distintos, factores legibles y área compatible;
 duplicados vinculados no aumentan la muestra. La clasificación queda en un bloque
 cerrado para dar prioridad al resumen, sin retirar definiciones ni justificaciones.
+
+## 2026-10-04 · Dato original y código de investigación
+Catálogos iniciales por 12 tipos (incluye oficina); no garantizan publicación de todos
+los factores. Tipo ordinal añadido: niveles por líneas en orden ascendente, códigos
+0, 1, 2... compartidos por sujeto y anuncios. Numérica conserva medida, binaria No=0
+Sí=1, nominal conserva clases sin imponer jerarquía. Orden no demuestra distancias
+iguales ni efecto en el precio. Regresión y correlación permanecen en Análisis futuro.
+Cada celda separa dato original de código. Planta: No=0, Parcial=1, Total=2; Sí sin
+cobertura queda pendiente. La ficha del sujeto permite Total sin alterar Sí anterior.
+Planes guardados conservan su tipo y categorías: el analista debe seleccionar Ordinal
+y definir sus niveles para cambiar una clasificación anterior. No se migra en silencio.
+Checkbox muestra sólo candidatos y área (inicial si hay candidatos), o todos los factores.
+Máximo cuatro candidatos; investigación ilimitada dentro del catálogo. Sin DDL.
+Pruebas: 1005 PHP, 144 JS, 176 BD en instancia desechable 3367, build 70,2 KB gzip.
+Navegador local: oficina, dato Parcial sujeto=1, portales No=0 Parcial=1 Total=2,
+guardado confirmado y recarga. Vista estrecha con scroll contenido, sin errores.

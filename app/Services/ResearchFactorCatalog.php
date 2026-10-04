@@ -28,7 +28,7 @@ final class ResearchFactorCatalog
             'access'=>$make('Tipo de acceso','categorical','categoría','functional_access_type','research_access','Investigar accesibilidad y condiciones operativas.','construction',$options('functional_access_type')),
             'stratum'=>$make('Estrato','categorical','categoría','research_stratum','stratum','Puede delimitar el mercado; no presume distancia económica entre estratos.','tipologias',"1\n2\n3\n4\n5\n6"),
             'deposit'=>$make('Depósitos','numeric','cantidad','research_deposit','ph_deposit_count','Investigar composición y derechos; no liquida su valor separado.','tipologias'),
-            'generator'=>$make('Planta eléctrica','categorical','alcance','research_generator','research_generator','Distinguir ausencia, respaldo parcial y total; silencio del portal no acredita ausencia.','attributes',"No\nParcial\nSí"),
+            'generator'=>$make('Planta eléctrica','ordinal','alcance','research_generator','research_generator','Distinguir ausencia, respaldo parcial y total; un Sí sin cobertura no acredita Total.','attributes',"No\nParcial\nTotal"),
             'destination'=>$make('Destinación / uso observado','categorical','categoría','research_destination','research_destination','Registrar el uso descrito; no sustituye el uso aprobado ni se deduce del tipo de anuncio.','tipologias',"Residencial\nComercial\nOficina\nIndustrial\nMixto\nRural\nDotacional\nOtro"),
         ];
     }

@@ -57,7 +57,7 @@ final class AppraisalSpecialAttributeAdvancedGroups
             'cocina_restaurante' => ['Cocina o restaurante', 'Soporte de alimentos, restaurante, bar o cocina operativa.', AppraisalSpecialAttributeOptions::yesPartial()],
             'zonas_comunes_hotel' => ['Zonas comunes', 'Lobby, salones, terrazas, piscina u otras áreas de huéspedes.', AppraisalSpecialAttributeOptions::level()],
             'lavanderia_equipos' => ['Lavandería y equipos', 'Equipos de operación, lavandería, aire, bombeo o soporte técnico.', AppraisalSpecialAttributeOptions::yesPartial()],
-            'planta_electrica_hotel' => ['Planta eléctrica', 'Existencia y alcance para operación, habitaciones o zonas comunes.', AppraisalSpecialAttributeOptions::yesPartial()],
+            'planta_electrica_hotel' => ['Planta eléctrica', 'Confirma cobertura: No, Parcial o Total. Sí conserva presencia con cobertura pendiente; distingue operación, habitaciones y zonas comunes.', AppraisalSpecialAttributeOptions::generatorCoverage()],
             'seguridad_hotel' => ['Seguridad', 'Control de acceso, vigilancia, cámaras o protocolos de huéspedes.', AppraisalSpecialAttributeOptions::level()],
             'ocupacion_operacion' => ['Operación u ocupación', 'Evidencia de operación, escala, ocupación o estado operativo.', AppraisalSpecialAttributeOptions::level()],
             'ubicacion_turistica' => ['Ubicación turística o comercial', 'Relación con demanda turística, corporativa o de servicios.', AppraisalSpecialAttributeOptions::level()],

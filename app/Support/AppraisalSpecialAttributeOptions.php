@@ -8,6 +8,7 @@ final class AppraisalSpecialAttributeOptions
     public static function quality(): array { return ['' => 'No verificado', 'deficiente' => 'Deficiente', 'normal' => 'Normal', 'bueno' => 'Bueno', 'superior' => 'Superior']; }
     public static function condition(): array { return ['' => 'No verificado', 'malo' => 'Malo', 'regular' => 'Regular', 'bueno' => 'Bueno', 'excelente' => 'Excelente']; }
     public static function yesPartial(): array { return ['' => 'No verificado', 'no' => 'No', 'parcial' => 'Parcial', 'si' => 'Sí']; }
+    public static function generatorCoverage(): array { return ['' => 'No verificado', 'no' => 'No', 'parcial' => 'Parcial', 'total' => 'Total', 'si' => 'Sí']; }
     public static function relevance(): array { return ['' => 'No verificado', 'ninguna' => 'Ninguna', 'menor' => 'Menor', 'relevante' => 'Relevante', 'superior' => 'Superior']; }
     public static function risk(): array { return ['' => 'No verificado', 'sin_evidencia' => 'Sin evidencia', 'bajo' => 'Bajo', 'medio' => 'Medio', 'alto' => 'Alto']; }
     public static function evidenceNeed(): array { return ['' => 'No verificado', 'no_requiere' => 'No requiere', 'requiere_foto' => 'Requiere foto', 'foto_cargada' => 'Foto cargada']; }

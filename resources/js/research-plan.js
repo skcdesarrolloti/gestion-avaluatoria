@@ -14,7 +14,20 @@ export function researchValue(raw, factor, key) {
         return null;
     }
     const categories = String(factor.categories ?? '').split('\n').map(normalize).filter(Boolean);
-    return categories.includes(text) ? text : null;
+    const index = categories.indexOf(text);
+    return index < 0 ? null : factor.kind === 'ordinal' ? index : text;
+}
+export function researchCode(raw, factor, key) {
+    const value = researchValue(raw, factor, key);
+    if (value === null) return 'Código: pendiente';
+    if (factor.kind === 'categorical') return `Clase: ${raw} · sin jerarquía`;
+    return `${factor.kind === 'numeric' ? 'Medida' : 'Código'}: ${value}`;
+}
+export function researchScale(factor) {
+    if (factor.kind === 'numeric') return 'Medida original; mayor número = mayor cantidad.';
+    if (factor.kind === 'binary') return '0 = No · 1 = Sí';
+    if (factor.kind === 'ordinal') return String(factor.categories ?? '').split('\n').filter(s => s.trim()).map((s, i) => `${i} = ${s.trim()}`).join(' · ') || 'Define el orden de menor a mayor.';
+    return 'Clases sin orden; no se califican de menor a mayor.';
 }
 export function factorEvidence(key, factor, groups) {
     const ready = [], values = [], portals = {};
@@ -52,6 +65,7 @@ export function researchSummary(plan, evidence) {
         const categories = [...new Set(String(f.categories ?? '').split('\n').map(normalize).filter(Boolean))];
         parameters += f.kind === 'categorical' ? Math.max(0, categories.length - 1) : 1;
         if (f.kind === 'categorical' && categories.length < 2) warnings.push(`${key}: define al menos dos categorías.`);
+        if (f.kind === 'ordinal' && categories.length < 2) warnings.push(`${key}: define al menos dos niveles de menor a mayor.`);
         if (!f.reason.trim() || !f.definition.trim()) warnings.push(`${key}: completa definición y justificación.`);
         if (researchValue(evidence.subjects[key], f, key) === null) warnings.push(`${key}: completa o concilia el dato del sujeto.`);
         if (stats[key].variation < 2) warnings.push(`${key}: no hay variación suficiente observada.`);
@@ -81,11 +95,13 @@ export function publishedAreaState(ads) {
 export function researchPlan(config) {
     return {
         plan: config.plan, evidence: config.evidence, catalog: config.catalog,
+        onlyCandidates: Object.values(config.plan.factors).some(f => f.decision === 'model'),
         comparisonId: config.evidence.groups[0]?.id || '',
         get comparisonGroup() { return this.evidence.groups.find(g => g.id === this.comparisonId) || {ads:[],contextPending:false}; },
         get comparisonKeys() {
             const area = ['area','built','land'].find(key => this.plan.factors[key]);
-            return [...new Set([area,...Object.keys(this.plan.factors)].filter(Boolean))];
+            const keys = Object.keys(this.plan.factors).filter(key => !this.onlyCandidates || !this.modelCount || this.plan.factors[key].decision === 'model');
+            return [...new Set([area,...keys].filter(Boolean))];
         },
         get publishedAreaState() { return publishedAreaState(this.comparisonGroup?.ads || []); },
         get publishedAreaLabel() { return ({difference:'Diferencia',review:'Base / dato por revisar',incomplete:'Datos incompletos',equal:'Coinciden con misma base',single:'Una fuente',missing:'Sin dato'})[this.publishedAreaState]; },
@@ -102,6 +118,8 @@ export function researchPlan(config) {
         get modelCount() { return Object.values(this.plan.factors).filter(f => f.decision === 'model').length; },
         modelUnavailable(key) { return this.modelCount >= 4 && this.plan.factors[key].decision !== 'model'; },
         subjectLabel(key) { return this.evidence.subjects[key] || 'Pendiente en numeral 3'; },
+        codeLabel(key,raw) { return researchCode(raw,this.plan.factors[key],key); },
+        scaleLabel(key) { return researchScale(this.plan.factors[key]); },
         factorLabel(key) { return this.catalog[key]?.label || key; },
         warningLabel(text) { const index = text.indexOf(':'); return `${text.startsWith('modelo:') ? 'Modelo' : this.factorLabel(text.slice(0, index))}${text.slice(index)}`; },
     };

@@ -19,7 +19,7 @@ final class ResearchPlanInput
             $decision=$factor['decision'] ?? '';
             if (!in_array($decision,['','filter','investigate','model','defer'],true)) throw new HttpException(422,'Decisión de factor inválida.');
             $kind=$factor['kind'] ?? ResearchFactorCatalog::all()[$key]['kind'];
-            if (!in_array($kind,['numeric','binary','categorical'],true)) throw new HttpException(422,'Tipo de dato inválido.');
+            if (!in_array($kind,['numeric','binary','categorical','ordinal'],true)) throw new HttpException(422,'Tipo de dato inválido.');
             $item=['decision'=>$decision,'kind'=>$kind];
             foreach (['reason'=>600,'definition'=>600,'categories'=>1200] as $field=>$max) {
                 $text=$factor[$field] ?? '';
@@ -28,6 +28,11 @@ final class ResearchPlanInput
             }
             $lines=array_values(array_unique(array_filter(array_map('trim',explode("\n",$item['categories'])))));
             if (count($lines)>15) throw new HttpException(422,'Usa hasta 15 categorías por factor.');
+            if ($kind==='ordinal') {
+                $normalized=array_map(static fn($line)=>trim(preg_replace('/[_\s]+/u',' ',strtr(mb_strtolower($line),['á'=>'a','é'=>'e','í'=>'i','ó'=>'o','ú'=>'u','ü'=>'u','ñ'=>'n']))),$lines);
+                if (count(array_unique($normalized))!==count($normalized) || array_intersect($normalized,['no verificado','por verificar','desconocido','no publicado','pendiente']))
+                    throw new HttpException(422,'La escala ordinal no admite niveles repetidos ni datos desconocidos como calificación.');
+            }
             $item['categories']=implode("\n",$lines);
             $out['factors'][$key]=$item;
         }
