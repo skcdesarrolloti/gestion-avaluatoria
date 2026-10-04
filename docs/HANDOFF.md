@@ -745,3 +745,17 @@ Máximo cuatro candidatos; investigación ilimitada dentro del catálogo. Sin DD
 Pruebas: 1005 PHP, 144 JS, 176 BD en instancia desechable 3367, build 70,2 KB gzip.
 Navegador local: oficina, dato Parcial sujeto=1, portales No=0 Parcial=1 Total=2,
 guardado confirmado y recarga. Vista estrecha con scroll contenido, sin errores.
+
+## 2026-10-04 · Filtros y obtención manual
+Destinación residencial/comercial/industrial es filtro, fuera del cuadro de atributos,
+calificaciones, coeficientes y meta. Servidor rechaza su uso como model/investigate;
+configuración anterior incompatible se conserva y pide corregir, sin borrado automático.
+Filtros documentan contexto: no descartan anuncios automáticamente. Cada atributo guarda
+collection=portal/manual/mixed para planificar su obtención. Ausencia en portales no
+excluye un atributo: investigación manual comparable por comparable con dato, fuente,
+fecha y soporte en captura existente. Elegir manual no inventa ni verifica valores.
+No añade factores personalizados fuera del catálogo ni un lector automático nuevo.
+JSON aditivo, sin DDL. Vista sólo candidatos conserva consulta completa. Pruebas:
+1008 PHP, 145 JS, build 70,3 KB gzip. Navegador local con guardado y recarga de Vista
+manual y Destinación filtro; pantalla estrecha sin desbordamiento ni consola con errores.
+También pasan 176 verificaciones BD contra una instancia local desechable nueva (3368).

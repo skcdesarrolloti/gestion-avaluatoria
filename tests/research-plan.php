@@ -3,6 +3,10 @@ declare(strict_types=1);
 (static function():void {
     $plan=\App\Services\ResearchPlanInput::input(json_encode(['factors'=>['bathrooms'=>['decision'=>'model','reason'=>'Dotación','definition'=>'Baños de la unidad']]],JSON_THROW_ON_ERROR));
     expect($plan['target_ratio']===10 && $plan['factors']['bathrooms']['kind']==='numeric' && isset($plan['updated_at']), 'plan valida borrador y registra fecha del servidor');
+    expectStatus(422,fn()=>\App\Services\ResearchPlanInput::input(json_encode(['factors'=>['destination'=>['decision'=>'model']]])),'destinación delimita la búsqueda y no entra al modelo');
+    $manual=\App\Services\ResearchPlanInput::input(json_encode(['factors'=>['view'=>['decision'=>'model','collection'=>'manual']]]));
+    expect($manual['factors']['view']['collection']==='manual','factor sin publicación puede planificarse para investigación manual');
+    expectStatus(422,fn()=>\App\Services\ResearchPlanInput::input(json_encode(['factors'=>['view'=>['collection'=>'inventar']]])),'obtención manual no habilita fuentes inventadas');
     \App\Services\ResearchPlanInput::validateScope($plan,'oficina','mercado');
     expectStatus(422,fn()=>\App\Services\ResearchPlanInput::validateScope($plan,'lote','mercado'),'no mezcla factores de oficina con terreno');
     expectStatus(422,fn()=>\App\Services\ResearchPlanInput::validateScope($plan,'oficina','costo'),'plan no invade costo');

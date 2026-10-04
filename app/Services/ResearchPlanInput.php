@@ -18,9 +18,13 @@ final class ResearchPlanInput
             if (!isset(ResearchFactorCatalog::all()[$key]) || !is_array($factor)) throw new HttpException(422,'Factor desconocido.');
             $decision=$factor['decision'] ?? '';
             if (!in_array($decision,['','filter','investigate','model','defer'],true)) throw new HttpException(422,'Decisión de factor inválida.');
+            if ($key==='destination' && !in_array($decision,['','filter','defer'],true)) throw new HttpException(422,'Destinación es un filtro de investigación, no un factor candidato al modelo.');
             $kind=$factor['kind'] ?? ResearchFactorCatalog::all()[$key]['kind'];
             if (!in_array($kind,['numeric','binary','categorical','ordinal'],true)) throw new HttpException(422,'Tipo de dato inválido.');
             $item=['decision'=>$decision,'kind'=>$kind];
+            $collection=$factor['collection'] ?? 'mixed';
+            if (!is_string($collection) || !in_array($collection,['portal','manual','mixed'],true)) throw new HttpException(422,'Revisa cómo obtendrás el dato del factor.');
+            $item['collection']=$collection;
             foreach (['reason'=>600,'definition'=>600,'categories'=>1200] as $field=>$max) {
                 $text=$factor[$field] ?? '';
                 if (!is_string($text) || mb_strlen($text)>$max) throw new HttpException(422,'Revisa definición, categorías o justificación: texto demasiado largo.');

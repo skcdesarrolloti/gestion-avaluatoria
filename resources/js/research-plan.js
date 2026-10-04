@@ -58,9 +58,10 @@ export function factorEvidence(key, factor, groups) {
     return { ready, missing, conflicts, formats, context, variation: new Set(values).size, portals };
 }
 export function researchSummary(plan, evidence) {
-    const selected = Object.entries(plan.factors).filter(([, f]) => f.decision === 'model');
+    const selected = Object.entries(plan.factors).filter(([key, f]) => key !== 'destination' && f.decision === 'model');
     const stats = Object.fromEntries(Object.entries(plan.factors).map(([key, f]) => [key, factorEvidence(key, f, evidence.groups)]));
     let parameters = 0; const warnings = [];
+    if (plan.factors.destination && !['','filter','defer'].includes(plan.factors.destination.decision)) warnings.push('destination: es un filtro de investigación; corrige su uso anterior.');
     for (const [key, f] of selected) {
         const categories = [...new Set(String(f.categories ?? '').split('\n').map(normalize).filter(Boolean))];
         parameters += f.kind === 'categorical' ? Math.max(0, categories.length - 1) : 1;
@@ -95,12 +96,12 @@ export function publishedAreaState(ads) {
 export function researchPlan(config) {
     return {
         plan: config.plan, evidence: config.evidence, catalog: config.catalog,
-        onlyCandidates: Object.values(config.plan.factors).some(f => f.decision === 'model'),
+        onlyCandidates: Object.entries(config.plan.factors).some(([key,f]) => key !== 'destination' && f.decision === 'model'),
         comparisonId: config.evidence.groups[0]?.id || '',
         get comparisonGroup() { return this.evidence.groups.find(g => g.id === this.comparisonId) || {ads:[],contextPending:false}; },
         get comparisonKeys() {
             const area = ['area','built','land'].find(key => this.plan.factors[key]);
-            const keys = Object.keys(this.plan.factors).filter(key => !this.onlyCandidates || !this.modelCount || this.plan.factors[key].decision === 'model');
+            const keys = Object.keys(this.plan.factors).filter(key => key !== 'destination' && (!this.onlyCandidates || !this.modelCount || this.plan.factors[key].decision === 'model'));
             return [...new Set([area,...keys].filter(Boolean))];
         },
         get publishedAreaState() { return publishedAreaState(this.comparisonGroup?.ads || []); },
@@ -115,7 +116,7 @@ export function researchPlan(config) {
         comparisonValue(key,ad) { return unknown(ad.values[key]) ? 'No publicado' : ad.values[key]; },
         get summary() { return researchSummary(this.plan, this.evidence); },
         get payload() { return JSON.stringify(this.plan); },
-        get modelCount() { return Object.values(this.plan.factors).filter(f => f.decision === 'model').length; },
+        get modelCount() { return Object.entries(this.plan.factors).filter(([key,f]) => key !== 'destination' && f.decision === 'model').length; },
         modelUnavailable(key) { return this.modelCount >= 4 && this.plan.factors[key].decision !== 'model'; },
         subjectLabel(key) { return this.evidence.subjects[key] || 'Pendiente en numeral 3'; },
         codeLabel(key,raw) { return researchCode(raw,this.plan.factors[key],key); },

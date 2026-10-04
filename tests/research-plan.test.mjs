@@ -88,3 +88,11 @@ test('ordinal codes share one ascending scale; original yes does not imply total
     assert.equal(comparisonState('generator',ordinal,[...ads,ad('ML',{generator:'Sí'})]),'review');
     assert.equal(researchSummary({target_ratio:10,factors:{generator:ordinal}},{subjects:{generator:'Total'},groups:[group('a',ads)]}).parameters,1);
 });
+
+test('destination stays outside factor codes and sample targets; manual factors remain candidates',()=>{
+    const factors={destination:{...numeric,decision:'model',kind:'categorical',categories:'Residencial\nComercial'},view:{...numeric,decision:'model',collection:'manual'}};
+    const ui=researchPlan({plan:{target_ratio:10,factors},evidence:{subjects:{view:'2'},groups:[]},catalog:{}});
+    assert.deepEqual(ui.comparisonKeys,['view']); ui.onlyCandidates=false;
+    assert.deepEqual(ui.comparisonKeys,['view']); assert.equal(ui.modelCount,1);
+    assert.equal(ui.summary.target,10); assert.equal(ui.summary.warnings.some(w=>w.startsWith('destination:')),true);
+});

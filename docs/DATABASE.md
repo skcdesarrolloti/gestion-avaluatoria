@@ -229,3 +229,5 @@ research_plan.factors.kind admite ordinal y conserva el orden de categories para
 Planta eléctrica admite total en special_attributes_json, conservando si como presencia
 sin cobertura detallada. Niveles duplicados equivalentes/desconocidos se rechazan para
 ordinal. Datos originales de anuncios intactos; códigos calculados sólo como consulta.
+
+research_plan.factors.collection: portal/manual/mixed (default mixed). Destinación mantiene clave histórica, pero sólo acepta filtro/pendiente; sin migración.

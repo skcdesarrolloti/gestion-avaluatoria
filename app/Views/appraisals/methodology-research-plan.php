@@ -10,7 +10,8 @@ if (($researchContext['regimen_ph'] ?? '')!=='si' && isset($researchCatalog['are
 }
 $researchPlan=['target_ratio'=>$selected['research_plan']['target_ratio'] ?? 10,'factors'=>[]];
 foreach ($researchCatalog as $key=>$factor) $researchPlan['factors'][$key]=array_replace(
-    ['decision'=>'','kind'=>$factor['kind'],'reason'=>'','definition'=>'','categories'=>$factor['categories']],$selected['research_plan']['factors'][$key] ?? []);
+    ['decision'=>$key==='destination'?'filter':'','kind'=>$factor['kind'],'collection'=>'mixed','reason'=>'','definition'=>'','categories'=>$factor['categories']],$selected['research_plan']['factors'][$key] ?? []);
+$researchFactors=array_diff_key($researchCatalog,['destination'=>true]);
 $researchEvidence=\App\Services\ResearchPlanEvidence::build($researchCatalog,$researchUnit,$comparableRows,$researchContext,$subject);
 $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$researchEvidence];
 ?>
@@ -19,7 +20,7 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
     <p class="mt-3 text-sm leading-6">Define qué investigar, dónde hay datos y por qué cada factor puede servir. El sujeto es la referencia; esta configuración prepara el análisis posterior.</p>
     <p class="mt-2 text-sm">Los usos «Filtro» e «Investigar» documentan la intención del analista: no cambian la captura ni descartan anuncios. Consulta la investigación por portal en la pestaña 3.</p>
     <p class="mt-2 text-sm">Si un dato sólo está descrito en texto o el sujeto usa otra clasificación, queda por conciliar. Por ejemplo, «piso alto» no se convierte automáticamente en un número de piso.</p>
-    <p class="mt-2 text-sm"><strong>Factores para <?= e($guide['type_label'] ?? $researchType) ?>:</strong> <?= e(implode(' · ',array_column($researchCatalog,'label'))) ?>. Catálogo inicial según tipo; no garantiza que los portales publiquen cada dato.</p>
+    <p class="mt-2 text-sm"><strong>Factores para <?= e($guide['type_label'] ?? $researchType) ?>:</strong> <?= e(implode(' · ',array_column($researchFactors,'label'))) ?>. Prioriza datos publicados; puedes investigar manualmente atributos relevantes que no aparezcan en los portales.</p>
     <?php if ($componentKey==='' || $researchCatalog===[] || empty($selected['method'])): ?>
     <p class="mt-4 rounded-xl bg-amber-50 p-4">Selecciona una unidad, confirma su tipo en el numeral 3 y guarda su método en Configuración para preparar su plan.</p>
     <?php else: ?>
@@ -35,6 +36,17 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
         <input type="hidden" name="component" value="<?= e($componentKey) ?>">
         <input type="hidden" name="version" value="<?= (int)($record['methodology_version'] ?? 0) ?>">
         <input type="hidden" name="research_plan" :value="payload" value="<?= e(json_encode($researchPlan,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>">
+        <?php if (isset($researchPlan['factors']['destination'])): ?>
+        <div class="mb-4 rounded-xl bg-slate-50 p-4 text-sm">
+            <h3 class="font-semibold">Filtros de investigación · destinación</h3>
+            <p class="mt-2">Residencial, comercial e industrial delimitan el universo de búsqueda. No son atributos candidatos, no reciben calificación ni aumentan la meta de muestras. Su aplicación se revisa por el analista; aquí no descarta anuncios automáticamente.</p>
+            <p class="mt-2">Uso observado del sujeto: <span x-text="subjectLabel('destination')"></span>.</p>
+            <label class="mt-2 block font-semibold">Tratamiento de la destinación<select class="input mt-1" x-model="plan.factors.destination.decision">
+                <option value="">Selecciona el tratamiento</option><option value="filter">Filtro de investigación</option><option value="defer">Pendiente de confirmar</option>
+                <?php if (!in_array($researchPlan['factors']['destination']['decision'],['','filter','defer'],true)): ?><option value="<?= e($researchPlan['factors']['destination']['decision']) ?>" disabled>Uso anterior: corrige a filtro o pendiente</option><?php endif; ?>
+            </select></label>
+        </div>
+        <?php endif; ?>
         <?php require __DIR__.'/methodology-research-comparison.php'; ?>
         <div class="rounded-xl border p-4">
             <h3 class="font-semibold">Viabilidad preliminar de la investigación</h3>
@@ -57,7 +69,7 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
         <details class="rounded-xl border p-4">
         <summary class="min-h-11 cursor-pointer font-semibold">Clasificar factores y preparar el modelo · máximo cuatro candidatos</summary>
         <div class="mt-4 grid gap-4 lg:grid-cols-2">
-        <?php foreach ($researchCatalog as $key=>$factor): ?>
+        <?php foreach ($researchFactors as $key=>$factor): ?>
             <article class="rounded-xl border p-4">
                 <h3 class="font-semibold"><?= e($factor['label']) ?> · <?= e($factor['unit']) ?></h3>
                 <p class="mt-2 text-sm"><strong>Sujeto:</strong> <span x-text="subjectLabel('<?= e($key) ?>')"></span>.
@@ -73,11 +85,14 @@ $researchConfig=['plan'=>$researchPlan,'catalog'=>$researchCatalog,'evidence'=>$
                         <option value="model" :disabled="modelUnavailable('<?= e($key) ?>')">Candidato para el modelo · máximo 4</option><option value="defer">Dejar pendiente</option>
                     </select>
                 </label>
+                <label class="mt-3 block text-sm font-semibold">Cómo obtener el dato<select class="input mt-1" x-model="plan.factors.<?= e($key) ?>.collection">
+                    <option value="mixed">Portal y verificación manual cuando falte</option><option value="portal">Priorizar información publicada en portales</option><option value="manual">Investigación manual comparable por comparable</option>
+                </select></label>
                 <details class="mt-3"><summary class="min-h-11 cursor-pointer text-sm font-semibold">Dónde hay datos y cómo definir el factor</summary>
                     <div class="text-sm"><template x-for="(counts,portal) in summary.stats.<?= e($key) ?>.portals" :key="portal">
                         <p class="mt-2" x-text="`${portal}: ${counts.present}/${counts.ads} anuncios con dato; ${counts.readable} legibles con esta definición.`"></p>
                     </template></div>
-                    <p class="mt-2 text-xs">Los anuncios por portal pueden pertenecer a un mismo inmueble. Dato complementario no equivale a dato confirmado; un formato sin equivalencia definida queda pendiente.</p>
+                    <p class="mt-2 text-xs">Los anuncios por portal pueden pertenecer a un mismo inmueble. Si falta este atributo, consíguelo por contacto, visita o documento y registra dato, fuente, fecha y soporte en su ficha de captura. No publicado no significa inexistente. Esta elección planifica la obtención; no completa ni verifica datos automáticamente.</p>
                     <label class="mt-3 block text-sm font-semibold">Tipo de variable<select class="input mt-1" x-model="plan.factors.<?= e($key) ?>.kind">
                         <option value="numeric">Numérica: cantidad o medida</option><option value="binary">Binaria: no=0, sí=1</option><option value="ordinal">Ordinal: niveles de menor a mayor</option><option value="categorical">Nominal: clases sin jerarquía</option></select></label>
                     <label class="mt-3 block text-sm font-semibold">Definición y forma de medición<textarea class="input mt-1" maxlength="600" rows="2" x-model="plan.factors.<?= e($key) ?>.definition" placeholder="Ej. Número de baños privados; misma definición en sujeto y muestras"></textarea></label>
