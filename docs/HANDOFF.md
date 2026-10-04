@@ -855,3 +855,9 @@ propios/comunes y conserva anteriores; 22 datos de casa/parqueo + 5 PH. Sin DDL.
 Revisar/restablecer escalas Vista antiguas; datos anteriores no se recodifican.
 1096 PHP, 153 JS, 196 BD3380, lint/build/71,3KB. Navegador ficticio: restablecer
 Vista y confirmar dato anterior, captura casa. Siguiente tipo pendiente: oficina.
+
+Vista sin ruido 2026-10-04: catálogo muestra descripción breve y jerarquía 0–3
+una sola vez. Restablecer usa navegación fetch con respuesta HTML del servidor,
+de modo que desaparecen aviso y botón tras el guardado, sin refresco adicional
+manual. No modifica capturas ni escalas históricas de planes. Validación: 1096 PHP,
+153 JS, 196 BD3381, lint/build/71,3KB; prueba local restablecer y vista estrecha.

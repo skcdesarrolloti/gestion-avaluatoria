@@ -11,7 +11,7 @@
     <p class="mt-3 text-xs">«Referenciado en portal» significa que la investigación de fichas públicas menciona ese campo o atributo en texto; no garantiza dato en cada aviso ni lectura automática. Si no está documentado, planifica contacto, visita o soporte manual. Desconocido no equivale a cero. Destinación es filtro y queda fuera de los factores.</p>
     <p class="mt-3 rounded bg-teal-50 p-3 text-sm">Área en m²: base obligatoria de cálculo, no candidato. COP/m² = precio / área compatible de terreno, construcción o privada según el alcance.</p>
     <details class="mt-3 rounded border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Cómo leer las calificaciones</summary>
-        <p class="text-sm">Cantidades: dato real, como 2 baños o 48 años. Presencia: 0 = No, 1 = Sí. Jerarquías: códigos fijos de menor a mayor cobertura o calidad. Clases como acceso, relieve y tipo de vista no tienen orden de mejor a peor; su codificación estadística se definirá en Análisis.</p>
+        <p class="text-sm">Cantidades: dato real, como 2 baños o 48 años. Presencia: 0 = No, 1 = Sí. Jerarquías: códigos fijos según la escala acordada. Clases como acceso y relieve no tienen orden de mejor a peor; su codificación estadística se definirá en Análisis.</p>
         <p class="mt-2 text-sm">Mayor edad, pendiente, restricción o humedad no significa mayor valor. La dirección de la medida se conserva; el modelo estudiará su relación con el precio. Sólo se califican datos comprobados, con soporte; desconocido queda pendiente.</p>
     </details>
     <?php foreach ($referenceTypes as $referenceKey=>$referenceLabel): ?>
