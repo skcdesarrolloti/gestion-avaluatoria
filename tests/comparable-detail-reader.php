@@ -27,6 +27,7 @@ catch (RuntimeException) { expect(true,'ficha sin identidad inequívoca queda pe
 
 $fincaUrl='https://www.fincaraiz.com.co/oficina-en-venta-en-manga-cartagena/193907764';
 $data=['id'=>193907764,'link'=>'/oficina-en-venta-en-manga-cartagena/193907764','description'=>'Recepción del edificio.',
+    'owner'=>['name'=>'Inmobiliaria de prueba','type'=>'inmobiliaria','masked_phone'=>'+5731'],
     'technicalSheet'=>[['field'=>'floor','text'=>'Piso N°','value'=>'4'],['field'=>'constructionYear','text'=>'Antigüedad','value'=>'1 a 8 años'],['field'=>'m2apto','text'=>'Área Privada','value'=>'123 m2']],
     'facilities'=>[['name'=>'Circuito cerrado de TV','group'=>'Exterior'],['name'=>'Parqueadero Visitantes','group'=>'Exterior']]];
 $doc=new DOMDocument(); $doc->loadHTML('<script id="__NEXT_DATA__" type="application/json">'.json_encode(['props'=>['pageProps'=>['data'=>$data]]]).'</script>');
@@ -35,4 +36,7 @@ $facts=json_decode($ficha['published_attributes'],true);
 expect($ficha['floor_level']==='4' && $facts['Área Privada']==='123 m2','ficha técnica conserva piso y etiqueta de área privada');
 expect(!isset($ficha['age_years'],$ficha['private_built_m2']),'ficha no convierte intervalo en edad ni privada en privada construida');
 expect(isset($facts['Circuito cerrado de TV'],$facts['Parqueadero Visitantes']),'ficha conserva todas las instalaciones publicadas');
+expect($ficha['contact_name']==='Inmobiliaria de prueba' && $facts['Anunciante']==='Inmobiliaria de prueba'
+    && $facts['Tipo de anunciante']==='inmobiliaria','ficha conserva anunciante distinto del portal y de propiedad jurídica');
+expect(!isset($ficha['contact_phone']),'no presenta teléfono enmascarado como contacto completo');
 expect(App\Services\FincaraizFichaDetails::parse($doc,str_replace('193907764','193978243',$fincaUrl))===[],'ficha técnica exige identidad del anuncio y no lee filtros relacionados');

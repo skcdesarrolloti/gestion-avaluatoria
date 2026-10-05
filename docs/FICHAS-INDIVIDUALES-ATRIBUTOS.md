@@ -27,6 +27,14 @@ privada construida. Un atributo de «Exterior» no se atribuye automáticamente 
 la unidad privada o a PH. Estrato publicado en oficina queda como dato original,
 no como factor del catálogo de oficinas.
 
+FincaRaíz también conserva el nombre y tipo del anunciante publicado en la ficha
+identificada: contact_name y atributos originales Anunciante/Tipo de anunciante.
+El campo owner del portal identifica al publicador; no demuestra propiedad legal
+del inmueble. Teléfonos enmascarados no se guardan como números completos. El portal
+sigue registrado por separado como fuente. Si no publica anunciante, queda pendiente.
+Validación adicional: 1446 PHP, 175 JS, lint/build y 76,3 KB gzip; dos fichas
+públicas conservan sus atributos y agregan los dos datos del anunciante.
+
 Otros portales e inmobiliarias del catálogo: lectura de datos estructurados de
 una única ficha identificada (descripción, atributos, instalaciones, medidas y
 precio COP). Cuando la fuente no entrega una entidad inequívoca, bloquea acceso,

@@ -15,6 +15,18 @@ final class FincaraizFichaDetails
             || ($data['link'] ?? '')!==parse_url($url,PHP_URL_PATH)) return [];
         $text=is_string($data['description'] ?? null)?$data['description']:'';
         $facts=[]; $row=[];
+        // Portal owner identifies the publisher, not legal ownership of the property.
+        $publisher=is_array($data['owner'] ?? null)?$data['owner']:[];
+        $name=is_string($publisher['name'] ?? null)?mb_substr(trim(strip_tags($publisher['name'])),0,120):'';
+        if ($name!=='') {
+            $row['contact_name']=$name;
+            $facts['Anunciante']=$name;
+            $text.="\nAnunciante: ".$name.';';
+            if (is_string($publisher['type'] ?? null) && trim($publisher['type'])!=='') {
+                $facts['Tipo de anunciante']=mb_substr(trim(strip_tags($publisher['type'])),0,80);
+                $text.="\nTipo de anunciante: ".$facts['Tipo de anunciante'].';';
+            }
+        }
         $fields=['bathrooms'=>'bathrooms','garage'=>'parking_spaces','floor'=>'floor_level','m2Built'=>'built_m2'];
         foreach (is_array($data['technicalSheet'] ?? null)?$data['technicalSheet']:[] as $entry) {
             if (!is_array($entry) || !is_string($entry['text'] ?? null) || !is_scalar($entry['value'] ?? null)) continue;
