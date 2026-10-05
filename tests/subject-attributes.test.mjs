@@ -2,6 +2,19 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { subjectAttributes } from '../resources/js/subject-attributes.js';
 
+test('initial score waits until saved row toggles have initialized', () => {
+    const row = attributeRow('4','3',false);
+    const unit = { dataset:{unitId:'u1'}, querySelectorAll:()=>[row.rating] };
+    const component = subjectAttributes('u1');
+    component.$el = {querySelectorAll:()=>[unit]};
+    let initialize;
+    component.$nextTick = callback => { initialize=callback; };
+    component.init();
+    row.toggle.checked=true; row.rating.disabled=false;
+    initialize();
+    assert.equal(component.unitScoreText('u1'),'Ajuste +5% · índice 80%');
+});
+
 function attributeRow(ratingValue, weightValue = '', checked = true) {
     const weight = { value: weightValue, dispatched: false, dispatchEvent() { this.dispatched = true; } };
     const toggle = { checked };
@@ -25,6 +38,7 @@ test('subject attribute score updates from current unsaved controls', () => {
     };
     const component = subjectAttributes('u1');
     component.$el = { querySelectorAll: (selector) => selector === '[data-attribute-unit]' ? [unit] : [] };
+    component.$nextTick = callback => callback();
     component.init();
     assert.equal(component.unitAdjustment('u1'), '+4,5%');
     assert.equal(component.unitScoreText('u1'), 'Ajuste +4,5% · índice 78%');
@@ -48,6 +62,7 @@ test('subject attribute score ignores incomplete rows', () => {
     };
     const component = subjectAttributes('u1');
     component.$el = { querySelectorAll: (selector) => selector === '[data-attribute-unit]' ? [unit] : [] };
+    component.$nextTick = callback => callback();
     component.init();
     assert.equal(component.unitAdjustment('u1'), '-5%');
     assert.equal(component.unitScoreText('u1'), 'Ajuste -5% · índice 40%');
@@ -77,6 +92,7 @@ test('subject attribute score ignores unchecked selected controls', () => {
     };
     const component = subjectAttributes('u1');
     component.$el = { querySelectorAll: (selector) => selector === '[data-attribute-unit]' ? [unit] : [] };
+    component.$nextTick = callback => callback();
     component.init();
     assert.equal(component.unitAdjustment('u1'), '0%');
 });

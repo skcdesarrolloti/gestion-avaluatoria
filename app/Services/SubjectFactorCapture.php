@@ -14,7 +14,7 @@ final class SubjectFactorCapture
     public static function catalog(array $unit,array $record,array $scales=[]): array
     {
         $type=self::type($unit,$record);
-        $catalog=ResearchFactorCatalog::forType($type,'',false,true);
+        $catalog=ResearchFactorCatalog::forInvestigation($type,'',true);
         $saved=self::decode($unit);
         if ($type==='apartamento') $catalog=ApartmentResearchFactors::preserve($catalog,$saved);
         if ($type==='casa') $catalog=HouseResearchFactors::preserve($catalog,$saved);

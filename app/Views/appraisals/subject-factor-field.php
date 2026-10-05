@@ -15,6 +15,14 @@ if ($captureStale) $captureLiveCode='(!captureConfirmed && captureValue === '.js
     <legend class="px-1 font-semibold"><?= e($captureFactor['label']) ?> · <?= e($captureFactor['unit']) ?></legend>
     <p class="text-xs"><?= e($captureFactor['why']) ?></p>
     <p class="mt-2 text-sm font-semibold"><?= e(\App\Services\ResearchFactorReference::scale($captureFactor)) ?></p>
+    <?php foreach (\App\Services\SubjectAttributeResearch::previous($factorUnit,$captureFactor) as $capturePrevious): ?>
+    <div class="mt-2 rounded bg-blue-50 p-2 text-xs">
+        <strong>Calificación valuatoria actual · <?= e($capturePrevious['label']) ?>:</strong>
+        <?= e($capturePrevious['observed']) ?> · calificación <?= e($capturePrevious['rating'] ?: 'pendiente') ?>/5 · peso <?= e($capturePrevious['weight'] ?: 'pendiente') ?>.
+        <?php if ($capturePrevious['notes']!==''): ?><p><?= e($capturePrevious['notes']) ?></p><?php endif; ?>
+        <p>Registro anterior conservado. Confirma abajo el dato y su soporte para investigar; esta clase no cambia su calificación ni su peso.</p>
+    </div>
+    <?php endforeach; ?>
     <?php if ($captureOriginal!==''): ?><p class="mt-2 rounded bg-slate-50 p-2 text-xs">Dato ya registrado en el capítulo 3: <?= e($captureOriginal) ?>. Verifica que corresponda a esta clasificación.</p>
         <?php if ($captureFactor['scale_valid'] && \App\Services\SubjectFactorCapture::validValue($captureOriginal,$captureFactor)): ?><button type="button" class="btn-secondary mt-2" @click="captureValue=<?= e(json_encode($captureOriginal,JSON_UNESCAPED_UNICODE)) ?>; $nextTick(() => $el.closest('fieldset').querySelector('[name$=&quot;[value]&quot;]').dispatchEvent(new Event('change', { bubbles: true })))">Usar dato existente · completar soporte</button><?php endif; ?>
     <?php endif; ?>

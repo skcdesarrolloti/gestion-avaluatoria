@@ -5,7 +5,7 @@ declare(strict_types=1);
     foreach (\App\Services\ComparablePortalProfiles::types() as $type=>$label) {
         $unit=['unit_kind'=>'property','property_type'=>$type];
         $capture=\App\Services\SubjectFactorCapture::catalog($unit,$record);
-        $expected=array_diff_key(\App\Services\ResearchFactorCatalog::forType($type),array_flip(['area','land','built','destination']));
+        $expected=array_diff_key(\App\Services\ResearchFactorCatalog::forInvestigation($type),array_flip(['area','land','built','destination']));
         expect(array_keys($capture)===array_keys($expected),'captura del sujeto cubre catálogo completo para '.$type);
     }
     $annex=\App\Services\SubjectFactorCapture::catalog(['unit_kind'=>'annex','construction_type'=>'deposito'],$record);

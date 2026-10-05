@@ -105,14 +105,15 @@ test('joint count counts confirmed properties, not advertisements or independent
     plan.factors.bathrooms.decision='filter'; plan.factors.view.decision='defer';
     assert.equal(researchSummary(plan,evidence).joint,0);
 });
-test('summary shows every factor and subject while limiting model to four, not investigation',()=>{
+test('summary shows every factor by default and retains more than four candidates for later analysis',()=>{
     const factors=Object.fromEntries(['area','bathrooms','parking','age','floor','view'].map(k=>[k,{...numeric,decision:k==='area'?'defer':k==='view'?'investigate':'model'}]));
     const ui=researchPlan({plan:{factors,target_ratio:10},catalog:{},evidence:{subjects:{bathrooms:'2'},groups:[]}});
+    assert.equal(ui.comparisonKeys.length,6); ui.onlyCandidates=true;
     assert.equal(ui.comparisonKeys.length,5); ui.onlyCandidates=false;
     assert.equal(ui.comparisonKeys.length,6); assert.equal(ui.subjectLabel('bathrooms'),'2');
-    assert.equal(ui.comparisonGroup.ads.length,0); assert.equal(ui.modelUnavailable('view'),true);
-    assert.equal(ui.modelUnavailable('bathrooms'),false); assert.equal(ui.summary.target,40);
-    factors.floor.decision='investigate'; assert.equal(ui.summary.selected,3); assert.equal(ui.modelUnavailable('view'),false);
+    assert.equal(ui.comparisonGroup.ads.length,0); assert.equal(ui.summary.target,40);
+    factors.view.decision='model'; assert.equal(ui.summary.selected,5); assert.equal(ui.summary.target,50);
+    assert.equal(ui.summary.warnings.some(w=>w.startsWith('modelo:')),false);
 });
 
 test('ordinal codes share one ascending scale; original yes does not imply total',()=>{

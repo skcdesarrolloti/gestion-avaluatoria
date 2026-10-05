@@ -14,7 +14,7 @@ declare(strict_types=1);
     expectStatus(422,fn()=>\App\Services\ResearchPlanInput::input('{invalid'),'JSON inválido no se guarda');
     expectStatus(422,fn()=>\App\Services\ResearchPlanInput::input('{"target_ratio":0,"factors":{}}'),'referencia inválida rechazada');
     $five=array_fill_keys(['bathrooms','parking','age','floor','view'],['decision'=>'model']);
-    expectStatus(422,fn()=>\App\Services\ResearchPlanInput::input(json_encode(['factors'=>$five])),'servidor limita candidatos a cuatro sin eliminar factores');
+    expect(count(\App\Services\ResearchPlanInput::input(json_encode(['factors'=>$five]))['factors'])===5,'servidor conserva más de cuatro candidatos para investigar sin ejecutar regresión');
     $five['view']['decision']='investigate';
     expect(count(\App\Services\ResearchPlanInput::input(json_encode(['factors'=>$five]))['factors'])===5,'se pueden investigar factores adicionales a cuatro candidatos');
     expect(isset(\App\Services\ResearchFactorCatalog::forType('apartamento')['ph_generator'],\App\Services\ResearchFactorCatalog::forType('apartamento')['destination']),'apartamento incluye planta eléctrica común PH y destinación');

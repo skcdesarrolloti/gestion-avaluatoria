@@ -72,7 +72,7 @@ $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'
                                     <label class="label"><?= e($fieldLabel) ?>
                                         <select class="input" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][<?= e($field) ?>]" :disabled="!enabled">
                                             <?php foreach ($specialAttributeOptions[$field] as $value => $text): ?>
-                                                <option value="<?= e($value) ?>" <?= $attrValue($unit, $key, $field) === $value ? 'selected' : '' ?>><?= e($text) ?></option>
+                                                <option value="<?= e($value) ?>" <?= $attrValue($unit, $key, $field) === (string)$value ? 'selected' : '' ?>><?= e($text) ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                     </label>
@@ -82,7 +82,7 @@ $unitType = (string) (($unit['property_type'] ?? '') ?: ($record['tipo_inmueble'
                                         <select class="input" name="unit_attributes[<?= e($unitId) ?>][items][<?= e($key) ?>][<?= e($field) ?>]"
                                             <?= $field === 'rating' ? 'data-attribute-rating' : 'data-attribute-weight' ?> :disabled="!enabled">
                                             <?php foreach ($specialAttributeOptions[$field] as $value => $text): ?>
-                                                <option value="<?= e($value) ?>" <?= $attrValue($unit, $key, $field) === $value ? 'selected' : '' ?>><?= e($text) ?></option>
+                                                <option value="<?= e($value) ?>" <?= $attrValue($unit, $key, $field) === (string)$value ? 'selected' : '' ?>><?= e($text) ?></option>
                                             <?php endforeach; ?>
                                         </select>
                                     </label>

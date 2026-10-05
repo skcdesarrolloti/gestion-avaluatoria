@@ -48,3 +48,5 @@ Vista pasa a ordinal 0–3 por instrucción explícita del usuario; la escala an
 permanece y requiere restablecimiento en catálogo, adopción en Insumos y confirmación
 del sujeto. Una escala inválida o anterior sin confirmar no presenta código aplicado.
 No modifica coeficientes ni implementa Análisis. 1096 PHP, 153 JS, 196 BD3380.
+
+Vigente 2026-10-05: captura integrada en 3.4 > Factores para investigación · módulo8. Calificación anterior conservada en otra subpestaña. Catálogo incorpora observables anteriores por tipo y ya no limita candidatos a cuatro. Ver CALIFICACIONES-INTEGRADAS-3-4.md.

@@ -283,3 +283,5 @@ Lote aprobado (2026-10-04): sin DDL. front_exposure y public_services usan captu
 Consultorio (2026-10-04): sin DDL; access_ramp es binario No/Sí en JSON existente de sujeto y plan. No se infiere rampa desde accesibilidad ni se sustituyen datos históricos.
 
 Edificio (2026-10-04): sin DDL. elevator_count usa cantidad en JSON existente de sujeto y plan; elevator binario previo se conserva sin inferir cantidad ni operación.
+
+Integración 3.4 (2026-10-05): sin DDL ni backfill. Calificación valuatoria mantiene special_attributes_json; captura de clases con soporte mantiene subject_factors_json/version. Claves complementarias d_ + SHA256 parcial estables; no se copian rating/weight ni se recodifican históricos. Prueba BD verifica ambas capturas independientes y conservación exacta del JSON anterior.

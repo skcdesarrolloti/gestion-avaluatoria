@@ -88,7 +88,6 @@ export function researchSummary(plan, evidence) {
     if (areaKey) stats[areaKey] = factorEvidence(areaKey,{kind:'numeric'},evidence.groups);
     const areaReady = areaKey ? stats[areaKey].ready.length : 0;
     const joint = selected.length ? evidence.groups.filter(group => (!areaKey || stats[areaKey].ready.includes(group.id)) && selected.every(([key]) => stats[key].ready.includes(group.id))).length : 0;
-    if (selected.length > 4) warnings.push('modelo: reduce la selección a cuatro factores como máximo.');
     return { stats, areaKey, areaReady, selected: selected.length, parameters, joint, target: selected.length * plan.target_ratio, coefficientTarget: parameters * plan.target_ratio, warnings };
 }
 export function comparisonState(key, factor, ads) {
@@ -112,7 +111,7 @@ export function researchPlan(config) {
         ...assessmentMethods,
         plan: config.plan, evidence: config.evidence, catalog: config.catalog,
         scaleValid(key) { return validResearchScale(this.plan.factors[key],this.catalog[key]); },
-        onlyCandidates: Object.entries(config.plan.factors).some(([key,f]) => researchFactor(key) && f.decision === 'model'),
+        onlyCandidates: false,
         comparisonId: config.evidence.groups[0]?.id || '',
         get comparisonGroup() { return this.evidence.groups.find(g => g.id === this.comparisonId) || {ads:[],contextPending:false}; },
         get comparisonKeys() {
@@ -133,7 +132,6 @@ export function researchPlan(config) {
         get summary() { return researchSummary(this.plan, this.evidence); },
         get payload() { return JSON.stringify(this.plan); },
         get modelCount() { return Object.entries(this.plan.factors).filter(([key,f]) => researchFactor(key) && f.decision === 'model').length; },
-        modelUnavailable(key) { return this.modelCount >= 4 && this.plan.factors[key].decision !== 'model'; },
         isFactor(key) { return researchFactor(key); },
         subjectLabel(key) { return this.evidence.subjects[key] || 'Pendiente: completar o calificar con soporte'; },
         codeLabel(key,raw) { return researchCode(raw,['area','built','land'].includes(key)?{kind:'numeric'}:{...this.plan.factors[key],scale_valid:this.scaleValid(key)},key); },

@@ -15,7 +15,7 @@ final class UserResearchFactorInput
             $data[$field]=trim(str_replace(["\r\n","\r"],"\n",$value));
         }
         if ($data['label']==='' || $data['why']==='' || $data['unit']==='') throw new HttpException(422,'Completa nombre, definición y unidad de medida.');
-        foreach (ResearchFactorCatalog::all() as $existingKey=>$existing) if ($existingKey!==$key && mb_strtolower($existing['label'])===mb_strtolower($data['label'])) throw new HttpException(422,'Ya existe un factor con ese nombre. Edita o asigna el existente.');
+        if (!$base || $data['label']!==$base['label']) foreach (ResearchFactorCatalog::all() as $existingKey=>$existing) if ($existingKey!==$key && mb_strtolower($existing['label'])===mb_strtolower($data['label'])) throw new HttpException(422,'Ya existe un factor con ese nombre. Edita o asigna el existente.');
         if (!in_array($data['kind'],['numeric','binary','ordinal','categorical'],true)) throw new HttpException(422,'Elige el tipo de dato.');
         if ($base && ($base['kind']==='numeric' || $data['kind']==='numeric') && ($base['kind']!==$data['kind'] || $base['unit']!==$data['unit'])) throw new HttpException(422,'Conserva la medida original del factor numérico; crea otro factor si necesitas otra medida.');
         if (!in_array($data['group'],['Unidad privada','Celdas de parqueo','Copropiedad PH','Terreno'],true)) throw new HttpException(422,'Elige el alcance del atributo.');

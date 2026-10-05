@@ -34,7 +34,7 @@ final class UserResearchFactors
     {
         if (isset(self::$items[$key])) return self::$items[$key]['types'];
         $out=[];
-        foreach (ComparablePortalProfiles::types() as $type=>$label) if (isset(ResearchFactorCatalog::forType($type)[$key])) $out[]=$type;
+        foreach (ComparablePortalProfiles::types() as $type=>$label) if (isset(ResearchFactorCatalog::forInvestigation($type)[$key])) $out[]=$type;
         return $out;
     }
 }

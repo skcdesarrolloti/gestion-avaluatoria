@@ -43,7 +43,7 @@
                 <input type="number" min="1" max="100" x-model.number="plan.target_ratio" class="input mt-2 max-w-40" placeholder="Ej. 10">
             </label>
             <p class="mt-2 text-sm" x-text="`Meta orientativa: ${summary.target} inmuebles. Faltan ${Math.max(0,summary.target-summary.joint)} respecto a esa referencia.`"></p>
-            <p class="mt-2 text-sm">Puedes investigar todos los factores y elegir como máximo cuatro candidatos para el modelo. Con diez inmuebles por factor: uno requiere una meta de 10; cuatro, de 40. Son inmuebles diferentes con los datos conjuntos, no anuncios duplicados.</p>
+            <p class="mt-2 text-sm">Puedes investigar todos los factores y proponer candidatos sin un tope de cuatro. La referencia de diez inmuebles por factor sirve para planificar: se cuentan inmuebles diferentes con datos conjuntos, no anuncios duplicados. La selección estadística se hará en Análisis.</p>
             <p class="mt-2 text-sm">Es una meta de planificación configurable, no una exigencia normativa ni garantía estadística. Las categorías pueden generar varios coeficientes; su suficiencia y codificación se revisarán en Análisis. Aquí todavía no se ajusta una regresión.</p>
             <details class="mt-3" x-show="summary.warnings.length"><summary class="min-h-11 cursor-pointer font-semibold text-amber-800">Pendientes de la configuración</summary>
                 <ul class="list-disc pl-5 text-sm"><template x-for="warning in summary.warnings" :key="warning"><li x-text="warningLabel(warning)"></li></template></ul>
@@ -52,7 +52,7 @@
         <p class="my-4 text-sm">Datos de las muestras guardadas al abrir esta consulta. Guarda la captura antes de <a class="font-semibold text-blue-700 underline" href="<?= e(url($basePath.'?component='.rawurlencode($componentKey).'&stage=3&research=1')) ?>">Actualizar consulta</a>.
             Los conteos son de disponibilidad, no de comparables aprobados ni valores adoptados.</p>
         <details class="rounded-xl border p-4">
-        <summary class="min-h-11 cursor-pointer font-semibold">Clasificar factores y preparar el modelo · máximo cuatro candidatos</summary>
+        <summary class="min-h-11 cursor-pointer font-semibold">Clasificar todos los factores y preparar el análisis</summary>
         <div class="mt-4 grid gap-4 lg:grid-cols-2">
         <?php foreach ($researchFactors as $key=>$factor): $factorPortals=\App\Services\ResearchFactorReference::portals($researchType,$key); $factorUnreferenced=array_diff(array_values(\App\Services\ComparablePortalProfiles::portals()),array_column($factorPortals,'label')); ?>
             <article class="rounded-xl border p-4">
@@ -74,7 +74,7 @@
                 <label class="mt-3 block text-sm font-semibold">Uso propuesto
                     <select class="input mt-1" x-model="plan.factors.<?= e($key) ?>.decision"><option value="">Selecciona el uso</option>
                         <option value="filter">Filtro de contexto</option><option value="investigate">Investigar disponibilidad</option>
-                        <option value="model" :disabled="modelUnavailable('<?= e($key) ?>')">Candidato para el modelo · máximo 4</option><option value="defer">Dejar pendiente</option>
+                        <option value="model" >Candidato para análisis posterior</option><option value="defer">Dejar pendiente</option>
                     </select>
                 </label>
                 <label class="mt-3 block text-sm font-semibold">Cómo obtener el dato<select class="input mt-1" x-model="plan.factors.<?= e($key) ?>.collection">

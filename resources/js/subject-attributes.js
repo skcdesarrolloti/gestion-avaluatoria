@@ -36,7 +36,7 @@ export function subjectAttributes(initialUnit = '') {
         scores: {},
         selectionTick: 0,
         init() {
-            this.refreshScores();
+            this.$nextTick(() => this.refreshScores());
         },
         handleAttributeChange(event) {
             if (event.target?.matches?.('[data-attribute-toggle]')) this.selectionTick += 1;

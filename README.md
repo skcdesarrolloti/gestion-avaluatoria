@@ -21,6 +21,9 @@ Consultorio comparte los factores y escalas de Oficina, más Rampa de acceso
 (0 No / 1 Sí), con captura en capítulos 3 y 8.
 Edificio completo: nueve atributos aprobados, ascensores operativos por cantidad
 y parqueo agrupado; capturas compartidas entre capítulos 3 y 8.
+[Dos calificaciones reunidas en 3.4](docs/CALIFICACIONES-INTEGRADAS-3-4.md):
+valoración anterior conservada y atributos compartidos con investigación del #8,
+sin un límite fijo de cuatro candidatos ni conversión de pesos en coeficientes.
 Academia compartida por método: una pestaña por método activo y sus alcances,
 artículos completos plegables y verificaciones particulares por unidad.
 Academia General reúne reglas comunes y casos de aplicación. Requisito del análisis:

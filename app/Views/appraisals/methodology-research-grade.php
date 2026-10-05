@@ -1,6 +1,6 @@
 <template x-if="isFactor(key)"><div>
     <p class="text-xs" x-text="`Comparable: ${assessmentCode(comparisonGroup.id,key)}`"></p>
-    <p class="text-xs" x-show="evidence.subjectCaptureKeys?.includes(key)">El dato del sujeto se actualiza en Capítulo 3 → Factores del sujeto.</p>
+    <p class="text-xs" x-show="evidence.subjectCaptureKeys?.includes(key)">El dato del sujeto se actualiza en 3.4 → Factores para investigación.</p>
     <details class="mt-2"><summary class="min-h-11 cursor-pointer text-xs font-semibold">Calificar con soporte</summary><div class="space-y-3">
     <template x-for="target in assessmentTargets(key)" :key="target"><div class="rounded border p-2">
         <p class="text-xs font-semibold" x-text="target==='subject'?'Sujeto · referencia':'Comparable · inmueble vinculado'"></p>

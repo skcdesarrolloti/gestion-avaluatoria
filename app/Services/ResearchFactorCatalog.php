@@ -30,7 +30,11 @@ final class ResearchFactorCatalog
             'deposit'=>$make('Depósitos','numeric','cantidad','research_deposit','ph_deposit_count','Investigar composición y derechos; no liquida su valor separado.','tipologias'),
             'generator'=>$make('Planta eléctrica','ordinal','alcance','research_generator','research_generator','Distinguir ausencia, respaldo parcial y total; un Sí sin cobertura no acredita Total.','attributes',"No\nParcial\nTotal"),
             'destination'=>$make('Destinación / uso observado','categorical','categoría','research_destination','research_destination','Registrar el uso descrito; no sustituye el uso aprobado ni se deduce del tipo de anuncio.','tipologias',"Residencial\nComercial\nOficina\nIndustrial\nMixto\nRural\nDotacional\nOtro"),
-        ] + ResearchFactorExtensions::all() + ApartmentResearchFactors::all() + HouseResearchFactors::all() + LocalResearchFactors::all() + LandResearchFactors::all() + ConsultingResearchFactors::all() + BuildingResearchFactors::all());
+        ] + ResearchFactorExtensions::all() + ApartmentResearchFactors::all() + HouseResearchFactors::all() + LocalResearchFactors::all() + LandResearchFactors::all() + ConsultingResearchFactors::all() + BuildingResearchFactors::all() + SubjectAttributeResearch::all());
+    }
+    public static function forInvestigation(string $type,string $part='',bool $historical=false): array
+    {
+        return SubjectAttributeResearch::catalog(self::forType($type,$part,false,$historical),$type,$part,$historical);
     }
     public static function forType(string $type,string $part='',bool $legacyOnly=false,bool $retainPreviousViewFactors=false): array
     {

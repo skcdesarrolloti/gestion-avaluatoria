@@ -2,7 +2,7 @@
 <section class="mt-5 rounded-xl border bg-white p-4" x-show="configTab==='factors'" x-cloak x-data="{referenceType:<?= e(json_encode($planReferenceType)) ?>,factorQuery:''}" aria-label="Catálogo permanente de factores">
     <h3 class="text-xl font-semibold">Factores por tipo de inmueble · catálogo permanente</h3>
     <?php $editFactor=[]; $editKey=''; require __DIR__.'/user-research-factor-editor.php'; ?>
-    <p class="mt-2 text-sm">Define aquí las escalas que reutilizarás en tus avalúos. Las clasificaciones guardadas anteriores se conservan. En Insumos eliges qué investigar, hasta cuatro candidatos y cómo conseguir el dato.</p>
+    <p class="mt-2 text-sm">Define aquí las escalas que reutilizarás en tus avalúos. Las clasificaciones guardadas anteriores se conservan. En Insumos eliges qué investigar, qué factores priorizar y cómo conseguir el dato.</p>
     <label class="mt-3 block text-sm font-semibold">Tipo de inmueble del catálogo<select class="input mt-1" x-model="referenceType">
         <option value="">Selecciona el tipo de inmueble</option>
         <?php foreach ($referenceTypes as $referenceKey=>$referenceLabel): ?><option value="<?= e($referenceKey) ?>"><?= e($referenceLabel) ?></option><?php endforeach; ?>
@@ -16,10 +16,10 @@
     </details>
     <?php foreach ($referenceTypes as $referenceKey=>$referenceLabel): ?>
     <div x-show="referenceType===<?= e(json_encode($referenceKey)) ?>" class="mt-3 max-w-full overflow-x-auto" tabindex="0" role="region" aria-label="Factores de <?= e($referenceLabel) ?>">
-        <p class="mb-2 text-sm font-semibold"><?= count(array_diff_key(\App\Services\ResearchFactorCatalog::forType($referenceKey),array_flip(['destination','area','land','built']))) ?> atributos disponibles · puedes investigar todos y proponer hasta cuatro candidatos.</p>
+        <p class="mb-2 text-sm font-semibold"><?= count(array_diff_key(\App\Services\ResearchFactorCatalog::forInvestigation($referenceKey),array_flip(['destination','area','land','built']))) ?> atributos disponibles · puedes investigar y proponer todos los factores disponibles.</p>
         <table class="w-full text-left text-sm"><caption class="sr-only">Catálogo de factores para <?= e($referenceLabel) ?></caption>
             <thead><tr><th scope="col" class="min-w-40 p-3">Factor</th><th scope="col" class="min-w-60 p-3">Definición y jerarquía / clases</th><th scope="col" class="min-w-52 p-3">Dónde focalizar la investigación</th></tr></thead>
-            <tbody><?php foreach (\App\Services\ResearchFactorScaleInput::catalog(\App\Services\ResearchFactorCatalog::forType($referenceKey),$factorScales ?? []) as $factorKey=>$factor): if (in_array($factorKey,['destination','area','land','built'],true)) continue;
+            <tbody><?php foreach (\App\Services\ResearchFactorScaleInput::catalog(\App\Services\ResearchFactorCatalog::forInvestigation($referenceKey),$factorScales ?? []) as $factorKey=>$factor): if (in_array($factorKey,['destination','area','land','built'],true)) continue;
                 if (!$factor['scale_valid']) $factor=\App\Services\ResearchFactorCatalog::all()[$factorKey];
                 $references=\App\Services\ResearchFactorReference::portals($referenceKey,$factorKey); ?>
                 <tr class="border-t" x-show="<?= e(json_encode(mb_strtolower($factor['label']))) ?>.includes(factorQuery.trim().toLowerCase())"><th scope="row" class="p-3"><?= e($factor['label']) ?> · <?= e($factor['unit']) ?><?php if (isset($factor['group'])): ?><span class="mt-1 block text-xs font-normal text-teal-900"><?= e($factor['group']) ?></span><?php endif; ?></th>

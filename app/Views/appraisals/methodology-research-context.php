@@ -1,7 +1,7 @@
 <?php
 $researchContext=\App\Services\ComparableSearchContext::forMethod($record,$units ?? [],$componentKey,$method ?? 'mercado');
 $researchType=\App\Services\ComparablePortalProfiles::defaultType((string)($researchContext['tipo_inmueble'] ?? ''));
-$researchCatalog=\App\Services\ResearchFactorScaleInput::catalog(\App\Services\ResearchFactorCatalog::forType($researchType,$components[$componentKey]['part'] ?? '',false,true),$factorScales ?? []);
+$researchCatalog=\App\Services\ResearchFactorScaleInput::catalog(\App\Services\ResearchFactorCatalog::forInvestigation($researchType,$components[$componentKey]['part'] ?? '',true),$factorScales ?? []);
 foreach (['landscape_view','panoramic_view'] as $previousViewKey) if (!isset($selected['research_plan']['factors'][$previousViewKey])) unset($researchCatalog[$previousViewKey]);
 if ($researchType==='apartamento') $researchCatalog=\App\Services\ApartmentResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
 if ($researchType==='casa') $researchCatalog=\App\Services\HouseResearchFactors::preserve($researchCatalog,$selected['research_plan']['factors'] ?? []);
