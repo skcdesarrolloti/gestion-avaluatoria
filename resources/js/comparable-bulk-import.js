@@ -136,6 +136,7 @@ export function fillRows(form, rows, defaultQuery, confirmDistinct, options = {}
         setField(row, 'intake_state', 'review');
         if (!data.consulted_at) setField(row, 'consulted_at', new Intl.DateTimeFormat('en-CA',{timeZone:'America/Bogota'}).format(new Date()));
         count++;
+        options.onInserted?.(data);
     });
     if (count > 0 || enriched > 0) {
         form.dispatchEvent(new Event('input', { bubbles: true }));

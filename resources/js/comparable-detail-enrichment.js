@@ -1,7 +1,7 @@
 import { sourceUpdate } from './comparable-source-update.js';
 
 // One request per listing, in order. Failure keeps the card, never invents facts.
-export async function completeListingDetails(items, endpoint, onProgress = () => {}) {
+export async function completeListingDetails(items, endpoint, onProgress = () => {}, onComplete = async () => {}) {
     let completed = 0, failed = 0, stop = '';
     for (const [index, item] of items.entries()) {
         onProgress(index + 1, items.length);
@@ -31,6 +31,7 @@ export async function completeListingDetails(items, endpoint, onProgress = () =>
             item.row.comparability_notes = `${item.row.comparability_notes || ''}\nLectura de ficha pendiente: ${reason}`.trim().slice(-1600);
             failed++;
         }
+        await onComplete(item);
     }
     return { completed, failed };
 }

@@ -1,8 +1,7 @@
-import { fillRows, parseComparableText } from './comparable-bulk-import.js';
+import { parseComparableText } from './comparable-bulk-import.js';
 import { candidateMatches, candidateSuggestions, matrixRows } from './comparable-candidate-review.js';
 import { previewFacts } from './comparable-preview-facts.js';
-import { flushModuleForm } from './module-autosave.js';
-import { completeListingDetails } from './comparable-detail-enrichment.js';
+import { captureSelectedDetails } from './capture-selected-details.js';
 const normalize = value => String(value ?? '').toLowerCase().trim();
 
 export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false, emptyMessage = '', readText = false }) {
@@ -30,15 +29,6 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
                 return;
             }
             this.results = rows.map((row, i) => ({ row, number: i + 1, matches: [] }));
-            if (panel.dataset.detailEndpoint) {
-                this.busy = true;
-                try {
-                    const detail = await completeListingDetails(this.results, panel.dataset.detailEndpoint,
-                        (number,total) => { this.message = `Completando ficha ${number} de ${total}. Aún no se ha incorporado el lote.`; });
-                    this.message = `${this.results.length} avisos preparados: ${detail.completed} fichas leídas y ${detail.failed} pendientes. Revisa los cuadros y pulsa Agregar. Todavía no se han guardado en la matriz.`;
-                } finally { this.busy = false; this.selected = []; this.refresh(); }
-                return;
-            }
             this.selected = []; this.refresh();
             this.message = `Pegado recibido: ${this.results.length} avisos preparados. Ahora pulsa «Agregar sugeridos sin coincidencias», debajo del cuadro. Todavía no se han agregado a la matriz.`;
         },
@@ -65,13 +55,12 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
                 const requested = [...this.selected];
                 this.refresh();
                 if (includeRegistered) this.selected = requested;
-                const rows = this.results.filter(item => this.selected.includes(item.row.source_url)).map(item => item.row);
-                const result = fillRows(form, rows, panel.dataset.query || '', undefined, { deferDuplicateReview: true });
+                const picked = this.results.filter(item => this.selected.includes(item.row.source_url));
+                const pending = captureSelectedDetails(form,picked,panel.dataset.query || '',panel.dataset.detailEndpoint,
+                    message=>{this.message=message;},includeRegistered);
                 this.selected = []; this.refresh();
-                const summary = `${result.count} avisos nuevos por revisar. ${result.enriched || 0} anuncios existentes complementados. ${result.duplicates} enlaces ya registrados sin duplicar. ${result.overflow} sin cargar.`;
-                this.message = `${summary} Guardando en la base de datos…`;
-                const saved = await flushModuleForm(form);
-                this.message = `${summary} ${saved ? 'Guardado confirmado en la base de datos. Puedes continuar en Revisar por portal.' : 'Guardado pendiente. No cierres ni recargues: pulsa Guardar matriz para reintentar y consulta el aviso de guardado.'}`;
+                this.message = await pending;
+                this.refresh();
             } finally { this.busy = false; }
         },
     };

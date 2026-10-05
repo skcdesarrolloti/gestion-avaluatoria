@@ -1,10 +1,23 @@
 # Completar los anuncios desde su ficha individual
 
-Después de pegar un listado, el lector recorre cada enlace en orden antes de
-ofrecer su incorporación. Muestra progreso, atributos publicados y estado por
-aviso. La búsqueda automática por barrio utiliza el mismo complemento. No guarda
-ni confirma muestras hasta que el analista pulse Agregar/Complementar; conserva
-la confirmación de guardado del servidor.
+La investigación se realiza en dos pasos, tanto al pegar un listado como al
+buscar automáticamente por barrio:
+
+1. Detectar los avisos del listado, mostrar los datos publicados y revisar
+   coincidencias. Agregar los sugeridos sin coincidencias guarda primero los
+   avisos nuevos y espera la confirmación del servidor.
+2. Abrir únicamente las fichas de los avisos efectivamente incorporados. Cada
+   complemento se guarda y confirma antes de solicitar la siguiente ficha.
+
+No se consultan automáticamente fichas descartadas, ya registradas o que no
+cupieron en la matriz. Las posibles coincidencias requieren revisión, no prueban
+identidad. La opción manual de complementar existentes conserva la posibilidad
+de releer avisos registrados elegidos expresamente por el analista.
+
+Si falla el primer guardado, no comienza la lectura individual. Si falla un
+guardado posterior, se detiene el complemento; los avisos iniciales ya guardados
+se conservan. Esperar el estado final antes de cambiar de pantalla. Este paso
+prepara información y no selecciona muestras o factores para análisis.
 
 FincaRaíz: JSON-LD más ficha técnica e instalaciones de __NEXT_DATA__, únicamente
 si ID y enlace corresponden al anuncio. Captura piso, administración, áreas con
@@ -40,3 +53,10 @@ QA en avalúo ficticio local: siete avisos conservados, dos complementados sin
 crear filas nuevas, guardado confirmado y recuperación en la tabla tras recarga.
 Captura y tabla sin desbordamiento estrecho; consola sin errores. No escribe en
 producción ni agrega esquema. Prueba visual: Fichas-individuales-atributos.png.
+
+Validación del flujo en dos pasos: 1437 PHP, 175 JS y 212 BD desechable (3398);
+build y 76,3 KB gzip. QA local: tres avisos pegados, dos existentes y uno nuevo;
+únicamente se leyó la ficha nueva después del primer guardado. Sus atributos
+se recuperaron tras recargar, junto con los siete anuncios previos. Vista
+estrecha sin desbordamiento y consola sin errores. Prueba visual:
+Investigacion-dos-pasos.png.

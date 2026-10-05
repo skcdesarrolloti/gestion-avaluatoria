@@ -1,7 +1,6 @@
 import { previewFacts } from './comparable-preview-facts.js';
-import { fillRows } from './comparable-bulk-import.js';
+import { captureSelectedDetails } from './capture-selected-details.js';
 import { candidateMatches, matrixRows, candidateSuggestions } from './comparable-candidate-review.js';
-import { completeListingDetails } from './comparable-detail-enrichment.js';
 
 export function fincaraizAreaSearch() {
     let panel, form;
@@ -68,26 +67,24 @@ export function fincaraizAreaSearch() {
                 const data = await response.json();
                 if (!response.ok || !data.ok) throw new Error(data.message || 'No se pudo consultar el portal.');
                 this.results = data.results.map(item => ({ ...item, row: { ...item.row, ph_regime: item.row.ph_regime || 'por_verificar' } })); this.page = data.page; this.hasNext = data.has_next; this.resultUrl = data.url;
-                if (panel.dataset.detailEndpoint) {
-                    const details = await completeListingDetails(this.results,panel.dataset.detailEndpoint,
-                        (number,total)=>{this.message=`Completando ficha ${number} de ${total}…`;});
-                    this.notice=`${details.completed} fichas individuales leídas; ${details.failed} pendientes. `;
-                }
                 this.refreshDuplicates();
                 this.notice += data.notice || '';
                 this.message = this.results.length ? `${this.results.length} avisos en la página ${this.page}: ${this.results.filter(item => item.suggested).length} sugeridos nuevos; ${this.results.filter(item => item.tone === 'registered').length} ya incorporados.` : 'No se encontraron avisos legibles. Comprueba el barrio en el portal.';
             } catch (error) { this.message = error.name === 'AbortError' ? 'El portal tardó demasiado. Reintenta o abre la búsqueda.' : error.message; }
             finally { clearTimeout(timer); this.busy = false; }
         },
-        incorporate(includeRegistered = false) {
+        async incorporate(includeRegistered = false) {
             if (this.busy || !this.selected.length) return;
+            this.busy=true;
+            try {
             const requested = [...this.selected]; this.refreshDuplicates();
             if (includeRegistered) this.selected = requested;
-            const rows = this.results.filter(item => this.selected.includes(item.row.source_url)).map(item => ({ ...item.row }));
-            const counts = fillRows(form, rows, this.resultUrl, undefined, {deferDuplicateReview:true});
-            this.message = `${counts.count} anuncios nuevos; ${counts.enriched || 0} existentes complementados; ${counts.duplicates} enlaces ya registrados sin duplicar. Comprueba diferencias y guardado en la bandeja.`;
+            const picked = this.results.filter(item => this.selected.includes(item.row.source_url));
+            this.message = await captureSelectedDetails(form,picked,this.resultUrl,panel.dataset.detailEndpoint,
+                message=>{this.message=message;},includeRegistered);
             this.selected = [];
             this.refreshDuplicates();
+            } finally { this.busy=false; }
         },
         captureAll() {
             this.refreshDuplicates();

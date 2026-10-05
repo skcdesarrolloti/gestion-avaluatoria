@@ -3,6 +3,7 @@
     data-city="<?= e($sourceSearch['city'] ?? $guide['source_search']['city'] ?? $record['municipio'] ?? '') ?>" data-query="<?= e($baseQuery) ?>" @input.stop @change.stop @comparable-matrix-changed.window="refresh()">
     <h4 class="font-semibold">Copiar y pegar desde <?= e($pasteLabel) ?></h4>
     <p class="mt-2 text-sm">En la fuente: <strong>Ctrl+A → Ctrl+C</strong>. Vuelve a esta ventana y pega con <strong>Ctrl+V</strong>. Revisa los avisos antes de incorporarlos.</p>
+    <p class="mt-2 text-sm"><strong>1.</strong> Detectar avisos y agregar los sugeridos sin coincidencias. <strong>2.</strong> Tras confirmar el guardado, investigar automáticamente las fichas incorporadas y guardar sus atributos.</p>
     <p role="status" x-ref="pasteFeedback" x-show="message" x-cloak class="mt-3 rounded-lg border bg-white p-3 text-sm font-semibold" x-text="message"></p>
     <label for="source-results-<?= (int) $sourceIndex ?>" class="mt-3 block text-sm font-semibold">Pega la página de resultados</label>
     <textarea id="source-results-<?= (int) $sourceIndex ?>" class="input mt-1 min-h-24 w-full bg-white" :value="pastedText"
