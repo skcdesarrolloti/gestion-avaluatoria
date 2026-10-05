@@ -17,7 +17,7 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
         <section id="source-panel-<?= $sourceIndex ?>" aria-label="<?= e($source['label']) ?>"
             x-show="sourceTab === <?= $sourceIndex ?>" <?= $sourceIndex ? 'x-cloak' : '' ?> class="mt-4 rounded-xl bg-white p-4">
             <a class="btn-primary my-3 min-h-11" href="<?= e($sourceOpen) ?>" target="_blank" rel="noopener">Abrir búsqueda en <?= e($source['label']) ?></a>
-            <details><summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Filtros y texto de búsqueda de esta fuente</summary><?php require __DIR__ . '/methodology-portal-search-prompt.php'; ?><a class="inline-flex min-h-11 items-center text-sm underline" href="<?= e($source['url']) ?>" target="_blank" rel="noopener">Enlace preparado de esta fuente</a></details>
+            <details><summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Cómo preparar los filtros</summary><?php require __DIR__ . '/methodology-portal-search-prompt.php'; ?></details>
             <?php
             $batchPortal = ['Ciencuadras'=>'ciencuadras','Properati'=>'properati','Mercado Libre Inmuebles'=>'mercadolibre'][$source['label']] ?? '';
             if ($batchPortal && ($guide['type_label'] ?? '') === 'Oficina' && ($guide['business_label'] ?? '') === 'Venta') {
@@ -29,12 +29,15 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
                 unset($pasteGeneral);
             }
             ?>
-            <details class="mt-2"><summary class="min-h-11 cursor-pointer py-2 text-sm">Guía de extracción de esta fuente</summary><?php require __DIR__ . '/methodology-portal-prompt.php'; ?></details>
+            <details class="mt-3"><summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Otras formas de captura · sólo si falla el pegado</summary>
+            <p class="text-sm">Puedes leer una ficha por su enlace o pegar su texto. Para recoger una página completa, usa el campo de resultados y «Subir no repetidos».</p>
             <?php if (($isFincaraiz || $isMetrocuadrado) && isset($record['id'])): ?>
             <details class="mt-3"><summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Búsqueda automática por barrio y lector de ficha (opcional)</summary>
                 <?php require __DIR__ . '/valuation-methodology-fincaraiz-zone.php'; ?>
             </details>
             <?php endif; ?>
+            <details class="mt-2"><summary class="min-h-11 cursor-pointer py-2 text-sm">Guía de extracción de esta fuente</summary><?php require __DIR__ . '/methodology-portal-prompt.php'; ?></details>
+            </details>
         </section>
     <?php endforeach; ?>
     <div class="mt-3 flex flex-wrap items-center gap-3 text-sm">
@@ -46,5 +49,4 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
         <?php require __DIR__ . '/methodology-portal-counts.php'; ?>
         <button type="button" class="btn-secondary my-2" @click="searchTab='matriz'; mode='cards'; add()">Capturar muestra manual</button>
     </details>
-    <details><summary class="min-h-11 cursor-pointer py-2 text-sm">Ayuda de captura</summary><?php require __DIR__ . '/methodology-capture-reading.php'; ?></details>
 </section>

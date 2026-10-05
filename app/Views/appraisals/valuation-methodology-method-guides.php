@@ -54,6 +54,7 @@ $firstMethodPart = (string) ($methodologyGuides[0]['parts'][0]['key'] ?? 'compre
                         <?php endforeach; ?>
                     </div>
                 <?php endif; ?>
+                <?php if ($guideKey==='mercado'): require __DIR__ . '/methodology-capture-reading.php'; endif; ?>
                 <?php require __DIR__ . '/valuation-methodology-method-review.php'; ?>
                 <?php if ($guideKey==='costo'): require __DIR__.'/methodology-cost-academy-topics.php'; else: ?>
                 <nav class="mt-4 flex gap-2 overflow-x-auto" aria-label="Detalle del método">

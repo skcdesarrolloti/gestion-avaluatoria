@@ -30,7 +30,7 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
             }
             this.results = rows.map((row, i) => ({ row, number: i + 1, matches: [] }));
             this.selected = []; this.refresh();
-            this.message = `Pegado recibido: ${this.results.length} avisos preparados. Ahora pulsa «Agregar sugeridos sin coincidencias», debajo del cuadro. Todavía no se han agregado a la matriz.`;
+            this.message = `Pegado recibido: ${this.results.length} avisos preparados. Pulsa «Subir no repetidos», arriba o al final de los avisos. Todavía no se han agregado a la matriz.`;
         },
         refresh() {
             const matches = candidateMatches(this.results, matrixRows(form));

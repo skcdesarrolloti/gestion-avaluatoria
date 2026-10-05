@@ -40,7 +40,7 @@ declare(strict_types=1);
     foreach (['ciencuadrasPaste', 'properatiPaste', 'mercadolibrePaste'] as $reader) {
         expect(str_contains($html, 'x-data="' . $reader . '"'), 'captura de oficina seleccionada mantiene lector ' . $reader);
     }
-    expect(str_contains($html, 'Agregar sugeridos sin coincidencias') && str_contains($html, 'Ctrl+V')
+    expect(str_contains($html, 'Subir no repetidos') && str_contains($html, 'Ctrl+V')
         && str_contains($html, 'Pega la página de resultados') && substr_count($html, 'id="tabla-madre-83"') === 1,
         'pegado, selección sin repetidos y única matriz persisten al reorganizar C');
     expect(str_contains($html, 'sourceResultsPaste(') && str_contains($html, 'Asesorar Inmobiliaria')
