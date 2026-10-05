@@ -1,4 +1,4 @@
-<section x-show="searchTab === 'matriz' && mode === 'intake'" class="mt-4" x-cloak>
+<section x-show="searchTab === 'matriz' && mode === 'intake' && intakeView!=='table'" class="mt-4" x-cloak>
     <div class="my-4 grid gap-3 sm:grid-cols-2" @input.stop @change.stop>
         <label class="label">Estado de recogida
             <select class="input" x-model="intakeFilter" @change="intakePage = 1; rebuildIntake()"><option value="all">Todos</option><option value="pending">Por confirmar</option><option value="confirmed">Confirmados para investigación</option><option value="excluded">No participan</option></select>

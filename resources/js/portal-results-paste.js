@@ -1,11 +1,12 @@
 import { fillRows, parseComparableText } from './comparable-bulk-import.js';
 import { candidateMatches, candidateSuggestions, matrixRows } from './comparable-candidate-review.js';
+import { previewFacts } from './comparable-preview-facts.js';
 const normalize = value => String(value ?? '').toLowerCase().trim();
 
-export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false }) {
+export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false, emptyMessage = '', readText = false }) {
     let panel, form;
     return {
-        results: [], selected: [], message: '', pastedText: '', busy: false,
+        previewFacts, results: [], selected: [], message: '', pastedText: '', busy: false,
         get suggestedCount() { return this.results.filter(item => item.suggested).length; },
         get registeredCount() { return this.results.filter(item => item.tone === 'registered').length; },
         get reviewCount() { return this.results.filter(item => item.tone === 'review').length; },
@@ -18,11 +19,11 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
             this.pastedText = text.slice(0, 4000) + (text.length > 4000 ? '\n… Vista abreviada del texto recibido.' : '');
             if (!text && !html) { this.message = 'No llegó texto de la página. Si copiaste una foto o captura, vuelve al listado de inmuebles y copia la página con Ctrl+A y Ctrl+C.'; return; }
             if (html.length + text.length > 2000000) { this.message = 'Copia solo una página de resultados (máximo 2 MB).'; return; }
-            let rows = html ? readRows(html, panel.dataset.city) : [];
+            let rows = html || readText ? readRows(html, panel.dataset.city, text) : [];
             if (allowTsv && !rows.length && text.includes('\t')) rows = parseComparableText(text).filter(row =>
                 validUrl(row.source_url) && row.price_amount && row.area_m2 && normalize(row.operation) === 'venta');
             if (!rows.length) {
-                this.message = `No se reconocieron tarjetas. Sí llegó contenido, pero no se pudieron leer sus avisos. Copia directamente la página de resultados de ${label} con Ctrl+A y Ctrl+C y pega con Ctrl+V (sin Mayús). No copies una ficha individual ni pases el texto por otra aplicación.`;
+                this.message = emptyMessage || `No se reconocieron tarjetas. Sí llegó contenido, pero no se pudieron leer sus avisos. Copia directamente la página de resultados de ${label} con Ctrl+A y Ctrl+C y pega con Ctrl+V (sin Mayús). No copies una ficha individual ni pases el texto por otra aplicación.`;
                 return;
             }
             this.results = rows.map((row, i) => ({ row, number: i + 1, matches: [] }));

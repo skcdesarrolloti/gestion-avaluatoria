@@ -1,3 +1,4 @@
+import { intakeTable } from './comparable-intake-table.js';
 import { comparisonRows } from './comparable-source-facts.js';
 import { publishedDetails } from './comparable-published-details.js';
 import { sourceUpdate } from './comparable-source-update.js';
@@ -35,7 +36,7 @@ export function comparableIntake(getEntries, getForm) {
     return {
         intakeCards:[], intakeTargets:[], intakeFilter:'all', intakePage:1, intakePages:1, intakeCount:0, intakeSearch:'',
         intakePortal:'', intakePortals:[], intakeView:'review', intakeConfirmedCount:0,
-        intakeStates,
+        intakeStates, intakeTableData:{columns:[],rows:[]},
         intakeNavigate(view) {
             this.searchTab='matriz'; this.intakeStep=view; this.intakeView=view;
             this.mode='intake'; this.intakeFilter='all'; this.intakeSearch=''; this.intakePage=1; this.rebuildIntake();
@@ -55,6 +56,9 @@ export function comparableIntake(getEntries, getForm) {
         rebuildIntake() {
             const entries = getEntries();
             const groups = intakeGroups(entries.filter(e => e.used).map(e => ({...e.data,index:e.index})));
+            let config={};
+            try { config=JSON.parse(getForm()?.dataset?.intakeEvidence || '{}'); } catch {}
+            this.intakeTableData=intakeTable(groups,config);
             this.intakeCount = groups.length;
             this.intakeTargets = groups.map(g => ({key:g.key,title:g.title}));
             let configured=[];

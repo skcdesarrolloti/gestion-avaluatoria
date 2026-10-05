@@ -75,6 +75,7 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
                     <label class="mt-2 block text-xs font-semibold">Propiedad horizontal de este aviso
                         <select class="input min-h-11" x-model="item.row.ph_regime" @change="selected = selected.filter(url => visibleResults.some(result => result.row.source_url === url))"><option value="por_verificar">Por verificar</option><option value="si">Sí, PH</option><option value="no">No PH</option></select>
                     </label>
+                    <?php require __DIR__ . '/methodology-preview-facts.php'; ?>
                     <p class="text-sm"><span x-text="money(item.row.price_amount)"></span> · <span x-text="item.row.area_m2 || 'Área pendiente'"></span> m²</p>
                     <p class="text-sm text-slate-600" x-text="item.row.address_hint || 'Dirección pendiente'"></p>
                     <a class="inline-flex min-h-11 items-center text-sm font-semibold text-blue-800" :href="item.row.source_url" target="_blank" rel="noopener">Ver ficha y comprobar ubicación</a>
@@ -91,7 +92,7 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
 </section>
 <?php endif; ?>
 <?php if (!$zoneSupported): ?><a x-show="sourceTask==='search'" href="<?= e($source['url']) ?>" target="_blank" rel="noopener" class="btn-primary min-h-11">Abrir búsqueda en <?= e($zonePortal) ?></a><?php endif; ?>
-<details x-show="sourceTask==='capture'" class="mt-4" open>
+<details class="mt-4">
     <summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Capturar un enlace individual o pegar texto</summary>
 
     <?php if (empty($isMetrocuadrado)) require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-url.php'; ?>

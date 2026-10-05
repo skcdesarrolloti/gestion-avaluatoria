@@ -25,7 +25,10 @@ import { ciencuadrasPaste } from './ciencuadras-paste.js';
 import { properatiPaste } from './properati-paste.js';
 import { mercadolibrePaste } from './mercadolibre-paste.js';
 
+import { sourceResultsPaste } from './source-results-paste.js';
+
 window.Alpine = Alpine;
+Alpine.data('sourceResultsPaste', sourceResultsPaste);
 Alpine.data('researchPlan', researchPlan);
 Alpine.data('igacUnitSelector', igacUnitSelector);
 Alpine.data('ciencuadrasPaste', ciencuadrasPaste);

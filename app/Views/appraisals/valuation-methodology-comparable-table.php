@@ -5,7 +5,7 @@
     x-data="comparableWorkbench" :data-comparable-mode="searchTab === 'mapa' ? 'cards' : mode" @input="refresh()" @change="refresh()"
     @intake-navigate.window="intakeNavigate($event.detail.view)" @comparable-imported="showImported($event.detail)"
     data-module-autosave data-save-in-place data-comparable-json
-    data-intake-sources="<?= e(json_encode(array_column($portalSources ?? [],'label'),JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>"
+    data-intake-sources="<?= e(json_encode(array_column(array_merge($portalSources ?? [],$agencySources ?? []),'label'),JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>"
     data-intake-evidence="<?= e(json_encode(['catalog'=>$researchCatalog,'subjects'=>$researchEvidence['subjects']],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>"
     data-ph-subject="<?= !empty($guide['is_ph']) ? 'si' : 'no' ?>"
     data-appraisal-id="<?= e($record['id']) ?>" data-excel-preview-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/excel/revisar')) ?>"
@@ -26,7 +26,7 @@
     <div id="capture-review" x-show="searchTab === 'matriz'" class="scroll-mt-6 flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Bandeja de captura · <?= e($methods[$method ?? 'mercado'] ?? 'Mercado') ?></p>
-            <h3 class="mt-2 text-xl font-semibold" x-text="intakeView==='review' ? 'Revisar anuncios de ' + intakePortal : 'Inmuebles confirmados · todos sus factores'"></h3>
+            <h3 class="mt-2 text-xl font-semibold" x-text="intakeView==='table' ? 'Tabla de inmuebles y atributos' : intakeView==='review' ? 'Revisar anuncios de ' + intakePortal : 'Inmuebles confirmados · todos sus factores'"></h3>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Revisa un anuncio a la vez y confirma su participación. Los confirmados reúnen sus atributos y fuentes; la comparabilidad y las coordenadas se verificarán en Análisis.
             </p>
@@ -37,7 +37,7 @@
             <button type="button" @click="searchTab = 'captura'" class="btn-secondary min-h-11">Seguir capturando</button>
         </div>
     </div>
-    <?php require __DIR__ . '/methodology-intake-cards.php'; ?>
+    <?php require __DIR__ . '/methodology-intake-cards.php'; require __DIR__ . '/methodology-intake-table.php'; ?>
     <details class="mt-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Excel · descargar o actualizar anuncios (opcional)</summary><button type="button" class="btn-secondary my-2" @click="searchTab='matriz'; mode='table'">Abrir tabla de respaldo</button><?php require __DIR__ . '/methodology-excel-import.php'; ?></details>
     <?php require __DIR__ . '/methodology-intake-unit-price-help.php'; ?>
     <div x-show="searchTab === 'matriz' && mode !== 'intake'"><?php require __DIR__ . '/valuation-methodology-capture-areas.php'; ?></div>

@@ -12,7 +12,7 @@ export function publishedDetails(text) {
     for (const [key, label] of Object.entries({private_built_m2:'[aá]rea (?:privada construida|construida privada)',private_free_m2:'[aá]rea privada libre',
         built_m2:'[aá]rea construida',land_m2:'[aá]rea (?:del terreno|terreno)',stratum:'estrato',floor_level:'(?:piso|nivel)',
         age_years:'(?:antig[uü]edad|edad)',bathrooms:'ba[nñ]os?',bedrooms:'(?:habitaciones?|alcobas?)'})) {
-        const value = number(label); if (value) result[key]=value;
+        const value = ['bathrooms','bedrooms'].includes(key) ? count(label) : number(label); if (value) result[key]=value;
     }
     if (parking) {result.parking_spaces=parking; result.ph_parking_presence=Number(parking) > 0 ? 'si' : 'no';}
     if (deposits) {result.ph_deposit_count=deposits; result.ph_deposit_presence=Number(deposits) > 0 ? 'si' : 'no';}

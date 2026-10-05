@@ -10,7 +10,7 @@ final class ComparablePortalLinks
         foreach (['FincaRaiz' => 'fincaraiz.com.co', 'Metrocuadrado' => 'metrocuadrado.com',
             'Ciencuadras' => 'ciencuadras.com', 'Properati' => 'properati.com.co',
             'Mercado Libre Inmuebles' => 'mercadolibre.com.co'] as $label => $domain) {
-            $sources[] = ['label' => $label, 'kind' => 'Búsqueda en Google', 'query' => $query,
+            $sources[] = ['label' => $label, 'domain' => $domain, 'kind' => 'Búsqueda en Google', 'query' => $query,
                 'url' => 'https://www.google.com/search?q=' . rawurlencode('site:' . $domain . ' ' . $query),
                 'instruction' => 'Busca en Google dentro del portal. Abre el aviso y comprueba los filtros.'];
         }

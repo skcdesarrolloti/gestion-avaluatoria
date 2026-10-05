@@ -34,7 +34,7 @@ final class AppraisalComparableSourceSearchBuilder
     {
         return [
             $this->agency('Araújo & Segovia', 'https://www.araujoysegovia.com/', $query, 'Principal',
-                ['Alta trayectoria y marca regional con operación inmobiliaria desde 1954.', 'Presencia multiciudad con sede y portafolio visible en Cartagena.', 'Oferta de arriendos, ventas, avalúos y administración; útil como referente amplio.']),
+                ['Alta trayectoria y marca regional con operación inmobiliaria desde 1953.', 'Presencia multiciudad con sede y portafolio visible en Cartagena.', 'Oferta de arriendos, ventas, avalúos y administración; útil como referente amplio.']),
             $this->agency('SuCasa Inmobiliaria', 'https://sucasainmobiliaria.com.co/', $query, 'Principal',
                 ['Portafolio local amplio por arriendo y venta.', 'Filtros por tipo, operación, barrio, precio y área.', 'Cobertura de apartamentos, casas, locales, oficinas, lotes y bodegas.']),
             $this->agency('Asesorar Inmobiliaria', 'https://asesorarinmobiliaria.com/', $query, 'Principal',

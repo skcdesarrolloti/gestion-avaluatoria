@@ -1,9 +1,10 @@
+import { previewFacts } from './comparable-preview-facts.js';
 import { fillRows } from './comparable-bulk-import.js';
 import { candidateMatches, matrixRows, candidateSuggestions } from './comparable-candidate-review.js';
 
 export function fincaraizAreaSearch() {
     let panel, form;
-    return {
+    return { previewFacts,
         phFilter: 'all',
         refreshDuplicates() {
             const matches = candidateMatches(this.results, matrixRows(form));
