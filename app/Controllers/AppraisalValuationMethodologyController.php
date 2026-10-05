@@ -177,7 +177,7 @@ final class AppraisalValuationMethodologyController
         try {
             $url = $_POST['source_url'] ?? '';
             if (!is_string($url)) throw new \InvalidArgumentException('El enlace debe ser texto.');
-            $result = (new \App\Services\FincaraizListingReader())->read($url);
+            $result = (new \App\Services\ComparableDetailReader())->read($url);
             Http::json(['ok' => true] + $result);
         } catch (\InvalidArgumentException $error) {
             Http::json(['ok' => false, 'message' => $error->getMessage()], 422);

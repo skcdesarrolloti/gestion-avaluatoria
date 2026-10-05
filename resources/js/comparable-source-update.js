@@ -8,6 +8,9 @@ export function sourceUpdate(existing, incoming) {
         if (!protectedFields.has(key) && String(value ?? '').trim() && !String(existing[key] ?? '').trim()) changes[key]=value;
     }
     const different = [];
+    if (incoming.published_text && existing.published_text && !existing.published_text.includes(incoming.published_text)) {
+        changes.published_text = `${existing.published_text}\n\nLectura adicional de la ficha:\n${incoming.published_text}`.slice(0,15900);
+    }
     const originalFacts=sourceFacts(existing.published_attributes), nextFacts=sourceFacts(incoming.published_attributes);
     const merged={...originalFacts};
     for (const [label,value] of Object.entries(nextFacts)) {
@@ -23,7 +26,8 @@ export function sourceUpdate(existing, incoming) {
         if (!before || !after) continue;
         const numeric = value => key === 'price_amount' ? amount(value) : Number(value.replace(',','.'));
         const numericField=['price_amount','area_m2','parking_spaces','ph_deposit_count','bathrooms','bedrooms','floor_level','age_years'].includes(key);
-        if (numericField ? numeric(before) !== numeric(after) : before !== after) different.push(`${labels[key] || key}: registrado ${before}; nueva lectura ${after}`);
+        const comparable = value => value.normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+        if (numericField ? numeric(before) !== numeric(after) : comparable(before) !== comparable(after)) different.push(`${labels[key] || key}: registrado ${before}; nueva lectura ${after}`);
     }
     if (different.length) {
         const note=different.join('; ');

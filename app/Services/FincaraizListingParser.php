@@ -59,7 +59,13 @@ final class FincaraizListingParser
                     $description .= "\n" . $attribute['name'] . ': ' . $attribute['value'] . ';';
             }
             $row = array_filter($row, static fn ($v) => $v !== '') + ComparablePublishedDetails::parse($description);
+            $detail=FincaraizFichaDetails::parse($doc,$url);
+            $row += $detail;
+            if (!empty($detail['published_text'])) $row['published_text']=$detail['published_text'];
+            $facts=json_decode($detail['published_attributes'] ?? '{}',true)+json_decode($row['published_attributes'],true);
+            $row['published_attributes']=json_encode((object)array_slice($facts,0,80,true),JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
             return ['row' => $row,
+                'read_scope'=>$detail?'Descripción, ficha técnica e instalaciones publicadas.':'Datos estructurados y descripción; ficha técnica pendiente.',
                 'title' => $this->text($item['name'] ?? 'Aviso'),
                 'warning' => 'Revisa ubicación, uso y clase de área. El aviso puede discrepar de los filtros. No se descargaron fotos ni PDF; los campos ausentes siguen pendientes.'];
         }

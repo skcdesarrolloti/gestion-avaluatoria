@@ -23,6 +23,7 @@ final class ComparablePublishedDetails
         foreach (['parking_spaces'=>'(?:parqueaderos?|garajes?|celdas? de parqueo)', 'ph_deposit_count'=>'(?:depósitos?|cuartos? útiles?)'] as $key=>$label) {
             $value=ComparableTextAttributes::count($text,$label); if ($value!=='') $out[$key]=$value;
         }
+        if (preg_match('/(?:antigüedad|edad)\s*[:：-]?\s*\d+\s*(?:a|[-–])\s*\d+/iu',$text)) unset($out['age_years']);
         if (isset($out['parking_spaces'])) $out['ph_parking_presence'] = (int) $out['parking_spaces'] > 0 ? 'si' : 'no';
         if (isset($out['ph_deposit_count'])) $out['ph_deposit_presence'] = (int) $out['ph_deposit_count'] > 0 ? 'si' : 'no';
         if (preg_match('/administración\s*[:：-]?\s*\$\s*([\d.,]+)/iu', $text, $m)) $out['admin_fee'] = str_replace(['.', ','], ['', '.'], $m[1]);

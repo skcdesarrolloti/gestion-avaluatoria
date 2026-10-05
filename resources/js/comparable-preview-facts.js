@@ -5,6 +5,6 @@ export function previewFacts(row) {
         parking_spaces:'Parqueaderos',ph_deposit_count:'Depósitos',floor_level:'Piso',age_years:'Edad',stratum:'Estrato',view_quality:'Vista',
         finish_quality:'Acabados',elevator:'Ascensor',research_generator:'Planta eléctrica',power_plant:'Planta eléctrica',amenities:'Amenidades',security_features:'Seguridad',market_services:'Servicios',
         research_access:'Acceso',research_levels:'Niveles',research_height:'Altura libre',research_service:'Alcoba de servicio',admin_fee:'Administración',private_built_m2:'Área privada construida · m²',private_free_m2:'Área privada libre · m²',built_m2:'Área construida · m²',land_m2:'Terreno · m²'};
-    return [...Object.entries(labels).filter(([key]) => String(row[key] ?? '').trim()!=='').map(([key,label]) => ({label,value:String(row[key])})),
+    return [...Object.entries(labels).filter(([key]) => String(row[key] ?? '').trim()!=='' && !(key==='stratum' && /^(oficina|consultorio)$/i.test(row.property_type || ''))).map(([key,label]) => ({label,value:String(row[key])})),
         ...Object.entries(sourceFacts(row.published_attributes)).map(([label,value]) => ({label:'Publicado: '+label,value:String(value)}))];
 }

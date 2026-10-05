@@ -1,11 +1,12 @@
 <section class="mt-4 rounded-lg border border-teal-100 bg-teal-50 p-3" x-data="<?= e($pasteComponent) ?>"
+    data-detail-endpoint="<?= !empty($record['id']) ? e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/leer-aviso')) : '' ?>"
     data-city="<?= e($sourceSearch['city'] ?? $guide['source_search']['city'] ?? $record['municipio'] ?? '') ?>" data-query="<?= e($baseQuery) ?>" @input.stop @change.stop @comparable-matrix-changed.window="refresh()">
     <h4 class="font-semibold">Copiar y pegar desde <?= e($pasteLabel) ?></h4>
     <p class="mt-2 text-sm">En la fuente: <strong>Ctrl+A → Ctrl+C</strong>. Vuelve a esta ventana y pega con <strong>Ctrl+V</strong>. Revisa los avisos antes de incorporarlos.</p>
     <p role="status" x-ref="pasteFeedback" x-show="message" x-cloak class="mt-3 rounded-lg border bg-white p-3 text-sm font-semibold" x-text="message"></p>
     <label for="source-results-<?= (int) $sourceIndex ?>" class="mt-3 block text-sm font-semibold">Pega la página de resultados</label>
     <textarea id="source-results-<?= (int) $sourceIndex ?>" class="input mt-1 min-h-24 w-full bg-white" :value="pastedText"
-        @paste="paste($event); $nextTick(() => $refs.pasteFeedback.scrollIntoView({ block: 'center', behavior: 'smooth' }))"
+        :disabled="busy" @paste="paste($event); $nextTick(() => $refs.pasteFeedback.scrollIntoView({ block: 'center', behavior: 'smooth' }))"
         placeholder="Haz clic aquí y pulsa Ctrl+V para preparar todos los avisos copiados." aria-describedby="source-help-<?= (int) $sourceIndex ?>"></textarea>
     <p id="source-help-<?= (int) $sourceIndex ?>" class="mt-2 text-xs"><?= !empty($pasteGeneral) ? 'Si el listado no se reconoce, pega el enlace y texto de una ficha; separa las fichas con una línea vacía.' : 'Este lector reconoce oficinas en venta de la ciudad del expediente.' ?> Solo se conserva lo publicado. Los datos faltantes quedan pendientes.</p>
     <div x-show="results.length" x-cloak class="mt-3">
@@ -30,6 +31,7 @@
                 <article class="rounded-lg border p-3" :class="item.tone === 'registered' ? 'bg-slate-100' : (item.tone === 'review' ? 'bg-amber-50' : 'bg-emerald-50')">
                     <label class="flex min-h-11 items-center gap-2 font-semibold"><input type="checkbox" x-model="selected" :value="item.row.source_url" :disabled="item.tone === 'registered' || busy"><span x-text="'Aviso ' + item.number + ' · ' + (item.row.listing_title || item.row.neighborhood || item.row.project_name || item.row.property_type || 'Ubicación por verificar')"></span></label>
                     <?php require __DIR__ . '/methodology-preview-facts.php'; ?>
+                    <p class="mt-2 text-sm font-semibold" x-show="item.detailState" x-text="item.detailState"></p>
                     <p class="mt-1 text-xs" x-text="item.label"></p>
                     <a class="mt-1 inline-flex min-h-11 items-center text-sm text-blue-700 underline" :href="item.row.source_url" target="_blank" rel="noopener">Ver inmueble</a>
                 </article>

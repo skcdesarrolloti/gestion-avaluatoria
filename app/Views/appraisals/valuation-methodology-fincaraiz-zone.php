@@ -16,6 +16,7 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
 ?>
 <?php if ($zoneSupported): ?>
 <section x-show="sourceTask==='search'" data-component="<?= e($componentKey ?? '') ?>" x-data="fincaraizAreaSearch" data-portal="<?= e($zonePrefix) ?>" data-neighborhood-id="<?= e((string) ($subject['neighborhood_id'] ?? '')) ?>"
+    data-detail-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/leer-aviso')) ?>"
     data-neighborhoods="<?= e(json_encode($zoneCatalog, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>"
     data-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/buscar-zona')) ?>"
     @input.stop @change.stop @comparable-matrix-changed.window="selected = []; refreshDuplicates()" :aria-busy="busy">
@@ -76,6 +77,7 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
                         <select class="input min-h-11" x-model="item.row.ph_regime" @change="selected = selected.filter(url => visibleResults.some(result => result.row.source_url === url))"><option value="por_verificar">Por verificar</option><option value="si">Sí, PH</option><option value="no">No PH</option></select>
                     </label>
                     <?php require __DIR__ . '/methodology-preview-facts.php'; ?>
+                    <p class="mt-2 text-sm font-semibold" x-show="item.detailState" x-text="item.detailState"></p>
                     <p class="text-sm"><span x-text="money(item.row.price_amount)"></span> · <span x-text="item.row.area_m2 || 'Área pendiente'"></span> m²</p>
                     <p class="text-sm text-slate-600" x-text="item.row.address_hint || 'Dirección pendiente'"></p>
                     <a class="inline-flex min-h-11 items-center text-sm font-semibold text-blue-800" :href="item.row.source_url" target="_blank" rel="noopener">Ver ficha y comprobar ubicación</a>

@@ -100,3 +100,5 @@ Actualización 2026-10-05: [captura por fuente y tabla](CAPTURA-POR-FUENTE-Y-TAB
 Corrección 2026-10-05: [baños y atributos del anuncio](CORRECCION-LECTURA-ATRIBUTOS.md). Evita confundir conteos con área y conserva la tarjeta completa con las características descritas.
 
 Guardado por portal: [confirmación, reintento y recuperación](GUARDADO-CAPTURAS-CONFIRMADO.md).
+
+Complemento automático por enlace: [fichas individuales y alcance](FICHAS-INDIVIDUALES-ATRIBUTOS.md).

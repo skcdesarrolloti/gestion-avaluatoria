@@ -2,6 +2,7 @@ import { fillRows, parseComparableText } from './comparable-bulk-import.js';
 import { candidateMatches, candidateSuggestions, matrixRows } from './comparable-candidate-review.js';
 import { previewFacts } from './comparable-preview-facts.js';
 import { flushModuleForm } from './module-autosave.js';
+import { completeListingDetails } from './comparable-detail-enrichment.js';
 const normalize = value => String(value ?? '').toLowerCase().trim();
 
 export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false, emptyMessage = '', readText = false }) {
@@ -12,8 +13,9 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
         get registeredCount() { return this.results.filter(item => item.tone === 'registered').length; },
         get reviewCount() { return this.results.filter(item => item.tone === 'review').length; },
         init() { panel = this.$el; form = document.getElementById('tabla-madre-83'); },
-        paste(event) {
+        async paste(event) {
             event.preventDefault();
+            if (this.busy) return;
             this.results = []; this.selected = [];
             const html = event.clipboardData?.getData('text/html') || '';
             const text = event.clipboardData?.getData('text/plain') || '';
@@ -28,6 +30,15 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
                 return;
             }
             this.results = rows.map((row, i) => ({ row, number: i + 1, matches: [] }));
+            if (panel.dataset.detailEndpoint) {
+                this.busy = true;
+                try {
+                    const detail = await completeListingDetails(this.results, panel.dataset.detailEndpoint,
+                        (number,total) => { this.message = `Completando ficha ${number} de ${total}. Aún no se ha incorporado el lote.`; });
+                    this.message = `${this.results.length} avisos preparados: ${detail.completed} fichas leídas y ${detail.failed} pendientes. Revisa los cuadros y pulsa Agregar. Todavía no se han guardado en la matriz.`;
+                } finally { this.busy = false; this.selected = []; this.refresh(); }
+                return;
+            }
             this.selected = []; this.refresh();
             this.message = `Pegado recibido: ${this.results.length} avisos preparados. Ahora pulsa «Agregar sugeridos sin coincidencias», debajo del cuadro. Todavía no se han agregado a la matriz.`;
         },

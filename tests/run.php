@@ -32,6 +32,7 @@ require __DIR__ . '/user-research-factors.php';
 require __DIR__ . '/subject-attribute-research.php';
 require __DIR__ . '/subject-factor-source.php';
 require __DIR__ . '/comparable-url-reader.php';
+require __DIR__ . '/comparable-detail-reader.php';
 require __DIR__ . '/comparable-search-context.php';
 require __DIR__ . '/comparable-area-search.php';
 require __DIR__ . '/comparable-metrocuadrado.php';
