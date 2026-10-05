@@ -87,6 +87,10 @@ async function save(form) {
     if (state.conflict) return;
     if (state.saving) return state.promise;
     if (!state.dirty) return;
+    if (globalThis.navigator?.onLine === false) {
+        setStatus(form, 'Sin conexión. Cambios pendientes: no cierres esta página. Se reintentará al recuperar la conexión.', 'offline');
+        return;
+    }
     const revision = state.revision;
     const extras = state.extras;
     state.extras = {};
@@ -106,6 +110,7 @@ async function save(form) {
         const result = await jsonResponse(response);
         if (response.status === 409) state.conflict = true;
         if (!response.ok || result.ok !== true) throw new Error(result.message || 'No se pudo confirmar el guardado.');
+        if (!Number.isInteger(result.version)) throw new Error('El servidor no confirmó la versión guardada. Conserva esta página y pulsa Guardar matriz para reintentar.');
         updateVersion(form, result);
         acknowledgeCompositionMethods(form, result);
         if (typeof result.object_text === 'string') form.querySelectorAll('[data-object-preview]').forEach(node => { node.textContent = result.object_text; });
@@ -115,7 +120,7 @@ async function save(form) {
         const time = result.saved_at ? new Date(result.saved_at).toLocaleTimeString('es-CO') : new Date().toLocaleTimeString('es-CO');
         setStatus(form, state.dirty ? 'Cambios pendientes' : 'Autoguardado confirmado: ' + time, state.dirty ? 'pending' : 'saved');
     } catch (error) {
-        if (error.name !== 'AbortError') setStatus(form, 'Pendiente de guardar: ' + error.message, 'error');
+        if (error.name !== 'AbortError') setStatus(form, 'Pendiente de guardar: ' + (error instanceof TypeError ? 'no se pudo conectar con el servidor. No cierres ni recargues; pulsa Guardar para reintentar.' : error.message), 'error');
         state.dirty = true;
     } finally {
         state.saving = false;
@@ -148,6 +153,15 @@ function cancel(form) {
     state.dirty = false;
 }
 
+export async function flushModuleForm(form) {
+    if (!form?.matches?.('[data-module-autosave]') || !form.dataset.autosaveEndpoint) return false;
+    const state = stateFor(form);
+    clearTimeout(state.timer);
+    await save(form);
+    if (state.dirty && !state.conflict) await save(form);
+    return !state.dirty && !state.saving && !state.conflict;
+}
+
 export async function flushModuleAutosaves() {
     for (const state of activeStates) if (state.form.isConnected === false) activeStates.delete(state);
     await Promise.all([...activeStates].map(async state => {
@@ -160,6 +174,9 @@ export async function flushModuleAutosaves() {
 
 export function installModuleAutosave() {
     window.gaFlushAutosaves = flushModuleAutosaves;
+    window.addEventListener('online', () => {
+        for (const state of activeStates) if (state.form.isConnected !== false && state.dirty && !state.conflict) flushModuleForm(state.form);
+    });
     document.addEventListener('input', event => markDirty(formFor(event.target), event.target));
     document.addEventListener('change', event => markDirty(formFor(event.target), event.target));
     document.addEventListener('click', event => {

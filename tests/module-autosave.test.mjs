@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { installModuleAutosave } from '../resources/js/module-autosave.js';
+import { installModuleAutosave, flushModuleForm } from '../resources/js/module-autosave.js';
 
 class HTMLFormElement {
     constructor() {
@@ -252,5 +252,54 @@ test('module autosave reports html server errors without injecting pages', async
     await runTimer();
     assert.match(form.status.textContent, /No pudimos completar la solicitud/);
     assert.equal(form.version.value, '7');
+    cleanup();
+});
+
+test('batch waits for server acknowledgment and rejects a missing version', async () => {
+    const { listeners, cleanup } = setup();
+    const form = new HTMLFormElement();
+    let acknowledge;
+    globalThis.fetch = () => new Promise(resolve => { acknowledge = resolve; });
+    listeners.input({ target: form });
+    let completed = false;
+    const pending = flushModuleForm(form).then(saved => { completed = true; return saved; });
+    await Promise.resolve();
+    assert.equal(completed, false);
+    assert.equal(form.status.dataset.autosaveTone, 'saving');
+    acknowledge({ ok: true, json: async () => ({ ok: true, version: 8 }) });
+    assert.equal(await pending, true);
+    listeners.input({ target: form });
+    globalThis.fetch = async () => ({ ok: true, json: async () => ({ ok: true }) });
+    assert.equal(await flushModuleForm(form), false);
+    assert.equal(form.version.value, '8');
+    assert.equal(form.status.dataset.autosaveTone, 'error');
+    globalThis.fetch = async () => ({ ok: true, json: async () => ({ ok: true, version: 9 }) });
+    assert.equal(await flushModuleForm(form), true);
+    assert.equal(form.version.value, '9');
+    cleanup();
+});
+
+test('offline batch stays pending and reconnect retries without overwriting a conflict', async () => {
+    const { listeners, cleanup } = setup();
+    const priorNavigator = Object.getOwnPropertyDescriptor(globalThis, 'navigator');
+    Object.defineProperty(globalThis, 'navigator', { configurable: true, value: { onLine: false } });
+    const form = new HTMLFormElement();
+    let calls = 0;
+    globalThis.fetch = async () => { calls++; return { ok: true, json: async () => ({ ok: true, version: 8 }) }; };
+    listeners.input({ target: form });
+    assert.equal(await flushModuleForm(form), false);
+    assert.equal(calls, 0);
+    assert.equal(form.status.dataset.autosaveTone, 'offline');
+    navigator.onLine = true;
+    assert.equal(await flushModuleForm(form), true);
+    assert.equal(calls, 1);
+    listeners.input({ target: form });
+    globalThis.fetch = async () => { calls++; return { ok: false, status: 409, json: async () => ({ message: 'Conflicto' }) }; };
+    assert.equal(await flushModuleForm(form), false);
+    assert.equal(await flushModuleForm(form), false);
+    assert.equal(calls, 2);
+    assert.equal(form.version.value, '8');
+    if (priorNavigator) Object.defineProperty(globalThis, 'navigator', priorNavigator);
+    else delete globalThis.navigator;
     cleanup();
 });

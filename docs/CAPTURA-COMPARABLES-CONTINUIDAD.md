@@ -98,3 +98,5 @@ Búsqueda compacta por portal (2026-10-05): acceso directo desde pasos principal
 Actualización 2026-10-05: [captura por fuente y tabla](CAPTURA-POR-FUENTE-Y-TABLA.md). Las inmobiliarias tienen pegado con revisión; tarjetas en cada fuente y tabla separada por inmueble. Se conservan todos los lectores anteriores.
 
 Corrección 2026-10-05: [baños y atributos del anuncio](CORRECCION-LECTURA-ATRIBUTOS.md). Evita confundir conteos con área y conserva la tarjeta completa con las características descritas.
+
+Guardado por portal: [confirmación, reintento y recuperación](GUARDADO-CAPTURAS-CONFIRMADO.md).

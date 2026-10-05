@@ -39,7 +39,8 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
     <?php endforeach; ?>
     <div class="mt-3 flex flex-wrap items-center gap-3 text-sm">
         <button type="button" class="btn-secondary min-h-11" @click="intakeNavigate('review')">Revisar anuncios de este portal</button>
-        <span data-autosave-status>Consulta el guardado al incorporar.</span>
+        <button type="submit" form="tabla-madre-83" class="btn-secondary min-h-11">Guardar matriz</button>
+        <span role="status" aria-live="polite" data-autosave-status>Al agregar avisos se confirmará aquí su guardado.</span>
     </div>
     <details class="mt-3"><summary class="min-h-11 cursor-pointer py-2 text-sm font-semibold">Resumen de recogida y captura manual (<span x-text="total"></span> anuncios)</summary>
         <?php require __DIR__ . '/methodology-portal-counts.php'; ?>

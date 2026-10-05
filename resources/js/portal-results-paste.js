@@ -1,6 +1,7 @@
 import { fillRows, parseComparableText } from './comparable-bulk-import.js';
 import { candidateMatches, candidateSuggestions, matrixRows } from './comparable-candidate-review.js';
 import { previewFacts } from './comparable-preview-facts.js';
+import { flushModuleForm } from './module-autosave.js';
 const normalize = value => String(value ?? '').toLowerCase().trim();
 
 export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false, emptyMessage = '', readText = false }) {
@@ -46,7 +47,7 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
             if (!this.selected.length) { this.message = 'No hay sugeridos nuevos: los avisos ya están registrados o tienen coincidencias pendientes de revisión.'; return; }
             this.add();
         },
-        add(includeRegistered = false) {
+        async add(includeRegistered = false) {
             if (this.busy || !this.selected.length) return;
             this.busy = true;
             try {
@@ -56,7 +57,10 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
                 const rows = this.results.filter(item => this.selected.includes(item.row.source_url)).map(item => item.row);
                 const result = fillRows(form, rows, panel.dataset.query || '', undefined, { deferDuplicateReview: true });
                 this.selected = []; this.refresh();
-                this.message = `${result.count} avisos nuevos por revisar. ${result.enriched || 0} anuncios existentes complementados. ${result.duplicates} enlaces ya registrados sin duplicar. ${result.overflow} sin cargar. Revisa la bandeja y el guardado.`;
+                const summary = `${result.count} avisos nuevos por revisar. ${result.enriched || 0} anuncios existentes complementados. ${result.duplicates} enlaces ya registrados sin duplicar. ${result.overflow} sin cargar.`;
+                this.message = `${summary} Guardando en la base de datos…`;
+                const saved = await flushModuleForm(form);
+                this.message = `${summary} ${saved ? 'Guardado confirmado en la base de datos. Puedes continuar en Revisar por portal.' : 'Guardado pendiente. No cierres ni recargues: pulsa Guardar matriz para reintentar y consulta el aviso de guardado.'}`;
             } finally { this.busy = false; }
         },
     };
