@@ -87,7 +87,13 @@ function isBlankRow(row) {
 function setField(row, key, value) {
     const input = field(row, key);
     if (!input || value === undefined || value === null || String(value).trim() === '') return;
-    if (input.tagName === 'SELECT' && ![...input.options].some(option => option.value === value)) return;
+    if (input.tagName === 'SELECT') {
+        const normalized = text => String(text ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+        const option=[...input.options].find(option => option.value === value)
+            || [...input.options].find(option => option.value && (normalized(option.value)===normalized(value) || normalized(option.textContent)===normalized(value)));
+        if (!option) return;
+        value=option.value;
+    }
     input.value = input.type === 'number' ? String(value).replace(',', '.') : value;
 }
 

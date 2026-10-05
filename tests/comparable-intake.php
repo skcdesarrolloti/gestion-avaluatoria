@@ -20,6 +20,13 @@ declare(strict_types=1);
     $full=\App\Services\ComparablePublishedDetails::parse("Baños: 3\nAscensor: Sí\nJacuzzi privado: No\n".str_repeat('Descripción original ',150));
     $saved=\App\Services\ComparableCaptureDetail::normalize($full);
     expect($full['bathrooms']==='3' && $full['elevator']==='Sí', 'lector recoge baños y ascensor explícitos');
+    foreach (['2 Baños395 m²'=>'2','1 Baños60 m²'=>'1','Baños: 0'=>'0'] as $text=>$expected) {
+        expect((\App\Services\ComparablePublishedDetails::parse($text)['bathrooms'] ?? null)===$expected,'lector distingue cantidad de baños del área: '.$text);
+    }
+    expect(!isset(\App\Services\ComparablePublishedDetails::parse('Baños 104 m²')['bathrooms']), 'lector no toma área sin cantidad de baños como conteo');
+    $description=\App\Services\ComparablePublishedDetails::parse('Oficina con 2 baños y 4 garajes. Servicios básicos de agua y electricidad. Vista panorámica. El edificio cuenta con ascensor y acceso para discapacitados.');
+    expect($description['bathrooms']==='2' && $description['parking_spaces']==='4' && $description['elevator']==='Sí'
+        && str_contains($description['published_attributes'],'Acceso para discapacitados'), 'descripción conserva atributos explícitos y cantidades separados de la calificación');
     expect(json_decode($saved['published_attributes'],true)['Jacuzzi privado']==='No' && mb_strlen($saved['published_text'])>1600, 'captura conserva atributo no catalogado y texto amplio');
     expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['published_attributes'=>'{"dato":{"objeto":"no"}}']), 'atributos originales rechazan estructuras no previstas');
 })();

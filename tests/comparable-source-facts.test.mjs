@@ -4,6 +4,15 @@ import { publishedDetails } from '../resources/js/comparable-published-details.j
 import { sourceFacts, comparisonRows } from '../resources/js/comparable-source-facts.js';
 import { sourceUpdate } from '../resources/js/comparable-source-update.js';
 import { duplicateEvidence } from '../resources/js/comparable-duplicates.js';
+
+test('explicit counts distinguish joined area badges from labelled quantities', () => {
+    for (const [text,expected] of [['2 Baños395 m²','2'],['1 Baños60 m²','1'],['Baños: 2 Área: 104 m²','2'],['Baños 104 m²',undefined],['Baños: 0','0'],['Baños: 2.5',undefined]])
+        assert.equal(publishedDetails(text).bathrooms,expected,text);
+    assert.equal(publishedDetails('Parqueaderos 104 m²').parking_spaces,undefined);
+    assert.equal(publishedDetails('Cuenta con 4 garajes.').parking_spaces,'4');
+    assert.equal(publishedDetails('Sin ascensor.').elevator,'No');
+    assert.equal(publishedDetails('Edificio con seis (6) ascensores.').elevator,'Sí');
+});
 test('collects unknown portal attributes and full description without statistical grades', () => {
     const row=publishedDetails('Baños: 2\nAscensor: Sí\nVista: Exterior paisajística\nJacuzzi privado: Sí\n'+ 'Descripción extensa '.repeat(150));
     assert.equal(row.bathrooms,'2'); assert.equal(row.elevator,'Sí');

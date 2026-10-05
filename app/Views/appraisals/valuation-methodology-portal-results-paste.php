@@ -28,7 +28,7 @@
         <div class="mt-3 grid gap-3 md:grid-cols-2">
             <template x-for="item in results" :key="item.row.source_url">
                 <article class="rounded-lg border p-3" :class="item.tone === 'registered' ? 'bg-slate-100' : (item.tone === 'review' ? 'bg-amber-50' : 'bg-emerald-50')">
-                    <label class="flex min-h-11 items-center gap-2 font-semibold"><input type="checkbox" x-model="selected" :value="item.row.source_url" :disabled="item.tone === 'registered' || busy"><span x-text="'Aviso ' + item.number + ' · ' + (item.row.neighborhood || item.row.project_name || 'Ubicación por verificar')"></span></label>
+                    <label class="flex min-h-11 items-center gap-2 font-semibold"><input type="checkbox" x-model="selected" :value="item.row.source_url" :disabled="item.tone === 'registered' || busy"><span x-text="'Aviso ' + item.number + ' · ' + (item.row.listing_title || item.row.neighborhood || item.row.project_name || item.row.property_type || 'Ubicación por verificar')"></span></label>
                     <?php require __DIR__ . '/methodology-preview-facts.php'; ?>
                     <p class="mt-1 text-xs" x-text="item.label"></p>
                     <a class="mt-1 inline-flex min-h-11 items-center text-sm text-blue-700 underline" :href="item.row.source_url" target="_blank" rel="noopener">Ver inmueble</a>

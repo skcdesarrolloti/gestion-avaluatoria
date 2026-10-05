@@ -39,3 +39,19 @@ test('property table retains contradictory sources, catalog gaps and arbitrary p
     assert.ok(result.columns.some(c => c.label==='Publicado: Jacuzzi'));
     assert.deepEqual(data.map(row => row.price_amount),['100','110',undefined]);
 });
+
+test('FincaRaiz joined badges do not make area become bathrooms and outside description reaches table', () => {
+    const previous=globalThis.document; globalThis.document=parseHTML('<html/>').document;
+    try {
+        const html='<section><div class="listingCard"><div><a href="/oficina-en-venta-en-manga-cartagena/193978243"><h2>Oficina en venta en Manga, Cartagena</h2></a><p>$ 1.400.000.000</p><div>2 Baños104 m²</div></div><p>El inmueble cuenta con 2 baños y 4 garajes. Servicios básicos de agua y electricidad. Vista panorámica. El edificio tiene acceso para discapacitados, acceso pavimentado y ascensor.</p></div><div class="listingCard"><a href="/oficina-en-venta-en-manga-cartagena/193978244"><h2>Oficina en venta en Manga, Cartagena</h2></a><p>$ 3.353.000.000</p><div>2 Baños395 m²</div><p>4 garajes.</p></div></section>';
+        const rows=readSourceRows(html,'','https://www.fincaraiz.com.co/','FincaRaiz');
+        assert.equal(rows.length,2); assert.deepEqual(rows.map(r=>r.bathrooms),['2','2']);
+        assert.deepEqual(rows.map(r=>r.area_m2),['104','395']); assert.equal(rows[0].parking_spaces,'4');
+        assert.equal(rows[0].elevator,'Sí'); assert.equal(rows[0].property_type,'Oficina'); assert.equal(rows[0].project_name,'');
+        assert.match(rows[0].listing_title,/Manga/); assert.match(rows[0].published_attributes,/Acceso para discapacitados/);
+        const table=intakeTable(intakeGroups(rows.map((row,i)=>({...row,id:String(i+1)}))),{catalog:{baths:{label:'Baños',sample:'bathrooms'}}});
+        assert.equal(table.rows[0].values.bathrooms.value,'FincaRaiz: 2');
+        assert.ok(table.columns.some(c=>c.label==='Publicado: Servicios descritos'));
+        assert.equal(rows[1].elevator,undefined);
+    } finally {globalThis.document=previous;}
+});

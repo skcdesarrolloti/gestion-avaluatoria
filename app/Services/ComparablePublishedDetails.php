@@ -8,7 +8,7 @@ final class ComparablePublishedDetails
     public static function parse(string $text): array
     {
         $original=trim(strip_tags($text));
-        $facts=ComparableSourceFacts::extract($original);
+        $facts=array_replace(ComparableTextAttributes::descriptions($original),ComparableSourceFacts::extract($original));
         $text = trim(preg_replace('/\s+/u', ' ', strip_tags($text)) ?? '');
         $out = ['intake_state'=>'review','published_attributes'=>json_encode((object)$facts,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR),
             'published_text'=>mb_substr($original,0,15920).(mb_strlen($original)>15920?' [Texto abreviado; consultar ficha original.]':'')];
@@ -16,11 +16,12 @@ final class ComparablePublishedDetails
         foreach (['private_built_m2'=>'área (?:privada construida|construida privada)', 'private_free_m2'=>'área privada libre',
             'built_m2'=>'área construida', 'land_m2'=>'área (?:del terreno|terreno)', 'stratum'=>'estrato',
             'floor_level'=>'(?:piso|nivel)', 'age_years'=>'(?:antigüedad|edad)','bathrooms'=>'baños?', 'bedrooms'=>'(?:habitaciones?|alcobas?)'] as $key=>$label) {
-            if (preg_match('/(?:' . $label . ')\s*[:：-]?\s*(\d+(?:[.,]\d+)?)/iu', $text, $m)) $out[$key] = str_replace(',', '.', $m[1]);
+            if (in_array($key,['bathrooms','bedrooms'],true)) {
+                $value=ComparableTextAttributes::count($text,$label); if ($value!=='') $out[$key]=$value;
+            } elseif (preg_match('/(?:' . $label . ')\s*[:：-]?\s*(\d+(?:[.,]\d+)?)/iu', $text, $m)) $out[$key] = str_replace(',', '.', $m[1]);
         }
         foreach (['parking_spaces'=>'(?:parqueaderos?|garajes?|celdas? de parqueo)', 'ph_deposit_count'=>'(?:depósitos?|cuartos? útiles?)'] as $key=>$label) {
-            if (preg_match('/' . $label . '\s*[:：-]?\s*(\d{1,3})\b/iu', $text, $m)
-                || preg_match('/\b(\d{1,3})\s+' . $label . '\b/iu', $text, $m)) $out[$key] = $m[1];
+            $value=ComparableTextAttributes::count($text,$label); if ($value!=='') $out[$key]=$value;
         }
         if (isset($out['parking_spaces'])) $out['ph_parking_presence'] = (int) $out['parking_spaces'] > 0 ? 'si' : 'no';
         if (isset($out['ph_deposit_count'])) $out['ph_deposit_presence'] = (int) $out['ph_deposit_count'] > 0 ? 'si' : 'no';
@@ -38,6 +39,8 @@ final class ComparablePublishedDetails
                 if (!preg_match('/^\d+(?:[.,]\d+)?(?:\s*m)?$/D',$value)) continue;
                 $value=preg_replace('/\s*m$/','',$value);
             }
+            if ($field==='elevator' && $value==='Mencionado en la descripción · verificar alcance') $value='Sí';
+            elseif ($field==='elevator' && $value==='No · descrito en el anuncio') $value='No';
             $out[$field]=mb_substr($value,0,['elevator'=>20,'view_quality'=>80,'finish_quality'=>80,'amenities'=>240,'security_features'=>180][$field] ?? 500);
         }
         return $out;

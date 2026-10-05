@@ -1,7 +1,18 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { parseComparableBlock, parseComparableText } from '../resources/js/comparable-bulk-import.js';
+import { parseComparableBlock, parseComparableText, fillRows } from '../resources/js/comparable-bulk-import.js';
 import { comparableUrlKey, hasComparableData, missingComparableFields } from '../resources/js/comparable-review.js';
+
+test('published affirmative attribute reaches the existing select without inventing a classification', () => {
+    const fields=['source_url','bathrooms','published_attributes','elevator','finish_quality'].map(key=>({name:`comparables[0][${key}]`,value:'',tagName:'INPUT'}));
+    Object.assign(fields[3],{tagName:'SELECT',options:[{value:'',textContent:'Seleccionar'},{value:'si',textContent:'Sí'},{value:'no',textContent:'No'}]});
+    Object.assign(fields[4],{tagName:'SELECT',options:[{value:'',textContent:'Seleccionar'},{value:'alto',textContent:'Alto'}]});
+    const row={sectionRowIndex:0,querySelectorAll:()=>fields};
+    const form={querySelectorAll:()=>[row],dispatchEvent:()=>{}};
+    const result=fillRows(form,[{source_url:'https://www.fincaraiz.com.co/oficina/123',bathrooms:'2',elevator:'Sí',finish_quality:'Modernos pisos',published_attributes:'{"Servicios descritos":"agua y electricidad"}'}],'',undefined,{deferDuplicateReview:true});
+    assert.equal(result.count,1); assert.equal(fields[1].value,'2'); assert.equal(fields[3].value,'si');
+    assert.equal(fields[4].value,''); assert.match(fields[2].value,/agua y electricidad/);
+});
 
 test('explicit tabular operation determines unit despite dual-operation listing URL', () => {
     const [row] = parseComparableText('fuente\tenlace\tprecio\tarea\toperacion\nCiencuadras\thttps://www.ciencuadras.com/inmueble/oficina-en-arriendo-o-venta-123\t$600.000.000\t42\tVenta');
