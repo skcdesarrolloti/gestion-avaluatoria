@@ -1,9 +1,11 @@
 <?php require __DIR__ . '/valuation-methodology-comparable-config.php'; ?>
+<?php require __DIR__ . '/methodology-research-context.php'; ?>
 <form id="tabla-madre-83" class="mt-6 scroll-mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" method="post"
     action="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables')) ?>"
     x-data="comparableWorkbench" :data-comparable-mode="searchTab === 'mapa' ? 'cards' : mode" @input="refresh()" @change="refresh()"
     @comparable-imported="showImported($event.detail)"
     data-module-autosave data-save-in-place data-comparable-json
+    data-intake-evidence="<?= e(json_encode(['catalog'=>$researchCatalog,'subjects'=>$researchEvidence['subjects']],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>"
     data-ph-subject="<?= !empty($guide['is_ph']) ? 'si' : 'no' ?>"
     data-appraisal-id="<?= e($record['id']) ?>" data-excel-preview-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/excel/revisar')) ?>"
     data-excel-save-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/excel/guardar')) ?>"
@@ -37,11 +39,7 @@
     </div>
     <details class="mt-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Excel · descargar o actualizar anuncios (opcional)</summary><?php require __DIR__ . '/methodology-excel-import.php'; ?></details>
     <?php require __DIR__ . '/methodology-intake-cards.php'; ?>
-    <div id="unit-price-help" x-show="searchTab === 'matriz' && mode !== 'intake'" class="mt-3 rounded-xl border border-amber-200 bg-amber-50 p-3 text-sm leading-6">
-        <p><strong>Comparación en COP/m².</strong> Oferta y negociado por m² se calculan automáticamente; los importes originales se conservan como soporte. Se exige régimen, área positiva y fuente; en NPH/condominio también la base del área publicada. Descuento vacío queda pendiente; cero debe ser confirmado. Un precio ya publicado por m² no se divide nuevamente.</p>
-        <p><strong>PH: cociente preliminar, pendiente de M4.</strong> Usa área privada construida, sin sumar áreas de garaje, depósito o áreas libres. Si el precio incluye estos componentes, hay que sustentar su depuración del comparable (art. 19.2.b); tener los mismos anexos que el sujeto no elimina esa revisión.</p>
-        <p><strong>Garaje y depósito del sujeto.</strong> Matrícula independiente: revisar valoración global o por m² según mercado y restricciones. Común de uso exclusivo: su incidencia queda implícita en la unidad principal y no se liquida independientemente (art. 36.2). Privado en la misma matrícula: documentar composición y áreas, sin asumir que equivale a bien común ni duplicar su valor. Sin evidencia para estimar el componente, queda pendiente; no se asignan porcentajes ni valores automáticos.</p>
-    </div>
+    <?php require __DIR__ . '/methodology-intake-unit-price-help.php'; ?>
     <div x-show="searchTab === 'matriz' && mode !== 'intake'"><?php require __DIR__ . '/valuation-methodology-capture-areas.php'; ?></div>
     <div x-show="searchTab === 'mapa'"><?php require __DIR__ . '/valuation-methodology-search-map.php'; ?></div>
     <div x-show="mode !== 'intake'"><?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-tools.php'; ?></div>

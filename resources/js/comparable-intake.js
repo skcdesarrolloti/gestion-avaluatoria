@@ -1,3 +1,8 @@
+import { comparisonRows } from './comparable-source-facts.js';
+import { publishedDetails } from './comparable-published-details.js';
+import { sourceUpdate } from './comparable-source-update.js';
+import { duplicateEvidence } from './comparable-duplicates.js';
+
 const normalize = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 export const intakeStates = {review:'Por revisar', selected:'Seleccionado para análisis', selected_pending:'Seleccionado con pendientes', not_selected:'No seleccionado'};
 export function intakeGroups(rows) {
@@ -11,7 +16,7 @@ export function intakeGroups(rows) {
     return [...groups.values()].map(group => {
         const states = new Set(group.rows.map(row => row.intake_state || (row.status === 'usada' ? 'selected_pending' : 'review')));
         group.state = states.size === 1 ? [...states][0] : 'review';
-        group.conflicts = ['price_amount','area_m2','parking_spaces','ph_deposit_count'].filter(key =>
+        group.conflicts = ['price_amount','area_m2','parking_spaces','ph_deposit_count','bathrooms','bedrooms','view_quality','elevator'].filter(key =>
             new Set(group.rows.map(row => normalize(row[key])).filter(Boolean)).size > 1);
         group.pending = group.rows.some(row => !row.price_amount || !row.area_m2 || !row.contact_phone);
         group.candidates = [];
@@ -19,7 +24,7 @@ export function intakeGroups(rows) {
     }).map((group, _, all) => {
         group.candidates = all.filter(other => other.key !== group.key && group.rows.some(a => other.rows.some(b =>
             normalize(a.operation) === normalize(b.operation) && normalize(a.property_type) === normalize(b.property_type) &&
-            ((normalize(a.project_name) && normalize(a.project_name) === normalize(b.project_name) && normalize(a.neighborhood) === normalize(b.neighborhood)) ||
+            (duplicateEvidence(a,b) || (normalize(a.project_name) && normalize(a.project_name) === normalize(b.project_name) && normalize(a.neighborhood) === normalize(b.neighborhood)) ||
             (normalize(a.contact_phone) && normalize(a.contact_phone) === normalize(b.contact_phone) && a.area_m2 && a.area_m2 === b.area_m2)))))
             .map(other => ({key:other.key,title:other.title}));
         return group;
@@ -29,6 +34,17 @@ export function comparableIntake(getEntries, getForm) {
     return {
         intakeCards:[], intakeTargets:[], intakeFilter:'all', intakePage:1, intakePages:1, intakeCount:0, intakeSearch:'',
         intakeStates,
+        intakeComparison(card) {
+            let config={};
+            try { config=JSON.parse(getForm().dataset.intakeEvidence || '{}'); } catch { /* A pending reference stays empty. */ }
+            return comparisonRows(card,config);
+        },
+        intakeComplement(row, text) {
+            if (!String(text || '').trim()) return;
+            const changes=sourceUpdate(row,publishedDetails(text));
+            Object.entries(changes).forEach(([key,value]) => this.intakeWrite(row.index,key,value));
+            this.intakeChanged();
+        },
         rebuildIntake() {
             const entries = getEntries();
             const groups = intakeGroups(entries.filter(e => e.used).map(e => ({...e.data,index:e.index})));

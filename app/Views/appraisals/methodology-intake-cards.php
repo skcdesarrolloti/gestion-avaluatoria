@@ -11,12 +11,12 @@
     <p class="mb-3 text-sm"><strong x-text="intakeCount"></strong> inmuebles · <span x-text="total"></span> anuncios. Los posibles duplicados siguen separados hasta confirmar su identidad.</p>
     <div class="grid gap-4 lg:grid-cols-2">
         <template x-for="card in intakeCards" :key="card.key">
-            <article class="min-w-0 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <article x-data="{comparisonOpen:false}" :class="comparisonOpen ? 'lg:col-span-2' : ''" class="min-w-0 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                 <h4 class="text-lg font-semibold" x-text="card.title"></h4>
                 <p class="mt-1 text-sm text-slate-600" x-text="card.rows[0].neighborhood || 'Ubicación publicada pendiente'"></p>
                 <template x-for="offer in card.rows" :key="offer.id"><p class="mt-2 rounded-lg bg-slate-50 p-2 text-sm" x-text="(offer.source_name || 'Fuente pendiente') + ': ' + (offer.price_amount || 'precio pendiente') + ' COP · ' + (offer.area_m2 || 'área pendiente') + ' m² · ' + (offer.listing_code || 'código pendiente')"></p></template>
                 <p class="mt-2 rounded-lg p-2 text-sm" :class="card.state.startsWith('selected') ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-900'" x-text="intakeStates[card.state]"></p>
-                <p class="mt-2 text-sm text-amber-900" x-show="card.conflicts.length" x-text="'Diferencias entre anuncios: ' + card.conflicts.map(k => ({price_amount:'precio',area_m2:'área publicada',parking_spaces:'parqueaderos',ph_deposit_count:'depósitos'})[k]).join(', ')"></p>
+                <p class="mt-2 text-sm text-amber-900" x-show="card.conflicts.length" x-text="'Diferencias entre anuncios: ' + card.conflicts.map(k => ({price_amount:'precio',area_m2:'área publicada',parking_spaces:'parqueaderos',ph_deposit_count:'depósitos',bathrooms:'baños',bedrooms:'habitaciones',view_quality:'vista',elevator:'ascensor'})[k]).join(', ')"></p>
                 <p class="mt-2 text-sm" x-show="card.pending">Hay datos básicos pendientes. Consulta cada fuente.</p>
                 <p class="mt-2 text-sm text-amber-900" x-show="card.candidates.length" x-text="'Posible mismo inmueble: ' + card.candidates.map(c => c.title).join(' · ') + '. Confirma antes de vincular.'"></p>
                 <label class="label mt-3">Decisión del analista
@@ -26,6 +26,7 @@
                     <select class="input" @change.stop="intakeLink(card, $event.target.value); $event.target.value = ''"><option value="">Selecciona sólo si confirmaste que es el mismo</option><template x-for="target in intakeTargets.filter(t => t.key !== card.key)" :key="target.key"><option :value="target.key" x-text="target.title + ' · ' + target.key.slice(0, 8)"></option></template></select>
                     <span class="mt-1 block text-xs font-normal">La vinculación vuelve a Por revisar. No altera precios, áreas, fotos ni fuentes.</span>
                 </label>
+                <?php require __DIR__ . '/methodology-intake-comparison.php'; ?>
                 <details class="mt-3 rounded-lg border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Anuncios, características y soportes (<span x-text="card.rows.length"></span>)</summary>
                     <template x-for="row in card.rows" :key="row.id">
                         <div class="mt-3 border-t pt-3">
@@ -35,6 +36,12 @@
                             <p class="mt-1 text-sm" x-text="'Consulta: ' + (row.consulted_at || 'pendiente') + ' · Contacto: ' + (row.contact_name || '') + ' ' + (row.contact_phone || 'pendiente')"></p>
                             <p class="mt-1 text-sm text-amber-900" x-show="row.published_location" x-text="'Referencia publicada sin verificar: ' + row.published_location"></p>
                             <p class="mt-2 whitespace-pre-wrap break-words text-sm" x-text="row.evidence_detail || row.comparability_notes || 'Sin descripción capturada'"></p>
+                            <details class="mt-2" x-show="row.published_text"><summary class="min-h-11 cursor-pointer text-sm">Texto de la ficha conservado</summary><p class="whitespace-pre-wrap break-words text-sm" x-text="row.published_text"></p></details>
+                            <details class="mt-2" x-data="{sourceText:''}"><summary class="min-h-11 cursor-pointer text-sm">Completar con la ficha de este anuncio</summary>
+                                <label class="label">Texto publicado en este mismo anuncio<textarea class="input" rows="4" maxlength="16000" x-model="sourceText" @input.stop placeholder="Pega descripción y características de esta ficha; conserva sus etiquetas y saltos de línea."></textarea></label>
+                                <button type="button" class="btn-secondary mt-2" @click="intakeComplement(row, sourceText); sourceText=''">Recoger atributos y completar vacíos</button>
+                                <p class="mt-1 text-xs">Los datos existentes se conservan. Las diferencias quedan registradas para revisión.</p>
+                            </details>
                             <p class="mt-2 whitespace-pre-wrap break-words text-sm text-amber-900" x-show="row.source_updates" x-text="row.source_updates"></p>
                             <details x-show="row.latest_source_excerpt" class="mt-2"><summary class="min-h-11 cursor-pointer text-sm">Último texto leído · contrastar con original</summary><p class="whitespace-pre-wrap break-words text-sm" x-text="row.latest_source_excerpt"></p></details>
                             <a x-show="/^https?:\/\//i.test(row.source_url)" :href="/^https?:\/\//i.test(row.source_url) ? row.source_url : '#'" target="_blank" rel="noopener noreferrer" class="mt-2 inline-flex min-h-11 items-center text-blue-700 underline">Abrir anuncio original</a>

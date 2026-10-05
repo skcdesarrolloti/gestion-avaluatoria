@@ -56,7 +56,7 @@ final class FincaraizListingParser
             $description .= is_string($entity['description'] ?? null) ? ' ' . $entity['description'] : '';
             foreach ($entity['additionalProperty'] ?? [] as $attribute) {
                 if (is_array($attribute) && is_scalar($attribute['name'] ?? null) && is_scalar($attribute['value'] ?? null))
-                    $description .= ' ' . $attribute['name'] . ': ' . $attribute['value'] . ';';
+                    $description .= "\n" . $attribute['name'] . ': ' . $attribute['value'] . ';';
             }
             $row = array_filter($row, static fn ($v) => $v !== '') + ComparablePublishedDetails::parse($description);
             return ['row' => $row,

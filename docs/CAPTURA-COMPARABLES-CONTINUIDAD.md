@@ -78,3 +78,11 @@ y clasificaciones con los comparables. Insumos consulta valor/soporte de esa cap
 no la sustituye con otra calificación manual. Escalas anteriores requieren revisión
 explícita. No cambia lectura de portales ni integra regresión. Véase
 FACTORES-SUJETO-CAPITULO-3.md.
+# Captura ampliada · 5 de octubre de 2026
+
+- Conservar muestras previas. `Agregar sugeridos` excluye anuncios ya registrados; completar la misma URL enriquece vacíos sin crear otra muestra.
+- `published_attributes` conserva etiquetas originales (hasta 80 pares, 500 caracteres por valor); `published_text` conserva hasta 16.000 caracteres con aviso de abreviación. Ambos viajan en `capture_details`, sin cambio de esquema.
+- El lector FincaRaíz conserva `additionalProperty`; Metrocuadrado conserva los campos del resultado reconocido. Pegados y fichas manuales usan extracción común. Un resumen no equivale a leer toda la ficha: completar los atributos pendientes desde el anuncio individual.
+- Las tarjetas incluyen cuadro sujeto / anuncios / validación. Sólo comparar versiones del mismo grupo confirmado; las coincidencias entre otros grupos son propuestas para revisión. No fusionar automáticamente.
+- Los cuadros de las tarjetas usan roles semánticos, no otro `tbody`: los lectores y crecimiento de filas siguen trabajando sobre la única tabla de captura.
+- Todos los atributos siguen disponibles. El cuadro abre compacto y permite desplegar los factores sin datos. Correlación y elección final de predictores corresponden a Análisis.

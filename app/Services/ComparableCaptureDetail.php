@@ -12,6 +12,8 @@ final class ComparableCaptureDetail
             'intake_note' => ['Pendientes o motivo de selección', 'text', 'shared'],
             'source_updates' => ['Lecturas posteriores del mismo anuncio · diferencias conservadas', 'text', 'shared'],
             'latest_source_excerpt' => ['Último texto leído del anuncio · contrastar con captura original', 'text', 'shared'],
+            'published_attributes' => ['Atributos originales publicados', 'facts', 'internal'],
+            'published_text' => ['Texto original de la ficha', 'source_text', 'shared'],
             'location_verification' => ['Verificación manual de ubicación', 'choice', 'map'],
             'published_location' => ['Coordenadas originales publicadas · referencia sin verificar', 'text', 'map'],
             'component_key' => ['Componente de la muestra', 'text', 'internal'],
@@ -57,7 +59,9 @@ final class ComparableCaptureDetail
             $value = trim((string) $value);
             if ($key === 'property_group' && $value !== '' && !preg_match('/^[a-f0-9]{32}$/D', $value))
                 throw new HttpException(422, 'Identificador de inmueble inválido.');
-            if (mb_strlen($value) > 1600) throw new HttpException(422, "$label: máximo 1600 caracteres.");
+            $limit=$type==='facts'?48000:($type==='source_text'?16000:1600);
+            if (mb_strlen($value) > $limit) throw new HttpException(422, "$label: máximo $limit caracteres.");
+            if ($type==='facts') $value=ComparableSourceFacts::normalize($value);
             if ($type === 'choice' && !array_key_exists($value, self::options($key)))
                 throw new HttpException(422, "$label: selecciona una opción válida.");
             if ($type === 'integer' && $value !== '' && (!preg_match('/^\d{1,3}$/D', $value)))

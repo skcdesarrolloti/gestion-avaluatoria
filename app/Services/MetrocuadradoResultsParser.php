@@ -60,6 +60,9 @@ final class MetrocuadradoResultsParser
         $notes = 'Resumen de Metrocuadrado. Verificar ubicación, vigencia, tipo de área y soporte. PH por verificar.';
         $portalNeighborhood = $this->text($item['mbarrio'] ?? '', 140);
         if ($portalNeighborhood !== '') $notes .= ' Barrio alternativo publicado: ' . $portalNeighborhood . '.';
+        $details=ComparablePublishedDetails::parse($this->text($item['description'] ?? $item['mdescripcion'] ?? $item['data']['mdescripcion'] ?? '', 16000));
+        $facts=json_decode($details['published_attributes'],true) + ComparableSourceFacts::structured($item);
+        $details['published_attributes']=json_encode((object)array_slice($facts,0,80,true),JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
         return ['source_type' => 'portal', 'source_name' => 'Metrocuadrado', 'source_url' => 'https://www.metrocuadrado.com' . $path,
             'listing_code' => $this->text($item['midinmueble'] ?? '', 120), 'operation' => 'Venta', 'property_type' => 'Oficina',
             'price_amount' => $this->number($item['mvalorventa'] ?? null), 'price_unit' => 'precio_total',
@@ -68,7 +71,7 @@ final class MetrocuadradoResultsParser
             'contact_name' => $this->text($item['data']['mnombrevisitor'] ?? '', 120), 'contact_phone' => $this->text($item['contactPhone'] ?? '', 80),
             'bathrooms' => $this->number($item['mnrobanos'] ?? null), 'parking_spaces' => $this->number($item['mnrogarajes'] ?? null),
             'ph_regime' => 'por_verificar', 'consulted_at' => date('Y-m-d'), 'comparability_notes' => $notes]
-            + ComparablePublishedDetails::parse($this->text($item['description'] ?? $item['mdescripcion'] ?? $item['data']['mdescripcion'] ?? '', 10000));
+            + $details;
     }
 
     private function text(mixed $value, int $limit): string { return is_scalar($value) ? mb_substr(trim((string) $value), 0, $limit) : ''; }

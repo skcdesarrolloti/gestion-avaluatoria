@@ -13,6 +13,7 @@ const equalNumber = (a, b, key) => number(a[key]) !== null && number(a[key]) ===
 export function duplicateEvidence(candidate, existing) {
     const url = comparableUrlKey(candidate.source_url);
     if (url && url === comparableUrlKey(existing.source_url)) return { exact: true, reasons: ['mismo enlace'] };
+    for (const key of ['operation','property_type']) if (text(candidate[key]) && text(existing[key]) && !same(candidate,existing,key)) return null;
     const reasons = [];
     if (same(candidate, existing, 'address_hint') && text(candidate.address_hint).length >= 8
         && /\d/.test(candidate.address_hint)) reasons.push('misma dirección anunciada');
@@ -20,12 +21,13 @@ export function duplicateEvidence(candidate, existing) {
     if (equalNumber(candidate, existing, 'area_m2')) reasons.push('misma área');
     if (equalNumber(candidate, existing, 'price_amount')) reasons.push('mismo precio');
     if (same(candidate, existing, 'neighborhood')) reasons.push('mismo sector');
+    if (same(candidate, existing, 'contact_phone')) reasons.push('mismo teléfono de contacto');
     const address = reasons.includes('misma dirección anunciada');
     const area = reasons.includes('misma área');
     const price = reasons.includes('mismo precio');
     const context = reasons.includes('mismo edificio/proyecto') || reasons.includes('mismo sector');
     // These are review signals, never an identity decision or an appraisal rule.
-    return (address && area) || (area && price && context) ? { exact: false, reasons } : null;
+    return (address && area) || (area && price && context) || (area && reasons.includes('mismo teléfono de contacto')) ? { exact: false, reasons } : null;
 }
 
 export function checkComparableDuplicates(data, rows, confirmDistinct = message => window.confirm(message)) {
