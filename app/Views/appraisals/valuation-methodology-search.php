@@ -35,7 +35,7 @@ $formulaFamilies = [
     </details>
     <?php require __DIR__ . '/methodology-portal-profiles.php'; ?>
     <?php require __DIR__ . '/methodology-research-plan.php'; ?>
-    <details x-show="searchTab === 'captura'" class="mb-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer py-2 font-semibold">Consulta general de esta unidad · conservar instrucciones</summary><?php require __DIR__ . '/methodology-search-prompt.php'; ?></details>
+    <details x-show="searchTab === 'captura'" class="mb-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer py-2 font-semibold">Contexto de la investigación · qué buscar y recoger</summary><?php require __DIR__ . '/methodology-search-prompt.php'; ?></details>
     <div x-show="searchTab === 'investigacion'"><?php require __DIR__ . '/methodology-market-coverage.php'; ?></div>
     <div class="mb-6" x-show="searchTab === 'captura'">
         <p class="eyebrow"><?= e(($prefix ?? 'M') . '3 · Insumos del método ' . ($methods[$method ?? 'mercado'] ?? 'Mercado')) ?></p>

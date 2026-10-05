@@ -44,7 +44,7 @@ foreach (['costo', 'renta'] as $index => $chosen) {
         && !str_contains($unitPage, 'Revisar Terreno industrial'), 'HTTP método guardado prevalece sobre enlace anterior y solo abre su unidad');
     $inputsPage = request($flowPath . '?component=' . $annexIds[$index] . '&stage=3')['body'];
     expect(!str_contains($inputsPage, $sampleId), 'HTTP insumos no mezclan muestras de otro componente');
-    expect(str_contains($inputsPage, $chosen === 'renta' ? 'Consulta preparada para esta unidad · Arriendo' : 'Insumos de Costo'),
+    expect(str_contains($inputsPage, $chosen === 'renta' ? 'Contexto de la investigación · Arriendo' : 'Insumos de Costo'),
         'HTTP prepara insumos adecuados a ' . $chosen);
 }
 require __DIR__ . '/market-evidence-http.php';
