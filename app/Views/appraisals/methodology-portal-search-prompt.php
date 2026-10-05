@@ -7,8 +7,10 @@
     </label>
     <button type="button" class="btn-secondary mt-2" @click="navigator.clipboard.writeText($refs.portalSearchText.value).then(() => searchCopyStatus = 'Búsqueda copiada.').catch(() => searchCopyStatus = 'Selecciona el texto y copia con Ctrl+C.')">Copiar búsqueda de <?= e($source['label']) ?></button>
     <p class="mt-3 text-sm"><strong>Filtros que debes buscar:</strong> <?= e($portalSearch['filters']) ?></p>
-    <p class="mt-1 text-sm"><?= e($portalSearch['help']) ?></p>
-    <p class="mt-1 text-xs">Si el campo sólo admite ubicación, escribe el barrio o la ciudad y usa los demás filtros por separado. Estas palabras no son una orden de IA ni garantizan resultados.</p>
+    <details class="mt-2 text-sm"><summary class="min-h-11 cursor-pointer py-2 font-semibold">Cómo aplicar los filtros en este portal</summary>
+        <p><?= e($portalSearch['help']) ?></p>
+        <p class="mt-1">Si sólo admite ubicación, escribe barrio o ciudad y selecciona operación y tipo en sus filtros. No exige garaje o depósito para iniciar; si faltan en el aviso, quedan por verificar.</p>
+    </details>
     <?php if ($portalSearch['google']!==''): ?>
     <details class="mt-2 text-sm"><summary class="min-h-11 cursor-pointer py-3 font-semibold">Alternativa: buscar este portal desde Google</summary>
         <label class="label">Consulta restringida a esta fuente<textarea class="input mt-1" rows="2" readonly x-ref="portalGoogleText" placeholder="Consulta con dominio del portal."><?= e($portalSearch['google']) ?></textarea></label>
@@ -17,5 +19,4 @@
     <?php endif; ?>
     <?php if ($portalSearch['alternatives']!==[]): ?><details class="mt-2 text-sm"><summary class="min-h-11 cursor-pointer py-3 font-semibold">Otras denominaciones de esta unidad</summary><p>Prueba cada búsqueda por separado y verifica que el aviso corresponda al uso y derecho valorados.</p><ul class="mt-2 list-disc pl-5"><?php foreach ($portalSearch['alternatives'] as $alternative): ?><li><?= e($alternative) ?></li><?php endforeach; ?></ul></details><?php endif; ?>
     <p class="mt-2 text-sm" role="status" x-text="searchCopyStatus"></p>
-    <p class="mt-2 text-xs">Empieza sin exigir garaje o depósito cuando buscas la unidad principal. Si el anuncio no los menciona, quedan por confirmar. Conservamos debajo la guía extensa de extracción de esta fuente.</p>
 </section>

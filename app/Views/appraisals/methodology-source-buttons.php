@@ -11,5 +11,4 @@
         </nav>
     <?php if ($sourceGroup === 'Inmobiliarias'): ?></details><?php else: ?></div><?php endif; ?>
     <?php endforeach; ?>
-    <p class="text-sm">Selecciona la fuente y usa su buscador o enlace. Se conservan los filtros disponibles para esa fuente; cuando no admite filtros automáticos, aplícalos en su sitio y pega los resultados aquí. El texto de búsqueda sirve de referencia, no es una instrucción de IA que el portal ejecute.</p>
 </div>

@@ -15,18 +15,10 @@ $zoneSupported = ($guide['type_label'] ?? '') === 'Oficina' && ($guide['business
 $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_search']['neighborhood'] ?? '');
 ?>
 <?php if ($zoneSupported): ?>
-<section data-component="<?= e($componentKey ?? '') ?>" x-data="fincaraizAreaSearch" data-portal="<?= e($zonePrefix) ?>" data-neighborhood-id="<?= e((string) ($subject['neighborhood_id'] ?? '')) ?>"
+<section x-show="sourceTask==='search'" data-component="<?= e($componentKey ?? '') ?>" x-data="fincaraizAreaSearch" data-portal="<?= e($zonePrefix) ?>" data-neighborhood-id="<?= e((string) ($subject['neighborhood_id'] ?? '')) ?>"
     data-neighborhoods="<?= e(json_encode($zoneCatalog, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>"
     data-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/buscar-zona')) ?>"
     @input.stop @change.stop @comparable-matrix-changed.window="selected = []; refreshDuplicates()" :aria-busy="busy">
-    <h4 class="font-semibold"><?= e($zonePortal) ?> · Datos del expediente</h4>
-    <div class="mt-2 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
-        <label class="text-sm">Tipo de inmueble<input class="input mt-1" value="<?= e((string) ($guide['type_label'] ?? '')) ?>" readonly placeholder="Completa el tipo en el expediente"></label>
-        <label class="text-sm">Operación<input class="input mt-1" value="<?= e((string) ($guide['business_label'] ?? '')) ?>" readonly placeholder="Completa la operación en el expediente"></label>
-        <label class="text-sm">Ciudad<input class="input mt-1" value="<?= e((string) ($sourceSearch['city'] ?? $guide['source_search']['city'] ?? $record['municipio'] ?? '')) ?>" readonly placeholder="Completa la ciudad en el expediente"></label>
-        <label class="text-sm">Propiedad horizontal (PH)<input class="input mt-1" value="<?= e(['si' => 'Sí', 'no' => 'No', 'no_aplica' => 'No aplica'][$record['regimen_ph'] ?? ''] ?? 'Por definir en el expediente') ?>" readonly placeholder="Completa PH en el expediente" aria-describedby="<?= e($zonePrefix) ?>-subject-ph-help"></label>
-    </div>
-    <p id="<?= e($zonePrefix) ?>-subject-ph-help" class="mt-2 text-xs text-slate-600">PH se toma del expediente del inmueble avaluado. El régimen de cada comparable se verifica por separado.</p>
     <label for="<?= e($zonePrefix) ?>-neighborhood" class="mt-3 block text-sm font-semibold">Barrio donde buscar</label>
     <input id="<?= e($zonePrefix) ?>-neighborhood" type="search" autocomplete="off" class="input mt-1 w-full" placeholder="Escribe para buscar en el catálogo: Boca…" x-model="neighborhood" :disabled="busy" @input="editNeighborhood()" @keydown.enter.prevent="search(1)" aria-describedby="<?= e($zonePrefix) ?>-zone-help">
     <p id="<?= e($zonePrefix) ?>-zone-help" class="mt-1 text-xs text-slate-600">Barrio inicial del expediente. Para cambiar la zona de búsqueda, escribe y selecciona una sugerencia de la base de datos; no modifica el inmueble avaluado.</p>
@@ -52,7 +44,7 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
             <button type="button" class="btn-secondary min-h-11" @click="selectSuggested()">Seleccionar sugeridos</button>
             <button type="button" class="btn-secondary min-h-11" @click="refreshDuplicates(); selected = visibleResults.filter(item => item.tone !== 'registered').map(item => item.row.source_url)">Seleccionar todos los disponibles</button>
             <button type="button" class="btn-secondary min-h-11" @click="selected = []" :disabled="!selected.length">Desmarcar todos</button>
-            <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'matriz'">Ver en matriz (<span x-text="total"></span>)</button>
+            <button type="button" class="btn-secondary min-h-11" @click="intakeNavigate('review')">Revisar anuncios (<span x-text="total"></span>)</button>
             <button type="button" class="btn-primary min-h-11" @click="incorporate()" :disabled="!selected.length || busy">Agregar nuevos seleccionados (<span x-text="selected.length"></span>)</button>
         </div>
         <p class="mt-2 text-sm" role="status"><strong><span x-text="total"></span> en la matriz en total</strong> · <span x-text="results.filter(item => item.tone === 'registered').length"></span> avisos de esta página ya están en ella · <span x-text="selected.length"></span> seleccionados pendientes de agregar.</p>
@@ -98,9 +90,10 @@ $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_se
     </div>
 </section>
 <?php endif; ?>
-<details class="mt-4" open>
+<?php if (!$zoneSupported): ?><a x-show="sourceTask==='search'" href="<?= e($source['url']) ?>" target="_blank" rel="noopener" class="btn-primary min-h-11">Abrir búsqueda en <?= e($zonePortal) ?></a><?php endif; ?>
+<details x-show="sourceTask==='capture'" class="mt-4" open>
     <summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Capturar un enlace individual o pegar texto</summary>
-    <?php if (!$zoneSupported): ?><a href="<?= e($source['url']) ?>" target="_blank" rel="noopener" class="btn-secondary min-h-11">Abrir búsqueda en <?= e($zonePortal) ?></a><?php endif; ?>
+
     <?php if (empty($isMetrocuadrado)) require BASE_PATH . '/app/Views/appraisals/valuation-methodology-comparable-url.php'; ?>
     <?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-paste.php'; ?>
 </details>
