@@ -24,14 +24,20 @@ if ($captureStale) $captureLiveCode='(!captureConfirmed && captureValue === '.js
     </div>
     <?php endforeach; ?>
     <?php if ($captureLinked): ?>
-        <div class="mt-3 rounded bg-teal-50 p-3 text-sm"><strong>Dato vinculado: <?= e($captureSource['value']) ?></strong>
+        <div class="mt-3 rounded bg-slate-100 p-3 text-sm">
+            <label class="block font-semibold">Dato de <?= e($captureFactor['label']) ?> · ya registrado
+                <input class="mt-1 block min-h-11 w-full rounded-lg border border-slate-300 bg-slate-200 px-3 py-2 text-slate-800" type="text" value="<?= e($captureSource['value']) ?>" readonly aria-readonly="true" placeholder="Dato tomado del registro original">
+            </label>
+            <p class="mt-2 text-xs">Dato proveniente de <?= e($captureSource['section']) ?> · <?= e($captureSource['field']) ?>; no digitado en esta sección.</p>
             <p><?= e(\App\Services\SubjectFactorCapture::code($captureSource['value'],$captureFactor)) ?></p>
             <p class="mt-1 text-xs"><?= e($captureSource['support']) ?></p>
             <a class="mt-2 inline-block min-h-11 font-semibold text-blue-700" href="<?= e($captureSource['hash']) ?>">Editar en <?= e($captureSource['section']) ?></a>
             <p class="text-xs">Se reutiliza en el módulo 8. Al corregir el registro original y volver a esta sección, se muestra actualizado.</p>
         </div>
     <?php else: ?>
-    <?php if ($captureSource!==[]): ?><p class="mt-2 rounded bg-slate-50 p-2 text-xs">Dato original: <?= e($captureSource['value']) ?> · módulo <?= e($captureSource['section']) ?>. <?= $captureItem!==[]?'Se conserva la clasificación de investigación ya guardada.':'Requiere precisar su equivalencia con esta escala; no se infiere una medida o categoría distinta.' ?></p>
+    <?php if ($captureSource!==[]): ?><p class="mt-2 rounded bg-slate-100 p-2 text-xs">
+        <?php if ($captureSource['value']===''): ?>Dato proveniente de <?= e($captureSource['section']) ?> · <?= e($captureSource['field']) ?>: no digitado en su origen.
+        <?php else: ?>Dato original: <?= e($captureSource['value']) ?> · módulo <?= e($captureSource['section']) ?>. <?= $captureItem!==[]?'Se conserva la clasificación de investigación ya guardada.':'Requiere precisar su equivalencia con esta escala; no se infiere una medida o categoría distinta.' ?><?php endif; ?></p>
     <?php endif; ?>
     <?php if ($captureStale): ?><p class="mt-2 rounded bg-amber-50 p-2 text-xs">Clasificación anterior conservada: <?= e($captureValue ?: 'Pendiente') ?>. Revisa el dato y confirma expresamente su clasificación actual.</p><?php endif; ?>
     <input type="hidden" name="<?= e($captureName) ?>[scale_kind]" value="<?= e($captureFactor['kind']) ?>">

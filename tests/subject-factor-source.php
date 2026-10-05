@@ -33,7 +33,8 @@ declare(strict_types=1);
     $record=['id'=>str_repeat('a',32),'tipo_inmueble'=>'oficina']; $units=[$unit]; $subject=[]; $factorScales=[];
     $subjectActionBase='avaluos/'.$record['id'].'/bien-sujeto';
     ob_start(); require BASE_PATH.'/app/Views/appraisals/subject-factors.php'; $html=ob_get_clean();
-    expect(str_contains($html,'Dato vinculado: 3') && !str_contains($html,'name="factors[bathrooms][value]"') && str_contains($html,'name="factors[deposit][value]"'),'interfaz muestra fuente vinculada sin input duplicado y permite capturar faltantes');
+    expect(str_contains($html,'readonly aria-readonly="true"') && str_contains($html,'bg-slate-200') && str_contains($html,'no digitado en esta sección') && !str_contains($html,'name="factors[bathrooms][value]"') && str_contains($html,'name="factors[deposit][value]"'),'dato existente sombreado y bloqueado sin enviarlo como captura nueva');
+    expect(str_contains($html,'no digitado en su origen'),'dato pendiente identifica el apartado de origen sin inventar valor');
     foreach (\App\Services\ComparablePortalProfiles::types() as $type=>$label) {
         $u=['property_type'=>$type];
         foreach (\App\Support\AppraisalSpecialAttributeCatalog::groups($type) as [$label,$items]) {

@@ -32,6 +32,9 @@ final class SubjectFactorSource
             $value=self::translate($key,$previous['observed']);
             return self::result($value,$factor,'3.4',$previous['label'],$previous['notes']);
         }
+        if (isset(Functional::definitions()[$field]) || in_array($field,['construction_age_years','construction_floors','front_length_m','depth_length_m'],true))
+            return self::result('',$factor,$section,Functional::definitions()[$field]['label'] ?? $factor['label'],'');
+        if (!empty($factor['legacy_keys'])) return self::result('',$factor,'3.4',$factor['label'],'');
         return [];
     }
     private static function translate(string $key,string $value): string

@@ -75,3 +75,5 @@ Validación: 1410 verificaciones PHP, 155 pruebas JS, 210 verificaciones BD en
 instancia desechable 3390, lint/build/tamaño 71,3 KB. Navegador local: captura en
 3.3, autoguardado, lectura vinculada, cambio de 2 a 3 y actualización por fetch;
 presentación en escritorio y pantalla estrecha. Sin cambios en fórmulas valuatorias.
+
+Presentación de origen (2026-10-05): los datos reutilizados aparecen en input readonly, sin name de captura, sombreado gris y aviso de origen/no digitado en esta sección. Si el campo original existe pero está vacío, se identifica apartado y atributo con 'no digitado en su origen'. No se modifica persistencia ni fórmulas. 1411 PHP, 155 JS, lint/build/tamaño71,3KB; navegador verifica campo no editable y aviso de vacío.
