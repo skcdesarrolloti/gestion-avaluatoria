@@ -4,6 +4,7 @@ import { sourceUpdate } from './comparable-source-update.js';
 import { duplicateEvidence } from './comparable-duplicates.js';
 
 const normalize = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
+const portalKey = value => normalize(value).replace(/ inmuebles$/, '');
 export const intakeStates = {review:'Por revisar', selected:'Seleccionado para análisis', selected_pending:'Seleccionado con pendientes', not_selected:'No seleccionado'};
 export function intakeGroups(rows) {
     const groups = new Map();
@@ -35,6 +36,11 @@ export function comparableIntake(getEntries, getForm) {
         intakeCards:[], intakeTargets:[], intakeFilter:'all', intakePage:1, intakePages:1, intakeCount:0, intakeSearch:'',
         intakePortal:'', intakePortals:[], intakeView:'review', intakeConfirmedCount:0,
         intakeStates,
+        intakeNavigate(view) {
+            this.searchTab='matriz'; this.intakeStep=view; this.intakeView=view;
+            this.mode='intake'; this.intakeFilter='all'; this.intakeSearch=''; this.intakePage=1; this.rebuildIntake();
+        },
+        intakePortalCount(portal) { return getEntries().filter(e => e.used && portalKey(e.data.source_name || 'Fuente pendiente')===portalKey(portal)).length; },
         intakeComparison(card) {
             let config={};
             try { config=JSON.parse(getForm().dataset.intakeEvidence || '{}'); } catch { /* A pending reference stays empty. */ }
@@ -51,12 +57,16 @@ export function comparableIntake(getEntries, getForm) {
             const groups = intakeGroups(entries.filter(e => e.used).map(e => ({...e.data,index:e.index})));
             this.intakeCount = groups.length;
             this.intakeTargets = groups.map(g => ({key:g.key,title:g.title}));
-            this.intakePortals=[...new Set(groups.flatMap(g => g.rows.map(r => r.source_name || 'Fuente pendiente')))];
-            if (!this.intakePortals.includes(this.intakePortal)) this.intakePortal=this.intakePortals[0] || '';
+            let configured=[];
+            try { configured=JSON.parse(getForm()?.dataset?.intakeSources || '[]'); } catch { /* Stored source labels remain available. */ }
+            this.intakePortals=[...new Map([...configured,...groups.flatMap(g => g.rows.map(r => r.source_name || 'Fuente pendiente'))].map(p => [portalKey(p),p])).values()];
+            const preferred=this.intakePortals.find(p => portalKey(p)===portalKey(this.sourcePortal));
+            if (preferred) this.intakePortal=preferred;
+            else if (!this.intakePortals.includes(this.intakePortal)) this.intakePortal=this.intakePortals[0] || '';
             this.intakeConfirmedCount=groups.filter(g => g.rows.some(r => r.capture_confirmation==='confirmed')).length;
             const query = normalize(this.intakeSearch);
             const visible=this.intakeView==='confirmed' ? groups.map(g => ({...g,rows:g.rows.filter(r => r.capture_confirmation==='confirmed')})).filter(g => g.rows.length)
-                : groups.flatMap(g => g.rows.filter(r => (r.source_name || 'Fuente pendiente')===this.intakePortal).map(r => ({...g,key:r.id,rows:[r]})));
+                : groups.flatMap(g => g.rows.filter(r => portalKey(r.source_name || 'Fuente pendiente')===portalKey(this.intakePortal)).map(r => ({...g,key:r.id,rows:[r]})));
             const filtered = visible.filter(g => (this.intakeFilter === 'all' || (g.rows.every(r => r.capture_confirmation==='confirmed') ? 'confirmed' : g.rows.every(r => r.capture_confirmation==='excluded') ? 'excluded' : 'pending')===this.intakeFilter) &&
                 (!query || normalize(g.rows.map(r => Object.values(r).join(' ')).join(' ')).includes(query)));
             this.intakePages = Math.max(1, filtered.length);

@@ -19,26 +19,25 @@ $formulaFamilies = [
     ['Costo', 'Valor = terreno + costo de reposición nuevo menos depreciación física, funcional y económica, con soporte de cantidades y precios.'],
 ];
 ?>
-<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ searchTab: '<?= ($_GET['research'] ?? '')==='1'?'investigacion':'captura' ?>' }">
-    <nav class="mb-6 flex flex-wrap gap-2 rounded-xl bg-slate-100 p-2" aria-label="Subpestañas de C · Insumos y comparables">
-        <button type="button" class="min-h-11 rounded-lg px-4 py-2 font-semibold" :aria-pressed="searchTab === 'captura'"
-            :class="searchTab === 'captura' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
-            @click="searchTab = 'captura'">1. Buscar inmuebles</button>
-        <button type="button" class="min-h-11 rounded-lg px-4 py-2 font-semibold" :aria-pressed="searchTab === 'matriz'"
-            :class="searchTab === 'matriz' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
-            @click="searchTab = 'matriz'">2. Inmuebles recogidos</button>
-        <button type="button" class="min-h-11 rounded-lg px-4 py-2 font-semibold" :aria-pressed="searchTab === 'configuracion_portales'"
-            :class="searchTab === 'configuracion_portales' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
-            @click="searchTab = 'configuracion_portales'">3. Configuración por portal y tipo de inmueble</button>
-        <button type="button" class="min-h-11 rounded-lg px-4 py-2 font-semibold" :aria-pressed="searchTab === 'investigacion'"
-            :class="searchTab === 'investigacion' ? 'bg-white text-orange-600 shadow-sm' : 'text-slate-600'"
-            @click="searchTab = 'investigacion'">4. Plan de investigación</button>
+<section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ sourcePortal: '', intakeStep: 'review', searchTab: '<?= ($_GET['research'] ?? '')==='1'?'investigacion':'captura' ?>' }">
+    <nav class="mb-3 flex flex-wrap gap-2 rounded-xl bg-slate-100 p-2" aria-label="Pasos de la investigación">
+        <button type="button" class="btn-secondary" :aria-pressed="searchTab==='captura'" :class="(searchTab==='captura') ? 'ring-2 ring-teal-700 bg-teal-50' : ''" @click="searchTab='captura'">1. Buscar por portal</button>
+        <button type="button" class="btn-secondary" :aria-pressed="searchTab==='matriz' && intakeStep==='review'" :class="(searchTab==='matriz' && intakeStep==='review') ? 'ring-2 ring-teal-700 bg-teal-50' : ''" @click="searchTab='matriz'; intakeStep='review'; $dispatch('intake-navigate',{view:'review'})">2. Revisar por portal</button>
+        <button type="button" class="btn-secondary" :aria-pressed="searchTab==='matriz' && intakeStep==='confirmed'" :class="(searchTab==='matriz' && intakeStep==='confirmed') ? 'ring-2 ring-teal-700 bg-teal-50' : ''" @click="searchTab='matriz'; intakeStep='confirmed'; $dispatch('intake-navigate',{view:'confirmed'})">3. Confirmados y factores</button>
     </nav>
+    <details class="mb-4 rounded-xl border p-3">
+        <summary class="min-h-11 cursor-pointer py-2 font-semibold">Herramientas de apoyo · guía de portales y planificación</summary>
+        <p class="my-2 text-sm">Consulta qué publica cada portal o prepara qué atributos investigar. Puedes recoger y confirmar anuncios sin completar un plan.</p>
+        <div class="flex flex-wrap gap-2">
+            <button type="button" class="btn-secondary" :aria-pressed="searchTab==='configuracion_portales'" @click="searchTab='configuracion_portales'">Qué publica cada portal</button>
+            <button type="button" class="btn-secondary" :aria-pressed="searchTab==='investigacion'" @click="searchTab='investigacion'">Planificar la investigación</button>
+        </div>
+    </details>
     <?php require __DIR__ . '/methodology-portal-profiles.php'; ?>
     <?php require __DIR__ . '/methodology-research-plan.php'; ?>
-    <?php require __DIR__ . '/methodology-search-prompt.php'; ?>
-    <div x-show="searchTab === 'matriz'"><?php require __DIR__ . '/methodology-market-coverage.php'; ?></div>
-    <div class="mb-6" x-show="searchTab !== 'configuracion_portales' && searchTab !== 'investigacion'">
+    <details x-show="searchTab === 'captura'" class="mb-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer py-2 font-semibold">Consulta general de esta unidad · conservar instrucciones</summary><?php require __DIR__ . '/methodology-search-prompt.php'; ?></details>
+    <div x-show="searchTab === 'investigacion'"><?php require __DIR__ . '/methodology-market-coverage.php'; ?></div>
+    <div class="mb-6" x-show="searchTab === 'captura'">
         <p class="eyebrow"><?= e(($prefix ?? 'M') . '3 · Insumos del método ' . ($methods[$method ?? 'mercado'] ?? 'Mercado')) ?></p>
         <h2 class="mt-2 text-2xl font-semibold">Investigación, muestra y trazabilidad de mercado</h2>
         <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
@@ -48,7 +47,7 @@ $formulaFamilies = [
         </p>
     </div>
 
-    <details x-show="searchTab !== 'configuracion_portales' && searchTab !== 'investigacion'" class="mb-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer py-3 font-semibold">Ver contexto del inmueble y reglas de captura</summary>
+    <details x-show="searchTab === 'captura'" class="mb-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer py-3 font-semibold">Ver contexto del inmueble y reglas de captura</summary>
     <div class="grid gap-4 lg:grid-cols-3">
         <div class="rounded-xl border border-slate-200 bg-slate-50 p-4">
             <p class="eyebrow">Activo sujeto</p>

@@ -47,3 +47,25 @@ test('captures explicit private area and annexes but never invents rights or exa
     assert.equal(publishedDetails('Parqueadero y depósito disponibles').ph_deposit_count,undefined);
     assert.equal(publishedDetails('Área privada: 85 m²').private_built_m2,undefined);
 });
+
+test('shared source selects its review and primary navigation clears view filters without changing data', () => {
+    const entries=[{used:true,index:0,data:{id:'a',source_name:'FincaRaíz',capture_confirmation:'confirmed'}},
+        {used:true,index:1,data:{id:'b',source_name:'Ciencuadras'}}];
+    const state=comparableIntake(()=>entries,()=>({dispatchEvent(){}}));
+    state.sourcePortal='Ciencuadras'; state.intakeNavigate('review');
+    assert.equal(state.intakePortal,'Ciencuadras'); assert.equal(state.intakeCards[0].key,'b');
+    assert.equal(state.intakePortalCount('Ciencuadras'),1);
+    state.intakeSearch='absent'; state.intakeFilter='excluded'; state.mode='table';
+    state.intakeNavigate('confirmed');
+    assert.equal(state.intakeStep,'confirmed'); assert.equal(state.mode,'intake');
+    assert.equal(state.intakeCards[0].key,'a'); assert.equal(entries[1].data.capture_confirmation,undefined);
+});
+
+test('a source without advertisements stays empty and Mercado Libre aliases share review counts', () => {
+    const entries=[{used:true,index:0,data:{id:'a',source_name:'Mercado Libre'}}];
+    const state=comparableIntake(()=>entries,()=>({dataset:{intakeSources:JSON.stringify(['Properati','Mercado Libre Inmuebles'])}}));
+    state.sourcePortal='Properati'; state.rebuildIntake();
+    assert.equal(state.intakePortal,'Properati'); assert.equal(state.intakeCards.length,0);
+    state.sourcePortal='Mercado Libre Inmuebles'; state.rebuildIntake();
+    assert.equal(state.intakeCards[0].key,'a'); assert.equal(state.intakePortalCount('Mercado Libre Inmuebles'),1);
+});

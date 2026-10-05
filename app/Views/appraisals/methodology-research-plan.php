@@ -1,9 +1,9 @@
 <?php require __DIR__.'/methodology-research-context.php'; ?>
 <div x-show="searchTab === 'investigacion'" x-cloak>
-    <h2 class="text-2xl font-semibold">Plan de investigación · <?= e($componentLabel ?? 'Selecciona una unidad') ?></h2>
+    <h2 class="text-2xl font-semibold">Planificar la investigación · <?= e($componentLabel ?? 'Selecciona una unidad') ?></h2>
     <p class="mt-3 text-sm leading-6">Define qué investigar, dónde hay datos y por qué cada factor puede servir. El sujeto es la referencia; esta configuración prepara el análisis posterior.</p>
     <a class="mt-2 inline-flex min-h-11 items-center font-semibold text-teal-800" href="<?= e(url('avaluos/'.$record['id'].'/bien-sujeto#factores')) ?>">Completar factores del sujeto en el capítulo 3</a>
-    <p class="mt-2 text-sm">Los usos «Filtro» e «Investigar» documentan la intención del analista: no cambian la captura ni descartan anuncios. Consulta la investigación por portal en la pestaña 3.</p>
+    <p class="mt-2 text-sm">Los usos «Filtro» e «Investigar» documentan la intención del analista: no cambian la captura ni descartan anuncios. Consulta «Qué publica cada portal» en las herramientas de apoyo.</p>
     <p class="mt-2 text-sm">Si un dato sólo está descrito en texto o el sujeto usa otra clasificación, queda por conciliar. Por ejemplo, «piso alto» no se convierte automáticamente en un número de piso.</p>
     <p class="mt-2 text-sm"><strong><?= count($researchFactors) ?> atributos para <?= e($guide['type_label'] ?? $researchType) ?>.</strong> Consulta el listado en «Clasificar factores». Prioriza datos publicados; puedes investigar manualmente atributos que no aparezcan en los portales.</p>
     <?php if ($componentKey==='' || $researchCatalog===[] || empty($selected['method'])): ?>
@@ -32,8 +32,8 @@
             </select></label>
         </div>
         <?php endif; ?>
-        <?php require __DIR__.'/methodology-research-comparison.php'; ?>
-        <div class="rounded-xl border p-4">
+        <details class="mb-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Disponibilidad de atributos · resumen de las muestras guardadas</summary><?php require __DIR__.'/methodology-research-comparison.php'; ?></details>
+        <details class="rounded-xl border p-4"><summary class="min-h-11 cursor-pointer font-semibold">Meta de muestras y viabilidad preliminar</summary>
             <h3 class="font-semibold">Viabilidad preliminar de la investigación</h3>
             <p class="mt-2 text-sm"><?= count($researchEvidence['groups']) ?> inmuebles potenciales; los anuncios sólo cuentan juntos si su identidad fue vinculada por el analista.
                 <?= (int)$researchEvidence['excluded'] ?> grupos no seleccionados o descartados quedan fuera.</p>
@@ -48,7 +48,7 @@
             <details class="mt-3" x-show="summary.warnings.length"><summary class="min-h-11 cursor-pointer font-semibold text-amber-800">Pendientes de la configuración</summary>
                 <ul class="list-disc pl-5 text-sm"><template x-for="warning in summary.warnings" :key="warning"><li x-text="warningLabel(warning)"></li></template></ul>
             </details>
-        </div>
+        </details>
         <p class="my-4 text-sm">Datos de las muestras guardadas al abrir esta consulta. Guarda la captura antes de <a class="font-semibold text-blue-700 underline" href="<?= e(url($basePath.'?component='.rawurlencode($componentKey).'&stage=3&research=1')) ?>">Actualizar consulta</a>.
             Los conteos son de disponibilidad, no de comparables aprobados ni valores adoptados.</p>
         <details class="rounded-xl border p-4">

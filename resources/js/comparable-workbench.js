@@ -74,6 +74,7 @@ export function comparableWorkbench() {
             this.initRemoval(form, entries);
             this.initExcel(form, entries);
             this.refresh();
+            this.$watch('sourcePortal', () => { this.intakePage=1; this.rebuildIntake(); });
             this.$watch('searchTab', () => { this.page = 1; this.render(); });
             resize = new ResizeObserver(() => this.syncWidth());
             resize.observe(this.$refs.grid);

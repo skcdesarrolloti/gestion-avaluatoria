@@ -5,8 +5,8 @@ $profileState=['portal'=>'fincaraiz','type'=>\App\Services\ComparablePortalProfi
 <section x-cloak x-show="searchTab === 'configuracion_portales'" class="rounded-xl border border-slate-200 bg-slate-50 p-4 sm:p-6"
     x-data="<?= e(json_encode($profileState, JSON_UNESCAPED_UNICODE|JSON_HEX_TAG|JSON_HEX_AMP|JSON_HEX_APOS|JSON_HEX_QUOT|JSON_THROW_ON_ERROR)) ?>">
     <p class="eyebrow">Configuración de referencia · Insumos</p>
-    <h3 class="mt-2 text-xl font-semibold">Configuración por portal y tipo de inmueble</h3>
-    <p class="mt-2 text-sm leading-6 text-slate-600">Elige tipo y portal para saber qué buscar. Esta referencia orienta la investigación; el plan del paso 4 muestra qué datos tienen realmente tus muestras. Revisión: <time datetime="2026-10-04">4 de octubre de 2026</time>.</p>
+    <h3 class="mt-2 text-xl font-semibold">Qué publica cada portal</h3>
+    <p class="mt-2 text-sm leading-6 text-slate-600">Elige tipo y portal para saber qué buscar. Esta referencia orienta la investigación; la herramienta de planificación muestra qué datos tienen realmente tus muestras. Revisión: <time datetime="2026-10-04">4 de octubre de 2026</time>.</p>
     <div class="mt-4 grid gap-4 sm:grid-cols-2">
         <label class="block font-semibold">Portal
             <select x-model="portal" class="input mt-2 min-h-11 w-full"><option value="">Selecciona un portal</option>

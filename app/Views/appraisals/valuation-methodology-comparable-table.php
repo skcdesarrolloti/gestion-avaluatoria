@@ -3,8 +3,9 @@
 <form id="tabla-madre-83" class="mt-6 scroll-mt-6 rounded-xl border border-slate-200 bg-white p-4 shadow-sm" method="post"
     action="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables')) ?>"
     x-data="comparableWorkbench" :data-comparable-mode="searchTab === 'mapa' ? 'cards' : mode" @input="refresh()" @change="refresh()"
-    @comparable-imported="showImported($event.detail)"
+    @intake-navigate.window="intakeNavigate($event.detail.view)" @comparable-imported="showImported($event.detail)"
     data-module-autosave data-save-in-place data-comparable-json
+    data-intake-sources="<?= e(json_encode(array_column($portalSources ?? [],'label'),JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>"
     data-intake-evidence="<?= e(json_encode(['catalog'=>$researchCatalog,'subjects'=>$researchEvidence['subjects']],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>"
     data-ph-subject="<?= !empty($guide['is_ph']) ? 'si' : 'no' ?>"
     data-appraisal-id="<?= e($record['id']) ?>" data-excel-preview-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/excel/revisar')) ?>"
@@ -17,18 +18,17 @@
     <input type="hidden" name="version" value="<?= (int) ($record['comparables_version'] ?? 0) ?>">
     <div x-show="searchTab === 'captura'"><?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-links.php'; ?></div>
     <section x-show="['matriz', 'mapa'].includes(searchTab)" x-effect="if (['matriz', 'mapa'].includes(searchTab)) $nextTick(() => syncWidth())">
-    <div class="mb-4 flex flex-wrap items-center gap-2" aria-label="Vistas de las muestras">
-        <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'matriz'; mode = 'intake'">Inmuebles recogidos (<span x-text="intakeCount"></span>)</button>
-        <button type="button" class="btn-secondary min-h-11" @click="searchTab = 'matriz'; mode = 'table'">Tabla y Excel · respaldo</button>
+    <?php require __DIR__ . '/methodology-intake-portals.php'; ?>
+    <div class="mb-4 flex flex-wrap items-center gap-2" aria-label="Vistas de las muestras" x-show="mode !== 'intake'">
+        <button type="button" class="btn-secondary min-h-11" @click="intakeNavigate(intakeStep)">Volver a las fichas (<span x-text="intakeCount"></span>)</button>
+
     </div>
     <div id="capture-review" x-show="searchTab === 'matriz'" class="scroll-mt-6 flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Bandeja de captura · <?= e($methods[$method ?? 'mercado'] ?? 'Mercado') ?></p>
-            <h3 class="mt-2 text-xl font-semibold">Inmuebles y anuncios recogidos</h3>
+            <h3 class="mt-2 text-xl font-semibold" x-text="intakeView==='review' ? 'Revisar anuncios de ' + intakePortal : 'Inmuebles confirmados · todos sus factores'"></h3>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                Cada anuncio conserva su fuente, código, precio y datos originales. Confirma cuáles corresponden al mismo inmueble:
-                sus diferencias se conservan. Confirmar lo incorpora a la investigación; no acredita comparabilidad ni lo selecciona para análisis.
-                La ubicación y sus coordenadas se verificarán manualmente en Análisis.
+                Revisa un anuncio a la vez y confirma su participación. Los confirmados reúnen sus atributos y fuentes; la comparabilidad y las coordenadas se verificarán en Análisis.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
@@ -37,8 +37,8 @@
             <button type="button" @click="searchTab = 'captura'" class="btn-secondary min-h-11">Seguir capturando</button>
         </div>
     </div>
-    <details class="mt-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Excel · descargar o actualizar anuncios (opcional)</summary><?php require __DIR__ . '/methodology-excel-import.php'; ?></details>
     <?php require __DIR__ . '/methodology-intake-cards.php'; ?>
+    <details class="mt-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Excel · descargar o actualizar anuncios (opcional)</summary><button type="button" class="btn-secondary my-2" @click="searchTab='matriz'; mode='table'">Abrir tabla de respaldo</button><?php require __DIR__ . '/methodology-excel-import.php'; ?></details>
     <?php require __DIR__ . '/methodology-intake-unit-price-help.php'; ?>
     <div x-show="searchTab === 'matriz' && mode !== 'intake'"><?php require __DIR__ . '/valuation-methodology-capture-areas.php'; ?></div>
     <div x-show="searchTab === 'mapa'"><?php require __DIR__ . '/valuation-methodology-search-map.php'; ?></div>

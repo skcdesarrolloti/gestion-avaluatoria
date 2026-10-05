@@ -1,12 +1,4 @@
 <section x-show="searchTab === 'matriz' && mode === 'intake'" class="mt-4" x-cloak>
-    <p class="rounded-xl bg-teal-50 p-4 text-sm">Revisa un anuncio a la vez, portal por portal. Confirmar lo incorpora a la investigación; la decisión de utilizarlo en Análisis se toma después. Cada fuente conserva sus datos.</p>
-    <div class="mt-3 flex flex-wrap gap-2" @click.stop>
-        <button type="button" class="btn-secondary" :aria-pressed="intakeView==='review'" @click="intakeView='review'; intakePage=1; rebuildIntake()">Revisar por portal</button>
-        <button type="button" class="btn-secondary" :aria-pressed="intakeView==='confirmed'" @click="intakeView='confirmed'; intakeFilter='all'; intakePage=1; rebuildIntake()">Cuadro de confirmados (<span x-text="intakeConfirmedCount"></span>)</button>
-    </div>
-    <label class="label mt-3" x-show="intakeView==='review'" @input.stop>Portal en investigación
-        <select class="input" x-model="intakePortal" @change.stop="intakePage=1; rebuildIntake()"><template x-for="portal in intakePortals" :key="portal"><option :value="portal" x-text="portal"></option></template></select>
-    </label>
     <div class="my-4 grid gap-3 sm:grid-cols-2" @input.stop @change.stop>
         <label class="label">Estado de recogida
             <select class="input" x-model="intakeFilter" @change="intakePage = 1; rebuildIntake()"><option value="all">Todos</option><option value="pending">Por confirmar</option><option value="confirmed">Confirmados para investigación</option><option value="excluded">No participan</option></select>
@@ -16,6 +8,7 @@
         </label>
     </div>
     <p class="mb-3 text-sm"><strong x-text="intakeCount"></strong> inmuebles · <span x-text="total"></span> anuncios. Los posibles duplicados siguen separados hasta confirmar su identidad.</p>
+    <p class="rounded-xl bg-slate-50 p-4 text-sm" x-show="!intakeCards.length" x-text="intakeView==='confirmed' ? 'No hay inmuebles confirmados con estos filtros. Revísalos en el paso 2.' : 'No hay anuncios de este portal con estos filtros. Puedes recogerlos en el paso 1.'"></p>
     <div class="grid gap-4">
         <template x-for="card in intakeCards" :key="card.key">
             <article class="min-w-0 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
@@ -68,10 +61,9 @@
             </article>
         </template>
     </div>
-    <p x-show="!intakeCards.length" class="mt-4 rounded-lg bg-slate-50 p-4">No hay inmuebles en este estado. Busca avisos o cambia el filtro.</p>
     <div class="mt-4 flex flex-wrap items-center gap-3">
         <button type="button" class="btn-secondary" :disabled="intakePage <= 1" @click="intakePage--; rebuildIntake()">Anterior</button>
-        <span class="text-sm" x-text="'Inmueble ' + intakePage + ' de ' + intakePages"></span>
+        <span class="text-sm" x-text="(intakeView==='review' ? 'Anuncio ' : 'Inmueble ') + intakePage + ' de ' + intakePages"></span>
         <button type="button" class="btn-secondary" :disabled="intakePage >= intakePages" @click="intakePage++; rebuildIntake()">Siguiente</button>
         <button type="submit" class="btn-primary">Guardar decisiones</button>
         <p class="text-sm">Confirmar recopila información. No ejecuta correlación, depuración ni regresión.</p>
