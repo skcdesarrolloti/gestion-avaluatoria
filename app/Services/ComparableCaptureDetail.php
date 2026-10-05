@@ -8,6 +8,7 @@ final class ComparableCaptureDetail
     {
         return [
             'intake_state' => ['Decisión de captura', 'choice', 'shared'],
+            'capture_confirmation' => ['Participación en la investigación', 'choice', 'shared'],
             'property_group' => ['Identificador de inmueble confirmado', 'text', 'internal'],
             'intake_note' => ['Pendientes o motivo de selección', 'text', 'shared'],
             'source_updates' => ['Lecturas posteriores del mismo anuncio · diferencias conservadas', 'text', 'shared'],
@@ -44,6 +45,7 @@ final class ComparableCaptureDetail
     }
     public static function options(string $key): array
     {
+        if ($key === 'capture_confirmation') return [''=>'Por confirmar','confirmed'=>'Confirmado para investigación','excluded'=>'No participa en investigación'];
         if ($key === 'intake_state') return [''=>'Por revisar','review'=>'Por revisar','selected'=>'Seleccionado para análisis','selected_pending'=>'Seleccionado con pendientes','not_selected'=>'No seleccionado'];
         if ($key === 'location_verification') return [''=>'Sin verificación manual','exact'=>'Ubicación exacta verificada manualmente','approximate'=>'Ubicación aproximada verificada manualmente'];
         if ($key === 'market_data_kind') return [''=>'Por confirmar','oferta'=>'Oferta de venta','transaccion'=>'Transacción de venta','arriendo'=>'Oferta / dato de arriendo'];

@@ -33,6 +33,7 @@ export function intakeGroups(rows) {
 export function comparableIntake(getEntries, getForm) {
     return {
         intakeCards:[], intakeTargets:[], intakeFilter:'all', intakePage:1, intakePages:1, intakeCount:0, intakeSearch:'',
+        intakePortal:'', intakePortals:[], intakeView:'review', intakeConfirmedCount:0,
         intakeStates,
         intakeComparison(card) {
             let config={};
@@ -50,12 +51,21 @@ export function comparableIntake(getEntries, getForm) {
             const groups = intakeGroups(entries.filter(e => e.used).map(e => ({...e.data,index:e.index})));
             this.intakeCount = groups.length;
             this.intakeTargets = groups.map(g => ({key:g.key,title:g.title}));
+            this.intakePortals=[...new Set(groups.flatMap(g => g.rows.map(r => r.source_name || 'Fuente pendiente')))];
+            if (!this.intakePortals.includes(this.intakePortal)) this.intakePortal=this.intakePortals[0] || '';
+            this.intakeConfirmedCount=groups.filter(g => g.rows.some(r => r.capture_confirmation==='confirmed')).length;
             const query = normalize(this.intakeSearch);
-            const filtered = groups.filter(g => (this.intakeFilter === 'all' || g.state === this.intakeFilter) &&
+            const visible=this.intakeView==='confirmed' ? groups.map(g => ({...g,rows:g.rows.filter(r => r.capture_confirmation==='confirmed')})).filter(g => g.rows.length)
+                : groups.flatMap(g => g.rows.filter(r => (r.source_name || 'Fuente pendiente')===this.intakePortal).map(r => ({...g,key:r.id,rows:[r]})));
+            const filtered = visible.filter(g => (this.intakeFilter === 'all' || (g.rows.every(r => r.capture_confirmation==='confirmed') ? 'confirmed' : g.rows.every(r => r.capture_confirmation==='excluded') ? 'excluded' : 'pending')===this.intakeFilter) &&
                 (!query || normalize(g.rows.map(r => Object.values(r).join(' ')).join(' ')).includes(query)));
-            this.intakePages = Math.max(1, Math.ceil(filtered.length / 8));
+            this.intakePages = Math.max(1, filtered.length);
             this.intakePage = Math.min(this.intakePage, this.intakePages);
-            this.intakeCards = filtered.slice((this.intakePage - 1) * 8, this.intakePage * 8);
+            this.intakeCards = filtered.slice(this.intakePage - 1, this.intakePage);
+        },
+        intakeConfirm(card, value) {
+            card.rows.forEach(row => this.intakeWrite(row.index,'capture_confirmation',value));
+            this.intakeChanged();
         },
         intakeWrite(index, key, value) {
             const control = getEntries()[index]?.controls.find(input => input.name.endsWith(`[${key}]`));

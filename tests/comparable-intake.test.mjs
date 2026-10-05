@@ -1,8 +1,19 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { intakeGroups } from '../resources/js/comparable-intake.js';
+import { intakeGroups, comparableIntake } from '../resources/js/comparable-intake.js';
 import { publishedDetails } from '../resources/js/comparable-published-details.js';
 import { sourceUpdate } from '../resources/js/comparable-source-update.js';
+test('portal review shows one advertisement and confirmation is separate from analysis selection', () => {
+    const entries=[{used:true,index:0,data:{id:'a',source_name:'FincaRaíz',capture_confirmation:''},controls:[{name:'comparables[0][capture_confirmation]',value:''}]},
+        {used:true,index:1,data:{id:'b',source_name:'Ciencuadras',capture_confirmation:'confirmed'},controls:[]}];
+    const state=comparableIntake(()=>entries,()=>({dispatchEvent(){}}));
+    state.rebuildIntake();
+    assert.equal(state.intakeCards.length,1); assert.equal(state.intakeCards[0].rows[0].id,'a');
+    state.intakePortal='Ciencuadras'; state.rebuildIntake(); assert.equal(state.intakeCards[0].rows[0].id,'b');
+    state.intakeView='confirmed'; state.rebuildIntake(); assert.equal(state.intakeCards[0].rows[0].id,'b');
+    state.intakeConfirm({rows:[{index:0}]},'confirmed'); assert.equal(entries[0].controls[0].value,'confirmed');
+    assert.equal(entries[0].data.intake_state,undefined);
+});
 test('later reading of the same URL fills blanks and flags changed price without overwriting it', () => {
     const changes=sourceUpdate({price_amount:'$ 100.000.000',area_m2:'80',intake_state:'selected'},
         {price_amount:'110000000',area_m2:'80',parking_spaces:'2',location_verification:'exact'});

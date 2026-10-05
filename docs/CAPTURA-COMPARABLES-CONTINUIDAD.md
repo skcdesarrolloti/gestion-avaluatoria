@@ -86,3 +86,9 @@ FACTORES-SUJETO-CAPITULO-3.md.
 - Las tarjetas incluyen cuadro sujeto / anuncios / validación. Sólo comparar versiones del mismo grupo confirmado; las coincidencias entre otros grupos son propuestas para revisión. No fusionar automáticamente.
 - Los cuadros de las tarjetas usan roles semánticos, no otro `tbody`: los lectores y crecimiento de filas siguen trabajando sobre la única tabla de captura.
 - Todos los atributos siguen disponibles. El cuadro abre compacto y permite desplegar los factores sin datos. Correlación y elección final de predictores corresponden a Análisis.
+
+## Revisión individual y conformación de investigación
+
+- La bandeja revisa un anuncio por página, filtrado por portal. El cuadro de confirmados agrupa únicamente fuentes confirmadas y muestra todos los factores.
+- capture_confirmation es independiente de intake_state: confirmar para investigación no selecciona para Análisis. No participa conserva el aviso; Volver a pendiente revierte la decisión.
+- Conserva identidad, fuentes, fotos, importadores, captura ampliada y tabla de respaldo. No borra las muestras previas ni modifica sus selecciones históricas.

@@ -27,7 +27,7 @@
             <h3 class="mt-2 text-xl font-semibold">Inmuebles y anuncios recogidos</h3>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
                 Cada anuncio conserva su fuente, código, precio y datos originales. Confirma cuáles corresponden al mismo inmueble:
-                sus diferencias se conservan. Seleccionar significa enviarlo a estudio; no acredita comparabilidad.
+                sus diferencias se conservan. Confirmar lo incorpora a la investigación; no acredita comparabilidad ni lo selecciona para análisis.
                 La ubicación y sus coordenadas se verificarán manualmente en Análisis.
             </p>
         </div>

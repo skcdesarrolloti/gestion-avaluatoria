@@ -1,29 +1,38 @@
 <section x-show="searchTab === 'matriz' && mode === 'intake'" class="mt-4" x-cloak>
-    <p class="rounded-xl bg-teal-50 p-4 text-sm">Una tarjeta por inmueble confirmado. Vincular anuncios conserva cada versión; no promedia precios ni completa un anuncio con datos de otro. Coordenadas del portal = referencia sin verificar.</p>
+    <p class="rounded-xl bg-teal-50 p-4 text-sm">Revisa un anuncio a la vez, portal por portal. Confirmar lo incorpora a la investigación; la decisión de utilizarlo en Análisis se toma después. Cada fuente conserva sus datos.</p>
+    <div class="mt-3 flex flex-wrap gap-2" @click.stop>
+        <button type="button" class="btn-secondary" :aria-pressed="intakeView==='review'" @click="intakeView='review'; intakePage=1; rebuildIntake()">Revisar por portal</button>
+        <button type="button" class="btn-secondary" :aria-pressed="intakeView==='confirmed'" @click="intakeView='confirmed'; intakeFilter='all'; intakePage=1; rebuildIntake()">Cuadro de confirmados (<span x-text="intakeConfirmedCount"></span>)</button>
+    </div>
+    <label class="label mt-3" x-show="intakeView==='review'" @input.stop>Portal en investigación
+        <select class="input" x-model="intakePortal" @change.stop="intakePage=1; rebuildIntake()"><template x-for="portal in intakePortals" :key="portal"><option :value="portal" x-text="portal"></option></template></select>
+    </label>
     <div class="my-4 grid gap-3 sm:grid-cols-2" @input.stop @change.stop>
         <label class="label">Estado de recogida
-            <select class="input" x-model="intakeFilter" @change="intakePage = 1; rebuildIntake()"><option value="all">Todos</option><template x-for="(label, key) in intakeStates" :key="key"><option :value="key" x-text="label"></option></template></select>
+            <select class="input" x-model="intakeFilter" @change="intakePage = 1; rebuildIntake()"><option value="all">Todos</option><option value="pending">Por confirmar</option><option value="confirmed">Confirmados para investigación</option><option value="excluded">No participan</option></select>
         </label>
         <label class="label">Buscar inmueble o anuncio
             <input class="input" x-model="intakeSearch" @input="intakePage = 1; rebuildIntake()" placeholder="Edificio, barrio, código o portal">
         </label>
     </div>
     <p class="mb-3 text-sm"><strong x-text="intakeCount"></strong> inmuebles · <span x-text="total"></span> anuncios. Los posibles duplicados siguen separados hasta confirmar su identidad.</p>
-    <div class="grid gap-4 lg:grid-cols-2">
+    <div class="grid gap-4">
         <template x-for="card in intakeCards" :key="card.key">
-            <article x-data="{comparisonOpen:false}" :class="comparisonOpen ? 'lg:col-span-2' : ''" class="min-w-0 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
+            <article class="min-w-0 rounded-xl border border-slate-200 bg-white p-4 shadow-sm">
                 <h4 class="text-lg font-semibold" x-text="card.title"></h4>
                 <p class="mt-1 text-sm text-slate-600" x-text="card.rows[0].neighborhood || 'Ubicación publicada pendiente'"></p>
                 <template x-for="offer in card.rows" :key="offer.id"><p class="mt-2 rounded-lg bg-slate-50 p-2 text-sm" x-text="(offer.source_name || 'Fuente pendiente') + ': ' + (offer.price_amount || 'precio pendiente') + ' COP · ' + (offer.area_m2 || 'área pendiente') + ' m² · ' + (offer.listing_code || 'código pendiente')"></p></template>
-                <p class="mt-2 rounded-lg p-2 text-sm" :class="card.state.startsWith('selected') ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-900'" x-text="intakeStates[card.state]"></p>
+                <p class="mt-2 rounded-lg p-2 text-sm" :class="card.rows.every(r => r.capture_confirmation==='confirmed') ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-900'" x-text="card.rows.every(r => r.capture_confirmation==='confirmed') ? 'Confirmado para investigación' : card.rows.every(r => r.capture_confirmation==='excluded') ? 'No participa en investigación' : 'Por confirmar'"></p>
                 <p class="mt-2 text-sm text-amber-900" x-show="card.conflicts.length" x-text="'Diferencias entre anuncios: ' + card.conflicts.map(k => ({price_amount:'precio',area_m2:'área publicada',parking_spaces:'parqueaderos',ph_deposit_count:'depósitos',bathrooms:'baños',bedrooms:'habitaciones',view_quality:'vista',elevator:'ascensor'})[k]).join(', ')"></p>
                 <p class="mt-2 text-sm" x-show="card.pending">Hay datos básicos pendientes. Consulta cada fuente.</p>
                 <p class="mt-2 text-sm text-amber-900" x-show="card.candidates.length" x-text="'Posible mismo inmueble: ' + card.candidates.map(c => c.title).join(' · ') + '. Confirma antes de vincular.'"></p>
-                <label class="label mt-3">Decisión del analista
-                    <select class="input" :value="card.state" @change.stop="intakeDecision(card, $event.target.value)"><template x-for="(label, key) in intakeStates" :key="key"><option :value="key" x-text="label"></option></template></select>
-                </label>
+                <div class="mt-3 flex flex-wrap gap-2">
+                    <button type="button" class="btn-primary" @click="intakeConfirm(card,'confirmed')">Confirmar para investigación</button>
+                    <button type="button" class="btn-secondary" @click="intakeConfirm(card,'excluded')">No participa</button>
+                    <button type="button" class="btn-secondary" @click="intakeConfirm(card,'')">Volver a pendiente</button>
+                </div>
                 <label class="label mt-3">Vincular a otro inmueble confirmado
-                    <select class="input" @change.stop="intakeLink(card, $event.target.value); $event.target.value = ''"><option value="">Selecciona sólo si confirmaste que es el mismo</option><template x-for="target in intakeTargets.filter(t => t.key !== card.key)" :key="target.key"><option :value="target.key" x-text="target.title + ' · ' + target.key.slice(0, 8)"></option></template></select>
+                    <select class="input" @change.stop="intakeLink(card, $event.target.value); $event.target.value = ''"><option value="">Selecciona sólo si confirmaste que es el mismo</option><template x-for="target in intakeTargets.filter(t => !card.rows.some(r => (r.property_group || r.id) === t.key))" :key="target.key"><option :value="target.key" x-text="target.title + ' · ' + target.key.slice(0, 8)"></option></template></select>
                     <span class="mt-1 block text-xs font-normal">La vinculación vuelve a Por revisar. No altera precios, áreas, fotos ni fuentes.</span>
                 </label>
                 <?php require __DIR__ . '/methodology-intake-comparison.php'; ?>
@@ -62,9 +71,9 @@
     <p x-show="!intakeCards.length" class="mt-4 rounded-lg bg-slate-50 p-4">No hay inmuebles en este estado. Busca avisos o cambia el filtro.</p>
     <div class="mt-4 flex flex-wrap items-center gap-3">
         <button type="button" class="btn-secondary" :disabled="intakePage <= 1" @click="intakePage--; rebuildIntake()">Anterior</button>
-        <span class="text-sm" x-text="'Página ' + intakePage + ' de ' + intakePages"></span>
+        <span class="text-sm" x-text="'Inmueble ' + intakePage + ' de ' + intakePages"></span>
         <button type="button" class="btn-secondary" :disabled="intakePage >= intakePages" @click="intakePage++; rebuildIntake()">Siguiente</button>
         <button type="submit" class="btn-primary">Guardar decisiones</button>
-        <a class="btn-secondary" data-intake-analysis href="<?= e(isset($flowUrl) ? $flowUrl('4') : url('avaluos/' . $record['id'] . '/metodologia-valuatoria?stage=4')) ?>">Continuar a Análisis con los seleccionados</a>
+        <p class="text-sm">Confirmar recopila información. No ejecuta correlación, depuración ni regresión.</p>
     </div>
 </section>

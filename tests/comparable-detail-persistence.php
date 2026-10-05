@@ -6,7 +6,7 @@ declare(strict_types=1);
     $row = ['id'=>$cid, 'source_name'=>'Prueba áreas', 'ph_regime'=>'no', 'land_m2'=>'250.5', 'built_m2'=>'120',
         'private_built_m2'=>'90', 'latitude'=>'10.4', 'longitude'=>'-75.5', 'evidence_detail'=>'Captura original',
         'ph_parking_presence'=>'si', 'ph_parking_nature'=>'privado_integrado', 'ph_deposit_count'=>'0', 'ph_components_source'=>'Contacto; prueba ficticia',
-        'published_attributes'=>'{"Jacuzzi privado":"No","Baños":"3"}','published_text'=>str_repeat('Texto original de prueba. ',100)];
+        'published_attributes'=>'{"Jacuzzi privado":"No","Baños":"3"}','published_text'=>str_repeat('Texto original de prueba. ',100),'capture_confirmation'=>'confirmed'];
     $repo->saveAll($aid, 1, App\Services\AppraisalComparableInput::rows(['comparable_rows_json'=>json_encode([$row])]), 0);
     $saved = $repo->forAppraisal($aid, 1)[0];
     expect($saved['land_m2'] === '250.5' && $saved['evidence_detail'] === 'Captura original', 'áreas y evidencia persisten en la misma muestra');
@@ -14,6 +14,7 @@ declare(strict_types=1);
     $saved = $repo->forAppraisal($aid, 1)[0];
     expect($saved['land_m2'] === '250.5' && $saved['private_built_m2'] === '90', 'cambio de régimen y cliente anterior conserva componentes omitidos');
     expect(json_decode($saved['published_attributes'],true)['Jacuzzi privado']==='No' && mb_strlen($saved['published_text'])>1600, 'BD conserva atributos adicionales y texto original aun desde cliente anterior');
+    expect($saved['capture_confirmation']==='confirmed' && !in_array($saved['intake_state'],['selected','selected_pending'],true), 'BD confirma participación en investigación sin seleccionar para análisis');
     expect($saved['ph_parking_nature'] === 'privado_integrado' && $saved['ph_deposit_count'] === '0'
         && $saved['ph_components_source'] === 'Contacto; prueba ficticia', 'cliente anterior conserva clasificación PH y soporte por ID');
     $repo->saveAll($aid, 1, [$saved + []], 2);
