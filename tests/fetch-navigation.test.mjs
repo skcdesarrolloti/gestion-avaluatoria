@@ -43,6 +43,13 @@ test('lets same-page anchors scroll normally', () => {
     assert.equal(isFetchableUrl(anchor, current), false);
 });
 
+test('explicit refresh fetches the same page after autosave while ordinary anchors stay local', () => {
+    const same = current + '#factores';
+    assert.equal(shouldHandleLink(link({ href: same }), click(), current), false);
+    assert.equal(shouldHandleLink(link({ href: same, hasAttribute: name => name === 'data-fetch-refresh' }), click(), current), true);
+    assert.equal(shouldHandleLink(link({ href: 'https://otro.test/#factores', hasAttribute: name => name === 'data-fetch-refresh' }), click(), current), false);
+});
+
 test('keeps return_to hash after post redirects', () => {
     const body = new FormData();
     body.set('return_to', '/public/avaluos/abc/bien-sujeto#atributos');

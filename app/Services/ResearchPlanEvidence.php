@@ -9,7 +9,7 @@ final class ResearchPlanEvidence
     {
         $definitions=\App\Support\AppraisalFunctionalVariableCatalog::definitions();
         $attributes=json_decode((string)($unit['special_attributes_json'] ?? '{}'),true) ?: [];
-        $subjects=[]; $captured=SubjectFactorCapture::decode($unit);
+        $subjects=[]; $sources=[]; $captured=SubjectFactorCapture::decode($unit);
         foreach ($catalog as $key=>$factor) {
             $raw=$unit[$factor['subject']] ?? '';
             if (in_array($key,['built','area'],true) && $factor['subject']==='built_area_adopted_m2' && ($raw==='' || $raw===null)) $raw=$unit['area_built_m2'] ?? '';
@@ -24,7 +24,12 @@ final class ResearchPlanEvidence
             }
             if ($key==='destination') $raw=MarketSubjectEvidence::decode($unit)['observed_use'] ?? '';
             if (isset($definitions[$factor['subject']]['options'])) $raw=$definitions[$factor['subject']]['options'][$raw] ?? $raw;
-            if (isset($captured[$key])) {
+            $source=SubjectFactorSource::resolve($key,$factor,$unit);
+            if ($source!==[]) {
+                $raw=$source['usable']?$source['value']:'';
+                $sources[$key]=$source;
+            }
+            if (isset($captured[$key]) && (trim((string)($captured[$key]['value'] ?? ''))!=='' || trim((string)($captured[$key]['support'] ?? ''))!=='')) {
                 $item=$captured[$key];
                 $raw=SubjectFactorCapture::compatible($item,$factor) && trim((string)($item['support'] ?? ''))!==''
                     && SubjectFactorCapture::validValue((string)($item['value'] ?? ''),$factor)?$item['value']:'';
@@ -66,10 +71,10 @@ final class ResearchPlanEvidence
                 'ads'=>$items,'signature'=>hash('sha256',json_encode($legacyItems,JSON_THROW_ON_ERROR)),'factorSignatures'=>$signatures,'contextPending'=>$contextPending];
         }
         $subjectSignatures=[];
-        foreach ($subjects as $key=>$value) $subjectSignatures[$key]=hash('sha256',json_encode(isset($captured[$key])?[$key=>$value,'capture'=>$captured[$key]]:[$key=>$value],JSON_THROW_ON_ERROR));
+        foreach ($subjects as $key=>$value) $subjectSignatures[$key]=hash('sha256',json_encode(isset($captured[$key])?[$key=>$value,'capture'=>$captured[$key]]:[$key=>$value,'source'=>$sources[$key] ?? []],JSON_THROW_ON_ERROR));
         $subjectBasis=array_replace(array_fill_keys(array_keys($legacy),''),array_intersect_key($subjects,$legacy));
         if ($captured!==[]) $subjectBasis['capture']=$captured;
         return ['subjectSignature'=>hash('sha256',json_encode($subjectBasis,JSON_THROW_ON_ERROR)),
-            'subjectFactorSignatures'=>$subjectSignatures,'subjectCaptureKeys'=>array_keys($captured),'subjects'=>$subjects,'groups'=>$groups,'excluded'=>$excluded,'operation'=>$operation];
+            'subjectFactorSignatures'=>$subjectSignatures,'subjectCaptureKeys'=>array_keys($captured),'subjectSources'=>$sources,'subjects'=>$subjects,'groups'=>$groups,'excluded'=>$excluded,'operation'=>$operation];
     }
 }

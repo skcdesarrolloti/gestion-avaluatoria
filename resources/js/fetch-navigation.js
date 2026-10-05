@@ -17,6 +17,8 @@ export function shouldHandleLink(link, event, currentHref = window.location.href
     if (event.defaultPrevented || event.button !== 0) return false;
     if (event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return false;
     if (link.target || link.hasAttribute('download') || link.closest?.('[data-no-fetch]')) return false;
+    try { if (link.hasAttribute('data-fetch-refresh')) { const target = new URL(link.href, currentHref); target.hash = ''; return isFetchableUrl(target.href, currentHref); } }
+    catch { return false; }
     return isFetchableUrl(link.href, currentHref);
 }
 function setBusy(active, text = 'Cargando...') {
@@ -33,7 +35,6 @@ function setBusy(active, text = 'Cargando...') {
     if (label) label.textContent = text;
     busyTimer = setTimeout(() => { loader.hidden = false; }, 300);
 }
-
 function updateHeadFrom(nextDocument) {
     document.title = nextDocument.title || document.title;
     const nextToken = nextDocument.querySelector('meta[name="csrf-token"]')?.content;

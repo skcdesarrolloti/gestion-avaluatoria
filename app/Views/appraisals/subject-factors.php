@@ -5,7 +5,7 @@ $factorRecord=$record+['factor_principal_count'=>count(array_filter($factorUnits
 <section class="rounded-2xl border bg-white p-5 sm:p-8" x-data="{ factorUnit: '<?= e($factorUnits[0]['id'] ?? '') ?>' }">
     <p class="eyebrow">3.4 · Datos de referencia para la investigación</p>
     <h2 class="mt-2 text-2xl font-semibold">Factores para investigación · módulo 8</h2>
-    <p class="mt-3 text-sm">Registra las características de cada unidad con las mismas clases y medidas del catálogo del capítulo 8. No son porcentajes de ajuste. Completa el dato y su soporte; desconocido queda pendiente, nunca cero.</p>
+    <p class="mt-3 text-sm">Las características ya registradas en el módulo 3 se vinculan aquí y se reutilizan en el módulo 8. Completa únicamente los datos faltantes o las clasificaciones que necesiten precisión. Desconocido queda pendiente, nunca cero.</p>
     <p class="mt-2 text-sm">Las áreas se diligencian en 3.2 y sirven de base para COP/m². Destinación es filtro. En Insumos decides qué factores investigar y proponer para el modelo.</p>
     <p class="mt-2 text-sm">Incluye los atributos observables de la calificación valuatoria actual, según el tipo de inmueble. Los que tienen otra clasificación se verifican con soporte; no se convierten los pesos ni el ajuste anterior en coeficientes de regresión. Puedes investigar todos los factores.</p>
     <?php if ($factorUnits===[]): ?><p class="mt-4">Registra primero las unidades del avalúo en el capítulo 1.</p><?php endif; ?>
@@ -17,8 +17,6 @@ $factorRecord=$record+['factor_principal_count'=>count(array_filter($factorUnits
     <?php foreach ($factorUnits as $factorUnit):
         $captureCatalog=\App\Services\SubjectFactorCapture::catalog($factorUnit,$factorRecord,$factorScales ?? []);
         $captureSaved=\App\Services\SubjectFactorCapture::decode($factorUnit);
-        $rawUnit=$factorUnit; unset($rawUnit['subject_factors_json']);
-        $captureExisting=\App\Services\ResearchPlanEvidence::build($captureCatalog,$rawUnit,[],['tipo_inmueble'=>\App\Services\SubjectFactorCapture::type($factorUnit,$factorRecord)],$subject)['subjects'];
         $captureEndpoint=url($subjectActionBase.'/unidades/'.$factorUnit['id'].'/factores'); ?>
     <div x-show="factorUnit==='<?= e($factorUnit['id']) ?>'" class="mt-5" role="tabpanel">
         <h3 class="text-xl font-semibold"><?= e($factorUnit['label'] ?: 'Unidad '.$factorUnit['unit_index']) ?></h3>

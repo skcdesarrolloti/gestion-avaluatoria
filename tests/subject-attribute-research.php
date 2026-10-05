@@ -13,7 +13,7 @@ declare(strict_types=1);
     $previous=\App\Services\SubjectAttributeResearch::previous($unit,$catalog[$key]);
     expect($previous[0]['observed']==='Bueno' && $previous[0]['rating']==='4' && $previous[0]['weight']==='3','integración muestra dato, calificación y peso anteriores intactos');
     $evidence=\App\Services\ResearchPlanEvidence::build($catalog,$unit,[],['tipo_inmueble'=>'oficina']);
-    expect($evidence['subjects'][$key]==='','calificación anterior no se convierte automáticamente en predictor ni coeficiente');
+    expect($evidence['subjects'][$key]==='Bueno','observación anterior se reutiliza como clase sin convertir calificación ni peso');
     expect($catalog['view']['legacy_keys']===['vista_oficina'] && !isset($catalog[\App\Services\SubjectAttributeResearch::key('vista_oficina')]),'vista se vincula a la escala aprobada sin duplicar un factor equivalente');
     $plan=\App\Services\ResearchPlanInput::input(json_encode(['factors'=>[$key=>['decision'=>'model','kind'=>'categorical','categories'=>$catalog[$key]['categories'],'definition'=>$catalog[$key]['why']]]]));
     \App\Services\ResearchPlanInput::validateScope($plan,'oficina','mercado');

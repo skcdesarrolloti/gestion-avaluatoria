@@ -102,7 +102,7 @@ $safeSubjectPartial = static function (string $path, string $label, array $conte
             <p class="text-sm">3.4 reúne la calificación valuatoria actual y las características que se investigan con los comparables. Se conservan los pesos, fórmulas y registros anteriores; las clases para el módulo 8 no los sustituyen.</p>
             <div class="mt-3 flex flex-wrap gap-2" role="tablist" aria-label="Calificaciones del sujeto">
                 <button class="btn-secondary" type="button" role="tab" :aria-selected="attributeMode==='actual'" :class="attributeMode==='actual'?'bg-teal-50 text-teal-900':''" @click="attributeMode='actual'; history.replaceState(null,'','#atributos')">Calificación valuatoria actual</button>
-                <button class="btn-secondary" type="button" role="tab" :aria-selected="attributeMode==='research'" :class="attributeMode==='research'?'bg-teal-50 text-teal-900':''" @click="attributeMode='research'; history.replaceState(null,'','#factores')">Factores para investigación · módulo 8</button>
+                <a class="btn-secondary" role="tab" :aria-selected="attributeMode==='research'" :class="attributeMode==='research'?'bg-teal-50 text-teal-900':''" href="<?= e(url($subjectActionBase).'#factores') ?>" @click="attributeMode='research'; history.replaceState(null,'','#factores')" data-fetch-refresh>Factores para investigación · módulo 8</a>
             </div>
         </div>
         <div x-show="attributeMode==='actual'" role="tabpanel"><?php $safeSubjectPartial('subject-attributes.php', '3.4 Diferenciales valuatorios', get_defined_vars()); ?></div>

@@ -50,3 +50,28 @@ del sujeto. Una escala inválida o anterior sin confirmar no presenta código ap
 No modifica coeficientes ni implementa Análisis. 1096 PHP, 153 JS, 196 BD3380.
 
 Vigente 2026-10-05: captura integrada en 3.4 > Factores para investigación · módulo8. Calificación anterior conservada en otra subpestaña. Catálogo incorpora observables anteriores por tipo y ya no limita candidatos a cuatro. Ver CALIFICACIONES-INTEGRADAS-3-4.md.
+# Reutilización de características (2026-10-05)
+
+SubjectFactorSource vincula observaciones existentes de la misma unidad en 3.2,
+3.3 y 3.4 con la referencia del módulo 8. Cuando la medida o clase es compatible,
+la tarjeta muestra Dato vinculado, su origen y Editar en el apartado original;
+no presenta otro input ni exige volver a escribir el soporte existente. Abrir
+la subpestaña de investigación espera autoguardados y actualiza por fetch.
+
+Se reutilizan variables funcionales, edad, niveles, frente/fondo de lote o finca
+y clases observadas de los diferenciales. Las escalas anteriores no se convierten
+en pesos, coeficientes ni medidas: piso alto no produce un número de piso,
+frente de lote no produce frente comercial, depósito presente no produce cantidad,
+Exterior o Panorámica genéricos no acreditan calle o paisaje. Sólo equivalencias
+explícitas se resuelven, por ejemplo Calle y Mar en la Vista aprobada.
+
+Las capturas de investigación ya diligenciadas se conservan y tienen prioridad;
+un borrador vacío permite reutilizar la fuente. Factores personalizados requieren
+verificación de la equivalencia. No hay migración ni copias a JSON que queden
+desactualizadas: el valor vinculado se lee del registro original. Las firmas por
+factor incluyen origen y soporte para avisar de cambios en investigación.
+
+Validación: 1410 verificaciones PHP, 155 pruebas JS, 210 verificaciones BD en
+instancia desechable 3390, lint/build/tamaño 71,3 KB. Navegador local: captura en
+3.3, autoguardado, lectura vinculada, cambio de 2 a 3 y actualización por fetch;
+presentación en escritorio y pantalla estrecha. Sin cambios en fórmulas valuatorias.
