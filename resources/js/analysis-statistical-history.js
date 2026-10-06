@@ -1,3 +1,4 @@
+import {sourceFacts} from './comparable-source-facts.js';
 import {modelArea,modelFactorCount,positiveModelArea} from './analysis-model-area.js';
 import {amount} from './comparable-negotiation.js';
 import {portalTable} from './comparable-portal-table.js';
@@ -21,9 +22,10 @@ export function snapshot(state,action,rows,changed='') {
     const table=portalTable(rows,true),columns=factors.map(key=>table.columns.find(c=>c.key===key) || {key}),area=modelArea(columns), missing=v=>v===undefined || v===null || /^(?:\s*|no publicado|pendiente|por confirmar)$/i.test(String(v).trim());
     const eligible=hasFactors?rows.filter((r,i)=>amount(r.area_m2)>0 && positiveModelArea(table.rows[i].values[area.key]) && factors.every(k=>!missing(table.rows[i].values[k]))):rows;
     const complete=hasFactors?eligible.length:null;
+    const simulated=eligible.some(r=>Object.values(sourceFacts(r.analysis_manual_factors)).some(e=>/^EJEMPLO SIMULADO\b/i.test(e.source || '')));
     const offer=eligible.map(r=>{const p=amount(r.price_amount),a=amount(r.area_m2);return p!==null && p>0 && a>0?(r.price_unit==='valor_m2'?p:p/a):null;});
     const adjusted=eligible.map(r=>{const result=state.analysisResult(r.id);return r.price_unit==='valor_m2'?result.value:result.perM2;});
-    state.analysisStatistics.push({at:new Date().toISOString(),action,changed,scope:state.analysisAppliedScope,regime:state.analysisSubjectRegime,count:rows.length,factors,complete,...(hasFactors?{model_area:area.key,factor_count:modelFactorCount(columns)}:{}),offer:statistics(offer),adjusted:statistics(adjusted)});
+    state.analysisStatistics.push({at:new Date().toISOString(),action,changed,scope:state.analysisAppliedScope,regime:state.analysisSubjectRegime,count:rows.length,factors,complete,...(simulated?{simulated:true}:{}),...(hasFactors?{model_area:area.key,factor_count:modelFactorCount(columns)}:{}),offer:statistics(offer),adjusted:statistics(adjusted)});
 }
 export function ensureHistory(state) {
     if(state.analysisStatistics.length)return;

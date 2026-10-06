@@ -1,3 +1,4 @@
+import {tableProjection} from './analysis-table-projection.js';
 import {manualMethods} from './analysis-manual-factors.js';
 import {modelArea,modelFactorCount,positiveModelArea} from './analysis-model-area.js';
 import {snapshot,ensureHistory,requireHistorySpace,workingRows} from './analysis-statistical-history.js';
@@ -7,8 +8,8 @@ import {factorProfile,factorSuggestion} from './analysis-factor-suggestions.js';
 
 const missing=value=>value===undefined || value===null || /^(?:\s*|no publicado|pendiente|por confirmar)$/i.test(String(value).trim());
 const historyModule=()=>import('./analysis-filter-history.js?'+(typeof __ANALYSIS_HISTORY_REVISION__==='undefined'?'test':__ANALYSIS_HISTORY_REVISION__));
-export function analysisCoverage(rows,type='') {
-    const table=portalTable(rows,true), fixed=new Set(['listing_code','price_amount','area_m2','contact_name','property_type','neighborhood',
+export function analysisCoverage(rows,type='',table=portalTable(rows,true)) {
+    const fixed=new Set(['listing_code','price_amount','area_m2','contact_name','property_type','neighborhood',
         ...['tipo de anunciante','descripcion','description','nombre','name','url','direccion','address','telefono','pricecurrency','moneda','valor de compra','codigo','identificador'].map(k=>'published:'+k)]);
     return table.columns.filter(c=>!fixed.has(c.key)).map(c=>factorProfile({...c,count:table.rows.filter(r=>!missing(r.values[c.key])).length},table,rows,type))
         .filter(c=>c.count>0).sort((a,b)=>b.count-a.count || a.label.localeCompare(b.label,'es'));
@@ -21,11 +22,12 @@ export function discountedAnalysis(row,percent) {
 }
 export function marketAnalysisTable(rows,subjectRegime='',subjectType='') {
     rows=rows.map(r=>({...r,ph_regime:r.ph_regime || 'por_verificar',ph_regime_source:r.ph_regime_source || ''}));
-    const table=portalTable(rows,true), factors=analysisCoverage(rows,subjectType);
+    const project=tableProjection(true), original=tableProjection(), active=tableProjection(true), factors=analysisCoverage(rows,subjectType);
+    let factorTable, factorCache;
     let saved={};try {saved=JSON.parse(rows.find(r=>r.analysis_factor_selection)?.analysis_factor_selection || '{}');} catch {}
     return {
-        analysisRows:rows, get analysisTable(){return portalTable(this.analysisRows,true);}, ...manualMethods(), analysisSubjectRegime:subjectRegime, analysisScope:saved.scope ?? 'subject', analysisAppliedScope:saved.applied_scope ?? saved.scope ?? 'subject', analysisRegimeApplied:saved.regime_applied ?? ['clean','result'].includes(saved.view), analysisThreshold:50, analysisView:saved.view ?? 'raw',
-        get analysisFactors(){return analysisCoverage(this.analysisActiveRows(),subjectType);},
+        analysisRows:rows, get analysisTable(){return project(this.analysisRows);}, get analysisOriginalTable(){return original(this.analysisRows);}, ...manualMethods(), analysisSubjectRegime:subjectRegime, analysisScope:saved.scope ?? 'subject', analysisAppliedScope:saved.applied_scope ?? saved.scope ?? 'subject', analysisRegimeApplied:saved.regime_applied ?? ['clean','result'].includes(saved.view), analysisThreshold:50, analysisView:saved.view ?? 'raw',
+        get analysisFactors(){const rows=this.analysisActiveRows(),table=active(rows);if(table!==factorTable){factorCache=analysisCoverage(rows,subjectType,table);factorTable=table;}return factorCache;},
         analysisSelected:(saved.selected ?? factors.map(f=>f.key)).filter(key=>factors.some(f=>f.key===key && f.compatible)),
         analysisApplied:saved.applied ?? saved.selected ?? [],
         analysisStatistics:saved.statistics ?? [], analysisReview:saved.review ?? [], analysisBusy:false, analysisProcessed:0, analysisFilterDone:false, analysisError:'',

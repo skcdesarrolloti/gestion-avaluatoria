@@ -37,3 +37,19 @@ conteo 2→3, autoguardado confirmado y pantalla estrecha sin desborde ni errore
 Acceso directo validado (2026-10-06): 1545 PHP, 210 JS, lint, build y
 78,3 KB inicial; navegador local confirma filtro, foco, edición de soporte sin
 perder la fila y ancho estrecho. Persistencia permanece igual.
+
+
+## Ejercicio autorizado con 34 muestras
+
+El 06/10/2026 el usuario autorizó completar los faltantes para un ejemplo.
+Se conserva published_attributes original; analysis_manual_factors identifica
+cada complemento con fuente que comienza EJEMPLO SIMULADO. La tabla muestra
+estos valores en morado con texto no verificado y aviso de ejercicio. Las nuevas
+etapas preservan simulated=true en el historial; anteriores no se reescriben.
+La marca no modifica fórmulas, descuentos, selecciones ni componentes.
+
+Se cachean las proyecciones del portal y perfiles de factores por sus valores
+fuente, invalidando datos manuales, soporte y composición del grupo. Evita
+releer todas las fichas por cada celda. 1547 PHP/212 JS/222 BD local3398;
+compilación/lint y 78,3 KB gzip. QA ficticio34: 29→34 con cinco complementos,
+aviso de simulación, historial identificado y sin errores de consola.

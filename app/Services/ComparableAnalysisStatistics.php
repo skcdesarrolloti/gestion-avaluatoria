@@ -22,7 +22,11 @@ final class ComparableAnalysisStatistics
                 if (!is_string($v->model_area ?? null) || mb_strlen($v->model_area)>180 || ($v->model_area!=='area_m2' && !in_array($v->model_area,$v->factors,true))
                     || !is_int($v->factor_count ?? null) || $v->factor_count!==count($v->factors)+($v->model_area==='area_m2'?1:0))
                     throw new HttpException(422,'Conteo de factores o área del modelo inválidos.');
-                $model=['model_area'=>$v->model_area,'factor_count'=>$v->factor_count];
+                $model+=['model_area'=>$v->model_area,'factor_count'=>$v->factor_count];
+            }
+            if (property_exists($v,'simulated')) {
+                if (!is_bool($v->simulated)) throw new HttpException(422,'Marca de ejemplo simulado inválida.');
+                $model['simulated']=$v->simulated;
             }
             $out[]=['at'=>$v->at,'action'=>$v->action,'changed'=>$v->changed,'scope'=>$v->scope,'regime'=>$v->regime,'count'=>$v->count,'factors'=>$v->factors,'complete'=>$v->complete,
                 'offer'=>self::stats($v->offer ?? null,$v->count),'adjusted'=>self::stats($v->adjusted ?? null,$v->count)]+$model;

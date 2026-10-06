@@ -19,7 +19,7 @@ export function manualMethods() {
     return {
         analysisOnlyMissing:false, analysisEditingId:'', analysisManualVersion:0, analysisCombinationCache:null,
         analysisManualEntry(id,key){return sourceFacts(this.analysisRows.find(r=>r.id===id)?.analysis_manual_factors)[key] || {};},
-        analysisOriginal(property,key){return portalTable([this.analysisRows[property.analysisIndex]]).rows[0].values[key];},
+        analysisOriginal(property,key){return this.analysisOriginalTable.rows[property.analysisIndex].values[key];},
         analysisCanEdit(property,key){return missingFactor(this.analysisOriginal(property,key));},
         analysisEdit(property,factor,field,value){
             if(!this.analysisCanEdit(property,factor.key))return;
@@ -30,8 +30,10 @@ export function manualMethods() {
         analysisCellState(property,factor){
             const value=property.values[factor.key];
             if(missingFactor(value) || factor.key===modelArea(this.analysisColumns()).key && !positiveModelArea(value))return 'missing';
-            return this.analysisManualEntry(property.key,factor.key).source?.trim()?'manual':'original';
+            const source=this.analysisManualEntry(property.key,factor.key).source?.trim();
+            return /^EJEMPLO SIMULADO\b/i.test(source || '')?'example':source?'manual':'original';
         },
+        analysisHasSimulated(){return this.analysisActiveRows().some(r=>Object.values(sourceFacts(r.analysis_manual_factors)).some(e=>/^EJEMPLO SIMULADO\b/i.test(e.source || '')));},
         analysisRowComplete(property){return complete(property,this.analysisColumns());},
         analysisDisplayRows(){return this.analysisVisibleRows().filter(r=>!this.analysisOnlyMissing || !this.analysisRowComplete(r) || r.key===this.analysisEditingId);},
         analysisCombinations(){

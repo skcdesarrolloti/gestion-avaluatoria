@@ -1,5 +1,5 @@
 <p class="whitespace-pre-wrap" x-text="property.values[factor.key] ?? 'Dato faltante'"></p>
-<p x-show="analysisView==='result'" class="mt-1 text-xs font-semibold" x-text="analysisCellState(property,factor)==='missing' ? 'Falta completar o verificar' : analysisCellState(property,factor)==='manual' ? 'Complementado por el analista' : 'Dato recogido'"></p>
+<p x-show="analysisView==='result'" class="mt-1 text-xs font-semibold" x-text="analysisCellState(property,factor)==='missing' ? 'Falta completar o verificar' : analysisCellState(property,factor)==='example' ? 'Ejemplo simulado · no verificado' : analysisCellState(property,factor)==='manual' ? 'Complementado por el analista' : 'Dato recogido'"></p>
 <div x-show="analysisView==='result' && analysisCanEdit(property,factor.key)">
     <label class="mt-2 block text-xs" :for="'manual-value-'+property.key+'-'+factor.key" x-text="factor.label+' · dato manual'"></label>
     <input class="input w-52" :id="'manual-value-'+property.key+'-'+factor.key" maxlength="500" placeholder="Digita el dato verificado" :value="analysisManualEntry(property.key,factor.key).value ?? ''" @input="analysisEdit(property,factor,'value',$event.target.value)">

@@ -37,3 +37,10 @@ declare(strict_types=1);
     expectStatus(422, fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_manual_factors'=>json_encode(['price_amount'=>['label'=>'Precio','value'=>'1','source'=>'x']])]), 'complemento no sustituye precio original');
     expectStatus(422, fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_manual_factors'=>json_encode(['published:estado'=>['label'=>'Estado','value'=>['x'],'source'=>'x']])]), 'complemento rechaza dato estructurado');
 })();
+
+(static function (): void {
+    $stage=['at'=>'2026-10-06T18:00:00.000Z','action'=>'factors','changed'=>'','scope'=>'subject','regime'=>'si','count'=>34,'factors'=>['published:area privada','bathrooms','published:antiguedad'],'complete'=>34,'model_area'=>'published:area privada','factor_count'=>3,'simulated'=>true,'offer'=>['n'=>34,'mean'=>100,'median'=>100,'sd'=>10,'cv'=>10],'adjusted'=>['n'=>0,'mean'=>null,'median'=>null,'sd'=>null,'cv'=>null]];
+    $out=\App\Services\ComparableAnalysisStatistics::normalize(json_decode(json_encode([$stage])));
+    expect($out[0]['simulated']===true && $out[0]['factor_count']===3, 'historial conserva marca de simulación y conteo de tres factores');
+    $stage['simulated']='si';expectStatus(422,fn()=>\App\Services\ComparableAnalysisStatistics::normalize(json_decode(json_encode([$stage]))),'historial rechaza marca de simulación adulterada');
+})();

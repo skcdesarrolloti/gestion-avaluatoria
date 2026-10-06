@@ -1,4 +1,5 @@
 <section class="mb-4 rounded-xl border p-3" aria-label="Completar datos y evaluar combinaciones">
+    <p x-show="analysisHasSimulated()" class="mb-2 rounded bg-purple-50 p-2 font-semibold text-purple-900">Ejercicio numérico con datos simulados. Los originales se conservan; estos complementos no son datos verificados.</p>
     <h3 class="font-semibold">Completar muestras para el análisis</h3>
     <p class="my-2" aria-live="polite" x-text="analysisActiveRows().length+' inmuebles conservados · '+analysisComplete()+' con datos completos · '+(analysisActiveRows().length-analysisComplete())+' con datos pendientes'"></p>
     <div class="flex flex-wrap gap-2 text-sm"><span class="rounded bg-emerald-50 p-2 text-emerald-900">Verde: dato recogido</span><span class="rounded bg-amber-50 p-2 text-amber-900">Amarillo: falta completar</span><span class="rounded bg-blue-50 p-2 text-blue-900">Azul: dato manual con soporte</span></div>

@@ -48,3 +48,12 @@ test('published-area suggestions contain exactly two non-area factors',()=>{
     const options=state.analysisCombinations();assert.ok(options.length);
     for(const option of options){assert.equal(option.keys.length,2);assert.ok(!option.keys.includes('published:area privada'));}
 });
+
+test('simulated values remain labelled and historical snapshots identify the exercise',()=>{
+    const state=marketAnalysisTable(samples(),'','oficina');state.analysisApplySuggestion();
+    state.analysisSelected=['published:area privada','published:antiguedad','published:estado'];state.analysisUpdate();
+    for(const property of state.analysisDisplayRows().filter(r=>!state.analysisRowComplete(r))){const factor=state.analysisColumns().find(f=>f.key==='published:estado');state.analysisEdit(property,factor,'value','Usado');state.analysisEdit(property,factor,'source','EJEMPLO SIMULADO: no verificado');}
+    assert.equal(state.analysisComplete(),34);assert.equal(state.analysisHasSimulated(),true);state.analysisRecordManual();
+    assert.equal(state.analysisStatistics.at(-1).simulated,true);assert.equal(state.analysisStatistics.at(-2).simulated,undefined);
+    assert.equal(state.analysisCellState(state.analysisVisibleRows()[20],state.analysisColumns().find(f=>f.key==='published:estado')),'example');
+});
