@@ -59,3 +59,19 @@ test('starting over clears sources, attributes and consolidation; all portal cou
  assert.ok(read().every(e=>e.data.published_attributes==='' && e.data.property_group==='' && e.data.capture_confirmation===''));
  await component.undoRemoval();assert.equal(read().filter(e=>e.used).length,2);
 });
+
+test('restarting one portal preserves other sources and clears its draft only after acknowledged persistence',async()=>{
+ const {component,entries,events}=setup();
+ entries.forEach((entry,i)=>entry.controls.push({name:`comparables[${i}][source_name]`,value:i ? 'Metrocuadrado' : 'FincaRaíz'}));
+ const untouched=entries[1].controls.map(c=>c.value);
+ component.requestSourceRemoval('FincaRaiz'); assert.deepEqual(component.removalPending,[0]);
+ await component.confirmRemoval();
+ assert.equal(entries[0].controls[1].value,''); assert.deepEqual(entries[1].controls.map(c=>c.value),untouched);
+ assert.ok(events.includes('comparable-source-restarted'));
+ await component.undoRemoval(); assert.equal(entries[0].controls[1].value,'https://example.com/0');
+ const failed=setup(async()=>false);
+ failed.entries[0].controls.push({name:'comparables[0][source_name]',value:'FincaRaíz'});
+ failed.component.requestSourceRemoval('FincaRaiz'); await failed.component.confirmRemoval();
+ assert.equal(failed.entries[0].controls[1].value,'https://example.com/0');
+ assert.ok(!failed.events.includes('comparable-source-restarted'));
+});

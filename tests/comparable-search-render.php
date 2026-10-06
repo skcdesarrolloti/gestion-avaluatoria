@@ -50,6 +50,12 @@ declare(strict_types=1);
     expect(str_contains($html,'Confirmar reinicio de las muestras') && str_contains($html,'Descargar respaldo en Excel')
         && str_contains($html,'Reunir: confirmé que es el mismo') && str_contains($html,"candidate.reasons.join"),
         'reinicio visible conserva confirmación y respaldo; consolidación muestra parejas y motivos de coincidencia');
+    foreach (array_merge($guide['source_search']['portal_sources'],$guide['source_search']['agency_sources']) as $source) {
+        $captureLabel = str_replace(' Inmuebles','',$source['label']);
+        expect(str_contains($html,'Empezar de cero en ' . e($captureLabel))
+            && str_contains($html,'Confirmar reinicio solo de ' . e($captureLabel)),
+            'fuente ' . $source['label'] . ' comparte inicio y reinicio limitado con confirmación');
+    }
     $guide = (new \App\Services\AppraisalComparableSearchGuide())->build(
         ['tipo_inmueble'=>'oficina', 'regimen_ph'=>'si', 'tipo_negocio'=>'venta'], [], [], []);
     ob_start(); require BASE_PATH . '/app/Views/appraisals/methodology-search-prompt.php'; $prompt = ob_get_clean();

@@ -4,12 +4,27 @@ import { previewFacts } from './comparable-preview-facts.js';
 import { captureSelectedDetails } from './capture-selected-details.js';
 import { comparableUrlKey } from './comparable-review.js';
 import { sourceUpdate } from './comparable-source-update.js';
-const normalize = value => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
+import { flushModuleForm } from './module-autosave.js';
+const normalize = value => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim().replace(/ inmuebles$/,'');
 
 export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false, emptyMessage = '', readText = false }) {
     let panel, form, leaveWarning;
     return {
-        previewFacts, results: [], pages: [], portalTotal: 0, selected: [], message: '', pastedText: '', busy: false,
+        previewFacts, sourceRevision: 0, captureReady: false, sourceRestartPending: false, results: [], pages: [], portalTotal: 0, selected: [], message: '', pastedText: '', busy: false,
+        get sourceSavedCount() { void this.sourceRevision; return form ? matrixRows(form).filter(row=>normalize(row.source_name)===normalize(label)).length : 0; },
+        restartPreview() {
+            this.results=[]; this.pages=[]; this.portalTotal=0; this.selected=[]; this.pastedText='';
+            this.sourceRestartPending=false; this.captureReady=true;
+            this.message='Nueva captura de esta fuente. Copia la primera página y después añade las siguientes.';
+        },
+        sourceRestarted(event) { if (!event.detail.source || normalize(event.detail.source)===normalize(label)) this.restartPreview(); },
+        async restartEmptySource() {
+            if (this.busy) return;
+            this.busy=true;
+            try { if (await flushModuleForm(form)) this.restartPreview();
+                else this.message='Guardado pendiente. No se inició otra captura; pulsa Guardar matriz y reintenta.';
+            } finally { this.busy=false; }
+        },
         get receivedCount() { return this.pages.reduce((sum,page)=>sum+page.count,0); },
         get suggestedCount() { return this.results.filter(item => item.suggested).length; },
         get registeredCount() { return this.results.filter(item => item.tone === 'registered').length; },
@@ -57,6 +72,7 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
             }
         },
         refresh() {
+            this.sourceRevision++;
             const matches = candidateMatches(this.results, matrixRows(form).filter(row => normalize(row.source_name)===normalize(label)));
             this.results.forEach((item, i) => { item.matches = matches[i]; });
             const suggestions = candidateSuggestions(this.results);
