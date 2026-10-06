@@ -2,7 +2,7 @@
 <nav class="mb-3 flex flex-wrap gap-2" aria-label="Pasos del análisis">
     <button type="button" class="btn-secondary" :disabled="analysisBusy" :aria-current="analysisView==='raw'?'step':null" :class="analysisView==='raw'?'ring-2 ring-teal-700':''" @click="analysisView='raw'; $dispatch('input')">1. Información recogida</button>
     <button type="button" class="btn-secondary" :disabled="analysisBusy" :aria-current="analysisView==='regime'?'step':null" :class="analysisView==='regime'?'ring-2 ring-teal-700':''" @click="analysisView='regime'; $dispatch('input')">2. Depurar muestras</button>
-    <button type="button" class="btn-secondary" :aria-current="analysisView==='clean'?'step':null" :class="analysisView==='clean'?'ring-2 ring-teal-700':''" :disabled="analysisBusy || !analysisRegimeApplied || analysisScope!==analysisAppliedScope" @click="analysisView='clean'; $dispatch('input')">3. Factores del analista</button>
+    <button type="button" class="btn-secondary" :aria-current="analysisView==='clean'?'step':null" :class="analysisView==='clean'?'ring-2 ring-teal-700':''" :disabled="analysisBusy || !analysisRegimeApplied || analysisScope!==analysisAppliedScope" @click="analysisView='clean'; $dispatch('input')">3. Depuración de factores por parte del analista</button>
     <button type="button" class="btn-secondary" :disabled="analysisBusy || !analysisRegimeApplied || analysisScope!==analysisAppliedScope" :aria-current="analysisView==='result'?'step':null" :class="analysisView==='result'?'ring-2 ring-teal-700':''" @click="analysisUpdate(); $dispatch('input')">4. Resultado depurado</button>
 </nav>
 <p class="mb-3 text-sm" x-show="analysisView==='raw'">Toda la información recogida. Continúa en 2. Depurar muestras y aplica el filtro antes de elegir factores.</p>
@@ -10,8 +10,7 @@
 <?php require __DIR__.'/methodology-analysis-regime-filter.php'; ?>
 <button type="button" class="btn-primary mb-3" :disabled="analysisBusy" @click="await analysisApplyRegime(); $dispatch('input')" x-text="analysisBusy ? 'Depurando…' : 'Aplicar depuración de muestras'">Aplicar depuración de muestras</button>
 <?php require __DIR__.'/methodology-analysis-retired.php'; ?>
-<p class="mb-3" role="status" x-show="analysisRegimeApplied && !analysisBusy" x-text="analysisRows.length+' muestras recogidas → '+analysisActiveRows().length+' para trabajar · '+(analysisRows.length-analysisActiveRows().length)+' fuera del grupo, conservadas'"></p>
-<button type="button" class="btn-secondary mb-3" :disabled="analysisBusy || !analysisRegimeApplied || analysisScope!==analysisAppliedScope" @click="analysisView='clean'; $dispatch('input')">Depuración de factores por parte del analista</button>
+<p class="mb-3" role="status" x-show="analysisFilterDone && !analysisBusy" x-text="analysisRows.length+' muestras recogidas → '+analysisActiveRows().length+' para trabajar · '+(analysisRows.length-analysisActiveRows().length)+' fuera del grupo, conservadas'"></p>
 </div>
 <div x-show="analysisView==='clean'" x-cloak>
 <p class="mb-3 text-sm">Regla de depuración: al menos 50 % con dato, compatible con el tipo y con variación. En oficinas, Habitaciones y Estrato no participan. No se borran datos. Para regresión faltará validar codificación, valor por m², correlación y colinealidad.</p>
