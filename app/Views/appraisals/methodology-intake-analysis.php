@@ -1,9 +1,13 @@
-<?php $intakeGroups = \App\Services\ComparableIntake::groups($comparableRows, true); ?>
+<?php
+$selectedGroups = \App\Services\ComparableIntake::groups($comparableRows, true);
+$intakeGroups = array_filter(\App\Services\ComparableIntake::groups($comparableRows), static fn($group,$key) => isset($selectedGroups[$key]) || count(array_filter($group, static fn($row)=>($row['capture_confirmation'] ?? '')==='confirmed'))===count($group), ARRAY_FILTER_USE_BOTH);
+$analysisRows = array_values(array_map(static function($group) { foreach ($group as $row) if (($row['research_primary'] ?? '')==='si') return $row; return $group[0]; },$intakeGroups));
+$analysisIndexes = array_column($analysisRows,'capture_index');
+?>
 <details class="mt-4 rounded-xl border p-4" open>
-    <summary class="min-h-11 cursor-pointer font-semibold">Inmuebles recibidos y verificación manual de ubicación (<?= count($intakeGroups) ?>)</summary>
-    <p class="mt-2 text-sm">Cada inmueble conserva sus anuncios y pendientes. Coordenadas publicadas, incluso las anteriores, siguen sin verificar hasta que el analista confirme el punto y registre su soporte. Todavía no se realiza depuración automática.</p>
+    <summary class="min-h-11 cursor-pointer font-semibold">Tabla de análisis · <?= count($intakeGroups) ?> inmuebles</summary>
     <?php if ($intakeGroups === []): ?><p class="mt-3 rounded-lg bg-amber-50 p-3">Selecciona inmuebles en Insumos para estudiarlos aquí. Los anuncios restantes siguen conservados.</p><?php else: ?>
-    <form class="mt-4" method="post" action="<?= e(url($basePath . '/comparables')) ?>" data-module-autosave data-save-in-place data-comparable-json
+    <form class="mt-4" x-data="marketAnalysisTable(<?= e(json_encode($analysisRows,JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT|JSON_THROW_ON_ERROR)) ?>)" method="post" action="<?= e(url($basePath . '/comparables')) ?>" data-module-autosave data-save-in-place data-comparable-json
         data-autosave-endpoint="<?= e(url($basePath . '/comparables/autoguardar')) ?>">
         <?= csrf_field() ?>
         <input type="hidden" name="component_scope" value="<?= e($componentKey) ?>">
@@ -15,9 +19,12 @@
             if (empty($row['published_location']) && empty($row['location_verification']) && ($row['latitude'] ?? '') !== '' && ($row['longitude'] ?? '') !== '')
                 $row['published_location'] = $row['latitude'] . ', ' . $row['longitude'] . ' · referencia anterior sin verificar.';
             foreach ($row as $key=>$value):
-            if (!is_scalar($value) || ($key === 'capture_index') || (in_array($index, $locationIndexes, true) && in_array($key, $locationKeys, true))) continue; ?>
+            if (!is_scalar($value) || ($key === 'capture_index') || ($key==='negotiation_discount' && in_array($index,$analysisIndexes,true)) || (in_array($index, $locationIndexes, true) && in_array($key, $locationKeys, true))) continue; ?>
             <input type="hidden" name="comparables[<?= $index ?>][<?= e($key) ?>]" value="<?= e((string) $value) ?>">
         <?php endforeach; endforeach; ?>
+        <?php foreach ($analysisRows as $row): ?><input type="hidden" name="comparables[<?= (int)$row['capture_index'] ?>][negotiation_discount]" value="<?= e((string)($row['negotiation_discount'] ?? '')) ?>" :value="analysisDiscounts['<?= e($row['id']) ?>']"><?php endforeach; ?>
+        <?php require __DIR__.'/methodology-analysis-data-table.php'; ?>
+        <details class="mt-4"><summary class="min-h-11 cursor-pointer font-semibold">Ubicación y anuncios originales</summary>
         <?php foreach ($intakeGroups as $group): $row = $group[0]; $index = $row['capture_index']; ?>
         <article class="mt-4 rounded-xl border p-4">
             <h3 class="font-semibold"><?= e(($row['project_name'] ?? '') ?: ($row['property_type'] ?? 'Inmueble')) ?> · <?= e($row['neighborhood'] ?? '') ?></h3>
@@ -44,8 +51,9 @@
             <?php else: ?><p class="mt-3 text-sm text-amber-900">Ubicación pendiente de verificación manual y soporte. No se muestra un punto como confirmado.</p><?php endif; ?>
         </article>
         <?php endforeach; ?>
+        </details>
         <p class="mt-3 text-sm" data-autosave-status>Autoguardado activo. Actualiza esta vista después de confirmar el guardado para consultar el mapa.</p>
-        <button class="btn-primary mt-3" type="submit">Guardar verificación de ubicación</button>
+        <button class="btn-primary mt-3" type="submit">Guardar análisis de muestras</button>
     </form>
     <?php endif; ?>
 </details>

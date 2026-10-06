@@ -26,8 +26,10 @@ import { properatiPaste } from './properati-paste.js';
 import { mercadolibrePaste } from './mercadolibre-paste.js';
 
 import { sourceResultsPaste } from './source-results-paste.js';
+import { marketAnalysisTable } from './market-analysis-table.js';
 
 window.Alpine = Alpine;
+Alpine.data('marketAnalysisTable', marketAnalysisTable);
 Alpine.data('sourceResultsPaste', sourceResultsPaste);
 Alpine.data('researchPlan', researchPlan);
 Alpine.data('igacUnitSelector', igacUnitSelector);

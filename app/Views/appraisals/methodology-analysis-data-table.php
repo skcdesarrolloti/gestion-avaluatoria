@@ -1,0 +1,17 @@
+<p class="mb-3 text-sm">Una fila por inmueble. Factores ordenados por cantidad de muestras con dato, sin límite de seis. Valor con descuento = oferta × (1 − descuento / 100); valor por m² = valor con descuento / área publicada.</p>
+<details class="mb-3 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Elegir factores por cantidad de datos</summary>
+    <div class="grid gap-2 sm:grid-cols-2"><template x-for="factor in analysisFactors" :key="factor.key"><label class="flex min-h-11 items-center gap-2"><input type="checkbox" :value="factor.key" x-model="analysisSelected" @input.stop @change.stop><span x-text="factor.label+' · '+factor.count+'/'+analysisRows.length+' con dato'"></span></label></template></div>
+</details>
+<div class="max-h-[65vh] overflow-auto rounded-xl border" role="region" aria-label="Tabla de análisis de inmuebles" tabindex="0">
+<table class="w-max min-w-full text-left text-sm"><thead class="sticky top-0 bg-slate-100"><tr>
+    <th class="sticky left-0 bg-slate-100 p-3">Inmueble</th><th class="p-3">Oferta · COP</th><th class="p-3">Área publicada · m²</th>
+    <template x-for="factor in analysisColumns()" :key="factor.key"><th class="max-w-48 p-3" x-text="factor.label+' ('+factor.count+'/'+analysisRows.length+')'"></th></template>
+    <th class="p-3">Descuento · %</th><th class="p-3">Valor con descuento · COP</th><th class="p-3">Valor por m² · COP/m²</th>
+</tr></thead><tbody><template x-for="(property,index) in analysisTable.rows" :key="property.key"><tr class="border-t">
+    <th class="sticky left-0 max-w-48 bg-white p-3"><span x-text="'Muestra '+(index+1)"></span><p class="font-normal" x-text="property.source_name"></p><a :href="/^https?:\/\//i.test(property.source_url) ? property.source_url : '#'" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center text-blue-700 underline">Ver anuncio</a></th>
+    <td class="p-3" x-text="analysisMoney(analysisOffer(property.key))"></td><td class="max-w-48 p-3"><span x-text="property.values.area_m2 ?? 'No publicado'"></span><p class="mt-1 text-xs text-amber-900" x-text="analysisAreaNote(property.key)"></p></td>
+    <template x-for="factor in analysisColumns()" :key="factor.key"><td class="max-w-48 whitespace-pre-wrap p-3" x-text="property.values[factor.key] ?? 'No publicado'"></td></template>
+    <td class="p-3"><label :for="'analysis-percent-'+property.key" class="block text-xs">Descuento · %</label><input :id="'analysis-percent-'+property.key" class="input w-28" type="number" min="0" max="100" step="any" placeholder="Ej. 10" :value="analysisPercents[property.key]" @input="analysisChange(property.key,$event.target.value)" :aria-invalid="Number(analysisPercents[property.key])<0 || Number(analysisPercents[property.key])>100"><span x-show="Number(analysisPercents[property.key])<0 || Number(analysisPercents[property.key])>100" class="block text-red-700">Usa de 0 a 100 %.</span></td>
+    <td class="p-3" x-text="analysisMoney(analysisResult(property.key).value)"></td><td class="p-3" x-text="analysisMoney(analysisResult(property.key).perM2)"></td>
+</tr></template></tbody></table></div>
+<p class="mt-2 text-sm text-slate-600">Vacío no equivale a cero. Son cálculos sobre oferta y área publicada; no sustituyen la depuración de componentes ni el valor adoptado. Registra el soporte del descuento en la muestra.</p>
