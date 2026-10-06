@@ -8,7 +8,7 @@ export const resolvedGroup = group => group.rows.every(r=>r.capture_confirmation
 export function consolidatedResearch(getEntries,getForm,getGroups) {
     return {
         consolidationRows:[], consolidationPending:0, consolidationDuplicates:0, consolidationShowAll:false,
-        researchBusy:false, researchMessage:'', researchResults:[], researchDone:0, researchTotal:0,
+        researchBusy:false, researchFinished:false, researchMessage:'', researchResults:[], researchDone:0, researchTotal:0,
         unambiguousGroups() { return this.consolidationRows.filter(g=>!g.candidates.length && !resolvedGroup(g)); },
         consolidationVisible() { return this.consolidationRows.filter(g=>this.consolidationShowAll || (!resolvedGroup(g) && (g.candidates.length || g.rows.length>1))); },
         confirmUnambiguous() {
@@ -28,6 +28,7 @@ export function consolidatedResearch(getEntries,getForm,getGroups) {
         async investigateConsolidated(id='') {
             if (this.researchBusy || this.consolidationPending) return;
             this.researchBusy=true;
+            this.researchFinished=false;
             this.researchDone=0; this.researchTotal=0;
             this.researchMessage='Preparando lectura y comprobando guardado…';
             try {
@@ -50,6 +51,7 @@ export function consolidatedResearch(getEntries,getForm,getGroups) {
                         this.researchDone++;
                     });
                 this.researchMessage=`${result.completed} fichas leídas; ${result.failed} pendientes. Guardado confirmado. Se leyó una ficha por inmueble consolidado.`;
+                this.researchFinished=!id;
             } catch { this.researchMessage='Lectura detenida. Conserva esta página y revisa el estado de guardado antes de continuar.'; }
             finally { this.researchBusy=false; this.rebuildIntake(); }
         },
