@@ -56,4 +56,9 @@
     expect(json_decode($historic['analysis_factor_selection'],true)['statistics'][0]===$stat,'etapa estadística conserva valores congelados y número de muestras');
     expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>json_encode(['selected'=>[],'threshold'=>50,'statistics'=>[array_replace($stat,['count'=>-1])]])]),'etapa rechaza cantidades negativas');
     expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>json_encode(['selected'=>[],'threshold'=>50,'statistics'=>[array_replace($stat,['offer'=>['n'=>35,'mean'=>100,'median'=>100,'sd'=>10,'cv'=>10]])]])]),'estadístico rechaza más valores que muestras');
+    $areaStat=array_replace($stat,['factors'=>['published:area privada','published:antiguedad','published:estado'],'complete'=>20,'model_area'=>'published:area privada','factor_count'=>3]);
+    $areaHistory=\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>json_encode(['selected'=>[],'threshold'=>50,'statistics'=>[$stat,$areaStat]])]);
+    expect(json_decode($areaHistory['analysis_factor_selection'],true)['statistics'][1]['factor_count']===3,'historial conserva tres factores con área privada sin añadir área publicada');
+    expect(!isset(json_decode($areaHistory['analysis_factor_selection'],true)['statistics'][0]['factor_count']),'historial anterior conserva su interpretación original sin reescribir conteos');
+    expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>json_encode(['selected'=>[],'threshold'=>50,'statistics'=>[array_replace($areaStat,['factor_count'=>4])]])]),'servidor rechaza doble conteo de área privada');
 })();

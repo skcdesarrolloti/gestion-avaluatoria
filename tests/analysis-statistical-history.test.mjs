@@ -47,3 +47,24 @@ test('opening results before factor selection keeps factors pending',async()=>{
  const state=marketAnalysisTable([{id:'a'.repeat(32),ph_regime:'si',price_amount:'100',area_m2:'10'}],'si');state.analysisView='regime';await state.analysisApplyRegime();state.analysisShowResult();
  assert.equal(state.analysisStatistics.some(v=>v.action==='factors'),false);
 });
+
+test('private area is the single area predictor: three factors need thirty complete rows, without changing unit-price denominator',async()=>{
+ const rows=Array.from({length:34},(_,i)=>({id:i.toString(16).padStart(32,'0'),ph_regime:'si',price_amount:'100000000',area_m2:String(40+i),published_attributes:JSON.stringify({'Área Privada':(30+i)+' m2','Antigüedad':i>=2&&i<29?String(i):'','Estado':i<22?(i%2?'Usado':'Nuevo'):''})}));
+ const state=marketAnalysisTable(rows,'si');state.analysisView='regime';await state.analysisApplyRegime();state.analysisView='clean';
+ state.analysisSelected=['published:area privada','published:antiguedad','published:estado'];state.analysisUpdate();
+ assert.equal(state.analysisFactorCount(),3);assert.equal(state.analysisModelArea().key,'published:area privada');
+ assert.deepEqual(state.analysisSampleRule(),{factors:3,complete:20,required:30,maximum:2,meets:false});
+ assert.equal(state.analysisStatistics.at(-1).factor_count,3);assert.equal(state.analysisStatistics.at(-1).complete,20);
+ state.analysisChange(rows[0].id,'10');assert.equal(state.analysisResult(rows[0].id).perM2,2250000);
+ const old=structuredClone(state.analysisStatistics.at(-1));delete old.model_area;delete old.factor_count;
+ state.analysisStatistics=[old];state.analysisView='clean';assert.equal(state.analysisFactorsPending(),true);state.analysisShowResult();
+ assert.deepEqual(state.analysisStatistics[0],old);assert.equal(state.analysisStatistics.at(-1).factor_count,3);
+ const reload=marketAnalysisTable([{...rows[0],analysis_factor_selection:state.analysisSelection()},...rows.slice(1)],'si');
+ assert.equal(reload.analysisFactorCount(),3);assert.deepEqual(reload.analysisStatistics,state.analysisStatistics);
+});
+test('model area must be positive; private free area never replaces mandatory area',async()=>{
+ const rows=Array.from({length:34},(_,i)=>({id:i.toString(16).padStart(32,'0'),ph_regime:'si',area_m2:'40',bathrooms:String(i%3),published_attributes:JSON.stringify({'Área Privada':i===0?'0 m²':i+' m²','Área Privada Libre':String(i)})}));
+ const state=marketAnalysisTable(rows,'si');state.analysisView='regime';await state.analysisApplyRegime();state.analysisView='clean';state.analysisSelected=['published:area privada','bathrooms'];state.analysisUpdate();
+ assert.equal(state.analysisComplete(),33);assert.equal(state.analysisStatistics.at(-1).complete,33);assert.equal(state.analysisFactorCount(),2);
+ state.analysisView='clean';state.analysisSelected=['published:area privada libre','bathrooms'];state.analysisUpdate();assert.equal(state.analysisModelArea().key,'area_m2');assert.equal(state.analysisFactorCount(),3);
+});

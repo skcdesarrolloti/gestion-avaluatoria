@@ -17,8 +17,15 @@ final class ComparableAnalysisStatistics
                 || !property_exists($v,'complete') || ($v->complete!==null && (!is_int($v->complete) || $v->complete<0 || $v->complete>$v->count)))
                 throw new HttpException(422,'Etapa estadística inválida.');
             foreach ($v->factors as $factor) if (!is_string($factor) || mb_strlen($factor)>180) throw new HttpException(422,'Factor histórico inválido.');
+            $model=[];
+            if (property_exists($v,'model_area') || property_exists($v,'factor_count')) {
+                if (!is_string($v->model_area ?? null) || mb_strlen($v->model_area)>180 || ($v->model_area!=='area_m2' && !in_array($v->model_area,$v->factors,true))
+                    || !is_int($v->factor_count ?? null) || $v->factor_count!==count($v->factors)+($v->model_area==='area_m2'?1:0))
+                    throw new HttpException(422,'Conteo de factores o área del modelo inválidos.');
+                $model=['model_area'=>$v->model_area,'factor_count'=>$v->factor_count];
+            }
             $out[]=['at'=>$v->at,'action'=>$v->action,'changed'=>$v->changed,'scope'=>$v->scope,'regime'=>$v->regime,'count'=>$v->count,'factors'=>$v->factors,'complete'=>$v->complete,
-                'offer'=>self::stats($v->offer ?? null,$v->count),'adjusted'=>self::stats($v->adjusted ?? null,$v->count)];
+                'offer'=>self::stats($v->offer ?? null,$v->count),'adjusted'=>self::stats($v->adjusted ?? null,$v->count)]+$model;
         }
         return $out;
     }
