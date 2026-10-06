@@ -26,10 +26,15 @@ import { properatiPaste } from './properati-paste.js';
 import { mercadolibrePaste } from './mercadolibre-paste.js';
 
 import { sourceResultsPaste } from './source-results-paste.js';
-import { marketAnalysisTable } from './market-analysis-table.js';
+import { loadAnalysisTable } from './analysis-table-loader.js';
 
+(async()=>{
 window.Alpine = Alpine;
-Alpine.data('marketAnalysisTable', marketAnalysisTable);
+try {await loadAnalysisTable(document,Alpine);} catch {
+    const form=document.querySelector('[data-market-analysis]');
+    if(form){form.setAttribute('x-ignore','');form.querySelectorAll('button').forEach(b=>b.disabled=true);
+        const notice=document.createElement('p');notice.textContent='No se pudo cargar el análisis. Recarga la página para reintentar.';notice.setAttribute('role','alert');form.prepend(notice);}
+}
 Alpine.data('sourceResultsPaste', sourceResultsPaste);
 Alpine.data('researchPlan', researchPlan);
 Alpine.data('igacUnitSelector', igacUnitSelector);
@@ -57,3 +62,5 @@ installDerivedRefresh();
 installComparableBulkImport();
 installComparableUrlImport();
 installFetchNavigation();
+
+})();

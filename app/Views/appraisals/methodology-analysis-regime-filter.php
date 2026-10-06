@@ -1,6 +1,6 @@
 <div class="mb-3 rounded-xl border p-3">
     <p class="text-sm" x-text="'Régimen del sujeto: '+(analysisSubjectRegime==='si'?'PH':analysisSubjectRegime==='no'?'No PH':'sin definir')"></p>
-    <label class="label">Muestras para trabajar<select class="input" x-model="analysisScope"><option value="subject">Priorizar el régimen del sujeto, incluidos indicios publicados</option><option value="all">Ver todas · ampliar o revisar pendientes</option></select></label>
+    <label class="label">Muestras para trabajar<select class="input" x-model="analysisScope" :disabled="analysisBusy"><option value="subject">Priorizar el régimen del sujeto, incluidos indicios publicados</option><option value="all">Ver todas · ampliar o revisar pendientes</option></select></label>
     <p class="mt-2 text-sm">Pulsa Aplicar depuración de muestras para ejecutar el filtro y ver el resultado.</p>
     <p class="text-sm text-amber-900" x-show="!analysisSubjectRegime">Define el régimen del sujeto para priorizar muestras. Se muestran todas.</p>
     <p class="text-sm text-amber-900" x-show="analysisSubjectRegime && !analysisMatches().length">No hay muestras identificadas ni con indicios del régimen del sujeto. Se muestran todas para revisar o ampliar la búsqueda.</p>

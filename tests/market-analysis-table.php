@@ -41,6 +41,12 @@
     expect(str_contains($html,'Aplicar depuración de muestras') && str_contains($html,'Depuración de factores por parte del analista'),'muestras y factores tienen acciones separadas');
     $regime=\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"threshold":50,"view":"regime","scope":"all","applied_scope":"subject","regime_applied":true}']);
     expect(json_decode($regime['analysis_factor_selection'],true)['applied_scope']==='subject','régimen aplicado persiste separado del propuesto');
+    $review=['id'=>str_repeat('a',32),'reason'=>'unknown','at'=>'2026-10-06T15:00:00.000Z','restored_at'=>'2026-10-06T15:01:00.000Z'];
+    $history=\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>json_encode(['selected'=>[],'threshold'=>50,'review'=>[$review]])]);
+    expect(json_decode($history['analysis_factor_selection'],true)['review'][0]===$review,'historial conserva motivo y fechas de retiro y reincorporación');
+    expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"threshold":50,"review":{}}']),'historial rechaza objetos en lugar de lista');
+    expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>json_encode(['selected'=>[],'threshold'=>50,'review'=>[array_replace($review,['id'=>'foreign'])]])]),'historial rechaza identificadores inválidos');
+    expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>json_encode(['selected'=>[],'threshold'=>50,'review'=>[array_replace($review,['reason'=>'delete'])]])]),'historial rechaza motivos inventados');
     $applied=\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":["bathrooms"],"applied":["floor_level"],"threshold":50,"view":"result"}']);
     expect(json_decode($applied['analysis_factor_selection'],true)['applied']===['floor_level'],'factores aplicados se conservan separados del borrador');
     expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"applied":{},"threshold":50}']),'factores aplicados rechazan objeto');

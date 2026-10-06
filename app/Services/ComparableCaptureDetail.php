@@ -80,12 +80,13 @@ final class ComparableCaptureDetail
                 if (isset($selection['applied_scope']) && !in_array($selection['applied_scope'],['subject','all'],true)) throw new HttpException(422,'Filtro aplicado inválido.');
                 if (isset($selection['regime_applied']) && !is_bool($selection['regime_applied'])) throw new HttpException(422,'Estado de depuración inválido.');
                 if (isset($selection['view']) && !in_array($selection['view'],['raw','regime','clean','result'],true)) throw new HttpException(422,'Vista de análisis inválida.');
+                $review=array_key_exists('review',$selection) ? ['review'=>ComparableAnalysisReview::normalize($selectionObject->review ?? null)] : [];
                 $value=json_encode(['selected'=>array_values(array_unique($selection['selected'])),'threshold'=>(float)$selection['threshold']]
                     + (isset($selection['scope']) ? ['scope'=>$selection['scope']] : [])
                     + (isset($selection['applied_scope']) ? ['applied_scope'=>$selection['applied_scope']] : [])
                     + (isset($selection['regime_applied']) ? ['regime_applied'=>$selection['regime_applied']] : [])
                     + (isset($selection['applied']) ? ['applied'=>array_values(array_unique($selection['applied']))] : [])
-                    + (isset($selection['view']) ? ['view'=>$selection['view']] : []),JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
+                    + (isset($selection['view']) ? ['view'=>$selection['view']] : []) + $review,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
             }
             if ($type === 'choice' && !array_key_exists($value, self::options($key)))
                 throw new HttpException(422, "$label: selecciona una opción válida.");

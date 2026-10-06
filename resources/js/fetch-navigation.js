@@ -1,3 +1,4 @@
+import { loadAnalysisTable } from './analysis-table-loader.js';
 const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 const flushAutosaves = () => typeof window.gaFlushAutosaves === 'function' ? window.gaFlushAutosaves() : Promise.resolve(true);
 let busyTimer = null;
@@ -41,7 +42,6 @@ function updateHeadFrom(nextDocument) {
     const token = document.querySelector('meta[name="csrf-token"]');
     if (token && nextToken !== undefined) token.content = nextToken;
 }
-
 function activateNewBody(body, focusMain = true) {
     document.body.replaceWith(body);
     try { window.Alpine?.initTree(document.body); } finally { setBusy(false); }
@@ -50,7 +50,6 @@ function activateNewBody(body, focusMain = true) {
     main?.setAttribute('tabindex', '-1');
     main?.focus({ preventScroll: true });
 }
-
 async function renderFetchedPage(response, fallbackUrl, focusMain) {
     const type = response.headers.get('content-type') ?? '';
     if (!type.includes('text/html')) {
@@ -60,6 +59,7 @@ async function renderFetchedPage(response, fallbackUrl, focusMain) {
     const html = await response.text();
     const nextDocument = new DOMParser().parseFromString(html, 'text/html');
     if (!nextDocument.body) throw new Error('Respuesta HTML inválida.');
+    await loadAnalysisTable(nextDocument.body,window.Alpine);
     updateHeadFrom(nextDocument);
     activateNewBody(nextDocument.body, focusMain);
     return true;

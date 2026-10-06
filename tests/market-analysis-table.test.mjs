@@ -46,7 +46,7 @@ test('discount formula distinguishes explicit zero, missing discount, zero area 
  ph.analysisRows[0].private_built_m2='20';ph.analysisRows[0].areas_source='Documento';assert.equal(ph.analysisAreaNote('ph'),'');
 });
 
-test('subject regime prioritizes declared and probable matches without changing regimes or losing other rows',()=>{
+test('subject regime prioritizes declared and probable matches without changing regimes or losing other rows',async()=>{
  const rows=[{id:'ph',property_type:'Oficina',ph_regime:'si',bathrooms:'1'},
  {id:'probable',property_type:'Oficina',regime_hint:{regime:'si',reason:'PH probable'},bathrooms:'2'},
  {id:'no',property_type:'Oficina',ph_regime:'no',regime_hint:{regime:'si'},bathrooms:'3',negotiation_discount:'120'},
@@ -58,7 +58,7 @@ test('subject regime prioritizes declared and probable matches without changing 
  assert.equal(state.analysisVisibleRows()[1].analysisIndex,1);
  assert.equal(state.analysisRows[1].ph_regime,'por_verificar');assert.equal(state.analysisRows.length,4);
  assert.equal(state.analysisDiscounts.no,'120');assert.equal(state.analysisEffectiveRegime(state.analysisRows[2]),'no');
- state.analysisScope='all';assert.equal(state.analysisVisibleRows().length,2);state.analysisApplyRegime();assert.equal(state.analysisVisibleRows().length,4);
+ state.analysisScope='all';assert.equal(state.analysisVisibleRows().length,2);await state.analysisApplyRegime();assert.equal(state.analysisVisibleRows().length,4);
  assert.equal(state.analysisColumns().find(f=>f.key==='bathrooms').count,3);
  assert.equal(JSON.parse(state.analysisSelection()).scope,'all');
  assert.equal(marketAnalysisTable([{...rows[0],analysis_factor_selection:state.analysisSelection()},...rows.slice(1)],'si').analysisScope,'all');
@@ -98,15 +98,15 @@ test('explicit update applies the draft and preserves prior results and choices 
 });
 
 
-test('regime filtering waits for its button and restores the applied scope independently from the draft',()=>{
+test('regime filtering waits for its button and restores the applied scope independently from the draft',async()=>{
  const rows=[{id:'a',area_m2:'40',ph_regime:'si',bathrooms:'1'},{id:'b',area_m2:'60',ph_regime:'no',bathrooms:'2'}];
  const state=marketAnalysisTable(rows,'si');state.analysisView='regime';
  assert.equal(state.analysisActiveRows().length,2);assert.equal(state.analysisRegimeApplied,false);
- state.analysisApplyRegime();assert.equal(state.analysisActiveRows().length,1);
+ await state.analysisApplyRegime();assert.equal(state.analysisActiveRows().length,1);
  state.analysisScope='all';assert.equal(state.analysisActiveRows().length,1);
  const restored=marketAnalysisTable([{...rows[0],analysis_factor_selection:state.analysisSelection()},rows[1]],'si');
  assert.equal(restored.analysisScope,'all');assert.equal(restored.analysisAppliedScope,'subject');assert.equal(restored.analysisActiveRows().length,1);
- restored.analysisApplyRegime();assert.equal(restored.analysisActiveRows().length,2);
+ await restored.analysisApplyRegime();assert.equal(restored.analysisActiveRows().length,2);
  restored.analysisView='clean';restored.analysisSelected=[];restored.analysisUpdate();assert.equal(restored.analysisComplete(),2);
  restored.analysisRows[0].area_m2='';assert.equal(restored.analysisComplete(),1);
 });
@@ -120,6 +120,25 @@ test('ten complete samples per factor includes mandatory area and changes with j
  assert.deepEqual(state.analysisSampleRule(),{factors:3,complete:29,required:30,maximum:2,meets:false});
  state.analysisRows[29].area_m2='69';assert.equal(state.analysisSampleRule().meets,true);assert.equal(state.analysisSampleRule().complete,30);
  state.analysisView='clean';state.analysisSelected=['bathrooms'];state.analysisUpdate();
- assert.equal(state.analysisSampleRule().factors,2);assert.equal(state.analysisSampleRule().required,20);assert.equal(state.analysisSampleRule().meets,true);
+ assert.equal(state.analysisSampleRule().factors,2);assert.equal(state.analysisSampleRule().required,30);assert.equal(state.analysisSampleRule().meets,false);
  const incomplete=marketAnalysisTable(rows.map((r,i)=>({...r,bathrooms:i<19?r.bathrooms:''})));incomplete.analysisApplySuggestion();incomplete.analysisSelected=['bathrooms'];incomplete.analysisUpdate();assert.equal(incomplete.analysisSampleRule().complete,19);assert.equal(incomplete.analysisSampleRule().meets,false);
+});
+
+
+test('filter progress, exclusion reasons and explicit restoration survive reloading without changing original regimes',async()=>{
+ const rows=[{id:'a'.repeat(32),ph_regime:'si',area_m2:'40'}, {id:'b'.repeat(32),ph_regime:'no',area_m2:'60'}, {id:'c'.repeat(32),area_m2:'70'}];
+ const state=marketAnalysisTable(rows,'si');state.analysisView='regime';const work=state.analysisApplyRegime();assert.equal(state.analysisBusy,true);await work;
+ assert.equal(state.analysisBusy,false);assert.equal(state.analysisFilterDone,true);assert.equal(state.analysisProcessed,3);
+ assert.deepEqual(state.analysisReview.map(r=>r.reason),['other','unknown']);assert.equal(state.analysisActiveRows().length,1);
+ await state.analysisReinclude(rows[1].id,true);assert.equal(state.analysisActiveRows().length,2);assert.equal(state.analysisRows[1].ph_regime,'no');
+ const restored=marketAnalysisTable([{...rows[0],analysis_factor_selection:state.analysisSelection()},...rows.slice(1)],'si');
+ assert.equal(restored.analysisActiveRows().length,2);assert.equal(restored.analysisReview.length,2);assert.ok(restored.analysisReview[0].restored_at);
+ const originalAt=restored.analysisReview[0].at;await restored.analysisApplyRegime();assert.equal(restored.analysisActiveRows().length,2);assert.equal(restored.analysisReview[0].at,originalAt);
+ await restored.analysisReinclude(rows[1].id,false);assert.equal(restored.analysisActiveRows().length,1);assert.equal(restored.analysisReview.length,2);
+ restored.analysisView='raw';assert.equal(restored.analysisActiveRows().length,3);assert.equal(restored.analysisRows[1].area_m2,'60');
+});
+
+test('a wide scope or no regime matches never creates exclusions',async()=>{
+ const state=marketAnalysisTable([{id:'a',ph_regime:'no'}],'si');state.analysisView='regime';await state.analysisApplyRegime();assert.equal(state.analysisReview.length,0);assert.equal(state.analysisActiveRows().length,1);
+ const all=marketAnalysisTable([{id:'b',ph_regime:'si'},{id:'c',ph_regime:'no'}],'si');all.analysisScope='all';all.analysisView='regime';await all.analysisApplyRegime();assert.equal(all.analysisReview.length,0);assert.equal(all.analysisActiveRows().length,2);
 });

@@ -1,21 +1,22 @@
 <p class="mb-3 text-sm">Una fila por inmueble. Factores ordenados por cantidad de muestras con dato, sin límite de seis. Valor con descuento = oferta × (1 − descuento / 100); valor por m² = valor con descuento / área publicada.</p>
 <nav class="mb-3 flex flex-wrap gap-2" aria-label="Pasos del análisis">
-    <button type="button" class="btn-secondary" :aria-current="analysisView==='raw'?'step':null" :class="analysisView==='raw'?'ring-2 ring-teal-700':''" @click="analysisView='raw'; $dispatch('input')">1. Información recogida</button>
-    <button type="button" class="btn-secondary" :aria-current="analysisView==='regime'?'step':null" :class="analysisView==='regime'?'ring-2 ring-teal-700':''" @click="analysisView='regime'; $dispatch('input')">2. Depurar muestras</button>
-    <button type="button" class="btn-secondary" :aria-current="analysisView==='clean'?'step':null" :class="analysisView==='clean'?'ring-2 ring-teal-700':''" :disabled="!analysisRegimeApplied || analysisScope!==analysisAppliedScope" @click="analysisView='clean'; $dispatch('input')">3. Factores del analista</button>
-    <button type="button" class="btn-secondary" :disabled="!analysisRegimeApplied || analysisScope!==analysisAppliedScope" :aria-current="analysisView==='result'?'step':null" :class="analysisView==='result'?'ring-2 ring-teal-700':''" @click="analysisUpdate(); $dispatch('input')">4. Resultado depurado</button>
+    <button type="button" class="btn-secondary" :disabled="analysisBusy" :aria-current="analysisView==='raw'?'step':null" :class="analysisView==='raw'?'ring-2 ring-teal-700':''" @click="analysisView='raw'; $dispatch('input')">1. Información recogida</button>
+    <button type="button" class="btn-secondary" :disabled="analysisBusy" :aria-current="analysisView==='regime'?'step':null" :class="analysisView==='regime'?'ring-2 ring-teal-700':''" @click="analysisView='regime'; $dispatch('input')">2. Depurar muestras</button>
+    <button type="button" class="btn-secondary" :aria-current="analysisView==='clean'?'step':null" :class="analysisView==='clean'?'ring-2 ring-teal-700':''" :disabled="analysisBusy || !analysisRegimeApplied || analysisScope!==analysisAppliedScope" @click="analysisView='clean'; $dispatch('input')">3. Factores del analista</button>
+    <button type="button" class="btn-secondary" :disabled="analysisBusy || !analysisRegimeApplied || analysisScope!==analysisAppliedScope" :aria-current="analysisView==='result'?'step':null" :class="analysisView==='result'?'ring-2 ring-teal-700':''" @click="analysisUpdate(); $dispatch('input')">4. Resultado depurado</button>
 </nav>
 <p class="mb-3 text-sm" x-show="analysisView==='raw'">Toda la información recogida. Continúa en 2. Depurar muestras y aplica el filtro antes de elegir factores.</p>
 <div x-show="analysisView==='regime'" x-cloak>
 <?php require __DIR__.'/methodology-analysis-regime-filter.php'; ?>
-<button type="button" class="btn-primary mb-3" @click="analysisApplyRegime(); $dispatch('input')">Aplicar depuración de muestras</button>
-<p class="mb-3" role="status" x-show="analysisRegimeApplied" x-text="analysisRows.length+' muestras recogidas → '+analysisActiveRows().length+' para trabajar · '+(analysisRows.length-analysisActiveRows().length)+' fuera del grupo, conservadas'"></p>
-<button type="button" class="btn-secondary mb-3" :disabled="!analysisRegimeApplied || analysisScope!==analysisAppliedScope" @click="analysisView='clean'; $dispatch('input')">Depuración de factores por parte del analista</button>
+<button type="button" class="btn-primary mb-3" :disabled="analysisBusy" @click="await analysisApplyRegime(); $dispatch('input')" x-text="analysisBusy ? 'Depurando…' : 'Aplicar depuración de muestras'">Aplicar depuración de muestras</button>
+<?php require __DIR__.'/methodology-analysis-retired.php'; ?>
+<p class="mb-3" role="status" x-show="analysisRegimeApplied && !analysisBusy" x-text="analysisRows.length+' muestras recogidas → '+analysisActiveRows().length+' para trabajar · '+(analysisRows.length-analysisActiveRows().length)+' fuera del grupo, conservadas'"></p>
+<button type="button" class="btn-secondary mb-3" :disabled="analysisBusy || !analysisRegimeApplied || analysisScope!==analysisAppliedScope" @click="analysisView='clean'; $dispatch('input')">Depuración de factores por parte del analista</button>
 </div>
 <div x-show="analysisView==='clean'" x-cloak>
 <p class="mb-3 text-sm">Regla de depuración: al menos 50 % con dato, compatible con el tipo y con variación. En oficinas, Habitaciones y Estrato no participan. No se borran datos. Para regresión faltará validar codificación, valor por m², correlación y colinealidad.</p>
 <p class="mb-3 text-sm" aria-live="polite" x-text="(analysisColumns().length+1)+' factores marcados: área en m² fija + '+analysisColumns().length+' elegidos. Después de cambiar la selección, pulsa Actualizar depuración y ver resultado.'"></p>
-<p class="mb-3 text-sm" aria-live="polite" x-text="'Mínimo 10 muestras completas por factor: '+analysisSampleRule().factors+' factores requieren '+analysisSampleRule().required+' muestras; esta selección tiene '+analysisSampleRule().complete+' filas completas.'"></p>
+<p class="mb-3 text-sm" aria-live="polite" x-text="'Mínimo 3 factores y 30 muestras completas; 10 por factor: '+analysisSampleRule().factors+' factores requieren '+analysisSampleRule().required+' muestras; esta selección tiene '+analysisSampleRule().complete+' filas completas.'"></p>
 <button type="button" class="btn-primary mb-3" @click="analysisUpdate(); $dispatch('input')">Actualizar depuración y ver resultado</button>
 <div class="mb-3 rounded-xl border p-3"><h3 class="font-semibold">Validaciones y selección de factores</h3>
     <label class="flex min-h-11 items-center gap-2"><input type="checkbox" checked disabled><span>Área publicada · m² — obligatoria, no se puede desmarcar</span></label>
@@ -26,8 +27,8 @@
 </div>
 <div x-show="analysisView==='result'" x-cloak>
     <p class="mb-3 rounded-xl border p-3" role="status" x-text="'Depuración actualizada: '+analysisActiveRows().length+' muestras · '+(analysisColumns().length+1)+' factores aplicados (incluye área en m²) · '+analysisComplete()+' filas con datos en todos los factores aplicados'"></p>
-    <p class="mb-3 text-sm" role="status" :class="analysisSampleRule().meets ? 'text-teal-800' : 'text-amber-900'" x-text="(analysisSampleRule().meets ? 'Cumple' : 'No cumple')+' el mínimo de 10 muestras completas por factor: '+analysisSampleRule().complete+' disponibles / '+analysisSampleRule().required+' necesarias. Con estas filas completas se admiten hasta '+analysisSampleRule().maximum+' factores, incluida el área.'"></p>
-    <p class="mb-3 text-sm" x-show="!analysisSampleRule().meets">Reduce factores o completa datos y vuelve a actualizar. Cumplir este mínimo no sustituye la validación de codificación, valor por m², correlación y colinealidad.</p>
+    <p class="mb-3 text-sm" role="status" :class="analysisSampleRule().meets ? 'text-teal-800' : 'text-amber-900'" x-text="(analysisSampleRule().meets ? 'Cumple' : 'No cumple')+' el mínimo de 3 factores y 30 muestras completas, con 10 por factor: '+analysisSampleRule().complete+' disponibles / '+analysisSampleRule().required+' necesarias. Con estas filas completas se admiten hasta '+analysisSampleRule().maximum+' factores, incluida el área.'"></p>
+    <p class="mb-3 text-sm" x-show="!analysisSampleRule().meets">Elige al menos tres factores, incluido el área, y completa o reincorpora muestras comparables. Luego actualiza. Cumplir este mínimo no sustituye la validación de codificación, valor por m², correlación y colinealidad.</p>
     <p class="mb-3 text-sm" x-show="!analysisColumns().length">No hay factores adicionales aplicados. El área en m² sigue fija. Vuelve a 3. Factores del analista para agregar otros factores.</p>
 </div>
 <div x-show="['raw','result'].includes(analysisView)" class="max-h-[65vh] overflow-auto rounded-xl border" role="region" aria-label="Tabla de análisis de inmuebles" tabindex="0">
