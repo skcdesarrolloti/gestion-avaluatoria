@@ -5,6 +5,7 @@
     <button type="button" class="btn-secondary" :aria-current="analysisView==='clean'?'step':null" :class="analysisView==='clean'?'ring-2 ring-teal-700':''" :disabled="analysisBusy || !analysisRegimeApplied || analysisScope!==analysisAppliedScope" @click="analysisView='clean'; $dispatch('input')">3. Depuración de factores por parte del analista</button>
     <button type="button" class="btn-secondary" :disabled="analysisBusy || !analysisRegimeApplied || analysisScope!==analysisAppliedScope" :aria-current="analysisView==='result'?'step':null" :class="analysisView==='result'?'ring-2 ring-teal-700':''" @click="analysisShowResult(); $dispatch('input')">4. Resultado depurado</button>
 </nav>
+<p class="mb-3 text-red-700" role="alert" x-show="analysisError && ['clean','result'].includes(analysisView)" x-text="analysisError"></p>
 <p class="mb-3 text-sm" x-show="analysisView==='raw'">Toda la información recogida. Continúa en 2. Depurar muestras y aplica el filtro antes de elegir factores.</p>
 <div x-show="analysisView==='regime'" x-cloak>
 <?php require __DIR__.'/methodology-analysis-regime-filter.php'; ?>
@@ -13,8 +14,9 @@
 <?php require __DIR__.'/methodology-analysis-retired.php'; ?>
 </div>
 <div x-show="analysisView==='clean'" x-cloak>
+<p class="mb-3 text-sm text-amber-900" role="status" x-show="analysisFactorsPending()">Selección modificada: pendiente de actualizar. El resultado anterior se conserva en el historial.</p>
 <p class="mb-3 text-sm">Regla de depuración: al menos 50 % con dato, compatible con el tipo y con variación. En oficinas, Habitaciones y Estrato no participan. No se borran datos. Para regresión faltará validar codificación, valor por m², correlación y colinealidad.</p>
-<p class="mb-3 text-sm" aria-live="polite" x-text="(analysisColumns().length+1)+' factores marcados: área en m² fija + '+analysisColumns().length+' elegidos. Después de cambiar la selección, pulsa Actualizar depuración y ver resultado.'"></p>
+<p class="mb-3 text-sm" aria-live="polite" x-text="(analysisColumns().length+1)+' factores marcados: área en m² fija + '+analysisColumns().length+' elegidos. Para aplicar esta selección, pulsa Actualizar depuración y ver resultado o abre 4. Resultado depurado.'"></p>
 <p class="mb-3 text-sm" aria-live="polite" x-text="'Mínimo 3 factores y 30 muestras completas; 10 por factor: '+analysisSampleRule().factors+' factores requieren '+analysisSampleRule().required+' muestras; esta selección tiene '+analysisSampleRule().complete+' filas completas.'"></p>
 <button type="button" class="btn-primary mb-3" @click="analysisUpdate(); $dispatch('input')">Actualizar depuración y ver resultado</button>
 <div class="mb-3 rounded-xl border p-3"><h3 class="font-semibold">Validaciones y selección de factores</h3>

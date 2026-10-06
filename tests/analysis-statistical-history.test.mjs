@@ -14,7 +14,7 @@ test('34,35,36 remain independent snapshots after reinclusions, discounts and re
  const before=JSON.stringify(state.analysisStatistics[1]);
  await state.analysisReinclude(rows[34].id,true);await state.analysisReinclude(rows[35].id,true);
  assert.deepEqual(state.analysisStatistics.map(v=>v.count),[36,34,35,36]);assert.equal(JSON.stringify(state.analysisStatistics[1]),before);
- state.analysisChange(rows[0].id,'10');state.analysisSelected=['bathrooms','published:piso'];state.analysisUpdate();
+ state.analysisChange(rows[0].id,'10');state.analysisSelected=['bathrooms','floor_level'];state.analysisUpdate();
  assert.equal(state.analysisStatistics.at(-1).action,'factors');assert.equal(state.analysisStatistics.at(-1).adjusted.n,1);
  assert.equal(state.analysisStatistics[1].adjusted.n,0);assert.equal(state.analysisStatistics.at(-1).complete,36);
  const reload=marketAnalysisTable([{...rows[0],analysis_factor_selection:state.analysisSelection()},...rows.slice(1)],'si');
@@ -31,4 +31,19 @@ test('history capacity never overwrites previous stages or applies a blocked cha
  const state=marketAnalysisTable([{id:'a'.repeat(32),ph_regime:'si'}],'si');state.analysisView='regime';
  state.analysisStatistics=Array.from({length:80},()=>({count:1,action:'filter'}));const before=JSON.stringify(state.analysisStatistics);
  await state.analysisApplyRegime();assert.equal(state.analysisRegimeApplied,false);assert.equal(JSON.stringify(state.analysisStatistics),before);assert.ok(state.analysisError);
+});
+
+test('opening result applies changed draft factors and preserves the previous six-factor stage',async()=>{
+ const rows=Array.from({length:71},(_,i)=>({id:i.toString(16).padStart(32,'0'),ph_regime:i<34?'si':'no',price_amount:String(100000000+i*1000000),area_m2:String(40+i),bathrooms:String(i%3+1),parking_spaces:String(i%2),published_attributes:JSON.stringify({Piso:String(i%5),Ascensor:i%2?'Sí':'No',Vigilancia:i%2?'No':'Sí'})}));
+ const state=marketAnalysisTable(rows,'si');state.analysisView='regime';await state.analysisApplyRegime();state.analysisView='clean';
+ state.analysisSelected=['bathrooms','parking_spaces','floor_level','published:ascensor','published:vigilancia'];state.analysisUpdate();
+ const old=JSON.stringify(state.analysisStatistics.at(-1));assert.equal(state.analysisStatistics.at(-1).factors.length+1,6);
+ state.analysisView='clean';state.analysisSelected=['bathrooms','parking_spaces','floor_level'];assert.equal(state.analysisFactorsPending(),true);
+ state.analysisShowResult();assert.equal(state.analysisView,'result');assert.equal(state.analysisColumns().length+1,4);assert.equal(state.analysisActiveRows().length,34);
+ assert.equal(state.analysisStatistics.at(-1).factors.length+1,4);assert.equal(JSON.stringify(state.analysisStatistics.at(-2)),old);assert.equal(state.analysisFactorsPending(),false);
+ const count=state.analysisStatistics.length;state.analysisView='clean';state.analysisShowResult();assert.equal(state.analysisStatistics.length,count);
+});
+test('opening results before factor selection keeps factors pending',async()=>{
+ const state=marketAnalysisTable([{id:'a'.repeat(32),ph_regime:'si',price_amount:'100',area_m2:'10'}],'si');state.analysisView='regime';await state.analysisApplyRegime();state.analysisShowResult();
+ assert.equal(state.analysisStatistics.some(v=>v.action==='factors'),false);
 });
