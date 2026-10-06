@@ -29,3 +29,22 @@ test('combinations use joint coverage, valid offers and count area only once',()
     state.analysisRows.slice(25).forEach(r=>r.price_amount='');state.analysisManualVersion++;
     assert.equal(state.analysisCombinations()[0].count,25);assert.equal(state.analysisCombinations()[0].meets,false);
 });
+
+test('choosing a combination opens incomplete properties directly and keeps the field while entering support',()=>{
+    const state=marketAnalysisTable(samples(),'','oficina');state.analysisApplySuggestion();
+    state.analysisSelected=['published:area privada','published:antiguedad','published:estado'];state.analysisUpdate();
+    const option={keys:[...state.analysisApplied]};state.analysisChooseCombination(option);
+    assert.equal(state.analysisView,'result');assert.equal(state.analysisOnlyMissing,true);assert.equal(state.analysisDisplayRows().length,14);
+    const property=state.analysisDisplayRows()[0],factor=state.analysisColumns().find(f=>f.key==='published:estado');
+    state.analysisEdit(property,factor,'value','Usado');state.analysisEdit(property,factor,'source','F');
+    assert.ok(state.analysisDisplayRows().some(r=>r.key===property.key));
+    state.analysisEdit(property,factor,'source','Ficha revisada, fecha y responsable');state.analysisRecordManual();
+    assert.equal(state.analysisDisplayRows().length,13);assert.equal(state.analysisStatistics.at(-1).complete,21);
+    state.analysisChooseCombination(state.analysisCombinations()[0]);assert.equal(state.analysisOnlyMissing,false);assert.equal(state.analysisDisplayRows().length,34);
+});
+
+test('published-area suggestions contain exactly two non-area factors',()=>{
+    const state=marketAnalysisTable(samples(),'','oficina');state.analysisView='result';state.analysisApplied=[];
+    const options=state.analysisCombinations();assert.ok(options.length);
+    for(const option of options){assert.equal(option.keys.length,2);assert.ok(!option.keys.includes('published:area privada'));}
+});

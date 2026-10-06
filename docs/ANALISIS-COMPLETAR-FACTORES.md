@@ -22,11 +22,18 @@ ordenadas por filas conjuntamente completas con oferta positiva y áreas válida
 Cada candidato cumple compatibilidad, cobertura mínima 50 % y variación.
 Área privada sustituye el predictor área publicada y no se cuenta dos veces.
 La base monetaria oferta/área publicada permanece igual. Para 3 factores se
-requieren 30 filas completas. El analista revisa cada sugerencia en el paso 3;
-no se aplica automáticamente ni se ejecuta una regresión. Cumplir cantidad no
+requieren 30 filas completas. El botón Completar inmuebles de esta combinación aplica esa elección explícita,
+registra la etapa y lleva a las filas pendientes, enfocando el primer campo visible.
+Ver anuncio permite consultar la ficha; el dato y soporte se completan ahí mismo.
+La fila en edición permanece visible hasta actualizar, para poder terminar el soporte.
+Si no hay pendientes se muestran los inmuebles de la combinación. No ejecuta regresión. Cumplir cantidad no
 acredita codificación, correlación, colinealidad, comparabilidad o descuentos.
 
 Verificación: 1545 PHP, 208 JS, 221 BD local desechable en puerto 3397;
 lint, build y 78,3 KB gzip inicial. Navegador local con datos ficticios: celda
 amarilla editable, dato sin soporte pendiente, cero explícito con soporte azul,
 conteo 2→3, autoguardado confirmado y pantalla estrecha sin desborde ni errores.
+
+Acceso directo validado (2026-10-06): 1545 PHP, 210 JS, lint, build y
+78,3 KB inicial; navegador local confirma filtro, foco, edición de soporte sin
+perder la fila y ancho estrecho. Persistencia permanece igual.
