@@ -1,8 +1,8 @@
 <section x-show="analysisModule==='regression'" x-cloak class="space-y-4">
     <h3 class="text-xl font-semibold">Modelo de regresión lineal múltiple</h3>
     <nav class="flex flex-wrap gap-2" aria-label="Pasos de la regresión">
-        <button type="button" class="btn-secondary" @click="regressionTab='academy'">1. Academia y fórmulas</button>
-        <button type="button" class="btn-secondary" @click="regressionTab='application'">2. Preparar y calcular</button>
+        <button type="button" class="btn-secondary" :aria-current="regressionTab==='academy'?'step':null" :class="regressionTab==='academy'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="regressionTab='academy'">1. Academia y fórmulas</button>
+        <button type="button" class="btn-secondary" :aria-current="regressionTab==='application'?'step':null" :class="regressionTab==='application'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="regressionTab='application'">2. Preparar y calcular</button>
     </nav>
     <div x-show="regressionTab==='academy'" class="rounded-xl border p-4 space-y-3">
         <p>El modelo relaciona el valor por m² con los factores elegidos. Cada coeficiente mide el cambio asociado a un factor manteniendo los otros constantes; la asociación no demuestra causalidad.</p>

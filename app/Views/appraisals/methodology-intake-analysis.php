@@ -30,11 +30,14 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
         <?php foreach ($analysisRows as $row): ?><input type="hidden" name="comparables[<?= (int)$row['capture_index'] ?>][negotiation_discount]" value="<?= e((string)($row['negotiation_discount'] ?? '')) ?>" :value="analysisDiscounts['<?= e($row['id']) ?>']"><?php endforeach; ?>
         <?php foreach ($analysisRows as $position=>$row): foreach (['ph_regime','ph_regime_source','analysis_manual_factors'] as $field): ?><input type="hidden" name="comparables[<?= (int)$row['capture_index'] ?>][<?= $field ?>]" :value="analysisRows[<?= $position ?>].<?= $field ?>"><?php endforeach; endforeach; ?>
         <input type="hidden" name="comparables[<?= (int)$analysisIndexes[0] ?>][analysis_factor_selection]" :value="analysisSelection()">
-        <nav class="mb-4 flex flex-wrap gap-2" aria-label="Submenú del análisis">
-            <button type="button" class="btn-secondary" @click="analysisModule='samples'">1. Muestras y depuración</button>
-            <button type="button" class="btn-secondary" @click="analysisModule='location'; analysisSubjectLocation=<?= e($analysisSubjectLocation) ?>">2. Coordenadas y mapa comparativo</button>
-            <button type="button" class="btn-secondary" @click="analysisModule='regression'">3. Modelo de regresión</button>
-        </nav>
+        <div class="sticky top-0 z-20 mb-4 rounded-xl border border-teal-700 bg-white p-3 shadow-sm">
+            <p class="mb-3 font-semibold text-teal-900" role="status" aria-live="polite">Estás en: M4 Análisis<?= !empty($componentLabel) ? ' · '.e($componentLabel) : '' ?> → <span x-text="analysisModule==='location' ? 'Coordenadas y mapa comparativo' : analysisModule==='regression' ? 'Modelo de regresión → '+(regressionTab==='academy'?'Academia y fórmulas':'Preparar y calcular') : 'Muestras y depuración → '+({raw:'Información recogida',regime:'Depurar muestras',clean:'Factores del analista',result:'Resultado depurado'}[analysisView] || 'Información recogida')"></span></p>
+            <nav class="flex flex-wrap gap-2" aria-label="Submenú del análisis">
+                <button type="button" class="btn-secondary" :aria-current="analysisModule==='samples'?'page':null" :class="analysisModule==='samples'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='samples'">1. Muestras y depuración</button>
+                <button type="button" class="btn-secondary" :aria-current="analysisModule==='location'?'page':null" :class="analysisModule==='location'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='location'; analysisSubjectLocation=<?= e($analysisSubjectLocation) ?>">2. Coordenadas y mapa comparativo</button>
+                <button type="button" class="btn-secondary" :aria-current="analysisModule==='regression'?'page':null" :class="analysisModule==='regression'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='regression'">3. Modelo de regresión</button>
+            </nav>
+        </div>
         <div x-show="analysisModule==='samples'">
         <?php require __DIR__.'/methodology-analysis-data-table.php'; ?>
         <details class="mt-4"><summary class="min-h-11 cursor-pointer font-semibold">Ubicación y anuncios originales</summary>

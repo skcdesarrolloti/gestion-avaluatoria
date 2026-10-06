@@ -907,3 +907,9 @@ principal, sujeto en origen, mapaSVG geográfico sin calles e informe de distanc
 OSM aparte; no inserción automática enPDF ni valor adoptado.1551PHP/215JS/223BD3399,
 lint/build78,3KB y QA local. Sin hosting ni cambios de datos reales.
 Ver ANALISIS-MAPA-REGRESION.md. Sigue validación diagnóstica y aplicación al sujeto.
+
+Ubicación visible en M4 (2026-10-06): barra fija dentro del análisis con ruta
+«Estás en: M4 Análisis · unidad → menú → paso», menú activo sombreado/borde verde
+y aria-current. Academia/aplicación también resaltan su paso. No cambia datos,
+conteos, selección ni cálculo.1551PHP/215JS/lint/build78,3KB, navegador local
+escritorio/estrecho sin errores. Pendiente actualización del hosting.
