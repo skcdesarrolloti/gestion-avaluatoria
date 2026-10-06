@@ -10,11 +10,11 @@ const normalize = value => String(value ?? '').normalize('NFD').replace(/[\u0300
 export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false, emptyMessage = '', readText = false }) {
     let panel, form, leaveWarning;
     return {
-        previewFacts, sourceRevision: 0, captureReady: false, sourceRestartPending: false, results: [], pages: [], portalTotal: 0, selected: [], message: '', pastedText: '', busy: false,
+        previewFacts, sourceRevision: 0, sourceRestartPending: false, results: [], pages: [], portalTotal: 0, selected: [], message: '', pastedText: '', busy: false,
         get sourceSavedCount() { void this.sourceRevision; return form ? matrixRows(form).filter(row=>normalize(row.source_name)===normalize(label)).length : 0; },
         restartPreview() {
             this.results=[]; this.pages=[]; this.portalTotal=0; this.selected=[]; this.pastedText='';
-            this.sourceRestartPending=false; this.captureReady=true;
+            this.sourceRestartPending=false;
             this.message='Nueva captura de esta fuente. Copia la primera página y después añade las siguientes.';
         },
         sourceRestarted(event) { if (!event.detail.source || normalize(event.detail.source)===normalize(label)) this.restartPreview(); },

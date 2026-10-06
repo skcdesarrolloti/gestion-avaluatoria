@@ -1,8 +1,7 @@
-<div class="my-3 rounded-lg border bg-white p-3">
+<div class="my-2">
     <p class="text-sm"><strong x-text="sourceSavedCount"></strong> anuncios incorporados de <?= e($pasteLabel) ?> en esta unidad.</p>
     <div class="mt-2 flex flex-wrap gap-2">
-        <button type="button" class="btn-primary min-h-11" :disabled="busy || removalBusy" @click="captureReady=true; sourceRestartPending=false">Continuar recogiendo</button>
-        <button type="button" class="btn-secondary min-h-11" :disabled="busy || removalBusy || researchBusy" @click="sourceRestartPending=true; requestSourceRemoval(<?= e(json_encode($pasteLabel)) ?>)">Empezar de cero en <?= e($pasteLabel) ?></button>
+        <button type="button" class="min-h-11 text-sm text-teal-800 underline" :disabled="busy || removalBusy || researchBusy" @click="sourceRestartPending=true; requestSourceRemoval(<?= e(json_encode($pasteLabel)) ?>)">Empezar de cero en <?= e($pasteLabel) ?></button>
     </div>
     <div x-show="sourceRestartPending" x-cloak class="mt-3 rounded-lg border border-amber-600 bg-amber-50 p-3">
         <p class="text-sm">Se retirarán los anuncios de <strong><?= e($pasteLabel) ?></strong> de esta unidad y se vaciarán sus páginas pegadas. Las muestras de otras fuentes se conservan. Descarga el respaldo antes de confirmar.</p>

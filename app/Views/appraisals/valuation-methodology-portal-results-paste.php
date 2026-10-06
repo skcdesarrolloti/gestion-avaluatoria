@@ -3,9 +3,7 @@
     data-city="<?= e($sourceSearch['city'] ?? $guide['source_search']['city'] ?? $record['municipio'] ?? '') ?>" data-query="<?= e($baseQuery) ?>" @input.stop @change.stop @comparable-matrix-changed.window="refresh()" @comparable-source-restarted.window="sourceRestarted($event)">
     <h4 class="font-semibold">Copiar y pegar desde <?= e($pasteLabel) ?></h4>
     <?php require __DIR__ . '/methodology-source-start.php'; ?>
-    <div x-show="captureReady" x-cloak>
-    <p class="mt-2 text-sm">En la fuente: <strong>Ctrl+A → Ctrl+C</strong>. Vuelve a esta ventana y pega con <strong>Ctrl+V</strong>. Revisa los avisos antes de incorporarlos.</p>
-    <p class="mt-2 text-sm"><strong>1.</strong> Copia y pega la primera página. <strong>2.</strong> Si el portal tiene más páginas, pulsa «Pegar otra página» y añádelas. <strong>3.</strong> Revisa los repetidos y sube solo los nuevos.</p>
+    <p class="mt-2 text-sm">En el portal: <strong>Ctrl+A → Ctrl+C</strong>. Pega aquí con <strong>Ctrl+V</strong>. Añade las demás páginas y después sube los no repetidos.</p>
     <p role="status" x-ref="pasteFeedback" x-show="message" x-cloak class="mt-3 rounded-lg border bg-white p-3 text-sm font-semibold" x-text="message"></p>
     <label for="source-results-<?= (int) $sourceIndex ?>" class="mt-3 block text-sm font-semibold">Pega la página de resultados</label>
     <textarea id="source-results-<?= (int) $sourceIndex ?>" x-ref="pasteInput" class="input mt-1 min-h-24 w-full bg-white" :value="pastedText"
@@ -46,6 +44,5 @@
             <button type="button" class="btn-primary min-h-11" :disabled="busy || !suggestedCount" @click="addSuggested()" x-text="busy ? 'Guardando…' : 'Subir sin repetidos de este portal (' + suggestedCount + ')'">Subir sin repetidos de este portal</button>
             <span class="text-sm" x-text="registeredCount + ' ya registrados · ' + reviewCount + ' por revisar'"></span>
         </div>
-    </div>
     </div>
 </section>
