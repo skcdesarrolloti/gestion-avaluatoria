@@ -20,4 +20,18 @@
     expect($detail['ph_regime_source']==='Reglamento consultado por analista','soporte PH se conserva separado de la fuente de áreas');
     expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"threshold":101}']),'umbral fuera de rango rechaza selección sin guardar');
     expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[{}],"threshold":50}']),'factor con estructura inválida no llega a persistencia');
+    $scope=\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"threshold":50,"scope":"subject"}']);
+    expect(json_decode($scope['analysis_factor_selection'],true)['scope']==='subject','filtro del régimen se conserva con selección');
+    expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"threshold":50,"scope":"delete"}']),'filtro inválido se rechaza');
+    $hint=static fn(array $row)=>\App\Services\ComparableRegimeSuggestion::hint($row);
+    expect($hint(['published_attributes'=>'{"Área Privada":"60 m2"}'])['regime']==='si','área privada publicada sugiere PH');
+    expect($hint(['published_text'=>'Área privada: 43,5 m²'])['regime']==='si','texto de área privada genera indicio');
+    expect($hint(['published_text'=>'Área privada: 0 m²'])['regime']==='','área cero no sugiere régimen');
+    expect($hint(['published_attributes'=>'{"Área Privada":"No publicado","Ascensor":"Sí"}'])['regime']==='','ascensor y área ausente no confirman PH');
+    expect($hint(['published_attributes'=>'{"Ascensor":"No"}'])['regime']==='','sin ascensor no implica No PH');
+    expect($hint(['published_text'=>'No está sometido a propiedad horizontal'])['regime']==='no','negación no se lee como PH afirmativo');
+    expect($hint(['published_text'=>'Sometido al régimen de propiedad horizontal'])['regime']==='si','régimen PH anunciado genera indicio');
+    expect($hint(['published_attributes'=>'{"Propiedad horizontal":"No","Área Privada":"40 m2"}'])['regime']==='','indicios contradictorios no clasifican');
+    expect(str_contains($html,'Muestras para trabajar'),'filtro visible explica depuración reversible');
+    expect(str_contains($html,'name="comparables[2][ph_regime]"'),'campos de filas ocultas permanecen en formulario');
 })();

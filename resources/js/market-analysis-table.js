@@ -15,21 +15,26 @@ export function discountedAnalysis(row,percent) {
     const discount=(price*pct/100).toFixed(4), value=price-Number(discount);
     return {discount,value,perM2:area>0 && row.price_unit!=='valor_m2' ? value/area : null};
 }
-export function marketAnalysisTable(rows) {
+export function marketAnalysisTable(rows,subjectRegime='') {
     rows=rows.map(r=>({...r,ph_regime:r.ph_regime || 'por_verificar',ph_regime_source:r.ph_regime_source || ''}));
     const table=portalTable(rows), factors=analysisCoverage(rows);
     let saved={};try {saved=JSON.parse(rows.find(r=>r.analysis_factor_selection)?.analysis_factor_selection || '{}');} catch {}
     return {
-        analysisRows:rows, analysisTable:table, analysisFactors:factors, analysisThreshold:saved.threshold ?? 50,
+        analysisRows:rows, analysisTable:table, analysisSubjectRegime:subjectRegime, analysisScope:saved.scope ?? 'subject', analysisThreshold:saved.threshold ?? 50,
+        get analysisFactors(){return analysisCoverage(this.analysisActiveRows());},
         analysisSelected:(saved.selected ?? factors.map(f=>f.key)).filter(key=>factors.some(f=>f.key===key && f.compatible)),
         analysisDiscounts:Object.fromEntries(rows.map(r=>[r.id,String(r.negotiation_discount??'')])),
         analysisPercents:Object.fromEntries(rows.map(r=>{const offer=amount(r.price_amount), discount=amount(r.negotiation_discount);
             return [r.id,offer>0 && discount!==null ? Number((discount/offer*100).toFixed(4)) : ''];})),
-        analysisColumns(){return this.analysisFactors.filter(f=>this.analysisSelected.includes(f.key));},
-        analysisSuggestion(factor){return factorSuggestion(factor,this.analysisRows.length,this.analysisThreshold);},
+        analysisColumns(){return this.analysisFactors.filter(f=>f.compatible && this.analysisSelected.includes(f.key));},
+        analysisEffectiveRegime(row){return ['si','no'].includes(row.ph_regime) ? row.ph_regime : (row.regime_hint?.regime || '');},
+        analysisMatches(){return this.analysisRows.filter(r=>this.analysisEffectiveRegime(r)===this.analysisSubjectRegime && this.analysisSubjectRegime);},
+        analysisActiveRows(){return this.analysisScope==='subject' && this.analysisMatches().length ? this.analysisMatches() : this.analysisRows;},
+        analysisVisibleRows(){const ids=new Set(this.analysisActiveRows().map(r=>r.id));return this.analysisTable.rows.map((r,i)=>({...r,analysisIndex:i})).filter(r=>ids.has(r.key));},
+        analysisSuggestion(factor){return factorSuggestion(factor,this.analysisActiveRows().length,this.analysisThreshold);},
         analysisApplySuggestion(){this.analysisSelected=this.analysisFactors.filter(f=>this.analysisSuggestion(f)==='Sugerido por cobertura y variación').map(f=>f.key);},
-        analysisSelection(){return JSON.stringify({selected:this.analysisSelected,threshold:Number(this.analysisThreshold)});},
-        analysisRegime(row){return !['si','no'].includes(row.ph_regime) ? 'Régimen sin verificar' : (row.ph_regime==='si'?'PH':'No PH')+(row.ph_regime_source.trim()?' · soporte registrado':' · falta soporte');},
+        analysisSelection(){return JSON.stringify({selected:this.analysisSelected,threshold:Number(this.analysisThreshold),scope:this.analysisScope});},
+        analysisRegime(row){return !['si','no'].includes(row.ph_regime) ? (row.regime_hint?.reason || 'Régimen sin verificar') : (row.ph_regime==='si'?'PH':'No PH')+(row.ph_regime_source.trim()?' · soporte registrado':' · falta soporte');},
         analysisChange(id,value){this.analysisPercents[id]=value;const pct=Number(value);if(value==='' || Number.isFinite(pct) && pct>=0 && pct<=100) this.analysisDiscounts[id]=discountedAnalysis(this.analysisRows.find(r=>r.id===id),value).discount;},
         analysisResult(id){const row=this.analysisRows.find(r=>r.id===id), offer=amount(row.price_amount), discount=amount(this.analysisDiscounts[id]), area=amount(row.area_m2);
             if(this.analysisPercents[id]!=='' && (Number(this.analysisPercents[id])<0 || Number(this.analysisPercents[id])>100)) return {value:null,perM2:null};

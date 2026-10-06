@@ -45,3 +45,23 @@ test('discount formula distinguishes explicit zero, missing discount, zero area 
  const ph=marketAnalysisTable([{id:'ph',...row,ph_regime:'si'}]);assert.match(ph.analysisAreaNote('ph'),/sin confirmar/);
  ph.analysisRows[0].private_built_m2='20';ph.analysisRows[0].areas_source='Documento';assert.equal(ph.analysisAreaNote('ph'),'');
 });
+
+test('subject regime prioritizes declared and probable matches without changing regimes or losing other rows',()=>{
+ const rows=[{id:'ph',property_type:'Oficina',ph_regime:'si',bathrooms:'1'},
+ {id:'probable',property_type:'Oficina',regime_hint:{regime:'si',reason:'PH probable'},bathrooms:'2'},
+ {id:'no',property_type:'Oficina',ph_regime:'no',regime_hint:{regime:'si'},bathrooms:'3',negotiation_discount:'120'},
+ {id:'unknown',property_type:'Oficina',published_attributes:'{"Ascensor":"Sí"}'}];
+ const state=marketAnalysisTable(rows,'si');
+ assert.deepEqual(state.analysisActiveRows().map(r=>r.id),['ph','probable']);
+ assert.equal(state.analysisColumns().find(f=>f.key==='bathrooms').count,2);
+ assert.equal(state.analysisVisibleRows()[1].analysisIndex,1);
+ assert.equal(state.analysisRows[1].ph_regime,'por_verificar');assert.equal(state.analysisRows.length,4);
+ assert.equal(state.analysisDiscounts.no,'120');assert.equal(state.analysisEffectiveRegime(state.analysisRows[2]),'no');
+ state.analysisScope='all';assert.equal(state.analysisVisibleRows().length,4);
+ assert.equal(state.analysisColumns().find(f=>f.key==='bathrooms').count,3);
+ assert.equal(JSON.parse(state.analysisSelection()).scope,'all');
+ assert.equal(marketAnalysisTable([{...rows[0],analysis_factor_selection:state.analysisSelection()},...rows.slice(1)],'si').analysisScope,'all');
+ assert.equal(marketAnalysisTable(rows,'no').analysisActiveRows()[0].id,'no');
+ assert.equal(marketAnalysisTable([rows[3]],'si').analysisActiveRows().length,1);
+ assert.equal(marketAnalysisTable(rows).analysisActiveRows().length,4);
+});
