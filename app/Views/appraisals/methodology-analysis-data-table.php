@@ -8,9 +8,9 @@
 <p class="mb-3 text-sm" x-show="analysisView==='raw'">Toda la información recogida. Continúa en 2. Depurar muestras y aplica el filtro antes de elegir factores.</p>
 <div x-show="analysisView==='regime'" x-cloak>
 <?php require __DIR__.'/methodology-analysis-regime-filter.php'; ?>
-<button type="button" class="btn-primary mb-3" :disabled="analysisBusy" @click="await analysisApplyRegime(); $dispatch('input')" x-text="analysisBusy ? 'Depurando…' : 'Aplicar depuración de muestras'">Aplicar depuración de muestras</button>
+<button type="button" class="btn-primary mb-3" :disabled="analysisBusy || (analysisRegimeApplied && analysisScope===analysisAppliedScope && !analysisError)" @click="await analysisApplyRegime(); $dispatch('input')" x-text="analysisBusy ? 'Depurando…' : analysisRegimeApplied && analysisScope===analysisAppliedScope && !analysisError ? 'Depuración finalizada · '+analysisActiveRows().length+' muestras para trabajar' : 'Aplicar depuración de muestras'">Aplicar depuración de muestras</button>
+<p class="mb-3" role="status" x-show="analysisRegimeApplied && analysisScope===analysisAppliedScope && !analysisBusy && !analysisError" x-text="analysisRows.length+' muestras recogidas → '+analysisActiveRows().length+' para trabajar · '+(analysisRows.length-analysisActiveRows().length)+' fuera del grupo, conservadas'"></p>
 <?php require __DIR__.'/methodology-analysis-retired.php'; ?>
-<p class="mb-3" role="status" x-show="analysisFilterDone && !analysisBusy" x-text="analysisRows.length+' muestras recogidas → '+analysisActiveRows().length+' para trabajar · '+(analysisRows.length-analysisActiveRows().length)+' fuera del grupo, conservadas'"></p>
 </div>
 <div x-show="analysisView==='clean'" x-cloak>
 <p class="mb-3 text-sm">Regla de depuración: al menos 50 % con dato, compatible con el tipo y con variación. En oficinas, Habitaciones y Estrato no participan. No se borran datos. Para regresión faltará validar codificación, valor por m², correlación y colinealidad.</p>
