@@ -7,6 +7,7 @@ $analysisRegime=in_array($analysisContext['regimen_ph'] ?? '',['si','no'],true) 
 foreach ($analysisRows as &$analysisRow) $analysisRow['regime_hint']=\App\Services\ComparableRegimeSuggestion::hint($analysisRow);
 unset($analysisRow);
 $analysisIndexes = array_column($analysisRows,'capture_index');
+$analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_flip(['latitude','longitude'])),JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT|JSON_THROW_ON_ERROR);
 ?>
 <details class="mt-4 rounded-xl border p-4" open>
     <summary class="min-h-11 cursor-pointer font-semibold">Tabla de análisis · <?= count($intakeGroups) ?> inmuebles recogidos</summary>
@@ -18,7 +19,7 @@ $analysisIndexes = array_column($analysisRows,'capture_index');
         <input type="hidden" name="version" value="<?= (int) ($record['comparables_version'] ?? 0) ?>">
         <input type="hidden" name="matrix_complete" value="1">
         <?php $locationKeys = ['latitude','longitude','location_verification','verification_detail','location_source'];
-        $locationIndexes = array_map(static fn ($group) => $group[0]['capture_index'], $intakeGroups);
+        $locationIndexes = $analysisIndexes;
         foreach ($comparableRows as $index=>$row):
             if (empty($row['published_location']) && empty($row['location_verification']) && ($row['latitude'] ?? '') !== '' && ($row['longitude'] ?? '') !== '')
                 $row['published_location'] = $row['latitude'] . ', ' . $row['longitude'] . ' · referencia anterior sin verificar.';
@@ -29,6 +30,12 @@ $analysisIndexes = array_column($analysisRows,'capture_index');
         <?php foreach ($analysisRows as $row): ?><input type="hidden" name="comparables[<?= (int)$row['capture_index'] ?>][negotiation_discount]" value="<?= e((string)($row['negotiation_discount'] ?? '')) ?>" :value="analysisDiscounts['<?= e($row['id']) ?>']"><?php endforeach; ?>
         <?php foreach ($analysisRows as $position=>$row): foreach (['ph_regime','ph_regime_source','analysis_manual_factors'] as $field): ?><input type="hidden" name="comparables[<?= (int)$row['capture_index'] ?>][<?= $field ?>]" :value="analysisRows[<?= $position ?>].<?= $field ?>"><?php endforeach; endforeach; ?>
         <input type="hidden" name="comparables[<?= (int)$analysisIndexes[0] ?>][analysis_factor_selection]" :value="analysisSelection()">
+        <nav class="mb-4 flex flex-wrap gap-2" aria-label="Submenú del análisis">
+            <button type="button" class="btn-secondary" @click="analysisModule='samples'">1. Muestras y depuración</button>
+            <button type="button" class="btn-secondary" @click="analysisModule='location'; analysisSubjectLocation=<?= e($analysisSubjectLocation) ?>">2. Coordenadas y mapa comparativo</button>
+            <button type="button" class="btn-secondary" @click="analysisModule='regression'">3. Modelo de regresión</button>
+        </nav>
+        <div x-show="analysisModule==='samples'">
         <?php require __DIR__.'/methodology-analysis-data-table.php'; ?>
         <details class="mt-4"><summary class="min-h-11 cursor-pointer font-semibold">Ubicación y anuncios originales</summary>
         <?php foreach ($intakeGroups as $group): $row = $group[0]; $index = $row['capture_index']; ?>
@@ -39,26 +46,16 @@ $analysisIndexes = array_column($analysisRows,'capture_index');
                 <p class="whitespace-pre-wrap text-sm text-amber-900"><?= e($announcement['intake_note'] ?? '') ?></p>
                 <?php require __DIR__ . '/methodology-intake-source-detail.php'; ?>
             <?php endforeach; ?>
-            <div class="mt-3 grid gap-3 sm:grid-cols-2">
-                <?php foreach (['latitude'=>'Latitud confirmada','longitude'=>'Longitud confirmada'] as $key=>$label): ?>
-                <label class="label"><?= e($label) ?><input class="input" name="comparables[<?= $index ?>][<?= e($key) ?>]" value="<?= e((string) ($row[$key] ?? '')) ?>" placeholder="<?= $key === 'latitude' ? '10.400000' : '-75.550000' ?>"></label>
-                <?php endforeach; ?>
-                <label class="label">Precisión verificada manualmente<select class="input" name="comparables[<?= $index ?>][location_verification]">
-                    <?php foreach (\App\Services\ComparableCaptureDetail::options('location_verification') as $value=>$label): ?><option value="<?= e($value) ?>" <?= ($row['location_verification'] ?? '') === $value ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?>
-                </select></label>
-                <label class="label">Fuente de ubicación<input class="input" name="comparables[<?= $index ?>][location_source]" value="<?= e($row['location_source'] ?? '') ?>" placeholder="Dirección confirmada, visita, documento o informante"></label>
-            </div>
-            <label class="label mt-3">Verificación: responsable, fecha y soporte<textarea class="input" rows="2" maxlength="1600" name="comparables[<?= $index ?>][verification_detail]" placeholder="Quién confirmó el punto, cuándo y con qué evidencia"><?= e($row['verification_detail'] ?? '') ?></textarea></label>
-            <?php if (in_array($row['location_verification'] ?? '', ['exact','approximate'], true) && ($row['verification_detail'] ?? '') !== '' && ($row['location_source'] ?? '') !== '' && is_numeric($row['latitude'] ?? '') && is_numeric($row['longitude'] ?? '')):
-                $mapCoordinates = (float) $row['latitude'] . ',' . (float) $row['longitude']; ?>
-                <details class="mt-3" data-verified-map><summary class="min-h-11 cursor-pointer text-blue-700">Mapa · <?= ($row['location_verification'] ?? '') === 'exact' ? 'punto exacto verificado' : 'referencia aproximada verificada' ?></summary>
-                    <iframe loading="lazy" class="mt-2 h-64 w-full rounded-lg border" title="Ubicación verificada manualmente" referrerpolicy="no-referrer" src="<?= e('https://maps.google.com/maps?q=' . rawurlencode($mapCoordinates) . '&output=embed') ?>"></iframe>
-                </details>
-            <?php else: ?><p class="mt-3 text-sm text-amber-900">Ubicación pendiente de verificación manual y soporte. No se muestra un punto como confirmado.</p><?php endif; ?>
         </article>
         <?php endforeach; ?>
         </details>
-        <p class="mt-3 text-sm" data-autosave-status>Autoguardado activo. Actualiza esta vista después de confirmar el guardado para consultar el mapa.</p>
+        </div>
+        <?php foreach ($analysisRows as $position=>$locationRow): foreach ($locationKeys as $field): ?>
+        <input type="hidden" name="comparables[<?= (int)$locationRow['capture_index'] ?>][<?= e($field) ?>]" :value="analysisRows[<?= $position ?>].<?= $field ?> || ''">
+        <?php endforeach; endforeach; ?>
+        <?php require __DIR__.'/methodology-analysis-location.php'; ?>
+        <?php require __DIR__.'/methodology-analysis-regression.php'; ?>
+        <p class="mt-3 text-sm" data-autosave-status>Autoguardado activo. Espera el guardado confirmado antes de exportar.</p>
         <button class="btn-primary mt-3" type="submit">Guardar análisis de muestras</button>
     </form>
     <?php endif; ?>

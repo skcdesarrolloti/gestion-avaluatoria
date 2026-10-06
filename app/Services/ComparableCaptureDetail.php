@@ -89,7 +89,8 @@ final class ComparableCaptureDetail
                     + (isset($selection['applied_scope']) ? ['applied_scope'=>$selection['applied_scope']] : [])
                     + (isset($selection['regime_applied']) ? ['regime_applied'=>$selection['regime_applied']] : [])
                     + (isset($selection['applied']) ? ['applied'=>array_values(array_unique($selection['applied']))] : [])
-                    + (isset($selection['view']) ? ['view'=>$selection['view']] : []) + $review + $statistics,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
+                    + (isset($selection['view']) ? ['view'=>$selection['view']] : []) + $review + $statistics
+                    + (array_key_exists('regression',$selection) ? ['regression'=>ComparableRegressionPreparation::normalize($selection['regression'])] : []),JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
             }
             if ($type === 'choice' && !array_key_exists($value, self::options($key)))
                 throw new HttpException(422, "$label: selecciona una opción válida.");

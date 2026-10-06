@@ -898,3 +898,12 @@ Completar factores en M4 (2026-10-06): colores con texto, edición de faltantes 
 Combinación → inmueble pendiente (2026-10-06): sustituye salto al paso3 por elección explícita y registro de etapa, filtro de filas incompletas y foco en primer campo manual visible. Enlace al anuncio en la misma fila. La fila en edición se mantiene al empezar soporte y sólo sale al actualizar; combinaciones completas muestran todas. Corregida propuesta área publicada para no incluir otra área como predictor duplicado. 1545 PHP/210 JS/lint/build78,3KB, QA local escritorio/estrecho; sin cambio de persistencia ni hosting.
 
 Ejemplo numérico34 autorizado (2026-10-06): cinco antigüedades faltantes en el grupo real34 se completaron mediante los campos manuales existentes, rango supuesto9–15años con fuente EJEMPLO SIMULADO/no verificado; originales preservados. JS etiqueta morado, aviso de ejercicio e historial opcionalsimulated validado/persistido. Proyecciones memoizadas invalidan fuentes y complementos para evitar parseos por celda. QA ficticio34 y automatizados1547PHP/212JS/222BD3398/build78,3KB. Cambios de código pendientes de hosting; no regresión todavía.
+
+Mapa/regresión M4 (2026-10-06): submenú muestras→localización→regresión, academia y
+fórmulas antes de codificación explícita/aplicación. QR, β/R²/ajustado/error/VIF,
+rechazo de matriz singular, mínimos acordados y simulación visible. Preparación
+persistente, resultados en memoria con informeHTML descargable. Captura WGS84
+principal, sujeto en origen, mapaSVG geográfico sin calles e informe de distancias.
+OSM aparte; no inserción automática enPDF ni valor adoptado.1551PHP/215JS/223BD3399,
+lint/build78,3KB y QA local. Sin hosting ni cambios de datos reales.
+Ver ANALISIS-MAPA-REGRESION.md. Sigue validación diagnóstica y aplicación al sujeto.

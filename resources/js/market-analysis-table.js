@@ -1,4 +1,6 @@
 import {tableProjection} from './analysis-table-projection.js';
+import {regressionMethods} from './analysis-regression.js';
+import {locationMapMethods} from './analysis-location-map.js';
 import {manualMethods} from './analysis-manual-factors.js';
 import {modelArea,modelFactorCount,positiveModelArea} from './analysis-model-area.js';
 import {snapshot,ensureHistory,requireHistorySpace,workingRows} from './analysis-statistical-history.js';
@@ -20,12 +22,14 @@ export function discountedAnalysis(row,percent) {
     const discount=(price*pct/100).toFixed(4), value=price-Number(discount);
     return {discount,value,perM2:area>0 && row.price_unit!=='valor_m2' ? value/area : null};
 }
-export function marketAnalysisTable(rows,subjectRegime='',subjectType='') {
+export function marketAnalysisTable(rows,subjectRegime='',subjectType='',subjectLocation={}) {
     rows=rows.map(r=>({...r,ph_regime:r.ph_regime || 'por_verificar',ph_regime_source:r.ph_regime_source || ''}));
     const project=tableProjection(true), original=tableProjection(), active=tableProjection(true), factors=analysisCoverage(rows,subjectType);
     let factorTable, factorCache;
     let saved={};try {saved=JSON.parse(rows.find(r=>r.analysis_factor_selection)?.analysis_factor_selection || '{}');} catch {}
     return {
+        analysisModule:'samples', ...regressionMethods(), ...locationMapMethods(subjectLocation),
+        regressionBasis:saved.regression?.basis || 'offer',regressionCodes:saved.regression?.codes || {},regressionConfirmed:saved.regression?.confirmed || false,
         analysisRows:rows, get analysisTable(){return project(this.analysisRows);}, get analysisOriginalTable(){return original(this.analysisRows);}, ...manualMethods(), analysisSubjectRegime:subjectRegime, analysisScope:saved.scope ?? 'subject', analysisAppliedScope:saved.applied_scope ?? saved.scope ?? 'subject', analysisRegimeApplied:saved.regime_applied ?? ['clean','result'].includes(saved.view), analysisThreshold:50, analysisView:saved.view ?? 'raw',
         get analysisFactors(){const rows=this.analysisActiveRows(),table=active(rows);if(table!==factorTable){factorCache=analysisCoverage(rows,subjectType,table);factorTable=table;}return factorCache;},
         analysisSelected:(saved.selected ?? factors.map(f=>f.key)).filter(key=>factors.some(f=>f.key===key && f.compatible)),
@@ -38,7 +42,7 @@ export function marketAnalysisTable(rows,subjectRegime='',subjectType='') {
         analysisColumns(){const keys=this.analysisView==='result'?this.analysisApplied:this.analysisSelected;return this.analysisFactors.filter(f=>this.analysisView==='raw' || this.analysisEligible(f) && keys.includes(f.key));},
         analysisEffectiveRegime(row){return ['si','no'].includes(row.ph_regime) ? row.ph_regime : (row.regime_hint?.regime || '');},
         analysisMatches(){return this.analysisRows.filter(r=>this.analysisEffectiveRegime(r)===this.analysisSubjectRegime && this.analysisSubjectRegime);},
-        analysisActiveRows(){const matches=this.analysisMatches();if(this.analysisView==='raw' || !this.analysisRegimeApplied || this.analysisAppliedScope!=='subject' || !matches.length)return this.analysisRows;const ids=new Set([...matches.map(r=>r.id),...this.analysisReview.filter(v=>v.restored_at).map(v=>v.id)]);return this.analysisRows.filter(r=>ids.has(r.id));},
+        analysisActiveRows(){const matches=this.analysisMatches();if(this.analysisView==='raw' && this.analysisModule==='samples' || !this.analysisRegimeApplied || this.analysisAppliedScope!=='subject' || !matches.length)return this.analysisRows;const ids=new Set([...matches.map(r=>r.id),...this.analysisReview.filter(v=>v.restored_at).map(v=>v.id)]);return this.analysisRows.filter(r=>ids.has(r.id));},
         analysisVisibleRows(){const ids=new Set(this.analysisActiveRows().map(r=>r.id));return this.analysisTable.rows.map((r,i)=>({...r,analysisIndex:i})).filter(r=>ids.has(r.key));},
         analysisSuggestion(factor){return factorSuggestion(factor,this.analysisActiveRows().length,this.analysisThreshold);},
         async analysisApplyRegime(){if(this.analysisBusy)return;this.analysisBusy=true;this.analysisProcessed=0;this.analysisFilterDone=false;this.analysisError='';try {requireHistorySpace(this);ensureHistory(this);await (await historyModule()).applyFilter(this);snapshot(this,'filter',workingRows(this));} catch {this.analysisError='No se pudo registrar la depuración. Reintenta; el historial admite hasta 80 etapas.';} finally {this.analysisBusy=false;}},
@@ -53,7 +57,7 @@ export function marketAnalysisTable(rows,subjectRegime='',subjectType='') {
         analysisComplete(){const columns=this.analysisColumns(),area=modelArea(columns);return this.analysisVisibleRows().filter(r=>amount(this.analysisRows[r.analysisIndex].area_m2)>0 && positiveModelArea(r.values[area.key]) && columns.every(f=>!missing(r.values[f.key]))).length;},
         analysisSampleRule(){const factors=this.analysisFactorCount(), complete=this.analysisComplete(), required=Math.max(30,factors*10);
             return {factors,complete,required,maximum:Math.floor(complete/10),meets:factors>=3 && complete>=required};},
-        analysisSelection(){return JSON.stringify({selected:this.analysisSelected,applied:this.analysisApplied,threshold:50,scope:this.analysisScope,applied_scope:this.analysisAppliedScope,regime_applied:this.analysisRegimeApplied,view:this.analysisView,review:this.analysisReview,statistics:this.analysisStatistics});},
+        analysisSelection(){return JSON.stringify({selected:this.analysisSelected,applied:this.analysisApplied,threshold:50,scope:this.analysisScope,applied_scope:this.analysisAppliedScope,regime_applied:this.analysisRegimeApplied,view:this.analysisView,review:this.analysisReview,statistics:this.analysisStatistics,regression:{basis:this.regressionBasis,confirmed:this.regressionConfirmed,codes:this.regressionCodes}});},
         analysisRegime(row){return !['si','no'].includes(row.ph_regime) ? (row.regime_hint?.reason || 'Régimen sin verificar') : (row.ph_regime==='si'?'PH':'No PH')+(row.ph_regime_source.trim()?' · soporte registrado':' · falta soporte');},
         analysisChange(id,value){this.analysisPercents[id]=value;const pct=Number(value);if(value==='' || Number.isFinite(pct) && pct>=0 && pct<=100) this.analysisDiscounts[id]=discountedAnalysis(this.analysisRows.find(r=>r.id===id),value).discount;},
         analysisResult(id){const row=this.analysisRows.find(r=>r.id===id), offer=amount(row.price_amount), discount=amount(this.analysisDiscounts[id]), area=amount(row.area_m2);
