@@ -12,6 +12,7 @@ final class ComparableCaptureDetail
             'property_group' => ['Identificador de inmueble confirmado', 'text', 'internal'],
             'research_primary' => ['Ficha principal para completar el inmueble', 'choice', 'internal'],
             'ph_regime_source' => ['Soporte del régimen PH o no PH del comparable', 'text', 'shared'],
+            'analysis_manual_factors' => ['Datos complementados manualmente en Análisis', 'manual_factors', 'internal'],
             'analysis_factor_selection' => ['Selección de factores y umbral de sugerencia', 'factor_selection', 'internal'],
             'intake_note' => ['Pendientes o motivo de selección', 'text', 'shared'],
             'source_updates' => ['Lecturas posteriores del mismo anuncio · diferencias conservadas', 'text', 'shared'],
@@ -65,8 +66,9 @@ final class ComparableCaptureDetail
             $value = trim((string) $value);
             if ($key === 'property_group' && $value !== '' && !preg_match('/^[a-f0-9]{32}$/D', $value))
                 throw new HttpException(422, 'Identificador de inmueble inválido.');
-            $limit=in_array($type,['facts','factor_selection'],true)?48000:($type==='source_text'?16000:1600);
+            $limit=in_array($type,['facts','factor_selection','manual_factors'],true)?48000:($type==='source_text'?16000:1600);
             if (mb_strlen($value) > $limit) throw new HttpException(422, "$label: máximo $limit caracteres.");
+            if ($type==='manual_factors') $value=ComparableAnalysisManualFactors::normalize($value);
             if ($type==='facts') $value=ComparableSourceFacts::normalize($value);
             if ($type==='factor_selection' && $value!=='') {
                 $selection=json_decode($value,true,8);

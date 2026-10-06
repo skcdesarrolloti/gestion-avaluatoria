@@ -1,4 +1,4 @@
-<details class="mb-3 rounded-xl border p-3" open>
+<details class="mb-3 rounded-xl border p-3">
     <summary class="min-h-11 cursor-pointer font-semibold">Historial estadístico de la depuración</summary>
     <p class="my-2 text-sm">Cada etapa conserva sus cifras y fecha. Reincorporar una muestra agrega otro resultado; no reemplaza el anterior. Las etapas previas a este historial no se reconstruyen.</p>
     <p class="my-2 text-sm">Estadísticos descriptivos sobre oferta / área publicada. En la etapa de factores se calculan sobre filas completas. El valor con descuento usa únicamente descuentos registrados. No son regresión ni valor adoptado; faltan revisar comparabilidad, áreas y componentes.</p>

@@ -27,3 +27,13 @@ declare(strict_types=1);
     expectStatus(422, fn () => \App\Services\ComparableCaptureDetail::normalize(['negotiation_discount'=>'10']), 'descuento sin oferta no se guarda');
     expect(!array_key_exists('negotiated_amount', \App\Services\ComparableCaptureDetail::normalize($negotiation + ['negotiated_amount'=>'1'])), 'valor derivado enviado por cliente no se persiste');
 })();
+
+(static function (): void {
+    $manual=json_encode(['published:estado'=>['label'=>'Estado','value'=>'Usado','source'=>'Ficha revisada; prueba ficticia']]);
+    $out=\App\Services\ComparableCaptureDetail::normalize(['analysis_manual_factors'=>$manual,'published_attributes'=>'{"Estado":""}']);
+    expect(json_decode($out['analysis_manual_factors'],true)['published:estado']['value']==='Usado', 'complemento manual separado del original');
+    expect(json_decode($out['published_attributes'],true)['Estado']==='', 'complemento no altera atributos publicados');
+    expectStatus(422, fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_manual_factors'=>'[]']), 'complemento rechaza lista inválida');
+    expectStatus(422, fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_manual_factors'=>json_encode(['price_amount'=>['label'=>'Precio','value'=>'1','source'=>'x']])]), 'complemento no sustituye precio original');
+    expectStatus(422, fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_manual_factors'=>json_encode(['published:estado'=>['label'=>'Estado','value'=>['x'],'source'=>'x']])]), 'complemento rechaza dato estructurado');
+})();

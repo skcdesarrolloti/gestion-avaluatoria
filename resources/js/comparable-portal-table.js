@@ -19,7 +19,7 @@ const aliases = new Map(fields.flatMap(([key,,names]) => names.map(label => [lab
 const labels = new Map(fields.map(([key,label]) => [key,label]));
 
 // Each row keeps one advertisement, without merging other sources or the subject.
-export function portalTable(advertisements) {
+export function portalTable(advertisements, manual=false) {
     const columns = new Map();
     const rows = advertisements.map(ad => {
         const values = {};
@@ -33,6 +33,10 @@ export function portalTable(advertisements) {
             if (!text(ad[key])) return;
             columns.set(key,{key,label});
             if (!Object.hasOwn(values,key)) values[key]=text(ad[key]);
+        });
+        if (manual) Object.entries(sourceFacts(ad.analysis_manual_factors)).forEach(([key,entry]) => {
+            if (!entry || typeof entry !== 'object' || !text(entry.value) || !text(entry.source)) return;
+            columns.set(key,{key,label:entry.label}); values[key]=text(entry.value);
         });
         return {key:ad.id,source_name:ad.source_name,title:ad.listing_title || ad.project_name || ad.property_type || 'Inmueble',
             source_url:ad.source_url,values};

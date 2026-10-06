@@ -18,7 +18,7 @@ export function snapshot(state,action,rows,changed='') {
     if(state.analysisStatistics.length>=80)throw new Error('history limit');
     const hasFactors=action==='factors' || (action!=='initial' && state.analysisStatistics.some(v=>v.action==='factors'));
     const factors=hasFactors?[...state.analysisApplied]:[];
-    const table=portalTable(rows),columns=factors.map(key=>table.columns.find(c=>c.key===key) || {key}),area=modelArea(columns), missing=v=>v===undefined || v===null || /^(?:\s*|no publicado|pendiente|por confirmar)$/i.test(String(v).trim());
+    const table=portalTable(rows,true),columns=factors.map(key=>table.columns.find(c=>c.key===key) || {key}),area=modelArea(columns), missing=v=>v===undefined || v===null || /^(?:\s*|no publicado|pendiente|por confirmar)$/i.test(String(v).trim());
     const eligible=hasFactors?rows.filter((r,i)=>amount(r.area_m2)>0 && positiveModelArea(table.rows[i].values[area.key]) && factors.every(k=>!missing(table.rows[i].values[k]))):rows;
     const complete=hasFactors?eligible.length:null;
     const offer=eligible.map(r=>{const p=amount(r.price_amount),a=amount(r.area_m2);return p!==null && p>0 && a>0?(r.price_unit==='valor_m2'?p:p/a):null;});

@@ -27,6 +27,7 @@
 <button type="button" class="btn-primary mb-3" @click="analysisUpdate(); $dispatch('input')">Actualizar depuración y ver resultado</button>
 </div>
 <div x-show="analysisView==='result'" x-cloak>
+<?php require __DIR__.'/methodology-analysis-completion.php'; ?>
 <?php require __DIR__.'/methodology-analysis-statistics.php'; ?>
 <div x-show="analysisStatistics.some(v=>v.action==='factors')">
     <p class="mb-3 rounded-xl border p-3" role="status" x-text="'Depuración actualizada: '+analysisActiveRows().length+' muestras · '+analysisFactorCount()+' factores aplicados (incluye '+analysisModelArea().label+') · '+analysisComplete()+' filas con datos en todos los factores aplicados'"></p>
@@ -40,14 +41,16 @@
     <th class="sticky left-0 bg-slate-100 p-3">Inmueble</th><th class="p-3">Régimen PH / no PH</th><th class="p-3">Oferta · COP</th><th class="p-3">Área publicada · m²</th>
     <template x-for="factor in analysisColumns()" :key="factor.key"><th class="max-w-48 p-3" x-text="factor.label+' ('+factor.count+'/'+analysisActiveRows().length+')'"></th></template>
     <th class="p-3">Descuento · %</th><th class="p-3">Valor con descuento · COP</th><th class="p-3">Valor por m² · COP/m²</th>
-</tr></thead><tbody><template x-for="(property,visibleIndex) in analysisVisibleRows()" :key="property.key"><tr class="border-t">
+</tr></thead><tbody><template x-for="(property,visibleIndex) in analysisDisplayRows()" :key="property.key"><tr class="border-t">
     <th class="sticky left-0 max-w-48 bg-white p-3"><span x-text="analysisView==='result' ? 'Fila '+(visibleIndex+1)+' de '+analysisVisibleRows().length : 'Muestra '+(property.analysisIndex+1)"></span><p x-show="analysisView==='result'" class="text-xs font-normal" x-text="'Referencia original: muestra '+(property.analysisIndex+1)"></p><p class="font-normal" x-text="analysisRows[property.analysisIndex].property_type"></p><p class="font-normal" x-text="property.source_name"></p><a :href="/^https?:\/\//i.test(property.source_url) ? property.source_url : '#'" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center text-blue-700 underline">Ver anuncio</a></th>
     <td class="max-w-64 p-3"><label :for="'analysis-regime-'+property.key" class="block text-xs">Régimen del inmueble</label><select class="input w-48" :id="'analysis-regime-'+property.key" x-model="analysisRows[property.analysisIndex].ph_regime"><option value="por_verificar">Sin verificar</option><option value="si">PH</option><option value="no">No PH</option></select>
         <p class="mt-1 text-xs" x-text="analysisRegime(analysisRows[property.analysisIndex])"></p>
         <details><summary class="min-h-11 cursor-pointer text-xs">Soporte del régimen</summary><label :for="'analysis-regime-source-'+property.key" class="block text-xs">Documento o fuente, fecha y responsable</label><textarea class="input w-48" rows="2" maxlength="1600" :id="'analysis-regime-source-'+property.key" placeholder="Ej. reglamento PH revisado, fecha y responsable" x-model="analysisRows[property.analysisIndex].ph_regime_source"></textarea></details>
     </td>
     <td class="p-3" x-text="analysisMoney(analysisOffer(property.key))"></td><td class="max-w-48 p-3"><span x-text="property.values.area_m2 ?? 'No publicado'"></span><p class="mt-1 text-xs text-amber-900" x-text="analysisAreaNote(property.key)"></p></td>
-    <template x-for="factor in analysisColumns()" :key="factor.key"><td class="max-w-48 whitespace-pre-wrap p-3" x-text="property.values[factor.key] ?? 'No publicado'"></td></template>
+    <template x-for="factor in analysisColumns()" :key="factor.key"><td class="max-w-64 p-3" :class="analysisView==='result' ? analysisCellState(property,factor)==='missing' ? 'bg-amber-50 text-amber-900' : analysisCellState(property,factor)==='manual' ? 'bg-blue-50 text-blue-900' : 'bg-emerald-50 text-emerald-900' : ''">
+        <?php require __DIR__.'/methodology-analysis-factor-cell.php'; ?>
+    </td></template>
     <td class="p-3"><label :for="'analysis-percent-'+property.key" class="block text-xs">Descuento · %</label><input :id="'analysis-percent-'+property.key" class="input w-28" type="number" min="0" max="100" step="any" placeholder="Ej. 10" :value="analysisPercents[property.key]" @input="analysisChange(property.key,$event.target.value)" :aria-invalid="Number(analysisPercents[property.key])<0 || Number(analysisPercents[property.key])>100"><span x-show="Number(analysisPercents[property.key])<0 || Number(analysisPercents[property.key])>100" class="block text-red-700">Usa de 0 a 100 %.</span></td>
     <td class="p-3" x-text="analysisMoney(analysisResult(property.key).value)"></td><td class="p-3" x-text="analysisMoney(analysisResult(property.key).perM2)"></td>
 </tr></template></tbody></table></div>
