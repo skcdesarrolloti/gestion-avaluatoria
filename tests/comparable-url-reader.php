@@ -40,6 +40,9 @@ declare(strict_types=1);
     $fallback = (new \App\Services\ComparablePortalLinks())->build('venta consultorio Cartagena', 'venta', 'consultorio', 'Cartagena', '');
     expect(str_contains($fallback[0]['url'], 'google.com/search') && $fallback[0]['kind'] === 'Búsqueda en Google', 'combinación no comprobada identifica búsqueda alternativa');
     $properati = (new \App\Services\ComparablePortalLinks())->build('venta oficina Bocagrande Cartagena', 'venta', 'oficina', 'Cartagena', 'Bocagrande')[3];
+    $finca = (new \App\Services\ComparablePortalLinks())->build('venta oficina Bocagrande Cartagena', 'venta', 'oficina', 'Cartagena de Indias', 'Bocagrande')[0];
+    expect($finca['url'] === 'https://www.fincaraiz.com.co/venta/oficinas/bocagrande/cartagena'
+        && str_contains($finca['instruction'], 'Bocagrande aplicados'), 'abrir FincaRaíz aplica Bocagrande y no toda Cartagena');
     expect($properati['url'] === 'https://www.properati.com.co/s/bocagrande/oficina/venta'
         && $properati['label'] === 'Properati' && $properati['network'] === 'Proppit', 'Properati conserva fuente y red con ruta de barrio verificada');
     expect($sources['portal_sources'][3]['url'] === 'https://www.properati.com.co/s/cartagena-bolivar/oficina/venta'
