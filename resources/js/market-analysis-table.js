@@ -20,7 +20,7 @@ export function marketAnalysisTable(rows,subjectRegime='',subjectType='') {
     const table=portalTable(rows), factors=analysisCoverage(rows,subjectType);
     let saved={};try {saved=JSON.parse(rows.find(r=>r.analysis_factor_selection)?.analysis_factor_selection || '{}');} catch {}
     return {
-        analysisRows:rows, analysisTable:table, analysisSubjectRegime:subjectRegime, analysisScope:saved.scope ?? 'subject', analysisThreshold:50, analysisView:saved.view ?? 'raw',
+        analysisRows:rows, analysisTable:table, analysisSubjectRegime:subjectRegime, analysisScope:saved.scope ?? 'subject', analysisAppliedScope:saved.applied_scope ?? saved.scope ?? 'subject', analysisRegimeApplied:saved.regime_applied ?? ['clean','result'].includes(saved.view), analysisThreshold:50, analysisView:saved.view ?? 'raw',
         get analysisFactors(){return analysisCoverage(this.analysisActiveRows(),subjectType);},
         analysisSelected:(saved.selected ?? factors.map(f=>f.key)).filter(key=>factors.some(f=>f.key===key && f.compatible)),
         analysisApplied:saved.applied ?? saved.selected ?? [],
@@ -31,13 +31,14 @@ export function marketAnalysisTable(rows,subjectRegime='',subjectType='') {
         analysisColumns(){const keys=this.analysisView==='result'?this.analysisApplied:this.analysisSelected;return this.analysisFactors.filter(f=>this.analysisView==='raw' || this.analysisEligible(f) && keys.includes(f.key));},
         analysisEffectiveRegime(row){return ['si','no'].includes(row.ph_regime) ? row.ph_regime : (row.regime_hint?.regime || '');},
         analysisMatches(){return this.analysisRows.filter(r=>this.analysisEffectiveRegime(r)===this.analysisSubjectRegime && this.analysisSubjectRegime);},
-        analysisActiveRows(){return this.analysisView!=='raw' && this.analysisScope==='subject' && this.analysisMatches().length ? this.analysisMatches() : this.analysisRows;},
+        analysisActiveRows(){return this.analysisView!=='raw' && this.analysisRegimeApplied && this.analysisAppliedScope==='subject' && this.analysisMatches().length ? this.analysisMatches() : this.analysisRows;},
         analysisVisibleRows(){const ids=new Set(this.analysisActiveRows().map(r=>r.id));return this.analysisTable.rows.map((r,i)=>({...r,analysisIndex:i})).filter(r=>ids.has(r.key));},
         analysisSuggestion(factor){return factorSuggestion(factor,this.analysisActiveRows().length,this.analysisThreshold);},
-        analysisApplySuggestion(){this.analysisView='clean';this.analysisSelected=this.analysisFactors.filter(f=>this.analysisEligible(f)).map(f=>f.key);},
+        analysisApplyRegime(){this.analysisAppliedScope=this.analysisScope;this.analysisRegimeApplied=true;},
+        analysisApplySuggestion(){this.analysisApplyRegime();this.analysisView='clean';this.analysisSelected=this.analysisFactors.filter(f=>this.analysisEligible(f)).map(f=>f.key);},
         analysisUpdate(){this.analysisView='clean';this.analysisApplied=this.analysisColumns().map(f=>f.key);this.analysisView='result';},
-        analysisComplete(){const columns=this.analysisColumns();return columns.length ? this.analysisVisibleRows().filter(r=>columns.every(f=>!missing(r.values[f.key]))).length : 0;},
-        analysisSelection(){return JSON.stringify({selected:this.analysisSelected,applied:this.analysisApplied,threshold:50,scope:this.analysisScope,view:this.analysisView});},
+        analysisComplete(){const columns=this.analysisColumns();return this.analysisVisibleRows().filter(r=>amount(this.analysisRows[r.analysisIndex].area_m2)>0 && columns.every(f=>!missing(r.values[f.key]))).length;},
+        analysisSelection(){return JSON.stringify({selected:this.analysisSelected,applied:this.analysisApplied,threshold:50,scope:this.analysisScope,applied_scope:this.analysisAppliedScope,regime_applied:this.analysisRegimeApplied,view:this.analysisView});},
         analysisRegime(row){return !['si','no'].includes(row.ph_regime) ? (row.regime_hint?.reason || 'Régimen sin verificar') : (row.ph_regime==='si'?'PH':'No PH')+(row.ph_regime_source.trim()?' · soporte registrado':' · falta soporte');},
         analysisChange(id,value){this.analysisPercents[id]=value;const pct=Number(value);if(value==='' || Number.isFinite(pct) && pct>=0 && pct<=100) this.analysisDiscounts[id]=discountedAnalysis(this.analysisRows.find(r=>r.id===id),value).discount;},
         analysisResult(id){const row=this.analysisRows.find(r=>r.id===id), offer=amount(row.price_amount), discount=amount(this.analysisDiscounts[id]), area=amount(row.area_m2);

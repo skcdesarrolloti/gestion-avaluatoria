@@ -77,9 +77,13 @@ final class ComparableCaptureDetail
                 if (array_key_exists('applied',$selection) && (!is_array($selectionObject->applied ?? null) || !array_is_list($selection['applied']) || count($selection['applied'])>160)) throw new HttpException(422,'Factores aplicados inválidos.');
                 foreach (array_merge($selection['selected'],$selection['applied'] ?? []) as $factor) if (!is_string($factor) || mb_strlen($factor)>180) throw new HttpException(422,'Factor de análisis inválido.');
                 if (isset($selection['scope']) && !in_array($selection['scope'],['subject','all'],true)) throw new HttpException(422,'Filtro de régimen inválido.');
-                if (isset($selection['view']) && !in_array($selection['view'],['raw','clean','result'],true)) throw new HttpException(422,'Vista de análisis inválida.');
+                if (isset($selection['applied_scope']) && !in_array($selection['applied_scope'],['subject','all'],true)) throw new HttpException(422,'Filtro aplicado inválido.');
+                if (isset($selection['regime_applied']) && !is_bool($selection['regime_applied'])) throw new HttpException(422,'Estado de depuración inválido.');
+                if (isset($selection['view']) && !in_array($selection['view'],['raw','regime','clean','result'],true)) throw new HttpException(422,'Vista de análisis inválida.');
                 $value=json_encode(['selected'=>array_values(array_unique($selection['selected'])),'threshold'=>(float)$selection['threshold']]
                     + (isset($selection['scope']) ? ['scope'=>$selection['scope']] : [])
+                    + (isset($selection['applied_scope']) ? ['applied_scope'=>$selection['applied_scope']] : [])
+                    + (isset($selection['regime_applied']) ? ['regime_applied'=>$selection['regime_applied']] : [])
                     + (isset($selection['applied']) ? ['applied'=>array_values(array_unique($selection['applied']))] : [])
                     + (isset($selection['view']) ? ['view'=>$selection['view']] : []),JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
             }

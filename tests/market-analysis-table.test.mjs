@@ -58,7 +58,7 @@ test('subject regime prioritizes declared and probable matches without changing 
  assert.equal(state.analysisVisibleRows()[1].analysisIndex,1);
  assert.equal(state.analysisRows[1].ph_regime,'por_verificar');assert.equal(state.analysisRows.length,4);
  assert.equal(state.analysisDiscounts.no,'120');assert.equal(state.analysisEffectiveRegime(state.analysisRows[2]),'no');
- state.analysisScope='all';assert.equal(state.analysisVisibleRows().length,4);
+ state.analysisScope='all';assert.equal(state.analysisVisibleRows().length,2);state.analysisApplyRegime();assert.equal(state.analysisVisibleRows().length,4);
  assert.equal(state.analysisColumns().find(f=>f.key==='bathrooms').count,3);
  assert.equal(JSON.parse(state.analysisSelection()).scope,'all');
  assert.equal(marketAnalysisTable([{...rows[0],analysis_factor_selection:state.analysisSelection()},...rows.slice(1)],'si').analysisScope,'all');
@@ -68,7 +68,7 @@ test('subject regime prioritizes declared and probable matches without changing 
 });
 
 test('explicit cleansing blocks below fifty percent and office stratum while retaining the full captured view',()=>{
- const rows=Array.from({length:4},(_,i)=>({id:String(i),property_type:i?'Por verificar':'Oficina',bathrooms:String(i),bedrooms:String(i+1),
+ const rows=Array.from({length:4},(_,i)=>({id:String(i),area_m2:'40',property_type:i?'Por verificar':'Oficina',bathrooms:String(i),bedrooms:String(i+1),
    published_attributes:JSON.stringify({'Estrato':String(i+3),Piso:i<2?String(i+5):'','Citófono':i===0?'Sí':'','Recepción':'Sí'})}));
  const state=marketAnalysisTable(rows,'','oficina');
  assert.equal(state.analysisView,'raw');assert.ok(state.analysisColumns().some(f=>f.label==='Estrato'));
@@ -85,7 +85,7 @@ test('explicit cleansing blocks below fifty percent and office stratum while ret
 });
 
 test('explicit update applies the draft and preserves prior results and choices between steps',()=>{
- const rows=Array.from({length:4},(_,i)=>({id:String(i),property_type:'Oficina',bathrooms:String(i),floor_level:i<2?String(i+1):''}));
+ const rows=Array.from({length:4},(_,i)=>({id:String(i),area_m2:'40',property_type:'Oficina',bathrooms:String(i),floor_level:i<2?String(i+1):''}));
  const state=marketAnalysisTable(rows);state.analysisView='clean';state.analysisUpdate();
  assert.equal(state.analysisView,'result');assert.equal(state.analysisColumns().length,2);assert.equal(state.analysisComplete(),2);
  state.analysisView='clean';state.analysisSelected=['bathrooms'];
@@ -94,5 +94,19 @@ test('explicit update applies the draft and preserves prior results and choices 
  state.analysisUpdate();assert.equal(state.analysisColumns().length,1);assert.equal(state.analysisComplete(),4);
  const restored=marketAnalysisTable([{...rows[0],analysis_factor_selection:state.analysisSelection()},...rows.slice(1)]);
  assert.equal(restored.analysisView,'result');assert.deepEqual(restored.analysisApplied,['bathrooms']);assert.equal(restored.analysisComplete(),4);
- state.analysisView='clean';state.analysisSelected=[];state.analysisUpdate();assert.equal(state.analysisColumns().length,0);assert.equal(state.analysisComplete(),0);
+ state.analysisView='clean';state.analysisSelected=[];state.analysisUpdate();assert.equal(state.analysisColumns().length,0);assert.equal(state.analysisComplete(),4);
+});
+
+
+test('regime filtering waits for its button and restores the applied scope independently from the draft',()=>{
+ const rows=[{id:'a',area_m2:'40',ph_regime:'si',bathrooms:'1'},{id:'b',area_m2:'60',ph_regime:'no',bathrooms:'2'}];
+ const state=marketAnalysisTable(rows,'si');state.analysisView='regime';
+ assert.equal(state.analysisActiveRows().length,2);assert.equal(state.analysisRegimeApplied,false);
+ state.analysisApplyRegime();assert.equal(state.analysisActiveRows().length,1);
+ state.analysisScope='all';assert.equal(state.analysisActiveRows().length,1);
+ const restored=marketAnalysisTable([{...rows[0],analysis_factor_selection:state.analysisSelection()},rows[1]],'si');
+ assert.equal(restored.analysisScope,'all');assert.equal(restored.analysisAppliedScope,'subject');assert.equal(restored.analysisActiveRows().length,1);
+ restored.analysisApplyRegime();assert.equal(restored.analysisActiveRows().length,2);
+ restored.analysisView='clean';restored.analysisSelected=[];restored.analysisUpdate();assert.equal(restored.analysisComplete(),2);
+ restored.analysisRows[0].area_m2='';assert.equal(restored.analysisComplete(),1);
 });
