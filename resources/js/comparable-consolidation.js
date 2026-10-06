@@ -25,14 +25,14 @@ export function consolidatedResearch(getEntries,getForm,getGroups) {
             if (this.consolidationPending || this.researchBusy) return;
             if (await flushModuleForm(getForm())) this.intakeNavigate('research');
         },
-        async investigateConsolidated() {
+        async investigateConsolidated(id='') {
             if (this.researchBusy || this.consolidationPending) return;
             this.researchBusy=true;
             try {
                 if (!await flushModuleForm(getForm())) { this.researchMessage='Guardado pendiente. No se inició la lectura.'; return; }
                 const groups=getGroups(getEntries().filter(e=>e.used).map(e=>({...e.data,index:e.index})));
                 if (groups.some(g=>!resolvedGroup(g))) { this.researchMessage='Termina de consolidar las muestras antes de abrir fichas.'; return; }
-                const picked=groups.filter(g=>g.rows.every(r=>r.capture_confirmation==='confirmed')).map(g=>({row:primaryListing(g)}));
+                const picked=groups.filter(g=>g.rows.every(r=>r.capture_confirmation==='confirmed')).map(g=>({row:primaryListing(g)})).filter(item=>!id || item.row.id===id);
                 this.researchResults=picked;
                 if (!picked.length) { this.researchMessage='No hay inmuebles consolidados para completar.'; return; }
                 const result=await completeListingDetails(picked,getForm().dataset.detailEndpoint,
