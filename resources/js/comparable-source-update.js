@@ -3,7 +3,7 @@ import { sourceFacts } from './comparable-source-facts.js';
 // Same URL: fill only blanks; retain conflicting values as a source observation.
 export function sourceUpdate(existing, incoming) {
     const changes = {};
-    const protectedFields = new Set(['id','property_group','intake_state','active','status','component_key','location_verification','latitude','longitude','published_attributes']);
+    const protectedFields = new Set(['id','property_group','research_primary','capture_confirmation','intake_state','active','status','component_key','location_verification','latitude','longitude','published_attributes']);
     for (const [key,value] of Object.entries(incoming)) {
         if (!protectedFields.has(key) && String(value ?? '').trim() && !String(existing[key] ?? '').trim()) changes[key]=value;
     }

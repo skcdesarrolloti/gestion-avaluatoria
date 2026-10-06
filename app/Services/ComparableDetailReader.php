@@ -43,7 +43,10 @@ final class ComparableDetailReader
                 if (strlen($html)+strlen($chunk)>2097152) return 0;
                 $html.=$chunk; return strlen($chunk);
             }]);
-        $success = curl_exec($curl); $status = curl_getinfo($curl,CURLINFO_RESPONSE_CODE); curl_close($curl);
+        $success = curl_exec($curl); $status = curl_getinfo($curl,CURLINFO_RESPONSE_CODE);
+        $redirect=curl_getinfo($curl,CURLINFO_REDIRECT_URL); curl_close($curl);
+        // Some agencies require a trailing slash. Never follow a different property or host.
+        if ($success!==false && in_array($status,[301,302,303,307,308],true) && !str_ends_with($url,'/') && $redirect===$url.'/') return $this->read($redirect);
         if ($success===false || $status!==200) throw new \RuntimeException('La fuente no permitió leer la ficha. Abre el enlace y copia su texto para completarla.');
         return (new ComparableDetailParser())->parse($html,$url);
     }

@@ -7,7 +7,7 @@ export function fincaraizAreaSearch() {
     return { previewFacts,
         phFilter: 'all',
         refreshDuplicates() {
-            const matches = candidateMatches(this.results, matrixRows(form));
+            const matches = candidateMatches(this.results, matrixRows(form).filter(row=>String(row.source_name || '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase()==='fincaraiz'));
             this.results.forEach((item, index) => {
                 const signature = JSON.stringify(matches[index]);
                 if (signature !== item.matchSignature) item.distinct = false;
@@ -80,7 +80,7 @@ export function fincaraizAreaSearch() {
             const requested = [...this.selected]; this.refreshDuplicates();
             if (includeRegistered) this.selected = requested;
             const picked = this.results.filter(item => this.selected.includes(item.row.source_url));
-            this.message = await captureSelectedDetails(form,picked,this.resultUrl,panel.dataset.detailEndpoint,
+            this.message = await captureSelectedDetails(form,picked,this.resultUrl,'',
                 message=>{this.message=message;},includeRegistered);
             this.selected = [];
             this.refreshDuplicates();

@@ -17,7 +17,7 @@ export async function captureSelectedDetails(form, items, query, endpoint, progr
     const unique = new Map();
     for (const item of items) if (accepted.has(comparableUrlKey(item.row.source_url))) unique.set(comparableUrlKey(item.row.source_url),item);
     const picked=[...unique.values()];
-    if (!endpoint || !picked.length) return `${summary} Guardado confirmado. No hay fichas nuevas para investigar.`;
+    if (!endpoint || !picked.length) return `${summary} Guardado confirmado. Continúa en Consolidación de las muestras; las fichas se investigan después.`;
     picked.forEach(item=>{item.detailState='Ficha pendiente de investigación';});
     try {
         const details = await io.read(picked,endpoint,

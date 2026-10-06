@@ -9,6 +9,7 @@
     data-intake-evidence="<?= e(json_encode(['catalog'=>$researchCatalog,'subjects'=>$researchEvidence['subjects']],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>"
     data-ph-subject="<?= !empty($guide['is_ph']) ? 'si' : 'no' ?>"
     data-appraisal-id="<?= e($record['id']) ?>" data-excel-preview-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/excel/revisar')) ?>"
+    data-detail-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/leer-aviso')) ?>"
     data-excel-save-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/excel/guardar')) ?>"
     data-excel-updated="<?= e(\App\Services\ComparableExcelHistory::display(\App\Services\ComparableExcelHistory::latest($record, $componentKey ?? ''))) ?>"
     data-subject-latitude="<?= e($subject['latitude'] ?? '') ?>" data-subject-longitude="<?= e($subject['longitude'] ?? '') ?>"
@@ -26,9 +27,9 @@
     <div id="capture-review" x-show="searchTab === 'matriz'" class="scroll-mt-6 flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Bandeja de captura · <?= e($methods[$method ?? 'mercado'] ?? 'Mercado') ?></p>
-            <h3 class="mt-2 text-xl font-semibold" x-text="(intakeView==='confirmed' ? 'Muestras confirmadas · ' : 'Muestras recogidas · ') + intakePortal"></h3>
+            <h3 class="mt-2 text-xl font-semibold" x-text="intakeView==='consolidation' ? 'Consolidación de las muestras' : intakeView==='research' ? 'Completar los inmuebles consolidados' : 'Muestras recogidas · '+intakePortal"></h3>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                Información recogida de los anuncios de este portal.
+                Información recogida y guardada de los anuncios.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
@@ -37,7 +38,7 @@
             <button type="button" @click="searchTab = 'captura'" class="btn-secondary min-h-11">Seguir capturando</button>
         </div>
     </div>
-    <?php require __DIR__ . '/methodology-intake-table.php'; require __DIR__ . '/methodology-intake-cards.php'; ?>
+    <?php require __DIR__ . '/methodology-consolidation.php'; require __DIR__ . '/methodology-research-consolidated.php'; require __DIR__ . '/methodology-intake-table.php'; require __DIR__ . '/methodology-intake-cards.php'; ?>
     <details class="mt-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Excel · descargar o actualizar anuncios (opcional)</summary><button type="button" class="btn-secondary my-2" @click="searchTab='matriz'; mode='table'">Abrir tabla de respaldo</button><?php require __DIR__ . '/methodology-excel-import.php'; ?></details>
     <?php require __DIR__ . '/methodology-intake-unit-price-help.php'; ?>
     <div x-show="searchTab === 'matriz' && mode !== 'intake'"><?php require __DIR__ . '/valuation-methodology-capture-areas.php'; ?></div>

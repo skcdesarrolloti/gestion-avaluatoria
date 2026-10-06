@@ -10,6 +10,7 @@ final class ComparableCaptureDetail
             'intake_state' => ['Decisión de captura', 'choice', 'shared'],
             'capture_confirmation' => ['Participación en la investigación', 'choice', 'shared'],
             'property_group' => ['Identificador de inmueble confirmado', 'text', 'internal'],
+            'research_primary' => ['Ficha principal para completar el inmueble', 'choice', 'internal'],
             'intake_note' => ['Pendientes o motivo de selección', 'text', 'shared'],
             'source_updates' => ['Lecturas posteriores del mismo anuncio · diferencias conservadas', 'text', 'shared'],
             'latest_source_excerpt' => ['Último texto leído del anuncio · contrastar con captura original', 'text', 'shared'],
@@ -45,6 +46,7 @@ final class ComparableCaptureDetail
     }
     public static function options(string $key): array
     {
+        if ($key === 'research_primary') return [''=>'Sin elección explícita','si'=>'Ficha principal','no'=>'Fuente de respaldo'];
         if ($key === 'capture_confirmation') return [''=>'Por confirmar','confirmed'=>'Confirmado para investigación','excluded'=>'No participa en investigación'];
         if ($key === 'intake_state') return [''=>'Por revisar','review'=>'Por revisar','selected'=>'Seleccionado para análisis','selected_pending'=>'Seleccionado con pendientes','not_selected'=>'No seleccionado'];
         if ($key === 'location_verification') return [''=>'Sin verificación manual','exact'=>'Ubicación exacta verificada manualmente','approximate'=>'Ubicación aproximada verificada manualmente'];

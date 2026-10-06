@@ -3,6 +3,14 @@ import assert from 'node:assert/strict';
 import { captureSelectedDetails } from '../resources/js/capture-selected-details.js';
 
 const cards=()=>[1,2,3].map(id=>({row:{source_url:'https://source.test/oficina-'+id},tone:id===1?'registered':'new'}));
+
+test('first sweep persists pasted rows without opening any individual ficha',async()=>{
+ let reads=0,saves=0;
+ const io={fill(_form,rows,_query,_unused,options){options.onInserted(rows[0]);return {count:1,duplicates:0,overflow:0};},
+ save:async()=>{saves++;return true;},read:async()=>{reads++;}};
+ assert.match(await captureSelectedDetails({},cards(),'','',()=>{},false,io),/Consolidación/);
+ assert.equal(reads,0);assert.equal(saves,1);
+});
 test('two steps save intake before reading only inserted properties and checkpoint each detail',async()=>{
  const events=[],items=cards(); let fills=0;
  const io={fill(_form,rows,_query,_unused,options){fills++;events.push('fill'+fills);if(fills===1)options.onInserted(rows[1]);return {count:1,duplicates:1,overflow:1};},

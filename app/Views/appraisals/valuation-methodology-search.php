@@ -21,10 +21,9 @@ $formulaFamilies = [
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ sourcePortal: '', intakeStep: 'review', supportTab: 'context', searchTab: 'captura' }">
     <nav class="mb-3 flex flex-wrap gap-2 rounded-xl bg-slate-100 p-2" aria-label="Pasos de la investigación">
-        <button type="button" class="btn-secondary" :aria-pressed="searchTab==='captura'" :class="(searchTab==='captura') ? 'ring-2 ring-teal-700 bg-teal-50' : ''" @click="searchTab='captura'">1. Buscar por portal</button>
-        <button type="button" class="btn-secondary" :aria-pressed="searchTab==='matriz' && intakeStep==='review'" :class="(searchTab==='matriz' && intakeStep==='review') ? 'ring-2 ring-teal-700 bg-teal-50' : ''" @click="searchTab='matriz'; intakeStep='review'; $dispatch('intake-navigate',{view:'review'})">2. Revisar por portal</button>
-        <button type="button" class="btn-secondary" :aria-pressed="searchTab==='matriz' && intakeStep==='confirmed'" :class="(searchTab==='matriz' && intakeStep==='confirmed') ? 'ring-2 ring-teal-700 bg-teal-50' : ''" @click="searchTab='matriz'; intakeStep='confirmed'; $dispatch('intake-navigate',{view:'confirmed'})">3. Confirmados y factores</button>
-        <button type="button" class="btn-secondary" :aria-pressed="searchTab==='matriz' && intakeStep==='table'" @click="searchTab='matriz'; intakeStep='table'; $dispatch('intake-navigate',{view:'table'})">4. Tabla de inmuebles</button>
+        <button type="button" class="btn-secondary" :aria-pressed="searchTab==='captura'" :class="(searchTab==='captura') ? 'ring-2 ring-teal-700 bg-teal-50' : ''" @click="searchTab='captura'">1. Recoger por portal</button>
+        <button type="button" class="btn-secondary" :aria-pressed="searchTab==='matriz' && intakeStep==='consolidation'" @click="searchTab='matriz'; intakeStep='consolidation'; $dispatch('intake-navigate',{view:'consolidation'})">2. Consolidación de las muestras</button>
+        <button type="button" class="btn-secondary" :aria-pressed="searchTab==='matriz' && intakeStep==='research'" @click="searchTab='matriz'; intakeStep='research'; $dispatch('intake-navigate',{view:'research'})">3. Completar inmuebles únicos</button>
     </nav>
     <?php require __DIR__ . '/methodology-search-support.php'; ?>
     <div class="mt-6" x-show="['captura','matriz','mapa'].includes(searchTab)">

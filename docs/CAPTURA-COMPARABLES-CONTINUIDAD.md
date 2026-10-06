@@ -104,3 +104,5 @@ Guardado por portal: [confirmación, reintento y recuperación](GUARDADO-CAPTURA
 Complemento automático por enlace: [fichas individuales y alcance](FICHAS-INDIVIDUALES-ATRIBUTOS.md).
 
 2026-10-06: [tabla simple por portal](TABLA-SIMPLE-POR-PORTAL.md). Solicitud del usuario: una fila por anuncio y solo columnas con información recogida; sin comparación con sujeto en Insumos. Revisión individual plegada, matriz y capturas conservadas.
+
+2026-10-06: [consolidar antes de investigar fichas](CONSOLIDACION-ANTES-DE-FICHAS.md). Sustituye el complemento automático al subir por recoger → consolidar → completar una ficha por inmueble único. Conserva anuncios de respaldo y el guardado confirmado.

@@ -40,3 +40,23 @@ expect($ficha['contact_name']==='Inmobiliaria de prueba' && $facts['Anunciante']
     && $facts['Tipo de anunciante']==='inmobiliaria','ficha conserva anunciante distinto del portal y de propiedad jurídica');
 expect(!isset($ficha['contact_phone']),'no presenta teléfono enmascarado como contacto completo');
 expect(App\Services\FincaraizFichaDetails::parse($doc,str_replace('193907764','193978243',$fincaUrl))===[],'ficha técnica exige identidad del anuncio y no lee filtros relacionados');
+
+$sources=(new App\Services\AppraisalComparableSourceSearchBuilder())->build([],['city_name'=>'Cartagena'],'oficina','Oficina','Venta');
+foreach (array_merge($sources['portal_sources'],$sources['agency_sources']) as $source) {
+    $parts=parse_url($source['url']); $url='https://'.($source['domain'] ?? $parts['host']).'/inmueble/oficina-123';
+    $html='<link rel="canonical" href="'.$url.'"><main><h1>Oficina</h1><dl><dt>Baños</dt><dd>2</dd><dt>Rampa de acceso</dt><dd>Sí</dd></dl><p>Anunciante: Agencia publicada</p><p>Recepción privada.</p><section class="related"><p>Baños: 999</p></section></main>';
+    $parsed=(new ComparableDetailParser())->parse($html,$url)['row'];
+    expect($parsed['bathrooms']==='2','lector visible preserva baños explícitos de '.$source['label']);
+    $facts=json_decode($parsed['published_attributes'],true);
+    expect($facts['Rampa de acceso']==='Sí' && !str_contains($parsed['published_text'],'999'),'lector de '.$source['label'].' conserva atributos sin mezclar relacionados');
+}
+$wasiUrl='https://asesorarinmobiliaria.com/inmueble/oficina-123/';
+$wasi=['url'=>['detail'=>rtrim($wasiUrl,'/')],'nombre'=>'Oficina publicada','descripcion'=>'Recepción privada.',
+    'gestion'=>['esVenta'=>true],'valor_venta'=>100000000,'n_baños'=>2,'area_construida'=>85,
+    'caracteristicas'=>[['nombre'=>'Rampa de acceso','valor'=>null],['nombre'=>'Piso','valor'=>'4']]];
+$wasiHtml='<script>window.VISUALINMUEBLE_INMUEBLE = '.json_encode($wasi).';</script>';
+$parsed=(new ComparableDetailParser())->parse($wasiHtml,$wasiUrl)['row'];
+expect($parsed['bathrooms']==='2' && $parsed['area_m2']==='85' && $parsed['floor_level']==='4','formato de inmobiliaria conserva medidas e instalaciones de su ficha');
+expect(json_decode($parsed['published_attributes'],true)['Rampa de acceso']==='Publicado en características','instalación sin valoración conserva lo publicado sin inventar calificación');
+try { (new ComparableDetailParser())->parse($wasiHtml,str_replace('123','456',$wasiUrl)); throw new LogicException('Identidad ajena'); }
+catch (RuntimeException) { expect(true,'formato de inmobiliaria no lee objeto de otra propiedad'); }

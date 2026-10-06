@@ -2,7 +2,7 @@ import { parseComparableText } from './comparable-bulk-import.js';
 import { candidateMatches, candidateSuggestions, matrixRows } from './comparable-candidate-review.js';
 import { previewFacts } from './comparable-preview-facts.js';
 import { captureSelectedDetails } from './capture-selected-details.js';
-const normalize = value => String(value ?? '').toLowerCase().trim();
+const normalize = value => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 
 export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false, emptyMessage = '', readText = false }) {
     let panel, form;
@@ -30,10 +30,10 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
             }
             this.results = rows.map((row, i) => ({ row, number: i + 1, matches: [] }));
             this.selected = []; this.refresh();
-            this.message = `Pegado recibido: ${this.results.length} avisos preparados. Pulsa «Subir no repetidos», arriba o al final de los avisos. Todavía no se han agregado a la matriz.`;
+            this.message = `Pegado recibido: ${this.results.length} avisos preparados. Pulsa «Subir sin repetidos de este portal», arriba o al final de los avisos. Todavía no se han agregado a la matriz.`;
         },
         refresh() {
-            const matches = candidateMatches(this.results, matrixRows(form));
+            const matches = candidateMatches(this.results, matrixRows(form).filter(row => normalize(row.source_name)===normalize(label)));
             this.results.forEach((item, i) => { item.matches = matches[i]; });
             const suggestions = candidateSuggestions(this.results);
             this.results.forEach((item, i) => Object.assign(item, suggestions[i]));
@@ -56,7 +56,7 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
                 this.refresh();
                 if (includeRegistered) this.selected = requested;
                 const picked = this.results.filter(item => this.selected.includes(item.row.source_url));
-                const pending = captureSelectedDetails(form,picked,panel.dataset.query || '',panel.dataset.detailEndpoint,
+                const pending = captureSelectedDetails(form,picked,panel.dataset.query || '', '',
                     message=>{this.message=message;},includeRegistered);
                 this.selected = []; this.refresh();
                 this.message = await pending;

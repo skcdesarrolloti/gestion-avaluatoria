@@ -34,7 +34,7 @@ export function portalTable(advertisements) {
             columns.set(key,{key,label});
             if (!Object.hasOwn(values,key)) values[key]=text(ad[key]);
         });
-        return {key:ad.id,title:ad.listing_title || ad.project_name || ad.property_type || 'Inmueble',
+        return {key:ad.id,source_name:ad.source_name,title:ad.listing_title || ad.project_name || ad.property_type || 'Inmueble',
             source_url:ad.source_url,values};
     });
     const order = fields.map(([key]) => key);

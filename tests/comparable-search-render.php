@@ -34,17 +34,17 @@ declare(strict_types=1);
     $subject = []; $comparableRows = []; $marketNeighborhoods = []; $componentKey = '';
     $_SESSION['csrf'] ??= 'test-capture-tabs';
     ob_start(); require BASE_PATH . '/app/Views/appraisals/valuation-methodology-search.php'; $html = ob_get_clean();
-    expect(str_contains($html, '1. Buscar por portal') && str_contains($html, '2. Revisar por portal')
+    expect(str_contains($html, '1. Recoger por portal') && str_contains($html, '2. Consolidación de las muestras')
         && str_contains($html, 'aria-label="Vistas de las muestras"'), 'C mantiene captura y bandeja con mapas dentro de las muestras');
-    expect(str_contains($html,'3. Confirmados y factores') && str_contains($html,"searchTab === 'configuracion_portales'"), 'investigación por portal independiente de captura y bandeja');
+    expect(str_contains($html,'3. Completar inmuebles únicos') && str_contains($html,"searchTab === 'configuracion_portales'"), 'investigación por portal independiente de captura y bandeja');
     foreach (['ciencuadrasPaste', 'properatiPaste', 'mercadolibrePaste'] as $reader) {
         expect(str_contains($html, 'x-data="' . $reader . '"'), 'captura de oficina seleccionada mantiene lector ' . $reader);
     }
-    expect(str_contains($html, 'Subir no repetidos') && str_contains($html, 'Ctrl+V')
+    expect(str_contains($html, 'Subir sin repetidos de este portal') && str_contains($html, 'Ctrl+V')
         && str_contains($html, 'Pega la página de resultados') && substr_count($html, 'id="tabla-madre-83"') === 1,
         'pegado, selección sin repetidos y única matriz persisten al reorganizar C');
     expect(str_contains($html, 'sourceResultsPaste(') && str_contains($html, 'Asesorar Inmobiliaria')
-        && str_contains($html, '4. Tabla de inmuebles') && str_contains($html, 'Muestras y datos de ')
+        && str_contains($html, 'Consolidación de las muestras') && str_contains($html, 'Muestras y datos de ')
         && !str_contains($html, 'Sujeto · capítulo 3') && !str_contains($html, 'Cuadro de atributos · sujeto y portales'),
         'lectores conservados y tabla por portal sin comparación con sujeto ni catálogo vacío');
     $guide = (new \App\Services\AppraisalComparableSearchGuide())->build(

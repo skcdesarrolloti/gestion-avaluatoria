@@ -7,7 +7,8 @@ export function parseComparableBlock(block) {
     if (!text) return {};
     const url = (text.match(/https?:\/\/[^\s)]+/i)?.[0] ?? '').replace(/[.,;]+$/, '');
     const price = text.match(/(?:\$|cop\s*)\s*[\d.,]{5,}/i)?.[0] ?? '';
-    const area = text.match(/(\d+(?:[.,]\d+)?)\s*(?:m2|m²|mt2|metros?\s*cuadrados?)/i)?.[1] ?? '';
+    const area = text.match(/(\d+(?:[.,]\d+)?)\s*(?:m2|m²|mt2|metros?\s*cuadrados?)/i)?.[1]
+        ?? text.match(/área\s*(?:m2|m²)\s*[:：]?\s*(\d+(?:[.,]\d+)?)/i)?.[1] ?? '';
     const phone = text.replace(/https?:\/\/\S+/gi, '').replace(/(?:\$|cop\s*)\s*[\d.,]+/gi, '')
         .match(/(?:tel[eé]fono|tel|celular|contacto|whatsapp)\s*[:.]?\s*(\+?[\d ()-]{7,20})/i)?.[1]?.trim() ?? '';
     const lower = text.toLowerCase();

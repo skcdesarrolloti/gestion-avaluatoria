@@ -1,8 +1,8 @@
 import { portalTable } from './comparable-portal-table.js';
-import { comparisonRows } from './comparable-source-facts.js';
 import { publishedDetails } from './comparable-published-details.js';
 import { sourceUpdate } from './comparable-source-update.js';
 import { duplicateEvidence } from './comparable-duplicates.js';
+import { consolidatedResearch, primaryListing, resolvedGroup } from './comparable-consolidation.js';
 
 const normalize = value => String(value || '').normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/\s+/g, ' ').trim();
 const portalKey = value => normalize(value).replace(/ inmuebles$/, '');
@@ -34,6 +34,7 @@ export function intakeGroups(rows) {
 }
 export function comparableIntake(getEntries, getForm) {
     return {
+        ...consolidatedResearch(getEntries,getForm,intakeGroups),
         intakeCards:[], intakeTargets:[], intakeFilter:'all', intakePage:1, intakePages:1, intakeCount:0, intakeSearch:'',
         intakePortal:'', intakePortals:[], intakeView:'review', intakeConfirmedCount:0,
         intakeStates, intakeTableData:{columns:[],rows:[]},
@@ -42,11 +43,6 @@ export function comparableIntake(getEntries, getForm) {
             this.mode='intake'; this.intakeFilter='all'; this.intakeSearch=''; this.intakePage=1; this.rebuildIntake();
         },
         intakePortalCount(portal) { return getEntries().filter(e => e.used && portalKey(e.data.source_name || 'Fuente pendiente')===portalKey(portal)).length; },
-        intakeComparison(card) {
-            let config={};
-            try { config=JSON.parse(getForm().dataset.intakeEvidence || '{}'); } catch { /* A pending reference stays empty. */ }
-            return comparisonRows(card,config);
-        },
         intakeComplement(row, text) {
             if (!String(text || '').trim()) return;
             const changes=sourceUpdate(row,publishedDetails(text));
@@ -57,19 +53,22 @@ export function comparableIntake(getEntries, getForm) {
             const entries = getEntries();
             const groups = intakeGroups(entries.filter(e => e.used).map(e => ({...e.data,index:e.index})));
             this.intakeCount = groups.length;
-            this.intakeTargets = groups.map(g => ({key:g.key,title:g.title}));
+            this.consolidationRows=groups;
+            this.consolidationPending=groups.filter(g=>!resolvedGroup(g)).length;
+            this.consolidationDuplicates=groups.reduce((sum,g)=>sum+g.rows.length-1,0);
+            this.intakeTargets = groups.map((g,i) => ({key:g.key,title:`${i+1}. ${g.title} · ${g.rows[0].source_name || 'Fuente'} · ${g.rows[0].listing_code || g.key.slice(0,8)} · ${g.rows[0].area_m2 || '?'} m²`}));
             let configured=[];
             try { configured=JSON.parse(getForm()?.dataset?.intakeSources || '[]'); } catch { /* Stored source labels remain available. */ }
             this.intakePortals=[...new Map([...configured,...groups.flatMap(g => g.rows.map(r => r.source_name || 'Fuente pendiente'))].map(p => [portalKey(p),p])).values()];
             const preferred=this.intakePortals.find(p => portalKey(p)===portalKey(this.sourcePortal));
             if (preferred) this.intakePortal=preferred;
             else if (!this.intakePortals.includes(this.intakePortal)) this.intakePortal=this.intakePortals[0] || '';
-            this.intakeTableData=portalTable(entries.filter(e => e.used &&
+            this.intakeTableData=this.intakeView==='research' ? portalTable(groups.filter(g=>g.rows.every(r=>r.capture_confirmation==='confirmed')).map(primaryListing)) : portalTable(entries.filter(e => e.used &&
                 portalKey(e.data.source_name || 'Fuente pendiente')===portalKey(this.intakePortal) &&
                 (this.intakeView!=='confirmed' || e.data.capture_confirmation==='confirmed')).map(e => ({...e.data,index:e.index})));
-            this.intakeConfirmedCount=groups.filter(g => g.rows.some(r => r.capture_confirmation==='confirmed')).length;
+            this.intakeConfirmedCount=groups.filter(g => g.rows.every(r => r.capture_confirmation==='confirmed')).length;
             const query = normalize(this.intakeSearch);
-            const visible=this.intakeView==='confirmed' ? groups.map(g => ({...g,rows:g.rows.filter(r => r.capture_confirmation==='confirmed')})).filter(g => g.rows.length)
+            const visible=this.intakeView==='research' ? groups.filter(g=>g.rows.every(r=>r.capture_confirmation==='confirmed')) : this.intakeView==='confirmed' ? groups.map(g => ({...g,rows:g.rows.filter(r => r.capture_confirmation==='confirmed')})).filter(g => g.rows.length)
                 : groups.flatMap(g => g.rows.filter(r => portalKey(r.source_name || 'Fuente pendiente')===portalKey(this.intakePortal)).map(r => ({...g,key:r.id,rows:[r]})));
             const filtered = visible.filter(g => (this.intakeFilter === 'all' || (g.rows.every(r => r.capture_confirmation==='confirmed') ? 'confirmed' : g.rows.every(r => r.capture_confirmation==='excluded') ? 'excluded' : 'pending')===this.intakeFilter) &&
                 (!query || normalize(g.rows.map(r => Object.values(r).join(' ')).join(' ')).includes(query)));
@@ -98,15 +97,21 @@ export function comparableIntake(getEntries, getForm) {
             const identity = targets[0].data.property_group || targets[0].data.id;
             [...targets.map(e => ({index:e.index})),...card.rows].forEach(row => {
                 this.intakeWrite(row.index,'property_group',identity);
-                this.intakeWrite(row.index,'intake_state','review');
+                this.intakeWrite(row.index,'capture_confirmation','');
+                this.intakeWrite(row.index,'research_primary','');
             });
             this.intakeChanged();
         },
         intakeUnlink(row) {
             const group = getEntries()[row.index]?.data.property_group;
-            getEntries().filter(e => group && e.data.property_group === group).forEach(e => this.intakeWrite(e.index,'intake_state','review'));
+            getEntries().filter(e => group && e.data.property_group === group).forEach(e => {
+                this.intakeWrite(e.index,'capture_confirmation','');
+                this.intakeWrite(e.index,'research_primary','');
+            });
             this.intakeWrite(row.index,'property_group','');
-            this.intakeWrite(row.index,'intake_state','review'); this.intakeChanged();
+            this.intakeWrite(row.index,'capture_confirmation','');
+            this.intakeWrite(row.index,'research_primary','');
+            this.intakeChanged();
         },
         intakeEdit(row) { this.mode='cards'; this.group='all'; this.showImported(row.index); this.group='all'; this.render(); },
     };

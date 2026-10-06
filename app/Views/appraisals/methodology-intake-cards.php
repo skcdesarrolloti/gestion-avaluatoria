@@ -1,4 +1,4 @@
-<details x-show="searchTab === 'matriz' && mode === 'intake' && intakeView!=='table'" class="mt-4 rounded-xl border p-3" x-cloak>
+<details x-show="searchTab === 'matriz' && mode === 'intake' && !['table','consolidation'].includes(intakeView)" class="mt-4 rounded-xl border p-3" x-cloak>
     <summary class="min-h-11 cursor-pointer font-semibold">Revisar una muestra, confirmar o completar datos</summary>
     <div class="my-4 grid gap-3 sm:grid-cols-2" @input.stop @change.stop>
         <label class="label">Estado de recogida

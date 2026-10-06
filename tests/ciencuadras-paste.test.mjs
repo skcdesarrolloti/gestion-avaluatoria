@@ -9,8 +9,8 @@ const card = { url: '/inmueble/oficina-en-arriendo-o-venta-en-boca-grande-cartag
 
 test('one-click batch keeps one representative, excludes matrix matches and cannot add twice', () => {
     const savedDocument = globalThis.document;
-    const make = (id, price) => ({ source_url: `https://www.ciencuadras.com/inmueble/oficina-${id}`, price_amount: price, area_m2: '42', neighborhood: 'Bocagrande' });
-    const keys = ['source_url', 'price_amount', 'area_m2', 'neighborhood', 'comparability_notes', 'status'];
+    const make = (id, price) => ({ source_url: `https://www.ciencuadras.com/inmueble/oficina-${id}`, source_name:'Ciencuadras', price_amount: price, area_m2: '42', neighborhood: 'Bocagrande' });
+    const keys = ['source_url', 'price_amount', 'area_m2', 'neighborhood', 'comparability_notes', 'status','source_name'];
     const data = [make(1, '600000000'), {}, {}, {}];
     const controls = data.map((row, i) => keys.map(key => ({ name: `comparables[${i}][${key}]`, value: row[key] || '', tagName: 'INPUT' })));
     const rows = controls.map((fields, i) => ({ sectionRowIndex: i, querySelectorAll: () => fields }));
@@ -64,7 +64,7 @@ test('pasting and selecting a tabulated batch never writes the matrix', () => {
 });
 test('deferred review imports possible matches, blocks exact URLs, and never declares them distinct', () => {
     const original = { source_url: 'https://www.ciencuadras.com/inmueble/oficina-123', price_amount: '600000000', area_m2: '42', neighborhood: 'Bocagrande' };
-    const keys = ['source_url', 'price_amount', 'area_m2', 'neighborhood', 'comparability_notes', 'status'];
+    const keys = ['source_url', 'price_amount', 'area_m2', 'neighborhood', 'comparability_notes', 'status','source_name'];
     const rows = [original, {}].map((data, i) => ({ sectionRowIndex: i, querySelectorAll: () => keys.map(key => controls[i][key]) }));
     const controls = [original, {}].map((data, i) => Object.fromEntries(keys.map(key => [key, { name: `comparables[${i}][${key}]`, value: data[key] || '', tagName: 'INPUT' }])));
     const form = { querySelectorAll: () => rows, dispatchEvent() {} };

@@ -19,7 +19,12 @@ final class ComparableDetailParser
         } finally { libxml_clear_errors(); libxml_use_internal_errors($previous); }
         $exact=array_values(array_filter($nodes,static fn ($n)=>rtrim((string)($n['url'] ?? ''),'/')===rtrim($url,'/')));
         $eligible=$exact ?: array_values(array_filter($nodes,static fn ($n)=>empty($n['url'])));
-        if (count($eligible)!==1) throw new \RuntimeException('No se identificó una ficha individual inequívoca. Copia su texto; no se mezclaron anuncios relacionados.');
+        $visible=ComparableVisibleDetails::parse($doc,$url);
+        if (count($eligible)!==1) {
+            if (!$visible) throw new \RuntimeException('No se identificó una ficha individual inequívoca. Copia su texto; no se mezclaron anuncios relacionados.');
+            $visible['row']['source_url']=$url; $visible['row']['consulted_at']=date('Y-m-d');
+            return $visible+['read_scope'=>'Ficha individual: características publicadas y descripción.','warning'=>'Datos publicados pendientes de verificar.'];
+        }
         $item=$eligible[0]; $entity=is_array($item['mainEntity'] ?? null)?$item['mainEntity']:$item;
         $description=is_string($item['description'] ?? null)?$item['description']:'';
         if ($entity!==$item && is_string($entity['description'] ?? null)) $description.="\n".$entity['description'];
@@ -28,7 +33,15 @@ final class ComparableDetailParser
             $description.="\n".$attribute['name'].': '.(is_bool($attribute['value'])?($attribute['value']?'Sí':'No'):$attribute['value']).';';
         }
         $row=ComparablePublishedDetails::parse($description);
-        $facts=json_decode($row['published_attributes'],true) + ComparableSourceFacts::structured($entity);
+        $facts=json_decode($row['published_attributes'],true);
+        if ($visible) {
+            $row=array_replace($visible['row'],$row);
+            $facts=array_replace(json_decode($visible['row']['published_attributes'],true),$facts);
+        }
+        foreach (['seller','provider'] as $key) {
+            $seller=$item[$key] ?? $entity[$key] ?? [];
+            if (is_array($seller) && is_string($seller['name'] ?? null)) { $row['contact_name']=$seller['name']; $facts['Anunciante']=$seller['name']; break; }
+        }
         $row['published_attributes']=json_encode((object)array_slice($facts,0,80,true),JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
         foreach (['bathrooms'=>'numberOfBathroomsTotal','bedrooms'=>'numberOfBedrooms'] as $field=>$key) {
             if (is_numeric($entity[$key] ?? null) && (float)$entity[$key]>=0) $row[$field]=(string)$entity[$key];
