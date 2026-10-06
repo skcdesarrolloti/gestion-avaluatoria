@@ -3,6 +3,7 @@
     <nav class="flex flex-wrap gap-2" aria-label="Pasos de la regresión">
         <button type="button" class="btn-secondary" :aria-current="regressionTab==='academy'?'step':null" :class="regressionTab==='academy'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="regressionTab='academy'">1. Academia y fórmulas</button>
         <button type="button" class="btn-secondary" :aria-current="regressionTab==='application'?'step':null" :class="regressionTab==='application'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="regressionTab='application'">2. Preparar y calcular</button>
+        <button type="button" class="btn-secondary" :aria-current="regressionTab==='diagnostics'?'step':null" :class="regressionTab==='diagnostics'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="regressionTab='diagnostics'">3. Gráficos y datos atípicos</button>
     </nav>
     <div x-show="regressionTab==='academy'" class="rounded-xl border p-4 space-y-3">
         <p>El modelo relaciona el valor por m² con los factores elegidos. Cada coeficiente mide el cambio asociado a un factor manteniendo los otros constantes; la asociación no demuestra causalidad.</p>
@@ -31,10 +32,14 @@
         <div x-show="regressionResult" class="rounded-xl border p-4 space-y-3">
             <p role="status" x-show="!regressionCurrent()" class="text-amber-900">Los datos o la selección cambiaron. Recalcula antes de exportar.</p>
             <p x-text="regressionResult?'n='+regressionResult.n+' · R²='+regressionResult.r2.toFixed(4)+' · R² ajustado='+regressionResult.adjustedR2.toFixed(4)+' · Error residual='+regressionResult.rmse.toFixed(2)+' COP/m²':''"></p>
+            <p class="font-semibold" x-text="regressionEquation()"></p>
+            <p class="text-sm">Resultado en COP/m². Antigüedad representa la categoría codificada, no años exactos. El descuento se usa para calcular el valor final; no cuenta como factor.</p>
             <div class="overflow-auto"><table class="min-w-full text-left"><thead><tr><th class="p-2">Variable</th><th class="p-2">Coeficiente</th><th class="p-2">VIF</th></tr></thead><tbody><template x-for="(coefficient,i) in (regressionResult?.coefficients || [])" :key="i"><tr><td class="p-2" x-text="i?regressionResult.matrix.cols[i-1].label:'Intercepto'"></td><td class="p-2" x-text="coefficient.toFixed(4)"></td><td class="p-2" x-text="i?regressionResult.vif[i-1].toFixed(3):'—'"></td></tr></template></tbody></table></div>
-            <p class="text-sm">Resultado exploratorio. La matriz numérica, valores estimados y residuos se incluyen en el informe descargable. Falta revisar diagnósticos y aplicar al sujeto antes de adoptar un valor.</p>
+            <p class="text-sm">Resultado exploratorio. Revisa distribución, residuos e influencia en «3. Gráficos y datos atípicos» antes de interpretar o aplicar al sujeto.</p>
+            <button type="button" class="btn-primary" :disabled="!regressionCurrent()" @click="regressionTab='diagnostics'">Ver gráficos y revisar datos atípicos</button>
             <button type="button" class="btn-secondary" :disabled="!regressionCurrent()" @click="regressionExport()">Descargar informe de regresión para el entregable</button>
         </div>
         <p class="text-sm">La codificación se guarda como preparación. El cálculo se ejecuta al pulsar el botón; descarga su informe para conservar esta ejecución.</p>
     </div>
+    <?php require __DIR__.'/methodology-regression-diagnostics.php'; ?>
 </section></template>

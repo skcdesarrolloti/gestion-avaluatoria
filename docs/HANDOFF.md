@@ -920,3 +920,5 @@ filas evita recorridos por celda; sin resultado no serializa stamp de regresión
 1551PHP/216JS/lint/build78,3KB. QA local edición34→33→34, autoguardado y códigos
 conservados al alternar paneles, sin errores. Producción inspeccionada solo en
 lectura; no despliegue ni benchmark porcentual. Ver ANALISIS-MAPA-REGRESION.md.
+
+Diagnósticos de regresión M4 (2026-10-06): ecuación visible y tercer paso Gráficos y datos atípicos; nueve SVG para tres factores, forma de y/residuos, SKEW/KURT corregidos, estimadores/MAPE del curso, Pearson, RIC/studentizado/h/Cook y revisión directa al inmueble. Informe HTML incluye gráficos y señales; no elimina ni cambia muestras ni datos originales. Leverage QR verificado contra fórmulas analíticas y Cook contra ajustes con observación retirada. Libros del profesor leídos sin cambios: S2 Hoja1 R²0,8951 vs Hoja2 R²0,2346; no adoptar texto de ecuación discrepante ni intervalo de media como exclusión. 1551PHP/220JS/lint/build78,4KB; QA local escritorio/estrecho sin errores. No DDL, ni ANOVA/inferencia/sujeto aún; pendiente hosting y recalcular matriz real. Ver ANALISIS-DIAGNOSTICOS-REGRESION.md.

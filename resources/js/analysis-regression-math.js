@@ -31,5 +31,11 @@ export function linearRegression(x,y) {
         }
         return diagonal*n;
     });
-    return {n,k,coefficients,fitted,residuals,r2,adjustedR2:1-(1-r2)*(n-1)/(n-p),rmse:Math.sqrt(sse/(n-p)),vif};
+    // h_i = ||R^-T z_i||², using the same standardized QR factors.
+    const leverage=x.map(row=>{
+        const z=[1,...row.map((v,j)=>(v-means[j])/scales[j])],u=Array(p).fill(0);
+        for(let j=0;j<p;j++)u[j]=(z[j]-u.reduce((s,v,i)=>s+(i<j?a[i][j]*v:0),0))/a[j][j];
+        return Math.min(1,Math.max(0,u.reduce((s,v)=>s+v*v,0)));
+    });
+    return {n,k,coefficients,fitted,residuals,r2,adjustedR2:1-(1-r2)*(n-1)/(n-p),rmse:Math.sqrt(sse/(n-p)),vif,leverage};
 }
