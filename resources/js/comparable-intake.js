@@ -24,11 +24,13 @@ export function intakeGroups(rows) {
         group.candidates = [];
         return group;
     }).map((group, _, all) => {
-        group.candidates = all.filter(other => other.key !== group.key && group.rows.some(a => other.rows.some(b =>
-            normalize(a.operation) === normalize(b.operation) && normalize(a.property_type) === normalize(b.property_type) &&
-            (duplicateEvidence(a,b) || (normalize(a.project_name) && normalize(a.project_name) === normalize(b.project_name) && normalize(a.neighborhood) === normalize(b.neighborhood)) ||
-            (normalize(a.contact_phone) && normalize(a.contact_phone) === normalize(b.contact_phone) && a.area_m2 && a.area_m2 === b.area_m2)))))
-            .map(other => ({key:other.key,title:other.title}));
+        group.candidates = all.filter(other => other.key !== group.key).flatMap(other => {
+            const matches=group.rows.flatMap(a=>other.rows.flatMap(b=>{
+                const evidence=duplicateEvidence(a,b);
+                return evidence?[{a,b,...evidence}]:[];
+            }));
+            return matches.length?[{key:other.key,title:other.title,row:matches[0].b,reasons:matches[0].reasons}]:[];
+        });
         return group;
     });
 }

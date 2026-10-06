@@ -21,3 +21,13 @@ La cobertura de rutas se verificó con fixtures de las 16 fuentes. Esto no garan
 - Compilación y límite de tamaño: 77,0 KB gzip, límite 80 KB.
 - Revisión visual local en escritorio y móvil, con datos ficticios: 56 anuncios, 20 grupos, 36 respaldos; tabla de 20 filas. Sin errores de consola observados.
 - Sin modificación de datos de producción. Publicación del código en `main`; el hosting necesita actualizarse para mostrar el cambio.
+
+## Aclaración y reinicio para probar una captura nueva
+
+La lista de todos los anuncios deja de ser la acción principal: las alertas muestran la pareja propuesta, precio, área, enlace y motivos concretos de coincidencia. «Reunir: confirmé que es el mismo» agrupa únicamente por decisión explícita. El menú para buscar otra coincidencia queda plegado. Mismo edificio, sin medidas u otra evidencia suficiente, ya no produce por sí solo una alerta.
+
+La vista compacta muestra parejas pendientes y grupos vinculados pendientes. «Conservar N sin alertas de repetidos» confirma en bloque esos grupos, sin seleccionar para Análisis. El checkbox permite revisar todos los inmuebles. Los conteos distinguen anuncios incorporados, grupos después de reunir y confirmados para investigar; no afirman que una muestra histórica provenga de una prueba nueva.
+
+«Empezar de cero · muestras de esta unidad» está visible en el recorrido principal. Ofrece respaldo Excel, reinicio explícito de toda la colección actual y restauración durante la página abierta. Utiliza el mecanismo existente de retiro y guardado confirmado; no cambia el sujeto ni otras unidades. Tras el reinicio confirmado, fuentes, atributos y decisiones se vacían y los contadores de portal y consolidación son cero. Las fotos conservan la identidad anterior, no se asignan a capturas nuevas. No se ejecutó el reinicio sobre producción: lo confirma el usuario desde ese control.
+
+Validación adicional: 1482 verificaciones PHP, 182 pruebas JS, 77,1 KB gzip. Pruebas de parejas con motivos, confirmación en bloque limitada a anuncios sin alertas y reinicio con cero conteos/restauración. UI local con datos ficticios: 4 anuncios → 3 grupos; reinicio → cero; restauración → 4 anuncios. Sin cambios nuevos de persistencia ni esquema.

@@ -29,10 +29,10 @@ test('confirmed property preserves contradictory source prices without creating 
     assert.deepEqual(groups[0].conflicts,['price_amount','area_m2']);
     assert.deepEqual(groups[0].rows.map(r=>r.price_amount),['100','110']);
 });
-test('building coincidence proposes review without merging distinct offices', () => {
+test('building alone does not produce a duplicate alert for distinct offices', () => {
     const groups=intakeGroups([{id:'a',project_name:'Torre Uno',neighborhood:'Centro',property_type:'Oficina',operation:'Venta'},
         {id:'b',project_name:'Torre Uno',neighborhood:'Centro',property_type:'Oficina',operation:'Venta'}]);
-    assert.equal(groups.length,2); assert.equal(groups[0].candidates[0].key,'b');
+    assert.equal(groups.length,2); assert.equal(groups[0].candidates.length,0);
 });
 test('previously used observations show their existing selection while new imports remain for review', () => {
     const groups=intakeGroups([{id:'a',status:'usada'},{id:'b',status:'por_verificar'}]);

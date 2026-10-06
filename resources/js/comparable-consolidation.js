@@ -7,8 +7,15 @@ export const resolvedGroup = group => group.rows.every(r=>r.capture_confirmation
 
 export function consolidatedResearch(getEntries,getForm,getGroups) {
     return {
-        consolidationRows:[], consolidationPending:0, consolidationDuplicates:0,
+        consolidationRows:[], consolidationPending:0, consolidationDuplicates:0, consolidationShowAll:false,
         researchBusy:false, researchMessage:'', researchResults:[],
+        unambiguousGroups() { return this.consolidationRows.filter(g=>!g.candidates.length && !resolvedGroup(g)); },
+        consolidationVisible() { return this.consolidationRows.filter(g=>this.consolidationShowAll || (!resolvedGroup(g) && (g.candidates.length || g.rows.length>1))); },
+        confirmUnambiguous() {
+            if (this.researchBusy || this.removalBusy) return;
+            this.unambiguousGroups().forEach(g=>g.rows.forEach(r=>this.intakeWrite(r.index,'capture_confirmation','confirmed')));
+            this.intakeChanged();
+        },
         intakePrimary(group,id) {
             if (!group.rows.some(row=>row.id===id)) return;
             group.rows.forEach(row=>this.intakeWrite(row.index,'research_primary',row.id===id?'si':'no'));
