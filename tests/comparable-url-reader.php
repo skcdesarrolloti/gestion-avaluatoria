@@ -42,7 +42,11 @@ declare(strict_types=1);
     $properati = (new \App\Services\ComparablePortalLinks())->build('venta oficina Bocagrande Cartagena', 'venta', 'oficina', 'Cartagena', 'Bocagrande')[3];
     $finca = (new \App\Services\ComparablePortalLinks())->build('venta oficina Bocagrande Cartagena', 'venta', 'oficina', 'Cartagena de Indias', 'Bocagrande')[0];
     expect($finca['url'] === 'https://www.fincaraiz.com.co/venta/oficinas/bocagrande/cartagena'
-        && str_contains($finca['instruction'], 'Bocagrande aplicados'), 'abrir FincaRaíz aplica Bocagrande y no toda Cartagena');
+        && str_contains($finca['instruction'], 'Bocagrande'), 'abrir FincaRaíz aplica Bocagrande y no toda Cartagena');
+    $manga = (new \App\Services\AppraisalComparableSourceSearchBuilder())->build(
+        ['tipo_negocio' => 'venta'], ['city_name' => 'Cartagena', 'neighborhood_name' => 'Manga'], 'oficina', 'Oficina', 'Venta');
+    expect($manga['portal_sources'][0]['url'] === 'https://www.fincaraiz.com.co/venta/oficinas/manga/cartagena',
+        'FincaRaíz toma el barrio del sujeto y no fija Bocagrande como zona universal');
     expect($properati['url'] === 'https://www.properati.com.co/s/bocagrande/oficina/venta'
         && $properati['label'] === 'Properati' && $properati['network'] === 'Proppit', 'Properati conserva fuente y red con ruta de barrio verificada');
     expect($sources['portal_sources'][3]['url'] === 'https://www.properati.com.co/s/cartagena-bolivar/oficina/venta'

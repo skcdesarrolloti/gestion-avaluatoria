@@ -20,11 +20,12 @@ final class ComparablePortalLinks
         if (!$cartagena || $operation !== 'venta') return $sources;
         $castillogrande = in_array($this->slug($neighborhood), ['castillogrande', 'castillo-grande'], true);
         if ($type === 'oficina' || ($type === 'casa' && $castillogrande)) {
-            $bocagrande = $type === 'oficina' && $this->slug($neighborhood) === 'bocagrande';
-            $place = $castillogrande ? 'castillogrande/cartagena' : ($bocagrande ? 'bocagrande/cartagena' : 'cartagena/bolivar');
+            $zone = $this->slug($neighborhood);
+            $officeZone = $type === 'oficina' && strlen($zone) >= 3;
+            $place = $castillogrande ? 'castillogrande/cartagena' : ($officeZone ? $zone . '/cartagena' : 'cartagena/bolivar');
             $sources[0]['url'] = 'https://www.fincaraiz.com.co/venta/' . ($type === 'oficina' ? 'oficinas' : 'casas') . '/' . $place;
             $sources[0]['kind'] = 'Filtros del portal';
-            $sources[0]['instruction'] = ($castillogrande || $bocagrande) ? 'Venta, tipo y ' . ($bocagrande ? 'Bocagrande' : 'Castillogrande') . ' aplicados; comprueba la ubicación declarada en cada aviso.'
+            $sources[0]['instruction'] = ($castillogrande || $officeZone) ? 'Venta y tipo preparados para ' . $neighborhood . '; comprueba que el portal muestre ese barrio seleccionado antes de copiar los resultados.'
                 : 'Venta, oficina y Cartagena aplicados. Falta seleccionar o comprobar el barrio: ' . $neighborhood . '.';
         }
         if ($type === 'oficina') {
