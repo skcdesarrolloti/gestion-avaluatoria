@@ -6,10 +6,12 @@
     <p class="mt-2 text-sm"><strong>1.</strong> Pega y revisa los avisos. <strong>2.</strong> Pulsa «Subir sin repetidos de este portal». Después consolida las muestras; todavía no se abren sus fichas.</p>
     <p role="status" x-ref="pasteFeedback" x-show="message" x-cloak class="mt-3 rounded-lg border bg-white p-3 text-sm font-semibold" x-text="message"></p>
     <label for="source-results-<?= (int) $sourceIndex ?>" class="mt-3 block text-sm font-semibold">Pega la página de resultados</label>
-    <textarea id="source-results-<?= (int) $sourceIndex ?>" class="input mt-1 min-h-24 w-full bg-white" :value="pastedText"
+    <textarea id="source-results-<?= (int) $sourceIndex ?>" x-ref="pasteInput" class="input mt-1 min-h-24 w-full bg-white" :value="pastedText"
         :disabled="busy" @paste="paste($event); $nextTick(() => $refs.pasteFeedback.scrollIntoView({ block: 'center', behavior: 'smooth' }))"
         placeholder="Haz clic aquí y pulsa Ctrl+V para preparar todos los avisos copiados." aria-describedby="source-help-<?= (int) $sourceIndex ?>"></textarea>
     <p id="source-help-<?= (int) $sourceIndex ?>" class="mt-2 text-xs"><?= !empty($pasteGeneral) ? 'Si el listado no se reconoce, pega el enlace y texto de una ficha; separa las fichas con una línea vacía.' : 'Este lector reconoce oficinas en venta de la ciudad del expediente.' ?> Solo se conserva lo publicado. Los datos faltantes quedan pendientes.</p>
+    <p class="mt-2 text-sm">Cada página se agrega a las muestras anteriores al pulsar «Subir sin repetidos». Pegar solo prepara el lote; no lo guarda.</p>
+    <button type="button" class="btn-secondary mt-2 min-h-11" :disabled="busy" @click="nextPage()">Pegar otra página</button>
     <div x-show="results.length" x-cloak class="mt-3">
         <p class="mb-3 text-sm font-semibold" x-text="results.length + ' avisos leídos en esta página · ' + suggestedCount + ' sugeridos para agregar · ' + registeredCount + ' ya registrados · ' + reviewCount + ' posibles coincidencias omitidas del lote sugerido'"></p>
         <div class="flex flex-wrap gap-2">

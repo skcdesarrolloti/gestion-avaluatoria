@@ -2,6 +2,7 @@ import { parseComparableText } from './comparable-bulk-import.js';
 import { candidateMatches, candidateSuggestions, matrixRows } from './comparable-candidate-review.js';
 import { previewFacts } from './comparable-preview-facts.js';
 import { captureSelectedDetails } from './capture-selected-details.js';
+import { flushModuleForm } from './module-autosave.js';
 const normalize = value => String(value ?? '').normalize('NFD').replace(/[\u0300-\u036f]/g,'').toLowerCase().trim();
 
 export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false, emptyMessage = '', readText = false }) {
@@ -61,6 +62,24 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
                 this.selected = []; this.refresh();
                 this.message = await pending;
                 this.refresh();
+            } finally { this.busy = false; }
+        },
+        async nextPage(save = flushModuleForm) {
+            if (this.busy) return;
+            this.refresh();
+            if (this.suggestedCount) {
+                this.message = 'Primero pulsa «Subir sin repetidos de este portal» para conservar los avisos nuevos de esta página.';
+                return;
+            }
+            this.busy = true;
+            try {
+                if (!await save(form)) {
+                    this.message = 'Guardado pendiente. Conserva esta página y pulsa Guardar matriz antes de pegar otra.';
+                    return;
+                }
+                this.results = []; this.selected = []; this.pastedText = '';
+                this.message = 'Campo listo para otra página. Los anuncios incorporados siguen guardados. Abre la siguiente página en el portal, copia con Ctrl+A → Ctrl+C y pega aquí con Ctrl+V. Después pulsa Subir sin repetidos de este portal.';
+                this.$refs?.pasteInput?.focus();
             } finally { this.busy = false; }
         },
     };
