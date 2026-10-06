@@ -51,4 +51,9 @@
     expect(json_decode($applied['analysis_factor_selection'],true)['applied']===['floor_level'],'factores aplicados se conservan separados del borrador');
     expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"applied":{},"threshold":50}']),'factores aplicados rechazan objeto');
     expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"applied":[{}],"threshold":50}']),'factor aplicado rechaza estructura anidada');
+    $stat=['at'=>'2026-10-06T15:00:00.000Z','action'=>'filter','changed'=>'','scope'=>'subject','regime'=>'si','count'=>34,'factors'=>[],'complete'=>null,'offer'=>['n'=>34,'mean'=>100,'median'=>100,'sd'=>10,'cv'=>10],'adjusted'=>['n'=>0,'mean'=>null,'median'=>null,'sd'=>null,'cv'=>null]];
+    $historic=\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>json_encode(['selected'=>[],'threshold'=>50,'statistics'=>[$stat]])]);
+    expect(json_decode($historic['analysis_factor_selection'],true)['statistics'][0]===$stat,'etapa estadística conserva valores congelados y número de muestras');
+    expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>json_encode(['selected'=>[],'threshold'=>50,'statistics'=>[array_replace($stat,['count'=>-1])]])]),'etapa rechaza cantidades negativas');
+    expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>json_encode(['selected'=>[],'threshold'=>50,'statistics'=>[array_replace($stat,['offer'=>['n'=>35,'mean'=>100,'median'=>100,'sd'=>10,'cv'=>10]])]])]),'estadístico rechaza más valores que muestras');
 })();

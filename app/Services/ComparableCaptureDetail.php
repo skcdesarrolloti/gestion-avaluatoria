@@ -65,12 +65,12 @@ final class ComparableCaptureDetail
             $value = trim((string) $value);
             if ($key === 'property_group' && $value !== '' && !preg_match('/^[a-f0-9]{32}$/D', $value))
                 throw new HttpException(422, 'Identificador de inmueble inválido.');
-            $limit=$type==='facts'?48000:(in_array($type,['source_text','factor_selection'],true)?16000:1600);
+            $limit=in_array($type,['facts','factor_selection'],true)?48000:($type==='source_text'?16000:1600);
             if (mb_strlen($value) > $limit) throw new HttpException(422, "$label: máximo $limit caracteres.");
             if ($type==='facts') $value=ComparableSourceFacts::normalize($value);
             if ($type==='factor_selection' && $value!=='') {
-                $selection=json_decode($value,true,4);
-                $selectionObject=json_decode($value,false,4);
+                $selection=json_decode($value,true,8);
+                $selectionObject=json_decode($value,false,8);
                 if (!is_array($selection) || !is_array($selectionObject->selected ?? null) || !array_is_list($selection['selected']) || count($selection['selected'])>160
                     || !is_numeric($selection['threshold']??null) || $selection['threshold']<0 || $selection['threshold']>100)
                     throw new HttpException(422,'Selección de factores inválida. Usa un umbral de 0 a 100 %.');
@@ -81,12 +81,13 @@ final class ComparableCaptureDetail
                 if (isset($selection['regime_applied']) && !is_bool($selection['regime_applied'])) throw new HttpException(422,'Estado de depuración inválido.');
                 if (isset($selection['view']) && !in_array($selection['view'],['raw','regime','clean','result'],true)) throw new HttpException(422,'Vista de análisis inválida.');
                 $review=array_key_exists('review',$selection) ? ['review'=>ComparableAnalysisReview::normalize($selectionObject->review ?? null)] : [];
+                $statistics=array_key_exists('statistics',$selection) ? ['statistics'=>ComparableAnalysisStatistics::normalize($selectionObject->statistics ?? null)] : [];
                 $value=json_encode(['selected'=>array_values(array_unique($selection['selected'])),'threshold'=>(float)$selection['threshold']]
                     + (isset($selection['scope']) ? ['scope'=>$selection['scope']] : [])
                     + (isset($selection['applied_scope']) ? ['applied_scope'=>$selection['applied_scope']] : [])
                     + (isset($selection['regime_applied']) ? ['regime_applied'=>$selection['regime_applied']] : [])
                     + (isset($selection['applied']) ? ['applied'=>array_values(array_unique($selection['applied']))] : [])
-                    + (isset($selection['view']) ? ['view'=>$selection['view']] : []) + $review,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
+                    + (isset($selection['view']) ? ['view'=>$selection['view']] : []) + $review + $statistics,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
             }
             if ($type === 'choice' && !array_key_exists($value, self::options($key)))
                 throw new HttpException(422, "$label: selecciona una opción válida.");
