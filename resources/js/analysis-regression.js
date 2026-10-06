@@ -15,7 +15,7 @@ export function regressionMethods() {
             return {id:r.key,label:'Muestra '+(r.analysisIndex+1),x,y};
         });return {cols,rows,complete:rows.filter(r=>r.x.every(Number.isFinite) && Number.isFinite(r.y))};},
         regressionStamp(){return JSON.stringify([this.analysisApplied,this.analysisActiveRows(),this.analysisDiscounts,this.regressionBasis,this.regressionCodes]);},
-        regressionCurrent(){return this.regressionResult?.stamp===this.regressionStamp();},
+        regressionCurrent(){return !!this.regressionResult && this.regressionResult.stamp===this.regressionStamp();},
         async regressionRun(){if(this.regressionBusy)return;this.regressionBusy=true;this.regressionError='';this.regressionResult=null;
             try {await new Promise(resolve=>setTimeout(resolve,30));if(!this.regressionConfirmed)throw new Error('Confirma la codificación antes de calcular.');
                 if(!this.analysisRegimeApplied || !this.analysisApplied.length || this.analysisFactorsPending())throw new Error('Aplica la depuración y actualiza los factores antes de calcular.');

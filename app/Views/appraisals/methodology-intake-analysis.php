@@ -38,7 +38,7 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
                 <button type="button" class="btn-secondary" :aria-current="analysisModule==='regression'?'page':null" :class="analysisModule==='regression'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='regression'">3. Modelo de regresión</button>
             </nav>
         </div>
-        <div x-show="analysisModule==='samples'">
+        <template x-if="analysisModule==='samples'"><div>
         <?php require __DIR__.'/methodology-analysis-data-table.php'; ?>
         <details class="mt-4"><summary class="min-h-11 cursor-pointer font-semibold">Ubicación y anuncios originales</summary>
         <?php foreach ($intakeGroups as $group): $row = $group[0]; $index = $row['capture_index']; ?>
@@ -52,7 +52,7 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
         </article>
         <?php endforeach; ?>
         </details>
-        </div>
+        </div></template>
         <?php foreach ($analysisRows as $position=>$locationRow): foreach ($locationKeys as $field): ?>
         <input type="hidden" name="comparables[<?= (int)$locationRow['capture_index'] ?>][<?= e($field) ?>]" :value="analysisRows[<?= $position ?>].<?= $field ?> || ''">
         <?php endforeach; endforeach; ?>

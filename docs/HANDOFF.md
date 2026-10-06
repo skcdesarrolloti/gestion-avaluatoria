@@ -913,3 +913,10 @@ Ubicación visible en M4 (2026-10-06): barra fija dentro del análisis con ruta
 y aria-current. Academia/aplicación también resaltan su paso. No cambia datos,
 conteos, selección ni cálculo.1551PHP/215JS/lint/build78,3KB, navegador local
 escritorio/estrecho sin errores. Pendiente actualización del hosting.
+
+Rendimiento M4 (2026-10-06): paneles muestras/mapa/regresión montados al abrir,
+datos y payload oculto conservados. Cache de lecturas derivadas y revisión de
+filas evita recorridos por celda; sin resultado no serializa stamp de regresión.
+1551PHP/216JS/lint/build78,3KB. QA local edición34→33→34, autoguardado y códigos
+conservados al alternar paneles, sin errores. Producción inspeccionada solo en
+lectura; no despliegue ni benchmark porcentual. Ver ANALISIS-MAPA-REGRESION.md.

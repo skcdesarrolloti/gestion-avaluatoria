@@ -1,4 +1,4 @@
-<section x-show="analysisModule==='regression'" x-cloak class="space-y-4">
+<template x-if="analysisModule==='regression'"><section class="space-y-4">
     <h3 class="text-xl font-semibold">Modelo de regresión lineal múltiple</h3>
     <nav class="flex flex-wrap gap-2" aria-label="Pasos de la regresión">
         <button type="button" class="btn-secondary" :aria-current="regressionTab==='academy'?'step':null" :class="regressionTab==='academy'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="regressionTab='academy'">1. Academia y fórmulas</button>
@@ -37,4 +37,4 @@
         </div>
         <p class="text-sm">La codificación se guarda como preparación. El cálculo se ejecuta al pulsar el botón; descarga su informe para conservar esta ejecución.</p>
     </div>
-</section>
+</section></template>

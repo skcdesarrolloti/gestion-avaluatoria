@@ -43,3 +43,21 @@ Las simulaciones siguen marcadas en pantalla e informe. No modifica originales.
 Validación:1551PHP/215JS/223BD3399, lint/build78,3KB. Navegador local con34muestras
 ficticias, confirmación de códigos, cálculo y vista de coordenadas; escritorio/móvil.
 Sin actualización del hosting ni cambio en datos de producción.
+
+## Rendimiento al editar (2026-10-06)
+
+Los paneles principales se montan al abrirlos (x-if); sus datos y campos ocultos
+de persistencia permanecen en el estado del formulario. Mapa y preparación de
+regresión ya no mantienen bindings activos mientras se editan muestras.
+Las lecturas derivadas y proyecciones se reutilizan hasta cambiar datos,
+selección, régimen, descuentos, códigos o vista. Un watcher profundo de filas
+invalida la revisión de datos; consumidores JS sin Alpine conservan la detección
+por contenido. Sin resultado de regresión no se serializa la matriz para comprobar
+vigencia. El ajuste sigue siendo explícito y el autoguardado conserva debounce800ms.
+
+Verificación:1551PHP/216JS, lint/build/tamaño78,3KB. QA local: edición cambia
+34→33→34 completas, autoguardado confirmado y códigos conservados al alternar
+muestras/mapa/regresión; sin errores de consola. La página publicada se inspeccionó
+solo en lectura: mapa y regresión ocultos seguían montados. No se midió una mejora
+porcentual ni se desplegó en hosting; otros bloques grandes del formulario pueden
+necesitar una medición adicional si la lentitud persiste tras actualizar.

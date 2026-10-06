@@ -1,4 +1,4 @@
-<section x-show="analysisModule==='location'" x-cloak class="space-y-4">
+<template x-if="analysisModule==='location'"><section class="space-y-4">
     <h3 class="text-xl font-semibold">Localización comparada del sujeto y las muestras</h3>
     <p>Registra coordenadas WGS84, precisión y evidencia del anuncio. Una ubicación de sector sigue siendo aproximada. Las coordenadas del sujeto se consultan desde su ficha.</p>
     <p x-text="'Sujeto: '+(analysisSubjectLocation.latitude || 'latitud pendiente')+', '+(analysisSubjectLocation.longitude || 'longitud pendiente')"></p>
@@ -26,4 +26,4 @@
         <button type="button" class="btn-secondary" @click="analysisMapReport()">Descargar mapa y cuadro de distancias</button>
     </div>
     <p class="text-sm">Espera Guardado confirmado antes de descargar la versión definitiva del informe.</p>
-</section>
+</section></template>

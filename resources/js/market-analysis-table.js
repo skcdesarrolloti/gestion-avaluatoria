@@ -1,4 +1,5 @@
 import {tableProjection} from './analysis-table-projection.js';
+import {cacheAnalysisReads} from './analysis-read-cache.js';
 import {regressionMethods} from './analysis-regression.js';
 import {locationMapMethods} from './analysis-location-map.js';
 import {manualMethods} from './analysis-manual-factors.js';
@@ -27,11 +28,13 @@ export function marketAnalysisTable(rows,subjectRegime='',subjectType='',subject
     const project=tableProjection(true), original=tableProjection(), active=tableProjection(true), factors=analysisCoverage(rows,subjectType);
     let factorTable, factorCache;
     let saved={};try {saved=JSON.parse(rows.find(r=>r.analysis_factor_selection)?.analysis_factor_selection || '{}');} catch {}
-    return {
+    return cacheAnalysisReads({
+        analysisReactiveCache:false,analysisDataRevision:0,
+        init(){if(!this.$watch)return;this.analysisReactiveCache=true;this.$watch('analysisRows',()=>{this.analysisDataRevision++;});},
         analysisModule:'samples', ...regressionMethods(), ...locationMapMethods(subjectLocation),
         regressionBasis:saved.regression?.basis || 'offer',regressionCodes:saved.regression?.codes || {},regressionConfirmed:saved.regression?.confirmed || false,
-        analysisRows:rows, get analysisTable(){return project(this.analysisRows);}, get analysisOriginalTable(){return original(this.analysisRows);}, ...manualMethods(), analysisSubjectRegime:subjectRegime, analysisScope:saved.scope ?? 'subject', analysisAppliedScope:saved.applied_scope ?? saved.scope ?? 'subject', analysisRegimeApplied:saved.regime_applied ?? ['clean','result'].includes(saved.view), analysisThreshold:50, analysisView:saved.view ?? 'raw',
-        get analysisFactors(){const rows=this.analysisActiveRows(),table=active(rows);if(table!==factorTable){factorCache=analysisCoverage(rows,subjectType,table);factorTable=table;}return factorCache;},
+        analysisRows:rows, get analysisTable(){return project(this.analysisRows,this.analysisReactiveCache?this.analysisDataRevision:undefined);}, get analysisOriginalTable(){return original(this.analysisRows,this.analysisReactiveCache?this.analysisDataRevision:undefined);}, ...manualMethods(), analysisSubjectRegime:subjectRegime, analysisScope:saved.scope ?? 'subject', analysisAppliedScope:saved.applied_scope ?? saved.scope ?? 'subject', analysisRegimeApplied:saved.regime_applied ?? ['clean','result'].includes(saved.view), analysisThreshold:50, analysisView:saved.view ?? 'raw',
+        get analysisFactors(){const rows=this.analysisActiveRows(),table=active(rows,this.analysisReactiveCache?this.analysisDataRevision:undefined);if(table!==factorTable){factorCache=analysisCoverage(rows,subjectType,table);factorTable=table;}return factorCache;},
         analysisSelected:(saved.selected ?? factors.map(f=>f.key)).filter(key=>factors.some(f=>f.key===key && f.compatible)),
         analysisApplied:saved.applied ?? saved.selected ?? [],
         analysisStatistics:saved.statistics ?? [], analysisReview:saved.review ?? [], analysisBusy:false, analysisProcessed:0, analysisFilterDone:false, analysisError:'',
@@ -69,5 +72,5 @@ export function marketAnalysisTable(rows,subjectRegime='',subjectType='',subject
         analysisAreaNote(id){const row=this.analysisRows.find(r=>r.id===id);return row.ph_regime==='si' && row.ph_special!=='condominio'
             && (amount(row.private_built_m2)!==amount(row.area_m2) || !String(row.areas_source??'').trim())
             ? 'PH · art. 19.2: base privada construida sin confirmar o sin soporte. Revisar área y componentes antes de adoptar el cociente.' : '';},
-    };
+    });
 }
