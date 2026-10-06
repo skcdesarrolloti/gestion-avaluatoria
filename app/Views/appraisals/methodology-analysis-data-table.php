@@ -15,6 +15,7 @@
 <div x-show="analysisView==='clean'" x-cloak>
 <p class="mb-3 text-sm">Regla de depuración: al menos 50 % con dato, compatible con el tipo y con variación. En oficinas, Habitaciones y Estrato no participan. No se borran datos. Para regresión faltará validar codificación, valor por m², correlación y colinealidad.</p>
 <p class="mb-3 text-sm" aria-live="polite" x-text="(analysisColumns().length+1)+' factores marcados: área en m² fija + '+analysisColumns().length+' elegidos. Después de cambiar la selección, pulsa Actualizar depuración y ver resultado.'"></p>
+<p class="mb-3 text-sm" aria-live="polite" x-text="'Mínimo 10 muestras completas por factor: '+analysisSampleRule().factors+' factores requieren '+analysisSampleRule().required+' muestras; esta selección tiene '+analysisSampleRule().complete+' filas completas.'"></p>
 <button type="button" class="btn-primary mb-3" @click="analysisUpdate(); $dispatch('input')">Actualizar depuración y ver resultado</button>
 <div class="mb-3 rounded-xl border p-3"><h3 class="font-semibold">Validaciones y selección de factores</h3>
     <label class="flex min-h-11 items-center gap-2"><input type="checkbox" checked disabled><span>Área publicada · m² — obligatoria, no se puede desmarcar</span></label>
@@ -25,7 +26,8 @@
 </div>
 <div x-show="analysisView==='result'" x-cloak>
     <p class="mb-3 rounded-xl border p-3" role="status" x-text="'Depuración actualizada: '+analysisActiveRows().length+' muestras · '+(analysisColumns().length+1)+' factores aplicados (incluye área en m²) · '+analysisComplete()+' filas con datos en todos los factores aplicados'"></p>
-    <p class="mb-3 text-sm text-amber-900" x-show="analysisColumns().length && analysisComplete()<=analysisColumns().length+2">Las filas completas no superan factores + 1. Vuelve a Factores del analista o completa datos antes de preparar la regresión.</p>
+    <p class="mb-3 text-sm" role="status" :class="analysisSampleRule().meets ? 'text-teal-800' : 'text-amber-900'" x-text="(analysisSampleRule().meets ? 'Cumple' : 'No cumple')+' el mínimo de 10 muestras completas por factor: '+analysisSampleRule().complete+' disponibles / '+analysisSampleRule().required+' necesarias. Con estas filas completas se admiten hasta '+analysisSampleRule().maximum+' factores, incluida el área.'"></p>
+    <p class="mb-3 text-sm" x-show="!analysisSampleRule().meets">Reduce factores o completa datos y vuelve a actualizar. Cumplir este mínimo no sustituye la validación de codificación, valor por m², correlación y colinealidad.</p>
     <p class="mb-3 text-sm" x-show="!analysisColumns().length">No hay factores adicionales aplicados. El área en m² sigue fija. Vuelve a 3. Factores del analista para agregar otros factores.</p>
 </div>
 <div x-show="['raw','result'].includes(analysisView)" class="max-h-[65vh] overflow-auto rounded-xl border" role="region" aria-label="Tabla de análisis de inmuebles" tabindex="0">

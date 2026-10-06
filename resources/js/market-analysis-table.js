@@ -38,6 +38,8 @@ export function marketAnalysisTable(rows,subjectRegime='',subjectType='') {
         analysisApplySuggestion(){this.analysisApplyRegime();this.analysisView='clean';this.analysisSelected=this.analysisFactors.filter(f=>this.analysisEligible(f)).map(f=>f.key);},
         analysisUpdate(){this.analysisView='clean';this.analysisApplied=this.analysisColumns().map(f=>f.key);this.analysisView='result';},
         analysisComplete(){const columns=this.analysisColumns();return this.analysisVisibleRows().filter(r=>amount(this.analysisRows[r.analysisIndex].area_m2)>0 && columns.every(f=>!missing(r.values[f.key]))).length;},
+        analysisSampleRule(){const factors=this.analysisColumns().length+1, complete=this.analysisComplete(), required=factors*10;
+            return {factors,complete,required,maximum:Math.floor(complete/10),meets:complete>=required};},
         analysisSelection(){return JSON.stringify({selected:this.analysisSelected,applied:this.analysisApplied,threshold:50,scope:this.analysisScope,applied_scope:this.analysisAppliedScope,regime_applied:this.analysisRegimeApplied,view:this.analysisView});},
         analysisRegime(row){return !['si','no'].includes(row.ph_regime) ? (row.regime_hint?.reason || 'Régimen sin verificar') : (row.ph_regime==='si'?'PH':'No PH')+(row.ph_regime_source.trim()?' · soporte registrado':' · falta soporte');},
         analysisChange(id,value){this.analysisPercents[id]=value;const pct=Number(value);if(value==='' || Number.isFinite(pct) && pct>=0 && pct<=100) this.analysisDiscounts[id]=discountedAnalysis(this.analysisRows.find(r=>r.id===id),value).discount;},

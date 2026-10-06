@@ -110,3 +110,16 @@ test('regime filtering waits for its button and restores the applied scope indep
  restored.analysisView='clean';restored.analysisSelected=[];restored.analysisUpdate();assert.equal(restored.analysisComplete(),2);
  restored.analysisRows[0].area_m2='';assert.equal(restored.analysisComplete(),1);
 });
+
+
+test('ten complete samples per factor includes mandatory area and changes with joint coverage',()=>{
+ const rows=Array.from({length:34},(_,i)=>({id:String(i),area_m2:String(40+i),bathrooms:String(i%3),floor_level:String(i%4)}));
+ const state=marketAnalysisTable(rows);state.analysisApplySuggestion();state.analysisUpdate();
+ assert.deepEqual(state.analysisSampleRule(),{factors:3,complete:34,required:30,maximum:3,meets:true});
+ state.analysisRows.slice(29).forEach(r=>r.area_m2='');
+ assert.deepEqual(state.analysisSampleRule(),{factors:3,complete:29,required:30,maximum:2,meets:false});
+ state.analysisRows[29].area_m2='69';assert.equal(state.analysisSampleRule().meets,true);assert.equal(state.analysisSampleRule().complete,30);
+ state.analysisView='clean';state.analysisSelected=['bathrooms'];state.analysisUpdate();
+ assert.equal(state.analysisSampleRule().factors,2);assert.equal(state.analysisSampleRule().required,20);assert.equal(state.analysisSampleRule().meets,true);
+ const incomplete=marketAnalysisTable(rows.map((r,i)=>({...r,bathrooms:i<19?r.bathrooms:''})));incomplete.analysisApplySuggestion();incomplete.analysisSelected=['bathrooms'];incomplete.analysisUpdate();assert.equal(incomplete.analysisSampleRule().complete,19);assert.equal(incomplete.analysisSampleRule().meets,false);
+});
