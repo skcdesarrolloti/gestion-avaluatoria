@@ -102,3 +102,5 @@ Corrección 2026-10-05: [baños y atributos del anuncio](CORRECCION-LECTURA-ATRI
 Guardado por portal: [confirmación, reintento y recuperación](GUARDADO-CAPTURAS-CONFIRMADO.md).
 
 Complemento automático por enlace: [fichas individuales y alcance](FICHAS-INDIVIDUALES-ATRIBUTOS.md).
+
+2026-10-06: [tabla simple por portal](TABLA-SIMPLE-POR-PORTAL.md). Solicitud del usuario: una fila por anuncio y solo columnas con información recogida; sin comparación con sujeto en Insumos. Revisión individual plegada, matriz y capturas conservadas.

@@ -26,9 +26,9 @@
     <div id="capture-review" x-show="searchTab === 'matriz'" class="scroll-mt-6 flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Bandeja de captura · <?= e($methods[$method ?? 'mercado'] ?? 'Mercado') ?></p>
-            <h3 class="mt-2 text-xl font-semibold" x-text="intakeView==='table' ? 'Tabla de inmuebles y atributos' : intakeView==='review' ? 'Revisar anuncios de ' + intakePortal : 'Inmuebles confirmados · todos sus factores'"></h3>
+            <h3 class="mt-2 text-xl font-semibold" x-text="(intakeView==='confirmed' ? 'Muestras confirmadas · ' : 'Muestras recogidas · ') + intakePortal"></h3>
             <p class="mt-2 max-w-3xl text-sm leading-6 text-slate-600">
-                Revisa un anuncio a la vez y confirma su participación. Los confirmados reúnen sus atributos y fuentes; la comparabilidad y las coordenadas se verificarán en Análisis.
+                Información recogida de los anuncios de este portal.
             </p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
@@ -37,7 +37,7 @@
             <button type="button" @click="searchTab = 'captura'" class="btn-secondary min-h-11">Seguir capturando</button>
         </div>
     </div>
-    <?php require __DIR__ . '/methodology-intake-cards.php'; require __DIR__ . '/methodology-intake-table.php'; ?>
+    <?php require __DIR__ . '/methodology-intake-table.php'; require __DIR__ . '/methodology-intake-cards.php'; ?>
     <details class="mt-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Excel · descargar o actualizar anuncios (opcional)</summary><button type="button" class="btn-secondary my-2" @click="searchTab='matriz'; mode='table'">Abrir tabla de respaldo</button><?php require __DIR__ . '/methodology-excel-import.php'; ?></details>
     <?php require __DIR__ . '/methodology-intake-unit-price-help.php'; ?>
     <div x-show="searchTab === 'matriz' && mode !== 'intake'"><?php require __DIR__ . '/valuation-methodology-capture-areas.php'; ?></div>

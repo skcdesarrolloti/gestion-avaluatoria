@@ -1,4 +1,5 @@
-<section x-show="searchTab === 'matriz' && mode === 'intake' && intakeView!=='table'" class="mt-4" x-cloak>
+<details x-show="searchTab === 'matriz' && mode === 'intake' && intakeView!=='table'" class="mt-4 rounded-xl border p-3" x-cloak>
+    <summary class="min-h-11 cursor-pointer font-semibold">Revisar una muestra, confirmar o completar datos</summary>
     <div class="my-4 grid gap-3 sm:grid-cols-2" @input.stop @change.stop>
         <label class="label">Estado de recogida
             <select class="input" x-model="intakeFilter" @change="intakePage = 1; rebuildIntake()"><option value="all">Todos</option><option value="pending">Por confirmar</option><option value="confirmed">Confirmados para investigación</option><option value="excluded">No participan</option></select>
@@ -28,7 +29,6 @@
                     <select class="input" @change.stop="intakeLink(card, $event.target.value); $event.target.value = ''"><option value="">Selecciona sólo si confirmaste que es el mismo</option><template x-for="target in intakeTargets.filter(t => !card.rows.some(r => (r.property_group || r.id) === t.key))" :key="target.key"><option :value="target.key" x-text="target.title + ' · ' + target.key.slice(0, 8)"></option></template></select>
                     <span class="mt-1 block text-xs font-normal">La vinculación vuelve a Por revisar. No altera precios, áreas, fotos ni fuentes.</span>
                 </label>
-                <?php require __DIR__ . '/methodology-intake-comparison.php'; ?>
                 <details class="mt-3 rounded-lg border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Anuncios, características y soportes (<span x-text="card.rows.length"></span>)</summary>
                     <template x-for="row in card.rows" :key="row.id">
                         <div class="mt-3 border-t pt-3">
@@ -68,4 +68,4 @@
         <button type="submit" class="btn-primary">Guardar decisiones</button>
         <p class="text-sm">Confirmar recopila información. No ejecuta correlación, depuración ni regresión.</p>
     </div>
-</section>
+</details>

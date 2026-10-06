@@ -1,4 +1,4 @@
-import { intakeTable } from './comparable-intake-table.js';
+import { portalTable } from './comparable-portal-table.js';
 import { comparisonRows } from './comparable-source-facts.js';
 import { publishedDetails } from './comparable-published-details.js';
 import { sourceUpdate } from './comparable-source-update.js';
@@ -56,9 +56,6 @@ export function comparableIntake(getEntries, getForm) {
         rebuildIntake() {
             const entries = getEntries();
             const groups = intakeGroups(entries.filter(e => e.used).map(e => ({...e.data,index:e.index})));
-            let config={};
-            try { config=JSON.parse(getForm()?.dataset?.intakeEvidence || '{}'); } catch {}
-            this.intakeTableData=intakeTable(groups,config);
             this.intakeCount = groups.length;
             this.intakeTargets = groups.map(g => ({key:g.key,title:g.title}));
             let configured=[];
@@ -67,6 +64,9 @@ export function comparableIntake(getEntries, getForm) {
             const preferred=this.intakePortals.find(p => portalKey(p)===portalKey(this.sourcePortal));
             if (preferred) this.intakePortal=preferred;
             else if (!this.intakePortals.includes(this.intakePortal)) this.intakePortal=this.intakePortals[0] || '';
+            this.intakeTableData=portalTable(entries.filter(e => e.used &&
+                portalKey(e.data.source_name || 'Fuente pendiente')===portalKey(this.intakePortal) &&
+                (this.intakeView!=='confirmed' || e.data.capture_confirmation==='confirmed')).map(e => ({...e.data,index:e.index})));
             this.intakeConfirmedCount=groups.filter(g => g.rows.some(r => r.capture_confirmation==='confirmed')).length;
             const query = normalize(this.intakeSearch);
             const visible=this.intakeView==='confirmed' ? groups.map(g => ({...g,rows:g.rows.filter(r => r.capture_confirmation==='confirmed')})).filter(g => g.rows.length)

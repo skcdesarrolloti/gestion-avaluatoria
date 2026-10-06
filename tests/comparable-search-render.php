@@ -44,8 +44,9 @@ declare(strict_types=1);
         && str_contains($html, 'Pega la página de resultados') && substr_count($html, 'id="tabla-madre-83"') === 1,
         'pegado, selección sin repetidos y única matriz persisten al reorganizar C');
     expect(str_contains($html, 'sourceResultsPaste(') && str_contains($html, 'Asesorar Inmobiliaria')
-        && str_contains($html, '4. Tabla de inmuebles') && str_contains($html, 'Inmuebles recogidos y atributos')
-        && str_contains($html, 'Sujeto · capítulo 3'), 'fuentes locales tienen lector con revisión y tabla separada con sujeto de referencia');
+        && str_contains($html, '4. Tabla de inmuebles') && str_contains($html, 'Muestras y datos de ')
+        && !str_contains($html, 'Sujeto · capítulo 3') && !str_contains($html, 'Cuadro de atributos · sujeto y portales'),
+        'lectores conservados y tabla por portal sin comparación con sujeto ni catálogo vacío');
     $guide = (new \App\Services\AppraisalComparableSearchGuide())->build(
         ['tipo_inmueble'=>'oficina', 'regimen_ph'=>'si', 'tipo_negocio'=>'venta'], [], [], []);
     ob_start(); require BASE_PATH . '/app/Views/appraisals/methodology-search-prompt.php'; $prompt = ob_get_clean();
