@@ -34,4 +34,8 @@
     expect($hint(['published_attributes'=>'{"Propiedad horizontal":"No","Área Privada":"40 m2"}'])['regime']==='','indicios contradictorios no clasifican');
     expect(str_contains($html,'Muestras para trabajar'),'filtro visible explica depuración reversible');
     expect(str_contains($html,'name="comparables[2][ph_regime]"'),'campos de filas ocultas permanecen en formulario');
+    $view=\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":["bathrooms"],"threshold":50,"view":"clean"}']);
+    expect(json_decode($view['analysis_factor_selection'],true)['view']==='clean','vista depurada se recupera como decisión guardada');
+    expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"threshold":50,"view":"execute"}']),'vista no permitida se rechaza');
+    expect(str_contains($html,'Información recogida') && str_contains($html,'Depurar factores'),'información íntegra y depuración tienen acciones separadas');
 })();

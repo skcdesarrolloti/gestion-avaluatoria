@@ -21,7 +21,7 @@ test('office bedrooms stay in original evidence but are not analysis factors, in
  const rows=[{id:'a',property_type:'Oficina',ph_regime:'si',bedrooms:'2',bathrooms:'1'},
  {id:'b',property_type:'Oficina',ph_regime:'no',bedrooms:'3',bathrooms:'2'}];
  const state=marketAnalysisTable(rows), bedrooms=state.analysisFactors.find(f=>f.key==='bedrooms');
- assert.equal(bedrooms.compatible,false);assert.ok(!state.analysisColumns().some(f=>f.key==='bedrooms'));
+ assert.equal(bedrooms.compatible,false);state.analysisApplySuggestion();assert.ok(!state.analysisColumns().some(f=>f.key==='bedrooms'));
  assert.equal(state.analysisRows[0].bedrooms,'2');assert.equal(rows[1].bedrooms,'3');
  assert.match(state.analysisRegime(state.analysisRows[0]),/PH · falta soporte/);
  assert.match(state.analysisRegime(state.analysisRows[1]),/No PH · falta soporte/);
@@ -52,6 +52,7 @@ test('subject regime prioritizes declared and probable matches without changing 
  {id:'no',property_type:'Oficina',ph_regime:'no',regime_hint:{regime:'si'},bathrooms:'3',negotiation_discount:'120'},
  {id:'unknown',property_type:'Oficina',published_attributes:'{"Ascensor":"Sí"}'}];
  const state=marketAnalysisTable(rows,'si');
+ state.analysisApplySuggestion();
  assert.deepEqual(state.analysisActiveRows().map(r=>r.id),['ph','probable']);
  assert.equal(state.analysisColumns().find(f=>f.key==='bathrooms').count,2);
  assert.equal(state.analysisVisibleRows()[1].analysisIndex,1);
@@ -61,7 +62,24 @@ test('subject regime prioritizes declared and probable matches without changing 
  assert.equal(state.analysisColumns().find(f=>f.key==='bathrooms').count,3);
  assert.equal(JSON.parse(state.analysisSelection()).scope,'all');
  assert.equal(marketAnalysisTable([{...rows[0],analysis_factor_selection:state.analysisSelection()},...rows.slice(1)],'si').analysisScope,'all');
- assert.equal(marketAnalysisTable(rows,'no').analysisActiveRows()[0].id,'no');
+ const no=marketAnalysisTable(rows,'no');no.analysisApplySuggestion();assert.equal(no.analysisActiveRows()[0].id,'no');
  assert.equal(marketAnalysisTable([rows[3]],'si').analysisActiveRows().length,1);
  assert.equal(marketAnalysisTable(rows).analysisActiveRows().length,4);
+});
+
+test('explicit cleansing blocks below fifty percent and office stratum while retaining the full captured view',()=>{
+ const rows=Array.from({length:4},(_,i)=>({id:String(i),property_type:i?'Por verificar':'Oficina',bathrooms:String(i),bedrooms:String(i+1),
+   published_attributes:JSON.stringify({'Estrato':String(i+3),Piso:i<2?String(i+5):'','Citófono':i===0?'Sí':'','Recepción':'Sí'})}));
+ const state=marketAnalysisTable(rows,'','oficina');
+ assert.equal(state.analysisView,'raw');assert.ok(state.analysisColumns().some(f=>f.label==='Estrato'));
+ state.analysisApplySuggestion();assert.deepEqual(state.analysisColumns().map(f=>f.key),['bathrooms','floor_level']);
+ assert.equal(state.analysisComplete(),2);assert.equal(state.analysisRows.length,4);
+ state.analysisSelected.push('published:citofono','published:estrato','bedrooms');
+ assert.equal(state.analysisColumns().length,2); // Saved or manually injected invalid selections cannot bypass rules.
+ state.analysisSelected=['bathrooms'];assert.equal(state.analysisComplete(),4);
+ const restored=marketAnalysisTable([{...rows[0],analysis_factor_selection:state.analysisSelection()},...rows.slice(1)],'','oficina');
+ assert.equal(restored.analysisView,'clean');assert.equal(restored.analysisColumns().length,1);
+ state.analysisView='raw';assert.ok(state.analysisColumns().some(f=>f.label==='Citófono'));assert.equal(state.analysisRows[0].bedrooms,'1');
+ const home=marketAnalysisTable(rows.map(r=>({...r,property_type:'Apartamento'})));home.analysisApplySuggestion();
+ assert.ok(home.analysisColumns().some(f=>f.label==='Estrato'));
 });

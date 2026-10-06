@@ -75,8 +75,10 @@ final class ComparableCaptureDetail
                     throw new HttpException(422,'Selección de factores inválida. Usa un umbral de 0 a 100 %.');
                 foreach ($selection['selected'] as $factor) if (!is_string($factor) || mb_strlen($factor)>180) throw new HttpException(422,'Factor de análisis inválido.');
                 if (isset($selection['scope']) && !in_array($selection['scope'],['subject','all'],true)) throw new HttpException(422,'Filtro de régimen inválido.');
+                if (isset($selection['view']) && !in_array($selection['view'],['raw','clean'],true)) throw new HttpException(422,'Vista de análisis inválida.');
                 $value=json_encode(['selected'=>array_values(array_unique($selection['selected'])),'threshold'=>(float)$selection['threshold']]
-                    + (isset($selection['scope']) ? ['scope'=>$selection['scope']] : []),JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
+                    + (isset($selection['scope']) ? ['scope'=>$selection['scope']] : [])
+                    + (isset($selection['view']) ? ['view'=>$selection['view']] : []),JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
             }
             if ($type === 'choice' && !array_key_exists($value, self::options($key)))
                 throw new HttpException(422, "$label: selecciona una opción válida.");

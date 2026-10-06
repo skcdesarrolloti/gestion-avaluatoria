@@ -1,11 +1,16 @@
 <p class="mb-3 text-sm">Una fila por inmueble. Factores ordenados por cantidad de muestras con dato, sin límite de seis. Valor con descuento = oferta × (1 − descuento / 100); valor por m² = valor con descuento / área publicada.</p>
+<div class="mb-3 flex flex-wrap gap-2"><button type="button" class="btn-secondary" @click="analysisView='raw'; $dispatch('input')">Información recogida</button><button type="button" class="btn-primary" @click="analysisApplySuggestion(); $dispatch('input')">Depurar factores</button></div>
+<p class="mb-3 text-sm" x-show="analysisView==='raw'">Toda la información recogida, incluidos factores que no aplican o tienen pocos datos. Pulsa Depurar factores para preparar la selección.</p>
+<div x-show="analysisView==='clean'" x-cloak>
 <?php require __DIR__.'/methodology-analysis-regime-filter.php'; ?>
-<details class="mb-3 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Elegir factores · sugerencia del algoritmo</summary>
-    <p class="text-sm">El analista decide. Cobertura y variación orientan; todavía no se calcula correlación. Las habitaciones publicadas en oficinas se conservan en el aviso original para revisar la inconsistencia.</p>
-    <label class="mt-3 block text-sm">Cobertura mínima para sugerir · %<input class="input w-28" type="number" min="0" max="100" step="any" placeholder="Ej. 50" x-model="analysisThreshold"></label>
-    <button type="button" class="btn-secondary my-3" @click="analysisApplySuggestion(); $dispatch('input')">Usar factores sugeridos</button>
-    <div class="grid gap-2 sm:grid-cols-2"><template x-for="factor in analysisFactors" :key="factor.key"><label class="flex min-h-11 items-center gap-2"><input type="checkbox" :value="factor.key" x-model="analysisSelected" :disabled="!factor.compatible"><span><span class="block" x-text="factor.label+' · '+factor.count+'/'+analysisActiveRows().length+' con dato ('+Math.round(factor.count/analysisActiveRows().length*100)+'%)'"></span><span class="block text-xs text-slate-600" x-text="analysisSuggestion(factor)"></span></span></label></template></div>
+<p class="mb-3 rounded-xl border p-3" x-text="analysisActiveRows().length+' muestras después del filtro · '+analysisColumns().length+' factores seleccionados · '+analysisComplete()+' filas con datos en todos los factores seleccionados'"></p>
+<p class="mb-3 text-sm">Regla de depuración: al menos 50 % con dato, compatible con el tipo y con variación. En oficinas, Habitaciones y Estrato no participan. No se borran datos. Para regresión faltará validar codificación, valor por m², correlación y colinealidad.</p>
+<p class="mb-3 text-sm text-amber-900" x-show="analysisColumns().length && analysisComplete()<=analysisColumns().length+1">Con estos factores, las filas completas no superan factores + 1. Revisa la selección y completa datos antes de preparar la regresión.</p>
+<details class="mb-3 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Validaciones y selección de factores</summary>
+    <p class="text-sm">El analista puede desmarcar candidatos. Factores descartados quedan bloqueados y conservados en Información recogida.</p>
+    <div class="grid gap-2 sm:grid-cols-2"><template x-for="factor in analysisFactors" :key="factor.key"><label class="flex min-h-11 items-center gap-2"><input type="checkbox" :checked="analysisEligible(factor) && analysisSelected.includes(factor.key)" @change="analysisSelected=$event.target.checked ? [...analysisSelected,factor.key] : analysisSelected.filter(k=>k!==factor.key)" :disabled="!analysisEligible(factor)"><span><span class="block" x-text="factor.label+' · '+factor.count+'/'+analysisActiveRows().length+' con dato ('+Math.round(factor.count/analysisActiveRows().length*100)+'%)'"></span><span class="block text-xs text-slate-600" x-text="analysisSuggestion(factor)"></span></span></label></template></div>
 </details>
+</div>
 <div class="max-h-[65vh] overflow-auto rounded-xl border" role="region" aria-label="Tabla de análisis de inmuebles" tabindex="0">
 <table class="w-max min-w-full text-left text-sm"><thead class="sticky top-0 bg-slate-100"><tr>
     <th class="sticky left-0 bg-slate-100 p-3">Inmueble</th><th class="p-3">Régimen PH / no PH</th><th class="p-3">Oferta · COP</th><th class="p-3">Área publicada · m²</th>
