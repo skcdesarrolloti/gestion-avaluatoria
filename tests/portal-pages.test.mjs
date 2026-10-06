@@ -23,17 +23,30 @@ test('21 then 16 announcements append, retain prior attributes and repeated page
     assert.equal(rows.filter(row=>row.querySelectorAll()[0].value).length,37);
 });
 
-test('another-page button retains preview until new announcements are uploaded and save acknowledged',async()=>{
+test('another-page button clears only paste field, retaining pages, pending cards and selection',()=>{
     const component=portalResultsPaste({label:'FincaRaiz'});
-    component.refresh=()=>{};
     component.results=[{suggested:true}]; component.pastedText='página actual';
-    let saves=0;
-    await component.nextPage(async()=>{saves++;return true;});
-    assert.equal(saves,0); assert.equal(component.pastedText,'página actual');
-    component.results=[{suggested:false,tone:'registered'}];
-    await component.nextPage(async()=>false);
-    assert.equal(component.pastedText,'página actual'); assert.match(component.message,/Guardado pendiente/);
-    await component.nextPage(async()=>true);
-    assert.equal(component.pastedText,''); assert.deepEqual(component.results,[]);
-    assert.match(component.message,/siguen guardados/);
+    component.pages=[{signature:'first',count:21}]; component.selected=['first'];
+    component.nextPage();
+    assert.equal(component.pastedText,''); assert.equal(component.results.length,1);
+    assert.equal(component.pages.length,1); assert.deepEqual(component.selected,['first']);
+    assert.match(component.message,/Se conservan/);
+});
+
+test('collect both pasted pages before upload and keep exact repeats out without replacing original data',()=>{
+    const component=portalResultsPaste({label:'FincaRaiz'});
+    const batch=(start,count)=>Array.from({length:count},(_,i)=>({source_url:`https://www.fincaraiz.com.co/oficina/${start+i}`,
+        source_name:'FincaRaiz',price_amount:String(500000000+i),area_m2:String(40+i),bathrooms:'2'}));
+    const first=batch(1,21), second=batch(22,16);
+    component.collectPage(first,'Mostrando 1 - 21 de 37 resultados');
+    const original=structuredClone(component.results[0].row);
+    component.nextPage();
+    component.collectPage(second,'Mostrando 22 - 37 de 37 resultados');
+    assert.equal(component.receivedCount,37); assert.equal(component.results.length,37);
+    assert.equal(component.pages.length,2); assert.equal(component.portalTotal,37);
+    component.collectPage(first,'Mostrando 1 - 21 de 37 resultados');
+    assert.equal(component.pages.length,2); assert.equal(component.results.length,37);
+    assert.deepEqual(component.results[0].row,original);
+    component.collectPage([first[0],...batch(38,1)]);
+    assert.equal(component.receivedCount,39); assert.equal(component.results.length,38);
 });
