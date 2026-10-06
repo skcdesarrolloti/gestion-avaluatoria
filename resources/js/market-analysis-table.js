@@ -1,11 +1,12 @@
 import {portalTable} from './comparable-portal-table.js';
 import {amount} from './comparable-negotiation.js';
+import {factorProfile,factorSuggestion} from './analysis-factor-suggestions.js';
 
 const missing=value=>value===undefined || value===null || /^(?:\s*|no publicado|pendiente|por confirmar)$/i.test(String(value).trim());
 export function analysisCoverage(rows) {
     const table=portalTable(rows), fixed=new Set(['listing_code','price_amount','area_m2','contact_name','property_type','neighborhood',
         ...['tipo de anunciante','descripcion','description','nombre','name','url','direccion','address','telefono','pricecurrency','moneda','valor de compra','codigo','identificador'].map(k=>'published:'+k)]);
-    return table.columns.filter(c=>!fixed.has(c.key)).map(c=>({...c,count:table.rows.filter(r=>!missing(r.values[c.key])).length}))
+    return table.columns.filter(c=>!fixed.has(c.key)).map(c=>factorProfile({...c,count:table.rows.filter(r=>!missing(r.values[c.key])).length},table,rows))
         .filter(c=>c.count>0).sort((a,b)=>b.count-a.count || a.label.localeCompare(b.label,'es'));
 }
 export function discountedAnalysis(row,percent) {
@@ -15,13 +16,20 @@ export function discountedAnalysis(row,percent) {
     return {discount,value,perM2:area>0 && row.price_unit!=='valor_m2' ? value/area : null};
 }
 export function marketAnalysisTable(rows) {
+    rows=rows.map(r=>({...r,ph_regime:r.ph_regime || 'por_verificar',ph_regime_source:r.ph_regime_source || ''}));
     const table=portalTable(rows), factors=analysisCoverage(rows);
+    let saved={};try {saved=JSON.parse(rows.find(r=>r.analysis_factor_selection)?.analysis_factor_selection || '{}');} catch {}
     return {
-        analysisRows:rows, analysisTable:table, analysisFactors:factors, analysisSelected:factors.map(f=>f.key),
+        analysisRows:rows, analysisTable:table, analysisFactors:factors, analysisThreshold:saved.threshold ?? 50,
+        analysisSelected:(saved.selected ?? factors.map(f=>f.key)).filter(key=>factors.some(f=>f.key===key && f.compatible)),
         analysisDiscounts:Object.fromEntries(rows.map(r=>[r.id,String(r.negotiation_discount??'')])),
         analysisPercents:Object.fromEntries(rows.map(r=>{const offer=amount(r.price_amount), discount=amount(r.negotiation_discount);
             return [r.id,offer>0 && discount!==null ? Number((discount/offer*100).toFixed(4)) : ''];})),
         analysisColumns(){return this.analysisFactors.filter(f=>this.analysisSelected.includes(f.key));},
+        analysisSuggestion(factor){return factorSuggestion(factor,this.analysisRows.length,this.analysisThreshold);},
+        analysisApplySuggestion(){this.analysisSelected=this.analysisFactors.filter(f=>this.analysisSuggestion(f)==='Sugerido por cobertura y variación').map(f=>f.key);},
+        analysisSelection(){return JSON.stringify({selected:this.analysisSelected,threshold:Number(this.analysisThreshold)});},
+        analysisRegime(row){return !['si','no'].includes(row.ph_regime) ? 'Régimen sin verificar' : (row.ph_regime==='si'?'PH':'No PH')+(row.ph_regime_source.trim()?' · soporte registrado':' · falta soporte');},
         analysisChange(id,value){this.analysisPercents[id]=value;const pct=Number(value);if(value==='' || Number.isFinite(pct) && pct>=0 && pct<=100) this.analysisDiscounts[id]=discountedAnalysis(this.analysisRows.find(r=>r.id===id),value).discount;},
         analysisResult(id){const row=this.analysisRows.find(r=>r.id===id), offer=amount(row.price_amount), discount=amount(this.analysisDiscounts[id]), area=amount(row.area_m2);
             if(this.analysisPercents[id]!=='' && (Number(this.analysisPercents[id])<0 || Number(this.analysisPercents[id])>100)) return {value:null,perM2:null};

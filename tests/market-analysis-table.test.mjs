@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import {analysisCoverage,discountedAnalysis,marketAnalysisTable} from '../resources/js/market-analysis-table.js';
+import {factorSuggestion} from '../resources/js/analysis-factor-suggestions.js';
 
 test('coverage includes more than six observed factors, counts zero, and preserves incomplete rows',()=>{
  const facts=Object.fromEntries(Array.from({length:10},(_,i)=>['Factor '+i,'Sí']));
@@ -15,6 +16,24 @@ test('coverage includes more than six observed factors, counts zero, and preserv
  assert.equal(state.analysisResult('a').perM2,4500000);assert.equal(state.analysisResult('b').value,null);
  state.analysisChange('a','120');assert.equal(state.analysisDiscounts.a,'50000000.0000');assert.equal(state.analysisResult('a').value,null);
  state.analysisChange('a','');assert.equal(state.analysisDiscounts.a,'');assert.equal(rows[0].price_amount,'500000000');
+});
+test('office bedrooms stay in original evidence but are not analysis factors, independently of PH',()=>{
+ const rows=[{id:'a',property_type:'Oficina',ph_regime:'si',bedrooms:'2',bathrooms:'1'},
+ {id:'b',property_type:'Oficina',ph_regime:'no',bedrooms:'3',bathrooms:'2'}];
+ const state=marketAnalysisTable(rows), bedrooms=state.analysisFactors.find(f=>f.key==='bedrooms');
+ assert.equal(bedrooms.compatible,false);assert.ok(!state.analysisColumns().some(f=>f.key==='bedrooms'));
+ assert.equal(state.analysisRows[0].bedrooms,'2');assert.equal(rows[1].bedrooms,'3');
+ assert.match(state.analysisRegime(state.analysisRows[0]),/PH · falta soporte/);
+ assert.match(state.analysisRegime(state.analysisRows[1]),/No PH · falta soporte/);
+ state.analysisRows[1].ph_regime_source='Documento revisado';assert.match(state.analysisRegime(state.analysisRows[1]),/soporte registrado/);
+ assert.match(factorSuggestion({compatible:true,count:7,distinct:3},71,50),/Pocos datos/);
+ assert.match(factorSuggestion({compatible:true,count:71,distinct:1},71,50),/Sin variación/);
+ assert.match(factorSuggestion({compatible:true,count:60,distinct:3},71,50),/Sugerido/);
+ state.analysisApplySuggestion();assert.deepEqual(state.analysisSelected,['bathrooms']);
+ const saved=state.analysisSelection();
+ const restored=marketAnalysisTable([{...rows[0],analysis_factor_selection:saved},rows[1]]);
+ assert.deepEqual(restored.analysisSelected,['bathrooms']);assert.equal(restored.analysisThreshold,50);
+ assert.match(marketAnalysisTable([{id:'x',property_type:'Oficina'}]).analysisRegime({ph_regime:'por_verificar',ph_regime_source:''}),/sin verificar/);
 });
 test('discount formula distinguishes explicit zero, missing discount, zero area and price already per m2',()=>{
  const row={price_amount:'1.000.000',area_m2:'20'};

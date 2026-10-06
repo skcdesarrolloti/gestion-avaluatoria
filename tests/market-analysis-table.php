@@ -14,4 +14,10 @@
     expect(str_contains($html,'name="comparables[0][negotiation_discount]" value="120"'),'anuncio secundario conserva descuento original');
     expect(str_contains($html,'name="comparables[3][id]"'),'anuncio excluido sigue en matriz sin eliminarse');
     expect(\App\Services\ComparableNegotiation::value(['price_amount'=>'500000000','negotiation_discount'=>'50000000.0000'])==='450000000.00','servidor valida y recalcula importe equivalente a diez por ciento');
+    $selection='{"selected":["bathrooms","floor_level"],"threshold":50}';
+    $detail=\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>$selection,'ph_regime_source'=>'Reglamento consultado por analista']);
+    expect(json_decode($detail['analysis_factor_selection'],true)['selected']===['bathrooms','floor_level'],'selección del analista se valida como dato persistente');
+    expect($detail['ph_regime_source']==='Reglamento consultado por analista','soporte PH se conserva separado de la fuente de áreas');
+    expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"threshold":101}']),'umbral fuera de rango rechaza selección sin guardar');
+    expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[{}],"threshold":50}']),'factor con estructura inválida no llega a persistencia');
 })();

@@ -11,6 +11,8 @@ final class ComparableCaptureDetail
             'capture_confirmation' => ['Participación en la investigación', 'choice', 'shared'],
             'property_group' => ['Identificador de inmueble confirmado', 'text', 'internal'],
             'research_primary' => ['Ficha principal para completar el inmueble', 'choice', 'internal'],
+            'ph_regime_source' => ['Soporte del régimen PH o no PH del comparable', 'text', 'shared'],
+            'analysis_factor_selection' => ['Selección de factores y umbral de sugerencia', 'factor_selection', 'internal'],
             'intake_note' => ['Pendientes o motivo de selección', 'text', 'shared'],
             'source_updates' => ['Lecturas posteriores del mismo anuncio · diferencias conservadas', 'text', 'shared'],
             'latest_source_excerpt' => ['Último texto leído del anuncio · contrastar con captura original', 'text', 'shared'],
@@ -63,9 +65,17 @@ final class ComparableCaptureDetail
             $value = trim((string) $value);
             if ($key === 'property_group' && $value !== '' && !preg_match('/^[a-f0-9]{32}$/D', $value))
                 throw new HttpException(422, 'Identificador de inmueble inválido.');
-            $limit=$type==='facts'?48000:($type==='source_text'?16000:1600);
+            $limit=$type==='facts'?48000:(in_array($type,['source_text','factor_selection'],true)?16000:1600);
             if (mb_strlen($value) > $limit) throw new HttpException(422, "$label: máximo $limit caracteres.");
             if ($type==='facts') $value=ComparableSourceFacts::normalize($value);
+            if ($type==='factor_selection' && $value!=='') {
+                $selection=json_decode($value,true,4);
+                if (!is_array($selection) || !is_array($selection['selected']??null) || !array_is_list($selection['selected']) || count($selection['selected'])>160
+                    || !is_numeric($selection['threshold']??null) || $selection['threshold']<0 || $selection['threshold']>100)
+                    throw new HttpException(422,'Selección de factores inválida. Usa un umbral de 0 a 100 %.');
+                foreach ($selection['selected'] as $factor) if (!is_string($factor) || mb_strlen($factor)>180) throw new HttpException(422,'Factor de análisis inválido.');
+                $value=json_encode(['selected'=>array_values(array_unique($selection['selected'])),'threshold'=>(float)$selection['threshold']],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
+            }
             if ($type === 'choice' && !array_key_exists($value, self::options($key)))
                 throw new HttpException(422, "$label: selecciona una opción válida.");
             if ($type === 'integer' && $value !== '' && (!preg_match('/^\d{1,3}$/D', $value)))
