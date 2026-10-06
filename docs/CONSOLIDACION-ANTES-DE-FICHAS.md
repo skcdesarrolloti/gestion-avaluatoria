@@ -85,3 +85,4 @@ Análisis: cuatro pasos visibles. Información recogida → Depurar muestras →
 
 Regla de trabajo solicitada por el usuario: mínimo10 muestras completas por factor, contando el área fija. Selección y resultado muestran necesarias=10×factores, disponibles=filas con área positiva y datos conjuntos, máximo=floor(disponibles/10) y cumple/no cumple. Se permite probar selecciones; una insuficiente queda advertida y no certificada para regresión. No se cambian datos, persistencia ni se calcula regresión.
 Validación de la regla: PHP1530/JS195, lint PHP, build y tamaño79,8KB gzip. Pruebas de frontera29/30/34 filas, área fija y datos incompletos; no hay cambio de esquema ni persistencia.
+La pantalla de depuración muestra una instrucción antes de aplicar el filtro; no anticipa la cantidad resultante. El resultado aparece tras la acción. Validado lint/PHP1530/JS195/build79,8KB y revisión visual local.
