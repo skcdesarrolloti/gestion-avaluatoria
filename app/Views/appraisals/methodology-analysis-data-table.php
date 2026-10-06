@@ -1,17 +1,27 @@
 <p class="mb-3 text-sm">Una fila por inmueble. Factores ordenados por cantidad de muestras con dato, sin límite de seis. Valor con descuento = oferta × (1 − descuento / 100); valor por m² = valor con descuento / área publicada.</p>
-<div class="mb-3 flex flex-wrap gap-2"><button type="button" class="btn-secondary" @click="analysisView='raw'; $dispatch('input')">Información recogida</button><button type="button" class="btn-primary" @click="analysisApplySuggestion(); $dispatch('input')">Depurar factores</button></div>
-<p class="mb-3 text-sm" x-show="analysisView==='raw'">Toda la información recogida, incluidos factores que no aplican o tienen pocos datos. Pulsa Depurar factores para preparar la selección.</p>
+<nav class="mb-3 flex flex-wrap gap-2" aria-label="Pasos del análisis">
+    <button type="button" class="btn-secondary" :aria-current="analysisView==='raw'?'step':null" :class="analysisView==='raw'?'ring-2 ring-teal-700':''" @click="analysisView='raw'; $dispatch('input')">1. Información recogida</button>
+    <button type="button" class="btn-secondary" :aria-current="analysisView==='clean'?'step':null" :class="analysisView==='clean'?'ring-2 ring-teal-700':''" @click="analysisView='clean'; $dispatch('input')">2. Seleccionar factores</button>
+    <button type="button" class="btn-secondary" :aria-current="analysisView==='result'?'step':null" :class="analysisView==='result'?'ring-2 ring-teal-700':''" @click="analysisUpdate(); $dispatch('input')">3. Resultado depurado</button>
+</nav>
+<p class="mb-3 text-sm" x-show="analysisView==='raw'">Toda la información recogida. Continúa en 2. Seleccionar factores para depurar.</p>
 <div x-show="analysisView==='clean'" x-cloak>
 <?php require __DIR__.'/methodology-analysis-regime-filter.php'; ?>
-<p class="mb-3 rounded-xl border p-3" x-text="analysisActiveRows().length+' muestras después del filtro · '+analysisColumns().length+' factores seleccionados · '+analysisComplete()+' filas con datos en todos los factores seleccionados'"></p>
 <p class="mb-3 text-sm">Regla de depuración: al menos 50 % con dato, compatible con el tipo y con variación. En oficinas, Habitaciones y Estrato no participan. No se borran datos. Para regresión faltará validar codificación, valor por m², correlación y colinealidad.</p>
-<p class="mb-3 text-sm text-amber-900" x-show="analysisColumns().length && analysisComplete()<=analysisColumns().length+1">Con estos factores, las filas completas no superan factores + 1. Revisa la selección y completa datos antes de preparar la regresión.</p>
-<details class="mb-3 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Validaciones y selección de factores</summary>
-    <p class="text-sm">El analista puede desmarcar candidatos. Factores descartados quedan bloqueados y conservados en Información recogida.</p>
+<p class="mb-3 text-sm" aria-live="polite" x-text="analysisColumns().length+' factores marcados. Después de cambiar la selección, pulsa Actualizar depuración y ver resultado.'"></p>
+<button type="button" class="btn-primary mb-3" @click="analysisUpdate(); $dispatch('input')">Actualizar depuración y ver resultado</button>
+<div class="mb-3 rounded-xl border p-3"><h3 class="font-semibold">Validaciones y selección de factores</h3>
+    <p class="text-sm">Marca o desmarca candidatos. Los descartados quedan bloqueados y conservados en Información recogida.</p>
     <div class="grid gap-2 sm:grid-cols-2"><template x-for="factor in analysisFactors" :key="factor.key"><label class="flex min-h-11 items-center gap-2"><input type="checkbox" :checked="analysisEligible(factor) && analysisSelected.includes(factor.key)" @change="analysisSelected=$event.target.checked ? [...analysisSelected,factor.key] : analysisSelected.filter(k=>k!==factor.key)" :disabled="!analysisEligible(factor)"><span><span class="block" x-text="factor.label+' · '+factor.count+'/'+analysisActiveRows().length+' con dato ('+Math.round(factor.count/analysisActiveRows().length*100)+'%)'"></span><span class="block text-xs text-slate-600" x-text="analysisSuggestion(factor)"></span></span></label></template></div>
-</details>
 </div>
-<div class="max-h-[65vh] overflow-auto rounded-xl border" role="region" aria-label="Tabla de análisis de inmuebles" tabindex="0">
+<button type="button" class="btn-primary mb-3" @click="analysisUpdate(); $dispatch('input')">Actualizar depuración y ver resultado</button>
+</div>
+<div x-show="analysisView==='result'" x-cloak>
+    <p class="mb-3 rounded-xl border p-3" role="status" x-text="'Depuración actualizada: '+analysisActiveRows().length+' muestras · '+analysisColumns().length+' factores aplicados · '+analysisComplete()+' filas con datos en todos los factores aplicados'"></p>
+    <p class="mb-3 text-sm text-amber-900" x-show="analysisColumns().length && analysisComplete()<=analysisColumns().length+1">Las filas completas no superan factores + 1. Vuelve a Seleccionar factores o completa datos antes de preparar la regresión.</p>
+    <p class="mb-3 text-sm" x-show="!analysisColumns().length">No hay factores aplicados. Vuelve a 2. Seleccionar factores.</p>
+</div>
+<div x-show="analysisView!=='clean'" class="max-h-[65vh] overflow-auto rounded-xl border" role="region" aria-label="Tabla de análisis de inmuebles" tabindex="0">
 <table class="w-max min-w-full text-left text-sm"><thead class="sticky top-0 bg-slate-100"><tr>
     <th class="sticky left-0 bg-slate-100 p-3">Inmueble</th><th class="p-3">Régimen PH / no PH</th><th class="p-3">Oferta · COP</th><th class="p-3">Área publicada · m²</th>
     <template x-for="factor in analysisColumns()" :key="factor.key"><th class="max-w-48 p-3" x-text="factor.label+' ('+factor.count+'/'+analysisActiveRows().length+')'"></th></template>
@@ -27,4 +37,4 @@
     <td class="p-3"><label :for="'analysis-percent-'+property.key" class="block text-xs">Descuento · %</label><input :id="'analysis-percent-'+property.key" class="input w-28" type="number" min="0" max="100" step="any" placeholder="Ej. 10" :value="analysisPercents[property.key]" @input="analysisChange(property.key,$event.target.value)" :aria-invalid="Number(analysisPercents[property.key])<0 || Number(analysisPercents[property.key])>100"><span x-show="Number(analysisPercents[property.key])<0 || Number(analysisPercents[property.key])>100" class="block text-red-700">Usa de 0 a 100 %.</span></td>
     <td class="p-3" x-text="analysisMoney(analysisResult(property.key).value)"></td><td class="p-3" x-text="analysisMoney(analysisResult(property.key).perM2)"></td>
 </tr></template></tbody></table></div>
-<p class="mt-2 text-sm text-slate-600">Vacío no equivale a cero. Son cálculos sobre oferta y área publicada; no sustituyen la depuración de componentes ni el valor adoptado. Registra el soporte del descuento en la muestra.</p>
+<p x-show="analysisView!=='clean'" class="mt-2 text-sm text-slate-600">Vacío no equivale a cero. Son cálculos sobre oferta y área publicada; no sustituyen la depuración de componentes ni el valor adoptado. Registra el soporte del descuento en la muestra.</p>

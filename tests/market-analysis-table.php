@@ -37,5 +37,9 @@
     $view=\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":["bathrooms"],"threshold":50,"view":"clean"}']);
     expect(json_decode($view['analysis_factor_selection'],true)['view']==='clean','vista depurada se recupera como decisión guardada');
     expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"threshold":50,"view":"execute"}']),'vista no permitida se rechaza');
-    expect(str_contains($html,'Información recogida') && str_contains($html,'Depurar factores'),'información íntegra y depuración tienen acciones separadas');
+    expect(str_contains($html,'1. Información recogida') && str_contains($html,'2. Seleccionar factores') && str_contains($html,'3. Resultado depurado'),'análisis separa pasos recogida selección y resultado');
+    $applied=\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":["bathrooms"],"applied":["floor_level"],"threshold":50,"view":"result"}']);
+    expect(json_decode($applied['analysis_factor_selection'],true)['applied']===['floor_level'],'factores aplicados se conservan separados del borrador');
+    expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"applied":{},"threshold":50}']),'factores aplicados rechazan objeto');
+    expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"applied":[{}],"threshold":50}']),'factor aplicado rechaza estructura anidada');
 })();

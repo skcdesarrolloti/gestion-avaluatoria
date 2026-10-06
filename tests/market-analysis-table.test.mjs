@@ -83,3 +83,16 @@ test('explicit cleansing blocks below fifty percent and office stratum while ret
  const home=marketAnalysisTable(rows.map(r=>({...r,property_type:'Apartamento'})));home.analysisApplySuggestion();
  assert.ok(home.analysisColumns().some(f=>f.label==='Estrato'));
 });
+
+test('explicit update applies the draft and preserves prior results and choices between steps',()=>{
+ const rows=Array.from({length:4},(_,i)=>({id:String(i),property_type:'Oficina',bathrooms:String(i),floor_level:i<2?String(i+1):''}));
+ const state=marketAnalysisTable(rows);state.analysisView='clean';state.analysisUpdate();
+ assert.equal(state.analysisView,'result');assert.equal(state.analysisColumns().length,2);assert.equal(state.analysisComplete(),2);
+ state.analysisView='clean';state.analysisSelected=['bathrooms'];
+ assert.deepEqual(state.analysisApplied,['bathrooms','floor_level']); // Draft edits have not applied the new result yet.
+ state.analysisView='raw';state.analysisView='clean';assert.deepEqual(state.analysisSelected,['bathrooms']);
+ state.analysisUpdate();assert.equal(state.analysisColumns().length,1);assert.equal(state.analysisComplete(),4);
+ const restored=marketAnalysisTable([{...rows[0],analysis_factor_selection:state.analysisSelection()},...rows.slice(1)]);
+ assert.equal(restored.analysisView,'result');assert.deepEqual(restored.analysisApplied,['bathrooms']);assert.equal(restored.analysisComplete(),4);
+ state.analysisView='clean';state.analysisSelected=[];state.analysisUpdate();assert.equal(state.analysisColumns().length,0);assert.equal(state.analysisComplete(),0);
+});

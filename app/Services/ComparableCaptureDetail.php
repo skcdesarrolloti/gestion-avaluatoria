@@ -70,14 +70,17 @@ final class ComparableCaptureDetail
             if ($type==='facts') $value=ComparableSourceFacts::normalize($value);
             if ($type==='factor_selection' && $value!=='') {
                 $selection=json_decode($value,true,4);
-                if (!is_array($selection) || !is_array($selection['selected']??null) || !array_is_list($selection['selected']) || count($selection['selected'])>160
+                $selectionObject=json_decode($value,false,4);
+                if (!is_array($selection) || !is_array($selectionObject->selected ?? null) || !array_is_list($selection['selected']) || count($selection['selected'])>160
                     || !is_numeric($selection['threshold']??null) || $selection['threshold']<0 || $selection['threshold']>100)
                     throw new HttpException(422,'Selección de factores inválida. Usa un umbral de 0 a 100 %.');
-                foreach ($selection['selected'] as $factor) if (!is_string($factor) || mb_strlen($factor)>180) throw new HttpException(422,'Factor de análisis inválido.');
+                if (array_key_exists('applied',$selection) && (!is_array($selectionObject->applied ?? null) || !array_is_list($selection['applied']) || count($selection['applied'])>160)) throw new HttpException(422,'Factores aplicados inválidos.');
+                foreach (array_merge($selection['selected'],$selection['applied'] ?? []) as $factor) if (!is_string($factor) || mb_strlen($factor)>180) throw new HttpException(422,'Factor de análisis inválido.');
                 if (isset($selection['scope']) && !in_array($selection['scope'],['subject','all'],true)) throw new HttpException(422,'Filtro de régimen inválido.');
-                if (isset($selection['view']) && !in_array($selection['view'],['raw','clean'],true)) throw new HttpException(422,'Vista de análisis inválida.');
+                if (isset($selection['view']) && !in_array($selection['view'],['raw','clean','result'],true)) throw new HttpException(422,'Vista de análisis inválida.');
                 $value=json_encode(['selected'=>array_values(array_unique($selection['selected'])),'threshold'=>(float)$selection['threshold']]
                     + (isset($selection['scope']) ? ['scope'=>$selection['scope']] : [])
+                    + (isset($selection['applied']) ? ['applied'=>array_values(array_unique($selection['applied']))] : [])
                     + (isset($selection['view']) ? ['view'=>$selection['view']] : []),JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR);
             }
             if ($type === 'choice' && !array_key_exists($value, self::options($key)))
