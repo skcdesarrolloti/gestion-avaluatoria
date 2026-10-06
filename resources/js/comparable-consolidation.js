@@ -8,7 +8,7 @@ export const resolvedGroup = group => group.rows.every(r=>r.capture_confirmation
 export function consolidatedResearch(getEntries,getForm,getGroups) {
     return {
         consolidationRows:[], consolidationPending:0, consolidationDuplicates:0, consolidationShowAll:false,
-        researchBusy:false, researchMessage:'', researchResults:[],
+        researchBusy:false, researchMessage:'', researchResults:[], researchDone:0, researchTotal:0,
         unambiguousGroups() { return this.consolidationRows.filter(g=>!g.candidates.length && !resolvedGroup(g)); },
         consolidationVisible() { return this.consolidationRows.filter(g=>this.consolidationShowAll || (!resolvedGroup(g) && (g.candidates.length || g.rows.length>1))); },
         confirmUnambiguous() {
@@ -28,12 +28,15 @@ export function consolidatedResearch(getEntries,getForm,getGroups) {
         async investigateConsolidated(id='') {
             if (this.researchBusy || this.consolidationPending) return;
             this.researchBusy=true;
+            this.researchDone=0; this.researchTotal=0;
+            this.researchMessage='Preparando lectura y comprobando guardado…';
             try {
                 if (!await flushModuleForm(getForm())) { this.researchMessage='Guardado pendiente. No se inició la lectura.'; return; }
                 const groups=getGroups(getEntries().filter(e=>e.used).map(e=>({...e.data,index:e.index})));
                 if (groups.some(g=>!resolvedGroup(g))) { this.researchMessage='Termina de consolidar las muestras antes de abrir fichas.'; return; }
                 const picked=groups.filter(g=>g.rows.every(r=>r.capture_confirmation==='confirmed')).map(g=>({row:primaryListing(g)})).filter(item=>!id || item.row.id===id);
                 this.researchResults=picked;
+                this.researchTotal=picked.length;
                 if (!picked.length) { this.researchMessage='No hay inmuebles consolidados para completar.'; return; }
                 const result=await completeListingDetails(picked,getForm().dataset.detailEndpoint,
                     (n,total)=>{this.researchMessage=`Completando inmueble ${n} de ${total}…`;},
@@ -44,6 +47,7 @@ export function consolidatedResearch(getEntries,getForm,getGroups) {
                         Object.entries(changes).filter(([key])=>key!=='intake_state').forEach(([key,value])=>this.intakeWrite(current.index,key,value));
                         this.intakeChanged();
                         if (!await flushModuleForm(getForm())) throw new Error('Guardado pendiente.');
+                        this.researchDone++;
                     });
                 this.researchMessage=`${result.completed} fichas leídas; ${result.failed} pendientes. Guardado confirmado. Se leyó una ficha por inmueble consolidado.`;
             } catch { this.researchMessage='Lectura detenida. Conserva esta página y revisa el estado de guardado antes de continuar.'; }

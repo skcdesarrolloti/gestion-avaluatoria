@@ -25,12 +25,13 @@ test('single-property enrichment reads only its principal listing and preserves 
  state.intakeWrite=(index,key,value)=>{rows[index][key]=value;};state.intakeChanged=()=>{};state.rebuildIntake=()=>{};
  const oldFetch=globalThis.fetch, oldDocument=globalThis.document, urls=[];
  globalThis.document={querySelector:()=>null};
- globalThis.fetch=async(url,options)=>{urls.push(options.body.get('source_url'));return {ok:true,headers:{get:()=> 'application/json'},json:async()=>({ok:true,row:{area_m2:'40',bathrooms:'2'}})};};
+ globalThis.fetch=async(url,options)=>{assert.equal(state.researchDone,0);assert.equal(state.researchTotal,1);urls.push(options.body.get('source_url'));return {ok:true,headers:{get:()=> 'application/json'},json:async()=>({ok:true,row:{area_m2:'40',bathrooms:'2'}})};};
  try {
   await state.investigateConsolidated('b');
   assert.deepEqual(urls,['https://example.test/b']);assert.equal(rows[1].bathrooms,'2');assert.equal(rows[1].price_amount,'500');
   assert.equal(rows[0].bathrooms,undefined);assert.equal(rows[2].price_amount,'900');assert.equal(rows[2].bathrooms,undefined);
   assert.match(state.researchMessage,/1 fichas leídas; 0 pendientes/);assert.equal(state.researchBusy,false);
+  assert.equal(state.researchDone,1);assert.equal(state.researchTotal,1);
  } finally {globalThis.fetch=oldFetch;globalThis.document=oldDocument;}
 });
 
