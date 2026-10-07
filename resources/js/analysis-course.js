@@ -7,7 +7,7 @@ import {downloadReport} from './analysis-download.js';
 import {courseInterpretations} from './analysis-course-interpretation.js';
 export const courseSteps=['Preparar la muestra','Bloques y distribución','Tendencia central','Dispersión','Sensibilidad y consideraciones','Precisión de la media','Conclusión y memoria'];
 export function courseMethods(){return {
-    courseStep:0,courseSteps,courseBasis:'adjusted',courseConfidence:'.95',courseResult:null,courseBusy:false,courseError:'',courseBootstrapBusy:false,courseProgress:0,courseNotes:{},courseConclusion:'',
+    courseStep:0,courseSteps,courseBasis:'adjusted',courseConfidence:'.95',courseResult:null,courseBusy:false,courseError:'',courseBootstrapBusy:false,courseProgress:0,courseNotes:{},courseConclusion:'',analysisReviewReturn:null,
     courseRows(){return this.analysisVisibleRows().map(r=>{const original=this.analysisRows[r.analysisIndex],area=amount(original.area_m2),offer=amount(original.price_amount),adjusted=this.analysisResult(r.key),discount=amount(this.analysisDiscounts[r.key]),reasons=[];
         if(!(area>0))reasons.push('Área publicada no positiva');if(!(offer>0))reasons.push('Oferta no positiva');if(original.price_unit==='valor_m2')reasons.push('Precio publicado unitario: requiere revisar base');
         if(this.courseBasis==='adjusted'&&(!Number.isFinite(adjusted.perM2)||discount===null))reasons.push('Descuento o valor final pendiente');
@@ -25,6 +25,9 @@ export function courseMethods(){return {
         }catch(e){this.courseError=e.message;}finally{this.courseBusy=false;}},
     async courseResample(){if(!this.courseCurrent()||this.courseBootstrapBusy)return;this.courseBootstrapBusy=true;this.courseProgress=0;const result=this.courseResult;
         try{const b=await courseBootstrap(result.valid.map(r=>r.y),result.summary.confidence,n=>this.courseProgress=n);if(this.courseResult===result)result.bootstrap=b;}catch{this.courseError='No se pudo completar el remuestreo.';}finally{this.courseBootstrapBusy=false;}},
-    async courseReview(id){this.analysisModule='samples';this.analysisView='result';this.analysisOnlyMissing=false;this.analysisEditingId=id;await this.$nextTick();const row=document.getElementById('analysis-row-'+id);row?.scrollIntoView({block:'center'});row?.focus({preventScroll:true});},
+    analysisReviewOrigin(){const p=this.analysisReviewReturn;return !p?'':p.module==='statistics'?'Análisis estadístico → '+courseSteps[p.step]:'Modelo de regresión → '+(p.tab==='diagnostics'?'Gráficos y datos atípicos':'Preparar y calcular');},
+    analysisReviewLabel(){const i=this.analysisRows.findIndex(r=>r.id===this.analysisEditingId);return i<0?'Inmueble en revisión':'Muestra '+(i+1);},
+    async courseReview(id){if(this.analysisModule!=='samples')this.analysisReviewReturn={module:this.analysisModule,step:this.courseStep,tab:this.regressionTab,scrollY:window.scrollY,scrollX:window.scrollX};this.analysisModule='samples';this.analysisView='result';this.analysisOnlyMissing=false;this.analysisEditingId=id;await this.$nextTick();const row=document.getElementById('analysis-row-'+id);row?.scrollIntoView({block:'center'});row?.focus({preventScroll:true});},
+    async analysisReturnFromReview(){const p=this.analysisReviewReturn;if(!p)return;this.analysisModule=p.module;this.courseStep=p.step;this.regressionTab=p.tab;this.analysisReviewReturn=null;await this.$nextTick();window.scrollTo({top:p.scrollY,left:p.scrollX,behavior:'instant'});const form=this.$root;const target=form?.querySelector(p.module==='statistics'?'[aria-label="Interpretación de los datos de este paso"]':'[aria-label="Pasos de la regresión"] button');target?.focus({preventScroll:true});},
     courseExport(){if(this.courseCurrent())downloadReport(courseReport(this.courseResult,this.courseNotes,this.courseConclusion),'analisis-estadistico-ejercicio.html');},
 };}

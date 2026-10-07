@@ -26,8 +26,7 @@ export function regressionMethods() {
         regressionNumber(v){return Number.isFinite(v)?v.toLocaleString('es-CO',{maximumFractionDigits:4}):'No estimable';},
         regressionPlot(element,svg){mountDiagnosticSvg(element,svg);},
         async regressionPending(row){if(!row.codeKeys.length){await this.courseReview(row.id);return;}const i=this.regressionCategories().findIndex(c=>c.key===row.codeKeys[0]);await this.$nextTick();const input=document.getElementById('regression-code-'+i);input?.scrollIntoView({block:'center'});input?.focus({preventScroll:true});},
-        async regressionReview(id){if(!this.regressionCurrent())return;this.analysisModule='samples';this.analysisView='result';this.analysisOnlyMissing=false;this.analysisEditingId=id;
-            await this.$nextTick();const row=document.getElementById('analysis-row-'+id);row?.scrollIntoView({block:'center'});row?.focus({preventScroll:true});},
+        async regressionReview(id){if(this.regressionCurrent())await this.courseReview(id);},
         async regressionRun(){if(this.regressionBusy)return;this.regressionBusy=true;this.regressionError='';this.regressionResult=null;
             try {await new Promise(resolve=>setTimeout(resolve,30));if(!this.regressionConfirmed)throw new Error('Confirma la codificación antes de calcular.');
                 if(!this.analysisRegimeApplied || !this.analysisApplied.length || this.analysisFactorsPending())throw new Error('Aplica la depuración y actualiza los factores antes de calcular.');

@@ -38,6 +38,11 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
                 <button type="button" class="btn-secondary" :aria-current="analysisModule==='statistics'?'page':null" :class="analysisModule==='statistics'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='statistics'">3. Análisis estadístico paso a paso</button>
                 <button type="button" class="btn-secondary" :aria-current="analysisModule==='regression'?'page':null" :class="analysisModule==='regression'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='regression'">4. Modelo de regresión</button>
             </nav>
+            <template x-if="analysisModule==='samples'&&analysisReviewReturn"><div class="mt-3 rounded-lg border bg-teal-50 p-3 space-y-2" role="status">
+                <p><strong x-text="'Estás revisando: '+analysisReviewLabel()"></strong><span x-text="' · Venías de: '+analysisReviewOrigin()"></span></p>
+                <p class="text-sm">Revisa o completa el inmueble en la tabla. Después regresa al mismo paso; si cambias datos, actualiza el cálculo allí.</p>
+                <button type="button" class="btn-primary" @click="await analysisReturnFromReview()" x-text="'Volver a '+analysisReviewOrigin()"></button>
+            </div></template>
         </div>
         <template x-if="analysisModule==='samples'"><div>
         <?php require __DIR__.'/methodology-analysis-data-table.php'; ?>

@@ -93,3 +93,11 @@ a porcentaje y su fórmula explicativa; no cambió el cálculo ni los datos.
 227 JS / 1551 PHP / lint / build 78,4 KB. QA local comprobó los siete pasos sin
 errores de consola y lectura de dispersión en escritorio. Notas sin persistencia
 nueva; hosting pendiente.
+
+Revisión con regreso (2026-10-06): Revisar inmueble conserva módulo, paso o pestaña
+de regresión y posición de lectura. Banner fijo identifica muestra y origen, con
+botón Volver al mismo paso. Revisión desde diagnósticos y pendientes de regresión
+comparte el recorrido; no cambia datos ni recalcula automáticamente. Si se editan
+datos, la ejecución anterior queda sujeta al aviso de actualización existente.
+QA local: sensibilidad → muestra1 enfocada → regreso a sensibilidad con resultado
+conservado, sin errores. 227JS/1551PHP/lint/build78,4KB. Pendiente hosting.

@@ -17,7 +17,7 @@
         <p class="rounded-xl border p-3" role="status" x-text="courseResult.rows.length+' muestras conservadas · '+courseResult.valid.length+' valores unitarios disponibles · '+courseResult.pending.length+' pendientes · '+courseResult.at"></p>
         <p class="text-sm" x-text="'Base aplicada: '+(courseResult.basis==='adjusted'?'valor con descuento / área publicada':'oferta / área publicada')+' · confianza '+100*courseResult.summary.confidence+' %'"></p>
         <p class="text-amber-900" x-show="!courseCurrent()">La base, confianza o datos cambiaron. Actualiza antes de interpretar o descargar; estas cifras corresponden a la ejecución anterior.</p>
-        <section class="rounded-xl border bg-teal-50 p-4 space-y-3" aria-label="Interpretación de los datos de este paso">
+        <section class="rounded-xl border bg-teal-50 p-4 space-y-3" aria-label="Interpretación de los datos de este paso" tabindex="-1">
             <h4 class="font-semibold">Qué dicen tus datos en este paso</h4>
             <p><strong>Resultado observado: </strong><span x-text="courseInterpretation().reading"></span></p>
             <p><strong>Qué significa: </strong><span x-text="courseInterpretation().meaning"></span></p>
