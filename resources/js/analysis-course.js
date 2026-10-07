@@ -4,6 +4,7 @@ import {courseHistogram} from './analysis-course-plots.js';
 import {mountDiagnosticSvg} from './analysis-diagnostic-plots.js';
 import {courseReport} from './analysis-course-report.js';
 import {downloadReport} from './analysis-download.js';
+import {courseInterpretations} from './analysis-course-interpretation.js';
 export const courseSteps=['Preparar la muestra','Bloques y distribución','Tendencia central','Dispersión','Sensibilidad y consideraciones','Precisión de la media','Conclusión y memoria'];
 export function courseMethods(){return {
     courseStep:0,courseSteps,courseBasis:'adjusted',courseConfidence:'.95',courseResult:null,courseBusy:false,courseError:'',courseBootstrapBusy:false,courseProgress:0,courseNotes:{},courseConclusion:'',
@@ -16,6 +17,7 @@ export function courseMethods(){return {
     courseStamp(){return JSON.stringify([this.analysisActiveRows(),this.analysisDiscounts,this.courseBasis,this.courseConfidence]);},
     courseCurrent(){return !!this.courseResult&&this.courseResult.stamp===this.courseStamp();},
     courseNumber(v){return Number.isFinite(v)?v.toLocaleString('es-CO',{maximumFractionDigits:4}):'No estimable';},
+    courseInterpretation(){return this.courseResult?courseInterpretations(this.courseResult)[this.courseStep]:null;},
     coursePlot(el,svg){mountDiagnosticSvg(el,svg);},
     async courseCalculate(){if(this.courseBusy||this.courseBootstrapBusy)return;this.courseBusy=true;this.courseError='';
         try{await new Promise(resolve=>setTimeout(resolve,0));if(!this.analysisRegimeApplied)throw new Error('Aplica primero la depuración de muestras.');const rows=this.courseRows(),valid=rows.filter(r=>!r.reasons.length&&Number.isFinite(r.y));if(valid.length<2)throw new Error('Completa al menos dos valores unitarios para el análisis descriptivo.');

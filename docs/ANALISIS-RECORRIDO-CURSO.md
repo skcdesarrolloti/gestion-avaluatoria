@@ -81,3 +81,15 @@ captura estrecha no fue devuelta por el navegador). Exportación verificada por
 contenido en pruebas; el control de navegador no devolvió ruta de descarga.
 Hosting pendiente de actualización por el usuario. Recalcular allí para usar
 las muestras reales del ejercicio; QA local no sustituye sus resultados.
+
+Interpretaciones por paso (2026-10-06): cuadro destacado con resultado observado,
+significado y acción siguiente, derivados de la ejecución actual. Incluye conteos,
+clases modales, centros y diferencia media/mediana, menor MAPE descriptivo, CV frente
+a ambos referentes del curso sin inferir ámbito, señales por inmueble, dirección
+de asimetría/curtosis, IC y contraste bootstrap cuando existe. No convierte estas
+señales en exclusión, normalidad, valor adoptado ni aprobación de regresión. Las
+siete lecturas también se incluyen en la memoria. Corregida unidad del descuento
+a porcentaje y su fórmula explicativa; no cambió el cálculo ni los datos.
+227 JS / 1551 PHP / lint / build 78,4 KB. QA local comprobó los siete pasos sin
+errores de consola y lectura de dispersión en escritorio. Notas sin persistencia
+nueva; hosting pendiente.
