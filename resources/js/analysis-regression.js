@@ -8,20 +8,24 @@ import {diagnosticReport} from './analysis-diagnostic-report.js';
 const numeric=v=>{const s=String(v??'').trim().replace(/\s*m[²2]$/i,'');return /^\d+(?:[.,]\d+)?$/.test(s)?Number(s.replace(',','.')):null;};
 export function regressionMethods() {
     return {
-        regressionTab:'academy',regressionBasis:'offer',regressionCodes:{},regressionConfirmed:false,regressionResult:null,regressionError:'',regressionBusy:false,
+        regressionTab:'application',regressionBasis:'offer',regressionCodes:{},regressionConfirmed:false,regressionResult:null,regressionError:'',regressionBusy:false,
         regressionColumns(){const cols=this.analysisFactors.filter(f=>this.analysisApplied.includes(f.key));const area=modelArea(cols);return area.key==='area_m2'?[area,...cols]:cols;},
         regressionCategories(){return this.regressionColumns().flatMap(f=>[...new Set(this.analysisVisibleRows().map(r=>String(r.values[f.key]??'')))].filter(v=>numeric(v)===null && v && !/^(no publicado|pendiente)$/i.test(v)).map(v=>({key:JSON.stringify([f.key,v]),factor:f.label,value:v})));},
         regressionMatrix(){const cols=this.regressionColumns();const rows=this.analysisVisibleRows().map(r=>{
             const x=cols.map(f=>{const v=r.values[f.key],num=numeric(v);return num!==null?num:numeric(this.regressionCodes[JSON.stringify([f.key,String(v??'')])]);});
             const original=this.analysisRows[r.analysisIndex],area=amount(original.area_m2),offer=amount(original.price_amount);
             const y=this.regressionBasis==='adjusted'?this.analysisResult(r.key).perM2:area>0 && original.price_unit!=='valor_m2' && offer>0?offer/area:null;
-            return {id:r.key,label:'Muestra '+(r.analysisIndex+1),x,y};
+            const codeKeys=[],reasons=cols.flatMap((f,i)=>{if(Number.isFinite(x[i]))return [];const value=String(r.values[f.key]??'').trim(),isCategory=value&&!/^(no publicado|pendiente|por confirmar)$/i.test(value);
+                if(isCategory)codeKeys.push(JSON.stringify([f.key,value]));return [f.label+(isCategory?': falta codificar «'+value+'»':': falta dato numérico')];});
+            if(!Number.isFinite(y))reasons.push(this.regressionBasis==='adjusted'?'Valor final, descuento o área pendiente':'Oferta o área pendiente');
+            return {id:r.key,label:'Muestra '+(r.analysisIndex+1),x,y,reasons,codeKeys};
         });return {cols,rows,complete:rows.filter(r=>r.x.every(Number.isFinite) && Number.isFinite(r.y))};},
         regressionStamp(){return JSON.stringify([this.analysisApplied,this.analysisActiveRows(),this.analysisDiscounts,this.regressionBasis,this.regressionCodes]);},
         regressionCurrent(){return !!this.regressionResult && this.regressionResult.stamp===this.regressionStamp();},
         regressionEquation(){return regressionEquation(this.regressionResult);},
         regressionNumber(v){return Number.isFinite(v)?v.toLocaleString('es-CO',{maximumFractionDigits:4}):'No estimable';},
         regressionPlot(element,svg){mountDiagnosticSvg(element,svg);},
+        async regressionPending(row){if(!row.codeKeys.length){await this.courseReview(row.id);return;}const i=this.regressionCategories().findIndex(c=>c.key===row.codeKeys[0]);await this.$nextTick();const input=document.getElementById('regression-code-'+i);input?.scrollIntoView({block:'center'});input?.focus({preventScroll:true});},
         async regressionReview(id){if(!this.regressionCurrent())return;this.analysisModule='samples';this.analysisView='result';this.analysisOnlyMissing=false;this.analysisEditingId=id;
             await this.$nextTick();const row=document.getElementById('analysis-row-'+id);row?.scrollIntoView({block:'center'});row?.focus({preventScroll:true});},
         async regressionRun(){if(this.regressionBusy)return;this.regressionBusy=true;this.regressionError='';this.regressionResult=null;

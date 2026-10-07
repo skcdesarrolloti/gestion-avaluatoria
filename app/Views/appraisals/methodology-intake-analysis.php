@@ -31,11 +31,12 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
         <?php foreach ($analysisRows as $position=>$row): foreach (['ph_regime','ph_regime_source','analysis_manual_factors'] as $field): ?><input type="hidden" name="comparables[<?= (int)$row['capture_index'] ?>][<?= $field ?>]" :value="analysisRows[<?= $position ?>].<?= $field ?>"><?php endforeach; endforeach; ?>
         <input type="hidden" name="comparables[<?= (int)$analysisIndexes[0] ?>][analysis_factor_selection]" :value="analysisSelection()">
         <div class="sticky top-0 z-20 mb-4 rounded-xl border border-teal-700 bg-white p-3 shadow-sm">
-            <p class="mb-3 font-semibold text-teal-900" role="status" aria-live="polite">Estás en: M4 Análisis<?= !empty($componentLabel) ? ' · '.e($componentLabel) : '' ?> → <span x-text="analysisModule==='location' ? 'Coordenadas y mapa comparativo' : analysisModule==='regression' ? 'Modelo de regresión → '+({academy:'Academia y fórmulas',application:'Preparar y calcular',diagnostics:'Gráficos y datos atípicos'}[regressionTab]) : 'Muestras y depuración → '+({raw:'Información recogida',regime:'Depurar muestras',clean:'Factores del analista',result:'Resultado depurado'}[analysisView] || 'Información recogida')"></span></p>
+            <p class="mb-3 font-semibold text-teal-900" role="status" aria-live="polite">Estás en: M4 Análisis<?= !empty($componentLabel) ? ' · '.e($componentLabel) : '' ?> → <span x-text="analysisModule==='location' ? 'Coordenadas y mapa comparativo' : analysisModule==='statistics' ? 'Análisis estadístico → '+courseSteps[courseStep] : analysisModule==='regression' ? 'Modelo de regresión → '+({academy:'Academia y fórmulas',application:'Preparar y calcular',diagnostics:'Gráficos y datos atípicos'}[regressionTab]) : 'Muestras y depuración → '+({raw:'Información recogida',regime:'Depurar muestras',clean:'Factores del analista',result:'Resultado depurado'}[analysisView] || 'Información recogida')"></span></p>
             <nav class="flex flex-wrap gap-2" aria-label="Submenú del análisis">
                 <button type="button" class="btn-secondary" :aria-current="analysisModule==='samples'?'page':null" :class="analysisModule==='samples'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='samples'">1. Muestras y depuración</button>
                 <button type="button" class="btn-secondary" :aria-current="analysisModule==='location'?'page':null" :class="analysisModule==='location'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='location'; analysisSubjectLocation=<?= e($analysisSubjectLocation) ?>">2. Coordenadas y mapa comparativo</button>
-                <button type="button" class="btn-secondary" :aria-current="analysisModule==='regression'?'page':null" :class="analysisModule==='regression'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='regression'">3. Modelo de regresión</button>
+                <button type="button" class="btn-secondary" :aria-current="analysisModule==='statistics'?'page':null" :class="analysisModule==='statistics'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='statistics'">3. Análisis estadístico paso a paso</button>
+                <button type="button" class="btn-secondary" :aria-current="analysisModule==='regression'?'page':null" :class="analysisModule==='regression'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='regression'">4. Modelo de regresión</button>
             </nav>
         </div>
         <template x-if="analysisModule==='samples'"><div>
@@ -57,6 +58,7 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
         <input type="hidden" name="comparables[<?= (int)$locationRow['capture_index'] ?>][<?= e($field) ?>]" :value="analysisRows[<?= $position ?>].<?= $field ?> || ''">
         <?php endforeach; endforeach; ?>
         <?php require __DIR__.'/methodology-analysis-location.php'; ?>
+        <?php require __DIR__.'/methodology-analysis-course.php'; ?>
         <?php require __DIR__.'/methodology-analysis-regression.php'; ?>
         <p class="mt-3 text-sm" data-autosave-status>Autoguardado activo. Espera el guardado confirmado antes de exportar.</p>
         <button class="btn-primary mt-3" type="submit">Guardar análisis de muestras</button>

@@ -1,7 +1,7 @@
 <template x-if="regressionTab==='diagnostics'"><div class="space-y-4">
     <h4 class="text-lg font-semibold">Gráficos y datos atípicos</h4>
     <p class="text-sm">Primero mira la distribución y los gráficos por factor; luego revisa los residuos y la influencia de cada inmueble. Las señales orientan la revisión del anuncio, las áreas, el descuento y la comparabilidad. No retiran muestras.</p>
-    <p x-show="!regressionResult">Calcula la regresión en «2. Preparar y calcular» para generar los gráficos.</p>
+    <p x-show="!regressionResult">Calcula la regresión en «1. Preparar y calcular» para generar los gráficos.</p>
     <template x-if="regressionResult"><div class="space-y-4">
         <p class="text-amber-900" x-show="!regressionCurrent()">Los datos cambiaron. Vuelve a preparar y calcular; este diagnóstico corresponde a la ejecución anterior.</p>
         <p class="rounded-lg bg-purple-50 p-3 text-purple-900" x-show="regressionResult.simulated">Ejemplo con datos simulados. Un ajuste alto tampoco convierte estos datos en evidencia verificada.</p>
