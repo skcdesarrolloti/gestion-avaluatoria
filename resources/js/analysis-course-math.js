@@ -1,5 +1,8 @@
 import {distribution,quantile} from './analysis-distribution.js';
 export function orderCourseEstimators(estimators){return [...estimators].sort((a,b)=>(Number.isFinite(a.mape)?a.mape:Infinity)-(Number.isFinite(b.mape)?b.mape:Infinity));}
+export function preferredCourseEstimators(estimators){const valid=orderCourseEstimators(estimators).filter(e=>Number.isFinite(e.mape)&&Number.isFinite(e.value));return valid.filter(e=>e.mape===valid[0]?.mape);}
+export function courseSelectionConclusion(estimators,format){const selected=preferredCourseEstimators(estimators);if(!selected.length)return 'No se selecciona un centro de referencia: no hay resultados MAPE estimables.';
+    const values=selected.map(e=>e.label+': '+format(e.value)+' COP/m²').join(' · ');return (selected.length===1?'Centro seleccionado para este análisis: ':'Centros con igual menor MAPE: ')+values+'. MAPE mínimo: '+format(selected[0].mape)+' %. '+(selected.length===1?'Se selecciona porque presenta la menor diferencia porcentual absoluta media frente a los valores de esta muestra.':'El empate no permite elegir un único centro mediante este criterio.')+' La selección es descriptiva y requiere continuar el análisis; no constituye el valor adoptado del avalúo.';}
 // Regularized incomplete beta and inverse Student t, without a normal approximation.
 function logGamma(z){const c=[676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-.13857109526572012,9.984369578019572e-6,1.5056327351493116e-7];
     if(z<.5)return Math.log(Math.PI)-Math.log(Math.sin(Math.PI*z))-logGamma(1-z);z--;let x=.99999999999980993;c.forEach((v,i)=>x+=v/(z+i+1));const t=z+c.length-.5;return .5*Math.log(2*Math.PI)+(z+.5)*Math.log(t)-t+Math.log(x);}
