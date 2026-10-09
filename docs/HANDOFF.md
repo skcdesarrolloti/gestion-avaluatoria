@@ -947,3 +947,15 @@ conservados. QA local3muestras: academia abre/cierra, escritorio/móvil375px sin
 desborde,10000remuestreos finalizan con resultados y sin errores de consola.
 PHP1555/JS227/lint/build78,4KB. Sin persistencia nueva; siguiente actualización
 por Git. No se ejecutó contra muestras reales del hosting.
+
+Apartado2 academia trazable (2026-10-09): acordeón jurídico/técnico y academia
+por cada uno de los siete pasos, accesible antes de calcular. Ejemplos y términos
+en español; fundamentos IGAC16–21/anexo2.1 y límites del alcance. Cotejo visual
+PDF local21–22/73/76; ficha oficial vigente. NTS S03(2009)7.1.8/7.1.10 y
+M01(2016)8/anexoB informativo; edición vigente pendiente. IVS104/106 referencia
+2025 traducción preliminar: cotejo inglés pendiente, sin conformidad automática.
+Advertencia contraste anexoA factores y Resolución; I01 pendiente de cotejo.
+Memoria HTML añade nota de fuentes/límites escapada. Sin cambiar datos, fórmulas,
+esquema o autoguardado. PHP1555/JS228/lint/build78,4KB; QA7academias sin cálculo,
+fuentes, enlaces, escritorio y móvil375px sin desborde ni errores de consola.
+Ver ANALISIS-ESTADISTICO-ACADEMIA.md. No se ejecutó sobre BD/muestras del hosting.

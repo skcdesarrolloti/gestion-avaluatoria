@@ -2,7 +2,9 @@
     <h3 class="text-xl font-semibold">Análisis estadístico · explicación y resultados paso a paso</h3>
     <p class="rounded-lg bg-purple-50 p-3 text-purple-900">Ejercicio exploratorio. Los datos simulados conservan su identificación; este recorrido no adopta un valor ni elimina muestras.</p>
     <p class="text-sm">Seguimos la sesión 1 del curso: preparar → tendencia central → dispersión → precisión → conclusión. Los bloques y diagnósticos robustos complementan ese recorrido. Cada paso reúne explicación, fórmula, resultado e interpretación.</p>
+    <?php require __DIR__.'/methodology-course-sources.php'; ?>
     <nav class="flex flex-wrap gap-2" aria-label="Pasos del análisis estadístico"><template x-for="(step,i) in courseSteps" :key="i"><button type="button" class="btn-secondary" :aria-current="courseStep===i?'step':null" :class="courseStep===i?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="courseStep=i" x-text="(i+1)+'. '+step"></button></template></nav>
+    <?php require __DIR__.'/methodology-course-academy.php'; ?>
     <details class="rounded-xl border p-4 space-y-3" :open="!courseResult"><summary class="min-h-11 cursor-pointer font-semibold">Base y confianza del cálculo · revisar o cambiar</summary>
         <label class="label">Base del ejercicio<select class="input" x-model="courseBasis"><option value="adjusted">Valor con descuento / área publicada · preliminar</option><option value="offer">Oferta / área publicada · exploración sin descuento</option></select></label>
         <label class="label">Confianza para el intervalo de la media<select class="input" x-model="courseConfidence"><option value=".90">90 %</option><option value=".95">95 %</option><option value=".99">99 %</option></select></label>

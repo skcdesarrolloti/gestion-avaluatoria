@@ -18,3 +18,11 @@ test('pending, bootstrap and non-estimable shape remain explicit in UI and repor
     const texts=courseInterpretations(r);assert.match(texts[0].reading,/4 de 5/);assert.match(texts[4].meaning,/no es estimable/);assert.match(texts[5].next,/99 a 101/);
     const html=courseReport(r);assert.equal((html.match(/<strong>Resultado observado:/g)||[]).length,7);assert.equal((html.match(/<strong>Qué hacer ahora:/g)||[]).length,7);
 });
+test('execution memory preserves source limits as escaped text without claiming appraisal conformity',()=>{
+    const r=result([8,10,12]),before=JSON.stringify(r),support='Art. 21: adopción de la media. IVS preliminar: cotejo pendiente. <script>alterar()</script>';
+    const html=courseReport(r,{},'',support);
+    assert.ok(html.includes('Fuentes y alcance de esta ejecución'));
+    assert.ok(html.includes('IVS preliminar: cotejo pendiente. &lt;script&gt;'));
+    assert.ok(!html.includes('<script>'));assert.ok(html.includes('según ámbito aplicable'));
+    assert.ok(html.includes('Conclusión del analista pendiente'));assert.equal(JSON.stringify(r),before);
+});
