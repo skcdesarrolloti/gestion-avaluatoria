@@ -2,7 +2,7 @@
 <details class="rounded-xl border p-4">
     <summary class="min-h-11 cursor-pointer font-semibold">Academia paso a paso · entender la regresión con ejemplos</summary>
     <div class="mt-3 space-y-3">
-        <p>En «Preparar y calcular» estudia los pasos 1–5. En «Gráficos y datos atípicos» estudia los pasos 6–9. Los ejemplos didácticos no modifican tus datos.</p>
+        <p>En «3. Construir el modelo» estudia los pasos 1–5. En «4. Revisar el modelo» estudia los pasos 6–9. Los ejemplos didácticos no modifican tus datos.</p>
         <?php foreach (\App\Support\MarketRegressionAcademy::topics() as [$tab, $title, $example, $meaning, $basis]): ?>
             <details x-show="regressionTab==='<?= e($tab) ?>'" class="rounded-lg border p-3">
                 <summary class="min-h-11 cursor-pointer font-semibold"><?= e($title) ?></summary>

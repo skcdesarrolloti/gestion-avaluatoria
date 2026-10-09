@@ -962,3 +962,5 @@ fuentes, enlaces, escritorio y móvil375px sin desborde ni errores de consola.
 Ver ANALISIS-ESTADISTICO-ACADEMIA.md. No se ejecutó sobre BD/muestras del hosting.
 
 Apartado 3: academia de regresión en acordeones, pasos 1–5 preparación y 6–9 diagnósticos. Descarga conserva fuentes/alcance escapados. Sin cambios de cálculo, muestras o BD. Fuentes y pendientes: REGRESION-ACADEMIA-FUNDAMENTO.md. PHP1555/JS228/build78,4KB; navegador escritorio/móvil375px, sin desbordamiento ni errores. Respaldo previo output/antes-regresion-academia-fd0da31.zip.
+
+M4: siete entradas principales visibles; diagnósticos separados de construcción, memoria separada de descriptiva; validación y sujeto con submenús pendientes. Conteos dinámicos, prueba visual con 71 ficticios. Sin fórmulas, selección o BD nuevas. PHP1562/JS228/build78,4KB; móvil375px sin desbordamiento ni errores. Ver ANALISIS-MENU-SIETE-ETAPAS.md.

@@ -8,7 +8,10 @@
     ];
     $basePath='/avaluos/test';$componentKey='unit';$record=['comparables_version'=>3];
     ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-intake-analysis.php';$html=ob_get_clean();
-    expect(str_contains($html,'Tabla de análisis · 2 inmuebles'),'análisis recibe confirmados sin exigir selección estadística anterior');
+    expect(str_contains($html,'Recorrido de análisis de mercado · 2 inmuebles'),'análisis recibe confirmados sin exigir selección estadística anterior');
+    foreach (['1. Preparar los datos','2. Entender la muestra','3. Construir el modelo','4. Revisar el modelo','5. Validar las predicciones','6. Aplicar al sujeto','7. Memoria y sustentación'] as $stage) {
+        expect(str_contains($html,$stage),'recorrido contiene etapa '.$stage);
+    }
     expect(str_contains($html,':value="analysisDiscounts[\''.str_repeat('b',32).'\']"'),'descuento editable se guarda en ficha principal confirmada');
     expect(substr_count($html,'name="comparables[1][negotiation_discount]"')===1,'descuento principal tiene un solo control para persistencia');
     expect(str_contains($html,'name="comparables[0][negotiation_discount]" value="120"'),'anuncio secundario conserva descuento original');

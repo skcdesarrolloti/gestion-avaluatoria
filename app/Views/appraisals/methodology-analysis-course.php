@@ -1,9 +1,10 @@
 <template x-if="analysisModule==='statistics'"><section class="space-y-4" @input.stop @change.stop>
-    <h3 class="text-xl font-semibold">Análisis estadístico · explicación y resultados paso a paso</h3>
+    <h3 class="text-xl font-semibold"><span x-text="courseStep===6 ? '7. Memoria y sustentación' : '2. Entender la muestra'"></span></h3>
     <p class="rounded-lg bg-purple-50 p-3 text-purple-900">Ejercicio exploratorio. Los datos simulados conservan su identificación; este recorrido no adopta un valor ni elimina muestras.</p>
     <p class="text-sm">Seguimos la sesión 1 del curso: preparar → tendencia central → dispersión → precisión → conclusión. Los bloques y diagnósticos robustos complementan ese recorrido. Cada paso reúne explicación, fórmula, resultado e interpretación.</p>
+    <p x-show="courseStep===6" class="rounded-lg border bg-amber-50 p-3">Memoria disponible del análisis descriptivo. La sustentación integral, manual del modelo, validación y anexos del informe final siguen pendientes. Las notas de esta ejecución se conservan mediante su descarga.</p>
     <?php require __DIR__.'/methodology-course-sources.php'; ?>
-    <nav class="flex flex-wrap gap-2" aria-label="Pasos del análisis estadístico"><template x-for="(step,i) in courseSteps" :key="i"><button type="button" class="btn-secondary" :aria-current="courseStep===i?'step':null" :class="courseStep===i?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="courseStep=i" x-text="(i+1)+'. '+step"></button></template></nav>
+    <nav x-show="courseStep!==6" class="flex flex-wrap gap-2" aria-label="Pasos del análisis estadístico"><template x-for="(step,i) in courseSteps" :key="i"><button type="button" class="btn-secondary" x-show="i!==6" :aria-current="courseStep===i?'step':null" :class="courseStep===i?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="courseStep=i" x-text="(i+1)+'. '+step"></button></template></nav>
     <?php require __DIR__.'/methodology-course-academy.php'; ?>
     <details class="rounded-xl border p-4 space-y-3" :open="!courseResult"><summary class="min-h-11 cursor-pointer font-semibold">Base y confianza del cálculo · revisar o cambiar</summary>
         <label class="label">Base del ejercicio<select class="input" x-model="courseBasis"><option value="adjusted">Valor con descuento / área publicada · preliminar</option><option value="offer">Oferta / área publicada · exploración sin descuento</option></select></label>
@@ -29,6 +30,6 @@
         <?php require __DIR__.'/methodology-course-preparation.php'; ?>
         <?php require __DIR__.'/methodology-course-descriptive.php'; ?>
         <?php require __DIR__.'/methodology-course-precision.php'; ?>
-        <div class="flex flex-wrap gap-2"><button type="button" class="btn-secondary" :disabled="courseStep===0" @click="courseStep--">Paso anterior</button><button type="button" class="btn-primary" :disabled="courseStep===6" @click="courseStep++">Siguiente paso</button><button type="button" class="btn-secondary" :disabled="!courseCurrent()||courseBootstrapBusy" @click="courseExport()">Descargar memoria en este orden</button></div>
+        <div x-show="courseStep!==6" class="flex flex-wrap gap-2"><button type="button" class="btn-secondary" :disabled="courseStep===0" @click="courseStep--">Paso anterior</button><button type="button" class="btn-primary" :disabled="courseStep>=5" @click="courseStep++">Siguiente paso</button><button type="button" class="btn-secondary" :disabled="!courseCurrent()||courseBootstrapBusy" @click="courseExport()">Descargar memoria en este orden</button></div>
     </div></template>
 </section></template>

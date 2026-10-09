@@ -241,3 +241,5 @@ Vista simplificada a cuatro clases: véase la revisión de 2026-10-04 en
 [plan de investigación](docs/PLAN-INVESTIGACION-MERCADO.md). [Captura del sujeto](docs/FACTORES-SUJETO-CAPITULO-3.md).
 
 [Academia de regresión y fundamento](docs/REGRESION-ACADEMIA-FUNDAMENTO.md): nueve temas en acordeones, fuentes identificadas y límites del modelo existente.
+
+[M4: menú de siete etapas](docs/ANALISIS-MENU-SIETE-ETAPAS.md): preparación, muestra, construcción, revisión, validación, sujeto y memoria.

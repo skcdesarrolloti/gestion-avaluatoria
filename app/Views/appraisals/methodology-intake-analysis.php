@@ -10,7 +10,7 @@ $analysisIndexes = array_column($analysisRows,'capture_index');
 $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_flip(['latitude','longitude'])),JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT|JSON_THROW_ON_ERROR);
 ?>
 <details class="mt-4 rounded-xl border p-4" open>
-    <summary class="min-h-11 cursor-pointer font-semibold">Tabla de análisis · <?= count($intakeGroups) ?> inmuebles recogidos</summary>
+    <summary class="min-h-11 cursor-pointer font-semibold">Recorrido de análisis de mercado · <?= count($intakeGroups) ?> inmuebles recogidos</summary>
     <?php if ($intakeGroups === []): ?>
     <?php require __DIR__.'/methodology-analysis-preparation.php'; ?>
     <p class="mt-3 rounded-lg bg-amber-50 p-3">Selecciona inmuebles en Insumos para estudiarlos aquí. Los anuncios restantes siguen conservados.</p><?php else: ?>
@@ -33,12 +33,7 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
         <?php foreach ($analysisRows as $position=>$row): foreach (['ph_regime','ph_regime_source','analysis_manual_factors'] as $field): ?><input type="hidden" name="comparables[<?= (int)$row['capture_index'] ?>][<?= $field ?>]" :value="analysisRows[<?= $position ?>].<?= $field ?>"><?php endforeach; endforeach; ?>
         <input type="hidden" name="comparables[<?= (int)$analysisIndexes[0] ?>][analysis_factor_selection]" :value="analysisSelection()">
         <div class="sm:sticky sm:top-0 z-20 mb-4 rounded-xl border border-teal-700 bg-white p-3 shadow-sm">
-            <p class="mb-3 font-semibold text-teal-900" role="status" aria-live="polite">Estás en: M4 Análisis<?= !empty($componentLabel) ? ' · '.e($componentLabel) : '' ?> → <span x-text="analysisModule==='preparation' ? 'Preparar los datos → Objetivo y unidad de análisis' : analysisModule==='location' ? 'Preparar los datos → Coordenadas y mapa comparativo' : analysisModule==='statistics' ? 'Análisis estadístico → '+courseSteps[courseStep] : analysisModule==='regression' ? 'Modelo de regresión → '+({academy:'Academia y fórmulas',application:'Preparar y calcular',diagnostics:'Gráficos y datos atípicos'}[regressionTab]) : 'Preparar los datos → Muestras y depuración → '+({raw:'Información recogida',regime:'Depurar muestras',clean:'Factores del analista',result:'Resultado depurado'}[analysisView] || 'Información recogida')"></span></p>
-            <nav class="flex flex-wrap gap-2" aria-label="Submenú del análisis">
-                <button type="button" class="btn-secondary" :aria-current="['preparation','samples','location'].includes(analysisModule)?'page':null" :class="['preparation','samples','location'].includes(analysisModule)?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='preparation'">1. Preparar los datos</button>
-                <button type="button" class="btn-secondary" :aria-current="analysisModule==='statistics'?'page':null" :class="analysisModule==='statistics'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='statistics'">2. Análisis estadístico paso a paso</button>
-                <button type="button" class="btn-secondary" :aria-current="analysisModule==='regression'?'page':null" :class="analysisModule==='regression'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='regression'">3. Modelo de regresión</button>
-            </nav>
+            <?php require __DIR__.'/methodology-analysis-menu.php'; ?>
             <?php require __DIR__.'/methodology-analysis-preparation-nav.php'; ?>
             <template x-if="analysisModule==='samples'&&analysisReviewReturn"><div class="mt-3 rounded-lg border bg-teal-50 p-3 space-y-2" role="status">
                 <p><strong x-text="'Estás revisando: '+analysisReviewLabel()"></strong><span x-text="' · Venías de: '+analysisReviewOrigin()"></span></p>
@@ -68,6 +63,7 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
         <?php require __DIR__.'/methodology-analysis-location.php'; ?>
         <?php require __DIR__.'/methodology-analysis-course.php'; ?>
         <?php require __DIR__.'/methodology-analysis-regression.php'; ?>
+        <?php require __DIR__.'/methodology-analysis-pending.php'; ?>
         <p class="mt-3 text-sm" data-autosave-status>Autoguardado activo. Espera el guardado confirmado antes de exportar.</p>
         <button class="btn-primary mt-3" type="submit">Guardar análisis de muestras</button>
     </form>

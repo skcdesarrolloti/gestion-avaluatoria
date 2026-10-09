@@ -1,9 +1,6 @@
 <template x-if="analysisModule==='regression'"><section class="space-y-4">
-    <h3 class="text-xl font-semibold">Modelo de regresión lineal múltiple</h3>
-    <nav class="flex flex-wrap gap-2" aria-label="Pasos de la regresión">
-        <button type="button" class="btn-secondary" :aria-current="regressionTab==='application'?'step':null" :class="regressionTab==='application'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="regressionTab='application'">1. Preparar y calcular</button>
-        <button type="button" class="btn-secondary" :aria-current="regressionTab==='diagnostics'?'step':null" :class="regressionTab==='diagnostics'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="regressionTab='diagnostics'">2. Gráficos y datos atípicos</button>
-    </nav>
+    <h3 class="text-xl font-semibold" x-text="regressionTab==='diagnostics'?'4. Revisar el modelo':'3. Construir el modelo'"></h3>
+    <p class="text-sm" x-show="regressionTab==='application'">Elegir Y y factores → confirmar codificación → calcular regresión múltiple. Regresión simple y comparación de alternativas siguen pendientes; el cálculo existente se conserva.</p>
     <?php require __DIR__.'/methodology-regression-academy.php'; ?>
     <details x-show="regressionTab==='application'" class="rounded-xl border p-4 space-y-3"><summary class="min-h-11 cursor-pointer font-semibold">Qué hacemos · fórmulas e interpretación del modelo</summary>
         <p>El modelo relaciona el valor por m² con los factores elegidos. Cada coeficiente mide el cambio asociado a un factor manteniendo los otros constantes; la asociación no demuestra causalidad.</p>
@@ -36,7 +33,7 @@
             <p class="font-semibold" x-text="regressionEquation()"></p>
             <p class="text-sm">Resultado en COP/m². Antigüedad representa la categoría codificada, no años exactos. El descuento se usa para calcular el valor final; no cuenta como factor.</p>
             <div class="overflow-auto"><table class="min-w-full text-left"><thead><tr><th class="p-2">Variable</th><th class="p-2">Coeficiente</th><th class="p-2">VIF</th></tr></thead><tbody><template x-for="(coefficient,i) in (regressionResult?.coefficients || [])" :key="i"><tr><td class="p-2" x-text="i?regressionResult.matrix.cols[i-1].label:'Intercepto'"></td><td class="p-2" x-text="coefficient.toFixed(4)"></td><td class="p-2" x-text="i?regressionResult.vif[i-1].toFixed(3):'—'"></td></tr></template></tbody></table></div>
-            <p class="text-sm">Resultado exploratorio. Revisa distribución, residuos e influencia en «2. Gráficos y datos atípicos» antes de interpretar o aplicar al sujeto.</p>
+            <p class="text-sm">Resultado exploratorio. Revisa distribución, residuos e influencia en «4. Revisar el modelo» antes de interpretar o aplicar al sujeto.</p>
             <button type="button" class="btn-primary" :disabled="!regressionCurrent()" @click="regressionTab='diagnostics'">Ver gráficos y revisar datos atípicos</button>
             <button type="button" class="btn-secondary" :disabled="!regressionCurrent()" @click="regressionExport()">Descargar informe de regresión para el entregable</button>
         </div>

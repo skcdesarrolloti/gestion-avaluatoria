@@ -32,7 +32,7 @@ export function marketAnalysisTable(rows,subjectRegime='',subjectType='',subject
     return cacheAnalysisReads({
         analysisReactiveCache:false,analysisDataRevision:0,
         init(){if(!this.$watch)return;this.analysisReactiveCache=true;this.$watch('analysisRows',()=>{this.analysisDataRevision++;});},
-        analysisModule:'samples', ...regressionMethods(), ...courseMethods(), ...locationMapMethods(subjectLocation),
+        analysisModule:'samples',analysisPendingStep:0, ...regressionMethods(), ...courseMethods(), ...locationMapMethods(subjectLocation),
         regressionBasis:saved.regression?.basis || 'offer',regressionCodes:saved.regression?.codes || {},regressionConfirmed:saved.regression?.confirmed || false,
         analysisRows:rows, get analysisTable(){return project(this.analysisRows,this.analysisReactiveCache?this.analysisDataRevision:undefined);}, get analysisOriginalTable(){return original(this.analysisRows,this.analysisReactiveCache?this.analysisDataRevision:undefined);}, ...manualMethods(), analysisSubjectRegime:subjectRegime, analysisScope:saved.scope ?? 'subject', analysisAppliedScope:saved.applied_scope ?? saved.scope ?? 'subject', analysisRegimeApplied:saved.regime_applied ?? ['clean','result'].includes(saved.view), analysisThreshold:50, analysisView:saved.view ?? 'raw',
         get analysisFactors(){const rows=this.analysisActiveRows(),table=active(rows,this.analysisReactiveCache?this.analysisDataRevision:undefined);if(table!==factorTable){factorCache=analysisCoverage(rows,subjectType,table);factorTable=table;}return factorCache;},
