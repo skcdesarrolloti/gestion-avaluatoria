@@ -1,9 +1,11 @@
 <div x-show="courseStep===2" class="rounded-xl border p-4 space-y-3">
     <h4 class="font-semibold">3. Tendencia central · curso, páginas 11–18</h4>
     <p>Se comparan varios centros; ninguno se adopta por defecto. La media usa todos los valores, la mediana depende del orden y la geométrica requiere valores positivos. La moda exacta depende de repeticiones; la clase modal es el bloque más frecuente.</p>
-    <p class="font-mono">Media = Σxᵢ / n · Geométrica = exp(Σln(xᵢ) / n)<br>MAPE del estimador = 100/n × Σ|xᵢ − estimador| / |xᵢ|</p>
+    <p class="font-mono">Media = Σxᵢ / n · Geométrica = exp(Σln(xᵢ) / n)</p>
+    <p><strong>MAPE · Mean Absolute Percentage Error (error porcentual absoluto medio).</strong> La tabla se ordena de menor a mayor MAPE; los resultados no estimables aparecen al final. Un valor menor indica menor diferencia porcentual media respecto de los datos de esta muestra, sin adoptar automáticamente ese estimador.</p>
+    <?php require __DIR__.'/methodology-course-mape-academy.php'; ?>
     <p>La recortada del ejercicio toma 20 % por cola: k = piso(0,20 × n). Sólo resume los valores centrales; las muestras originales siguen conservadas. MAPE compara cada centro con estos mismos datos, no garantiza precisión fuera de la muestra.</p>
-    <div class="overflow-auto"><table class="min-w-full text-left"><thead><tr><th class="p-2">Estimador</th><th class="p-2">COP/m²</th><th class="p-2">MAPE %</th></tr></thead><tbody><template x-for="e in courseResult.summary.estimators" :key="e.label"><tr><td class="p-2" x-text="e.label"></td><td class="p-2" x-text="courseNumber(e.value)"></td><td class="p-2" x-text="courseNumber(e.mape)"></td></tr></template></tbody></table></div>
+    <div class="overflow-auto"><table class="min-w-full text-left"><thead><tr><th class="p-2">Estimador</th><th class="p-2">COP/m²</th><th class="p-2">MAPE % · menor a mayor</th></tr></thead><tbody><template x-for="e in courseSortedEstimators()" :key="e.label"><tr><td class="p-2" x-text="e.label"></td><td class="p-2" x-text="courseNumber(e.value)"></td><td class="p-2" x-text="courseNumber(e.mape)"></td></tr></template></tbody></table></div>
     <p x-text="'Moda exacta: '+(courseResult.summary.modes.length?courseResult.summary.modes.map(v=>courseNumber(v)).join(', '):'sin repeticiones')"></p>
     <p x-text="'Clase modal: '+courseResult.summary.classes.filter(c=>c.frequency===Math.max(...courseResult.summary.classes.map(v=>v.frequency))).map(c=>'bloque '+c.n).join(', ')"></p>
     <p x-text="'Recortada: '+Math.floor(courseResult.valid.length*.2)+' valores por cola para este estimador; '+(courseResult.valid.length-2*Math.floor(courseResult.valid.length*.2))+' valores en su cálculo.'"></p>
