@@ -1,5 +1,12 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
+test('applied group count stays at 34 while original consultation shows 71 without changing saved decisions',()=>{
+ const saved={scope:'subject',applied_scope:'subject',regime_applied:true,view:'result',selected:[],applied:[],statistics:[],review:[]};
+ const rows=Array.from({length:71},(_,i)=>({id:String(i),ph_regime:i<34?'si':'no',area_m2:'40',price_amount:'400000000',...(i===0?{analysis_factor_selection:JSON.stringify(saved)}:{})}));
+ const state=marketAnalysisTable(rows,'si');const before=state.analysisSelection();
+ state.analysisModule='samples';state.analysisView='raw';assert.equal(state.analysisActiveRows().length,71);assert.equal(state.analysisWorkingCount(),34);
+ state.analysisView='result';assert.equal(state.analysisWorkingCount(),34);assert.equal(state.analysisSelection(),before);
+});
 import {marketAnalysisTable} from '../resources/js/market-analysis-table.js';
 import {statistics} from '../resources/js/analysis-statistical-history.js';
 test('sample statistics omit missing values and use sample deviation',()=>{

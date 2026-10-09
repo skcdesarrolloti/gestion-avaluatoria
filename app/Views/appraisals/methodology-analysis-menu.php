@@ -15,5 +15,10 @@ $marketMenu = [
         <button type="button" class="btn-secondary text-left" :aria-current="<?= e($active) ?>?'page':null" :class="<?= e($active) ?>?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="<?= e($action) ?>"><?= e($title) ?></button>
     <?php endforeach; ?>
 </nav>
-<p class="mt-3 text-sm" x-text="analysisRows.length+' inmuebles recogidos · '+analysisActiveRows().length+' en el grupo actual'"></p>
-<p class="text-sm">El total recogido no equivale a las filas completas del cálculo. Cada procedimiento informa sus disponibles y pendientes; cambiar de menú conserva las muestras.</p>
+<p class="mt-3 font-semibold text-teal-900" role="status" x-text="analysisRegimeApplied?'Grupo de trabajo aplicado: '+analysisWorkingCount()+' inmuebles':'Preparación del grupo: pendiente de aplicar'"></p>
+<p class="text-sm" x-show="analysisRegimeApplied">Se conserva la preparación guardada. Consultar antecedentes no reaplica filtros ni reincorpora muestras.</p>
+<details class="mt-3 rounded-lg border p-3">
+    <summary class="min-h-11 cursor-pointer font-semibold">Consultar antecedentes · total recogido e historial</summary>
+    <p class="my-3 text-sm" x-text="analysisRows.length+' inmuebles recogidos · '+analysisWorkingCount()+' en el grupo aplicado · '+(analysisRows.length-analysisWorkingCount())+' fuera de ese grupo, conservados'"></p>
+    <?php require __DIR__.'/methodology-analysis-statistics.php'; ?>
+</details>

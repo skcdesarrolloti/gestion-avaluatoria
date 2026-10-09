@@ -8,7 +8,7 @@
     ];
     $basePath='/avaluos/test';$componentKey='unit';$record=['comparables_version'=>3];
     ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-intake-analysis.php';$html=ob_get_clean();
-    expect(str_contains($html,'Recorrido de análisis de mercado · 2 inmuebles'),'análisis recibe confirmados sin exigir selección estadística anterior');
+    expect(str_contains($html,'Recorrido de análisis de mercado'),'recorrido mantiene acceso al análisis existente');
     expect(str_contains($html,'2 inmuebles recibidos para este recorrido'),'recepción cuenta inmuebles y no anuncios');
     expect(str_contains($html,'1 anuncios con notas o diferencias conservadas'),'recepción incluye alertas de fuentes secundarias');
     expect(str_contains($html,'Diferencia secundaria &lt;script&gt;revisar()&lt;/script&gt;'),'recepción escapa diferencias sin ejecutarlas');

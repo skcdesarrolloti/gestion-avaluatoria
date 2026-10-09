@@ -1,4 +1,5 @@
-<section x-show="['preparation','samples','location'].includes(analysisModule)" class="mb-4 rounded-xl border border-teal-700 p-4 space-y-3" aria-label="Guía de revisión del menú 1">
+<details x-show="['preparation','samples','location'].includes(analysisModule)" class="mb-4 rounded-xl border p-4 space-y-3" aria-label="Guía de revisión del menú 1">
+    <summary class="min-h-11 cursor-pointer font-semibold">Ayuda académica · preparación y uso de lo recibido de Insumos</summary>
     <h3 class="text-lg font-semibold">Preparar lo recibido de Insumos · pendientes y decisiones de análisis</h3>
     <p>Continúa desde la captura, consolidación y lectura realizadas en Insumos. Conserva las agrupaciones y datos existentes. Empieza por las notas, diferencias y faltantes recibidos; vuelve a la fuente cuando exista una duda o falte sustento para una decisión. Después define el grupo, la base de cálculo, los factores y la localización.</p>
     <?php require __DIR__.'/methodology-preparation-received.php'; ?>
@@ -76,4 +77,4 @@
             <p class="text-sm">Consulta el texto y alcance de los arts. 19–21 y anexo 2.1 de la Resolución 0941 en Academia. La revisión de fuentes y comparabilidad precede al cálculo; esta guía no introduce nuevos criterios de exclusión.</p>
         </div>
     </details>
-</section>
+</details>

@@ -46,6 +46,7 @@ export function marketAnalysisTable(rows,subjectRegime='',subjectType='',subject
         analysisColumns(){const keys=this.analysisView==='result'?this.analysisApplied:this.analysisSelected;return this.analysisFactors.filter(f=>this.analysisView==='raw' || this.analysisEligible(f) && keys.includes(f.key));},
         analysisEffectiveRegime(row){return ['si','no'].includes(row.ph_regime) ? row.ph_regime : (row.regime_hint?.regime || '');},
         analysisMatches(){return this.analysisRows.filter(r=>this.analysisEffectiveRegime(r)===this.analysisSubjectRegime && this.analysisSubjectRegime);},
+        analysisWorkingCount(){return workingRows(this).length;},
         analysisActiveRows(){const matches=this.analysisMatches();if(this.analysisView==='raw' && this.analysisModule==='samples' || !this.analysisRegimeApplied || this.analysisAppliedScope!=='subject' || !matches.length)return this.analysisRows;const ids=new Set([...matches.map(r=>r.id),...this.analysisReview.filter(v=>v.restored_at).map(v=>v.id)]);return this.analysisRows.filter(r=>ids.has(r.id));},
         analysisVisibleRows(){const ids=new Set(this.analysisActiveRows().map(r=>r.id));return this.analysisTable.rows.map((r,i)=>({...r,analysisIndex:i})).filter(r=>ids.has(r.key));},
         analysisSuggestion(factor){return factorSuggestion(factor,this.analysisActiveRows().length,this.analysisThreshold);},
