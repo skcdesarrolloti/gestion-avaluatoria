@@ -43,8 +43,8 @@
     $view=\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":["bathrooms"],"threshold":50,"view":"clean"}']);
     expect(json_decode($view['analysis_factor_selection'],true)['view']==='clean','vista depurada se recupera como decisión guardada');
     expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"threshold":50,"view":"execute"}']),'vista no permitida se rechaza');
-    expect(str_contains($html,'1. Información recogida') && str_contains($html,'2. Depurar muestras') && str_contains($html,'4. Resultado depurado'),'análisis separa pasos recogida selección y resultado');
-    expect(str_contains($html,'Aplicar depuración de muestras') && str_contains($html,'Depuración de factores por parte del analista'),'muestras y factores tienen acciones separadas');
+    expect(str_contains($html,'Consultar originales') && str_contains($html,'Revisar composición del grupo') && str_contains($html,'Volver al grupo preparado') && !str_contains($html,'aria-label="Pasos del análisis"'),'grupo preparado conserva consulta y selección sin otro nivel de submenús');
+    expect(str_contains($html,'Aplicar depuración de muestras') && str_contains($html,'Elegir otros factores · selección manual'),'muestras y factores tienen acciones separadas');
     $regime=\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"threshold":50,"view":"regime","scope":"all","applied_scope":"subject","regime_applied":true}']);
     expect(json_decode($regime['analysis_factor_selection'],true)['applied_scope']==='subject','régimen aplicado persiste separado del propuesto');
     $review=['id'=>str_repeat('a',32),'reason'=>'unknown','at'=>'2026-10-06T15:00:00.000Z','restored_at'=>'2026-10-06T15:01:00.000Z'];
@@ -67,6 +67,14 @@
     expect(json_decode($areaHistory['analysis_factor_selection'],true)['statistics'][1]['factor_count']===3,'historial conserva tres factores con área privada sin añadir área publicada');
     expect(!isset(json_decode($areaHistory['analysis_factor_selection'],true)['statistics'][0]['factor_count']),'historial anterior conserva su interpretación original sin reescribir conteos');
     expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>json_encode(['selected'=>[],'threshold'=>50,'statistics'=>[array_replace($areaStat,['factor_count'=>4])]])]),'servidor rechaza doble conteo de área privada');
+    $priorQuery=$_GET;
+    $_GET['panel']='regression';
+    ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-intake-analysis.php';$direct=ob_get_clean();
+    expect(str_contains($direct,'x-init="analysisModule=&#039;regression&#039;;regressionTab=&#039;application&#039;"') && str_contains($direct,'name="comparables[3][id]"'),'entrada directa al modelo conserva formulario y anuncios excluidos');
+    $_GET['panel']='<script>execute()</script>';
+    ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-intake-analysis.php';$invalid=ob_get_clean();
+    expect(str_contains($invalid,'if(analysisRegimeApplied)analysisView=&#039;result&#039;') && !str_contains($invalid,'<script>execute()</script>'),'panel ajeno abre grupo guardado sin ejecutar contenido ni reaplicar filtros');
+    $_GET=$priorQuery;
     $comparableRows=[];
     $componentKey='annex';$componentLabel='<script>Depósito</script>';
     $units=[['id'=>'annex','unit_kind'=>'annex','unit_index'=>1,'property_type'=>'parqueadero']];

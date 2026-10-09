@@ -52,6 +52,7 @@ $costAcademyTheoryOnly = $costAcademy && ($selected['method'] ?? '') !== 'costo'
     <section class="rounded-xl border bg-white p-6"><h2 class="text-xl font-semibold"><?= e($prefix . $stage . ' ' . Workflow::STAGES[$stage]) ?></h2>
     <p class="mt-3">El método puede asignarse al componente y su academia está disponible. Su desarrollo operativo se realizará en la siguiente etapa. No se han calculado ni adoptado valores.</p></section>
 <?php elseif ($stage === '3'): ?>
+    <?php require __DIR__ . '/methodology-market-capture-navigation.php'; ?>
     <?php require __DIR__ . '/methodology-unassigned.php'; ?>
     <?php require __DIR__ . '/valuation-methodology-search.php'; ?>
 <?php else: ?>
@@ -59,4 +60,4 @@ $costAcademyTheoryOnly = $costAcademy && ($selected['method'] ?? '') !== 'costo'
 <?php endif; ?>
 </div>
 
-<?php if (!$costAcademyTheoryOnly && !in_array($stage,['plan','1'],true)): require __DIR__ . '/methodology-next.php'; endif; ?>
+<?php if (!$costAcademyTheoryOnly && !in_array($stage,['plan','1'],true) && !($method==='mercado' && in_array($stage,['3','4'],true))): require __DIR__ . '/methodology-next.php'; endif; ?>

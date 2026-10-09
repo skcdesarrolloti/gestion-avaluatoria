@@ -5,7 +5,7 @@
     <template x-for="option in analysisCombinations()" :key="option.labels"><article class="mt-2 rounded-lg border p-3" :class="option.meets ? 'bg-emerald-50 text-emerald-900' : 'bg-amber-50 text-amber-900'">
         <p class="font-semibold" x-text="option.labels"></p>
         <p x-text="option.count+' muestras completas / '+option.required+' necesarias · '+(option.meets ? 'Cumple la cantidad para 3 factores' : 'Faltan '+(option.required-option.count)+' muestras completas')"></p>
-        <button type="button" class="btn-secondary mt-2" @click="analysisChooseCombination(option); if(!analysisError)regressionConfirmed=false; $dispatch('input')">Aplicar estos factores al modelo</button>
+        <button type="button" class="btn-secondary mt-2" :disabled="analysisBusy || !analysisRegimeApplied || analysisScope!==analysisAppliedScope" @click="analysisChooseCombination(option); if(!analysisError)regressionConfirmed=false; $dispatch('input')">Aplicar estos factores al modelo</button>
     </article></template>
-    <p class="text-sm" x-show="!analysisCombinations().length">No hay dos factores adicionales elegibles con los datos actuales. La captura y corrección de datos se consulta en Insumos.</p>
+    <p class="text-sm" x-show="!analysisCombinations().length">No hay dos factores adicionales elegibles con los datos actuales. Consulta Captura y consolidación dentro de 1. Preparar los datos para investigar los faltantes.</p>
     </details>

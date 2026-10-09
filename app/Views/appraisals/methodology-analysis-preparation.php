@@ -20,7 +20,7 @@ if ($preparationDate === '') $preparationPending[] = 'Fecha de valor';
             <?php foreach ($preparationFields as $field=>$label): ?>
             <div><dt class="font-semibold"><?= e($label) ?></dt><dd><?= e($preparationLabels[$field][4][$analysisContext[$field] ?? ''] ?? 'Pendiente de registrar o revisar') ?></dd></div>
             <?php endforeach; ?>
-            <div><dt class="font-semibold">Unidad de observación</dt><dd>Un inmueble por grupo de anuncios confirmado o seleccionado en Insumos. Se utiliza su anuncio principal; los demás se conservan como fuentes.</dd></div>
+            <div><dt class="font-semibold">Unidad de observación</dt><dd>Un inmueble por grupo de anuncios confirmado o seleccionado en Captura y consolidación. Se utiliza su anuncio principal; los demás se conservan como fuentes.</dd></div>
         </dl>
         <?php if ($preparationPending !== []): ?><p class="rounded-lg bg-amber-50 p-3"><strong>Información pendiente:</strong> <?= e(implode(' · ', $preparationPending)) ?>. Complétala en la ficha del encargo antes de sustentar una conclusión.</p><?php endif; ?>
         <p class="text-sm text-slate-600">La finalidad, el derecho, la base y la fecha proceden del encargo general. El tipo se consulta en el contexto del componente actual. Esta consulta no confirma por sí sola la comparabilidad de las muestras.</p>
@@ -37,5 +37,5 @@ if ($preparationDate === '') $preparationPending[] = 'Fecha de valor';
         <p class="mt-3">Reducir el CV seleccionando una franja de precios no demuestra que el grupo represente al sujeto. Conservamos los datos individuales y documentamos las decisiones antes de interpretar la media o una predicción.</p>
         <p class="mt-3 text-sm">Referencia de estudio: Sesión 1, preparación y distribución; Sesión 2, robustez y depuración; Sesión 3, modelación y validación. El marco normativo del expediente se consulta en Academia y en las advertencias de Análisis.</p>
     </details>
-    <p class="text-sm">Continúa en 1.2 Muestras y depuración para revisar los datos existentes y en 1.3 Coordenadas y mapa comparativo para comprobar su localización.</p>
+    <p class="text-sm">Consulta Grupo preparado para utilizar la selección guardada y Ubicación y mapa para atender localizaciones pendientes. La captura se realiza una sola vez en Captura y consolidación.</p>
 </section>

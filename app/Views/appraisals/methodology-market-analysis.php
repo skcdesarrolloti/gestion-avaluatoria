@@ -15,6 +15,8 @@ $stale = !empty($selected['analysis']) && ($selected['evidence_hash'] ?? '') !==
             <p class="mt-3 text-sm">La dispersión no sustituye la revisión de comparabilidad. No se eliminan datos atípicos automáticamente ni se declara cumplimiento por obtener un CV bajo.</p>
         </details>
     <?php endif; ?>
+    <details class="mt-5 rounded-xl border p-4" <?= $stage==='5'?'open':'' ?>>
+    <summary class="min-h-11 cursor-pointer font-semibold"><?= $stage==='4'?'Redacción de la memoria del análisis':'Conclusión para el entregable' ?></summary>
     <form class="mt-5" method="post" action="<?= e(url($basePath . '/flujo')) ?>" data-module-autosave data-save-in-place data-autosave-endpoint="<?= e(url($basePath . '/flujo')) ?>">
         <?= csrf_field() ?>
         <input type="hidden" name="version" value="<?= (int) ($record['methodology_version'] ?? 0) ?>">
@@ -34,5 +36,6 @@ $stale = !empty($selected['analysis']) && ($selected['evidence_hash'] ?? '') !==
         <button type="submit" class="btn-primary mt-3">Guardar ahora</button>
         <a class="btn-secondary mt-3" href="<?= e($flowUrl($stage === '4' ? '5' : 'integration')) ?>"><?= $stage === '4' ? 'Continuar a M5 Entregable' : 'Revisar integración' ?></a>
     </form>
+    </details>
     <?php endif; ?>
 </section>

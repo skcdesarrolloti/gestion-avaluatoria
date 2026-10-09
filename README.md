@@ -2,7 +2,9 @@
 
 Capítulo 8: [plan de valoración y artículos por paso](docs/PLAN-VALORACION-CAP8.md).
 
-Recorrido simplificado: Configuración → Academia → Insumos → Análisis → Entregable.
+Mercado: Configuración → Análisis → Entregable. Captura y consolidación se integran
+en 1. Preparar los datos; academia plegable junto a las tareas. Las rutas anteriores
+y sus datos se conservan. Otros métodos mantienen su organización propia.
 M4: [Preparar los datos y objetivo de análisis](docs/ANALISIS-PREPARAR-DATOS.md),
 con consulta del encargo y acceso a muestras, depuración y mapa existentes.
 [Apartado 2: academia estadística y fuentes trazables](docs/ANALISIS-ESTADISTICO-ACADEMIA.md),

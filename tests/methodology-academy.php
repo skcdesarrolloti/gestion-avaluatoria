@@ -33,7 +33,8 @@ declare(strict_types=1);
         $stage=$inputStage;
         ob_start();require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php';$inputHtml=ob_get_clean();
         expect(!str_contains($inputHtml,'id="articulos-del-paso"') && !str_contains($inputHtml,'Artículos completos para este paso'), 'etapa '.$stage.' no repite la academia');
-        expect(str_contains($inputHtml,'>Academia</a>'), 'etapa '.$stage.' conserva acceso a Academia');
+        expect(!str_contains($inputHtml,'>Academia</a>') && !str_contains($inputHtml,'>Insumos</a>'), 'Mercado integra captura y academia sin pestañas separadas en etapa '.$stage);
+        if ($stage==='3') expect(str_contains($inputHtml,'Academia de captura') && str_contains($inputHtml,'Leer artículo 19 completo'), 'captura conserva artículos aplicables dentro de un acordeón');
     }
     $stage='1';
     $componentKey='office:metodo:renta';$selected=$flow[$componentKey];$method='renta';

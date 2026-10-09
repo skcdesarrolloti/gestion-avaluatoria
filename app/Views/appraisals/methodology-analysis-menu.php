@@ -1,6 +1,6 @@
 <?php
 $marketMenu = [
-    ['1. Preparar los datos', "['preparation','samples','location'].includes(analysisModule)", "analysisModule='preparation'"],
+    ['1. Preparar los datos', "['preparation','samples','location'].includes(analysisModule)", "analysisModule='samples'"],
     ['2. Entender la muestra', "analysisModule==='statistics'&&courseStep!==6", "analysisModule='statistics';courseStep=0"],
     ['3. Construir el modelo', "analysisModule==='regression'&&regressionTab==='application'", "analysisModule='regression';regressionTab='application'"],
     ['4. Revisar el modelo', "analysisModule==='regression'&&regressionTab==='diagnostics'", "analysisModule='regression';regressionTab='diagnostics'"],
@@ -21,4 +21,5 @@ $marketMenu = [
     <summary class="min-h-11 cursor-pointer font-semibold">Consultar antecedentes · total recogido e historial</summary>
     <p class="my-3 text-sm" x-text="analysisRows.length+' inmuebles recogidos · '+analysisWorkingCount()+' en el grupo aplicado · '+(analysisRows.length-analysisWorkingCount())+' fuera de ese grupo, conservados'"></p>
     <?php require __DIR__.'/methodology-analysis-statistics.php'; ?>
+    <?php require __DIR__.'/methodology-preparation-received.php'; ?>
 </details>
