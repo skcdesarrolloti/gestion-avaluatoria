@@ -14,6 +14,7 @@
     <div x-show="regressionTab==='application'" class="space-y-4">
         <p class="rounded-lg bg-purple-50 p-3 text-purple-900" x-show="analysisHasSimulated()">Ejercicio con datos simulados. Los resultados deben conservar esta identificación en el entregable.</p>
         <p x-text="'Factores aplicados: '+regressionColumns().map(f=>f.label).join(' + ')"></p>
+        <?php require __DIR__.'/methodology-regression-combinations.php'; ?>
         <label class="label">Variable dependiente<select class="input" x-model="regressionBasis" @change="regressionConfirmed=false"><option value="offer">Oferta / área publicada · exploratorio sin descuento</option><option value="adjusted">Valor con descuento / área publicada · solo descuentos registrados</option></select></label>
         <p class="text-sm">Vacío no equivale a cero. Se usan los factores ya aplicados en Resultado depurado. Las filas sin valor numérico quedan pendientes; se conservan en la matriz original.</p>
         <div class="rounded-xl border p-4">
