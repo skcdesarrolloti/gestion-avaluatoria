@@ -25,3 +25,12 @@ y escape. QA local con34 ficticios y extremos4,2/16millones: dos señales,
 academia, escritorio y móvil375px sin desbordamiento global ni errores de
 consola. Exportación verificada. Sin modificación de BD ni ejecución sobre
 muestras reales del hosting. No se alteran fórmulas ni se excluyen inmuebles.
+
+La barra de cuartiles incorpora ahora un punto por inmueble en su valor exacto.
+Valores próximos o repetidos se apilan verticalmente sin desplazar el precio.
+Cada punto tiene identificación y valor accesibles; rojo con cruz conserva las
+señales de los límites RIC existentes. Los cortes coincidentes no forman nuevos
+grupos. Misma representación en memoria exportada. PHP1561/JS234/lint790;
+build/check:size78,5KB. QA local:34 puntos/dos señales, escritorio y móvil sin
+desbordamiento global ni errores. Pruebas de apilamiento, conservación, serie
+constante y escape. Sin cambios de persistencia, fórmulas o selección.

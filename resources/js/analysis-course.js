@@ -26,7 +26,7 @@ export function courseMethods(){return {
     coursePlot(el,svg){mountDiagnosticSvg(el,svg);},
     courseDispersionPlot(){return courseDispersionPlot(this.courseResult.valid,this.courseResult.summary);},
     courseOutsideLimits(){return this.courseResult.valid.filter(r=>outsideCourseLimits(r,this.courseResult.summary));},
-    courseQuartileBar(){return courseQuartileBar(this.courseResult.summary);},
+    courseQuartileBar(){return courseQuartileBar(this.courseResult.summary,this.courseResult.valid);},
     courseQuartileRanges(){return courseQuartileRanges(this.courseResult.summary);},
     async courseCalculate(){if(this.courseBusy||this.courseBootstrapBusy)return;this.courseBusy=true;this.courseError='';
         try{await new Promise(resolve=>setTimeout(resolve,0));if(!this.analysisRegimeApplied)throw new Error('Aplica primero la depuración de muestras.');const rows=this.courseRows(),valid=rows.filter(r=>!r.reasons.length&&Number.isFinite(r.y));if(valid.length<2)throw new Error('Completa al menos dos valores unitarios para el análisis descriptivo.');
