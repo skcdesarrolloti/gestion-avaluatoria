@@ -938,3 +938,12 @@ PHP1555/JS227, build y tamaño78,4KB. QA local datos sintéticos: entrada1.1,
 matriz, mapa, estadística y regresión; móvil375px sin desbordamiento ni errores
 de consola. Pendiente despliegue al hosting y siguientes pasos acordados.
 Ver ANALISIS-PREPARAR-DATOS.md para alcance, comandos y límites.
+
+Academia de precisión ampliada (2026-10-09): acordeón principal con siete temas
+para principiantes: ejemplo8/10/12, bolsa con reemplazo, botón10000, límites,
+ICt/gl/error estándar/semiancho, alcance y ruta de trabajo. Términos explicados
+en español entre paréntesis. Cálculo opcional plegado aparte; matemáticas y datos
+conservados. QA local3muestras: academia abre/cierra, escritorio/móvil375px sin
+desborde,10000remuestreos finalizan con resultados y sin errores de consola.
+PHP1555/JS227/lint/build78,4KB. Sin persistencia nueva; siguiente actualización
+por Git. No se ejecutó contra muestras reales del hosting.

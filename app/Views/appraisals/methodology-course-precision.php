@@ -1,14 +1,19 @@
 <div x-show="courseStep===5" class="rounded-xl border p-4 space-y-3">
     <h4 class="font-semibold">6. Precisión de la media · curso, páginas 36–46</h4>
+    <?php require __DIR__.'/methodology-course-precision-academy.php'; ?>
     <p>El intervalo cuantifica la precisión de la media bajo los supuestos de muestreo. No es el rango de precios individuales, el error del avalúo ni una garantía frente a sesgo. Anuncios relacionados pueden aportar información dependiente.</p>
-    <p class="font-mono">Error estándar = s / √n<br>IC = media ± t((1 + confianza)/2; n − 1) × s / √n<br>Semiancho relativo % = 100 × semiancho / |media|</p>
+    <p class="font-mono">Error estándar (variabilidad estimada de la media) = s / √n<br>IC (intervalo de confianza) = media ± t((1 + confianza)/2; n − 1) × s / √n<br>Semiancho (margen a cada lado de la media) relativo % = 100 × semiancho / |media|</p>
     <div class="overflow-auto"><table class="min-w-full text-left"><thead><tr><th class="p-2">Confianza %</th><th class="p-2">gl</th><th class="p-2">t</th><th class="p-2">Error estándar</th><th class="p-2">Semiancho</th><th class="p-2">Inferior</th><th class="p-2">Superior</th><th class="p-2">Semiancho relativo %</th></tr></thead><tbody><tr><td class="p-2" x-text="100*courseResult.summary.confidence"></td><td class="p-2" x-text="courseResult.valid.length-1"></td><template x-for="key in ['t','se','margin','lowerCI','upperCI','relativeMargin']" :key="key"><td class="p-2" x-text="courseNumber(courseResult.summary[key])"></td></template></tr></tbody></table></div>
     <p>Interpretación: en repeticiones del procedimiento, la proporción de intervalos que contiene la media poblacional corresponde al nivel elegido. La conclusión exige revisar representatividad, independencia y extremos.</p>
-    <h5 class="font-semibold">Remuestreo bootstrap · complemento opcional del curso</h5>
-    <p>Se extraen n valores con reemplazo, se recalculan media, mediana y CV, y se repite 10.000 veces con semilla 2026. Los intervalos percentiles muestran sensibilidad a la muestra; no crean inmuebles ni aumentan su cantidad.</p>
+    <details class="rounded-xl border p-4 space-y-3">
+    <summary class="min-h-11 cursor-pointer font-semibold">Bootstrap (remuestreo con reemplazo) · cálculo opcional y resultados</summary>
+    <p>En cada repetición se extraen n valores (cantidad disponible) permitiendo repetir unos y omitir otros. Se recalculan media (promedio), mediana (valor central) y CV (coeficiente de variación). La media original permanece igual.</p>
+    <p>El botón repite ese cálculo 10.000 veces; no crea inmuebles. Lee primero la academia para entender los límites y sus supuestos.</p>
     <button type="button" class="btn-secondary" :disabled="!courseCurrent()||courseBootstrapBusy" @click="await courseResample()" x-text="courseBootstrapBusy?'Remuestreando…':'Ejecutar 10.000 remuestreos'"></button>
     <div x-show="courseBootstrapBusy" role="status"><progress class="w-full" max="10000" :value="courseProgress"></progress><p x-text="courseProgress+' / 10.000 remuestreos · '+Math.round(courseProgress/100)+' %'"></p></div>
     <template x-if="courseResult.bootstrap"><div><div class="overflow-auto"><table class="min-w-full text-left"><thead><tr><th class="p-2">Serie</th><th class="p-2">Inferior</th><th class="p-2">Superior</th></tr></thead><tbody><template x-for="item in [{key:'mean',label:'Media · COP/m²'},{key:'median',label:'Mediana · COP/m²'},{key:'cv',label:'CV · %'}]" :key="item.key"><tr><td class="p-2" x-text="item.label"></td><td class="p-2" x-text="courseNumber(courseResult.bootstrap[item.key][0])"></td><td class="p-2" x-text="courseNumber(courseResult.bootstrap[item.key][1])"></td></tr></template></tbody></table></div><p class="text-sm" x-text="'10.000 repeticiones · semilla '+courseResult.bootstrap.seed+' · generador Mulberry32 · confianza '+courseResult.bootstrap.confidence*100+' % · cuantiles interpolados'"></p></div></template>
+    <p class="text-sm">Semilla (número inicial reproducible); Mulberry32 (generador seudoaleatorio); cuantiles interpolados (límites obtenidos entre posiciones ordenadas). Los límites describen cada medida remuestreada; no son el rango de precios individuales ni el valor adoptado.</p>
+    </details>
 </div>
 <div x-show="courseStep===6" class="rounded-xl border p-4 space-y-3">
     <h4 class="font-semibold">7. Conclusión y memoria · curso, páginas 47–51</h4>
