@@ -8,6 +8,7 @@ import {courseReport} from './analysis-course-report.js';
 import {downloadReport} from './analysis-download.js';
 import {courseInterpretations} from './analysis-course-interpretation.js';
 import {courseProgressSummary} from './analysis-course-progress-summary.js';
+import {courseQuartileCalculation,courseQuartileOperation,courseQuartileLimitOperations} from './analysis-course-quartile-calculation.js';
 export const courseSteps=['Base del cálculo','Bloques y distribución','Tendencia central','Dispersión','Sensibilidad y consideraciones','Precisión de la media','Conclusión y memoria'];
 export function courseMethods(){return {
     courseStep:0,courseSteps,courseBasis:'adjusted',courseConfidence:'.95',courseResult:null,courseBusy:false,courseError:'',courseBootstrapBusy:false,courseProgress:0,courseNotes:{},courseConclusion:'',analysisReviewReturn:null,
@@ -29,6 +30,9 @@ export function courseMethods(){return {
     courseOutsideLimits(){return this.courseResult.valid.filter(r=>outsideCourseLimits(r,this.courseResult.summary));},
     courseQuartileBar(){return courseQuartileBar(this.courseResult.summary,this.courseResult.valid);},
     courseQuartileRanges(){return courseQuartileRanges(this.courseResult.summary);},
+    courseQuartileCalculation(){return courseQuartileCalculation(this.courseResult.valid);},
+    courseQuartileOperation(c){return courseQuartileOperation(c,v=>this.courseNumber(v));},
+    courseQuartileLimitOperations(){return courseQuartileLimitOperations(this.courseResult.summary,v=>this.courseNumber(v));},
     courseProgressSummary(){return courseProgressSummary(this.courseResult);},
     async courseCalculate(){if(this.courseBusy||this.courseBootstrapBusy)return;this.courseBusy=true;this.courseError='';
         try{await new Promise(resolve=>setTimeout(resolve,0));if(!this.analysisRegimeApplied)throw new Error('Aplica primero la depuración de muestras.');const rows=this.courseRows(),valid=rows.filter(r=>!r.reasons.length&&Number.isFinite(r.y));if(valid.length<2)throw new Error('Completa al menos dos valores unitarios para el análisis descriptivo.');

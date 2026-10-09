@@ -16,4 +16,5 @@
             <p class="text-sm"><a class="underline" href="https://www.itl.nist.gov/div898/handbook/eda/section3/boxplot.htm" target="_blank" rel="noopener" data-no-fetch>NIST · cuartiles y tramo intercuartílico</a>. Referencia estadística de apoyo.</p>
         </div>
     </details>
+    <?php require __DIR__.'/methodology-course-quartile-calculation.php'; ?>
 </div>

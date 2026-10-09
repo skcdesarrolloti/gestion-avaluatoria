@@ -7,6 +7,7 @@
         <summary class="min-h-11 cursor-pointer font-semibold">Límites exploratorios · fórmula e interpretación</summary>
         <div class="mt-3 space-y-3">
             <p class="font-mono">RIC = Q3 − Q1<br>Límite inferior = Q1 − 1,5 × RIC<br>Límite superior = Q3 + 1,5 × RIC</p>
+            <div class="space-y-2 font-mono"><template x-for="line in courseQuartileLimitOperations()" :key="line"><p x-text="line"></p></template></div>
             <p>Q1 y Q3 son los cuartiles primero y tercero: delimitan el 50 % central de los valores ordenados. RIC es el rango intercuartílico, es decir, la amplitud de ese tramo. Se utiliza la interpolación de cuartiles del cálculo existente.</p>
             <p>Un valor estrictamente inferior o superior a estos límites se señala para investigar su precio, área, fuente y comparabilidad. Un valor exactamente en el límite permanece dentro. El rojo indica una señal exploratoria; no demuestra un error ni autoriza excluir el inmueble.</p>
             <p>Estos límites son distintos del intervalo de confianza de la media y del umbral del CV. No representan precios mínimos o máximos admisibles para el avalúo. La media del gráfico conserva su cálculo original; el centro seleccionado por MAPE pertenece a la comparación del paso anterior.</p>
