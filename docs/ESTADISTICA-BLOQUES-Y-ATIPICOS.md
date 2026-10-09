@@ -30,3 +30,16 @@ npm run build y npm run check:size (78,4 KB). Navegador local con 71 inmuebles
 ficticios y 34 seleccionados: cálculo, ayuda plegable, enlace a sensibilidad,
 grupo conservado y bloque vacío; móvil375px sin desbordamiento y consola sin
 errores. No se ejecutó sobre la base ni las muestras del hosting.
+
+## Ajuste de presentación · 2026-10-09
+
+Media y CV descriptivo visibles directamente en la tabla por intervalo y marca
+ de clase, conservando el cálculo sobre valores individuales. Alcance breve
+visible: no acredita comparabilidad/cumplimiento y requiere el análisis completo.
+Redacción profesional; detalle técnico plegado con referencias. Se retira el
+botón que salta a sensibilidad y el ejemplo docente extenso. Continuación por
+los pasos existentes, sin nuevas acciones ni cambios de muestras.
+
+Verificación: PHP1561, JS229, lint787, build/check:size78,4KB. QA local con34
+ficticios: tabla media/CV, bloque vacío no estimable, acordeón, ausencia del
+botón retirado, móvil375px sin desbordamiento y consola sin errores.
