@@ -1,0 +1,18 @@
+<div class="space-y-3">
+    <h5 class="font-semibold">Cuartiles · ubicación de los precios ordenados</h5>
+    <p>Los cuartiles son tres puntos de corte que dividen los valores, ordenados de menor a mayor, en cuatro tramos. Q1 sitúa aproximadamente el 25 % de las observaciones por debajo; Q2 es la mediana, el punto central; Q3 sitúa aproximadamente el 75 % por debajo. Entre Q1 y Q3 se encuentra el tramo central de la distribución.</p>
+    <div class="overflow-auto" tabindex="0" aria-label="Barra de cuartiles · desplazamiento horizontal en pantallas pequeñas"><div class="min-w-[640px]" :key="courseResult.at" x-effect="coursePlot($el,courseQuartileBar())"></div></div>
+    <p class="text-sm" x-text="'El tramo central inicia en Q1 = '+courseNumber(courseResult.summary.q1)+' y termina en Q3 = '+courseNumber(courseResult.summary.q3)+' COP/m². Su amplitud, RIC, es '+courseNumber(courseResult.summary.q3-courseResult.summary.q1)+' COP/m².'"></p>
+    <div class="overflow-auto"><table class="min-w-full text-left text-sm"><thead><tr><th class="p-2">Tramo ordenado</th><th class="p-2">Posición porcentual</th><th class="p-2">Desde COP/m²</th><th class="p-2">Hasta COP/m²</th></tr></thead><tbody><template x-for="r in courseQuartileRanges()" :key="r.label"><tr class="border-t"><td class="p-2" x-text="r.label"></td><td class="p-2" x-text="r.percent"></td><td class="p-2" x-text="courseNumber(r.from)"></td><td class="p-2" x-text="courseNumber(r.to)"></td></tr></template></tbody></table></div>
+    <details class="rounded-lg border bg-slate-50 p-3">
+        <summary class="min-h-11 cursor-pointer font-semibold">Qué muestran los cuartiles y para qué se utilizan</summary>
+        <div class="mt-3 space-y-3">
+            <p><strong>Lectura:</strong> primero se ordenan los precios. Con 100 observaciones, los cortes se sitúan alrededor de las posiciones 25, 50 y 75. Son posiciones entre datos, no el 25 %, 50 % o 75 % del precio máximo.</p>
+            <p><strong>Utilidad:</strong> permiten ubicar el centro, comparar la amplitud de los tramos y describir la distribución. El RIC (rango intercuartílico) mide la distancia entre Q1 y Q3; se utiliza para construir los límites exploratorios del gráfico de dispersión. Los extremos mínimo y máximo pueden cambiar mucho sin desplazar igualmente los cuartiles.</p>
+            <p><strong>Longitud de la barra:</strong> cada tramo ocupa una longitud proporcional a su diferencia de precios. Un tramo ancho muestra mayor separación de precios; no significa que contenga más inmuebles. Los valores repetidos pueden hacer coincidir varios cortes.</p>
+            <p><strong>Convención de cálculo:</strong> se conserva la interpolación lineal existente: posición = (n − 1) × p, contando desde cero, con p = 0,25; 0,50; 0,75. Si la posición queda entre dos observaciones ordenadas, se interpola entre ellas. Por eso un cuartil puede no coincidir con un precio observado y los tramos no tienen necesariamente igual cantidad exacta de inmuebles.</p>
+            <p>Los extremos compartidos en la tabla son puntos de corte, no grupos de muestras nuevos. Esta visualización no aplica filtros, no excluye inmuebles y no adopta un precio.</p>
+            <p class="text-sm"><a class="underline" href="https://www.itl.nist.gov/div898/handbook/eda/section3/boxplot.htm" target="_blank" rel="noopener" data-no-fetch>NIST · cuartiles y tramo intercuartílico</a>. Referencia estadística de apoyo.</p>
+        </div>
+    </details>
+</div>

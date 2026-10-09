@@ -2,6 +2,7 @@
     <p>Cada punto representa un inmueble: la altura corresponde a su valor unitario y el eje horizontal conserva el orden del listado. Los puntos rojos, marcados también con una cruz, están fuera de los límites exploratorios. La línea azul representa la media de toda la muestra.</p>
     <div class="overflow-auto" tabindex="0" aria-label="Gráfico de dispersión · desplazamiento horizontal en pantallas pequeñas"><div class="min-w-[640px]" :key="courseResult.at" x-effect="coursePlot($el,courseDispersionPlot())"></div></div>
     <p class="text-sm" x-text="'Límite inferior: '+courseNumber(courseResult.summary.lower)+' COP/m² · Límite superior: '+courseNumber(courseResult.summary.upper)+' COP/m² · '+courseOutsideLimits().length+' inmuebles fuera de límites.'"></p>
+    <?php require __DIR__.'/methodology-course-quartiles.php'; ?>
     <details class="rounded-lg border bg-slate-50 p-3">
         <summary class="min-h-11 cursor-pointer font-semibold">Límites exploratorios · fórmula e interpretación</summary>
         <div class="mt-3 space-y-3">
