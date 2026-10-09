@@ -1,6 +1,7 @@
 import {amount} from './comparable-negotiation.js';
 import {courseSummary,courseBootstrap,orderCourseEstimators,preferredCourseEstimators,courseSelectionConclusion} from './analysis-course-math.js';
 import {courseHistogram} from './analysis-course-plots.js';
+import {courseDispersionPlot,outsideCourseLimits} from './analysis-course-dispersion-plot.js';
 import {mountDiagnosticSvg} from './analysis-diagnostic-plots.js';
 import {courseReport} from './analysis-course-report.js';
 import {downloadReport} from './analysis-download.js';
@@ -22,6 +23,8 @@ export function courseMethods(){return {
     courseEstimatorSelected(e){return preferredCourseEstimators(this.courseResult?.summary.estimators||[]).some(v=>v.label===e.label);},
     courseSelectionConclusion(){return courseSelectionConclusion(this.courseResult?.summary.estimators||[],v=>this.courseNumber(v));},
     coursePlot(el,svg){mountDiagnosticSvg(el,svg);},
+    courseDispersionPlot(){return courseDispersionPlot(this.courseResult.valid,this.courseResult.summary);},
+    courseOutsideLimits(){return this.courseResult.valid.filter(r=>outsideCourseLimits(r,this.courseResult.summary));},
     async courseCalculate(){if(this.courseBusy||this.courseBootstrapBusy)return;this.courseBusy=true;this.courseError='';
         try{await new Promise(resolve=>setTimeout(resolve,0));if(!this.analysisRegimeApplied)throw new Error('Aplica primero la depuración de muestras.');const rows=this.courseRows(),valid=rows.filter(r=>!r.reasons.length&&Number.isFinite(r.y));if(valid.length<2)throw new Error('Completa al menos dos valores unitarios para el análisis descriptivo.');
             const s=courseSummary(valid,Number(this.courseConfidence));this.courseResult={rows,valid,pending:rows.filter(r=>!valid.includes(r)),summary:s,histogram:courseHistogram(s.classes),stamp:this.courseStamp(),at:new Date().toISOString(),basis:this.courseBasis,simulated:this.analysisHasSimulated(),bootstrap:null};

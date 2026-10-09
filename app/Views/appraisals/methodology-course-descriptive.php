@@ -13,7 +13,8 @@
 </div>
 <div x-show="courseStep===3" class="rounded-xl border p-4 space-y-3">
     <h4 class="font-semibold">4. Dispersión · curso, páginas 21–35</h4>
-    <p>Un centro parecido puede ocultar dispersiones distintas. Se calcula la versión muestral con n−1 y se declara la unidad. Un CV alto invita a estudiar comparabilidad y mercado; no dice qué inmueble es incorrecto.</p>
+    <p>La dispersión mide cuánto varían los precios por m² entre los inmuebles. Permite distinguir una muestra concentrada de otra con precios muy separados, aunque ambas tengan un promedio parecido. La desviación estándar expresa esa variación en COP/m² y el CV la expresa como porcentaje de la media.</p>
+    <?php require __DIR__.'/methodology-course-dispersion-cloud.php'; ?>
     <p class="font-mono">Rango = máximo − mínimo<br>s² = Σ(xᵢ − media)² / (n − 1) · s = √s² · CV = 100 × s / |media|</p>
     <div class="overflow-auto"><table class="min-w-full text-left"><thead><tr><th class="p-2">Mínimo</th><th class="p-2">Máximo</th><th class="p-2">Rango</th><th class="p-2">Varianza</th><th class="p-2">s</th><th class="p-2">CV %</th></tr></thead><tbody><tr><template x-for="key in ['min','max','range','variance','sd','cv']" :key="key"><td class="p-2" x-text="courseNumber(courseResult.summary[key])"></td></template></tr></tbody></table></div>
     <p class="text-sm">Resolución IGAC 0941 de 2026, art. 21: límites máximos del CV (coeficiente de variación) para adoptar la media, 7,50 % urbano y 10,0 % rural, según el ámbito aplicable. Exige además revisar el mercado; estos límites no ordenan exclusiones ni validan por sí solos el avalúo. Este ejercicio no adopta una media automáticamente.</p>
