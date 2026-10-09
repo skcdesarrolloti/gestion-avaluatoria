@@ -41,6 +41,7 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
                 <button type="button" class="btn-primary" @click="await analysisReturnFromReview()" x-text="'Volver a '+analysisReviewOrigin()"></button>
             </div></template>
         </div>
+        <?php require __DIR__.'/methodology-preparation-guide.php'; ?>
         <template x-if="analysisModule==='preparation'"><div><?php require __DIR__.'/methodology-analysis-preparation.php'; ?></div></template>
         <template x-if="analysisModule==='samples'"><div>
         <?php require __DIR__.'/methodology-analysis-data-table.php'; ?>

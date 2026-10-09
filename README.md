@@ -243,3 +243,5 @@ Vista simplificada a cuatro clases: véase la revisión de 2026-10-04 en
 [Academia de regresión y fundamento](docs/REGRESION-ACADEMIA-FUNDAMENTO.md): nueve temas en acordeones, fuentes identificadas y límites del modelo existente.
 
 [M4: menú de siete etapas](docs/ANALISIS-MENU-SIETE-ETAPAS.md): preparación, muestra, construcción, revisión, validación, sujeto y memoria.
+
+Menú 1 incluye guía contextual en acordeones: qué revisar, dónde corregir y cómo reconocer pendientes antes del análisis estadístico.
