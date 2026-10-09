@@ -245,3 +245,5 @@ Vista simplificada a cuatro clases: véase la revisión de 2026-10-04 en
 [M4: menú de siete etapas](docs/ANALISIS-MENU-SIETE-ETAPAS.md): preparación, muestra, construcción, revisión, validación, sujeto y memoria.
 
 Menú 1 incluye guía contextual en acordeones: qué revisar, dónde corregir y cómo reconocer pendientes antes del análisis estadístico.
+
+Preparación recibe el trabajo de Insumos: consulta notas y diferencias de todas las fuentes del grupo y conserva agrupaciones, ficha principal y atributos. Revisión centrada en pendientes y decisiones de análisis.
