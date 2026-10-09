@@ -1,8 +1,8 @@
 <?php $statisticsAcademy = \App\Support\MarketStatisticsAcademy::steps(); ?>
 <?php foreach ($statisticsAcademy as $academyIndex=>$academyStep): ?>
 <div x-show="courseStep===<?= $academyIndex ?>">
-    <details class="rounded-xl border bg-slate-50 p-4">
-        <summary class="min-h-11 cursor-pointer font-semibold">Academia de este paso · <?= e($academyStep['title']) ?></summary>
+    <div class="mt-3 space-y-3">
+        <h4 class="font-semibold"><?= e($academyStep['title']) ?></h4>
         <div class="mt-3 space-y-3">
             <p class="text-sm">Ejemplo didáctico; no se agrega a tus muestras ni constituye un precio del mercado actual.</p>
             <p><strong>Con un ejemplo: </strong><?= e($academyStep['example']) ?></p>
@@ -19,6 +19,6 @@
                 </div>
             </details>
         </div>
-    </details>
+    </div>
 </div>
 <?php endforeach; ?>

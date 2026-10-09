@@ -5,7 +5,7 @@ import {mountDiagnosticSvg} from './analysis-diagnostic-plots.js';
 import {courseReport} from './analysis-course-report.js';
 import {downloadReport} from './analysis-download.js';
 import {courseInterpretations} from './analysis-course-interpretation.js';
-export const courseSteps=['Preparar la muestra','Bloques y distribución','Tendencia central','Dispersión','Sensibilidad y consideraciones','Precisión de la media','Conclusión y memoria'];
+export const courseSteps=['Base del cálculo','Bloques y distribución','Tendencia central','Dispersión','Sensibilidad y consideraciones','Precisión de la media','Conclusión y memoria'];
 export function courseMethods(){return {
     courseStep:0,courseSteps,courseBasis:'adjusted',courseConfidence:'.95',courseResult:null,courseBusy:false,courseError:'',courseBootstrapBusy:false,courseProgress:0,courseNotes:{},courseConclusion:'',analysisReviewReturn:null,
     courseRows(){return this.analysisVisibleRows().map(r=>{const original=this.analysisRows[r.analysisIndex],area=amount(original.area_m2),offer=amount(original.price_amount),adjusted=this.analysisResult(r.key),discount=amount(this.analysisDiscounts[r.key]),reasons=[];

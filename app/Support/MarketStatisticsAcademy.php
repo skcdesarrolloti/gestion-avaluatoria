@@ -8,7 +8,7 @@ final class MarketStatisticsAcademy
     {
         return [
             [
-                'title'=>'1. Preparar la muestra: qué dato entra al cálculo',
+                'title'=>'1. Base del cálculo: qué dato entra al cálculo',
                 'example'=>'Ejemplo didáctico: oferta de 500 millones COP, descuento de negociación sustentado del 10 % y área publicada de 50 m². El valor después de negociación es 450 millones; el cociente preliminar es 9 millones COP/m². Si el precio incluye un garaje o el área no es la privada pertinente, todavía falta depurar la base.',
                 'meaning'=>'Una observación (dato de un inmueble) debe conservar sus fuentes. Dos anuncios del mismo inmueble no son dos comparables independientes. Un dato faltante tampoco equivale a cero: un descuento vacío queda pendiente, mientras un cero registrado significa que no se descontó negociación.',
                 'next'=>'Revisa fuente, fecha, ubicación, precio, área, régimen y componentes incluidos. El cociente de esta pantalla usa el área publicada: verifica su correspondencia con la base requerida antes de adoptarlo.',
