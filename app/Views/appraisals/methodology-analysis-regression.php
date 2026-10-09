@@ -4,6 +4,7 @@
         <button type="button" class="btn-secondary" :aria-current="regressionTab==='application'?'step':null" :class="regressionTab==='application'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="regressionTab='application'">1. Preparar y calcular</button>
         <button type="button" class="btn-secondary" :aria-current="regressionTab==='diagnostics'?'step':null" :class="regressionTab==='diagnostics'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="regressionTab='diagnostics'">2. Gráficos y datos atípicos</button>
     </nav>
+    <?php require __DIR__.'/methodology-regression-academy.php'; ?>
     <details x-show="regressionTab==='application'" class="rounded-xl border p-4 space-y-3"><summary class="min-h-11 cursor-pointer font-semibold">Qué hacemos · fórmulas e interpretación del modelo</summary>
         <p>El modelo relaciona el valor por m² con los factores elegidos. Cada coeficiente mide el cambio asociado a un factor manteniendo los otros constantes; la asociación no demuestra causalidad.</p>
         <p class="font-mono">yᵢ = β₀ + β₁xᵢ₁ + … + βₖxᵢₖ + εᵢ</p>

@@ -350,7 +350,8 @@ duplicar campos del avalúo.
 ## Pruebas aisladas
 
 `php tests/run.php` comprueba validación y autenticación con SQLite en memoria.
-`npm test` comprueba estados y concurrencia del cliente sin instalar navegador.
+
+pm test` comprueba estados y concurrencia del cliente sin instalar navegador.
 `php tests/database.php` comprueba MySQL/MariaDB en bases desechables locales;
 requiere `GA_TEST_PORT`, opcional `GA_TEST_USER`/`GA_TEST_PASSWORD`. Nunca usa `.env`
 para elegir una base a borrar: no borra bases ni tablas y rechaza fixtures existentes.
@@ -959,3 +960,5 @@ Memoria HTML añade nota de fuentes/límites escapada. Sin cambiar datos, fórmu
 esquema o autoguardado. PHP1555/JS228/lint/build78,4KB; QA7academias sin cálculo,
 fuentes, enlaces, escritorio y móvil375px sin desborde ni errores de consola.
 Ver ANALISIS-ESTADISTICO-ACADEMIA.md. No se ejecutó sobre BD/muestras del hosting.
+
+Apartado 3: academia de regresión en acordeones, pasos 1–5 preparación y 6–9 diagnósticos. Descarga conserva fuentes/alcance escapados. Sin cambios de cálculo, muestras o BD. Fuentes y pendientes: REGRESION-ACADEMIA-FUNDAMENTO.md. PHP1555/JS228/build78,4KB; navegador escritorio/móvil375px, sin desbordamiento ni errores. Respaldo previo output/antes-regresion-academia-fd0da31.zip.

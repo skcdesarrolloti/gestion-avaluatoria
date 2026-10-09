@@ -109,7 +109,9 @@ npm test
 npm run check:size
 ```
 
-En PowerShell usa `npm.cmd` si la política local bloquea `npm.ps1`.
+En PowerShell usa 
+pm.cmd` si la política local bloquea 
+pm.ps1`.
 Composer es opcional para este esqueleto; el autoload mínimo ya está en `bootstrap.php`.
 
 Para importar los PDFs privados de normas técnicas después de migrar la base:
@@ -197,7 +199,8 @@ tests/               Pruebas aisladas
 - Permite escribir en `storage/`, `storage/sessions/` y `storage/rate-limits/`; un
   único servidor comparte el límite de intentos por filesystem. Para varios servidores
   implementar un limitador centralizado.
-- Sube assets compilados, código y migraciones. Excluye `node_modules/`, `tests/`,
+- Sube assets compilados, código y migraciones. Excluye 
+ode_modules/`, `tests/`,
   secretos de desarrollo y bases temporales. Configura `.env` en el servidor.
   Si el despliegue Git borra `.env`, crea `.gestion-avaluatoria.env` en la carpeta
   padre del proyecto; la app lo lee después de `.env` y no se versiona.
@@ -236,3 +239,5 @@ Investigación de factores: [plan por unidad y método](docs/PLAN-INVESTIGACION-
 
 Vista simplificada a cuatro clases: véase la revisión de 2026-10-04 en
 [plan de investigación](docs/PLAN-INVESTIGACION-MERCADO.md). [Captura del sujeto](docs/FACTORES-SUJETO-CAPITULO-3.md).
+
+[Academia de regresión y fundamento](docs/REGRESION-ACADEMIA-FUNDAMENTO.md): nueve temas en acordeones, fuentes identificadas y límites del modelo existente.
