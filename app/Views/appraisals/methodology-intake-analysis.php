@@ -11,9 +11,11 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
 ?>
 <details class="mt-4 rounded-xl border p-4" open>
     <summary class="min-h-11 cursor-pointer font-semibold">Tabla de análisis · <?= count($intakeGroups) ?> inmuebles recogidos</summary>
-    <?php if ($intakeGroups === []): ?><p class="mt-3 rounded-lg bg-amber-50 p-3">Selecciona inmuebles en Insumos para estudiarlos aquí. Los anuncios restantes siguen conservados.</p><?php else: ?>
+    <?php if ($intakeGroups === []): ?>
+    <?php require __DIR__.'/methodology-analysis-preparation.php'; ?>
+    <p class="mt-3 rounded-lg bg-amber-50 p-3">Selecciona inmuebles en Insumos para estudiarlos aquí. Los anuncios restantes siguen conservados.</p><?php else: ?>
     <form data-market-analysis class="mt-4" x-data="marketAnalysisTable(<?= e(json_encode($analysisRows,JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT|JSON_THROW_ON_ERROR)) ?>, '<?= e($analysisRegime) ?>', <?= e(json_encode($analysisContext['tipo_inmueble'] ?? '',JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT|JSON_THROW_ON_ERROR)) ?>)" method="post" action="<?= e(url($basePath . '/comparables')) ?>" data-module-autosave data-save-in-place data-comparable-json
-        data-autosave-endpoint="<?= e(url($basePath . '/comparables/autoguardar')) ?>">
+        x-init="analysisModule='preparation'" data-autosave-endpoint="<?= e(url($basePath . '/comparables/autoguardar')) ?>">
         <?= csrf_field() ?>
         <input type="hidden" name="component_scope" value="<?= e($componentKey) ?>">
         <input type="hidden" name="version" value="<?= (int) ($record['comparables_version'] ?? 0) ?>">
@@ -30,20 +32,21 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
         <?php foreach ($analysisRows as $row): ?><input type="hidden" name="comparables[<?= (int)$row['capture_index'] ?>][negotiation_discount]" value="<?= e((string)($row['negotiation_discount'] ?? '')) ?>" :value="analysisDiscounts['<?= e($row['id']) ?>']"><?php endforeach; ?>
         <?php foreach ($analysisRows as $position=>$row): foreach (['ph_regime','ph_regime_source','analysis_manual_factors'] as $field): ?><input type="hidden" name="comparables[<?= (int)$row['capture_index'] ?>][<?= $field ?>]" :value="analysisRows[<?= $position ?>].<?= $field ?>"><?php endforeach; endforeach; ?>
         <input type="hidden" name="comparables[<?= (int)$analysisIndexes[0] ?>][analysis_factor_selection]" :value="analysisSelection()">
-        <div class="sticky top-0 z-20 mb-4 rounded-xl border border-teal-700 bg-white p-3 shadow-sm">
-            <p class="mb-3 font-semibold text-teal-900" role="status" aria-live="polite">Estás en: M4 Análisis<?= !empty($componentLabel) ? ' · '.e($componentLabel) : '' ?> → <span x-text="analysisModule==='location' ? 'Coordenadas y mapa comparativo' : analysisModule==='statistics' ? 'Análisis estadístico → '+courseSteps[courseStep] : analysisModule==='regression' ? 'Modelo de regresión → '+({academy:'Academia y fórmulas',application:'Preparar y calcular',diagnostics:'Gráficos y datos atípicos'}[regressionTab]) : 'Muestras y depuración → '+({raw:'Información recogida',regime:'Depurar muestras',clean:'Factores del analista',result:'Resultado depurado'}[analysisView] || 'Información recogida')"></span></p>
+        <div class="sm:sticky sm:top-0 z-20 mb-4 rounded-xl border border-teal-700 bg-white p-3 shadow-sm">
+            <p class="mb-3 font-semibold text-teal-900" role="status" aria-live="polite">Estás en: M4 Análisis<?= !empty($componentLabel) ? ' · '.e($componentLabel) : '' ?> → <span x-text="analysisModule==='preparation' ? 'Preparar los datos → Objetivo y unidad de análisis' : analysisModule==='location' ? 'Preparar los datos → Coordenadas y mapa comparativo' : analysisModule==='statistics' ? 'Análisis estadístico → '+courseSteps[courseStep] : analysisModule==='regression' ? 'Modelo de regresión → '+({academy:'Academia y fórmulas',application:'Preparar y calcular',diagnostics:'Gráficos y datos atípicos'}[regressionTab]) : 'Preparar los datos → Muestras y depuración → '+({raw:'Información recogida',regime:'Depurar muestras',clean:'Factores del analista',result:'Resultado depurado'}[analysisView] || 'Información recogida')"></span></p>
             <nav class="flex flex-wrap gap-2" aria-label="Submenú del análisis">
-                <button type="button" class="btn-secondary" :aria-current="analysisModule==='samples'?'page':null" :class="analysisModule==='samples'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='samples'">1. Muestras y depuración</button>
-                <button type="button" class="btn-secondary" :aria-current="analysisModule==='location'?'page':null" :class="analysisModule==='location'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='location'; analysisSubjectLocation=<?= e($analysisSubjectLocation) ?>">2. Coordenadas y mapa comparativo</button>
-                <button type="button" class="btn-secondary" :aria-current="analysisModule==='statistics'?'page':null" :class="analysisModule==='statistics'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='statistics'">3. Análisis estadístico paso a paso</button>
-                <button type="button" class="btn-secondary" :aria-current="analysisModule==='regression'?'page':null" :class="analysisModule==='regression'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='regression'">4. Modelo de regresión</button>
+                <button type="button" class="btn-secondary" :aria-current="['preparation','samples','location'].includes(analysisModule)?'page':null" :class="['preparation','samples','location'].includes(analysisModule)?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='preparation'">1. Preparar los datos</button>
+                <button type="button" class="btn-secondary" :aria-current="analysisModule==='statistics'?'page':null" :class="analysisModule==='statistics'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='statistics'">2. Análisis estadístico paso a paso</button>
+                <button type="button" class="btn-secondary" :aria-current="analysisModule==='regression'?'page':null" :class="analysisModule==='regression'?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="analysisModule='regression'">3. Modelo de regresión</button>
             </nav>
+            <?php require __DIR__.'/methodology-analysis-preparation-nav.php'; ?>
             <template x-if="analysisModule==='samples'&&analysisReviewReturn"><div class="mt-3 rounded-lg border bg-teal-50 p-3 space-y-2" role="status">
                 <p><strong x-text="'Estás revisando: '+analysisReviewLabel()"></strong><span x-text="' · Venías de: '+analysisReviewOrigin()"></span></p>
                 <p class="text-sm">Revisa o completa el inmueble en la tabla. Después regresa al mismo paso; si cambias datos, actualiza el cálculo allí.</p>
                 <button type="button" class="btn-primary" @click="await analysisReturnFromReview()" x-text="'Volver a '+analysisReviewOrigin()"></button>
             </div></template>
         </div>
+        <template x-if="analysisModule==='preparation'"><div><?php require __DIR__.'/methodology-analysis-preparation.php'; ?></div></template>
         <template x-if="analysisModule==='samples'"><div>
         <?php require __DIR__.'/methodology-analysis-data-table.php'; ?>
         <details class="mt-4"><summary class="min-h-11 cursor-pointer font-semibold">Ubicación y anuncios originales</summary>

@@ -928,3 +928,13 @@ Recorrido del curso M4 (2026-10-06): sesión1 de51p leída completa, explicació
 Interpretación M4 por paso (2026-10-06): lectura dinámica Resultado observado / Qué significa / Qué hacer ahora en cada uno de los siete pasos y en memoria HTML. Conteos, bloques, centros/MAPE, CV, señales y forma, IC/bootstrap y conclusión; sin dictamen automático ni cambios a muestras. Descuento expresado como porcentaje en informe. 227JS/1551PHP/lint/build78,4KB; QA local siete lecturas y escritorio sin errores. Pendiente hosting. Ver ANALISIS-RECORRIDO-CURSO.md.
 
 Revisar inmueble y regresar M4 (2026-10-06): origen en memoria de ficha, banner fijo con muestra/ruta y Volver al mismo paso; conserva resultados y posición, revisión/regresión comparte recorrido. No cambia datos ni autocalcula. QA sensibilidad→muestra1→sensibilidad y foco de inmueble, sin errores; 227JS/1551PHP/lint/build78,4KB. Pendiente hosting. Ver ANALISIS-RECORRIDO-CURSO.md.
+
+M4 Preparar los datos (2026-10-09): primera pantalla 1.1 Objetivo y unidad de
+análisis, consulta del encargo y tipo del componente, pendientes visibles y guía
+académica sobre observaciones, precio/base de área y futura definición de Y/X.
+1.2 conserva muestras/depuración y 1.3 el mapa; estadística y regresión existentes
+continúan accesibles. Sin DDL, campos editables nuevos ni cambios de fórmulas.
+PHP1555/JS227, build y tamaño78,4KB. QA local datos sintéticos: entrada1.1,
+matriz, mapa, estadística y regresión; móvil375px sin desbordamiento ni errores
+de consola. Pendiente despliegue al hosting y siguientes pasos acordados.
+Ver ANALISIS-PREPARAR-DATOS.md para alcance, comandos y límites.

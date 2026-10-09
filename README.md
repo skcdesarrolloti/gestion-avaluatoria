@@ -3,6 +3,8 @@
 Capítulo 8: [plan de valoración y artículos por paso](docs/PLAN-VALORACION-CAP8.md).
 
 Recorrido simplificado: Configuración → Academia → Insumos → Análisis → Entregable.
+M4: [Preparar los datos y objetivo de análisis](docs/ANALISIS-PREPARAR-DATOS.md),
+con consulta del encargo y acceso a muestras, depuración y mapa existentes.
 Mercado: [bandeja de inmuebles y anuncios](docs/MERCADO-INSUMOS-BANDEJA.md),
 captura complementaria por fuente y ubicación verificada manualmente en Análisis.
 Insumos: [configuración documentada por portal y tipo](docs/PORTALES-CAMPOS-POR-TIPO.md),

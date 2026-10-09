@@ -61,4 +61,13 @@
     expect(json_decode($areaHistory['analysis_factor_selection'],true)['statistics'][1]['factor_count']===3,'historial conserva tres factores con área privada sin añadir área publicada');
     expect(!isset(json_decode($areaHistory['analysis_factor_selection'],true)['statistics'][0]['factor_count']),'historial anterior conserva su interpretación original sin reescribir conteos');
     expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>json_encode(['selected'=>[],'threshold'=>50,'statistics'=>[array_replace($areaStat,['factor_count'=>4])]])]),'servidor rechaza doble conteo de área privada');
+    $comparableRows=[];
+    $componentKey='annex';$componentLabel='<script>Depósito</script>';
+    $units=[['id'=>'annex','unit_kind'=>'annex','unit_index'=>1,'property_type'=>'parqueadero']];
+    $record=['tipo_inmueble'=>'oficina','finalidad'=>'judicial','value_date'=>'2026-10-09'];
+    ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-intake-analysis.php';$empty=ob_get_clean();
+    expect(str_contains($empty,'1.1 Objetivo y unidad de análisis') && !str_contains($empty,'<form'),'preparación se consulta sin muestras ni formulario vacío que sobrescriba la matriz');
+    expect(str_contains($empty,'Parqueadero') && !str_contains($empty,'<dd>Oficina</dd>'),'preparación usa el tipo del anexo en vez del tipo global del encargo');
+    expect(str_contains($empty,'&lt;script&gt;Depósito&lt;/script&gt;') && !str_contains($empty,'<script>'),'contexto del componente se presenta escapado');
+    expect(str_contains($empty,'Información pendiente:') && str_contains($empty,'Base de valor') && str_contains($empty,'2026-10-09'),'preparación distingue campos ausentes de fecha registrada');
 })();
