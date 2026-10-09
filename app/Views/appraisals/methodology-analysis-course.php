@@ -8,8 +8,18 @@
         <?php require __DIR__.'/methodology-course-sources.php'; ?>
     </details>
     <details class="rounded-xl border p-4 space-y-3" :open="!courseResult"><summary class="min-h-11 cursor-pointer font-semibold">Base y confianza del cálculo · revisar o cambiar</summary>
-        <label class="label">Base del ejercicio<select class="input" x-model="courseBasis"><option value="adjusted">Valor con descuento / área publicada · preliminar</option><option value="offer">Oferta / área publicada · exploración sin descuento</option></select></label>
-        <label class="label">Confianza para el intervalo de la media<select class="input" x-model="courseConfidence"><option value=".90">90 %</option><option value=".95">95 %</option><option value=".99">99 %</option></select></label>
+        <label class="label">Base del ejercicio<select class="input" x-model="courseBasis" aria-describedby="course-basis-description"><option value="adjusted">Valor con descuento / área publicada · preliminar</option><option value="offer">Oferta / área publicada · exploración sin descuento</option></select></label>
+        <div id="course-basis-description" class="rounded-lg bg-slate-50 p-3 text-sm" aria-live="polite">
+            <p x-show="courseBasis==='adjusted'">Divide el precio después del descuento de negociación registrado entre el área publicada. Ejemplo: oferta de $500 millones, descuento sustentado del 10 % y área de 50 m² → $450 millones ÷ 50 = $9 millones/m². Si falta el descuento, el valor queda pendiente; un cero registrado indica que no se descontó. El cociente es preliminar: todavía requiere comprobar el área y los componentes incluidos.</p>
+            <p x-show="courseBasis==='offer'">Divide el precio anunciado entre el área publicada, sin aplicar descuentos. Ejemplo: oferta de $500 millones y área de 50 m² → $10 millones/m². Sirve para explorar las ofertas recibidas; el precio anunciado no acredita un precio de cierre. Todavía requiere comprobar el área y los componentes incluidos.</p>
+        </div>
+        <label class="label">Confianza para el intervalo de la media<select class="input" x-model="courseConfidence" aria-describedby="course-confidence-description"><option value=".90">90 %</option><option value=".95">95 %</option><option value=".99">99 %</option></select></label>
+        <div id="course-confidence-description" class="rounded-lg bg-slate-50 p-3 text-sm" aria-live="polite">
+            <p x-show="Number(courseConfidence)===.90">90 %: con los mismos datos, produce un intervalo más estrecho que 95 % o 99 %. Si se repitiera el procedimiento de muestreo bajo sus supuestos, aproximadamente 90 de cada 100 intervalos contendrían la media poblacional.</p>
+            <p x-show="Number(courseConfidence)===.95">95 %: con los mismos datos, produce un intervalo más amplio que 90 % y más estrecho que 99 %. Si se repitiera el procedimiento de muestreo bajo sus supuestos, aproximadamente 95 de cada 100 intervalos contendrían la media poblacional.</p>
+            <p x-show="Number(courseConfidence)===.99">99 %: con los mismos datos, produce el intervalo más amplio de estas tres opciones. Si se repitiera el procedimiento de muestreo bajo sus supuestos, aproximadamente 99 de cada 100 intervalos contendrían la media poblacional.</p>
+            <p class="mt-2">Media poblacional significa el promedio del mercado definido que buscamos estimar. Este porcentaje no mide la exactitud del avalúo ni corrige sesgos o datos sin verificar. Cambiar la confianza no cambia los precios, la media ni el CV (coeficiente de variación).</p>
+        </div>
         <p class="text-sm">Se usan todos los valores disponibles del grupo aplicado, aunque falten otros factores. Para PH, confronta área privada y componentes en su sección antes de interpretar este cociente preliminar.</p>
     </details>
     <div class="space-y-3">
