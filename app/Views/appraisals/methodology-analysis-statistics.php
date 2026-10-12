@@ -1,5 +1,6 @@
-<details class="mb-3 rounded-xl border p-3">
+<details class="mb-3 rounded-xl border p-3" x-data="{historyOpen:false}" @toggle.stop="historyOpen=$el.open">
     <summary class="min-h-11 cursor-pointer font-semibold">Historial estadístico de la depuración</summary>
+    <template x-if="historyOpen"><div>
     <p class="my-2 text-sm">Cada etapa conserva sus cifras y fecha. Reincorporar una muestra agrega otro resultado; no reemplaza el anterior. Las etapas previas a este historial no se reconstruyen.</p>
     <p class="my-2 text-sm text-purple-900" x-show="analysisStatistics.some(stage=>stage.simulated)">El historial contiene un ejercicio con datos simulados, identificado en su etapa.</p>
     <p class="my-2 text-sm">Estadísticos descriptivos sobre oferta / área publicada. En la etapa de factores se calculan sobre filas completas. El valor con descuento usa únicamente descuentos registrados. No son regresión ni valor adoptado; faltan revisar comparabilidad, áreas y componentes.</p>
@@ -12,4 +13,5 @@
             <td colspan="6" class="p-0"><table class="w-full text-left"><tbody><template x-for="basis in ['offer','adjusted']" :key="basis"><tr><th class="min-w-40 p-3" x-text="basis==='offer'?'Oferta / m²':'Con descuento / m²'"></th><td class="min-w-24 p-3" x-text="stage[basis].n"></td><template x-for="key in ['mean','median','sd','cv']" :key="key"><td class="min-w-36 p-3" x-text="stage[basis][key]===null?'No estimable':new Intl.NumberFormat('es-CO',{maximumFractionDigits:2}).format(stage[basis][key])"></td></template></tr></template></tbody></table></td>
         </tr></template></tbody>
     </table></div>
+    </div></template>
 </details>

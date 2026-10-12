@@ -17,9 +17,11 @@ $marketMenu = [
 </nav>
 <p class="mt-3 font-semibold text-teal-900" role="status" x-text="analysisRegimeApplied?'Grupo de trabajo aplicado: '+analysisWorkingCount()+' inmuebles':'Preparación del grupo: pendiente de aplicar'"></p>
 <p class="text-sm" x-show="analysisRegimeApplied">Se conserva la preparación guardada. Consultar antecedentes no reaplica filtros ni reincorpora muestras.</p>
-<details class="mt-3 rounded-lg border p-3">
+<details class="mt-3 rounded-lg border p-3" x-data="{antecedentsOpen:false}" @toggle.stop="antecedentsOpen=$el.open">
     <summary class="min-h-11 cursor-pointer font-semibold">Consultar antecedentes · total recogido e historial</summary>
+    <template x-if="antecedentsOpen"><div>
     <p class="my-3 text-sm" x-text="analysisRows.length+' inmuebles recogidos · '+analysisWorkingCount()+' en el grupo aplicado · '+(analysisRows.length-analysisWorkingCount())+' fuera de ese grupo, conservados'"></p>
     <?php require __DIR__.'/methodology-analysis-statistics.php'; ?>
     <?php require __DIR__.'/methodology-preparation-received.php'; ?>
+    </div></template>
 </details>

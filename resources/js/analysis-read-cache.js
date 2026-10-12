@@ -6,7 +6,7 @@ export function cacheAnalysisReads(state) {
     const caches=new Map();
     for(const name of methods){const method=state[name];state[name]=function(...args){
         if(!this.analysisReactiveCache)return method.apply(this,args);
-        const stamp=JSON.stringify([this.analysisDataRevision,this.analysisView,this.analysisModule,this.analysisAppliedScope,
+        const stamp=JSON.stringify([this.analysisDataRevision,this.analysisView,this.analysisView==='raw'&&this.analysisModule==='samples',this.analysisAppliedScope,
             this.analysisRegimeApplied,this.analysisSubjectRegime,this.analysisSelected,this.analysisApplied,
             this.analysisReview,this.analysisOnlyMissing,this.analysisEditingId,this.analysisMapOnlyPending,this.analysisMapEditingId,
             this.regressionBasis,this.regressionCodes,this.analysisDiscounts,this.analysisSubjectLocation,this.courseBasis,this.courseConfidence]);

@@ -16,8 +16,9 @@ export function factorCombinations(properties,candidates,area) {
     return options.sort((a,b)=>b.count-a.count || a.labels.localeCompare(b.labels,'es')).slice(0,3);
 }
 export function manualMethods() {
+    let combinationCache;
     return {
-        analysisOnlyMissing:false, analysisEditingId:'', analysisManualVersion:0, analysisCombinationCache:null,
+        analysisOnlyMissing:false, analysisEditingId:'', analysisManualVersion:0,
         analysisManualEntry(id,key){return sourceFacts(this.analysisRows.find(r=>r.id===id)?.analysis_manual_factors)[key] || {};},
         analysisOriginal(property,key){return this.analysisOriginalTable.rows[property.analysisIndex].values[key];},
         analysisCanEdit(property,key){return missingFactor(this.analysisOriginal(property,key));},
@@ -38,9 +39,9 @@ export function manualMethods() {
         analysisDisplayRows(){return this.analysisVisibleRows().filter(r=>!this.analysisOnlyMissing || !this.analysisRowComplete(r) || r.key===this.analysisEditingId);},
         analysisCombinations(){
             const stamp=JSON.stringify([this.analysisManualVersion,this.analysisActiveRows().map(r=>r.id),this.analysisFactors,this.analysisModelArea().key]);
-            if(this.analysisCombinationCache?.stamp===stamp)return this.analysisCombinationCache.options;
+            if(combinationCache?.stamp===stamp)return combinationCache.options;
             const options=factorCombinations(this.analysisVisibleRows(),this.analysisFactors.filter(f=>this.analysisEligible(f)),this.analysisModelArea());
-            this.analysisCombinationCache={stamp,options};return options;
+            combinationCache={stamp,options};return options;
         },
         analysisChooseCombination(option){
             this.analysisSelected=[...option.keys];this.analysisUpdate();
