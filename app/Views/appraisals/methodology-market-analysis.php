@@ -10,10 +10,6 @@ $stale = !empty($selected['analysis']) && ($selected['evidence_hash'] ?? '') !==
     <?php if ($stale): ?><p role="alert" class="mt-4 rounded-xl bg-amber-50 p-4">Las muestras cambiaron desde la última redacción. Revisa el análisis y la conclusión antes de utilizarlos.</p><?php endif; ?>
     <?php if ($stage === '4'): ?>
         <?php require __DIR__ . '/methodology-intake-analysis.php'; ?>
-        <details class="mt-4 rounded-xl border p-4"><summary class="min-h-11 cursor-pointer font-semibold">Academia y criterio de adopción · artículo 21</summary>
-            <?php $readingNumber = 21; require __DIR__ . '/valuation-methodology-article-reading.php'; ?>
-            <p class="mt-3 text-sm">La dispersión no sustituye la revisión de comparabilidad. No se eliminan datos atípicos automáticamente ni se declara cumplimiento por obtener un CV bajo.</p>
-        </details>
     <?php endif; ?>
     <details class="mt-5 rounded-xl border p-4" <?= $stage==='5'?'open':'' ?>>
     <summary class="min-h-11 cursor-pointer font-semibold"><?= $stage==='4'?'Redacción de la memoria del análisis':'Conclusión para el entregable' ?></summary>
