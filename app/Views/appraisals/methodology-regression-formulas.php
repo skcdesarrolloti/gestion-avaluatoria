@@ -1,0 +1,9 @@
+    <details x-show="regressionTab==='application'" class="rounded-xl border p-4 space-y-3"><summary class="min-h-11 cursor-pointer font-semibold">Qué hacemos · fórmulas e interpretación del modelo</summary>
+        <p>El modelo relaciona el valor por m² con los factores elegidos. Cada coeficiente mide el cambio asociado a un factor manteniendo los otros constantes; la asociación no demuestra causalidad.</p>
+        <p class="font-mono">yᵢ = β₀ + β₁xᵢ₁ + … + βₖxᵢₖ + εᵢ</p>
+        <p>y: oferta / área publicada, o valor con descuento / área publicada. x: factores numéricos del inmueble, con el área del modelo contada una sola vez. β₀: intercepto; β: coeficientes; ε: error.</p>
+        <p class="font-mono">β̂ = (XᵀX)⁻¹Xᵀy · minimizar Σ(yᵢ − ŷᵢ)²<br>eᵢ = yᵢ − ŷᵢ<br>R² = 1 − SSE / SST<br>R² ajustado = 1 − (1 − R²)(n − 1)/(n − k − 1)<br>Error residual = √[SSE/(n − k − 1)]<br>VIFⱼ = 1/(1 − R²ⱼ)</p>
+        <p>La fórmula matricial requiere rango completo; el cálculo usa QR para mayor estabilidad. Antes de interpretar, revisar linealidad, residuos, independencia, varianza del error, correlaciones y colinealidad. La normalidad de los errores afecta las inferencias e intervalos; no se declara validación por un R² alto.</p>
+        <p>Regla de trabajo acordada: mínimo 3 factores y 30 filas completas, con 10 filas por factor. Es un criterio del ejercicio; no garantiza calidad estadística. Rangos de antigüedad requieren una codificación explícita. Un código ordinal supone un efecto lineal por escalón y no equivale a años exactos. Categorías sin orden requieren otro tratamiento, como variables indicadoras.</p>
+        <a class="text-blue-700 underline" href="https://www.itl.nist.gov/div898/handbook/pmd/section1/pmd141.htm" target="_blank" rel="noopener">Fuente académica: NIST · mínimos cuadrados lineales</a>
+    </details>

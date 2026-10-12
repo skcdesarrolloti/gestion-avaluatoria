@@ -1,37 +1,30 @@
 <template x-if="analysisModule==='regression'"><section class="space-y-4">
     <h3 class="text-xl font-semibold" x-text="regressionTab==='diagnostics'?'4. Revisar el modelo':'3. Construir el modelo'"></h3>
-    <p class="text-sm" x-show="regressionTab==='application'">Elegir Y y factores → confirmar codificación → calcular regresión múltiple. Regresión simple y comparación de alternativas siguen pendientes; el cálculo existente se conserva.</p>
-    <p class="text-sm" x-show="regressionTab==='application'"><strong>Tener en cuenta de los pasos 1 y 2:</strong> el grupo y los atributos preparados se reutilizan; el análisis descriptivo aporta contexto sobre centro, dispersión y extremos. Aquí se define Y, se codifican los factores y se comprueba qué filas pueden entrar al modelo. No se repite la captura ni la selección de inmuebles.</p>
-    <?php require __DIR__.'/methodology-regression-academy.php'; ?>
-    <details x-show="regressionTab==='application'" class="rounded-xl border p-4 space-y-3"><summary class="min-h-11 cursor-pointer font-semibold">Qué hacemos · fórmulas e interpretación del modelo</summary>
-        <p>El modelo relaciona el valor por m² con los factores elegidos. Cada coeficiente mide el cambio asociado a un factor manteniendo los otros constantes; la asociación no demuestra causalidad.</p>
-        <p class="font-mono">yᵢ = β₀ + β₁xᵢ₁ + … + βₖxᵢₖ + εᵢ</p>
-        <p>y: oferta / área publicada, o valor con descuento / área publicada. x: factores numéricos del inmueble, con el área del modelo contada una sola vez. β₀: intercepto; β: coeficientes; ε: error.</p>
-        <p class="font-mono">β̂ = (XᵀX)⁻¹Xᵀy · minimizar Σ(yᵢ − ŷᵢ)²<br>eᵢ = yᵢ − ŷᵢ<br>R² = 1 − SSE / SST<br>R² ajustado = 1 − (1 − R²)(n − 1)/(n − k − 1)<br>Error residual = √[SSE/(n − k − 1)]<br>VIFⱼ = 1/(1 − R²ⱼ)</p>
-        <p>La fórmula matricial requiere rango completo; el cálculo usa QR para mayor estabilidad. Antes de interpretar, revisar linealidad, residuos, independencia, varianza del error, correlaciones y colinealidad. La normalidad de los errores afecta las inferencias e intervalos; no se declara validación por un R² alto.</p>
-        <p>Regla de trabajo acordada: mínimo 3 factores y 30 filas completas, con 10 filas por factor. Es un criterio del ejercicio; no garantiza calidad estadística. Rangos de antigüedad requieren una codificación explícita. Un código ordinal supone un efecto lineal por escalón y no equivale a años exactos. Categorías sin orden requieren otro tratamiento, como variables indicadoras.</p>
-        <a class="text-blue-700 underline" href="https://www.itl.nist.gov/div898/handbook/pmd/section1/pmd141.htm" target="_blank" rel="noopener">Fuente académica: NIST · mínimos cuadrados lineales</a>
-    </details>
+    <p class="text-sm" x-show="regressionTab==='application'">Con el grupo preparado: elige el valor a explicar, confirma los factores y calcula la regresión múltiple.</p>
+
     <div x-show="regressionTab==='application'" class="space-y-4">
         <p class="rounded-lg bg-purple-50 p-3 text-purple-900" x-show="analysisHasSimulated()">Ejercicio con datos simulados. Los resultados deben conservar esta identificación en el entregable.</p>
         <p x-text="'Factores aplicados: '+regressionColumns().map(f=>f.label).join(' + ')"></p>
         <p class="rounded-lg bg-amber-50 p-3" x-show="!analysisRegimeApplied || analysisScope!==analysisAppliedScope">Primero prepara el grupo en 1. Preparar los datos. La selección de factores conserva ese grupo.</p>
         <p class="text-red-700" role="alert" x-show="analysisError" x-text="analysisError"></p>
-        <?php require __DIR__.'/methodology-regression-combinations.php'; ?>
-        <details class="rounded-lg border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Elegir otros factores · selección manual</summary>
+        <details class="rounded-lg border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Cambiar factores · opcional</summary>
+            <?php require __DIR__.'/methodology-regression-combinations.php'; ?>
             <?php require __DIR__.'/methodology-regression-factor-selection.php'; ?>
         </details>
-        <label class="label">Variable dependiente<select class="input" x-model="regressionBasis" @change="regressionConfirmed=false"><option value="offer">Oferta / área publicada · exploratorio sin descuento</option><option value="adjusted">Valor con descuento / área publicada · solo descuentos registrados</option></select></label>
-        <p class="text-sm">Vacío no equivale a cero. Se usan los factores ya aplicados en Resultado depurado. Las filas sin valor numérico quedan pendientes; se conservan en la matriz original.</p>
+        <label class="label">1. Valor que queremos explicar (Y)<select class="input" x-model="regressionBasis" @change="regressionConfirmed=false"><option value="offer">Oferta / área publicada · exploratorio sin descuento</option><option value="adjusted">Valor con descuento / área publicada · solo descuentos registrados</option></select></label>
+        <p class="text-sm">Se usan los factores preparados. Las filas sin valores numéricos quedan pendientes, conservadas en el grupo.</p>
         <div class="rounded-xl border p-4">
-            <h4 class="font-semibold">Codificación de textos y rangos</h4>
-            <p class="text-sm">Asigna un número sustentado por categoría. Ejemplo ordinal de antigüedad: 1–8 → 1; 9–15 → 2; 16–30 → 3; más de 30 → 4. Se interpreta como categoría, no como edad en años.</p>
+            <h4 class="font-semibold">2. Confirmar los factores</h4>
+            <details x-show="regressionCategories().length" :open="regressionCategories().length>0"><summary class="min-h-11 cursor-pointer font-semibold">Codificar textos y rangos pendientes</summary>
+            <p class="text-sm">Asigna un número sustentado por categoría. El código no convierte un rango de antigüedad en años exactos; consulta el ejemplo en Ayuda y sustento del modelo.</p>
             <template x-for="(category,i) in regressionCategories()" :key="category.key"><label class="label mt-3"><span x-text="category.factor+' · '+category.value"></span><input class="input" :id="'regression-code-'+i" type="number" min="0" step="any" placeholder="Código numérico confirmado, ej. 2" x-model="regressionCodes[category.key]" @input="regressionConfirmed=false"></label></template>
+            </details>
             <label class="flex min-h-11 items-center gap-2 mt-3"><input type="checkbox" x-model="regressionConfirmed">Confirmé la codificación, sus unidades y la pertinencia del tratamiento lineal.</label>
         </div>
         <p role="status" x-text="regressionMatrix().complete.length+' filas numéricas completas de '+regressionMatrix().rows.length+' · '+regressionColumns().length+' factores · '+Math.max(30,regressionColumns().length*10)+' filas necesarias'"></p>
-        <p class="text-sm">Treinta es el mínimo del ejercicio, no el máximo. Todas las filas numéricas completas se utilizan. Las demás se conservan y se detallan abajo.</p>
+        <p class="text-sm">Se utilizan todas las filas completas. El mínimo indicado es un criterio del ejercicio, no una garantía de calidad.</p>
         <details x-show="regressionMatrix().rows.some(r=>r.reasons.length)" class="rounded-lg border p-3"><summary class="min-h-11 cursor-pointer font-semibold">¿Qué falta en las muestras pendientes?</summary><template x-for="r in regressionMatrix().rows.filter(r=>r.reasons.length)" :key="r.id"><div class="mt-3"><p x-text="r.label+' · '+r.reasons.join(' · ')"></p><button type="button" class="btn-secondary" @click="await regressionPending(r)" x-text="r.codeKeys.length?'Completar codificación':'Completar este inmueble'"></button></div></template></details>
+        <h4 class="font-semibold">3. Calcular y revisar el resultado</h4>
         <button type="button" class="btn-primary" :disabled="regressionBusy || !regressionConfirmed" @click="await regressionRun()" x-text="regressionBusy?'Calculando regresión…':'Calcular regresión'"></button>
         <p class="text-red-700" role="alert" x-show="regressionError" x-text="regressionError"></p>
         <div x-show="regressionResult" class="rounded-xl border p-4 space-y-3">
@@ -39,12 +32,16 @@
             <p x-text="regressionResult?'n='+regressionResult.n+' · R²='+regressionResult.r2.toFixed(4)+' · R² ajustado='+regressionResult.adjustedR2.toFixed(4)+' · Error residual='+regressionResult.rmse.toFixed(2)+' COP/m²':''"></p>
             <p class="font-semibold" x-text="regressionEquation()"></p>
             <p class="text-sm">Resultado en COP/m². Antigüedad representa la categoría codificada, no años exactos. El descuento se usa para calcular el valor final; no cuenta como factor.</p>
-            <div class="overflow-auto"><table class="min-w-full text-left"><thead><tr><th class="p-2">Variable</th><th class="p-2">Coeficiente</th><th class="p-2">VIF</th></tr></thead><tbody><template x-for="(coefficient,i) in (regressionResult?.coefficients || [])" :key="i"><tr><td class="p-2" x-text="i?regressionResult.matrix.cols[i-1].label:'Intercepto'"></td><td class="p-2" x-text="coefficient.toFixed(4)"></td><td class="p-2" x-text="i?regressionResult.vif[i-1].toFixed(3):'—'"></td></tr></template></tbody></table></div>
+            <details><summary class="min-h-11 cursor-pointer font-semibold">Detalle de coeficientes y colinealidad (VIF)</summary><div class="overflow-auto"><table class="min-w-full text-left"><thead><tr><th class="p-2">Variable</th><th class="p-2">Coeficiente</th><th class="p-2">VIF</th></tr></thead><tbody><template x-for="(coefficient,i) in (regressionResult?.coefficients || [])" :key="i"><tr><td class="p-2" x-text="i?regressionResult.matrix.cols[i-1].label:'Intercepto'"></td><td class="p-2" x-text="coefficient.toFixed(4)"></td><td class="p-2" x-text="i?regressionResult.vif[i-1].toFixed(3):'—'"></td></tr></template></tbody></table></div></details>
             <p class="text-sm">Resultado exploratorio. Revisa distribución, residuos e influencia en «4. Revisar el modelo» antes de interpretar o aplicar al sujeto.</p>
             <button type="button" class="btn-primary" :disabled="!regressionCurrent()" @click="regressionTab='diagnostics'">Ver gráficos y revisar datos atípicos</button>
             <button type="button" class="btn-secondary" :disabled="!regressionCurrent()" @click="regressionExport()">Descargar informe de regresión para el entregable</button>
         </div>
         <p class="text-sm">La codificación se guarda como preparación. El cálculo se ejecuta al pulsar el botón; descarga su informe para conservar esta ejecución.</p>
     </div>
+    <details class="rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Ayuda y sustento del modelo · ejemplos, fórmulas y fuentes</summary><div class="mt-3 space-y-3">
+        <?php require __DIR__.'/methodology-regression-academy.php'; ?>
+        <?php require __DIR__.'/methodology-regression-formulas.php'; ?>
+    </div></details>
     <?php require __DIR__.'/methodology-regression-diagnostics.php'; ?>
 </section></template>

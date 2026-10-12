@@ -44,7 +44,7 @@
     expect(json_decode($view['analysis_factor_selection'],true)['view']==='clean','vista depurada se recupera como decisión guardada');
     expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"threshold":50,"view":"execute"}']),'vista no permitida se rechaza');
     expect(str_contains($html,'Consultar originales') && str_contains($html,'Revisar composición del grupo') && str_contains($html,'Volver al grupo preparado') && !str_contains($html,'aria-label="Pasos del análisis"'),'grupo preparado conserva consulta y selección sin otro nivel de submenús');
-    expect(str_contains($html,'Aplicar depuración de muestras') && str_contains($html,'Elegir otros factores · selección manual'),'muestras y factores tienen acciones separadas');
+    expect(str_contains($html,'Aplicar depuración de muestras') && str_contains($html,'Cambiar factores · opcional') && str_contains($html,'Aplicar factores al modelo'),'muestras y factores conservan acciones separadas en el recorrido simplificado');
     $regime=\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"threshold":50,"view":"regime","scope":"all","applied_scope":"subject","regime_applied":true}']);
     expect(json_decode($regime['analysis_factor_selection'],true)['applied_scope']==='subject','régimen aplicado persiste separado del propuesto');
     $review=['id'=>str_repeat('a',32),'reason'=>'unknown','at'=>'2026-10-06T15:00:00.000Z','restored_at'=>'2026-10-06T15:01:00.000Z'];

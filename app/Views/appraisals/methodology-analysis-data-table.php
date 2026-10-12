@@ -1,4 +1,4 @@
-<p class="mb-3 text-sm">Una fila por inmueble. Factores ordenados por cantidad de muestras con dato, sin límite de seis. Valor con descuento = oferta × (1 − descuento / 100); valor por m² = valor con descuento / área publicada.</p>
+<p x-show="analysisView!=='result'" class="mb-3 text-sm">Una fila por inmueble. Los factores se ordenan por disponibilidad de datos.</p>
 <details class="mb-3 rounded-lg border p-3">
     <summary class="min-h-11 cursor-pointer font-semibold">Consultar originales o revisar el grupo · opcional</summary>
     <p class="my-2 text-sm">El grupo guardado se conserva. Abre estas herramientas sólo si necesitas consultar los originales o cambiar una decisión de preparación.</p>
@@ -20,10 +20,9 @@
 <div x-show="analysisView==='result'" x-cloak>
 <?php require __DIR__.'/methodology-analysis-completion.php'; ?>
 <details x-show="analysisStatistics.some(v=>v.action==='factors')" class="mb-3 rounded-xl border p-3">
-    <summary class="min-h-11 cursor-pointer font-semibold">Consultar factores aplicados y criterios del ejercicio</summary>
+    <summary class="min-h-11 cursor-pointer font-semibold">Consultar factores preparados</summary>
     <p class="mb-3 rounded-xl border p-3" role="status" x-text="'Depuración actualizada: '+analysisActiveRows().length+' muestras · '+analysisFactorCount()+' factores aplicados (incluye '+analysisModelArea().label+') · '+analysisComplete()+' filas con datos en todos los factores aplicados'"></p>
-    <p class="mb-3 text-sm" role="status" :class="analysisSampleRule().meets ? 'text-teal-800' : 'text-amber-900'" x-text="(analysisSampleRule().meets ? 'Cumple' : 'No cumple')+' el mínimo de 3 factores y 30 muestras completas, con 10 por factor: '+analysisSampleRule().complete+' disponibles / '+analysisSampleRule().required+' necesarias. Con estas filas completas se admiten hasta '+analysisSampleRule().maximum+' factores, incluida el área.'"></p>
-    <p class="mb-3 text-sm" x-show="!analysisSampleRule().meets">Elige al menos tres factores, incluido el área, y completa o reincorpora muestras comparables. Luego actualiza. Cumplir este mínimo no sustituye la validación de codificación, valor por m², correlación y colinealidad.</p>
+    <p class="mb-3 text-sm">El paso 3 comprobará la codificación y la cantidad de filas disponibles para los factores del modelo.</p>
     <p class="mb-3 text-sm" x-show="!analysisColumns().length">No hay factores adicionales aplicados. El área en m² sigue fija. Elige los factores en 3. Construir el modelo.</p>
 </details>
 </div>
