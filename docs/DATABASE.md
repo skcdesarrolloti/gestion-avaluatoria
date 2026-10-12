@@ -1,5 +1,12 @@
 # Crear y evolucionar la base sin SQL manual
 
+Ejecución descriptiva de M4: `analysis_course_execution` se conserva en el JSON
+`capture_details` existente del anuncio principal, por expediente/propietario y
+versión de comparables. No cambia el esquema ni requiere migración. Incluye entradas,
+resumen numérico, base/confianza/paso, fecha, simulación, notas/conclusión y remuestreo.
+Validación específica; una petición anterior que omita el campo lo conserva.
+Las gráficas se reconstruyen desde la ejecución guardada, sin adoptar un valor.
+
 Catálogo editable: 202610040003_user_research_factors.php agrega
 user_research_factors, clave compuesta owner_id/factor_key, definition_json,
 version y updated_at. Definiciones y asignaciones por propietario; CAS evita

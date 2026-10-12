@@ -20,6 +20,7 @@ require __DIR__ . '/assignment-document-table.php';
 require __DIR__ . '/sector-photo-controls.php';
 require __DIR__ . '/comparable-search-render.php';
 require __DIR__ . '/market-analysis-table.php';
+require __DIR__ . '/course-execution-validation.php';
 require __DIR__ . '/regression-preparation.php';
 require __DIR__ . '/comparable-portal-search-prompt.php';
 require __DIR__ . '/comparable-portal-profiles.php';

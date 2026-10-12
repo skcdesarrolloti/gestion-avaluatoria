@@ -31,8 +31,8 @@ export function marketAnalysisTable(rows,subjectRegime='',subjectType='',subject
     let saved={};try {saved=JSON.parse(rows.find(r=>r.analysis_factor_selection)?.analysis_factor_selection || '{}');} catch {}
     return cacheAnalysisReads({
         analysisReactiveCache:false,analysisDataRevision:0,
-        init(){if(!this.$watch)return;this.analysisReactiveCache=true;this.$watch('analysisRows',()=>{this.analysisDataRevision++;});},
-        analysisModule:'samples',analysisPendingStep:0, ...regressionMethods(), ...courseMethods(), ...locationMapMethods(subjectLocation),
+        async init(){if(this.$watch){this.analysisReactiveCache=true;this.$watch('analysisRows',()=>{this.analysisDataRevision++;});}await this.courseRestore();if(this.$watch)this.$watch('courseStep',()=>this.coursePersist());},
+        analysisModule:'samples',analysisPendingStep:0, ...regressionMethods(), ...courseMethods(rows.find(r=>r.analysis_course_execution)?.analysis_course_execution || ''), ...locationMapMethods(subjectLocation),
         regressionBasis:saved.regression?.basis || 'offer',regressionCodes:saved.regression?.codes || {},regressionConfirmed:saved.regression?.confirmed || false,
         analysisRows:rows, get analysisTable(){return project(this.analysisRows,this.analysisReactiveCache?this.analysisDataRevision:undefined);}, get analysisOriginalTable(){return original(this.analysisRows,this.analysisReactiveCache?this.analysisDataRevision:undefined);}, ...manualMethods(), analysisSubjectRegime:subjectRegime, analysisScope:saved.scope ?? 'subject', analysisAppliedScope:saved.applied_scope ?? saved.scope ?? 'subject', analysisRegimeApplied:saved.regime_applied ?? ['clean','result'].includes(saved.view), analysisThreshold:50, analysisView:saved.view ?? 'raw',
         get analysisFactors(){const rows=this.analysisActiveRows(),table=active(rows,this.analysisReactiveCache?this.analysisDataRevision:undefined);if(table!==factorTable){factorCache=analysisCoverage(rows,subjectType,table);factorTable=table;}return factorCache;},

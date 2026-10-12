@@ -9,8 +9,9 @@ import {downloadReport} from './analysis-download.js';
 import {courseInterpretations} from './analysis-course-interpretation.js';
 import {courseProgressSummary} from './analysis-course-progress-summary.js';
 import {courseQuartileCalculation,courseQuartileOperation,courseQuartileLimitOperations} from './analysis-course-quartile-calculation.js';
+import {courseSnapshot,restoreCourseSnapshot} from './analysis-course-storage.js';
 export const courseSteps=['Base del cálculo','Bloques y distribución','Tendencia central','Dispersión','Sensibilidad y consideraciones','Precisión de la media','Conclusión y memoria'];
-export function courseMethods(){return {
+export function courseMethods(saved=''){return {
     courseStep:0,courseSteps,courseBasis:'adjusted',courseConfidence:'.95',courseResult:null,courseBusy:false,courseError:'',courseBootstrapBusy:false,courseProgress:0,courseNotes:{},courseConclusion:'',analysisReviewReturn:null,
     courseRows(){return this.analysisVisibleRows().map(r=>{const original=this.analysisRows[r.analysisIndex],area=amount(original.area_m2),offer=amount(original.price_amount),adjusted=this.analysisResult(r.key),discount=amount(this.analysisDiscounts[r.key]),reasons=[];
         if(!(area>0))reasons.push('Área publicada no positiva');if(!(offer>0))reasons.push('Oferta no positiva');if(original.price_unit==='valor_m2')reasons.push('Precio publicado unitario: requiere revisar base');
@@ -18,7 +19,14 @@ export function courseMethods(){return {
         const y=this.courseBasis==='adjusted'?adjusted.perM2:area>0&&offer>0?offer/area:null;
         return {id:r.key,label:'Muestra '+(r.analysisIndex+1),y,reasons,area,offer,discount,final:adjusted.value,areaNote:this.analysisAreaNote(r.key),regime:this.analysisRegime(original)};
     });},
-    courseStamp(){return JSON.stringify([this.analysisActiveRows(),this.analysisDiscounts,this.courseBasis,this.courseConfidence]);},
+    courseStamp(){return JSON.stringify([this.courseRows().map(r=>[r.id,r.y,r.area,r.offer,r.discount,r.final,r.reasons]),this.courseBasis,Number(this.courseConfidence),this.analysisHasSimulated()]);},
+    courseSnapshot(){return this.courseResult?courseSnapshot(this):saved;},
+    async coursePersist(){await this.$nextTick?.();this.$root?.dispatchEvent(new Event('input',{bubbles:true}));},
+    async courseRestore(){
+        try {const restored=restoreCourseSnapshot(saved);if(restored){this.courseBasis=restored.basis;this.courseConfidence=String(restored.confidence);this.courseStep=restored.step;this.courseNotes=restored.notes;this.courseConclusion=restored.conclusion;this.courseResult=restored.result;return;}
+            if(this.analysisRegimeApplied&&this.analysisStatistics.some(v=>v.action==='factors')){await this.courseCalculate();if(this.courseResult){this.courseResult.reconstructed=true;this.courseStep=3;await this.coursePersist();}}
+        }catch{this.courseError='No se pudo recuperar la ejecución guardada. Se conserva su registro; no lo sobrescribas.';}
+    },
     courseCurrent(){return !!this.courseResult&&this.courseResult.stamp===this.courseStamp();},
     courseNumber(v){return Number.isFinite(v)?v.toLocaleString('es-CO',{maximumFractionDigits:4}):'No estimable';},
     courseInterpretation(){return this.courseResult?courseInterpretations(this.courseResult)[this.courseStep]:null;},
@@ -37,9 +45,9 @@ export function courseMethods(){return {
     async courseCalculate(){if(this.courseBusy||this.courseBootstrapBusy)return;this.courseBusy=true;this.courseError='';
         try{await new Promise(resolve=>setTimeout(resolve,0));if(!this.analysisRegimeApplied)throw new Error('Aplica primero la depuración de muestras.');const rows=this.courseRows(),valid=rows.filter(r=>!r.reasons.length&&Number.isFinite(r.y));if(valid.length<2)throw new Error('Completa al menos dos valores unitarios para el análisis descriptivo.');
             const s=courseSummary(valid,Number(this.courseConfidence));this.courseResult={rows,valid,pending:rows.filter(r=>!valid.includes(r)),summary:s,histogram:courseHistogram(s.classes),stamp:this.courseStamp(),at:new Date().toISOString(),basis:this.courseBasis,simulated:this.analysisHasSimulated(),bootstrap:null};
-        }catch(e){this.courseError=e.message;}finally{this.courseBusy=false;}},
+        }catch(e){this.courseError=e.message;}finally{this.courseBusy=false;if(this.courseResult&&!this.courseError)await this.coursePersist();}},
     async courseResample(){if(!this.courseCurrent()||this.courseBootstrapBusy)return;this.courseBootstrapBusy=true;this.courseProgress=0;const result=this.courseResult;
-        try{const b=await courseBootstrap(result.valid.map(r=>r.y),result.summary.confidence,n=>this.courseProgress=n);if(this.courseResult===result)result.bootstrap=b;}catch{this.courseError='No se pudo completar el remuestreo.';}finally{this.courseBootstrapBusy=false;}},
+        try{const b=await courseBootstrap(result.valid.map(r=>r.y),result.summary.confidence,n=>this.courseProgress=n);if(this.courseResult===result){result.bootstrap=b;await this.coursePersist();}}catch{this.courseError='No se pudo completar el remuestreo.';}finally{this.courseBootstrapBusy=false;}},
     analysisReviewOrigin(){const p=this.analysisReviewReturn;return !p?'':p.module==='statistics'?(p.step===6?'Memoria y sustentación':'Entender la muestra → '+courseSteps[p.step]):(p.tab==='diagnostics'?'Revisar el modelo':'Construir el modelo');},
     analysisReviewLabel(){const i=this.analysisRows.findIndex(r=>r.id===this.analysisEditingId);return i<0?'Inmueble en revisión':'Muestra '+(i+1);},
     async courseReview(id){if(this.analysisModule!=='samples')this.analysisReviewReturn={module:this.analysisModule,step:this.courseStep,tab:this.regressionTab,scrollY:window.scrollY,scrollX:window.scrollX};this.analysisModule='samples';this.analysisView='result';this.analysisOnlyMissing=false;this.analysisEditingId=id;await this.$nextTick();const row=document.getElementById('analysis-row-'+id);row?.scrollIntoView({block:'center'});row?.focus({preventScroll:true});},

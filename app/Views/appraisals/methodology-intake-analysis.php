@@ -18,7 +18,7 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
     <?php else: ?>
     <?php $initialPanel = is_string($_GET['panel'] ?? null) ? $_GET['panel'] : '';
     $initialAction = match ($initialPanel) {
-        'statistics'=>"analysisModule='statistics';courseStep=0",
+        'statistics'=>"analysisModule='statistics'",
         'regression'=>"analysisModule='regression';regressionTab='application'",
         'diagnostics'=>"analysisModule='regression';regressionTab='diagnostics'",
         'validation'=>"analysisModule='validation'", 'subject'=>"analysisModule='subject'",
@@ -38,12 +38,13 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
             if (empty($row['published_location']) && empty($row['location_verification']) && ($row['latitude'] ?? '') !== '' && ($row['longitude'] ?? '') !== '')
                 $row['published_location'] = $row['latitude'] . ', ' . $row['longitude'] . ' · referencia anterior sin verificar.';
             foreach ($row as $key=>$value):
-            if (!is_scalar($value) || ($key === 'capture_index') || (in_array($key,['negotiation_discount','negotiation_source','negotiation_kind','ph_regime','ph_regime_source','analysis_manual_factors'],true) && in_array($index,$analysisIndexes,true)) || ($key==='analysis_factor_selection' && $index===$analysisIndexes[0]) || (in_array($index, $locationIndexes, true) && in_array($key, $locationKeys, true))) continue; ?>
+            if (!is_scalar($value) || ($key === 'capture_index') || (in_array($key,['negotiation_discount','negotiation_source','negotiation_kind','ph_regime','ph_regime_source','analysis_manual_factors'],true) && in_array($index,$analysisIndexes,true)) || (in_array($key,['analysis_factor_selection','analysis_course_execution'],true) && $index===$analysisIndexes[0]) || (in_array($index, $locationIndexes, true) && in_array($key, $locationKeys, true))) continue; ?>
             <input type="hidden" name="comparables[<?= $index ?>][<?= e($key) ?>]" value="<?= e((string) $value) ?>">
         <?php endforeach; endforeach; ?>
         <?php foreach ($analysisRows as $row): ?><input type="hidden" name="comparables[<?= (int)$row['capture_index'] ?>][negotiation_discount]" value="<?= e((string)($row['negotiation_discount'] ?? '')) ?>" :value="analysisDiscounts['<?= e($row['id']) ?>']"><?php endforeach; ?>
         <?php foreach ($analysisRows as $position=>$row): foreach (['ph_regime','ph_regime_source','analysis_manual_factors','negotiation_source','negotiation_kind'] as $field): ?><input type="hidden" name="comparables[<?= (int)$row['capture_index'] ?>][<?= $field ?>]" :value="analysisRows[<?= $position ?>].<?= $field ?>"><?php endforeach; endforeach; ?>
         <input type="hidden" name="comparables[<?= (int)$analysisIndexes[0] ?>][analysis_factor_selection]" :value="analysisSelection()">
+        <input type="hidden" name="comparables[<?= (int)$analysisIndexes[0] ?>][analysis_course_execution]" :value="courseSnapshot()">
         <div class="mb-4 rounded-xl border border-teal-700 bg-white p-3 shadow-sm">
             <?php require __DIR__.'/methodology-analysis-menu.php'; ?>
             <?php require __DIR__.'/methodology-analysis-preparation-nav.php'; ?>

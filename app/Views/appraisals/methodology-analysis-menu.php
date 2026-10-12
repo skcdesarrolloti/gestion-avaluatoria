@@ -1,7 +1,7 @@
 <?php
 $marketMenu = [
     ['1. Preparar los datos', "['preparation','samples','location'].includes(analysisModule)", "analysisModule='samples';if(analysisRegimeApplied)analysisView='result'"],
-    ['2. Entender la muestra', "analysisModule==='statistics'&&courseStep!==6", "analysisModule='statistics';courseStep=0"],
+    ['2. Entender la muestra', "analysisModule==='statistics'&&courseStep!==6", "analysisModule='statistics';if(courseStep===6)courseStep=0"],
     ['3. Construir el modelo', "analysisModule==='regression'&&regressionTab==='application'", "analysisModule='regression';regressionTab='application'"],
     ['4. Revisar el modelo', "analysisModule==='regression'&&regressionTab==='diagnostics'", "analysisModule='regression';regressionTab='diagnostics'"],
     ['5. Validar las predicciones', "analysisModule==='validation'", "analysisModule='validation';analysisPendingStep=0"],

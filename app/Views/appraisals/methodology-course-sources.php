@@ -29,7 +29,7 @@
         <details class="rounded-lg border p-3">
             <summary class="min-h-11 cursor-pointer font-semibold">Apoyo académico y estado del trabajo · qué queda por demostrar</summary>
             <p class="mt-3">Sesión 1 del curso: preparación, centros, dispersión y precisión; sesiones 2–3: robustez y modelación. Sturges, recorte del 20 %, señales robustas y remuestreo con 10.000 repeticiones son decisiones académicas del ejercicio. No las presentamos como cifras exigidas textualmente por la Resolución.</p>
-            <p class="mt-3">Seguimos usando valores unitarios preliminares sobre área publicada. Están pendientes, según el caso, la depuración de componentes, la verificación de áreas y fuentes, la decisión normativa del encargo y la conclusión profesional. Las notas del ejercicio se conservan en la descarga; esta ampliación no añade autoguardado ni un motor de certificación.</p>
+            <p class="mt-3">Seguimos usando valores unitarios preliminares sobre área publicada. Están pendientes, según el caso, la depuración de componentes, la verificación de áreas y fuentes, la decisión normativa del encargo y la conclusión profesional. Las notas y la ejecución se autoguardan y se incluyen en la descarga; esto no certifica cumplimiento.</p>
         </details>
     </div>
 </details>

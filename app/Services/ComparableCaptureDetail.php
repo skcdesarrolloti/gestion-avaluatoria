@@ -14,6 +14,7 @@ final class ComparableCaptureDetail
             'ph_regime_source' => ['Soporte del régimen PH o no PH del comparable', 'text', 'shared'],
             'analysis_manual_factors' => ['Datos complementados manualmente en Análisis', 'manual_factors', 'internal'],
             'analysis_factor_selection' => ['Selección de factores y umbral de sugerencia', 'factor_selection', 'internal'],
+            'analysis_course_execution' => ['Ejecución del análisis estadístico', 'course_execution', 'internal'],
             'intake_note' => ['Pendientes o motivo de selección', 'text', 'shared'],
             'source_updates' => ['Lecturas posteriores del mismo anuncio · diferencias conservadas', 'text', 'shared'],
             'latest_source_excerpt' => ['Último texto leído del anuncio · contrastar con captura original', 'text', 'shared'],
@@ -61,15 +62,17 @@ final class ComparableCaptureDetail
         $out = [];
         foreach (self::fields() as $key => [$label, $type]) {
             if ($type === 'calculated') continue;
+            if ($type==='course_execution' && !array_key_exists($key,$row)) continue;
             $value = $row[$key] ?? '';
             if (!is_scalar($value) && $value !== null) throw new HttpException(422, "Formato inválido: $label.");
             $value = trim((string) $value);
             if ($key === 'property_group' && $value !== '' && !preg_match('/^[a-f0-9]{32}$/D', $value))
                 throw new HttpException(422, 'Identificador de inmueble inválido.');
-            $limit=in_array($type,['facts','factor_selection','manual_factors'],true)?48000:($type==='source_text'?16000:1600);
+            $limit=$type==='course_execution'?96000:(in_array($type,['facts','factor_selection','manual_factors'],true)?48000:($type==='source_text'?16000:1600));
             if (mb_strlen($value) > $limit) throw new HttpException(422, "$label: máximo $limit caracteres.");
             if ($type==='manual_factors') $value=ComparableAnalysisManualFactors::normalize($value);
             if ($type==='facts') $value=ComparableSourceFacts::normalize($value);
+            if ($type==='course_execution') $value=ComparableCourseExecution::normalize($value);
             if ($type==='factor_selection' && $value!=='') {
                 $selection=json_decode($value,true,8);
                 $selectionObject=json_decode($value,false,8);

@@ -1008,3 +1008,17 @@ Paso 3 simplificado en tareas visibles: elegir Y, confirmar factores/códigos y 
 Rendimiento de antecedentes/navegación: contenido de antecedentes y tabla histórica se montan solo al abrir cada acordeón y se destruyen al cerrar, conservando el historial en estado/guardado. Caché de lecturas usa el contexto efectivo (originales en muestras) en vez de invalidar todo por cualquier cambio de pestaña; respeta diferencias de raw y filtros existentes. Caché de combinaciones queda en cierre privado, sin escrituras reactivas durante la consulta. PHP1561/JS239/build78,5KB; prueba con reactividad Vue usada por Alpine y71 filas verifica una sola ejecución al navegar, ausencia de escrituras de consulta y conservación del historial; cambios de datos siguen invalidando. No se midió tiempo ni se reprodujo diálogo del hosting en navegador real; verificación pendiente tras actualizar. Sin cambios de BD/datos/cálculos.
 
 Preparación práctica: tabla abierta directamente, descuento/valores antes de atributos y soporte/tipo de descuento editables en cada fila sobre campos existentes negotiation_source/kind; vinculación única por anuncio principal y conservación de fuentes secundarias. Academia de preparación en acordeón único bajo tabla con ejemplo/fórmula/fundamento existente y encargo. Herramientas de originales/composición después; Grupo preparado vuelve a result sin generar etapas. Resumen compacto; actualización manual sigue accesible tras completar última celda. Advertencia de área por fila plegable. PHP1563/JS239/lint795/build78,5KB; render local comprueba tabla/soportes/academia/orden, pruebas envío único y edición de soporte. Sin DDL o cambios de cálculos/captura/historial. Verificación visual real pendiente.
+
+Continuidad del análisis descriptivo: ejecución persistida en capture_details existente,
+campo analysis_course_execution del anuncio principal. Base/confianza/paso, entradas,
+resumen numérico, fecha, notas/conclusión y bootstrap se conservan con autoguardado
+800ms/versionado/CSRF/autorización existentes. Recarga restaura números y gráficos;
+cambio de entradas conserva ejecución anterior marcada desactualizada. Migración
+legacy lógica: si no existe ejecución pero hay preparación con factores, reconstruye
+desde datos actuales (base ajustada95% acordada), identifica reconstrucción y guarda;
+no recupera notas no persistidas ni inventa fecha histórica. Entrada inválida se retiene,
+sin sobrescritura silenciosa. Petición antigua omitiendo campo conserva ejecución.
+PHP1568/JS241/lint799/build78,5KB; BD local desechable ga_test_app/ga_test_auth puerto3369,
+227 verificaciones, recuperación, propietario y conflictos. Prueba JS→normalizador PHP→JS
+conserva cuartiles/centros/fecha/notas/paso, detecta obsolescencia y no agrega etapas históricas.
+Sin DDL ni cambios de muestras. Verificación del navegador/expediente de hosting pendiente.

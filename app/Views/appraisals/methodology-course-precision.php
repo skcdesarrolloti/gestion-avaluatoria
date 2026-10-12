@@ -19,7 +19,7 @@
     <h4 class="font-semibold">7. Conclusión y memoria · curso, páginas 47–51</h4>
     <p>Contrasta comparabilidad, centros, dispersión, sensibilidad y precisión antes de concluir. Un dato extremo sin evidencia de no comparabilidad se conserva. Justifica cualquier decisión; este recorrido no retira muestras ni adopta un valor.</p>
     <label class="label">Conclusión del analista para el ejercicio<textarea class="input" rows="4" placeholder="Explica los bloques observados, estimadores, dispersión, limitaciones y revisiones pendientes" x-model="courseConclusion"></textarea></label>
-    <p class="text-sm text-amber-900">La conclusión y las consideraciones se conservan en la descarga de esta ejecución. No se autoguardan todavía. El informe reproduce los siete pasos, base, muestras pendientes, clases, fórmulas, resultados y notas.</p>
+    <p class="text-sm text-amber-900">La conclusión y las consideraciones se autoguardan con esta ejecución. Espera Guardado confirmado. El informe reproduce los siete pasos, base, muestras pendientes, clases, fórmulas, resultados y notas.</p>
     <button type="button" class="btn-primary" :disabled="!courseCurrent()||courseBootstrapBusy" @click="courseExport()">Descargar memoria del ejercicio</button>
     <button type="button" class="btn-secondary" @click="analysisModule='regression';regressionTab='application'">Continuar a preparar la regresión</button>
     <p>La regresión usa los valores individuales y los factores aplicados, con sus propios requisitos. Su conteo puede diferir del descriptivo; el paso Preparar y calcular mostrará el motivo por inmueble.</p>

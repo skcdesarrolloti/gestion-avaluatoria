@@ -44,7 +44,7 @@ final class MarketStatisticsAcademy
                 'example'=>'Si entre valores de 8, 10 y 12 aparece uno de 30 millones COP/m², revisa qué lo explica: ubicación, área, componentes, calidad, error de captura u otro mercado. El precio alto por sí solo no permite decidir cuál de esas explicaciones es correcta.',
                 'meaning'=>'RIC (rango intercuartílico) mide la distancia entre Q1 y Q3 (posiciones del 25 % y 75 % de los datos ordenados). MAD (mediana de las desviaciones absolutas respecto a la mediana) describe dispersión robusta. Asimetría describe hacia qué lado se extiende la distribución; curtosis ayuda a estudiar su forma. Ninguna señal demuestra un error.',
                 'next'=>'Abre Revisar inmueble, contrasta la evidencia y deja tu consideración. Los multiplicadores 1,5 del RIC y el umbral 3,5 del diagnóstico robusto son criterios exploratorios del cálculo actual; no son órdenes normativas de eliminar datos.',
-                'basis'=>'Art. 20.c–d: forma y técnicas robustas, de uso optativo. Art. 21, parágrafo 1: análisis conjunto cuando aplica y sin inferir el valor por el signo de la asimetría. Las consideraciones de este recorrido sólo se conservan en la ficha abierta y la memoria descargada.',
+                'basis'=>'Art. 20.c–d: forma y técnicas robustas, de uso optativo. Art. 21, parágrafo 1: análisis conjunto cuando aplica y sin inferir el valor por el signo de la asimetría. Las consideraciones se autoguardan con la ejecución; espera la confirmación del servidor.',
                 'articles'=>[20,21],
             ],
             [
@@ -59,7 +59,7 @@ final class MarketStatisticsAcademy
                 'title'=>'7. Conclusión y memoria: explicar cómo llegamos al resultado',
                 'example'=>'Una memoria útil permite seguir la cadena: fuente y dato original → revisión de área y componentes → decisión sobre comparabilidad → cálculo → interpretación → criterio y limitación. Decir sólo «el CV pasó» no explica por qué los datos representan al sujeto.',
                 'meaning'=>'Trazabilidad significa poder reconstruir el origen y las operaciones. La memoria de este ejercicio conserva la ejecución descargada; no es todavía el informe final ni una declaración de cumplimiento de todas las normas.',
-                'next'=>'Documenta la base, fecha, grupo usado, pendientes y razones. Conserva la descarga: las notas y esta conclusión no se autoguardan. Si falta información concluyente o el mercado es heterogéneo, revisa el art. 21, parágrafo 2, antes de concluir.',
+                'next'=>'Documenta la base, fecha, grupo usado, pendientes y razones. La ejecución, notas y conclusión se autoguardan; espera la confirmación del servidor. Si falta información concluyente o el mercado es heterogéneo, revisa el art. 21, parágrafo 2, antes de concluir.',
                 'basis'=>'Art. 21, parágrafos 1–2, según su alcance; anexo 2.1: datos trazables y tablas legibles. NTS S 03 (edición examinada 2009), 7.1.8 y 7.1.10, e IVS 106 (referencia de estudio 2025), 20 y 30: documentar datos, análisis, razones y límites, sin certificar conformidad por esta pantalla.',
                 'articles'=>[21],
             ],

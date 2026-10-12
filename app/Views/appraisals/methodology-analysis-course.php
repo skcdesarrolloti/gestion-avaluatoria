@@ -1,8 +1,8 @@
-<template x-if="analysisModule==='statistics'"><section class="space-y-4" @input.stop @change.stop>
+<template x-if="analysisModule==='statistics'"><section class="space-y-4" @input.stop="coursePersist()" @change.stop="coursePersist()">
     <h3 class="text-xl font-semibold"><span x-text="courseStep===6 ? '7. Memoria y sustentación' : '2. Entender la muestra'"></span></h3>
     <p x-show="courseStep===0" class="text-sm"><strong>Tener en cuenta del paso 1:</strong> se reutiliza el grupo preparado. Aquí eliges qué valor describir y calculas su distribución; solo vuelve a revisar un inmueble si el cálculo muestra un pendiente o una duda concreta.</p>
     <p class="rounded-lg bg-purple-50 p-3 text-purple-900">Ejercicio exploratorio. Los datos simulados conservan su identificación; este recorrido no adopta un valor ni elimina muestras.</p>
-    <p x-show="courseStep===6" class="rounded-lg border bg-amber-50 p-3">Memoria disponible del análisis descriptivo. La sustentación integral, manual del modelo, validación y anexos del informe final siguen pendientes. Las notas de esta ejecución se conservan mediante su descarga.</p>
+    <p x-show="courseStep===6" class="rounded-lg border bg-amber-50 p-3">Memoria disponible del análisis descriptivo. La sustentación integral, manual del modelo, validación y anexos del informe final siguen pendientes. La ejecución y sus notas se autoguardan; espera la confirmación del servidor.</p>
     <nav x-show="courseStep!==6" class="flex flex-wrap gap-2" aria-label="Pasos del análisis estadístico"><template x-for="(step,i) in courseSteps" :key="i"><button type="button" class="btn-secondary" x-show="i!==6" :aria-current="courseStep===i?'step':null" :class="courseStep===i?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="courseStep=i" x-text="(i+1)+'. '+step"></button></template></nav>
     <details class="rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Academia y fundamentos · explicación del paso actual</summary>
         <?php require __DIR__.'/methodology-course-academy.php'; ?>
@@ -29,6 +29,7 @@
     </div>
     <p x-show="!courseResult" class="text-sm">Pulsa Calcular análisis estadístico. Se utiliza el grupo guardado; no necesitas repetir su preparación.</p>
     <template x-if="courseResult"><div class="space-y-4">
+        <p class="text-sm text-amber-900" x-show="courseResult.reconstructed">Resultado reconstruido con los datos preparados actuales: la versión anterior no guardaba esta ejecución. Se conserva desde ahora; no acredita recuperar notas anteriores no guardadas.</p>
         <p class="rounded-xl border p-3" role="status" :title="'Calculado: '+courseResult.at" x-text="courseResult.rows.length+' muestras · '+courseResult.valid.length+' valores disponibles · '+courseResult.pending.length+' pendientes'"></p>
         <p class="text-sm" x-text="'Base aplicada: '+(courseResult.basis==='adjusted'?'valor con descuento / área publicada':'oferta / área publicada')+' · confianza '+100*courseResult.summary.confidence+' %'"></p>
         <p class="text-amber-900" x-show="!courseCurrent()">La base, confianza o datos cambiaron. Actualiza antes de interpretar o descargar; estas cifras corresponden a la ejecución anterior.</p>
