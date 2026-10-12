@@ -1,6 +1,6 @@
 <?php
 $marketMenu = [
-    ['1. Preparar los datos', "['preparation','samples','location'].includes(analysisModule)", "analysisModule='samples'"],
+    ['1. Preparar los datos', "['preparation','samples','location'].includes(analysisModule)", "analysisModule='samples';if(analysisRegimeApplied)analysisView='result'"],
     ['2. Entender la muestra', "analysisModule==='statistics'&&courseStep!==6", "analysisModule='statistics';courseStep=0"],
     ['3. Construir el modelo', "analysisModule==='regression'&&regressionTab==='application'", "analysisModule='regression';regressionTab='application'"],
     ['4. Revisar el modelo', "analysisModule==='regression'&&regressionTab==='diagnostics'", "analysisModule='regression';regressionTab='diagnostics'"],
@@ -16,7 +16,6 @@ $marketMenu = [
     <?php endforeach; ?>
 </nav>
 <p class="mt-3 font-semibold text-teal-900" role="status" x-text="analysisRegimeApplied?'Grupo de trabajo aplicado: '+analysisWorkingCount()+' inmuebles':'Preparación del grupo: pendiente de aplicar'"></p>
-<p class="text-sm" x-show="analysisRegimeApplied">Se conserva la preparación guardada. Consultar antecedentes no reaplica filtros ni reincorpora muestras.</p>
 <details class="mt-3 rounded-lg border p-3" x-data="{antecedentsOpen:false}" @toggle.stop="antecedentsOpen=$el.open">
     <summary class="min-h-11 cursor-pointer font-semibold">Consultar antecedentes · total recogido e historial</summary>
     <template x-if="antecedentsOpen"><div>

@@ -25,7 +25,7 @@ export function discountedAnalysis(row,percent) {
     return {discount,value,perM2:area>0 && row.price_unit!=='valor_m2' ? value/area : null};
 }
 export function marketAnalysisTable(rows,subjectRegime='',subjectType='',subjectLocation={}) {
-    rows=rows.map(r=>({...r,ph_regime:r.ph_regime || 'por_verificar',ph_regime_source:r.ph_regime_source || ''}));
+    rows=rows.map(r=>({...r,ph_regime:r.ph_regime || 'por_verificar',ph_regime_source:r.ph_regime_source || '',negotiation_source:r.negotiation_source || '',negotiation_kind:r.negotiation_kind || ''}));
     const project=tableProjection(true), original=tableProjection(), active=tableProjection(true), factors=analysisCoverage(rows,subjectType);
     let factorTable, factorCache;
     let saved={};try {saved=JSON.parse(rows.find(r=>r.analysis_factor_selection)?.analysis_factor_selection || '{}');} catch {}

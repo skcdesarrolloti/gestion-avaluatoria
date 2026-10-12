@@ -38,11 +38,11 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
             if (empty($row['published_location']) && empty($row['location_verification']) && ($row['latitude'] ?? '') !== '' && ($row['longitude'] ?? '') !== '')
                 $row['published_location'] = $row['latitude'] . ', ' . $row['longitude'] . ' · referencia anterior sin verificar.';
             foreach ($row as $key=>$value):
-            if (!is_scalar($value) || ($key === 'capture_index') || (in_array($key,['negotiation_discount','ph_regime','ph_regime_source','analysis_manual_factors'],true) && in_array($index,$analysisIndexes,true)) || ($key==='analysis_factor_selection' && $index===$analysisIndexes[0]) || (in_array($index, $locationIndexes, true) && in_array($key, $locationKeys, true))) continue; ?>
+            if (!is_scalar($value) || ($key === 'capture_index') || (in_array($key,['negotiation_discount','negotiation_source','negotiation_kind','ph_regime','ph_regime_source','analysis_manual_factors'],true) && in_array($index,$analysisIndexes,true)) || ($key==='analysis_factor_selection' && $index===$analysisIndexes[0]) || (in_array($index, $locationIndexes, true) && in_array($key, $locationKeys, true))) continue; ?>
             <input type="hidden" name="comparables[<?= $index ?>][<?= e($key) ?>]" value="<?= e((string) $value) ?>">
         <?php endforeach; endforeach; ?>
         <?php foreach ($analysisRows as $row): ?><input type="hidden" name="comparables[<?= (int)$row['capture_index'] ?>][negotiation_discount]" value="<?= e((string)($row['negotiation_discount'] ?? '')) ?>" :value="analysisDiscounts['<?= e($row['id']) ?>']"><?php endforeach; ?>
-        <?php foreach ($analysisRows as $position=>$row): foreach (['ph_regime','ph_regime_source','analysis_manual_factors'] as $field): ?><input type="hidden" name="comparables[<?= (int)$row['capture_index'] ?>][<?= $field ?>]" :value="analysisRows[<?= $position ?>].<?= $field ?>"><?php endforeach; endforeach; ?>
+        <?php foreach ($analysisRows as $position=>$row): foreach (['ph_regime','ph_regime_source','analysis_manual_factors','negotiation_source','negotiation_kind'] as $field): ?><input type="hidden" name="comparables[<?= (int)$row['capture_index'] ?>][<?= $field ?>]" :value="analysisRows[<?= $position ?>].<?= $field ?>"><?php endforeach; endforeach; ?>
         <input type="hidden" name="comparables[<?= (int)$analysisIndexes[0] ?>][analysis_factor_selection]" :value="analysisSelection()">
         <div class="mb-4 rounded-xl border border-teal-700 bg-white p-3 shadow-sm">
             <?php require __DIR__.'/methodology-analysis-menu.php'; ?>
@@ -55,10 +55,8 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
         </div>
         <template x-if="analysisModule==='preparation'"><div><?php require __DIR__.'/methodology-analysis-preparation.php'; ?></div></template>
         <template x-if="analysisModule==='samples'"><div>
-        <details class="mb-4 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Academia y encargo · qué representa cada dato</summary>
-            <?php require __DIR__.'/methodology-analysis-preparation.php'; ?>
-        </details>
         <?php require __DIR__.'/methodology-analysis-data-table.php'; ?>
+        <?php require __DIR__.'/methodology-preparation-academy.php'; ?>
         <details class="mt-4"><summary class="min-h-11 cursor-pointer font-semibold">Ubicación y anuncios originales</summary>
         <?php foreach ($intakeGroups as $group): $row = $group[0]; $index = $row['capture_index']; ?>
         <article class="mt-4 rounded-xl border p-4">
