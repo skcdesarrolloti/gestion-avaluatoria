@@ -47,6 +47,8 @@
     expect(str_contains($html,'Aplicar depuración de muestras') && str_contains($html,'Cambiar factores · opcional') && str_contains($html,'Aplicar factores al modelo'),'muestras y factores conservan acciones separadas en el recorrido simplificado');
     expect(substr_count($html,'name="comparables[1][negotiation_source]"')===1 && substr_count($html,'name="comparables[1][negotiation_kind]"')===1,'soportes de descuento tienen una sola vinculación de envío para la ficha principal');
     expect(str_contains($html,'x-model="analysisRows[property.analysisIndex].negotiation_source"') && str_contains($html,'Academia y sustento · datos, descuento y comparabilidad'),'tabla permite completar soporte directamente y conserva academia plegable');
+    expect(substr_count($html,'name="comparables[1][price_amount]"')===1 && substr_count($html,'name="comparables[1][area_m2]"')===1 && substr_count($html,'name="comparables[1][source_updates]"')===1,'corrección en sensibilidad envía precio, área y registro sin duplicar campos');
+    expect(str_contains($html,'Editar datos aquí') && str_contains($html,'MAD · significado y ejemplo'),'sensibilidad conserva edición en fila y academia de MAD');
     $regime=\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"threshold":50,"view":"regime","scope":"all","applied_scope":"subject","regime_applied":true}']);
     expect(json_decode($regime['analysis_factor_selection'],true)['applied_scope']==='subject','régimen aplicado persiste separado del propuesto');
     $review=['id'=>str_repeat('a',32),'reason'=>'unknown','at'=>'2026-10-06T15:00:00.000Z','restored_at'=>'2026-10-06T15:01:00.000Z'];

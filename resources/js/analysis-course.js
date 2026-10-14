@@ -10,8 +10,10 @@ import {courseInterpretations} from './analysis-course-interpretation.js';
 import {courseProgressSummary} from './analysis-course-progress-summary.js';
 import {courseQuartileCalculation,courseQuartileOperation,courseQuartileLimitOperations} from './analysis-course-quartile-calculation.js';
 import {courseSnapshot,restoreCourseSnapshot} from './analysis-course-storage.js';
+import {courseInlineMethods} from './analysis-course-inline.js';
 export const courseSteps=['Base del cálculo','Bloques y distribución','Tendencia central','Dispersión','Sensibilidad y consideraciones','Precisión de la media','Conclusión y memoria'];
 export function courseMethods(saved=''){return {
+    ...courseInlineMethods(),
     courseStep:0,courseSteps,courseBasis:'adjusted',courseConfidence:'.95',courseResult:null,courseBusy:false,courseError:'',courseBootstrapBusy:false,courseProgress:0,courseNotes:{},courseConclusion:'',analysisReviewReturn:null,
     courseRows(){return this.analysisVisibleRows().map(r=>{const original=this.analysisRows[r.analysisIndex],area=amount(original.area_m2),offer=amount(original.price_amount),adjusted=this.analysisResult(r.key),discount=amount(this.analysisDiscounts[r.key]),reasons=[];
         if(!(area>0))reasons.push('Área publicada no positiva');if(!(offer>0))reasons.push('Oferta no positiva');if(original.price_unit==='valor_m2')reasons.push('Precio publicado unitario: requiere revisar base');

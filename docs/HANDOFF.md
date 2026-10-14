@@ -1022,3 +1022,16 @@ PHP1568/JS241/lint799/build78,5KB; BD local desechable ga_test_app/ga_test_auth 
 227 verificaciones, recuperación, propietario y conflictos. Prueba JS→normalizador PHP→JS
 conserva cuartiles/centros/fecha/notas/paso, detecta obsolescencia y no agrega etapas históricas.
 Sin DDL ni cambios de muestras. Verificación del navegador/expediente de hosting pendiente.
+
+Sensibilidad: «Editar datos aquí» en la misma fila reemplaza salida a Grupo preparado.
+Oferta/área/descuento/factores preparados y fuente se aplican mediante un solo botón;
+validación previa, registro before/after en source_updates existente (sin truncar historial),
+atributos corregidos como complemento con fuente manteniendo originales capturados.
+Campos originales de precio/área y registro tienen vinculación dinámica única al guardado.
+La ejecución previa sigue visible/desactualizada hasta actualizar estadística; no aparta
+inmuebles ni agrega etapas históricas automáticamente. MAD: inglés/español, fórmula,
+ejemplo de distancias y alcance en acordeón con fuente NIST. PHP1570/JS243/lint800/build78,5KB;
+BD ga_test_app/ga_test_auth desechables puerto3371,229 verificaciones. Pruebas validación,
+edición sin navegar, origen de atributos conservado, obsolescencia, recálculo posterior,
+recarga BD y envío único. Primera corrida BD interrumpida al detener prematuramente
+su proceso; repetida completa en instancia nueva, satisfactoria. Visual real pendiente.
