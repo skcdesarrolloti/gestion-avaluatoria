@@ -19,14 +19,11 @@ $pendingStages = [
 <?php foreach ($pendingStages as $key=>[$title,$steps,$explanations]): ?>
 <template x-if="analysisModule==='<?= e($key) ?>'"><section class="space-y-4">
     <h3 class="text-xl font-semibold"><?= e($title) ?></h3>
-    <p class="rounded-lg border bg-amber-50 p-3"><strong>Etapa pendiente de desarrollo.</strong> Sus entradas ya están organizadas para trabajarlas una por una. Aquí no se ejecutan cálculos ni se adopta un valor.</p>
-    <nav class="flex flex-wrap gap-2" aria-label="Submenús de <?= e($title) ?>">
-        <?php foreach ($steps as $i=>$step): ?>
-        <button type="button" class="btn-secondary" :aria-current="analysisPendingStep===<?= $i ?>?'step':null" @click="analysisPendingStep=<?= $i ?>"><?= e(($key==='validation'?'5.':'6.').($i+1).' '.$step) ?></button>
-        <?php endforeach; ?>
-    </nav>
+    <p class="rounded-lg border bg-amber-50 p-3">Esta etapa todavía no ejecuta cálculos. Primero completamos la revisión de los datos y del modelo; esta pantalla no añade tareas de captura.</p>
+    <details class="rounded-lg border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Qué debe comprobar esta etapa · ayuda y alcance</summary><div class="mt-3 space-y-3">
     <?php foreach ($explanations as $i=>$explanation): ?>
-    <div x-show="analysisPendingStep===<?= $i ?>" class="rounded-xl border p-4"><h4 class="font-semibold"><?= e($steps[$i]) ?></h4><p class="mt-3"><?= e($explanation) ?></p></div>
+    <p><strong><?= e($steps[$i]) ?>:</strong> <?= e($explanation) ?></p>
     <?php endforeach; ?>
+    </div></details>
 </section></template>
 <?php endforeach; ?>

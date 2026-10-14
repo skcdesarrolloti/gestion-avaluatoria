@@ -132,6 +132,22 @@ test('module autosave posts form data and updates optimistic version', async () 
     assert.equal(dispatched.at(-1).detail.topic, 'appraisal:abc:chapter-zero');
     cleanup();
 });
+test('autosave distinguishes preparation failure from a network failure and keeps unsaved changes pending',async()=>{
+    const {listeners,runTimer,cleanup}=setup(),form=new HTMLFormElement();let calls=0;
+    globalThis.fetch=async()=>{calls++;throw new TypeError('network');};
+    listeners.input({target:new HTMLInputElement(form)});await runTimer();
+    assert.match(form.status.textContent,/no se pudo conectar/);assert.equal(form.version.value,'7');
+    globalThis.FormData=class {constructor(){throw new TypeError('preparation');}};
+    listeners.input({target:new HTMLInputElement(form)});await runTimer();
+    assert.match(form.status.textContent,/preparar o procesar/);assert.equal(calls,1);assert.equal(form.version.value,'7');form.isConnected=false;cleanup();
+});
+test('autosave does not report lost connection when server confirmation precedes a screen update failure',async()=>{
+    const {listeners,runTimer,cleanup}=setup(),form=new HTMLFormElement(),query=form.querySelectorAll.bind(form);
+    form.querySelectorAll=selector=>{if(selector==='[data-object-preview]')throw new TypeError('screen update');return query(selector);};
+    globalThis.fetch=async()=>({ok:true,json:async()=>({ok:true,version:8,object_text:'Confirmado'})});
+    listeners.input({target:new HTMLInputElement(form)});await runTimer();
+    assert.equal(form.version.value,'8');assert.match(form.status.textContent,/servidor confirmó/);assert.doesNotMatch(form.status.textContent,/no se pudo conectar/);form.isConnected=false;cleanup();
+});
 
 test('appraiser change only saves draft without creating dossier number', async () => {
     const { listeners, runTimer, timerDelay, cleanup } = setup();

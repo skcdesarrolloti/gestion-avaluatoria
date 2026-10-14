@@ -1035,3 +1035,12 @@ BD ga_test_app/ga_test_auth desechables puerto3371,229 verificaciones. Pruebas v
 edición sin navegar, origen de atributos conservado, obsolescencia, recálculo posterior,
 recarga BD y envío único. Primera corrida BD interrumpida al detener prematuramente
 su proceso; repetida completa en instancia nueva, satisfactoria. Visual real pendiente.
+
+Etapas pendientes5/6: mantiene títulos y contenido académico planeado, reemplaza
+cinco submenús por un acordeón por etapa. No implementa ni aparenta validación
+externa o aplicación al sujeto. Guardado: distingue fallo de preparación, conexión,
+respuesta y actualización de pantalla tras confirmación; no atribuye todo TypeError
+a red. Datos pendientes/versionado/reintento conservados. PHP1570/JS245/build78,6KB;
+pruebas simulan conexión, error previo al envío y fallo tras confirmación sin afirmar
+desconexión falsa. Causa del aviso concreto del hosting no reproducida; no se declara
+resuelta la conexión. No cambia cálculos, notas o persistencia. Visual real pendiente.

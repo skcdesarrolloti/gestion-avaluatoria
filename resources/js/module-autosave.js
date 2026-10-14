@@ -99,18 +99,22 @@ async function save(form) {
     const buttons = [...form.querySelectorAll('button[type="submit"]')];
     buttons.forEach(button => { button.disabled = true; });
     setStatus(form, 'Guardando cambios...', 'saving');
-    state.promise = (async () => { try {
+    state.promise = (async () => { let phase='prepare'; try {
+        const body=formBody(form, extras);
+        phase='network';
         const response = await fetch(form.dataset.autosaveEndpoint, {
             method: 'POST',
-            body: formBody(form, extras),
+            body,
             headers: { Accept: 'application/json', 'X-CSRF-Token': csrfToken() },
             credentials: 'same-origin',
             signal: state.controller.signal,
         });
+        phase='response';
         const result = await jsonResponse(response);
         if (response.status === 409) state.conflict = true;
         if (!response.ok || result.ok !== true) throw new Error(result.message || 'No se pudo confirmar el guardado.');
         if (!Number.isInteger(result.version)) throw new Error('El servidor no confirmó la versión guardada. Conserva esta página y pulsa Guardar matriz para reintentar.');
+        phase='confirmed';
         updateVersion(form, result);
         acknowledgeCompositionMethods(form, result);
         if (typeof result.object_text === 'string') form.querySelectorAll('[data-object-preview]').forEach(node => { node.textContent = result.object_text; });
@@ -120,7 +124,11 @@ async function save(form) {
         const time = result.saved_at ? new Date(result.saved_at).toLocaleTimeString('es-CO') : new Date().toLocaleTimeString('es-CO');
         setStatus(form, state.dirty ? 'Cambios pendientes' : 'Autoguardado confirmado: ' + time, state.dirty ? 'pending' : 'saved');
     } catch (error) {
-        if (error.name !== 'AbortError') setStatus(form, 'Pendiente de guardar: ' + (error instanceof TypeError ? 'no se pudo conectar con el servidor. No cierres ni recargues; pulsa Guardar para reintentar.' : error.message), 'error');
+        if (error.name !== 'AbortError') setStatus(form, phase==='confirmed'
+            ? 'El servidor confirmó el guardado, pero falló la actualización de la pantalla. Conserva esta página mientras se revisa el aviso.'
+            : 'Pendiente de guardar: ' + (error instanceof TypeError ? phase==='network'
+                ? 'no se pudo conectar con el servidor. No cierres ni recargues; pulsa Guardar para reintentar.'
+                : 'no se pudo preparar o procesar el guardado. Los cambios siguen en esta página; pulsa Guardar para reintentar.' : error.message), 'error');
         state.dirty = true;
     } finally {
         state.saving = false;
