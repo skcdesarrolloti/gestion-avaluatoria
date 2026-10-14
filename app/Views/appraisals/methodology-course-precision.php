@@ -1,4 +1,4 @@
-<div x-show="courseStep===5" class="rounded-xl border p-4 space-y-3">
+<template x-if="courseStep===5"><div class="rounded-xl border p-4 space-y-3">
     <h4 class="font-semibold">6. Precisión de la media · curso, páginas 36–46</h4>
     <?php require __DIR__.'/methodology-course-precision-academy.php'; ?>
     <p>El intervalo cuantifica la precisión de la media bajo los supuestos de muestreo. No es el rango de precios individuales, el error del avalúo ni una garantía frente a sesgo. Anuncios relacionados pueden aportar información dependiente.</p>
@@ -14,8 +14,8 @@
     <template x-if="courseResult.bootstrap"><div><div class="overflow-auto"><table class="min-w-full text-left"><thead><tr><th class="p-2">Serie</th><th class="p-2">Inferior</th><th class="p-2">Superior</th></tr></thead><tbody><template x-for="item in [{key:'mean',label:'Media · COP/m²'},{key:'median',label:'Mediana · COP/m²'},{key:'cv',label:'CV · %'}]" :key="item.key"><tr><td class="p-2" x-text="item.label"></td><td class="p-2" x-text="courseNumber(courseResult.bootstrap[item.key][0])"></td><td class="p-2" x-text="courseNumber(courseResult.bootstrap[item.key][1])"></td></tr></template></tbody></table></div><p class="text-sm" x-text="'10.000 repeticiones · semilla '+courseResult.bootstrap.seed+' · generador Mulberry32 · confianza '+courseResult.bootstrap.confidence*100+' % · cuantiles interpolados'"></p></div></template>
     <p class="text-sm">Semilla (número inicial reproducible); Mulberry32 (generador seudoaleatorio); cuantiles interpolados (límites obtenidos entre posiciones ordenadas). Los límites describen cada medida remuestreada; no son el rango de precios individuales ni el valor adoptado.</p>
     </details>
-</div>
-<div x-show="courseStep===6" class="rounded-xl border p-4 space-y-3">
+</div></template>
+<template x-if="courseStep===6"><div class="rounded-xl border p-4 space-y-3">
     <h4 class="font-semibold">7. Conclusión y memoria · curso, páginas 47–51</h4>
     <p>Contrasta comparabilidad, centros, dispersión, sensibilidad y precisión antes de concluir. Un dato extremo sin evidencia de no comparabilidad se conserva. Justifica cualquier decisión; este recorrido no retira muestras ni adopta un valor.</p>
     <label class="label">Conclusión del analista para el ejercicio<textarea class="input" rows="4" placeholder="Explica los bloques observados, estimadores, dispersión, limitaciones y revisiones pendientes" x-model="courseConclusion"></textarea></label>
@@ -23,4 +23,4 @@
     <button type="button" class="btn-primary" :disabled="!courseCurrent()||courseBootstrapBusy" @click="courseExport()">Descargar memoria del ejercicio</button>
     <button type="button" class="btn-secondary" @click="analysisModule='regression';regressionTab='application'">Continuar a preparar la regresión</button>
     <p>La regresión usa los valores individuales y los factores aplicados, con sus propios requisitos. Su conteo puede diferir del descriptivo; el paso Preparar y calcular mostrará el motivo por inmueble.</p>
-</div>
+</div></template>

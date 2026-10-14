@@ -1,6 +1,7 @@
 import { packComparableRows } from './comparable-transport.js';
 import { publishDerivedChange } from './derived-refresh.js';
 import { acknowledgeCompositionMethods } from './composition-method-save.js';
+import { requestDeadline } from './request-deadline.js';
 
 const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 const states = new WeakMap();
@@ -95,6 +96,7 @@ async function save(form) {
     const extras = state.extras;
     state.extras = {};
     state.saving = true;
+    state.lastSaveSucceeded = false;
     state.controller = new AbortController();
     const buttons = [...form.querySelectorAll('button[type="submit"]')];
     buttons.forEach(button => { button.disabled = true; });
@@ -102,15 +104,18 @@ async function save(form) {
     state.promise = (async () => { let phase='prepare'; try {
         const body=formBody(form, extras);
         phase='network';
-        const response = await fetch(form.dataset.autosaveEndpoint, {
-            method: 'POST',
-            body,
-            headers: { Accept: 'application/json', 'X-CSRF-Token': csrfToken() },
-            credentials: 'same-origin',
-            signal: state.controller.signal,
-        });
-        phase='response';
-        const result = await jsonResponse(response);
+        const { response, result } = await requestDeadline(async () => {
+            const response = await fetch(form.dataset.autosaveEndpoint, {
+                method: 'POST',
+                body,
+                headers: { Accept: 'application/json', 'X-CSRF-Token': csrfToken() },
+                credentials: 'same-origin',
+                signal: state.controller.signal,
+            });
+            phase='response';
+            const result = await jsonResponse(response);
+            return { response, result };
+        }, state.controller);
         if (response.status === 409) state.conflict = true;
         if (!response.ok || result.ok !== true) throw new Error(result.message || 'No se pudo confirmar el guardado.');
         if (!Number.isInteger(result.version)) throw new Error('El servidor no confirmó la versión guardada. Conserva esta página y pulsa Guardar matriz para reintentar.');
@@ -120,6 +125,7 @@ async function save(form) {
         if (typeof result.object_text === 'string') form.querySelectorAll('[data-object-preview]').forEach(node => { node.textContent = result.object_text; });
         updateDossierNumber(form, result);
         publishDerivedChange(form, result);
+        state.lastSaveSucceeded = true;
         state.dirty = state.revision !== revision;
         const time = result.saved_at ? new Date(result.saved_at).toLocaleTimeString('es-CO') : new Date().toLocaleTimeString('es-CO');
         setStatus(form, state.dirty ? 'Cambios pendientes' : 'Autoguardado confirmado: ' + time, state.dirty ? 'pending' : 'saved');
@@ -135,7 +141,7 @@ async function save(form) {
         state.controller = null;
         state.promise = null;
         buttons.forEach(button => { button.disabled = false; });
-        if (state.dirty && !state.conflict && state.revision !== revision) state.timer = setTimeout(() => save(form), 800);
+        if (state.lastSaveSucceeded && state.dirty && !state.conflict && state.revision !== revision) state.timer = setTimeout(() => save(form), 800);
     } })();
     return state.promise;
 }
@@ -166,7 +172,7 @@ export async function flushModuleForm(form) {
     const state = stateFor(form);
     clearTimeout(state.timer);
     await save(form);
-    if (state.dirty && !state.conflict) await save(form);
+    if (state.lastSaveSucceeded && state.dirty && !state.conflict) await save(form);
     return !state.dirty && !state.saving && !state.conflict;
 }
 
@@ -175,7 +181,7 @@ export async function flushModuleAutosaves() {
     await Promise.all([...activeStates].map(async state => {
         clearTimeout(state.timer);
         await save(state.form);
-        if (state.dirty && !state.conflict) await save(state.form);
+        if (state.lastSaveSucceeded && state.dirty && !state.conflict) await save(state.form);
     }));
     return ![...activeStates].some(state => state.dirty || state.saving);
 }

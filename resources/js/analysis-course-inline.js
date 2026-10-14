@@ -1,6 +1,8 @@
 import {amount} from './comparable-negotiation.js';
 import {sourceFacts} from './comparable-source-facts.js';
 export function courseInlineMethods(){return {
+    courseInlineDrafts:{},
+    courseInlineEdit(id){return this.courseInlineDrafts[id]??=this.courseInlineDraft(id);},
     courseInlineDraft(id){const row=this.analysisRows.find(r=>r.id===id),property=this.analysisVisibleRows().find(r=>r.key===id);
         if(!row||!property)return null;
         return {offer:row.price_amount,area:row.area_m2,percent:String(this.analysisPercents[id]??''),source:row.negotiation_source||'',
@@ -20,6 +22,6 @@ export function courseInlineMethods(){return {
         if(audit.length>1600){draft.error='El registro de correcciones alcanzó su límite. No se aplicaron cambios; conserva el soporte antes de continuar.';return false;}
         row.price_amount=String(offer);row.area_m2=String(area);row.negotiation_source=source;row.source_updates=audit;row.analysis_manual_factors=JSON.stringify(bag);
         this.analysisChange(id,pct===null?'':String(pct));this.analysisManualVersion++;this.analysisDataRevision++;
-        await this.coursePersist();return true;
+        delete this.courseInlineDrafts[id];await this.coursePersist();return true;
     }
 };}

@@ -1044,3 +1044,23 @@ a red. Datos pendientes/versionado/reintento conservados. PHP1570/JS245/build78,
 pruebas simulan conexión, error previo al envío y fallo tras confirmación sin afirmar
 desconexión falsa. Causa del aviso concreto del hosting no reproducida; no se declara
 resuelta la conexión. No cambia cálculos, notas o persistencia. Visual real pendiente.
+
+Demora M4 (2026-10-13): los pasos estadísticos ocultos montaban sus tablas y
+efectos SVG al abrir Estadística. Ahora base, centros, dispersión, sensibilidad,
+precisión y conclusión se montan únicamente al seleccionarlos; sus datos siguen
+en el estado y en la ejecución guardada. No cambia academia ni fórmulas.
+Los borradores de corrección inline se retienen en memoria al cambiar de paso;
+solo Aplicar corrección los pasa a la matriz, como antes. Sin almacenamiento local.
+Autoguardado: espera máxima de 20 s incluyendo lectura de respuesta, aborta la
+petición del cliente y conserva pendientes sin confirmar un guardado. Navegar no
+duplica un envío fallido; solo envía nuevamente cambios posteriores a un guardado
+confirmado. Un servidor podría haber escrito antes del timeout: el reintento sigue
+sujeto al versionado optimista/409, sin sobrescritura. No promete cancelar trabajo
+del servidor ni confirma la causa concreta de demora del hosting.
+Validación: PHP1570, JS248, lint799, build/check:size78,7KB; BD229 en instancia nueva
+desechable ga_test_app/ga_test_auth, puerto3372 (detenida). Primera preparación
+falló por crear el log dentro del directorio antes de inicializarlo; repetida en
+directorio nuevo con log externo, satisfactoria. Prueba Alpine con vistas PHP reales:
+0 gráficos fuera de Dispersión, 2 al entrar, notas/fecha conservadas al cambiar de
+paso. Pruebas de respuesta bloqueada, un único envío fallido y reintento explícito.
+No se verificó sesión autenticada ni tiempos/móvil/escritorio reales del hosting.

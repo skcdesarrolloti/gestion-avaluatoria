@@ -1,4 +1,4 @@
-<details x-data="{draft:null}" @toggle.stop="if($el.open)draft=courseInlineDraft(r.id)">
+<details x-data="{draft:null}" @toggle.stop="if($el.open)draft=courseInlineEdit(r.id)">
     <summary class="min-h-11 cursor-pointer font-semibold">Editar datos aquí</summary>
     <template x-if="draft"><div class="min-w-64 space-y-2">
         <label class="label">Oferta · COP<input class="input" type="number" min="0.0001" step="any" placeholder="Precio total verificado" x-model="draft.offer"></label>

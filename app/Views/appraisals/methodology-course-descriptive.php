@@ -1,4 +1,4 @@
-<div x-show="courseStep===2" class="rounded-xl border p-4 space-y-3">
+<template x-if="courseStep===2"><div class="rounded-xl border p-4 space-y-3">
     <h4 class="font-semibold">3. Tendencia central · curso, páginas 11–18</h4>
     <p>Se comparan varios centros y se selecciona como referencia descriptiva el que presenta el menor MAPE entre los estimadores calculados. La media usa todos los valores, la mediana depende del orden y la geométrica requiere valores positivos. La moda exacta depende de repeticiones; la clase modal es el bloque más frecuente.</p>
     <p class="font-mono">Media = Σxᵢ / n · Geométrica = exp(Σln(xᵢ) / n)</p>
@@ -10,8 +10,8 @@
     <p x-text="'Moda exacta: '+(courseResult.summary.modes.length?courseResult.summary.modes.map(v=>courseNumber(v)).join(', '):'sin repeticiones')"></p>
     <p x-text="'Clase modal: '+courseResult.summary.classes.filter(c=>c.frequency===Math.max(...courseResult.summary.classes.map(v=>v.frequency))).map(c=>'bloque '+c.n).join(', ')"></p>
     <p x-text="'Recortada: '+Math.floor(courseResult.valid.length*.2)+' valores por cola para este estimador; '+(courseResult.valid.length-2*Math.floor(courseResult.valid.length*.2))+' valores en su cálculo.'"></p>
-</div>
-<div x-show="courseStep===3" class="rounded-xl border p-4 space-y-3">
+</div></template>
+<template x-if="courseStep===3"><div class="rounded-xl border p-4 space-y-3">
     <h4 class="font-semibold">4. Dispersión · curso, páginas 21–35</h4>
     <p>La dispersión mide cuánto varían los precios por m² entre los inmuebles. Permite distinguir una muestra concentrada de otra con precios muy separados, aunque ambas tengan un promedio parecido. La desviación estándar expresa esa variación en COP/m² y el CV la expresa como porcentaje de la media.</p>
     <?php require __DIR__.'/methodology-course-dispersion-cloud.php'; ?>
@@ -21,8 +21,8 @@
     <?php $readingNumber = 21; require __DIR__ . '/valuation-methodology-article-reading.php'; ?>
     <details class="rounded-lg border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Ver cálculo por inmueble</summary><div class="overflow-auto"><table class="min-w-full text-left text-sm"><thead><tr><th class="p-2">Muestra</th><th class="p-2">x − media</th><th class="p-2">(x − media)²</th></tr></thead><tbody><template x-for="r in courseResult.valid" :key="r.id"><tr><td class="p-2" x-text="r.label"></td><td class="p-2" x-text="courseNumber(r.y-courseResult.summary.mean)"></td><td class="p-2" x-text="courseNumber((r.y-courseResult.summary.mean)**2)"></td></tr></template></tbody></table></div></details>
     <?php require __DIR__.'/methodology-course-progress-summary.php'; ?>
-</div>
-<div x-show="courseStep===4" class="rounded-xl border p-4 space-y-3">
+</div></template>
+<template x-if="courseStep===4"><div class="rounded-xl border p-4 space-y-3">
     <h4 class="font-semibold">5. Sensibilidad y consideraciones · curso, páginas 14, 30 y 49–50; diagnósticos complementarios</h4>
     <p>Contrasta media, mediana y recortada del paso 3. El cambio entre ellas muestra sensibilidad. Revisar un extremo no significa eliminarlo: deja la consideración y verifica el inmueble.</p>
     <details class="rounded-lg border p-3"><summary class="min-h-11 cursor-pointer font-semibold">MAD · significado y ejemplo</summary><div class="mt-2 space-y-2">
@@ -36,4 +36,4 @@
     <div class="overflow-auto"><table class="min-w-full text-left"><thead><tr><th class="p-2">Asimetría</th><th class="p-2">Exceso de curtosis</th><th class="p-2">Q1</th><th class="p-2">Q3</th><th class="p-2">MAD</th></tr></thead><tbody><tr><template x-for="key in ['skew','kurt','q1','q3','mad']" :key="key"><td class="p-2" x-text="courseNumber(courseResult.summary[key])"></td></template></tr></tbody></table></div>
     <p class="text-sm text-amber-900">Las consideraciones se autoguardan con la ejecución y se incluyen en la memoria descargada. Espera Guardado confirmado.</p>
     <div class="max-h-[65vh] overflow-auto"><table class="min-w-full text-left text-sm"><thead><tr><th class="p-2">Inmueble</th><th class="p-2">Valor unitario</th><th class="p-2">z robusto</th><th class="p-2">Señales</th><th class="p-2">Consideración</th></tr></thead><tbody><template x-for="r in courseResult.summary.considerations" :key="r.id"><tr class="border-t" :class="r.flags.length?'bg-amber-50':''"><td class="p-2"><p x-text="r.label"></p><?php require __DIR__.'/methodology-course-inline-edit.php'; ?></td><td class="p-2" x-text="courseNumber(r.y)"></td><td class="p-2" x-text="courseNumber(r.modifiedZ)"></td><td class="p-2" x-text="r.flags.join(' · ')||'Sin señales'"></td><td class="p-2"><label class="label"><span x-text="'Consideración sobre '+r.label"></span><textarea class="input min-w-64" rows="2" placeholder="Ej. revisar ubicación, área, parqueo o soporte del descuento" x-model="courseNotes[r.id]"></textarea></label></td></tr></template></tbody></table></div>
-</div>
+</div></template>

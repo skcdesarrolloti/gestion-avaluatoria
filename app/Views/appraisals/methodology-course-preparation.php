@@ -1,11 +1,11 @@
-<details x-show="courseStep===0" class="rounded-xl border p-3 space-y-3">
+<template x-if="courseStep===0"><details class="rounded-xl border p-3 space-y-3">
     <summary class="min-h-11 cursor-pointer font-semibold">Detalle por inmueble · valores, fórmulas y pendientes</summary>
     <h4 class="font-semibold">1. Base del cálculo · curso, páginas 5–10 y 19</h4>
     <p>Esta tabla comprueba el cálculo con los datos del grupo preparado en el paso 1. No repite la captura ni la selección. Los motivos de pendiente corresponden a la base estadística elegida.</p>
     <p class="font-mono">Valor final = oferta − descuento = oferta × (1 − porcentaje / 100)<br>Valor unitario preliminar = valor final / área publicada</p>
     <div class="max-h-[65vh] overflow-auto"><table class="min-w-full text-left text-sm"><thead><tr><th class="p-2">Inmueble</th><th class="p-2">Oferta COP</th><th class="p-2">Descuento COP</th><th class="p-2">Valor final COP</th><th class="p-2">Área m²</th><th class="p-2">Valor unitario</th><th class="p-2">Estado</th></tr></thead><tbody><template x-for="r in courseResult.rows" :key="r.id"><tr class="border-t" :class="r.reasons.length?'bg-amber-50':''"><td class="p-2"><p x-text="r.label"></p><button type="button" class="btn-secondary" @click="await courseReview(r.id)">Revisar inmueble</button></td><template x-for="key in ['offer','discount','final','area']" :key="key"><td class="p-2" x-text="courseNumber(r[key])"></td></template><td class="p-2" x-text="r.reasons.length?'Pendiente':courseNumber(r.y)"></td><td class="p-2"><p x-text="r.reasons.join(' · ')||'Disponible para el ejercicio'"></p><p class="text-amber-900" x-text="r.areaNote"></p></td></tr></template></tbody></table></div>
     <p class="text-sm">La estadística descriptiva no exige tres factores ni treinta muestras. Esos mínimos pertenecen al ejercicio de regresión. Aquí no desaparecen las pendientes.</p>
-</details>
+</details></template>
 <template x-if="courseStep===1"><div class="rounded-xl border p-4 space-y-3">
     <h4 class="font-semibold">2. Bloques y distribución</h4>
     <p>Se calculan la media y el CV (coeficiente de variación) de los inmuebles de cada bloque. La tabla presenta los resultados por intervalo y marca de clase, utilizando los valores unitarios individuales.</p>
