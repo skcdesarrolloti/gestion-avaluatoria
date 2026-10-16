@@ -11,9 +11,11 @@ import {courseProgressSummary} from './analysis-course-progress-summary.js';
 import {courseQuartileCalculation,courseQuartileOperation,courseQuartileLimitOperations} from './analysis-course-quartile-calculation.js';
 import {courseSnapshot,restoreCourseSnapshot} from './analysis-course-storage.js';
 import {courseInlineMethods} from './analysis-course-inline.js';
+import {courseCalculation} from './analysis-course-calculation.js';
 export const courseSteps=['Base del cálculo','Bloques y distribución','Tendencia central','Dispersión','Sensibilidad y consideraciones','Precisión de la media','Conclusión y memoria'];
 export function courseMethods(saved=''){return {
     ...courseInlineMethods(),
+    courseDataOpen:false,
     courseStep:0,courseSteps,courseBasis:'adjusted',courseConfidence:'.95',courseResult:null,courseBusy:false,courseError:'',courseBootstrapBusy:false,courseProgress:0,courseNotes:{},courseConclusion:'',analysisReviewReturn:null,
     courseRows(){return this.analysisVisibleRows().map(r=>{const original=this.analysisRows[r.analysisIndex],area=amount(original.area_m2),offer=amount(original.price_amount),adjusted=this.analysisResult(r.key),discount=amount(this.analysisDiscounts[r.key]),reasons=[];
         if(!(area>0))reasons.push('Área publicada no positiva');if(!(offer>0))reasons.push('Oferta no positiva');if(original.price_unit==='valor_m2')reasons.push('Precio publicado unitario: requiere revisar base');
@@ -44,6 +46,7 @@ export function courseMethods(saved=''){return {
     courseQuartileOperation(c){return courseQuartileOperation(c,v=>this.courseNumber(v));},
     courseQuartileLimitOperations(){return courseQuartileLimitOperations(this.courseResult.summary,v=>this.courseNumber(v));},
     courseProgressSummary(){return courseProgressSummary(this.courseResult);},
+    courseCalculation(label=''){return courseCalculation(this.courseResult,label);},
     async courseCalculate(){if(this.courseBusy||this.courseBootstrapBusy)return;this.courseBusy=true;this.courseError='';
         try{await new Promise(resolve=>setTimeout(resolve,0));if(!this.analysisRegimeApplied)throw new Error('Aplica primero la depuración de muestras.');const rows=this.courseRows(),valid=rows.filter(r=>!r.reasons.length&&Number.isFinite(r.y));if(valid.length<2)throw new Error('Completa al menos dos valores unitarios para el análisis descriptivo.');
             const s=courseSummary(valid,Number(this.courseConfidence));this.courseResult={rows,valid,pending:rows.filter(r=>!valid.includes(r)),summary:s,histogram:courseHistogram(s.classes),stamp:this.courseStamp(),at:new Date().toISOString(),basis:this.courseBasis,simulated:this.analysisHasSimulated(),bootstrap:null};
@@ -52,7 +55,7 @@ export function courseMethods(saved=''){return {
         try{const b=await courseBootstrap(result.valid.map(r=>r.y),result.summary.confidence,n=>this.courseProgress=n);if(this.courseResult===result){result.bootstrap=b;await this.coursePersist();}}catch{this.courseError='No se pudo completar el remuestreo.';}finally{this.courseBootstrapBusy=false;}},
     analysisReviewOrigin(){const p=this.analysisReviewReturn;return !p?'':p.module==='statistics'?(p.step===6?'Memoria y sustentación':'Entender la muestra → '+courseSteps[p.step]):(p.tab==='diagnostics'?'Revisar el modelo':'Construir el modelo');},
     analysisReviewLabel(){const i=this.analysisRows.findIndex(r=>r.id===this.analysisEditingId);return i<0?'Inmueble en revisión':'Muestra '+(i+1);},
-    async courseReview(id){if(this.analysisModule!=='samples')this.analysisReviewReturn={module:this.analysisModule,step:this.courseStep,tab:this.regressionTab,scrollY:window.scrollY,scrollX:window.scrollX};this.analysisModule='samples';this.analysisView='result';this.analysisOnlyMissing=false;this.analysisEditingId=id;await this.$nextTick();const row=document.getElementById('analysis-row-'+id);row?.scrollIntoView({block:'center'});row?.focus({preventScroll:true});},
+    async courseReview(id){if(this.analysisModule==='statistics'){this.courseDataOpen=true;}else{if(this.analysisModule!=='samples')this.analysisReviewReturn={module:this.analysisModule,step:this.courseStep,tab:this.regressionTab,scrollY:window.scrollY,scrollX:window.scrollX};this.analysisModule='samples';}this.analysisView='result';this.analysisOnlyMissing=false;this.analysisEditingId=id;await this.$nextTick();const row=document.getElementById('analysis-row-'+id);row?.scrollIntoView({block:'center'});row?.focus({preventScroll:true});},
     async analysisReturnFromReview(){const p=this.analysisReviewReturn;if(!p)return;this.analysisModule=p.module;this.courseStep=p.step;this.regressionTab=p.tab;this.analysisReviewReturn=null;await this.$nextTick();window.scrollTo({top:p.scrollY,left:p.scrollX,behavior:'instant'});const form=this.$root;const target=form?.querySelector(p.module==='statistics'?'[aria-label="Interpretación de los datos de este paso"]':'[aria-label="Etapas de M4 Análisis de mercado"] button');target?.focus({preventScroll:true});},
     courseExport(){if(this.courseCurrent()){const support=this.$root?.querySelector('[data-course-normative-support]')?.value||'';downloadReport(courseReport(this.courseResult,this.courseNotes,this.courseConclusion,support),'analisis-estadistico-ejercicio.html');}},
 };}

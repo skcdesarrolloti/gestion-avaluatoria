@@ -8,7 +8,7 @@
 <?php require __DIR__.'/methodology-analysis-retired.php'; ?>
 </div>
 
-<div x-show="analysisView==='result'" x-cloak>
+<div x-show="analysisView==='result'&&analysisModule==='samples'" x-cloak>
 <?php require __DIR__.'/methodology-analysis-completion.php'; ?>
 <details x-show="analysisStatistics.some(v=>v.action==='factors')" class="mb-3 rounded-xl border p-3">
     <summary class="min-h-11 cursor-pointer font-semibold">Consultar factores preparados</summary>
@@ -19,7 +19,7 @@
 </div>
 <section x-show="['raw','result'].includes(analysisView)" class="space-y-2">
     <h3 class="font-semibold">Revisar y completar los inmuebles</h3>
-    <p class="text-sm">Edita el descuento y sus soportes en cada fila. Completa los atributos faltantes con su fuente; desplaza la tabla horizontalmente para ver todas las columnas.</p>
+    <p class="text-sm">Para corregir precio, área o atributos, abre «Editar datos aquí» en la fila. El descuento y su soporte también se editan directamente. Desplaza la tabla para ver todas las columnas.</p>
 <div x-ref="analysisTable" x-show="['raw','result'].includes(analysisView)" class="max-h-[65vh] overflow-auto rounded-xl border" role="region" aria-label="Tabla de análisis de inmuebles" tabindex="0">
 <table class="w-max min-w-full text-left text-sm"><thead class="sticky top-0 bg-slate-100"><tr>
     <th class="sticky left-0 bg-slate-100 p-3">Inmueble</th><th class="p-3">Régimen PH / no PH</th><th class="p-3">Oferta · COP</th><th class="p-3">Área publicada · m²</th>
@@ -27,7 +27,7 @@
     <template x-for="factor in analysisColumns()" :key="factor.key"><th class="max-w-48 p-3" x-text="factor.label+' ('+factor.count+'/'+analysisActiveRows().length+')'"></th></template>
 
 </tr></thead><tbody><template x-for="(property,visibleIndex) in analysisDisplayRows()" :key="property.key"><tr class="border-t" :id="'analysis-row-'+property.key" tabindex="-1" :class="analysisEditingId===property.key?'ring-2 ring-teal-700':''">
-    <th class="sticky left-0 max-w-48 bg-white p-3"><span x-text="analysisView==='result' ? (analysisOnlyMissing ? 'Inmueble pendiente '+(visibleIndex+1)+' de '+analysisDisplayRows().length : 'Fila '+(visibleIndex+1)+' de '+analysisVisibleRows().length) : 'Muestra '+(property.analysisIndex+1)"></span><p x-show="analysisView==='result'" class="text-xs font-normal" x-text="'Referencia original: muestra '+(property.analysisIndex+1)"></p><p class="font-normal" x-text="analysisRows[property.analysisIndex].property_type"></p><p class="font-normal" x-text="property.source_name"></p><a :href="/^https?:\/\//i.test(property.source_url) ? property.source_url : '#'" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center text-blue-700 underline">Ver anuncio</a></th>
+    <th class="sticky left-0 max-w-48 bg-white p-3"><span x-text="analysisView==='result' ? (analysisOnlyMissing ? 'Inmueble pendiente '+(visibleIndex+1)+' de '+analysisDisplayRows().length : 'Fila '+(visibleIndex+1)+' de '+analysisVisibleRows().length) : 'Muestra '+(property.analysisIndex+1)"></span><p x-show="analysisView==='result'" class="text-xs font-normal" x-text="'Referencia original: muestra '+(property.analysisIndex+1)"></p><p class="font-normal" x-text="analysisRows[property.analysisIndex].property_type"></p><p class="font-normal" x-text="property.source_name"></p><a :href="/^https?:\/\//i.test(property.source_url) ? property.source_url : '#'" target="_blank" rel="noopener" class="inline-flex min-h-11 items-center text-blue-700 underline">Ver anuncio</a><div x-data="{r:{id:property.key}}" class="font-normal"><?php require __DIR__.'/methodology-course-inline-edit.php'; ?></div></th>
     <td class="max-w-64 p-3"><label :for="'analysis-regime-'+property.key" class="block text-xs">Régimen del inmueble</label><select class="input w-48" :id="'analysis-regime-'+property.key" x-model="analysisRows[property.analysisIndex].ph_regime"><option value="por_verificar">Sin verificar</option><option value="si">PH</option><option value="no">No PH</option></select>
         <p class="mt-1 text-xs" x-text="analysisRegime(analysisRows[property.analysisIndex])"></p>
         <details><summary class="min-h-11 cursor-pointer text-xs">Soporte del régimen</summary><label :for="'analysis-regime-source-'+property.key" class="block text-xs">Documento o fuente, fecha y responsable</label><textarea class="input w-48" rows="2" maxlength="1600" :id="'analysis-regime-source-'+property.key" placeholder="Ej. reglamento PH revisado, fecha y responsable" x-model="analysisRows[property.analysisIndex].ph_regime_source"></textarea></details>
@@ -43,9 +43,5 @@
 
 <details class="mb-3 rounded-lg border p-3">
     <summary class="min-h-11 cursor-pointer font-semibold">Consultar originales o revisar el grupo · opcional</summary>
-    <div class="flex flex-wrap gap-2">
-        <button type="button" class="btn-secondary" :disabled="analysisBusy" @click="analysisView='raw'">Consultar originales</button>
-        <button type="button" class="btn-secondary" :disabled="analysisBusy" @click="analysisView='regime'">Revisar composición del grupo</button>
-        <button type="button" class="btn-secondary" :disabled="analysisBusy || !analysisRegimeApplied || analysisScope!==analysisAppliedScope" @click="analysisView='result'">Volver al grupo preparado</button>
-    </div>
+    <label class="label">Datos que quieres revisar<select class="input" x-model="analysisView" :disabled="analysisBusy"><option value="" disabled>Selecciona qué datos consultar</option><option value="result" :disabled="!analysisRegimeApplied||analysisScope!==analysisAppliedScope">Grupo preparado</option><option value="raw">Consultar originales</option><option value="regime">Revisar composición del grupo</option></select></label>
 </details>

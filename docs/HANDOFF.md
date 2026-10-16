@@ -1064,3 +1064,24 @@ directorio nuevo con log externo, satisfactoria. Prueba Alpine con vistas PHP re
 0 gráficos fuera de Dispersión, 2 al entrar, notas/fecha conservadas al cambiar de
 paso. Pruebas de respuesta bloqueada, un único envío fallido y reintento explícito.
 No se verificó sesión autenticada ni tiempos/móvil/escritorio reales del hosting.
+
+2026-10-15: simplificación y operaciones verificables a partir del Excel del usuario.
+Seis pestañas de estadística pasan a un selector conservando índices/guardado;
+misma tabla de preparación accesible desde Estadística, editor de fila reutilizado
+para precio/área/descuento/atributos/evidencia. Revisar desde Estadística abre esa
+tabla sin salir del paso. Captura queda como herramienta complementaria plegable;
+grupo/mapa siguen visibles. Consulta originales/composición/grupo mediante selector.
+Academia conservada, preámbulo de centros trasladado al acordeón existente.
+Cuadros nuevos, plegables y con montaje diferido: origen de centros y MAPE por
+inmueble (error absoluto/porcentual/suma/n), mínimo/máximo/rango/varianza/s/CV.
+Solo leen la ejecución previa; nunca actualizan muestras o adoptan un valor.
+Excel leído sin editarlo: 34 valores de Hoja1 C3:C36 y fórmulas/valores cacheados
+de centros/MAPE; cálculo JS independiente coincide con cuatro MAPE y rango.
+Una segunda apertura del libro fue denegada mientras estaba abierto: cotejo contra
+la extracción inicial ya obtenida, sin cerrar ni modificar Excel.
+PHP1570, JS251, lint801, build/check:size78,7KB. BD229 en nuevas ga_test_app/ga_test_auth
+desechables puerto3373, instancia detenida. Navegador Chrome headless con vistas PHP
+reales y 34 filas ficticias: selector, MAPE por inmueble, dispersión/cuartiles,
+corrección precio con fuente sin salir del paso, visita al mapa y regreso con paso
+y fecha conservados. Escritorio1440/móvil390, sin errores JS/desbordamiento global;
+capturas revisadas. No se ejecutó contra una sesión autenticada de producción.

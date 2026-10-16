@@ -1,12 +1,10 @@
 <template x-if="courseStep===2"><div class="rounded-xl border p-4 space-y-3">
     <h4 class="font-semibold">3. Tendencia central · curso, páginas 11–18</h4>
-    <p>Se comparan varios centros y se selecciona como referencia descriptiva el que presenta el menor MAPE entre los estimadores calculados. La media usa todos los valores, la mediana depende del orden y la geométrica requiere valores positivos. La moda exacta depende de repeticiones; la clase modal es el bloque más frecuente.</p>
-    <p class="font-mono">Media = Σxᵢ / n · Geométrica = exp(Σln(xᵢ) / n)</p>
-    <p><strong>MAPE · Mean Absolute Percentage Error (error porcentual absoluto medio).</strong> La tabla se ordena de menor a mayor MAPE; los resultados no estimables aparecen al final. Un valor menor indica menor diferencia porcentual media respecto de los datos de esta muestra, sin adoptar automáticamente ese estimador.</p>
-    <?php require __DIR__.'/methodology-course-mape-academy.php'; ?>
-    <p>La recortada del ejercicio toma 20 % por cola: k = piso(0,20 × n). Sólo resume los valores centrales; las muestras originales siguen conservadas. MAPE compara cada centro con estos mismos datos, no garantiza precisión fuera de la muestra.</p>
+    <p><strong>MAPE · Mean Absolute Percentage Error (error porcentual absoluto medio).</strong> Compara los centros con los mismos valores de la muestra. Resultados ordenados de menor a mayor MAPE.</p>
     <div class="overflow-auto"><table class="min-w-full text-left"><thead><tr><th class="p-2">Estimador</th><th class="p-2">COP/m²</th><th class="p-2">MAPE % · menor a mayor</th><th class="p-2">Selección para este análisis</th></tr></thead><tbody><template x-for="e in courseSortedEstimators()" :key="e.label"><tr :class="courseEstimatorSelected(e)?'bg-teal-50 font-semibold':''"><td class="p-2" x-text="e.label"></td><td class="p-2" x-text="courseNumber(e.value)"></td><td class="p-2" x-text="courseNumber(e.mape)"></td><td class="p-2" x-text="courseEstimatorSelected(e)?'Menor MAPE · referencia descriptiva':'—'"></td></tr></template></tbody></table></div>
     <p class="rounded-lg border bg-teal-50 p-3" aria-live="polite" x-text="courseSelectionConclusion()"></p>
+    <?php require __DIR__.'/methodology-course-mape-calculation.php'; ?>
+    <?php require __DIR__.'/methodology-course-mape-academy.php'; ?>
     <p x-text="'Moda exacta: '+(courseResult.summary.modes.length?courseResult.summary.modes.map(v=>courseNumber(v)).join(', '):'sin repeticiones')"></p>
     <p x-text="'Clase modal: '+courseResult.summary.classes.filter(c=>c.frequency===Math.max(...courseResult.summary.classes.map(v=>v.frequency))).map(c=>'bloque '+c.n).join(', ')"></p>
     <p x-text="'Recortada: '+Math.floor(courseResult.valid.length*.2)+' valores por cola para este estimador; '+(courseResult.valid.length-2*Math.floor(courseResult.valid.length*.2))+' valores en su cálculo.'"></p>
@@ -16,6 +14,7 @@
     <p>La dispersión mide cuánto varían los precios por m² entre los inmuebles. Permite distinguir una muestra concentrada de otra con precios muy separados, aunque ambas tengan un promedio parecido. La desviación estándar expresa esa variación en COP/m² y el CV la expresa como porcentaje de la media.</p>
     <?php require __DIR__.'/methodology-course-dispersion-cloud.php'; ?>
     <p class="font-mono">Rango = máximo − mínimo<br>s² = Σ(xᵢ − media)² / (n − 1) · s = √s² · CV = 100 × s / |media|</p>
+    <?php require __DIR__.'/methodology-course-range-calculation.php'; ?>
     <div class="overflow-auto"><table class="min-w-full text-left"><thead><tr><th class="p-2">Mínimo</th><th class="p-2">Máximo</th><th class="p-2">Rango</th><th class="p-2">Varianza</th><th class="p-2">s</th><th class="p-2">CV %</th></tr></thead><tbody><tr><template x-for="key in ['min','max','range','variance','sd','cv']" :key="key"><td class="p-2" x-text="courseNumber(courseResult.summary[key])"></td></template></tr></tbody></table></div>
     <p class="text-sm">Resolución IGAC 0941 de 2026, art. 21: límites máximos del CV (coeficiente de variación) para adoptar la media, 7,50 % urbano y 10,0 % rural, según el ámbito aplicable. Exige además revisar el mercado; estos límites no ordenan exclusiones ni validan por sí solos el avalúo. Este ejercicio no adopta una media automáticamente.</p>
     <?php $readingNumber = 21; require __DIR__ . '/valuation-methodology-article-reading.php'; ?>

@@ -5,6 +5,29 @@ no cambia muestras, fórmulas, criterios de exclusión ni estructura de persiste
 
 ## Organización
 
+Actualización 15/10/2026: un selector reemplaza las seis pestañas de estadística,
+conservando sus pasos, orden, navegación anterior/siguiente y paso guardado.
+«Revisar o corregir datos» abre la misma tabla de preparación dentro del paso;
+Revisar inmueble permanece en Estadística. Precio, área, descuento y atributos se
+corrigen en la fila con evidencia. El cálculo previo sigue visible, marcado como
+desactualizado, hasta actualizarlo. El mapa y sus soportes se conservan.
+
+Tendencia central añade un acordeón de operaciones: suma/n, posiciones de la
+mediana, suma y cantidad del tramo acotado, suma de logaritmos y media geométrica.
+Para cada centro se muestran los valores individuales ordenados, su origen,
+error absoluto, error porcentual, suma de porcentajes y división entre n. La
+acotada sigue comparándose con todos los valores, no solo con su tramo central.
+No se cambia ningún estimador, criterio de selección o convención de cuartiles.
+Dispersión muestra inmuebles mínimo/máximo, resta del rango, suma de cuadrados,
+divisor n−1, raíz de varianza y cociente del CV. Estos cuadros se montan al abrirlos
+y leen la ejecución guardada, sin mezclarla con correcciones posteriores.
+
+Referencia de presentación: lectura de Hoja1 del archivo del solicitante
+«Libro de Ejemplo de Regresion Lineal.xlsx», C3:C36; centros C37:C40; errores D:K;
+promedios H37:K37 y rango C43. No se modifica ni importa el libro a un expediente.
+La comprobación independiente de sus 34 valores reproduce los cuatro MAPE y el
+rango de la lectura inicial. Se conserva academia/fuentes plegables junto al cálculo.
+
 - Un acordeón jurídico/técnico compartido: marco nacional, NTS, IVS y límites.
 - Un acordeón de academia del paso seleccionado, disponible antes de calcular.
 - Cada paso: ejemplo didáctico, significado, revisión y fundamento con alcance.

@@ -3,7 +3,14 @@
     <p x-show="courseStep===0" class="text-sm"><strong>Tener en cuenta del paso 1:</strong> se reutiliza el grupo preparado. Aquí eliges qué valor describir y calculas su distribución; solo vuelve a revisar un inmueble si el cálculo muestra un pendiente o una duda concreta.</p>
     <p class="rounded-lg bg-purple-50 p-3 text-purple-900">Ejercicio exploratorio. Los datos simulados conservan su identificación; este recorrido no adopta un valor ni elimina muestras.</p>
     <p x-show="courseStep===6" class="rounded-lg border bg-amber-50 p-3">Memoria disponible del análisis descriptivo. La sustentación integral, manual del modelo, validación y anexos del informe final siguen pendientes. La ejecución y sus notas se autoguardan; espera la confirmación del servidor.</p>
-    <nav x-show="courseStep!==6" class="flex flex-wrap gap-2" aria-label="Pasos del análisis estadístico"><template x-for="(step,i) in courseSteps" :key="i"><button type="button" class="btn-secondary" x-show="i!==6" :aria-current="courseStep===i?'step':null" :class="courseStep===i?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="courseStep=i" x-text="(i+1)+'. '+step"></button></template></nav>
+    <label x-show="courseStep!==6" class="label">Qué quieres revisar<select class="input" x-model.number="courseStep" aria-label="Pasos del análisis estadístico"><option value="" disabled>Selecciona una parte del análisis</option><template x-for="(step,i) in courseSteps.slice(0,6)" :key="i"><option :value="i" x-text="(i+1)+'. '+step"></option></template></select></label>
+    <details class="rounded-xl border p-3" :open="courseDataOpen" @toggle.stop="courseDataOpen=$el.open">
+        <summary class="min-h-11 cursor-pointer font-semibold">Revisar o corregir datos · misma tabla del grupo preparado</summary>
+        <template x-if="courseDataOpen"><div class="mt-3 space-y-3">
+            <p class="text-sm">Las correcciones se hacen en la fila del inmueble. Después actualiza el análisis; la ejecución anterior se conserva hasta ese momento.</p>
+            <?php require __DIR__.'/methodology-analysis-data-table.php'; ?>
+        </div></template>
+    </details>
     <details class="rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Academia y fundamentos · explicación del paso actual</summary>
         <?php require __DIR__.'/methodology-course-academy.php'; ?>
         <?php require __DIR__.'/methodology-course-sources.php'; ?>

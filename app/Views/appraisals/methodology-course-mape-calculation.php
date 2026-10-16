@@ -1,0 +1,20 @@
+<details class="rounded-lg border p-3" x-data="{calculationOpen:false,estimatorLabel:''}" @toggle.stop="calculationOpen=$el.open">
+    <summary class="min-h-11 cursor-pointer font-semibold">De dónde salen los centros y el MAPE · cálculo por inmueble</summary>
+    <template x-if="calculationOpen"><div class="mt-3 space-y-3">
+        <label class="label">Centro que quieres comprobar<select class="input" x-model="estimatorLabel"><option value="">Centro con menor MAPE</option><template x-for="e in courseResult.summary.estimators" :key="e.label"><option :value="e.label" x-text="e.label"></option></template></select></label>
+        <template x-for="audit in [courseCalculation(estimatorLabel)]" :key="audit.estimator.label"><div class="space-y-3">
+            <div class="overflow-auto" tabindex="0" role="region" aria-label="Origen de las medidas de tendencia central"><table class="min-w-[40rem] w-full text-left text-sm"><thead><tr><th class="p-2">Medida</th><th class="p-2">Datos y operación · COP/m²</th><th class="p-2">Resultado</th></tr></thead><tbody>
+                <tr><th class="p-2">Media</th><td class="p-2" x-text="courseNumber(audit.meanSum)+' ÷ '+audit.n"></td><td class="p-2" x-text="courseNumber(courseResult.summary.mean)"></td></tr>
+                <tr><th class="p-2">Mediana</th><td class="p-2" x-text="'Posiciones '+audit.medianLowPosition+' y '+audit.medianHighPosition+': ('+courseNumber(audit.medianLow.y)+' + '+courseNumber(audit.medianHigh.y)+') ÷ 2'"></td><td class="p-2" x-text="courseNumber(courseResult.summary.median)"></td></tr>
+                <tr><th class="p-2">Media acotada · 40 % total</th><td class="p-2" x-text="'Se omiten '+audit.trim+' por cada extremo solo para este centro. Posiciones '+audit.trimmedFirst+' a '+audit.trimmedLast+': '+courseNumber(audit.trimmedSum)+' ÷ '+audit.trimmedCount"></td><td class="p-2" x-text="courseNumber(audit.trimmedValue)"></td></tr>
+                <tr><th class="p-2">Media geométrica</th><td class="p-2" x-text="'exp(suma de ln(x) ÷ n) = exp('+courseNumber(audit.logSum)+' ÷ '+audit.n+')'"></td><td class="p-2" x-text="courseNumber(audit.geometricValue)"></td></tr>
+            </tbody></table></div>
+            <p class="text-sm" x-text="'Referencia aplicada en la tabla: '+audit.estimator.label+' = '+courseNumber(audit.estimator.value)+' COP/m². Se comparan los '+audit.n+' valores disponibles, también para la media acotada.'"></p>
+            <p class="font-mono text-sm">Error absoluto = |valor observado − centro|<br>Error porcentual = 100 × error absoluto / |valor observado|<br>MAPE = suma de errores porcentuales / número de valores</p>
+            <div class="max-h-[60vh] overflow-auto" tabindex="0" role="region" aria-label="Cálculo del MAPE por inmueble"><table class="min-w-[40rem] w-full text-left text-sm"><thead class="sticky top-0 bg-slate-100"><tr><th class="p-2">Posición</th><th class="p-2">Inmueble de origen</th><th class="p-2">Valor observado · COP/m²</th><th class="p-2">Error absoluto · COP/m²</th><th class="p-2">Error porcentual · %</th></tr></thead><tbody>
+                <template x-for="r in audit.rows" :key="r.id"><tr class="border-t"><td class="p-2" x-text="r.position"></td><td class="p-2" x-text="r.label"></td><td class="p-2" x-text="courseNumber(r.y)"></td><td class="p-2" x-text="courseNumber(r.absolute)"></td><td class="p-2" x-text="courseNumber(r.percent)"></td></tr></template>
+            </tbody><tfoot class="border-t font-semibold"><tr><td class="p-2" colspan="4">Suma de errores porcentuales</td><td class="p-2" x-text="courseNumber(audit.sumPercent)"></td></tr><tr><td class="p-2" colspan="4" x-text="'MAPE = '+courseNumber(audit.sumPercent)+' ÷ '+audit.n"></td><td class="p-2" x-text="courseNumber(audit.mape)+' %'"></td></tr></tfoot></table></div>
+            <p class="text-xs">Los cálculos usan los valores completos; la pantalla redondea su presentación. En Excel, promediar cocientes y aplicar formato porcentaje equivale a este promedio de porcentajes. Un valor observado cero deja el MAPE no estimable.</p>
+        </div></template>
+    </div></template>
+</details>

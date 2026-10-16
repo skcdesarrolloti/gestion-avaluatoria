@@ -1,6 +1,9 @@
 <details class="rounded-lg border bg-slate-50 p-3">
     <summary class="min-h-11 cursor-pointer font-semibold">MAPE · fórmula e interpretación</summary>
     <div class="mt-3 space-y-3">
+        <p>Se comparan varios centros y se selecciona como referencia descriptiva el que presenta el menor MAPE entre los estimadores calculados. La media usa todos los valores, la mediana depende del orden y la geométrica requiere valores positivos. La moda exacta depende de repeticiones; la clase modal es el bloque más frecuente.</p>
+        <p class="font-mono">Media = Σxᵢ / n · Geométrica = exp(Σln(xᵢ) / n)</p>
+        <p>La recortada del ejercicio toma 20 % por cola: k = piso(0,20 × n). Sólo resume los valores centrales; las muestras originales siguen conservadas. MAPE compara cada centro con estos mismos datos, no garantiza precisión fuera de la muestra. Los resultados no estimables aparecen al final de la comparación.</p>
         <p class="font-mono">MAPE (%) = (100 / n) × Σᵢ₌₁ⁿ (|xᵢ − c| / |xᵢ|)</p>
         <p><strong>n:</strong> cantidad de valores unitarios disponibles. <strong>xᵢ:</strong> valor unitario observado de cada inmueble. <strong>c:</strong> estimador que se compara, como media o mediana. <strong>Σ:</strong> suma de todos los términos. Las barras | | indican valor absoluto: se considera la magnitud de la diferencia, sin su signo.</p>
         <p>Se resta el estimador a cada valor observado, se toma la diferencia absoluta y se divide por el valor observado. Se promedian esas proporciones y se multiplican por 100. Si algún valor observado es cero, esta fórmula no es estimable. Los valores pequeños tienen mayor peso relativo para una misma diferencia monetaria.</p>

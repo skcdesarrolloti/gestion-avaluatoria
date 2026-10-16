@@ -5,13 +5,16 @@ existentes. Los restantes pasos del plan académico se ampliarán progresivament
 
 ## Menú actual
 
-1. Preparar los datos.
-   - 1.1 Objetivo y unidad de análisis: consulta del encargo y explicación inicial.
-   - 1.2 Muestras y depuración: herramientas existentes de información recogida,
-     régimen, factores y resultado, con anuncios originales e historial.
-   - 1.3 Coordenadas y mapa comparativo: verificación existente de localización.
-2. Análisis estadístico paso a paso: recorrido existente de siete pasos.
-3. Modelo de regresión: academia, preparación y diagnósticos existentes.
+Actualización 15/10/2026. Se conservan las siete etapas principales de M4.
+Preparar los datos presenta Grupo preparado y Ubicación y mapa. Captura y
+consolidación queda en «Agregar inmuebles o consultar la captura»; conserva su
+ruta y lectores. Corregir un inmueble existente no necesita abrir esa ruta.
+La tabla ofrece «Editar datos aquí» por fila con precio, área, descuento, atributos
+y fuente. Consultar originales/composición/grupo se elige en un solo selector
+plegable; mantiene todos los inmuebles, criterios, fuentes e historial.
+Entender la muestra reutiliza la misma tabla dentro de un acordeón: corregir o
+revisar no abandona el paso estadístico. El mapa sigue disponible y cambiar entre
+ubicación y estadística conserva el paso y la ejecución. No recalcula al navegar.
 
 El primer panel se abre al entrar a M4. Cambiar de panel no cambia la selección
 guardada, aplica filtros ni actualiza cálculos. La navegación fija se limita a
