@@ -1161,3 +1161,16 @@ conteos, selección sin coincidencias, PH y matriz compartida. Sin prueba BD adi
 porque solo cambia presentación/enlaces. No se desplegó al hosting. El primer ensayo
 PHP mostró avisos por datos incompletos del fixture de navegación; se completó el
 fixture, sin modificar reglas de aplicación, y la repetición pasó sin avisos.
+
+
+2026-10-19 · Academia contextual al cambiar método o tratamiento.
+La explicación breve vuelve junto a cada desplegable, en un acordeón que se abre
+automáticamente al seleccionar una opción y puede cerrarse manualmente. El texto
+es el existente de MethodologySelectionHelp, reactivo a la opción elegida. Se mueve
+desde el acordeón general, sin duplicarlo. El soporte ampliado, justificación,
+contrastes y alcance se conservan en el acordeón general. Labels explícitos y
+aria-describedby a la explicación única. Sin cambios de negocio o persistencia.
+PHP1580/JS256, lint de la vista modificada, build/check:size78,8KB. Chrome con vista
+PHP real: tres tratamientos, cambio de método y cierre manual; explicación correcta,
+justificación/alcance previos conservados, sin errores JS ni desbordamiento en
+escritorio1440/móvil390. Capturas revisadas. Sin despliegue al hosting.

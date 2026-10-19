@@ -152,3 +152,9 @@ Método y tratamiento permanecen visibles; explicaciones, justificación, alcanc
 y métodos de contraste usan un mismo acordeón. Sus controles permanecen dentro
 del mismo formulario, habilitados y con los valores guardados aunque se cierre.
 No cambia el endpoint, CSRF, versión, persistencia, unidades o modelos de datos.
+
+
+Academia contextual: al elegir método o tratamiento, su explicación breve se abre
+justo debajo del selector, en un acordeón cerrable. La justificación y el soporte
+ampliado siguen plegables. Las explicaciones usan el texto existente y no modifican
+los campos de decisión ni los textos ya escritos por el analista.

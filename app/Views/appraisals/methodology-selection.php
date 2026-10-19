@@ -18,21 +18,25 @@ $selectionTreatments=\App\Services\MethodologySelectionHelp::treatments();
     <input type="hidden" name="version" value="<?= (int) ($record['methodology_version'] ?? 0) ?>">
     <h2 class="text-xl font-semibold">Método y alcance · <?= e($componentLabel) ?></h2>
     <div class="mt-5 grid gap-5 sm:grid-cols-2">
-        <label class="block font-semibold">Método del componente
-            <select name="method" aria-label="Método del componente" aria-describedby="method-help-<?= e($componentKey) ?>" class="input" x-model="chosenMethod"><option value="">Selecciona el método</option>
+        <div><label for="method-choice-<?= e($componentKey) ?>" class="block font-semibold">Método del componente</label>
+            <select id="method-choice-<?= e($componentKey) ?>" name="method" aria-label="Método del componente" aria-describedby="method-help-<?= e($componentKey) ?>" class="input" x-model="chosenMethod" @change="$refs.methodAcademy.open=Boolean($event.target.value)"><option value="">Selecciona el método</option>
             <?php foreach ($methods as $key => $label): if (isset($selectionComponent['alternate_method']) && $key!==$selectionComponent['alternate_method']) continue; ?><option value="<?= e($key) ?>" <?= ($selected['method'] ?? '') === $key ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?>
             </select>
-        </label>
-        <label class="block font-semibold">Tratamiento en la integración
-            <select name="treatment" aria-label="Tratamiento en la integración" aria-describedby="treatment-help-<?= e($componentKey) ?>" class="input" x-model="chosenTreatment"><option value="">Selecciona el tratamiento</option>
+            <details x-ref="methodAcademy" class="mt-2"><summary class="min-h-11 cursor-pointer text-sm font-semibold">Qué significa el método elegido</summary>
+                <p id="method-help-<?= e($componentKey) ?>" class="text-sm leading-6 text-slate-600" aria-live="polite" x-text="methodHelp[chosenMethod]?.concept || 'Elige el método según el alcance y la evidencia disponible.'"><?= e($selectionHelp[$selected['method'] ?? '']['concept'] ?? 'Elige el método según el alcance y la evidencia disponible.') ?></p>
+            </details>
+        </div>
+        <div><label for="treatment-choice-<?= e($componentKey) ?>" class="block font-semibold">Tratamiento en la integración</label>
+            <select id="treatment-choice-<?= e($componentKey) ?>" name="treatment" aria-label="Tratamiento en la integración" aria-describedby="treatment-help-<?= e($componentKey) ?>" class="input" x-model="chosenTreatment" @change="$refs.treatmentAcademy.open=Boolean($event.target.value)"><option value="">Selecciona el tratamiento</option>
             <?php foreach (['separado' => 'Valor separado', 'integrado' => 'Incluido en la unidad principal', 'descriptivo' => 'Solo descriptivo'] as $key => $label): ?>
             <option value="<?= e($key) ?>" <?= ($selected['treatment'] ?? '') === $key ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?>
             </select>
-        </label>
+            <details x-ref="treatmentAcademy" class="mt-2"><summary class="min-h-11 cursor-pointer text-sm font-semibold">Qué significa este tratamiento</summary>
+                <p id="treatment-help-<?= e($componentKey) ?>" class="text-sm leading-6 text-slate-600" aria-live="polite" x-text="treatmentHelp[chosenTreatment] || 'Define cómo se presentará este alcance al revisar los resultados.'"><?= e($selectionTreatments[$selected['treatment'] ?? ''] ?? 'Define cómo se presentará este alcance al revisar los resultados.') ?></p>
+            </details>
+        </div>
     </div>
     <details class="mt-4"><summary class="min-h-11 cursor-pointer font-semibold">Academia, justificación y alcance</summary>
-            <p id="method-help-<?= e($componentKey) ?>" class="mt-2 block text-sm font-normal leading-6 text-slate-600" x-text="methodHelp[chosenMethod]?.concept || 'Elige el método según el alcance y la evidencia disponible.'"><?= e($selectionHelp[$selected['method'] ?? '']['concept'] ?? 'Elige el método según el alcance y la evidencia disponible.') ?></p>
-            <p id="treatment-help-<?= e($componentKey) ?>" class="mt-2 block text-sm font-normal leading-6 text-slate-600" x-text="treatmentHelp[chosenTreatment] || 'Define cómo se presentará este alcance al revisar los resultados.'"><?= e($selectionTreatments[$selected['treatment'] ?? ''] ?? 'Define cómo se presentará este alcance al revisar los resultados.') ?></p>
     <?php if (!isset($selectionComponent['alternate_method'])): ?>
     <fieldset class="mt-4"><legend class="font-semibold">Otros métodos para contrastar este mismo alcance (opcional)</legend>
         <input type="hidden" name="additional_methods_present" value="1">
