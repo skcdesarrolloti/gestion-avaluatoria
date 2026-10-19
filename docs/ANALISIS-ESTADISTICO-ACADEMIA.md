@@ -147,3 +147,11 @@ no infiere errores o exclusiones del signo de una medida. Conserva ejemplo y
 fórmulas existentes; en móvil apila cada indicador. Las explicaciones también se
 incluyen en la memoria descargable y usan los datos ya guardados, sin persistencia
 nueva ni recálculo del estudio.
+Vista previa al revisar: el paso 5 compara ejecución guardada y cambios actuales
+(n, media, s, CV, Q1/Q3), con valor unitario por fila y CV dentro del editor.
+Combina borradores numéricos de varias filas sin escribirlos en la ejecución;
+los cambios sin aplicar se identifican. Cualquier fila incompleta bloquea el CV
+de revisión, sin excluirla. Se compara con 7,5 % como referente solicitado, sin
+certificación automática o nuevos filtros. Aplicar corrección conserva evidencia
+y autoguardado existente; Actualizar análisis incorpora las correcciones aplicadas
+a la ejecución y su memoria. La vista previa no agrega almacenamiento.

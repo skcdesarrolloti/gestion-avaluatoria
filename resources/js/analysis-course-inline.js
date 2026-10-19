@@ -7,10 +7,12 @@ export function courseInlineMethods(){return {
     courseInlineFields(draft){const keys=this.analysisVerificationColumns().map(f=>f.key);return draft.factors.filter(f=>keys.includes(f.key));},
     courseInlineDraft(id){const row=this.analysisRows.find(r=>r.id===id),property=this.analysisVisibleRows().find(r=>r.key===id);
         if(!row||!property)return null;
-        return {offer:row.price_amount,area:row.area_m2,percent:String(this.analysisPercents[id]??''),source:row.negotiation_source||'',
+        return {offer:row.price_amount,area:row.area_m2,percent:String(this.analysisPercents[id]??''),previewOriginal:{offer:row.price_amount,area:row.area_m2,percent:String(this.analysisPercents[id]??'')},source:row.negotiation_source||'',
             factors:this.analysisVerificationColumns().map(f=>({key:f.key,label:f.label,value:String(property?.values[f.key]??'')})),error:''};},
     async courseInlineApply(id,draft){
-        draft.error='';const row=this.analysisRows.find(r=>r.id===id),offer=amount(draft.offer),area=amount(draft.area),pct=draft.percent===''?null:Number(String(draft.percent).replace(',','.'));
+        draft.error='';const row=this.analysisRows.find(r=>r.id===id),current=this.courseInlineDraft(id),base=draft.previewOriginal;
+        const value=key=>base&&current&&String(draft[key])===String(base[key])?current[key]:draft[key];
+        const offer=amount(value('offer')),area=amount(value('area')),percent=value('percent'),pct=percent===''?null:Number(String(percent).replace(',','.'));
         if(!row||!this.courseInlineDraft(id)){draft.error='Este inmueble ya no está en el grupo actual. Se conserva el resultado anterior.';return false;}
         if(!(offer>0&&area>0)||pct!==null&&(!Number.isFinite(pct)||pct<0||pct>100)){draft.error='Precio y área deben ser positivos; descuento entre 0 y 100 %, o vacío si está pendiente.';return false;}
         const source=String(draft.source||'').trim();if(!source||source.length>1600){draft.error='Indica fuente, fecha y motivo de la corrección (máximo 1600 caracteres).';return false;}
@@ -19,7 +21,7 @@ export function courseInlineMethods(){return {
             if(f.value!==prev.value){bag[f.key]={label:prev.label,value:String(f.value),source};changes.push(prev.label+': '+prev.value+' → '+f.value);}}
         if(offer!==amount(original.offer))changes.push('Oferta COP: '+original.offer+' → '+offer);
         if(area!==amount(original.area))changes.push('Área m²: '+original.area+' → '+area);
-        if(String(draft.percent)!==original.percent)changes.push('Descuento %: '+original.percent+' → '+draft.percent);
+        if(String(percent)!==original.percent)changes.push('Descuento %: '+original.percent+' → '+percent);
         const audit=changes.length?[row.source_updates||'',new Date().toISOString()+' · Corrección: '+changes.join('; ')+' · '+source].filter(Boolean).join('\n'):row.source_updates||'';
         if(audit.length>1600){draft.error='El registro de correcciones alcanzó su límite. No se aplicaron cambios; conserva el soporte antes de continuar.';return false;}
         row.price_amount=String(offer);row.area_m2=String(area);row.negotiation_source=source;row.source_updates=audit;row.analysis_manual_factors=JSON.stringify(bag);

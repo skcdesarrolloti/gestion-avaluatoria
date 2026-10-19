@@ -1278,3 +1278,25 @@ lectura calculada, navegación, notas y recuperación; escritorio1440/móvil390 
 errores ni desbordamiento, capturas revisadas. Transporte de guardado simulado en
 la prueba UI; no acredita hosting. Sin prueba BD adicional: no cambia persistencia.
 Publicar el repositorio no despliega al hosting.
+2026-10-19 · Resultados al revisar las muestras, dentro de Sensibilidad.
+Se incorpora comparación reactiva ejecución guardada / al revisar / diferencia:
+cantidad disponible, media, desviación muestral, CV y Q1/Q3. Lee oferta, área y
+descuento actuales junto a los borradores numéricos abiertos de la misma tabla.
+El valor unitario de revisión se muestra por fila y dentro del editor; allí también
+se muestra el CV del grupo para verlo mientras se escribe. No modifica ejecución,
+concepto, gráficos o memoria antes de aplicar correcciones y actualizar el análisis.
+Grupo y número de borradores sin aplicar visibles; ninguna selección/exclusión
+nueva. Una fila incompleta/inválida bloquea el resumen del grupo en lugar de omitirla.
+El 7,5 % es un referente de comparación indicado por el solicitante, sin certificar
+el avalúo ni sugerir alterar datos correctos. El cálculo usa la base vigente y el
+redondeo de descuento existente. Los campos sin modificar de un borrador conservan
+los cambios actuales de la tabla al aplicar, evitando revertir un descuento directo.
+Se mantienen evidencia/auditoría, autoguardado y actualización explícita del análisis.
+Validación: PHP1581, JS266, lint807 (php -n -l y vista final con configuración usual),
+build/check:size78,9KB. Pruebas de múltiples borradores, invariancia de ejecución y
+snapshot, entradas inválidas, bases, edición directa, precisión del descuento y
+concordancia tras aplicar/calcular. Chrome con vistas PHP/34 filas ficticias prueba
+reacción al escribir, CV bloqueado al vaciar área, aplicación con soporte y cálculo
+final coincidente; escritorio1440/móvil390 sin errores/desbordamiento. Guardado HTTP
+simulado; sin prueba de BD adicional porque no cambia persistencia ni esquema.
+Publicar al repositorio no actualiza hosting.
