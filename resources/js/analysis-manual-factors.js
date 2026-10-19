@@ -35,7 +35,7 @@ export function manualMethods() {
             return /^EJEMPLO SIMULADO\b/i.test(source || '')?'example':source?'manual':'original';
         },
         analysisHasSimulated(){return this.analysisActiveRows().some(r=>Object.values(sourceFacts(r.analysis_manual_factors)).some(e=>/^EJEMPLO SIMULADO\b/i.test(e.source || '')));},
-        analysisRowComplete(property){return complete(property,this.analysisColumns());},
+        analysisRowComplete(property){return complete(property,this.analysisVerificationColumns());},
         analysisDisplayRows(){return this.analysisVisibleRows().filter(r=>!this.analysisOnlyMissing || !this.analysisRowComplete(r) || r.key===this.analysisEditingId);},
         analysisCombinations(){
             const stamp=JSON.stringify([this.analysisManualVersion,this.analysisActiveRows().map(r=>r.id),this.analysisFactors,this.analysisModelArea().key]);

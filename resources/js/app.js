@@ -32,7 +32,7 @@ import { loadAnalysisTable } from './analysis-table-loader.js';
 window.Alpine = Alpine;
 try {await loadAnalysisTable(document,Alpine);} catch {
     const form=document.querySelector('[data-market-analysis]');
-    if(form){form.setAttribute('x-ignore','');form.querySelectorAll('button').forEach(b=>b.disabled=true);
+    if(form){const root=form.closest('[x-data]')??form;root.setAttribute('x-ignore','');root.querySelectorAll('button').forEach(b=>b.disabled=true);
         const notice=document.createElement('p');notice.textContent='No se pudo cargar el análisis. Recarga la página para reintentar.';notice.setAttribute('role','alert');form.prepend(notice);}
 }
 Alpine.data('sourceResultsPaste', sourceResultsPaste);

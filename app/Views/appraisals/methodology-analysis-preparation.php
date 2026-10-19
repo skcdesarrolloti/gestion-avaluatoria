@@ -10,7 +10,7 @@ $preparationDate = trim((string) ($analysisContext['value_date'] ?? ''));
 if ($preparationDate === '') $preparationPending[] = 'Fecha de valor';
 ?>
 <section class="mt-4 space-y-4" aria-label="Objetivo y unidad de análisis">
-    <h3 class="text-xl font-semibold">1. Preparar los datos</h3>
+    <h3 class="text-xl font-semibold">1. Preparar la muestra</h3>
     <p>Antes de estudiar la dispersión o construir una regresión, precisamos el encargo y la unidad que representa cada observación. Este paso consulta la información ya registrada en la ficha.</p>
     <div class="rounded-xl border p-4 space-y-3">
         <h4 class="text-lg font-semibold">1.1 Objetivo y unidad de análisis</h4>

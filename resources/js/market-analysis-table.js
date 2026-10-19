@@ -31,12 +31,12 @@ export function marketAnalysisTable(rows,subjectRegime='',subjectType='',subject
     let saved={};try {saved=JSON.parse(rows.find(r=>r.analysis_factor_selection)?.analysis_factor_selection || '{}');} catch {}
     return cacheAnalysisReads({
         analysisReactiveCache:false,analysisDataRevision:0,
-        async init(){if(this.$watch){this.analysisReactiveCache=true;this.$watch('analysisRows',()=>{this.analysisDataRevision++;});}await this.courseRestore();if(this.$watch)this.$watch('courseStep',()=>this.coursePersist());},
+        async init(){if(this.$watch){this.analysisReactiveCache=true;this.$watch('analysisRows',()=>{this.analysisDataRevision++;});}await this.courseRestore();this.courseBasis=saved.basis??this.courseBasis;if(this.$watch)this.$watch('courseStep',()=>this.coursePersist());},
         analysisModule:'samples',analysisPendingStep:0, ...regressionMethods(), ...courseMethods(rows.find(r=>r.analysis_course_execution)?.analysis_course_execution || ''), ...locationMapMethods(subjectLocation),
         regressionBasis:saved.regression?.basis || 'offer',regressionCodes:saved.regression?.codes || {},regressionConfirmed:saved.regression?.confirmed || false,
         analysisRows:rows, get analysisTable(){return project(this.analysisRows,this.analysisReactiveCache?this.analysisDataRevision:undefined);}, get analysisOriginalTable(){return original(this.analysisRows,this.analysisReactiveCache?this.analysisDataRevision:undefined);}, ...manualMethods(), analysisSubjectRegime:subjectRegime, analysisScope:saved.scope ?? 'subject', analysisAppliedScope:saved.applied_scope ?? saved.scope ?? 'subject', analysisRegimeApplied:saved.regime_applied ?? ['clean','result'].includes(saved.view), analysisThreshold:50, analysisView:saved.view ?? 'raw',
-        get analysisFactors(){const rows=this.analysisActiveRows(),table=active(rows,this.analysisReactiveCache?this.analysisDataRevision:undefined);if(table!==factorTable){factorCache=analysisCoverage(rows,subjectType,table);factorTable=table;}return factorCache;},
-        analysisSelected:(saved.selected ?? factors.map(f=>f.key)).filter(key=>factors.some(f=>f.key===key && f.compatible)),
+        get analysisFactors(){const rows=this.analysisActiveRows(),table=active(rows,this.analysisReactiveCache?this.analysisDataRevision:undefined);if(table!==factorTable){factorCache=analysisCoverage(rows,subjectType,table);for(const f of factors)if(!factorCache.some(c=>c.key===f.key))factorCache.push(factorProfile({...f,count:0},table,rows,subjectType));factorTable=table;}return factorCache;},
+        analysisSelected:saved.selected ?? factors.filter(f=>f.compatible).map(f=>f.key),
         analysisApplied:saved.applied ?? saved.selected ?? [],
         analysisStatistics:saved.statistics ?? [], analysisReview:saved.review ?? [], analysisBusy:false, analysisProcessed:0, analysisFilterDone:false, analysisError:'',
         analysisDiscounts:Object.fromEntries(rows.map(r=>[r.id,String(r.negotiation_discount??'')])),
@@ -44,6 +44,8 @@ export function marketAnalysisTable(rows,subjectRegime='',subjectType='',subject
             return [r.id,offer>0 && discount!==null ? Number((discount/offer*100).toFixed(4)) : ''];})),
         analysisEligible(f){return f.compatible && f.count/this.analysisActiveRows().length>=0.5 && f.distinct>1;},
         analysisColumns(){const keys=this.analysisView==='result'?this.analysisApplied:this.analysisSelected;return this.analysisFactors.filter(f=>this.analysisView==='raw' || this.analysisEligible(f) && keys.includes(f.key));},
+        analysisVerificationColumns(){return this.analysisFactors.filter(f=>f.compatible && this.analysisSelected.includes(f.key));},
+        analysisVerificationComplete(){const columns=this.analysisVerificationColumns(),area=modelArea(columns);return this.analysisVisibleRows().filter(r=>amount(this.analysisRows[r.analysisIndex].area_m2)>0 && positiveModelArea(r.values[area.key]) && columns.every(f=>!missing(r.values[f.key]))).length;},
         analysisEffectiveRegime(row){return ['si','no'].includes(row.ph_regime) ? row.ph_regime : (row.regime_hint?.regime || '');},
         analysisMatches(){return this.analysisRows.filter(r=>this.analysisEffectiveRegime(r)===this.analysisSubjectRegime && this.analysisSubjectRegime);},
         analysisWorkingCount(){return workingRows(this).length;},
@@ -62,7 +64,7 @@ export function marketAnalysisTable(rows,subjectRegime='',subjectType='',subject
         analysisComplete(){const columns=this.analysisColumns(),area=modelArea(columns);return this.analysisVisibleRows().filter(r=>amount(this.analysisRows[r.analysisIndex].area_m2)>0 && positiveModelArea(r.values[area.key]) && columns.every(f=>!missing(r.values[f.key]))).length;},
         analysisSampleRule(){const factors=this.analysisFactorCount(), complete=this.analysisComplete(), required=Math.max(30,factors*10);
             return {factors,complete,required,maximum:Math.floor(complete/10),meets:factors>=3 && complete>=required};},
-        analysisSelection(){return JSON.stringify({selected:this.analysisSelected,applied:this.analysisApplied,threshold:50,scope:this.analysisScope,applied_scope:this.analysisAppliedScope,regime_applied:this.analysisRegimeApplied,view:this.analysisView,review:this.analysisReview,statistics:this.analysisStatistics,regression:{basis:this.regressionBasis,confirmed:this.regressionConfirmed,codes:this.regressionCodes}});},
+        analysisSelection(){return JSON.stringify({selected:this.analysisSelected,applied:this.analysisApplied,basis:this.courseBasis,threshold:50,scope:this.analysisScope,applied_scope:this.analysisAppliedScope,regime_applied:this.analysisRegimeApplied,view:this.analysisView,review:this.analysisReview,statistics:this.analysisStatistics,regression:{basis:this.regressionBasis,confirmed:this.regressionConfirmed,codes:this.regressionCodes}});},
         analysisRegime(row){return !['si','no'].includes(row.ph_regime) ? (row.regime_hint?.reason || 'Régimen sin verificar') : (row.ph_regime==='si'?'PH':'No PH')+(row.ph_regime_source.trim()?' · soporte registrado':' · falta soporte');},
         analysisChange(id,value){this.analysisPercents[id]=value;const pct=Number(value);if(value==='' || Number.isFinite(pct) && pct>=0 && pct<=100) this.analysisDiscounts[id]=discountedAnalysis(this.analysisRows.find(r=>r.id===id),value).discount;},
         analysisResult(id){const row=this.analysisRows.find(r=>r.id===id), offer=amount(row.price_amount), discount=amount(this.analysisDiscounts[id]), area=amount(row.area_m2);

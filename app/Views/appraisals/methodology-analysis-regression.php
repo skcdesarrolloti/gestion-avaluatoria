@@ -5,12 +5,9 @@
     <div x-show="regressionTab==='application'" class="space-y-4">
         <p class="rounded-lg bg-purple-50 p-3 text-purple-900" x-show="analysisHasSimulated()">Ejercicio con datos simulados. Los resultados deben conservar esta identificación en el entregable.</p>
         <p x-text="'Factores aplicados: '+regressionColumns().map(f=>f.label).join(' + ')"></p>
-        <p class="rounded-lg bg-amber-50 p-3" x-show="!analysisRegimeApplied || analysisScope!==analysisAppliedScope">Primero prepara el grupo en 1. Preparar los datos. La selección de factores conserva ese grupo.</p>
+        <p class="rounded-lg bg-amber-50 p-3" x-show="!analysisRegimeApplied || analysisScope!==analysisAppliedScope">Primero prepara el grupo en 1. Preparar la muestra. La selección de factores conserva ese grupo.</p>
         <p class="text-red-700" role="alert" x-show="analysisError" x-text="analysisError"></p>
-        <details class="rounded-lg border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Cambiar factores · opcional</summary>
-            <?php require __DIR__.'/methodology-regression-combinations.php'; ?>
-            <?php require __DIR__.'/methodology-regression-factor-selection.php'; ?>
-        </details>
+        <button type="button" class="btn-secondary" @click="analysisModule='preparation';if(analysisRegimeApplied)analysisView='result'">Revisar selección en Preparar la muestra</button>
         <label class="label">1. Valor que queremos explicar (Y)<select class="input" x-model="regressionBasis" @change="regressionConfirmed=false"><option value="offer">Oferta / área publicada · exploratorio sin descuento</option><option value="adjusted">Valor con descuento / área publicada · solo descuentos registrados</option></select></label>
         <p class="text-sm">Se usan los factores preparados. Las filas sin valores numéricos quedan pendientes, conservadas en el grupo.</p>
         <div class="rounded-xl border p-4">

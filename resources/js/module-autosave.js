@@ -59,6 +59,7 @@ function updateVersion(form, result) {
     if (!Number.isInteger(result.version)) return;
     const field = form.querySelector('input[name="version"]');
     if (field) field.value = String(result.version);
+    form.closest?.('[data-methodology-version-group]')?.querySelectorAll('form').forEach(peer => { if (peer.getAttribute('action') === form.getAttribute('action')) peer.querySelector('input[name="version"]')?.setAttribute('value', String(result.version)); });
     form.closest?.('[data-ph-section]')?.querySelectorAll('input[name="version"]').forEach(node => {
         node.value = String(result.version);
     });

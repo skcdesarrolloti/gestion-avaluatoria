@@ -25,7 +25,7 @@ export function courseMethods(saved=''){return {
     });},
     courseStamp(){return JSON.stringify([this.courseRows().map(r=>[r.id,r.y,r.area,r.offer,r.discount,r.final,r.reasons]),this.courseBasis,Number(this.courseConfidence),this.analysisHasSimulated()]);},
     courseSnapshot(){return this.courseResult?courseSnapshot(this):saved;},
-    async coursePersist(){await this.$nextTick?.();this.$root?.dispatchEvent(new Event('input',{bubbles:true}));},
+    async coursePersist(){await this.$nextTick?.();const root=this.$root;(root?.matches?.('[data-market-analysis]')?root:root?.querySelector?.('[data-market-analysis]')??root)?.dispatchEvent(new Event('input',{bubbles:true}));},
     async courseRestore(){
         try {const restored=restoreCourseSnapshot(saved);if(restored){this.courseBasis=restored.basis;this.courseConfidence=String(restored.confidence);this.courseStep=restored.step;this.courseNotes=restored.notes;this.courseConclusion=restored.conclusion;this.courseResult=restored.result;return;}
             if(this.analysisRegimeApplied&&this.analysisStatistics.some(v=>v.action==='factors')){await this.courseCalculate();if(this.courseResult){this.courseResult.reconstructed=true;this.courseStep=3;await this.coursePersist();}}

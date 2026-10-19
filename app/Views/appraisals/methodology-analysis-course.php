@@ -1,6 +1,6 @@
 <template x-if="analysisModule==='statistics'"><section class="space-y-4" @input.stop="coursePersist()" @change.stop="coursePersist()">
     <h3 class="text-xl font-semibold"><span x-text="courseStep===6 ? '7. Memoria y sustentación' : '2. Entender la muestra'"></span></h3>
-    <p x-show="courseStep===0" class="text-sm"><strong>Tener en cuenta del paso 1:</strong> se reutiliza el grupo preparado. Aquí eliges qué valor describir y calculas su distribución; solo vuelve a revisar un inmueble si el cálculo muestra un pendiente o una duda concreta.</p>
+    <p x-show="courseStep===0" class="text-sm"><strong>Tener en cuenta del paso 1:</strong> se reutiliza el grupo preparado. Aquí calculas la distribución con la base configurada; solo vuelve a revisar un inmueble si el cálculo muestra un pendiente o una duda concreta.</p>
     <p class="rounded-lg bg-purple-50 p-3 text-purple-900">Ejercicio exploratorio. Los datos simulados conservan su identificación; este recorrido no adopta un valor ni elimina muestras.</p>
     <p x-show="courseStep===6" class="rounded-lg border bg-amber-50 p-3">Memoria disponible del análisis descriptivo. La sustentación integral, manual del modelo, validación y anexos del informe final siguen pendientes. La ejecución y sus notas se autoguardan; espera la confirmación del servidor.</p>
     <label x-show="courseStep!==6" class="label">Qué quieres revisar<select class="input" x-model.number="courseStep" aria-label="Pasos del análisis estadístico"><option value="" disabled>Selecciona una parte del análisis</option><template x-for="(step,i) in courseSteps.slice(0,6)" :key="i"><option :value="i" x-text="(i+1)+'. '+step"></option></template></select></label>
@@ -16,11 +16,8 @@
         <?php require __DIR__.'/methodology-course-sources.php'; ?>
     </details>
     <details x-show="courseStep===0||courseStep===5" class="rounded-xl border p-4 space-y-3" :open="!courseResult"><summary class="min-h-11 cursor-pointer font-semibold">Base y confianza del cálculo · revisar o cambiar</summary>
-        <label class="label">Base del ejercicio<select class="input" x-model="courseBasis" aria-describedby="course-basis-description"><option value="adjusted">Valor con descuento / área publicada · preliminar</option><option value="offer">Oferta / área publicada · exploración sin descuento</option></select></label>
-        <div id="course-basis-description" class="rounded-lg bg-slate-50 p-3 text-sm" aria-live="polite">
-            <p x-show="courseBasis==='adjusted'">Usa el valor después del descuento registrado, dividido entre el área publicada. Si falta el descuento, ese inmueble queda pendiente; cero indica que no se descontó. Esta opción usa la preparación guardada.</p>
-            <p x-show="courseBasis==='offer'">Usa la oferta dividida entre el área publicada, sin descuento. Describe los precios anunciados y permite comparar esta base con la opción después de negociación.</p>
-        </div>
+        <p class="text-sm" x-text="'Base del estudio: '+(courseBasis==='adjusted'?'valor con descuento / área publicada':'oferta / área publicada')"></p>
+        <button type="button" class="btn-secondary" @click="analysisModule='preparation';if(analysisRegimeApplied)analysisView='result'">Revisar configuración en Preparar la muestra</button>
         <label class="label">Confianza para el intervalo de la media<select class="input" x-model="courseConfidence" aria-describedby="course-confidence-description"><option value=".90">90 %</option><option value=".95">95 %</option><option value=".99">99 %</option></select></label>
         <div id="course-confidence-description" class="rounded-lg bg-slate-50 p-3 text-sm" aria-live="polite">
             <p x-show="Number(courseConfidence)===.90">90 %: con los mismos datos, produce un intervalo más estrecho que 95 % o 99 %. Si se repitiera el procedimiento de muestreo bajo sus supuestos, aproximadamente 90 de cada 100 intervalos contendrían la media poblacional.</p>

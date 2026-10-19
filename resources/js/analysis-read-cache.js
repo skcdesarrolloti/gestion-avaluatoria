@@ -1,6 +1,6 @@
 // Alpine gets one deep watcher for input changes, instead of scanning every source per cell.
 export function cacheAnalysisReads(state) {
-    const methods=['analysisMatches','analysisActiveRows','analysisVisibleRows','analysisColumns','analysisComplete',
+    const methods=['analysisMatches','analysisActiveRows','analysisVisibleRows','analysisColumns','analysisComplete','analysisVerificationColumns','analysisVerificationComplete',
         'analysisDisplayRows','analysisHasSimulated','analysisFactorsPending','analysisCombinations',
         'regressionColumns','regressionCategories','regressionMatrix','regressionStamp','courseStamp','analysisMapPoints','analysisMapCaptureRows'];
     const caches=new Map();

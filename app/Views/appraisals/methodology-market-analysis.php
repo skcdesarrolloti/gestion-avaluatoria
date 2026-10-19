@@ -1,7 +1,7 @@
 <?php
 $stale = !empty($selected['analysis']) && ($selected['evidence_hash'] ?? '') !== \App\Services\MethodologyWorkflow::fingerprint($comparableRows);
 ?>
-<section class="rounded-2xl border bg-white p-5 sm:p-8">
+<section class="rounded-2xl border bg-white p-5 sm:p-8" data-methodology-version-group>
     <h2 class="text-2xl font-semibold">M<?= e($stage) ?> <?= $stage === '4' ? 'Análisis' : 'Entregable' ?> · <?= e($componentLabel) ?></h2>
     <?php require __DIR__ . '/methodology-ph-guidance.php'; ?>
     <?php if ($componentKey === '' || ($selected['method'] ?? '') !== 'mercado'): ?>

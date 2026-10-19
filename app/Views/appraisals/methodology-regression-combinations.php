@@ -7,5 +7,5 @@
         <p x-text="option.count+' muestras completas / '+option.required+' necesarias · '+(option.meets ? 'Cumple la cantidad para 3 factores' : 'Faltan '+(option.required-option.count)+' muestras completas')"></p>
         <button type="button" class="btn-secondary mt-2" :disabled="analysisBusy || !analysisRegimeApplied || analysisScope!==analysisAppliedScope" @click="analysisChooseCombination(option); if(!analysisError)regressionConfirmed=false; $dispatch('input')">Aplicar estos factores al modelo</button>
     </article></template>
-    <p class="text-sm" x-show="!analysisCombinations().length">No hay dos factores adicionales elegibles con los datos actuales. Consulta Captura y consolidación dentro de 1. Preparar los datos para investigar los faltantes.</p>
+    <p class="text-sm" x-show="!analysisCombinations().length">No hay dos factores adicionales elegibles con los datos actuales. Consulta Captura y consolidación dentro de 1. Preparar la muestra para investigar los faltantes.</p>
     </details>

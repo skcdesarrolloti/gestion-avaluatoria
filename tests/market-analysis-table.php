@@ -12,7 +12,7 @@
     expect(str_contains($html,'2 inmuebles recibidos para este recorrido'),'recepción cuenta inmuebles y no anuncios');
     expect(str_contains($html,'1 anuncios con notas o diferencias conservadas'),'recepción incluye alertas de fuentes secundarias');
     expect(str_contains($html,'Diferencia secundaria &lt;script&gt;revisar()&lt;/script&gt;'),'recepción escapa diferencias sin ejecutarlas');
-    foreach (['1. Preparar los datos','2. Entender la muestra','3. Construir el modelo','4. Revisar el modelo','5. Validar las predicciones','6. Aplicar al sujeto','7. Memoria y sustentación'] as $stage) {
+    foreach (['1. Preparar la muestra','2. Entender la muestra','3. Construir el modelo','4. Revisar el modelo','5. Validar las predicciones','6. Aplicar al sujeto','7. Memoria y sustentación'] as $stage) {
         expect(str_contains($html,$stage),'recorrido contiene etapa '.$stage);
     }
     expect(str_contains($html,':value="analysisDiscounts[\''.str_repeat('b',32).'\']"'),'descuento editable se guarda en ficha principal confirmada');
@@ -43,8 +43,11 @@
     $view=\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":["bathrooms"],"threshold":50,"view":"clean"}']);
     expect(json_decode($view['analysis_factor_selection'],true)['view']==='clean','vista depurada se recupera como decisión guardada');
     expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"threshold":50,"view":"execute"}']),'vista no permitida se rechaza');
+    expectStatus(422,fn()=>\App\Services\ComparableCaptureDetail::normalize(['analysis_factor_selection'=>'{"selected":[],"threshold":50,"basis":"inventada"}']),'base del estudio no admitida se rechaza');
+    expect(substr_count($html,'<legend class="font-semibold">Atributos para verificar y analizar</legend>')===1 && str_contains($html,'Verificación de las muestras'),'una sola selección de atributos en la configuración de preparación');
+    expect(!str_contains($html,'Cambiar factores · opcional') && str_contains($html,'Revisar selección en Preparar la muestra'),'modelo reutiliza selección sin un segundo editor de factores');
     expect(str_contains($html,'Consultar originales') && str_contains($html,'Revisar composición del grupo') && str_contains($html,'Datos que quieres revisar') && !str_contains($html,'aria-label="Pasos del análisis"'),'grupo preparado conserva consulta y selección mediante un selector');
-    expect(str_contains($html,'Aplicar depuración de muestras') && str_contains($html,'Cambiar factores · opcional') && str_contains($html,'Aplicar factores al modelo'),'muestras y factores conservan acciones separadas en el recorrido simplificado');
+    expect(str_contains($html,'Aplicar depuración de muestras') && str_contains($html,'Configuración del estudio') && str_contains($html,'Aplicar selección al modelo'),'muestras y factores conservan acciones separadas en el recorrido simplificado');
     expect(substr_count($html,'name="comparables[1][negotiation_source]"')===1 && substr_count($html,'name="comparables[1][negotiation_kind]"')===1,'soportes de descuento tienen una sola vinculación de envío para la ficha principal');
     expect(str_contains($html,'x-model="analysisRows[property.analysisIndex].negotiation_source"') && str_contains($html,'Academia y sustento · datos, descuento y comparabilidad'),'tabla permite completar soporte directamente y conserva academia plegable');
     expect(substr_count($html,'name="comparables[1][price_amount]"')===1 && substr_count($html,'name="comparables[1][area_m2]"')===1 && substr_count($html,'name="comparables[1][source_updates]"')===1,'corrección en sensibilidad envía precio, área y registro sin duplicar campos');

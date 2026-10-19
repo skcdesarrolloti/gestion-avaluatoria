@@ -18,6 +18,7 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
     <?php else: ?>
     <?php $initialPanel = is_string($_GET['panel'] ?? null) ? $_GET['panel'] : '';
     $initialAction = match ($initialPanel) {
+        'preparation'=>"analysisModule='preparation';if(analysisRegimeApplied)analysisView='result'",
         'statistics'=>"analysisModule='statistics'",
         'regression'=>"analysisModule='regression';regressionTab='application'",
         'diagnostics'=>"analysisModule='regression';regressionTab='diagnostics'",
@@ -26,8 +27,8 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
         'location'=>"analysisModule='location';analysisSubjectLocation=".$analysisSubjectLocation,
         default=>"analysisModule='samples';if(analysisRegimeApplied)analysisView='result'",
     }; ?>
-    <form data-market-analysis class="mt-4" x-data="marketAnalysisTable(<?= e(json_encode($analysisRows,JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT|JSON_THROW_ON_ERROR)) ?>, '<?= e($analysisRegime) ?>', <?= e(json_encode($analysisContext['tipo_inmueble'] ?? '',JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT|JSON_THROW_ON_ERROR)) ?>)" method="post" action="<?= e(url($basePath . '/comparables')) ?>" data-module-autosave data-save-in-place data-comparable-json
-        x-init="<?= e($initialAction) ?>" data-autosave-endpoint="<?= e(url($basePath . '/comparables/autoguardar')) ?>">
+    <div class="mt-4" x-data="marketAnalysisTable(<?= e(json_encode($analysisRows,JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT|JSON_THROW_ON_ERROR)) ?>, '<?= e($analysisRegime) ?>', <?= e(json_encode($analysisContext['tipo_inmueble'] ?? '',JSON_HEX_TAG|JSON_HEX_APOS|JSON_HEX_AMP|JSON_HEX_QUOT|JSON_THROW_ON_ERROR)) ?>)" x-init="<?= e($initialAction) ?>">
+    <form data-market-analysis method="post" action="<?= e(url($basePath . '/comparables')) ?>" data-module-autosave data-save-in-place data-comparable-json data-autosave-endpoint="<?= e(url($basePath . '/comparables/autoguardar')) ?>">
         <?= csrf_field() ?>
         <input type="hidden" name="component_scope" value="<?= e($componentKey) ?>">
         <input type="hidden" name="version" value="<?= (int) ($record['comparables_version'] ?? 0) ?>">
@@ -54,7 +55,7 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
                 <button type="button" class="btn-primary" @click="await analysisReturnFromReview()" x-text="'Volver a '+analysisReviewOrigin()"></button>
             </div></template>
         </div>
-        <template x-if="analysisModule==='preparation'"><div><?php require __DIR__.'/methodology-analysis-preparation.php'; ?></div></template>
+        <template x-if="analysisModule==='preparation'"><div><?php require __DIR__.'/methodology-study-configuration.php'; ?></div></template>
         <template x-if="analysisModule==='samples'"><div>
         <?php require __DIR__.'/methodology-analysis-data-table.php'; ?>
         <?php require __DIR__.'/methodology-preparation-academy.php'; ?>
@@ -81,5 +82,12 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
         <p class="mt-3 text-sm" data-autosave-status>Autoguardado activo. Espera el guardado confirmado antes de exportar.</p>
         <button class="btn-primary mt-3" type="submit">Guardar análisis de muestras</button>
     </form>
+    <?php if (isset($components[$componentKey],$methods,$units,$selected,$flowUrl)): ?>
+    <details x-show="analysisModule==='preparation'" class="mt-4 rounded-xl border p-3">
+        <summary class="min-h-11 cursor-pointer font-semibold">Método y alcance del estudio</summary>
+        <?php require __DIR__.'/methodology-selection.php'; ?>
+    </details>
+    <?php endif; ?>
+    </div>
     <?php endif; ?>
 </details>

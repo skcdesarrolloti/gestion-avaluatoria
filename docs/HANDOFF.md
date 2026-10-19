@@ -1085,3 +1085,36 @@ reales y 34 filas ficticias: selector, MAPE por inmueble, dispersión/cuartiles,
 corrección precio con fuente sin salir del paso, visita al mapa y regreso con paso
 y fecha conservados. Escritorio1440/móvil390, sin errores JS/desbordamiento global;
 capturas revisadas. No se ejecutó contra una sesión autenticada de producción.
+
+
+2026-10-19 · Configuración y verificación reunidas en Preparar la muestra.
+Tres entradas: Configuración del estudio, Verificación de las muestras, Ubicación
+y mapa. Base descriptiva y atributos seleccionados en configuración; método y
+alcance existentes en acordeón del mismo lugar, con formularios independientes
+(sin anidarlos). Acceso superior Configuración redirige a preparación en Mercado
+con muestras; plan/unidades/métodos y rutas previas siguen disponibles.
+Se reutiliza la selección persistida: columnas/editor incluyen atributos compatibles
+habilitados aunque no cumplan cobertura/variación para regresión. Si el único dato
+está fuera del grupo aplicado, el atributo sigue disponible con cobertura cero.
+Deshabilitar conserva datos originales/manuales y excluye su borrador de corrección.
+Conteos de pendientes de verificación usan atributos habilitados; completo no es
+verificado. Se retira el segundo selector del modelo; codificación técnica sigue
+en regresión. Academia y combinaciones conservadas dentro de acordeones.
+`basis` offer/adjusted validada en analysis_factor_selection existente, recuperable
+antes de calcular. Sin migraciones/DDL. Ejecuciones, notas, fechas, gráficos, captura,
+originales e historial conservados. Cambiar base conserva ejecución anterior con
+obsolescencia hasta cálculo explícito; no fuerza CV ni elimina muestras.
+Control Alpine compartido fuera de los formularios; coursePersist dirige el evento
+al formulario correcto. Tras confirmación, método y memoria sincronizan versiones
+solo entre formularios del mismo endpoint dentro del grupo del expediente; no
+alteran versión de comparables o soporte PH. Conflictos externos siguen en 409.
+Verificación: PHP1573, JS256, lint803 archivos, build y check:size78,8KB. BD230
+verificaciones en nuevas ga_test_app/ga_test_auth desechables puerto3374; proceso
+detenido. Pruebas de selección/edición/deshabilitación/recarga, base antes de
+primera ejecución y separación de versiones. Chrome headless con vistas PHP reales
+y 34 muestras ficticias: escritorio1440/móvil390, columnas deshabilitar/habilitar,
+base, método en formulario independiente, mapa, conservación de ejecución, MAPE,
+dispersión y corrección en el mismo paso. Sin errores JS ni desbordamiento global.
+Capturas revisadas. Sin despliegue ni prueba contra sesión autenticada del hosting.
+Siguiente trabajo acordado: continuar paso5 Sensibilidad y consideraciones; esta
+entrega organiza la preparación, sin añadir otro diagnóstico o excluir inmuebles.

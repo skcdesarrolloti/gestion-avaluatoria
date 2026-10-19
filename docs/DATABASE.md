@@ -1,5 +1,13 @@
 # Crear y evolucionar la base sin SQL manual
 
+Configuración de M4 (19/10/2026): `basis` (offer/adjusted) se valida y conserva en
+`analysis_factor_selection`, dentro de `capture_details` existente. `selected`
+habilita campos de verificación; `applied` conserva los factores preparados para
+modelo con sus reglas previas. Deshabilitar no borra originales/complementos.
+Sin cambio de esquema ni migración. Versiones de comparables y flujo del método
+siguen independientes; método y memoria del mismo endpoint comparten la versión
+confirmada en pantalla, manteniendo conflictos externos HTTP409.
+
 Ejecución descriptiva de M4: `analysis_course_execution` se conserva en el JSON
 `capture_details` existente del anuncio principal, por expediente/propietario y
 versión de comparables. No cambia el esquema ni requiere migración. Incluye entradas,
