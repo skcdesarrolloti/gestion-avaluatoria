@@ -83,3 +83,15 @@ No desplegado al hosting en esta entrega.
 
 Comandos: `php tests/run.php`, `npm test`, `npm run build`, `npm run check:size`;
 lint con `php -l` sobre los archivos PHP de app, routes, database, bin y tests.
+
+
+### Menú dependiente del paso 1
+
+Las cuatro opciones de Preparar la muestra se despliegan desde su propio botón,
+identificado con flecha, sin una barra de opciones debajo de todo el recorrido.
+La misma plantilla sirve a M3 (enlaces) y M4 (estado Alpine del formulario actual).
+Abrir el desplegable no cambia el paso ni los datos: se navega al elegir una opción.
+Se cierra al elegir, pulsar Escape o hacer clic fuera. Escape devuelve el foco al
+botón; Tab recorre las opciones nativas. aria-expanded/aria-controls identifican
+la relación. En móvil el menú conserva ancho/alto acotados y se lleva a la vista
+al abrir, sin recargar ni recalcular el análisis. El estado abierto no se persiste.

@@ -1205,3 +1205,24 @@ métodos, lecturas y anexos en suite existente. Un selector del diagnóstico loc
 buscaba un botón dentro de un acordeón cerrado: se corrigió para abrir su summary;
 una expresión de extracción de href confundía :href con href: se corrigió el test.
 Sin prueba BD adicional, pues no cambia persistencia. Sin despliegue al hosting.
+
+
+2026-10-19 · Opciones dependientes del botón Preparar la muestra.
+El submenú deja la fila inferior y se anida en el primer elemento del menú general,
+con posición de desplegable junto a su botón. Captura y análisis reutilizan la
+plantilla de cuatro opciones; las demás etapas conservan su acceso. Abrir/cerrar
+no navega ni modifica formularios: se elige la opción para cambiar de vista.
+Estado local Alpine, sin columnas ni cambios de persistencia. Flecha, aria-expanded,
+aria-controls y región de navegación; Escape cierra/devuelve foco, Tab recorre
+controles, elección/clic fuera cierran. Alto/ancho acotados; al abrir se ajusta el
+scroll para mostrar el desplegable completo. Lectores, academia, mapa y guardados
+conservados; no hay nuevas reglas, cálculos o filtros.
+Validación: PHP1581, JS256, lint804 y vistas modificadas, build/check:size78,9KB.
+Chrome con vistas PHP reales y 34 filas ficticias: despliegue ligado al padre por
+posición y DOM, cuatro opciones únicas, Escape/foco/Tab/cierre exterior/selección,
+captura con pegado visible y retorno, mapa y paso estadístico, grupo y fecha
+conservados. Escritorio1440/móvil390 sin desbordamiento ni errores JS; capturas
+revisadas. Primeras comprobaciones instantáneas del diagnóstico se adelantaban
+al render reactivo; corregidas para esperar visibilidad antes de inspección/Tab.
+Sin prueba BD adicional porque solo cambia la presentación del menú. Sin despliegue
+ni prueba autenticada en hosting.

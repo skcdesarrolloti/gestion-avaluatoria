@@ -48,7 +48,6 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
         <input type="hidden" name="comparables[<?= (int)$analysisIndexes[0] ?>][analysis_course_execution]" :value="courseSnapshot()">
         <div class="mb-4 rounded-xl border border-teal-700 bg-white p-3 shadow-sm">
             <?php require __DIR__.'/methodology-analysis-menu.php'; ?>
-            <?php require __DIR__.'/methodology-analysis-preparation-nav.php'; ?>
             <template x-if="analysisModule==='samples'&&analysisReviewReturn"><div class="mt-3 rounded-lg border bg-teal-50 p-3 space-y-2" role="status">
                 <p><strong x-text="'Estás revisando: '+analysisReviewLabel()"></strong><span x-text="' · Venías de: '+analysisReviewOrigin()"></span></p>
                 <p class="text-sm">Revisa o completa el inmueble en la tabla. Después regresa al mismo paso; si cambias datos, actualiza el cálculo allí.</p>

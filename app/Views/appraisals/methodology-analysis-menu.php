@@ -11,8 +11,15 @@ $marketMenu = [
 ?>
 <p class="mb-3 font-semibold text-teal-900" role="status" aria-live="polite">Estás en: M4 Análisis de mercado<?= !empty($componentLabel) ? ' · '.e($componentLabel) : '' ?> → <span x-text="analysisModule==='statistics' ? (courseStep===6?'Memoria y sustentación':'Entender la muestra → '+courseSteps[courseStep]) : analysisModule==='regression' ? (regressionTab==='diagnostics'?'Revisar el modelo':'Construir el modelo') : analysisModule==='validation' ? 'Validar las predicciones' : analysisModule==='subject' ? 'Aplicar al sujeto' : 'Preparar la muestra'"></span></p>
 <nav class="grid gap-2 sm:grid-cols-2 lg:grid-cols-4" aria-label="Etapas de M4 Análisis de mercado">
-    <?php foreach ($marketMenu as [$title,$active,$action]): ?>
+    <?php foreach ($marketMenu as $menuIndex=>[$title,$active,$action]): ?>
+        <?php if ($menuIndex===0): ?>
+        <div class="relative" x-data="{preparationMenuOpen:false}" @click.outside="preparationMenuOpen=false" @keydown.escape.stop="preparationMenuOpen=false;$refs.preparationTrigger.focus()">
+            <button type="button" class="btn-secondary w-full justify-between gap-2 text-left" x-ref="preparationTrigger" aria-controls="market-preparation-actions" :aria-expanded="preparationMenuOpen" :aria-current="<?= e($active) ?>?'page':null" :class="<?= e($active) ?>?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="preparationMenuOpen=!preparationMenuOpen;if(preparationMenuOpen)$nextTick(()=>$refs.preparationActions.scrollIntoView({block:'nearest'}))"><?= e($title) ?><span aria-hidden="true">▾</span></button>
+            <?php $capturePreparationMenu=false; require __DIR__.'/methodology-analysis-preparation-nav.php'; ?>
+        </div>
+        <?php else: ?>
         <button type="button" class="btn-secondary text-left" :aria-current="<?= e($active) ?>?'page':null" :class="<?= e($active) ?>?'bg-teal-50 ring-2 ring-teal-700 font-bold':''" @click="<?= e($action) ?>"><?= e($title) ?></button>
+        <?php endif; ?>
     <?php endforeach; ?>
 </nav>
 <p class="mt-3 font-semibold text-teal-900" role="status" x-text="analysisRegimeApplied?'Grupo de trabajo aplicado: '+analysisWorkingCount()+' inmuebles':'Preparación del grupo: pendiente de aplicar'"></p>
