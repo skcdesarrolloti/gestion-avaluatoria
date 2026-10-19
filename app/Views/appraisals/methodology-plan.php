@@ -16,10 +16,7 @@ $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)(
     </nav>
     <?php require __DIR__.'/methodology-factor-reference.php'; ?>
     <div x-show="configTab==='methods'" data-ph-section>
-    <p class="mt-3 leading-6">Define el alcance y elige los métodos aquí. Después entra a la academia del recorrido elegido. Las unidades siguen siendo las registradas en los capítulos 1 y 3.</p>
-    <details class="mt-3"><summary class="min-h-11 cursor-pointer font-semibold">Consultar las recomendaciones y su soporte técnico</summary>
-        <?php require __DIR__.'/valuation-methodology-decision.php'; ?>
-    </details>
+    <p class="mt-3 leading-6">Elige el método y su tratamiento. Los datos del inmueble se toman de los capítulos 1 y 3.</p>
     <a class="inline-flex min-h-11 items-center font-semibold text-blue-800 underline" href="<?= e($flowUrl('1','costo','').'&consult_method=costo') ?>">Consultar academia C1 · Costo sin asignarlo</a>
     <?php if ($components===[]): ?><p class="mt-4 rounded-xl border border-dashed p-4">Registra primero las unidades del predio en capítulos 1 y 3. La academia puede consultarse sin asignar un método.</p><?php endif; ?>
     <?php if ($planUnits!==[]): ?>
@@ -64,10 +61,7 @@ $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)(
             <div class="mt-4 space-y-3">
             <?php foreach ($planParts as $planPartKey): $planPart=$components[$planPartKey]; $planItem=$flow[$planPartKey] ?? []; $planMethod=$planItem['method'] ?? ''; ?>
                 <div class="rounded-xl bg-slate-50 p-4">
-                    <div><p class="font-semibold"><?= e(isset($planPart['part']) ? ($planPart['part']==='terreno'?'Terreno':'Construcción') : 'Unidad / alcance completo') ?></p>
-                        <p class="mt-1 text-sm">Método: <?= e($planMethods[$planMethod] ?? 'Por definir') ?></p>
-                        <p class="mt-1 text-xs"><?= in_array($planMethod,['mercado','renta'],true) ? count(\App\Services\MethodologyComparableScope::rows($allComparableRows,$planPartKey)).' muestras propias' : ($planMethod!==''?'Insumos propios del método':'Método pendiente de selección') ?></p></div>
-                    <p class="mt-2 whitespace-pre-wrap break-words text-sm sm:mt-0"><?= e(($planItem['coverage'] ?? '') ?: 'Define qué incluye y excluye este valor antes de trabajar sus insumos.') ?></p>
+                    <p class="text-xs"><?= in_array($planMethod,['mercado','renta'],true) ? count(\App\Services\MethodologyComparableScope::rows($allComparableRows,$planPartKey)).' muestras propias' : ($planMethod!==''?'Insumos propios del método':'Método pendiente de selección') ?></p>
                     <?php (static function() use ($record,$units,$components,$flow,$methods,$basePath,$flowUrl,$planPartKey,$planPart,$planItem,$planMethod): void {
                         $componentKey=$planPartKey; $componentLabel=$planPart['label']; $selected=$planItem; $method=$planMethod ?: 'mercado';
                         require __DIR__.'/methodology-selection.php';
@@ -75,8 +69,8 @@ $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)(
                     <div class="mt-4 space-y-2">
                     <?php foreach ([$planPartKey,...array_keys(array_filter($components,static fn($c)=>($c['comparison_key'] ?? '')===$planPartKey))] as $studyKey):
                         $studyMethod=$flow[$studyKey]['method'] ?? ''; if ($studyMethod==='') continue; ?>
-                        <p class="font-semibold"><?= e($planMethods[$studyMethod]) ?><?= $studyKey!==$planPartKey?' · contraste del mismo alcance':'' ?></p>
                         <?php if ($studyKey!==$planPartKey): ?>
+                        <p class="font-semibold"><?= e($planMethods[$studyMethod]) ?> · contraste del mismo alcance</p>
                         <a class="inline-flex min-h-11 items-center text-sm font-semibold text-blue-800 underline" href="<?= e($flowUrl('2',$studyMethod,$studyKey)) ?>">Definir alcance y justificación del contraste</a>
                         <?php endif; ?>
                         <a class="btn-secondary" href="<?= e($flowUrl('1',$studyMethod,$studyKey)) ?>">Abrir academia de <?= e($planMethods[$studyMethod]) ?></a>
@@ -91,5 +85,10 @@ $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)(
         </article>
     <?php endforeach; ?>
     </div>
+    <details class="mt-5 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Academia · recomendación y datos del expediente</summary>
+        <?php (static function() use ($methodologyDecision,$methodologyDecisionRows,$flowUrl,$method,$componentKey): void {
+            $decisionCompact=true; require __DIR__.'/valuation-methodology-decision.php';
+        })(); ?>
+    </details>
     </div>
 </section>

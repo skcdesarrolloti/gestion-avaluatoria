@@ -1118,3 +1118,24 @@ dispersión y corrección en el mismo paso. Sin errores JS ni desbordamiento glo
 Capturas revisadas. Sin despliegue ni prueba contra sesión autenticada del hosting.
 Siguiente trabajo acordado: continuar paso5 Sensibilidad y consideraciones; esta
 entrega organiza la preparación, sin añadir otro diagnóstico o excluir inmuebles.
+
+
+2026-10-19 · Simplificación de recomendación y decisión del método.
+El plan presenta primero el formulario del alcance activo; al final queda academia
+cerrada con recomendación compacta y datos del expediente solo consultables.
+Sin la repetición de las tarjetas de pasos/componentes sugeridos dentro del plan;
+se conserva la consulta técnica completa en su ruta anterior y las lecturas,
+fuentes y matriz. Se retiran método/cobertura estáticos duplicados del formulario
+y la segunda sugerencia encima del selector. Método/tratamiento siguen visibles;
+conceptos, justificación, cobertura y contrastes se reúnen en el acordeón existente.
+No cambian nombres de campos, autoguardado, versiones, endpoints ni almacenamiento.
+Sin DDL o borrado de datos. Prueba Chrome con vistas PHP reales y valores ficticios
+guardados: método, tratamiento, justificación, cobertura y contraste Renta presentes;
+FormData idéntico antes/después de abrir/cerrar acordeón; sin formularios anidados.
+Desktop1440/móvil390, sin errores JS ni desbordamiento; capturas revisadas.
+PHP1575, JS256, lint804 archivos, build y check:size78,8KB. Sin prueba BD adicional
+porque el cambio afecta solo vistas; la persistencia no se modifica. No desplegado
+ni probado contra sesión autenticada del hosting. La primera captura local excedió
+el búfer de salida por tamaño de la academia existente; repetida con búfer mayor.
+Se corrigió un selector del diagnóstico de accesibilidad (dt sin nombre accesible),
+sin afectar la aplicación. No se confunde la recomendación con una elección guardada.

@@ -11,6 +11,7 @@ $firstComponent = in_array((string) ($componentKey ?? ''), array_column($compone
     ? (string) $componentKey : (string) ($componentItems[0]['id'] ?? '');
 ?>
 <section class="rounded-2xl border border-emerald-100 bg-emerald-50 p-6 shadow-sm sm:p-8">
+    <?php if (!empty($decisionCompact)): require __DIR__.'/methodology-decision-summary.php'; else: ?>
     <div class="grid gap-5 xl:grid-cols-[0.95fr_1.05fr]">
         <div>
             <p class="eyebrow">8.2 Selección metodológica</p>
@@ -45,7 +46,8 @@ $firstComponent = in_array((string) ($componentKey ?? ''), array_column($compone
         </div>
     </div>
 
-    <?php if ($workflowItems !== []): ?>
+    <?php endif; ?>
+    <?php if ($workflowItems !== [] && empty($decisionCompact)): ?>
         <div class="mt-6 grid gap-3 lg:grid-cols-4">
             <?php foreach ($workflowItems as $index => $item): ?>
                 <article class="rounded-xl border border-emerald-100 bg-white p-4 text-sm leading-5">
@@ -108,7 +110,7 @@ $firstComponent = in_array((string) ($componentKey ?? ''), array_column($compone
         </div>
     <?php endif; ?>
 
-    <?php if ($componentItems !== []): ?>
+    <?php if ($componentItems !== [] && empty($decisionCompact)): ?>
         <div class="mt-6 rounded-xl border border-emerald-100 bg-white p-4"
             x-data="{ componentTab: '<?= e($firstComponent) ?>' }">
             <div class="flex flex-wrap items-start justify-between gap-3">

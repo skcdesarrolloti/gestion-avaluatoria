@@ -30,6 +30,11 @@ declare(strict_types=1);
                 && !str_contains($html,'Resolución 941 · Artículos completos para este paso') && str_contains($html,'academy=general'), 'configuración remite artículos generales a academia sin desplegar checklist');
             expect(str_contains($html,'aria-label="Unidades en configuración"') && str_contains($html,'Método y alcance · Oficina &lt;principal&gt;')
                 && !str_contains($html,'Método y alcance · Depósito de oficina'),'configuración muestra pestañas pero sólo formularios de la unidad elegida');
+            expect(substr_count($html,'name="method"')===1 && substr_count($html,'name="reason"')===1 && substr_count($html,'name="coverage"')===1,
+                'configuración conserva una sola edición del método, justificación y alcance de la unidad activa');
+            expect(strpos($html,'Método y alcance · Oficina')<strpos($html,'Academia · recomendación y datos del expediente')
+                && !str_contains($html,'Camino recomendado') && str_contains($html,'Datos utilizados · solo consulta'),
+                'decisión editable precede academia compacta sin repetir el recorrido ni la cabecera de recomendación');
         }
         if ($stage === 'components') {
             expect(str_contains($html, 'Verificación de la unidad principal y los anexos')

@@ -137,3 +137,18 @@ muestras, valores, JSON ni esquema; no implementa etapas posteriores.
 Validación: PHP690, JS131, lint, build y 66,4KB gzip. Chrome local: tres unidades
 PH con Mercado y una sola academia; caso NPH con Mercado/Costo/Renta, cambio entre
 academias, lector completo abre/cierra; móvil CSS367/scroll367 sin desbordamiento.
+
+
+## Configuración sin repetir el expediente · 19/10/2026
+
+La decisión editable (método, tratamiento) aparece antes de la recomendación.
+Los datos del encargo se reutilizan desde capítulos 1 y 3. La consulta académica
+queda al final, cerrada: una sugerencia breve y una lista plegable de datos de
+origen; conserva fuentes, artículos y matriz técnica. La pantalla del plan omite
+las tarjetas de recorrido y las sugerencias por componente que repetían su propio
+plan operativo. La ruta anterior de consulta técnica conserva su vista completa.
+Se retiran etiquetas de método y cobertura repetidas alrededor del formulario.
+Método y tratamiento permanecen visibles; explicaciones, justificación, alcance
+y métodos de contraste usan un mismo acordeón. Sus controles permanecen dentro
+del mismo formulario, habilitados y con los valores guardados aunque se cierre.
+No cambia el endpoint, CSRF, versión, persistencia, unidades o modelos de datos.
