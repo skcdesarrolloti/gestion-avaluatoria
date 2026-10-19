@@ -2,7 +2,7 @@
 <section class="mt-5 rounded-xl border bg-white p-4" x-show="configTab==='factors'" x-cloak x-data="{referenceType:<?= e(json_encode($planReferenceType)) ?>,factorQuery:''}" aria-label="Catálogo permanente de factores">
     <h3 class="text-xl font-semibold">Factores por tipo de inmueble · catálogo permanente</h3>
     <?php $editFactor=[]; $editKey=''; require __DIR__.'/user-research-factor-editor.php'; ?>
-    <p class="mt-2 text-sm">Define aquí las escalas que reutilizarás en tus avalúos. Las clasificaciones guardadas anteriores se conservan. En Insumos eliges qué investigar, qué factores priorizar y cómo conseguir el dato.</p>
+    <p class="mt-2 text-sm">Catálogo reutilizable de nombres y escalas. Los atributos de este estudio se seleccionan en Preparar la muestra → Configuración del estudio.</p>
     <label class="mt-3 block text-sm font-semibold">Tipo de inmueble del catálogo<select class="input mt-1" x-model="referenceType">
         <option value="">Selecciona el tipo de inmueble</option>
         <?php foreach ($referenceTypes as $referenceKey=>$referenceLabel): ?><option value="<?= e($referenceKey) ?>"><?= e($referenceLabel) ?></option><?php endforeach; ?>

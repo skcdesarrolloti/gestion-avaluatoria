@@ -106,3 +106,11 @@ Complemento automático por enlace: [fichas individuales y alcance](FICHAS-INDIV
 2026-10-06: [tabla simple por portal](TABLA-SIMPLE-POR-PORTAL.md). Solicitud del usuario: una fila por anuncio y solo columnas con información recogida; sin comparación con sujeto en Insumos. Revisión individual plegada, matriz y capturas conservadas.
 
 2026-10-06: [consolidar antes de investigar fichas](CONSOLIDACION-ANTES-DE-FICHAS.md). Sustituye el complemento automático al subir por recoger → consolidar → completar una ficha por inmueble único. Conserva anuncios de respaldo y el guardado confirmado.
+
+
+19/10/2026 · Acceso directo dentro del recorrido de Mercado: Preparar la muestra →
+Traer muestras de portales. Retira el acordeón que ocultaba el acceso. M3 y M4
+muestran la misma navegación de preparación; sus lectores, formularios, matrices,
+fuentes, conteos y selecciones no se modifican. Se retira únicamente la segunda
+barra de Configuración/Análisis durante un recorrido de Mercado activo. Conserva
+la entrada general para organizar unidades/métodos y el entregable al concluir.

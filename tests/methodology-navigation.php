@@ -95,4 +95,16 @@ declare(strict_types=1);
     ob_start(); require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php'; $html=ob_get_clean();
     expect(str_contains($html,'method=costo&amp;stage=3&amp;component=annex'), 'academia general conserva el método al abrir insumos de Costo');
     unset($_GET['academy']);
+    $method='mercado'; $componentKey='office'; $selected=$flow['office'];
+    $comparableRows=[['id'=>str_repeat('b',32),'component_key'=>'office','sample_index'=>1,'source_name'=>'Fuente de prueba','neighborhood'=>'Centro','capture_confirmation'=>'confirmed','research_primary'=>'si','price_amount'=>'500000000','area_m2'=>'50']];
+    $allComparableRows=$comparableRows;
+    foreach (['3','4'] as $stage) {
+        ob_start(); require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php'; $html=ob_get_clean();
+        expect(!str_contains($html,'aria-label="Organización del capítulo 8"') && substr_count($html,'aria-label="Etapas de M4 Análisis de mercado"')===1,
+            'mercado usa un solo recorrido sin barra de configuración duplicada en '.$stage);
+        expect(str_contains($html,'Traer muestras de portales') && !str_contains($html,'Agregar inmuebles o consultar la captura'),
+            'captura accesible directamente sin ocultarse en un acordeón en '.$stage);
+        if ($stage==='3') expect(str_contains($html,'1. Recoger por portal') && str_contains($html,'&amp;panel=preparation') && str_contains($html,'Verificación de las muestras'),
+            'lectores y retorno a la misma configuración y verificación disponibles desde captura');
+    }
 })();

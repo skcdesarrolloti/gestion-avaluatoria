@@ -11,12 +11,13 @@ if (!isset($methods[$navigationMethod])) {
 }
 $navigationHasRoute=$navigationKey!=='' && isset($methods[$navigationMethod]);
 $navigationMarket = $method === 'mercado';
-$navigationStudy=$navigationMarket && $navigationWorking && ($selected['method'] ?? '')==='mercado' && !empty($comparableRows);
+$navigationWorkspace=$navigationMarket && $navigationWorking && ($selected['method'] ?? '')==='mercado' && in_array($stage,['3','4'],true) && ($stage==='3' || !empty($comparableRows));
 ?>
+<?php if (!$navigationWorkspace): ?>
 <section class="mt-5 rounded-xl border bg-white p-4" aria-label="Camino del capítulo 8">
     <p class="font-semibold"><?= $navigationMarket ? 'Configuración → Análisis → Entregable. La captura y la academia están dentro del recorrido.' : 'Configura el alcance y los métodos; después sigue academia → insumos → análisis → entregable.' ?></p>
     <nav class="mt-3 flex flex-wrap gap-3" aria-label="Organización del capítulo 8">
-        <a class="btn-secondary <?= $navigationConfig?'bg-teal-50 text-teal-900':'' ?>" href="<?= e($navigationStudy ? $flowUrl('4','mercado',$componentKey).'&panel=preparation' : $flowUrl('plan',null,'')) ?>"><?= $navigationStudy?'Configuración del estudio':'Configuración' ?></a>
+        <a class="btn-secondary <?= $navigationConfig?'bg-teal-50 text-teal-900':'' ?>" href="<?= e($flowUrl('plan',null,'')) ?>">Configuración</a>
         <?php if (!$navigationMarket): ?><a class="btn-secondary <?= $stage==='1'?'bg-teal-50 text-teal-900':'' ?>" href="<?= e($navigationConfig || $navigationGeneral?$flowUrl('1',null,'').'&academy=general':$flowUrl('1',null,$navigationKey)) ?>">Academia</a><?php endif; ?>
         <?php foreach (($navigationMarket ? ['4'=>'Análisis','5'=>'Entregable'] : ['3'=>'Insumos','4'=>'Análisis','5'=>'Entregable']) as $navStep=>$navLabel): ?>
         <a class="btn-secondary <?= ($stage===(string)$navStep || ($navigationMarket && $navStep==='4' && $stage==='3'))?'bg-teal-50 text-teal-900':'' ?>" href="<?= e($flowUrl($navigationHasRoute ? (string)$navStep : 'plan',$navigationHasRoute ? $navigationMethod : null,$navigationKey)) ?>"><?= e($navLabel) ?></a>
@@ -33,3 +34,4 @@ $navigationStudy=$navigationMarket && $navigationWorking && ($selected['method']
     <p class="mt-3 text-sm"><strong>Trabajando en:</strong> <?= e($componentLabel) ?> · <?= e($methods[$selected['method'] ?? ''] ?? 'Método pendiente') ?>.</p>
     <?php endif; ?>
 </section>
+<?php endif; ?>

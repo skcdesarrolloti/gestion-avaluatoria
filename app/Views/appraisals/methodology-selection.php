@@ -67,6 +67,6 @@ $selectionTreatments=\App\Services\MethodologySelectionHelp::treatments();
     </details>
     <p class="mt-3 text-sm" data-autosave-status>Autoguardado activo · máximo 2000 caracteres por explicación.</p>
     <button type="submit" class="btn-primary mt-4">Guardar ahora</button>
-    <a class="btn-secondary mt-4" href="<?= e($flowUrl('plan',null,$selectionComponent['unit']['id'])) ?>">Actualizar configuración y recorridos</a>
+    <a class="btn-secondary mt-4" href="<?= e($flowUrl('plan',null,$selectionComponent['unit']['id'])) ?>">Organizar unidades y métodos</a>
 </form>
 <?php endif; ?>

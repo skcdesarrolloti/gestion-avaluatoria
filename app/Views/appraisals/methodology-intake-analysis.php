@@ -81,6 +81,7 @@ $analysisSubjectLocation=json_encode(array_intersect_key($subject ?? [],array_fl
         <?php require __DIR__.'/methodology-analysis-pending.php'; ?>
         <p class="mt-3 text-sm" data-autosave-status>Autoguardado activo. Espera el guardado confirmado antes de exportar.</p>
         <button class="btn-primary mt-3" type="submit">Guardar análisis de muestras</button>
+        <?php if (isset($flowUrl)): ?><a class="btn-secondary mt-3" x-show="analysisModule==='statistics'&&courseStep===6" href="<?= e($flowUrl('5')) ?>">Abrir entregable</a><?php endif; ?>
     </form>
     <?php if (isset($components[$componentKey],$methods,$units,$selected,$flowUrl)): ?>
     <details x-show="analysisModule==='preparation'" class="mt-4 rounded-xl border p-3">

@@ -2,8 +2,9 @@
 
 Capítulo 8: [plan de valoración y artículos por paso](docs/PLAN-VALORACION-CAP8.md).
 
-Mercado: Configuración → Análisis → Entregable. Captura y consolidación se integran
-en 1. Preparar la muestra; academia plegable junto a las tareas. Las rutas anteriores
+Mercado: un solo recorrido durante captura y análisis. En 1. Preparar la muestra
+se accede a configuración, Traer muestras de portales, verificación y mapa;
+academia plegable junto a las tareas. Las rutas anteriores
 y sus datos se conservan. Otros métodos mantienen su organización propia.
 M4: [Preparar la muestra: configuración, verificación y mapa](docs/ANALISIS-PREPARAR-DATOS.md),
 con consulta del encargo y acceso a muestras, depuración y mapa existentes.

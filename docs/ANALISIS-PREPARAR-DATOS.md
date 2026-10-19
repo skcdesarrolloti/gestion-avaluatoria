@@ -6,12 +6,17 @@ existentes. Los restantes pasos del plan académico se ampliarán progresivament
 ## Menú actual
 
 Actualización 19/10/2026. Se conservan las siete etapas principales de M4.
-«Preparar la muestra» reúne tres entradas: Configuración del estudio, Verificación
-de las muestras y Ubicación y mapa. Configuración del estudio reúne base del
+«Preparar la muestra» reúne Configuración del estudio, el acceso directo Traer
+muestras de portales, Verificación de las muestras y Ubicación y mapa. Configuración del estudio reúne base del
 análisis descriptivo, atributos habilitados y, en acordeón, método/alcance existentes.
-El acceso superior de Configuración abre este panel en recorridos de Mercado
-con muestras; el plan general sigue disponible para organizar unidades y métodos.
-La captura conserva su enlace plegable, lectores, fuentes y todos los anuncios.
+Durante captura y análisis de Mercado activo se muestra únicamente su recorrido,
+sin otra barra superior de Configuración/Análisis. La misma navegación de preparación
+aparece en ambas rutas. Traer muestras de portales abre los lectores existentes
+sin acordeón intermedio. El plan general se conserva mediante Organizar unidades y
+métodos; las entradas sin método o sin muestras mantienen su orientación inicial.
+En Memoria y sustentación se mantiene el enlace al entregable. El catálogo define
+nombres/escalas reutilizables; la selección de atributos del estudio sigue siendo
+única en Preparar la muestra.
 
 Los atributos seleccionados son las columnas editables de la verificación,
 incluso con poca cobertura o sin variación. Precio, área y descuento se mantienen.

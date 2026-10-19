@@ -1139,3 +1139,25 @@ ni probado contra sesión autenticada del hosting. La primera captura local exce
 el búfer de salida por tamaño de la academia existente; repetida con búfer mayor.
 Se corrigió un selector del diagnóstico de accesibilidad (dt sin nombre accesible),
 sin afectar la aplicación. No se confunde la recomendación con una elección guardada.
+
+
+2026-10-19 · Un solo recorrido y captura accesible.
+Retira la barra superior Configuración/Análisis/Entregable en M3/M4 de Mercado
+activo; M4 sin muestras y otras rutas/métodos mantienen la orientación anterior.
+Preparar la muestra muestra Configuración del estudio, Traer muestras de portales,
+Verificación de las muestras y Ubicación y mapa, en el mismo orden en captura y
+análisis. El acceso a lectores deja de estar oculto en un acordeón. La selección
+actual de atributos se conserva, sin duplicar controles o introducir otro modelo.
+El enlace administrativo se denomina Organizar unidades y métodos; se mantiene
+Abrir entregable en Memoria y sustentación. Catálogo aclara nombres/escalas frente
+a selección de atributos del estudio. No se modifican lectores ni lógica de captura,
+SQL, persistencia, filtros o cálculos. Sin migraciones ni cambios destructivos.
+Validación PHP1580/JS256/lint804/build/check:size78,8KB; Chrome con vistas PHP reales
+y 34 filas ficticias, navegación fetch desde preparación a lectores y regreso,
+campo de pegar resultados visible, matriz única; conserva grupo, precio, selección
+y fecha de ejecución. Escritorio1440/móvil390, sin errores JS/desbordamiento global;
+capturas revisadas. Pruebas originales de captura conservan los cinco portales,
+conteos, selección sin coincidencias, PH y matriz compartida. Sin prueba BD adicional
+porque solo cambia presentación/enlaces. No se desplegó al hosting. El primer ensayo
+PHP mostró avisos por datos incompletos del fixture de navegación; se completó el
+fixture, sin modificar reglas de aplicación, y la repetición pasó sin avisos.
