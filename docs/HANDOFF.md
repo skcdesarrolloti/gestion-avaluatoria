@@ -1240,3 +1240,24 @@ contención y navegación por teclado, captura/retorno, verificación, mapa y ej
 (fecha/paso/grupo) conservados. Escritorio1440 y móvil390 sin desbordamiento ni
 errores JS; capturas revisadas. Respuestas de guardado simuladas en la revisión UI;
 sin prueba BD adicional porque no cambia persistencia. Sin despliegue al hosting.
+2026-10-19 · Sensibilidad con cuartiles, operaciones y concepto descriptivo.
+En el paso 5 existente se añade la franja Q1–Q3 y mediana al gráfico conservado;
+cuadro de cuartiles/límites y comparación de media, mediana y recortada con
+operaciones, diferencia con signo y porcentaje frente a la media. Comprobación
+plegable y de montaje diferido de los valores ordenados y su uso en la recortada.
+Se reutilizan estimadores y límites existentes: sin nuevas reglas de exclusión,
+umbrales de sensibilidad, decisiones normativas, recálculos al navegar o esquemas.
+El concepto automático utiliza solo la ejecución guardada; separa franja central,
+señales RIC/robustas y recorte posicional, señala CV global y datos simulados.
+El mismo concepto se reproduce al restaurar y en la memoria descargada (precisión
+unificada a cuatro decimales). Notas del analista y edición mantienen el transporte
+existente. MAD/asimetría/curtosis y academia se conservan en acordeones.
+Verificación: PHP1581, JS259, lint805, build/check:size78,8KB gzip. Pruebas nuevas:
+resultados numéricos independientes, conservación/snapshot, escape, media cero,
+serie constante, n pequeño y límites inclusivos. Actualizada la prueba de montaje
+diferido para el gráfico añadido. Chrome con vistas PHP reales y 34 filas ficticias:
+gráfico/cuadro/concepto, nota editable, restauración desde ejecución y navegación
+sin cambiar fecha/grupo. Escritorio1440 y móvil390 sin errores JS ni desbordamiento;
+capturas inspeccionadas. HTTP de guardado simulado en revisión visual; no acredita
+sesión/BD del hosting. Sin prueba BD adicional: no cambia persistencia. Falta
+actualizar hosting; publicar el repositorio no despliega la aplicación.

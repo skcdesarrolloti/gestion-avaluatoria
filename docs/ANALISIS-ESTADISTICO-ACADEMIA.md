@@ -121,3 +121,22 @@ Academias disponibles antes de calcular en los siete pasos; apertura de fuentes
 NTS/IVS y de fundamento del CV con enlaces originales. Escritorio y móvil375px
 útiles sin desbordamiento horizontal, consola sin errores. No se confirma
 despliegue al hosting mediante la publicación al repositorio.
+
+## Sensibilidad y concepto · 19/10/2026
+
+El paso 5 conserva el grupo y la ejecución guardada. Reutiliza el gráfico de
+Dispersión con franja Q1–Q3, mediana punteada, media y límites de 1,5 RIC.
+Se muestran cuartiles/límites y tres centros con sus operaciones y diferencias
+absolutas con signo y relativas respecto de la media; media cero deja el porcentaje
+no estimable. La recortada conserva el criterio existente: piso(0,20n) por cola.
+El acordeón de comprobación muestra todos los valores ordenados y cuáles entran
+en ese promedio; se monta al abrir. No crea filtros ni exclusiones.
+
+El concepto descriptivo automático cuantifica diferencias, separa estar fuera de
+Q1–Q3 de cruzar los límites del RIC y conserva las señales robustas. No clasifica
+sensibilidad mediante umbrales inventados ni certifica el CV. Recuerda si hay datos
+simulados. Se deriva de los datos de la ejecución, se reproduce al restaurarla y
+se incluye en la memoria; las consideraciones del analista conservan su guardado
+existente. No agrega campos almacenados ni modifica esquemas o versiones.
+MAD, asimetría y curtosis se conservan como diagnósticos complementarios plegables;
+academia contextual y edición por inmueble siguen disponibles en el mismo paso.

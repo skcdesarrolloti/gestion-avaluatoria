@@ -41,7 +41,7 @@ test('only the selected statistics step mounts its rows and plots; notes and res
         live.courseStep = 4;
         await settle();
         assert.equal(root.querySelectorAll('textarea').length,34);
-        assert.equal(plots,2);
+        assert.equal(plots,3);
         const draft = live.courseInlineEdit('0');
         draft.offer = '450000000';
         draft.source = 'Corrección aún por aplicar';
@@ -57,7 +57,7 @@ test('only the selected statistics step mounts its rows and plots; notes and res
         assert.equal(live.courseInlineEdit('0').source,'Corrección aún por aplicar');
         assert.equal(live.analysisRows[0].price_amount,'400000000');
         assert.equal(live.courseResult.at,at);
-        assert.equal(plots,2);
+        assert.equal(plots,4);
     } finally {
         Alpine.destroyTree(root);
         delete window.HTMLTemplateElement.prototype.firstElementChild;

@@ -37,7 +37,7 @@
         <p class="rounded-xl border p-3" role="status" :title="'Calculado: '+courseResult.at" x-text="courseResult.rows.length+' muestras · '+courseResult.valid.length+' valores disponibles · '+courseResult.pending.length+' pendientes'"></p>
         <p class="text-sm" x-text="'Base aplicada: '+(courseResult.basis==='adjusted'?'valor con descuento / área publicada':'oferta / área publicada')+' · confianza '+100*courseResult.summary.confidence+' %'"></p>
         <p class="text-amber-900" x-show="!courseCurrent()">La base, confianza o datos cambiaron. Actualiza antes de interpretar o descargar; estas cifras corresponden a la ejecución anterior.</p>
-        <details class="rounded-xl border bg-teal-50 p-3 space-y-3" aria-label="Interpretación de los datos de este paso" tabindex="-1">
+        <details x-show="courseStep!==4" class="rounded-xl border bg-teal-50 p-3 space-y-3" aria-label="Interpretación de los datos de este paso" tabindex="-1">
             <summary class="min-h-11 cursor-pointer font-semibold">Qué significa el resultado · explicación y siguiente paso</summary>
             <p><strong>Resultado observado: </strong><span x-text="courseInterpretation().reading"></span></p>
             <p><strong>Qué significa: </strong><span x-text="courseInterpretation().meaning"></span></p>

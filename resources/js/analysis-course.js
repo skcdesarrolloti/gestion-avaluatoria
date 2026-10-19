@@ -12,6 +12,7 @@ import {courseQuartileCalculation,courseQuartileOperation,courseQuartileLimitOpe
 import {courseSnapshot,restoreCourseSnapshot} from './analysis-course-storage.js';
 import {courseInlineMethods} from './analysis-course-inline.js';
 import {courseCalculation} from './analysis-course-calculation.js';
+import {courseSensitivity} from './analysis-course-sensitivity.js';
 export const courseSteps=['Base del cálculo','Bloques y distribución','Tendencia central','Dispersión','Sensibilidad y consideraciones','Precisión de la media','Conclusión y memoria'];
 export function courseMethods(saved=''){return {
     ...courseInlineMethods(),
@@ -47,6 +48,8 @@ export function courseMethods(saved=''){return {
     courseQuartileLimitOperations(){return courseQuartileLimitOperations(this.courseResult.summary,v=>this.courseNumber(v));},
     courseProgressSummary(){return courseProgressSummary(this.courseResult);},
     courseCalculation(label=''){return courseCalculation(this.courseResult,label);},
+    courseSensitivity(){return courseSensitivity(this.courseResult,v=>this.courseNumber(v));},
+    courseSensitivityPlot(){return courseDispersionPlot(this.courseResult.valid,this.courseResult.summary,true);},
     async courseCalculate(){if(this.courseBusy||this.courseBootstrapBusy)return;this.courseBusy=true;this.courseError='';
         try{await new Promise(resolve=>setTimeout(resolve,0));if(!this.analysisRegimeApplied)throw new Error('Aplica primero la depuración de muestras.');const rows=this.courseRows(),valid=rows.filter(r=>!r.reasons.length&&Number.isFinite(r.y));if(valid.length<2)throw new Error('Completa al menos dos valores unitarios para el análisis descriptivo.');
             const s=courseSummary(valid,Number(this.courseConfidence));this.courseResult={rows,valid,pending:rows.filter(r=>!valid.includes(r)),summary:s,histogram:courseHistogram(s.classes),stamp:this.courseStamp(),at:new Date().toISOString(),basis:this.courseBasis,simulated:this.analysisHasSimulated(),bootstrap:null};
