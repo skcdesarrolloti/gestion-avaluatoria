@@ -1226,3 +1226,17 @@ revisadas. Primeras comprobaciones instantáneas del diagnóstico se adelantaban
 al render reactivo; corregidas para esperar visibilidad antes de inspección/Tab.
 Sin prueba BD adicional porque solo cambia la presentación del menú. Sin despliegue
 ni prueba autenticada en hosting.
+
+2026-10-19 · Corrección del menú solicitada por el usuario.
+Se retira el desplegable: las cuatro opciones de Preparar la muestra quedan
+estáticas debajo de su propio elemento, con sangría y línea de dependencia.
+Captura las muestra siempre; análisis las muestra cuando está activo ese paso.
+Sin flecha, estado de apertura, posición absoluta, superposición o scroll forzado.
+El botón principal recupera su acción anterior de abrir la verificación existente.
+Se conservan las siete etapas, rutas, academia, lectores, mapa, datos y guardados.
+Validación: PHP1581, JS256, lint804, build/check:size78,8KB gzip. Chrome con vistas
+PHP reales y 34 muestras ficticias: posición estática dentro del bloque padre,
+contención y navegación por teclado, captura/retorno, verificación, mapa y ejecución
+(fecha/paso/grupo) conservados. Escritorio1440 y móvil390 sin desbordamiento ni
+errores JS; capturas revisadas. Respuestas de guardado simuladas en la revisión UI;
+sin prueba BD adicional porque no cambia persistencia. Sin despliegue al hosting.

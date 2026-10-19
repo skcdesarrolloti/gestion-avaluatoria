@@ -1,4 +1,4 @@
-<nav id="market-preparation-actions" x-ref="preparationActions" class="absolute left-0 top-full z-30 mt-2 flex max-h-[60vh] w-72 max-w-[calc(100vw-3rem)] flex-col gap-1 overflow-y-auto rounded-xl border border-teal-700 bg-white p-2 shadow-lg" x-show="preparationMenuOpen" x-cloak @click="if($event.target.closest('button,a'))preparationMenuOpen=false" aria-label="Opciones de Preparar la muestra">
+<nav id="market-preparation-actions" class="ml-3 mt-2 flex flex-col gap-2 border-l-2 border-teal-700 pl-3" <?php if (empty($capturePreparationMenu)): ?>x-show="['preparation','samples','location'].includes(analysisModule)" x-cloak<?php endif; ?> aria-label="Opciones de Preparar la muestra">
     <?php foreach (['preparation'=>'Configuración del estudio','samples'=>'Verificación de las muestras','location'=>'Ubicación y mapa'] as $panel=>$label): ?>
     <?php if (!empty($capturePreparationMenu)): ?>
     <a class="btn-secondary justify-start text-left" href="<?= e($flowUrl('4').($panel==='samples'?'':'&panel='.$panel)) ?>"><?= e($label) ?></a>

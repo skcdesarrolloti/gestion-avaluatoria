@@ -87,11 +87,11 @@ lint con `php -l` sobre los archivos PHP de app, routes, database, bin y tests.
 
 ### Menú dependiente del paso 1
 
-Las cuatro opciones de Preparar la muestra se despliegan desde su propio botón,
-identificado con flecha, sin una barra de opciones debajo de todo el recorrido.
-La misma plantilla sirve a M3 (enlaces) y M4 (estado Alpine del formulario actual).
-Abrir el desplegable no cambia el paso ni los datos: se navega al elegir una opción.
-Se cierra al elegir, pulsar Escape o hacer clic fuera. Escape devuelve el foco al
-botón; Tab recorre las opciones nativas. aria-expanded/aria-controls identifican
-la relación. En móvil el menú conserva ancho/alto acotados y se lleva a la vista
-al abrir, sin recargar ni recalcular el análisis. El estado abierto no se persiste.
+Las cuatro opciones de Preparar la muestra aparecen debajo de su propio botón,
+en el mismo bloque, con sangría y una línea que identifica la dependencia.
+Son elementos del flujo normal de la página, sin flecha, desplegable ni superposición.
+La misma plantilla sirve a M3 (enlaces siempre visibles) y M4 (opciones visibles
+mientras está activa preparación, verificación o ubicación). Pulsar el paso 1
+abre la verificación existente; no requiere abrir otro menú. Tab recorre los
+controles nativos. Las demás etapas mantienen sus acciones y el orden original.
+En móvil los bloques se apilan sin taparse. No cambia persistencia ni cálculos.
