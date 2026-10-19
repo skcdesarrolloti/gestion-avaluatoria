@@ -140,3 +140,10 @@ se incluye en la memoria; las consideraciones del analista conservan su guardado
 existente. No agrega campos almacenados ni modifica esquemas o versiones.
 MAD, asimetría y curtosis se conservan como diagnósticos complementarios plegables;
 academia contextual y edición por inmueble siguen disponibles en el mismo paso.
+Los diagnósticos del paso 5 incluyen un cuadro de explicaciones por indicador:
+resultado, definición y lectura calculada de la ejecución (asimetría, exceso de
+curtosis, MAD, Q1/Q3 y z robusto). Distingue MAD cero de ausencia de señales y
+no infiere errores o exclusiones del signo de una medida. Conserva ejemplo y
+fórmulas existentes; en móvil apila cada indicador. Las explicaciones también se
+incluyen en la memoria descargable y usan los datos ya guardados, sin persistencia
+nueva ni recálculo del estudio.

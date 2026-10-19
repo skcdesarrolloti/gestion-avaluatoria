@@ -1261,3 +1261,20 @@ sin cambiar fecha/grupo. Escritorio1440 y móvil390 sin errores JS ni desbordami
 capturas inspeccionadas. HTTP de guardado simulado en revisión visual; no acredita
 sesión/BD del hosting. Sin prueba BD adicional: no cambia persistencia. Falta
 actualizar hosting; publicar el repositorio no despliega la aplicación.
+2026-10-19 · Explicaciones de los diagnósticos dentro de Sensibilidad.
+El cuadro numérico de MAD/asimetría/curtosis se sustituye por indicador, resultado,
+qué mide y lectura de la ejecución guardada. Incluye Q1/Q3 como referencia ya
+calculada y z robusto con conteo/muestras señaladas. Se explican signos, unidades,
+MAD cero, formas no estimables y límites de lo que permite concluir cada medida.
+Se mantiene el acordeón existente, ejemplo MAD, fórmulas, edición y notas; sin
+pantallas, criterios o cálculos nuevos. En móvil cada fila se apila con sus etiquetas.
+La misma explicación se incorpora escapada a la memoria descargable; todo se deriva
+de la ejecución existente, sin campos ni cambios de persistencia.
+Verificación: PHP1581, JS262, lint806 (php -n -l) y vista final con configuración
+habitual, build/check:size78,9KB gzip. Pruebas de signos positivos/negativos, MAD cero
+en serie no constante, z no estimable, muestras señaladas, conservación y escape
+en memoria. Chrome/vistas PHP reales/34 muestras ficticias: cinco explicaciones,
+lectura calculada, navegación, notas y recuperación; escritorio1440/móvil390 sin
+errores ni desbordamiento, capturas revisadas. Transporte de guardado simulado en
+la prueba UI; no acredita hosting. Sin prueba BD adicional: no cambia persistencia.
+Publicar el repositorio no despliega al hosting.

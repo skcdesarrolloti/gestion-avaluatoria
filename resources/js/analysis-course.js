@@ -13,6 +13,7 @@ import {courseSnapshot,restoreCourseSnapshot} from './analysis-course-storage.js
 import {courseInlineMethods} from './analysis-course-inline.js';
 import {courseCalculation} from './analysis-course-calculation.js';
 import {courseSensitivity} from './analysis-course-sensitivity.js';
+import {courseDiagnostics} from './analysis-course-diagnostics.js';
 export const courseSteps=['Base del cálculo','Bloques y distribución','Tendencia central','Dispersión','Sensibilidad y consideraciones','Precisión de la media','Conclusión y memoria'];
 export function courseMethods(saved=''){return {
     ...courseInlineMethods(),
@@ -49,6 +50,7 @@ export function courseMethods(saved=''){return {
     courseProgressSummary(){return courseProgressSummary(this.courseResult);},
     courseCalculation(label=''){return courseCalculation(this.courseResult,label);},
     courseSensitivity(){return courseSensitivity(this.courseResult,v=>this.courseNumber(v));},
+    courseDiagnostics(){return courseDiagnostics(this.courseResult,v=>this.courseNumber(v));},
     courseSensitivityPlot(){return courseDispersionPlot(this.courseResult.valid,this.courseResult.summary,true);},
     async courseCalculate(){if(this.courseBusy||this.courseBootstrapBusy)return;this.courseBusy=true;this.courseError='';
         try{await new Promise(resolve=>setTimeout(resolve,0));if(!this.analysisRegimeApplied)throw new Error('Aplica primero la depuración de muestras.');const rows=this.courseRows(),valid=rows.filter(r=>!r.reasons.length&&Number.isFinite(r.y));if(valid.length<2)throw new Error('Completa al menos dos valores unitarios para el análisis descriptivo.');
