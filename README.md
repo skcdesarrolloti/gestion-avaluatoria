@@ -1,6 +1,6 @@
 # Gestión avaluatoria · SuCasa
 
-Capítulo 8: [plan de valoración y artículos por paso](docs/PLAN-VALORACION-CAP8.md).
+Capítulo 8: [Define el estudio y continúa con sus muestras o insumos](docs/PLAN-VALORACION-CAP8.md).
 
 Mercado: un solo recorrido durante captura y análisis. En 1. Preparar la muestra
 se accede a configuración, Traer muestras de portales, verificación y mapa;

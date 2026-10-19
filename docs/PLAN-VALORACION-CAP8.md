@@ -158,3 +158,23 @@ Academia contextual: al elegir método o tratamiento, su explicación breve se a
 justo debajo del selector, en un acordeón cerrable. La justificación y el soporte
 ampliado siguen plegables. Las explicaciones usan el texto existente y no modifican
 los campos de decisión ni los textos ya escritos por el analista.
+
+
+## Hilo de entrada al estudio · 19/10/2026
+
+La entrada de Mercado muestra «Define el estudio», sin otra barra de Configuración
+encima. Secuencia visible: elegir unidad, definir método/tratamiento y continuar.
+Organización de partes permanece en «Revisar qué partes se valoran», abierto si ya
+hay terreno/construcción separados o un bloqueo previo. Se conserva su formulario.
+Método/tratamiento mantienen su academia contextual. Guardar queda como acción
+secundaria; Continuar con las muestras/insumos es la acción principal. El catálogo,
+los ejemplos y las lecturas completas siguen disponibles en consulta plegable,
+con botón Volver al estudio. Se retiran marcos anidados y el enlace de regreso al
+mismo plan dentro de su propio formulario.
+
+Continuar conserva el componente y el método elegido. Mercado con muestras propias
+abre M4 para prepararlas; sin muestras abre M3. Otros métodos abren sus insumos M3.
+Cambiar las partes exige actualizar el plan antes de continuar, para no abrir un
+alcance anterior; el bloqueo es de navegación y no agrega reglas de valoración.
+Los enlaces reutilizan la navegación fetch y su espera de guardados pendientes.
+No se modifican endpoints, datos guardados, filtros, cálculos ni reglas del método.

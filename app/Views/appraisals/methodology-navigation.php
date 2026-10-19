@@ -13,7 +13,7 @@ $navigationHasRoute=$navigationKey!=='' && isset($methods[$navigationMethod]);
 $navigationMarket = $method === 'mercado';
 $navigationWorkspace=$navigationMarket && $navigationWorking && ($selected['method'] ?? '')==='mercado' && in_array($stage,['3','4'],true) && ($stage==='3' || !empty($comparableRows));
 ?>
-<?php if (!$navigationWorkspace): ?>
+<?php if (!$navigationWorkspace && !($navigationMarket && $stage==='plan')): ?>
 <section class="mt-5 rounded-xl border bg-white p-4" aria-label="Camino del capítulo 8">
     <p class="font-semibold"><?= $navigationMarket ? 'Configuración → Análisis → Entregable. La captura y la academia están dentro del recorrido.' : 'Configura el alcance y los métodos; después sigue academia → insumos → análisis → entregable.' ?></p>
     <nav class="mt-3 flex flex-wrap gap-3" aria-label="Organización del capítulo 8">

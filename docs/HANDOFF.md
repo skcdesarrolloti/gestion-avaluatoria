@@ -1174,3 +1174,34 @@ PHP1580/JS256, lint de la vista modificada, build/check:size78,8KB. Chrome con v
 PHP real: tres tratamientos, cambio de método y cierre manual; explicación correcta,
 justificación/alcance previos conservados, sin errores JS ni desbordamiento en
 escritorio1440/móvil390. Capturas revisadas. Sin despliegue al hosting.
+
+
+2026-10-19 · Entrada guiada sin repetir Configuración.
+Mercado stage=plan elimina su barra general duplicada y muestra Define el estudio:
+elegir unidad → método/tratamiento → continuar con muestras/insumos. Organización
+se consulta en acordeón (abierto para partes separadas/bloqueadas), con controles
+originales. Ejemplo, catálogo y academia general/costo pasan a consulta plegable;
+catálogo conserva apertura directa factor_catalog=1 y regreso mediante configTab.
+Academia contextual de los selectores conservada. Formulario y contenedores del
+plan sin sucesión de recuadros; vistas de selección fuera del plan conservan estilo.
+
+Nueva continuación usa el método elegido y la misma clave del componente: Mercado
+con muestras propias→M4; sin ellas→M3; otros métodos→sus insumos. Muestras ajenas no
+cuentan. Atributos se mantienen en la preparación existente. El botón del plan ya
+no vuelve al propio plan. planNeedsRefresh es estado temporal de interfaz: al
+cambiar organización impide abrir claves anteriores hasta Actualizar plan. No se
+persiste ese indicador ni se agregan reglas de negocio. Guarda/navega con el mismo
+fetch, CSRF, formularios y versiones existentes. Sin cambios SQL, migraciones o
+recálculo de estadísticas.
+
+Validación: PHP1581, JS256, lint804 y revisión final de vistas/prueba modificadas,
+build/check:size78,8KB. Chrome con vistas PHP reales y 34 muestras ficticias: plan,
+cambio Renta/Mercado actualiza destino; POST de guardado antes del GET de continuar;
+preparación conserva grupo/fecha y lector expone pegado; catálogo y retorno; NPH
+bloquea continuar al cambiar partes y lo rehabilita si vuelve a la organización
+inicial. Escritorio1440/móvil390, sin errores JS/desbordamiento; capturas revisadas.
+Prueba PHP adicional de destino por unidad con/sin capturas; conservación de otros
+métodos, lecturas y anexos en suite existente. Un selector del diagnóstico local
+buscaba un botón dentro de un acordeón cerrado: se corrigió para abrir su summary;
+una expresión de extracción de href confundía :href con href: se corrigió el test.
+Sin prueba BD adicional, pues no cambia persistencia. Sin despliegue al hosting.

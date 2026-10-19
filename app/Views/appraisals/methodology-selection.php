@@ -4,6 +4,8 @@
 <?php $selectionComponent=$components[$componentKey];
 $selectionHelp=\App\Services\MethodologySelectionHelp::methods($componentLabel);
 $selectionTreatments=\App\Services\MethodologySelectionHelp::treatments();
+$selectionRoutes=[];
+if (!empty($selectionInPlan)) foreach ($methods as $selectionMethod=>$selectionLabel) $selectionRoutes[$selectionMethod]=$flowUrl($selectionMethod==='mercado' && !empty($selectionHasSamples)?'4':'3',$selectionMethod,$componentKey);
 ?>
 <?php if (($record['regimen_ph'] ?? '') === 'si' && $method === 'mercado'): ?>
 <details class="mb-4"><summary class="min-h-11 cursor-pointer font-semibold">Composición y derechos de la unidad PH</summary>
@@ -11,8 +13,8 @@ $selectionTreatments=\App\Services\MethodologySelectionHelp::treatments();
 </details>
 <?php endif; ?>
 <form x-data="<?= e(json_encode(['chosenMethod'=>$selected['method'] ?? '', 'chosenTreatment'=>$selected['treatment'] ?? '',
-    'methodHelp'=>$selectionHelp,'treatmentHelp'=>$selectionTreatments,'reasonText'=>$selected['reason'] ?? '', 'coverageText'=>$selected['coverage'] ?? ''],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>" method="post" action="<?= e(url($basePath . '/flujo')) ?>" data-module-autosave data-save-in-place
-    data-autosave-endpoint="<?= e(url($basePath . '/flujo')) ?>" class="rounded-2xl border bg-white p-5 sm:p-8">
+    'methodHelp'=>$selectionHelp,'treatmentHelp'=>$selectionTreatments,'nextRoutes'=>$selectionRoutes,'reasonText'=>$selected['reason'] ?? '', 'coverageText'=>$selected['coverage'] ?? ''],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>" method="post" action="<?= e(url($basePath . '/flujo')) ?>" data-module-autosave data-save-in-place
+    data-autosave-endpoint="<?= e(url($basePath . '/flujo')) ?>" class="<?= !empty($selectionInPlan)?'space-y-3':'rounded-2xl border bg-white p-5 sm:p-8' ?>">
     <?= csrf_field() ?>
     <input type="hidden" name="component" value="<?= e($componentKey) ?>">
     <input type="hidden" name="version" value="<?= (int) ($record['methodology_version'] ?? 0) ?>">
@@ -70,7 +72,13 @@ $selectionTreatments=\App\Services\MethodologySelectionHelp::treatments();
     <?php require __DIR__.'/methodology-cost-scope.php'; ?>
     </details>
     <p class="mt-3 text-sm" data-autosave-status>Autoguardado activo · máximo 2000 caracteres por explicación.</p>
-    <button type="submit" class="btn-primary mt-4">Guardar ahora</button>
+    <button type="submit" class="<?= !empty($selectionInPlan)?'btn-secondary':'btn-primary' ?> mt-4">Guardar ahora</button>
+    <?php if (!empty($selectionInPlan)): ?>
+    <a class="btn-primary mt-4" <?= isset($selectionRoutes[$selected['method'] ?? ''])?'href="'.e($selectionRoutes[$selected['method']]).'"':'aria-disabled="true"' ?> :href="!planNeedsRefresh?nextRoutes[chosenMethod] || null:null" :aria-disabled="!nextRoutes[chosenMethod]||planNeedsRefresh" :tabindex="nextRoutes[chosenMethod]&&!planNeedsRefresh?0:-1" @click="if(!nextRoutes[chosenMethod]||planNeedsRefresh)$event.preventDefault()" x-text="chosenMethod==='mercado'?'Continuar con las muestras':'Continuar con los insumos'">Continuar con las muestras o insumos</a>
+    <p class="mt-2 text-sm" x-show="!chosenMethod">Selecciona el método para continuar.</p>
+    <p class="mt-2 text-sm" x-show="planNeedsRefresh">Cambiaste las partes del estudio. Pulsa Actualizar plan antes de continuar.</p>
+    <?php else: ?>
     <a class="btn-secondary mt-4" href="<?= e($flowUrl('plan',null,$selectionComponent['unit']['id'])) ?>">Organizar unidades y métodos</a>
+    <?php endif; ?>
 </form>
 <?php endif; ?>

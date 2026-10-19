@@ -7,17 +7,14 @@ $planExample=\App\Services\MethodologySelectionHelp::example($record,$planUnits[
 $planReferenceUnit=$planUnits[$planActive]['unit'] ?? [];
 $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)($planReferenceUnit['property_type'] ?? (($planReferenceUnit['unit_kind'] ?? '')==='property'?($record['tipo_inmueble'] ?? ''):'')));
 ?>
-<section class="rounded-2xl border bg-white p-5 sm:p-8" aria-labelledby="plan-valoracion-titulo" x-data="{configTab:<?= e(json_encode(($_GET['factor_catalog'] ?? '')==='1'?'factors':'methods')) ?>}">
-    <p class="eyebrow">Configuración</p>
-    <h2 id="plan-valoracion-titulo" class="mt-2 text-2xl font-semibold">Configuración de la valoración</h2>
-    <nav class="mt-4 flex flex-wrap gap-2" aria-label="Configuración de métodos y factores">
-        <button type="button" class="btn-secondary" @click="configTab='methods'" :aria-pressed="configTab==='methods'">Métodos y alcances</button>
-        <button type="button" class="btn-secondary" @click="configTab='factors'" :aria-pressed="configTab==='factors'">Catálogo de factores</button>
+<section class="rounded-2xl border bg-white p-5 sm:p-8" aria-labelledby="plan-valoracion-titulo" x-data="{configTab:<?= e(json_encode(($_GET['factor_catalog'] ?? '')==='1'?'factors':'methods')) ?>,planNeedsRefresh:false}" @plan-organization-change="planNeedsRefresh=$event.detail.changed">
+    <h2 id="plan-valoracion-titulo" class="text-2xl font-semibold" x-text="configTab==='factors'?'Catálogo de nombres y escalas':'Define el estudio'">Define el estudio</h2>
+    <nav x-show="configTab==='factors'" x-cloak class="mt-4 flex flex-wrap gap-2" aria-label="Volver al estudio">
+        <button type="button" class="btn-secondary" @click="configTab='methods'">Volver al estudio</button>
     </nav>
     <?php require __DIR__.'/methodology-factor-reference.php'; ?>
     <div x-show="configTab==='methods'" data-ph-section>
-    <p class="mt-3 leading-6">Elige el método y su tratamiento. Los datos del inmueble se toman de los capítulos 1 y 3.</p>
-    <a class="inline-flex min-h-11 items-center font-semibold text-blue-800 underline" href="<?= e($flowUrl('1','costo','').'&consult_method=costo') ?>">Consultar academia C1 · Costo sin asignarlo</a>
+    <p class="mt-3 leading-6">Elige la unidad → define su método → continúa con las muestras o insumos.</p>
     <?php if ($components===[]): ?><p class="mt-4 rounded-xl border border-dashed p-4">Registra primero las unidades del predio en capítulos 1 y 3. La academia puede consultarse sin asignar un método.</p><?php endif; ?>
     <?php if ($planUnits!==[]): ?>
     <nav class="mt-5 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Unidades en configuración">
@@ -26,18 +23,16 @@ $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)(
         <?php endforeach; ?>
     </nav>
     <?php endif; ?>
-    <details class="mt-4 rounded-xl border bg-teal-50 p-4">
-        <summary class="min-h-11 cursor-pointer font-semibold"><?= e($planExample[0]) ?></summary>
-        <p class="mt-2 text-sm leading-6"><?= e($planExample[1]) ?></p>
-    </details>
     <div class="mt-5 space-y-5">
     <?php foreach ($components as $planKey=>$planUnit): if (isset($planUnit['parent_key']) || isset($planUnit['comparison_key'])) continue;
         if ($planKey!==$planActive) continue;
         $planSplit=!empty($planUnit['container']);
         $planParts=!empty($planUnit['plan_blocked']) ? [] : ($planSplit ? [$planKey.':terreno',$planKey.':construccion'] : [$planKey]);
     ?>
-        <article class="rounded-xl border p-4">
-            <h3 class="text-xl font-semibold"><?= e($planUnit['label']) ?></h3>
+        <article class="space-y-4">
+            <h3 class="sr-only"><?= e($planUnit['label']) ?></h3>
+            <details class="rounded-lg border p-3" <?= $planSplit || !empty($planUnit['plan_blocked'])?'open':'' ?>>
+            <summary class="min-h-11 cursor-pointer font-semibold">Revisar qué partes se valoran · <?= $planSplit?'terreno y construcción':'unidad completa' ?></summary>
             <p class="mt-1 text-sm text-slate-600"><?= ($planUnit['unit']['unit_kind'] ?? '')==='annex'?'Anexo registrado':'Unidad registrada' ?> · capítulos 1 y 3</p>
             <p class="mt-2 text-sm">Estructura registrada: <?= e(\App\Support\UnitMethodStructure::options()[$planUnit['unit']['method_structure'] ?? ''] ?? 'Por definir en capítulo 1') ?>. Esta estructura orienta el alcance; el analista elige el método.</p>
             <form x-data="{ organization: <?= e(json_encode($planSplit?'land_building':'whole')) ?> }" class="mt-4" method="post" action="<?= e(url($basePath.'/flujo')) ?>" data-module-autosave data-save-in-place data-autosave-endpoint="<?= e(url($basePath.'/flujo')) ?>">
@@ -45,7 +40,7 @@ $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)(
                 <input type="hidden" name="component" value="<?= e($planKey) ?>">
                 <input type="hidden" name="version" value="<?= (int)($record['methodology_version'] ?? 0) ?>">
                 <label class="block font-semibold">Qué partes vas a valorar en <?= e($planUnit['label']) ?>
-                    <select class="input" name="plan_parts" x-model="organization">
+                    <select class="input" name="plan_parts" x-model="organization" @change="$dispatch('plan-organization-change',{changed:$event.target.value!==<?= e(json_encode($planSplit?'land_building':'whole')) ?>})">
                         <option value="whole" <?= !$planSplit?'selected':'' ?>>Unidad con un alcance propio</option>
                         <option value="land_building" <?= $planSplit?'selected':'' ?> <?= (($record['regimen_ph'] ?? '')==='no' && ($planUnit['unit']['unit_kind'] ?? '')==='property') || $planSplit?'':'disabled' ?>>Terreno y construcción por separado</option>
                     </select>
@@ -57,13 +52,15 @@ $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)(
                 <button type="submit" class="btn-secondary mt-3">Guardar organización</button>
                 <a class="btn-primary mt-3" href="<?= e($flowUrl('plan',null,$planKey)) ?>">Actualizar plan</a>
             </form>
+            </details>
             <?php if (!empty($planUnit['plan_blocked'])): ?><p role="alert" class="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">Revisa la organización: el régimen o el tipo de unidad cambió desde que separaste terreno y construcción. Los recorridos anteriores están conservados e inactivos. Confirma NPH en el expediente o guarda «Unidad con un alcance propio» para reorganizar esta valoración.</p><?php endif; ?>
             <div class="mt-4 space-y-3">
             <?php foreach ($planParts as $planPartKey): $planPart=$components[$planPartKey]; $planItem=$flow[$planPartKey] ?? []; $planMethod=$planItem['method'] ?? ''; ?>
-                <div class="rounded-xl bg-slate-50 p-4">
+                <div class="space-y-3">
                     <p class="text-xs"><?= in_array($planMethod,['mercado','renta'],true) ? count(\App\Services\MethodologyComparableScope::rows($allComparableRows,$planPartKey)).' muestras propias' : ($planMethod!==''?'Insumos propios del método':'Método pendiente de selección') ?></p>
-                    <?php (static function() use ($record,$units,$components,$flow,$methods,$basePath,$flowUrl,$planPartKey,$planPart,$planItem,$planMethod): void {
+                    <?php (static function() use ($record,$units,$components,$flow,$methods,$basePath,$flowUrl,$planPartKey,$planPart,$planItem,$planMethod,$allComparableRows): void {
                         $componentKey=$planPartKey; $componentLabel=$planPart['label']; $selected=$planItem; $method=$planMethod ?: 'mercado';
+                        $selectionInPlan=true; $selectionHasSamples=\App\Services\MethodologyComparableScope::rows($allComparableRows,$planPartKey)!==[];
                         require __DIR__.'/methodology-selection.php';
                     })(); ?>
                     <div class="mt-4 space-y-2">
@@ -73,7 +70,7 @@ $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)(
                         <p class="font-semibold"><?= e($planMethods[$studyMethod]) ?> · contraste del mismo alcance</p>
                         <a class="inline-flex min-h-11 items-center text-sm font-semibold text-blue-800 underline" href="<?= e($flowUrl('2',$studyMethod,$studyKey)) ?>">Definir alcance y justificación del contraste</a>
                         <?php endif; ?>
-                        <a class="btn-secondary" href="<?= e($flowUrl('1',$studyMethod,$studyKey)) ?>">Abrir academia de <?= e($planMethods[$studyMethod]) ?></a>
+                        <details><summary class="min-h-11 cursor-pointer text-sm font-semibold">Consultar academia de <?= e($planMethods[$studyMethod]) ?></summary><a class="btn-secondary" href="<?= e($flowUrl('1',$studyMethod,$studyKey)) ?>">Abrir academia de <?= e($planMethods[$studyMethod]) ?></a></details>
                     <?php endforeach; ?>
                     </div>
                 </div>
@@ -86,6 +83,12 @@ $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)(
     <?php endforeach; ?>
     </div>
     <details class="mt-5 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Academia · recomendación y datos del expediente</summary>
+        <details class="mt-3 rounded-xl border bg-teal-50 p-3"><summary class="min-h-11 cursor-pointer font-semibold"><?= e($planExample[0]) ?></summary><p class="mt-2 text-sm"><?= e($planExample[1]) ?></p></details>
+        <div class="my-3 flex flex-wrap gap-2">
+            <button type="button" class="btn-secondary" @click="configTab='factors'">Editar catálogo de factores</button>
+            <a class="btn-secondary" href="<?= e($flowUrl('1',null,'').'&academy=general') ?>">Fundamentos generales</a>
+            <a class="btn-secondary" href="<?= e($flowUrl('1','costo','').'&consult_method=costo') ?>">Consultar academia C1 · Costo sin asignarlo</a>
+        </div>
         <?php (static function() use ($methodologyDecision,$methodologyDecisionRows,$flowUrl,$method,$componentKey): void {
             $decisionCompact=true; require __DIR__.'/valuation-methodology-decision.php';
         })(); ?>

@@ -22,11 +22,11 @@ declare(strict_types=1);
             require BASE_PATH . '/app/Views/appraisals/valuation-methodology.php';
             $html = ob_get_contents();
         } finally { ob_end_clean(); }
-        expect(str_contains($html, '>Configuración</a>') && !str_contains($html, 'Herramientas y consultas del expediente')
+        expect(($stage==='plan'?!str_contains($html,'aria-label="Organización del capítulo 8"'):str_contains($html, '>Configuración</a>')) && !str_contains($html, 'Herramientas y consultas del expediente')
             && !str_contains($html, 'aria-label="Etapas de Mercado"'), 'navegación común sin menús duplicados en ' . $stage);
-        foreach (['Análisis','Entregable'] as $label) expect(str_contains($html,'>'.$label.'</a>'), 'paso visible incluso sin recorrido en '.$stage.': '.$label);
+        if ($stage!=='plan') foreach (['Análisis','Entregable'] as $label) expect(str_contains($html,'>'.$label.'</a>'), 'paso visible incluso sin recorrido en '.$stage.': '.$label);
         if ($stage==='plan') {
-            expect(str_contains($html,'Configuración de la valoración') && !str_contains($html,'Verificación de datos guardados')
+            expect(str_contains($html,'Define el estudio') && !str_contains($html,'Verificación de datos guardados')
                 && !str_contains($html,'Resolución 941 · Artículos completos para este paso') && str_contains($html,'academy=general'), 'configuración remite artículos generales a academia sin desplegar checklist');
             expect(str_contains($html,'aria-label="Unidades en configuración"') && str_contains($html,'Método y alcance · Oficina &lt;principal&gt;')
                 && !str_contains($html,'Método y alcance · Depósito de oficina'),'configuración muestra pestañas pero sólo formularios de la unidad elegida');
@@ -35,6 +35,8 @@ declare(strict_types=1);
             expect(strpos($html,'Método y alcance · Oficina')<strpos($html,'Academia · recomendación y datos del expediente')
                 && !str_contains($html,'Camino recomendado') && str_contains($html,'Datos utilizados · solo consulta'),
                 'decisión editable precede academia compacta sin repetir el recorrido ni la cabecera de recomendación');
+            expect(str_contains($html,'Continuar con las muestras o insumos') && !str_contains($html,'>Organizar unidades y métodos</a>') && str_contains($html,'Revisar qué partes se valoran'),
+                'definición del estudio ofrece continuación y conserva organización sin enlace que regrese a la misma pantalla');
         }
         if ($stage === 'components') {
             expect(str_contains($html, 'Verificación de la unidad principal y los anexos')
@@ -107,4 +109,19 @@ declare(strict_types=1);
         if ($stage==='3') expect(str_contains($html,'1. Recoger por portal') && str_contains($html,'&amp;panel=preparation') && str_contains($html,'Verificación de las muestras'),
             'lectores y retorno a la misma configuración y verificación disponibles desde captura');
     }
+    $stage='plan';
+    $continueTarget=static function(string $html): array {
+        preg_match('/<a\b[^>]*?\shref="([^"]+)"[^>]*>Continuar con las muestras o insumos<\/a>/s',$html,$match);
+        parse_str((string)parse_url(html_entity_decode($match[1] ?? ''),PHP_URL_QUERY),$query);
+        return $query;
+    };
+    ob_start(); require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php'; $html=ob_get_clean();
+    $target=$continueTarget($html);
+    expect(($target['stage'] ?? '')==='4' && ($target['component'] ?? '')==='office' && ($target['method'] ?? '')==='mercado',
+        'continuar desde estudio con muestras propias abre su preparación sin volver a capturar');
+    $allComparableRows=[['id'=>str_repeat('c',32),'component_key'=>'annex']]; $comparableRows=[];
+    ob_start(); require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php'; $html=ob_get_clean();
+    $target=$continueTarget($html);
+    expect(($target['stage'] ?? '')==='3' && ($target['component'] ?? '')==='office',
+        'muestras de otra unidad no desvían la continuación de una unidad sin capturas');
 })();
