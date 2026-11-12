@@ -1,5 +1,6 @@
 <?php
 $savedRows = is_array($comparableRows ?? null) ? array_values($comparableRows) : [];
+$studyToken=($componentKey ?? '')===''?'bank':\App\Services\ComparableStudy::token($method ?? 'mercado',$guide['business_label'] ?? '');
 $blank = ['id' => '', 'active' => 'si', 'status' => 'por_verificar', 'source_type' => '',
     'source_name' => '', 'source_url' => '', 'query_used' => '', 'operation' => (string) ($guide['business_label'] ?? ''),
     'property_type' => (string) ($guide['type_label'] ?? ''), 'neighborhood' => '', 'address_hint' => '',

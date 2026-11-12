@@ -2773,6 +2773,7 @@ Certificado de tradicion.",
     expect(true, 'rate limit usa temporal si storage falla');
     unlink($blockedDirectory);
     require __DIR__ . '/income-inputs-render.php';
+    require __DIR__ . '/comparable-study.php';
     require __DIR__ . '/office-igac.php';
     require __DIR__ . '/comparable-intake.php';
     report();

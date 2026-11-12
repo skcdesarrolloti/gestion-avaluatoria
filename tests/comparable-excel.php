@@ -45,6 +45,10 @@ use App\Services\ComparableExcelArchive;
         expectStatus(409,fn()=>ComparableExcelInput::read($path,$aid,'',5,$existing),'Excel antiguo rechaza versión posterior sin sobrescribir');
         expectStatus(422,fn()=>ComparableExcelInput::read($path,$aid,'otra',4,$existing),'Excel de otra unidad no se mezcla');
         expectStatus(422,fn()=>ComparableExcelInput::read($path,'otro','',4,$existing),'Excel de otro expediente se rechaza');
+        expectStatus(422,fn()=>ComparableExcelInput::read($path,$aid,'',4,$existing,'renta:arriendo'),'Excel anterior sin investigación no entra en Renta');
+        $write($meta+['study_scope'=>'mercado:venta']);
+        expectStatus(422,fn()=>ComparableExcelInput::read($path,$aid,'',4,$existing,'renta:arriendo'),'Excel de venta no se importa en investigación de arriendos');
+        expect(ComparableExcelInput::read($path,$aid,'',4,$existing,'mercado:venta')[0]['source_name']==='Aviso confirmado','Excel de la misma investigación conserva lectura original');
         $zip=new ZipArchive();$zip->open($path);$zip->addFromString('xl/sharedStrings.xml','<!DOCTYPE sst [<!ENTITY x SYSTEM "file:///etc/passwd">]><sst/>');$zip->close();
         expectStatus(422,fn()=>ComparableExcelInput::read($path,$aid,'',4,$existing),'lector Excel rechaza entidades externas');
     } finally { if(is_file($path)) unlink($path); }

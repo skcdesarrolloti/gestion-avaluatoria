@@ -3,6 +3,9 @@
 Renta: [primer bloque conceptual](docs/RENTA-PRIMER-BLOQUE.md) en Insumos, con
 listas, ayudas y soportes normativos. Academia incluye orientación y resumen PDF;
 respuestas como borrador por recorrido, sin cálculos ni nuevas migraciones.
+Investigaciones de [ventas y arriendos independientes](docs/INVESTIGACIONES-VENTAS-ARRIENDOS.md):
+colecciones, guardado y Excel separados por unidad, método y operación; muestras
+históricas conservadas al cambiar de método.
 
 Capítulo 8: [Define el estudio y continúa con sus muestras o insumos](docs/PLAN-VALORACION-CAP8.md).
 

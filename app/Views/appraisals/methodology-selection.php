@@ -9,7 +9,7 @@ $selectionAcademyRoutes=[];
 foreach ($methods as $selectionMethod=>$selectionLabel) $selectionAcademyRoutes[$selectionMethod]=$flowUrl('1',$selectionMethod,$componentKey);
 $selectionAcademyBinding="academyRoutes.renta + '#renta-orientacion'";
 if (!empty($selectionInPlan)) $selectionAcademyBinding='!planNeedsRefresh ? ('.$selectionAcademyBinding.') : null';
-if (!empty($selectionInPlan)) foreach ($methods as $selectionMethod=>$selectionLabel) $selectionRoutes[$selectionMethod]=$flowUrl($selectionMethod==='mercado' && !empty($selectionHasSamples)?'4':'3',$selectionMethod,$componentKey);
+if (!empty($selectionInPlan)) foreach ($methods as $selectionMethod=>$selectionLabel) $selectionRoutes[$selectionMethod]=$flowUrl($selectionMethod==='mercado' && (($selectionSamples['mercado'] ?? null)!==null?$selectionSamples['mercado']>0:!empty($selectionHasSamples))?'4':'3',$selectionMethod,$componentKey);
 ?>
 <?php if (($record['regimen_ph'] ?? '') === 'si' && $method === 'mercado'): ?>
 <details class="mb-4"><summary class="min-h-11 cursor-pointer font-semibold">Composición y derechos de la unidad PH</summary>

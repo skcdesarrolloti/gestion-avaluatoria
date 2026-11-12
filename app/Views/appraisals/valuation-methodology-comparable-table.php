@@ -11,11 +11,12 @@
     data-appraisal-id="<?= e($record['id']) ?>" data-excel-preview-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/excel/revisar')) ?>"
     data-detail-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/leer-aviso')) ?>"
     data-excel-save-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/excel/guardar')) ?>"
-    data-excel-updated="<?= e(\App\Services\ComparableExcelHistory::display(\App\Services\ComparableExcelHistory::latest($record, $componentKey ?? ''))) ?>"
+    data-excel-updated="<?= e(\App\Services\ComparableExcelHistory::display(\App\Services\ComparableExcelHistory::latest($record, ($componentKey ?? '').'|'.$studyToken))) ?>"
     data-subject-latitude="<?= e($subject['latitude'] ?? '') ?>" data-subject-longitude="<?= e($subject['longitude'] ?? '') ?>"
     data-autosave-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/autoguardar')) ?>">
     <?= csrf_field() ?>
     <input type="hidden" name="component_scope" value="<?= e($componentKey ?? '') ?>">
+    <input type="hidden" name="study_scope" value="<?= e($studyToken) ?>">
     <input type="hidden" name="version" value="<?= (int) ($record['comparables_version'] ?? 0) ?>">
     <?php require __DIR__ . '/methodology-capture-restart.php'; ?>
     <div x-show="searchTab === 'captura'"><?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-links.php'; ?></div>

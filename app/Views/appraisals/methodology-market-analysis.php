@@ -17,6 +17,7 @@ $stale = !empty($selected['analysis']) && ($selected['evidence_hash'] ?? '') !==
         <?= csrf_field() ?>
         <input type="hidden" name="version" value="<?= (int) ($record['methodology_version'] ?? 0) ?>">
         <input type="hidden" name="component" value="<?= e($componentKey) ?>">
+        <input type="hidden" name="study_scope" value="<?= e(\App\Services\ComparableStudy::token('mercado',$guide['business_label'] ?? '')) ?>">
         <?php if ($stage === '4'): ?>
         <label class="block font-semibold">Memoria del análisis del componente
             <textarea class="input" rows="8" name="analysis" maxlength="6000" placeholder="Documenta selección y exclusión de muestras, negociación, ajustes sustentados, cálculos y criterio de adopción."><?= e($selected['analysis'] ?? '') ?></textarea>

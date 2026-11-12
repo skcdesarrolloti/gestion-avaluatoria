@@ -73,7 +73,7 @@ export function exportCapture(entries, form) {
         return row;
     });
     const bytes = tableWorkbook(orderExcelColumns(columns), rows, form.dataset.phSubject === 'si' ? 'Comparables PH' : 'Comparables NPH', {
-        appraisal:form.dataset.appraisalId,scope:form.querySelector('[name=component_scope]').value,version:Number(form.querySelector('[name=version]').value),exported_at:new Date().toISOString()});
+        appraisal:form.dataset.appraisalId,scope:form.querySelector('[name=component_scope]').value,study_scope:form.querySelector('[name=study_scope]')?.value ?? '',version:Number(form.querySelector('[name=version]').value),exported_at:new Date().toISOString()});
     const url = URL.createObjectURL(new Blob([bytes], {type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}));
     const link = document.createElement('a'); link.href = url; link.download = `comparables-${form.dataset.phSubject === 'si' ? 'PH' : 'NPH'}-v${form.querySelector('[name=version]').value}-${new Date().toISOString().replaceAll(':','-').slice(0,19)}.xlsx`;
     link.click(); setTimeout(() => URL.revokeObjectURL(url), 1000);

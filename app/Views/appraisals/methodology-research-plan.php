@@ -21,6 +21,7 @@
         <input type="hidden" name="component" value="<?= e($componentKey) ?>">
         <input type="hidden" name="version" value="<?= (int)($record['methodology_version'] ?? 0) ?>">
         <input type="hidden" name="research_plan" :value="payload" value="<?= e(json_encode($researchPlan,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>">
+        <input type="hidden" name="study_scope" value="<?= e(\App\Services\ComparableStudy::token($method ?? 'mercado',$guide['business_label'] ?? '')) ?>">
         <?php if (isset($researchPlan['factors']['destination'])): ?>
         <div class="mb-4 rounded-xl bg-slate-50 p-4 text-sm">
             <h3 class="font-semibold">Filtros de investigación · destinación</h3>

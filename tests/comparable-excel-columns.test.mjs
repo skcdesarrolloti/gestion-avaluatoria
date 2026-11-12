@@ -24,7 +24,7 @@ test('Descarga ordenada conserva valores, identidad, contexto y referencias de f
         ph_parking_nature:'Privado'};
     const keys=Object.keys(data), numeric=new Set(['price_amount','area_m2','negotiation_discount','negotiated_amount']);
     const {document}=parseHTML(`<form data-ph-subject="si" data-appraisal-id="${'b'.repeat(32)}">
-        <input name="component_scope" value="oficina"><input name="version" value="5">
+        <input name="component_scope" value="oficina"><input name="study_scope" value="mercado:venta"><input name="version" value="5">
         <table><thead><tr>${keys.map(key=>`<th>${key}</th>`).join('')}</tr></thead><tbody><tr>
         ${keys.map(key=>`<td><input name="rows[0][${key}]" type="${numeric.has(key)?'number':'text'}"></td>`).join('')}
         </tr></tbody></table></form>`);
@@ -37,6 +37,7 @@ test('Descarga ordenada conserva valores, identidad, contexto y referencias de f
     try {
         exportCapture([{used:true,data,tr,controls:[...tr.querySelectorAll('input')],capturePending:[]}],form);
         const contents=new TextDecoder().decode(await blob.arrayBuffer());
+        assert.ok(contents.includes('mercado:venta'));
         const sorted=orderExcelColumns([{key:'id'},{key:'capture_pending'},...keys.filter(key=>key!=='id').map(key=>({key}))]);
         const ref=key=>`${columnName(sorted.findIndex(column=>column.key===key))}2`;
         assert.match(contents,/<c r="A1"[^>]*><is><t[^>]*>source_name<\/t>/);

@@ -55,12 +55,12 @@ $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)(
             </details>
             <?php if (!empty($planUnit['plan_blocked'])): ?><p role="alert" class="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">Revisa la organización: el régimen o el tipo de unidad cambió desde que separaste terreno y construcción. Los recorridos anteriores están conservados e inactivos. Confirma NPH en el expediente o guarda «Unidad con un alcance propio» para reorganizar esta valoración.</p><?php endif; ?>
             <div class="mt-4 space-y-3">
-            <?php foreach ($planParts as $planPartKey): $planPart=$components[$planPartKey]; $planItem=$flow[$planPartKey] ?? []; $planMethod=$planItem['method'] ?? ''; ?>
-                <div class="space-y-3" x-data="{activeStudyMethod:<?= e(json_encode($planMethod)) ?>}" @method-selection-change="activeStudyMethod=$event.detail.method">
-                    <p class="text-xs"><?= in_array($planMethod,['mercado','renta'],true) ? count(\App\Services\MethodologyComparableScope::rows($allComparableRows,$planPartKey)).' muestras propias' : ($planMethod!==''?'Insumos propios del método':'Método pendiente de selección') ?></p>
-                    <?php (static function() use ($record,$units,$components,$flow,$methods,$basePath,$flowUrl,$planPartKey,$planPart,$planItem,$planMethod,$allComparableRows): void {
+            <?php foreach ($planParts as $planPartKey): $planPart=$components[$planPartKey]; $planItem=$flow[$planPartKey] ?? []; $planMethod=$planItem['method'] ?? ''; $studyCounts=\App\Services\ComparableStudy::counts($allComparableRows,$planPartKey,$record); ?>
+                <div class="space-y-3" x-data="<?= e(json_encode(['activeStudyMethod'=>$planMethod,'studyCounts'=>$studyCounts])) ?>" @method-selection-change="activeStudyMethod=$event.detail.method">
+                    <p class="text-xs" x-text="['mercado','renta'].includes(activeStudyMethod)?studyCounts[activeStudyMethod]+' muestras propias de esta investigación':(activeStudyMethod?'Insumos propios del método':'Método pendiente de selección')"><?= e(isset($studyCounts[$planMethod])?$studyCounts[$planMethod].' muestras propias de esta investigación':'Insumos propios del método') ?></p>
+                    <?php (static function() use ($record,$units,$components,$flow,$methods,$basePath,$flowUrl,$planPartKey,$planPart,$planItem,$planMethod,$allComparableRows,$studyCounts): void {
                         $componentKey=$planPartKey; $componentLabel=$planPart['label']; $selected=$planItem; $method=$planMethod ?: 'mercado';
-                        $selectionInPlan=true; $selectionHasSamples=\App\Services\MethodologyComparableScope::rows($allComparableRows,$planPartKey)!==[];
+                        $selectionInPlan=true; $selectionSamples=$studyCounts; $selectionHasSamples=($studyCounts[$planMethod] ?? 0)>0;
                         require __DIR__.'/methodology-selection.php';
                     })(); ?>
                     <div class="mt-4 space-y-2" x-show="activeStudyMethod !== 'renta'" <?= $planMethod==='renta'?'x-cloak':'' ?>>

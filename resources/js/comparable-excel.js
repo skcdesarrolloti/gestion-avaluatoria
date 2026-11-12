@@ -6,6 +6,7 @@ export function comparableExcel() {
     const request=async endpoint=>{
         const body=new FormData(); body.set('excel',pendingFile);body.set('_token',form.querySelector('[name=_token]').value);
         body.set('component_scope',form.querySelector('[name=component_scope]').value);
+        body.set('study_scope',form.querySelector('[name=study_scope]')?.value ?? '');
         const response=await fetch(endpoint,{method:'POST',body,headers:{Accept:'application/json'}});
         if (!response.headers.get('content-type')?.includes('application/json')) throw new Error('No se pudo leer Excel. Comprueba la sesión y el tamaño del archivo.');
         const result=await response.json();if (!response.ok || !result.ok) throw new Error(result.message || 'No se pudo guardar el Excel.');

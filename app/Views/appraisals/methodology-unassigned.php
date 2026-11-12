@@ -1,11 +1,22 @@
 <?php
-$assignmentPools = ['' => \App\Services\MethodologyComparableScope::rows($allComparableRows, '')];
-foreach ($allComparableRows as $sample) {
+$studyToken=$componentKey===''?'bank':\App\Services\ComparableStudy::token($method ?? 'mercado',$guide['business_label'] ?? '');
+$studyContext=['token'=>$studyToken,'operation'=>explode(':',$studyToken)[1] ?? ''];
+$otherStudies=array_filter($allComparableRows,static fn($row)=>($row['component_key'] ?? '')===$componentKey && !\App\Services\ComparableStudy::compatible($row,$studyContext));
+$compatibleRows=array_values(array_filter($allComparableRows,static fn($row)=>\App\Services\ComparableStudy::compatible($row,$studyContext)));
+$assignmentPools = ['' => \App\Services\MethodologyComparableScope::rows($compatibleRows, '')];
+foreach ($compatibleRows as $sample) {
     $savedKey = $sample['component_key'] ?? '';
     if ($savedKey !== '' && (!isset($components[$savedKey]) || !empty($components[$savedKey]['container']))) $assignmentPools[$savedKey][] = $sample;
 }
 if ($componentKey !== '') $assignmentPools[$componentKey] = $comparableRows;
 ?>
+<?php if ($componentKey!==''): ?>
+<aside class="mb-4 rounded-xl border border-teal-200 bg-teal-50 p-4">
+    <p class="font-semibold">Investigación actual: <?= e($methods[$method] ?? $method) ?> · <?= e($studyContext['operation']==='arriendo'?'Arriendos':'Ventas') ?></p>
+    <p class="mt-2 text-sm">Esta captura y su Excel contienen únicamente las muestras de esta investigación. Las ventas y los arriendos se mantienen separados al cambiar de método.</p>
+    <?php if ($otherStudies!==[]): ?><p class="mt-2 text-sm"><?= count($otherStudies) ?> muestras de otras investigaciones o pendientes de clasificación permanecen conservadas y no participan aquí.</p><?php endif; ?>
+</aside>
+<?php endif; ?>
 <?php foreach ($assignmentPools as $sourceScope => $bank): if ($bank === []) continue; ?>
 <details class="mb-5 rounded-xl border border-amber-200 bg-amber-50 p-4" <?= $componentKey === '' ? 'open' : '' ?>>
     <summary class="min-h-11 cursor-pointer font-semibold"><?= $sourceScope === '' ? count($bank) . ' muestras conservadas sin asignación' : (isset($components[$sourceScope]) ? 'Reasignar muestras de este componente' : count($bank) . ' muestras con asignación anterior: vincular a una unidad registrada') ?></summary>
@@ -13,6 +24,7 @@ if ($componentKey !== '') $assignmentPools[$componentKey] = $comparableRows;
     <form method="post" action="<?= e(url($basePath . '/asignar-muestras')) ?>" class="mt-4">
         <?= csrf_field() ?>
         <input type="hidden" name="source_scope" value="<?= e($sourceScope) ?>">
+        <input type="hidden" name="study_scope" value="<?= e($studyToken) ?>">
         <input type="hidden" name="version" value="<?= (int) ($record['comparables_version'] ?? 0) ?>">
         <label class="block font-semibold">Componente destino
             <select name="component" class="input"><option value="">Banco sin asignar</option>

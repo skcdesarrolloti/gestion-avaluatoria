@@ -1,5 +1,10 @@
 # Crear y evolucionar la base sin SQL manual
 
+12/11/2026 · Separación de investigaciones sin DDL: research_method y
+research_operation en capture_details; planes/memorias por método en
+methodology_workflow.method_studies. No borra ni migra automáticamente muestras.
+Ver INVESTIGACIONES-VENTAS-ARRIENDOS.md para históricos, guardas y pruebas.
+
 Renta conceptual (12/11/2026): `income_concept` dentro del JSON existente
 `methodology_workflow`, por componente/contraste y propietario; versión optimista
 de metodología compartida con su plan. Sin esquema ni migración nueva. Se conservan

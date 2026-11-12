@@ -110,6 +110,8 @@ declare(strict_types=1);
             'lectores y retorno a la misma configuración y verificación disponibles desde captura');
     }
     $stage='plan';
+    $record['methodology_workflow']=json_encode($flow);
+    $allComparableRows[0]['operation']='Venta';
     $continueTarget=static function(string $html): array {
         preg_match('/<a\b[^>]*?\shref="([^"]+)"[^>]*>Continuar con las muestras o insumos<\/a>/s',$html,$match);
         parse_str((string)parse_url(html_entity_decode($match[1] ?? ''),PHP_URL_QUERY),$query);

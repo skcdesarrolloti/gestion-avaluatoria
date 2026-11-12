@@ -23,6 +23,8 @@ final class ComparableCaptureDetail
             'location_verification' => ['Verificación manual de ubicación', 'choice', 'map'],
             'published_location' => ['Coordenadas originales publicadas · referencia sin verificar', 'text', 'map'],
             'component_key' => ['Componente de la muestra', 'text', 'internal'],
+            'research_method' => ['Método de la investigación', 'text', 'internal'],
+            'research_operation' => ['Operación de la investigación', 'text', 'internal'],
             'area_basis' => ['Qué área publica la fuente', 'text', 'shared'],
             'market_data_kind' => ['Tipo de dato: oferta, transacción o arriendo', 'choice', 'shared'],
             'market_city' => ['Municipio del comparable y fuente', 'text', 'shared'],

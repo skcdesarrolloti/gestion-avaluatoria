@@ -1,5 +1,13 @@
 # Entrega al responsable de la implementación
 
+12/11/2026 · Investigación separada por unidad/recorrido, método y operación:
+Renta no carga ni sobrescribe ventas; guardado/Excel/reasignación validan el estudio
+en servidor. Históricos sin operación quedan conservados sin atribución automática.
+Planes y memorias se conservan por método al cambiar y regresar. Aviso visible con
+colección actual y muestras conservadas fuera; conteos y continuación coherentes.
+Sin DDL ni cálculos nuevos. PHP1625/JS272/BD246 y11 específicos posteriores/HTTP14;
+UI PHP+BD reales local escritorio/móvil. Detalles en INVESTIGACIONES-VENTAS-ARRIENDOS.md.
+
 12/11/2026 · Insumos de Renta ligero: entrada y preparación sin recuperar ni montar
 la matriz; captura por fetch al abrir paso3, con guardado previo, carga/error y
 reintento. Conserva una matriz montada, borradores y portal al volver. JS de Renta

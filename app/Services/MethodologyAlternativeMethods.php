@@ -41,7 +41,7 @@ final class MethodologyAlternativeMethods
                 $saved[$studyKey]=array_replace($saved[$studyKey] ?? [], ['method'=>$other]);
             }
         }
-        $saved[$key]=array_replace($saved[$key] ?? [],$changes);
+        $saved[$key]=MethodStudyState::change($saved[$key] ?? [],$changes);
         return $saved;
     }
 }

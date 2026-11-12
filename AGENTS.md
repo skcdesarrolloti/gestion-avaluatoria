@@ -112,6 +112,11 @@ de negocio ni trasladar el controlador monolítico. No modificar InversKC al tra
 
 ## Continuidad de captura de comparables
 
+Las investigaciones de ventas y arriendos se separan por unidad/recorrido, método
+y operación en servidor, guardado y Excel. Conservar datos anteriores y no inferir
+operaciones desconocidas. Antes de cambiar su aislamiento, leer
+`docs/INVESTIGACIONES-VENTAS-ARRIENDOS.md` y mantener las pruebas de cambio de método.
+
 Antes de modificar el módulo C o sus lectores, leer
 `docs/CAPTURA-COMPARABLES-CONTINUIDAD.md` y conservar el pegado por portal,
 conteos, selección sin coincidencias y matriz compartida. Reorganizar la interfaz

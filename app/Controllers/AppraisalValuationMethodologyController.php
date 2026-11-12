@@ -34,7 +34,7 @@ final class AppraisalValuationMethodologyController
             $componentKey = (string)(array_key_first(\App\Services\MethodologyValuationPlan::working($components)) ?? '');
         }
         $flow = \App\Services\MethodologyWorkflow::saved($record);
-        $selected = $flow[$componentKey] ?? [];
+        $selected = \App\Services\MethodStudyState::visible($flow[$componentKey] ?? []);
         $method = ($selected['method'] ?? '') ?: (is_string($_GET['method'] ?? null) ? $_GET['method'] : 'mercado');
         if (!isset(\App\Services\MethodologyWorkflow::METHODS[$method])) $method = 'mercado';
         $stage = is_string($_GET['stage'] ?? null) ? $_GET['stage'] : 'plan';
@@ -42,9 +42,11 @@ final class AppraisalValuationMethodologyController
         if (!in_array($stage, ['plan', 'components', 'integration', 'decision', 'report', '1', '2', '3', '4', '5'], true)) $stage = 'plan';
         if (!empty($components[$componentKey]['container']) && in_array($stage, ['components','1','2','3','4','5'], true)) $stage = 'plan';
         if ($stage==='1' && ($_GET['consult_method'] ?? '')==='costo') $method='costo';
+        if (isset(\App\Services\MethodologyWorkflow::METHODS[$flow[$componentKey]['method'] ?? '']))
+            $selected=\App\Services\MethodStudyState::visible($flow[$componentKey],\App\Services\ComparableStudy::context($record,$componentKey)['token']);
         $deferIncome=$stage==='3' && $method==='renta' && ($_GET['renta_paso'] ?? '')!=='capture';
         $allComparableRows=$deferIncome?[]:$this->comparables->forAppraisal($id,$this->user['id']);
-        $comparableRows=\App\Services\MethodologyComparableScope::rows($allComparableRows,$componentKey);
+        $comparableRows=\App\Services\MethodologyComparableScope::rows($allComparableRows,$componentKey,$record);
         $searchRecord = \App\Services\ComparableSearchContext::forMethod($record, $units, $componentKey, $method);
         $methodologyChapter = (new AppraisalMethodologyChapterReport())->build($record, $subject, $units);
         $marketNeighborhoods = $deferIncome?[]:array_map(static function (array $row): array {
@@ -73,14 +75,17 @@ final class AppraisalValuationMethodologyController
         if ($version === false || $version === null || $version < 0) throw new \App\Core\HttpException(422, 'Versión inválida.');
         $changes = \App\Services\MethodologyWorkflow::input($_POST);
         if (isset($changes['research_plan'])) {
+            $study=\App\Services\ComparableStudy::assertRequest($record,$key,$_POST);
+            $changes['research_plan']['study_scope']=$study['token'];
+            $previousPlan=\App\Services\MethodStudyState::visible(\App\Services\MethodologyWorkflow::saved($record)[$key] ?? [],$study['token'])['research_plan'] ?? [];
             if (count($changes)!==1) throw new \App\Core\HttpException(422,'Guarda el plan separado de la configuración del método.');
             $scopeRecord=\App\Services\ComparableSearchContext::forMethod($record,$this->appraisals->units($id,$this->user['id']),$key,
                 \App\Services\MethodologyWorkflow::saved($record)[$key]['method'] ?? '');
             \App\Services\ResearchPlanInput::validateScope($changes['research_plan'],
                 \App\Services\ComparablePortalProfiles::defaultType((string)($scopeRecord['tipo_inmueble'] ?? '')),
                 \App\Services\MethodologyWorkflow::saved($record)[$key]['method'] ?? '',$components[$key]['part'] ?? '');
-            \App\Services\ResearchAssessmentInput::validateScope($changes['research_plan'],\App\Services\MethodologyComparableScope::rows($this->comparables->forAppraisal($id,$this->user['id']),$key),\App\Services\MethodologyWorkflow::saved($record)[$key]['research_plan'] ?? []);
-            \App\Services\ResearchFactorReference::validateFixed($changes['research_plan'],\App\Services\MethodologyWorkflow::saved($record)[$key]['research_plan'] ?? [],$this->factorScales->all($this->user['id']));
+            \App\Services\ResearchAssessmentInput::validateScope($changes['research_plan'],\App\Services\MethodologyComparableScope::rows($this->comparables->forAppraisal($id,$this->user['id']),$key,$record),$previousPlan);
+            \App\Services\ResearchFactorReference::validateFixed($changes['research_plan'],$previousPlan,$this->factorScales->all($this->user['id']));
         }
         if (isset($components[$key]['alternate_method'])) {
             if (isset($changes['additional_methods']) || (isset($changes['method']) && $changes['method']!==$components[$key]['alternate_method']))
@@ -91,8 +96,9 @@ final class AppraisalValuationMethodologyController
             \App\Services\MethodologyValuationPlan::validateParts($record, $components[$key], $changes['plan_parts']);
         } else \App\Services\MethodologyValuationPlan::validateWorkKey($key, $components);
         if (isset($changes['analysis']) || isset($changes['conclusion'])) {
+            \App\Services\ComparableStudy::assertRequest($record,$key,$_POST);
             if ((\App\Services\MethodologyWorkflow::saved($record)[$key]['method'] ?? '') !== 'mercado') throw new \App\Core\HttpException(422, 'Selecciona Mercado antes de guardar su análisis.');
-            $rows = \App\Services\MethodologyComparableScope::rows($this->comparables->forAppraisal($id, $this->user['id']), $key);
+            $rows = \App\Services\MethodologyComparableScope::rows($this->comparables->forAppraisal($id, $this->user['id']), $key,$record);
             $changes['evidence_hash'] = \App\Services\MethodologyWorkflow::fingerprint($rows);
         }
         $next = $this->workflow->save($id, $this->user['id'], $version, $key, $changes);
@@ -113,29 +119,7 @@ final class AppraisalValuationMethodologyController
     public function saveExcel(string $id): never
     { \App\Services\ComparableExcelAction::run($this->appraisals,$this->comparables,$this->user['id'],$id,true); }
     public function assignComparables(string $id): never
-    {
-        $record = $this->appraisals->find($id, $this->user['id']);
-        $components = \App\Services\MethodologyWorkflow::components($record, $this->appraisals->units($id, $this->user['id']));
-        $key = is_string($_POST['component'] ?? null) ? $_POST['component'] : '';
-        \App\Services\MethodologyValuationPlan::validateWorkKey($key, $components);
-        $source = is_string($_POST['source_scope'] ?? null) ? $_POST['source_scope'] : '';
-        if ($source === $key) throw new \App\Core\HttpException(422, 'Selecciona un destino distinto.');
-        $ids = $_POST['samples'] ?? [];
-        if (!is_array($ids) || $ids === []) throw new \App\Core\HttpException(422, 'Marca las muestras que deseas asignar.');
-        $rows = $this->comparables->forAppraisal($id, $this->user['id']);
-        // An old synthetic or inactive source may be recovered only from this owned collection.
-        if ($source !== '' && \App\Services\MethodologyComparableScope::rows($rows, $source) === []) throw new \App\Core\HttpException(422, 'La asignación anterior no contiene muestras de este expediente.');
-        $found = [];
-        foreach ($rows as &$row) if (in_array($row['id'], $ids, true)) {
-            if (($row['component_key'] ?? '') !== $source) throw new \App\Core\HttpException(409, 'La muestra cambió de componente. Recarga para revisar.');
-            $row['component_key'] = $key;
-            $found[] = $row['id'];
-        }
-        unset($row);
-        if (count(array_unique($ids)) !== count($found)) throw new \App\Core\HttpException(422, 'Una muestra no pertenece al expediente.');
-        $this->comparables->saveAll($id, $this->user['id'], $rows, (int) ($_POST['version'] ?? -1));
-        Http::redirect('avaluos/' . $id . '/metodologia-valuatoria?component=' . rawurlencode($key) . '&stage=3');
-    }
+    { \App\Services\ComparableStudyAction::assign($this->appraisals,$this->comparables,$this->user['id'],$id); }
 
     public function saveComparables(string $id): never
     {
@@ -155,17 +139,7 @@ final class AppraisalValuationMethodologyController
     }
 
     private function persistComparables(string $id): int
-    {
-        $this->appraisals->find($id, $this->user['id']);
-        if (($_POST['matrix_complete'] ?? '') !== '1') throw new \App\Core\HttpException(422, 'El envío de la matriz llegó incompleto; no se guardaron cambios.');
-        $version = filter_var($_POST['version'] ?? null, FILTER_VALIDATE_INT);
-        if ($version === false || $version === null || $version < 0) throw new \App\Core\HttpException(422, 'Falta la versión de la matriz. Recarga antes de guardar.');
-        $key = is_string($_POST['component_scope'] ?? null) ? $_POST['component_scope'] : '';
-        $components = \App\Services\MethodologyWorkflow::components($this->appraisals->find($id, $this->user['id']), $this->appraisals->units($id, $this->user['id']));
-        \App\Services\MethodologyValuationPlan::validateWorkKey($key, $components);
-        $rows = \App\Services\MethodologyComparableScope::merge($this->comparables->forAppraisal($id, $this->user['id']), AppraisalComparableInput::rows($_POST), $key);
-        return $this->comparables->saveAll($id, $this->user['id'], $rows, $version);
-    }
+    { return \App\Services\ComparableStudyAction::persist($this->appraisals,$this->comparables,$this->user['id'],$id); }
 
     public function readComparable(string $id): never
     {

@@ -66,6 +66,7 @@ require __DIR__ . '/analyst-access-persistence.php';
 require __DIR__ . '/unit-reclassification-persistence.php';
 require __DIR__ . '/methodology-persistence.php';
 require __DIR__ . '/income-concept-persistence.php';
+require __DIR__ . '/comparable-study-persistence.php';
 require __DIR__ . '/research-plan-persistence.php';
 require __DIR__ . '/research-scales-persistence.php';
 require __DIR__ . '/subject-factors-persistence.php';

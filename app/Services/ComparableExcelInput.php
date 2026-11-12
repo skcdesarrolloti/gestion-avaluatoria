@@ -5,7 +5,7 @@ use App\Core\HttpException;
 
 final class ComparableExcelInput
 {
-    public static function read(string $path, string $appraisalId, string $scope, int $version, array $existing): array
+    public static function read(string $path, string $appraisalId, string $scope, int $version, array $existing, ?string $study=null): array
     {
         $archive = new ComparableExcelArchive($path); $sheets = $archive->sheets();
         if (!isset($sheets['_SuCasa'])) throw new HttpException(422, 'Este Excel no tiene identificación de muestras. Exporta nuevamente desde el módulo y conserva los encabezados e ID.');
@@ -15,6 +15,7 @@ final class ComparableExcelInput
         if (($meta['format'] ?? '') !== 'sucasa-comparables-2' || ($meta['appraisal'] ?? '') !== $appraisalId
             || ($meta['scope'] ?? null) !== $scope) throw new HttpException(422, 'El Excel pertenece a otro expediente o unidad/banco.');
         if (($meta['version'] ?? -1) !== $version) throw new HttpException(409, 'La matriz cambió desde que exportaste. Exporta la versión actual y aplica allí tus ajustes.');
+        if ($study!==null && ($meta['study_scope'] ?? '')!==$study) throw new HttpException(422,'El Excel corresponde a otra investigación o a una exportación anterior. Descarga el Excel de ventas o arriendos que estás trabajando.');
         if (!isset($sheets[$meta['sheet'] ?? ''])) throw new HttpException(422, 'No se encuentra la hoja de comparables exportada.');
         return self::rows($archive->rows($sheets[$meta['sheet']]), $meta['columns'] ?? [], $existing);
     }
@@ -38,7 +39,7 @@ final class ComparableExcelInput
             $row = [];
             foreach ($map as $index => $column) {
                 $key = $column['key'];
-                if (in_array($key, ['capture_pending','negotiated_amount','negotiation_percent','component_key', ...array_keys(ComparableUnitPrice::fields())], true)) continue;
+                if (in_array($key, ['capture_pending','negotiated_amount','negotiation_percent','component_key','research_method','research_operation', ...array_keys(ComparableUnitPrice::fields())], true)) continue;
                 $cell = $cells[$index] ?? ['value'=>'', 'formula'=>false, 'type'=>'inlineStr'];
                 if ($cell['formula']) throw new HttpException(422, 'Sólo se admiten fórmulas en las columnas calculadas de negociación. Pega valores en los campos editables.');
                 $value = trim($cell['value']);

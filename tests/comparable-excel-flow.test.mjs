@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import {comparableExcel} from '../resources/js/comparable-excel.js';
 function fixture() {
     const input={name:'comparables[0][contact_name]',value:'Antes',tagName:'INPUT',type:'text',closest:()=>null};
-    const fields={version:{value:'1'},_token:{value:'token'},component_scope:{value:'oficina'}};
+    const fields={version:{value:'1'},_token:{value:'token'},component_scope:{value:'oficina'},study_scope:{value:'renta:arriendo'}};
     const form={dataset:{excelUpdated:'Sin importación',excelPreviewEndpoint:'/revisar',excelSaveEndpoint:'/guardar'},querySelector:selector=>fields[selector.match(/name=([^\]]+)/)[1]]};
     const state={...comparableExcel(),refresh(){}};
     state.initExcel(form,[{used:true,data:{id:'sample'},controls:[input]}]);
@@ -13,7 +13,7 @@ const event=()=>({target:{files:[new File(['xlsx'],'muestras.xlsx')],value:'mues
 test('Revisión Excel no modifica datos ni fecha; sólo confirmación guardada actualiza ambos',async()=>{
     const original=globalThis.fetch,{state,input,fields}=fixture();const requests=[];
     try {
-        globalThis.fetch=async endpoint=>{requests.push(endpoint);return {ok:true,headers:{get:()=> 'application/json'},json:async()=>endpoint==='/revisar'
+        globalThis.fetch=async (endpoint,options)=>{assert.equal(options.body.get('study_scope'),'renta:arriendo');requests.push(endpoint);return {ok:true,headers:{get:()=> 'application/json'},json:async()=>endpoint==='/revisar'
             ? {ok:true,version:1,rows:[{id:'sample',contact_name:'Excel'}]}
             : {ok:true,version:2,excel_updated:'Guardado 02/10/2026 13:00:00'}};};
         await state.prepareExcel(event());

@@ -5,13 +5,15 @@ use App\Core\HttpException;
 
 final class MethodologyComparableScope
 {
-    public static function rows(array $rows, string $key): array
+    public static function rows(array $rows, string $key, ?array $record=null): array
     {
+        if ($record!==null) return ComparableStudy::rows($rows,$key,$record);
         return array_values(array_filter($rows, static fn ($row) => ($row['component_key'] ?? '') === $key));
     }
 
-    public static function merge(array $existing, array $incoming, string $key): array
+    public static function merge(array $existing, array $incoming, string $key, ?array $record=null): array
     {
+        if ($record!==null) return ComparableStudy::merge($existing,$incoming,$key,$record);
         $other = array_values(array_filter($existing, static fn ($row) => ($row['component_key'] ?? '') !== $key));
         $protected = array_column($other, 'id');
         $ids = [];
