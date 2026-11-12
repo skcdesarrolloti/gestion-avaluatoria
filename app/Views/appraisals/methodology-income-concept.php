@@ -12,6 +12,11 @@ $incomeState=['occupancy'=>$incomeValues['occupancy'] ?? '', 'scope'=>$incomeVal
     <p class="eyebrow">Renta · Preparación conceptual · <?= e($componentLabel) ?></p>
     <h2 class="mt-2 text-2xl font-semibold">1. Comprender el inmueble y su arriendo</h2>
     <p class="mt-3 leading-6">Empieza con estas tres preguntas. Si falta información, puedes dejarla pendiente y continuar después. Aquí todavía no se solicitan importes ni tasas.</p>
+    <aside class="mt-4 rounded-xl bg-teal-50 p-4" aria-labelledby="renta-concepto-utilidad">
+        <h3 id="renta-concepto-utilidad" class="font-semibold">¿Para qué sirve esta información en el informe?</h3>
+        <p class="mt-2 text-sm leading-6">Estas respuestas preparan la descripción de la ocupación, la parte del inmueble que se estudiará y los soportes disponibles o pendientes de verificar. Se guardan como borrador en el expediente; todavía no se incorporan automáticamente al informe final.</p>
+        <p class="mt-2 text-sm leading-6"><strong>No modifican los filtros de búsqueda en portales.</strong> Los criterios para buscar arriendos comparables se preparan por separado.</p>
+    </aside>
     <p class="mt-2 text-sm text-slate-600">Las opciones ayudan a describir el caso; no son categorías impuestas literalmente por las normas. El signo (?) explica cada pregunta.</p>
     <a class="mt-3 inline-flex min-h-11 items-center font-semibold text-blue-800 underline" href="<?= e($flowUrl('1')) ?>#renta-orientacion">Consultar orientación y resumen en Academia de Renta</a>
     <form id="income-concept-form" class="mt-5 space-y-5" method="post" action="<?= e($incomeEndpoint) ?>"

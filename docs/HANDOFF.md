@@ -1,5 +1,10 @@
 # Entrega al responsable de la implementación
 
+12/11/2026 · Aclaración visible al inicio del bloque conceptual de Renta: prepara
+ocupación, cobertura y soportes para el informe; hoy se conserva como borrador,
+sin incorporación automática al informe ni modificación de filtros de portales.
+Solo presentación; sin campos, cálculos, persistencia ni migraciones nuevas.
+
 12/11/2026 · Acuerdo permanente: publicar con commit y push a origin/main, sin
 solicitar acceso al hosting. Tras la entrega 52f07d5/56fd194 se verificó el resumen
 PDF público HTTP200 y SHA-256 idéntico al local; no confundir las notas históricas
