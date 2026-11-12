@@ -1,11 +1,12 @@
 <?php
 $incomeTabs=['concept'=>'1. Comprender el inmueble','search'=>'2. Preparar la búsqueda','capture'=>'3. Recoger muestras'];
-$incomeInitial=array_key_exists((string)($_GET['renta_paso'] ?? ''),$incomeTabs)?(string)$_GET['renta_paso']:'concept';
+$incomeInitial=is_string($_GET['renta_paso'] ?? null) && isset($incomeTabs[$_GET['renta_paso']])?$_GET['renta_paso']:'concept';
 $incomeSourceList=array_merge($guide['source_search']['portal_sources'] ?? [],$guide['source_search']['agency_sources'] ?? []);
 ?>
 <section data-methodology-version-group data-income-inputs
-    x-data="<?= e(json_encode(['incomeTab'=>$incomeInitial,'incomePortal'=>$incomeSourceList[0]['label'] ?? ''],JSON_UNESCAPED_UNICODE)) ?>"
-    x-init="if (location.hash==='#renta-concepto') incomeTab='concept'; if (location.hash==='#renta-busqueda') incomeTab='search'; if (location.hash==='#captura-83') incomeTab='capture'">
+    data-income-loaded="<?= $incomeInitial==='capture'?'1':'0' ?>" data-income-capture-url="<?= e($flowUrl('3').'&renta_paso=capture') ?>"
+    data-income-state="<?= e(json_encode(['incomeTab'=>$incomeInitial,'incomePortal'=>$incomeSourceList[0]['label'] ?? ''],JSON_UNESCAPED_UNICODE)) ?>"
+    x-data="incomeInputs">
     <nav class="mb-5 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist" aria-label="Preparación e investigación de Renta">
         <?php $incomeKeys=array_keys($incomeTabs); foreach ($incomeKeys as $incomeIndex=>$incomeKey):
             $incomePrevious=$incomeKeys[($incomeIndex+2)%3];$incomeNext=$incomeKeys[($incomeIndex+1)%3]; ?>
@@ -13,12 +14,12 @@ $incomeSourceList=array_merge($guide['source_search']['portal_sources'] ?? [],$g
             class="btn-secondary shrink-0" href="<?= e($flowUrl('3').'&renta_paso='.$incomeKey) ?>"
             aria-selected="<?= $incomeInitial===$incomeKey?'true':'false' ?>" :aria-selected="incomeTab==='<?= e($incomeKey) ?>'"
             :tabindex="incomeTab==='<?= e($incomeKey) ?>'?0:-1" :class="incomeTab==='<?= e($incomeKey) ?>'?'bg-teal-50 text-teal-900 ring-2 ring-teal-700':''"
-            @click.prevent="incomeTab='<?= e($incomeKey) ?>'"
-            @keydown.right.prevent="incomeTab='<?= e($incomeNext) ?>'; $refs.incomeTab<?= e($incomeNext) ?>.focus()"
-            @keydown.left.prevent="incomeTab='<?= e($incomePrevious) ?>'; $refs.incomeTab<?= e($incomePrevious) ?>.focus()"
-            @keydown.home.prevent="incomeTab='concept'; $refs.incomeTabconcept.focus()"
-            @keydown.end.prevent="incomeTab='capture'; $refs.incomeTabcapture.focus()"
-            @keydown.space.prevent="incomeTab='<?= e($incomeKey) ?>'"><?= e($incomeTabs[$incomeKey]) ?></a>
+            @click.prevent="openTab('<?= e($incomeKey) ?>')"
+            @keydown.right.prevent="openTab('<?= e($incomeNext) ?>'); $refs.incomeTab<?= e($incomeNext) ?>.focus()"
+            @keydown.left.prevent="openTab('<?= e($incomePrevious) ?>'); $refs.incomeTab<?= e($incomePrevious) ?>.focus()"
+            @keydown.home.prevent="openTab('concept'); $refs.incomeTabconcept.focus()"
+            @keydown.end.prevent="openTab('capture'); $refs.incomeTabcapture.focus()"
+            @keydown.space.prevent="openTab('<?= e($incomeKey) ?>')"><?= e($incomeTabs[$incomeKey]) ?></a>
         <?php endforeach; ?>
     </nav>
     <div id="renta-panel-concept" role="tabpanel" aria-labelledby="renta-tab-concept" x-show="incomeTab==='concept'">
@@ -29,6 +30,14 @@ $incomeSourceList=array_merge($guide['source_search']['portal_sources'] ?? [],$g
         <?php require __DIR__.'/methodology-income-search.php'; ?>
     </div>
     <div id="renta-panel-capture" role="tabpanel" aria-labelledby="renta-tab-capture" x-show="incomeTab==='capture'">
-        <?php require __DIR__.'/methodology-unassigned.php'; require __DIR__.'/valuation-methodology-search.php'; ?>
+        <div class="mb-4 rounded-xl border bg-white p-4" x-show="!incomeLoaded" :aria-busy="incomeLoading">
+            <p role="status" aria-live="polite" x-text="incomeLoading?'Cargando las muestras de esta unidad…':'Las muestras se cargan al abrir esta pestaña.'">Las muestras se cargan al abrir esta pestaña.</p>
+            <p class="mt-2 text-red-800" role="alert" x-text="incomeError"></p>
+            <button type="button" class="btn-secondary mt-3" @click="openTab('capture')" :disabled="incomeLoading">Cargar muestras / reintentar</button>
+            <noscript><a class="btn-secondary mt-3" href="<?= e($flowUrl('3').'&renta_paso=capture') ?>">Abrir las muestras de esta unidad</a></noscript>
+        </div>
+        <div x-ref="incomeCapture" data-income-capture-content>
+            <?php if ($incomeInitial==='capture'): require __DIR__.'/methodology-unassigned.php'; require __DIR__.'/valuation-methodology-search.php'; endif; ?>
+        </div>
     </div>
 </section>

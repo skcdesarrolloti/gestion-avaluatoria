@@ -1,5 +1,13 @@
 # Entrega al responsable de la implementación
 
+12/11/2026 · Insumos de Renta ligero: entrada y preparación sin recuperar ni montar
+la matriz; captura por fetch al abrir paso3, con guardado previo, carga/error y
+reintento. Conserva una matriz montada, borradores y portal al volver. JS de Renta
+bajo demanda, versión por hash. Comparación de HTML local77muestras:66KB/31
+controles al entrar frente a3,96MB/8.861controles de captura. Ver detalle y alcance
+en RENTA-PRIMER-BLOQUE.md; no cambia BD ni cálculos. Publicar con commit/push y
+comprobar recurso público income-inputs.js y después las pestañas en el aplicativo.
+
 12/11/2026 · Renta con tres pestañas horizontales en Insumos: comprender, preparar
 búsqueda y recoger muestras. Preparación consulta criterios del expediente y guía
 por fuente; al continuar conserva el portal elegido en la captura existente.

@@ -1,4 +1,4 @@
-import { loadAnalysisTable } from './analysis-table-loader.js';
+import { loadPageComponents } from './page-components-loader.js';
 const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 const flushAutosaves = () => typeof window.gaFlushAutosaves === 'function' ? window.gaFlushAutosaves() : Promise.resolve(true);
 let busyTimer = null;
@@ -59,7 +59,7 @@ async function renderFetchedPage(response, fallbackUrl, focusMain) {
     const html = await response.text();
     const nextDocument = new DOMParser().parseFromString(html, 'text/html');
     if (!nextDocument.body) throw new Error('Respuesta HTML inválida.');
-    await loadAnalysisTable(nextDocument.body,window.Alpine);
+    await loadPageComponents(nextDocument.body,window.Alpine);
     updateHeadFrom(nextDocument);
     activateNewBody(nextDocument.body, focusMain);
     return true;

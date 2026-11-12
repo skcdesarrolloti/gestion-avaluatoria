@@ -1,5 +1,26 @@
 # Renta: primer bloque conceptual
 
+12/11/2026 · Corrección de carga al entrar a Insumos. Las pestañas conceptual y
+preparación ya no consultan ni renderizan las muestras, catálogo de factores o
+barrios para captura. La matriz completa se solicita por la misma ruta protegida
+al abrir «3. Recoger muestras», con `renta_paso=capture`. Se espera confirmación
+del autoguardado, se muestra carga/error/reintento y se rechaza login/HTML antiguo.
+La captura se monta una sola vez por visita; vuelve a mostrarse conservando su
+borrador y portal. Sin JS se ofrece enlace server-rendered. El módulo JS de Renta
+se carga solo donde aparece ese bloque y se versiona por hash del bundle.
+Medición local con 77 anuncios ficticios: entrada66.194bytes/31controles frente a
+captura3.963.927bytes/8.861controles. Es una medición de HTML local, no un tiempo
+garantizado de hosting. No hay eliminación ni cambio de esquema o de datos.
+Pruebas agregadas: render íntegro de77muestras, entrada sin matriz, importación
+diferida, carga concurrente única, bloqueo por guardado fallido, sesión vencida,
+red/HTML antiguo y reintento, conservación del borrador al volver. La UI local
+confirma fuente Metrocuadrado y un formulario al navegar entre pestañas.
+Validación de esta corrección: PHP1604, JS272, lint de archivos PHP modificados,
+build y check:size79,0KB. Escritorio1440/móvil390 sin desbordamiento; capturas
+renta-carga-ligera-*.png en output/pdf. No se ejecutó suite BD: no cambia escritura
+ni esquema. POST de la fixture visual simulado; los errores/reintentos se prueban
+además en JS. La publicación en GitHub requiere comprobarse en el sitio.
+
 12/11/2026 · Insumos de Renta se organiza en tres pestañas horizontales:
 1. Comprender el inmueble; 2. Preparar la búsqueda; 3. Recoger muestras.
 Solo se muestra un panel con JavaScript; en móvil la barra se desplaza horizontalmente.

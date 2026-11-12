@@ -9,7 +9,6 @@ use App\Models\AppraisalSubjectRepository;
 use App\Services\AppraisalComparableInput;
 use App\Services\AppraisalComparableSearchGuide;
 use App\Services\AppraisalMethodologyChapterReport;
-
 final class AppraisalValuationMethodologyController
 {
     public function __construct(private AppraisalRepository $appraisals,
@@ -19,7 +18,6 @@ final class AppraisalValuationMethodologyController
         private \App\Models\GeoMasterRepository $geo,
         private \App\Models\MethodologyWorkflowRepository $workflow,
         private \App\Models\ResearchFactorScaleRepository $factorScales) {}
-
     public function show(string $id): void
     {
         header('Cache-Control: no-store');
@@ -27,8 +25,6 @@ final class AppraisalValuationMethodologyController
         $subject = $this->subjects->find($id, $this->user['id']);
         $units = $this->appraisals->units($id, $this->user['id']);
         $phProfile = $this->ph->profile($id, $this->user['id']);
-        $comparableRows = $this->comparables->forAppraisal($id, $this->user['id']);
-        $allComparableRows = $comparableRows;
         $components = \App\Services\MethodologyWorkflow::components($record, $units);
         $componentKey = is_string($_GET['component'] ?? '') ? ($_GET['component'] ?? '') : '';
         \App\Services\MethodologyWorkflow::validateKey($componentKey, $components);
@@ -37,7 +33,6 @@ final class AppraisalValuationMethodologyController
             && !($stage==='1' && ($_GET['consult_method'] ?? '')==='costo')) {
             $componentKey = (string)(array_key_first(\App\Services\MethodologyValuationPlan::working($components)) ?? '');
         }
-        $comparableRows = \App\Services\MethodologyComparableScope::rows($allComparableRows, $componentKey);
         $flow = \App\Services\MethodologyWorkflow::saved($record);
         $selected = $flow[$componentKey] ?? [];
         $method = ($selected['method'] ?? '') ?: (is_string($_GET['method'] ?? null) ? $_GET['method'] : 'mercado');
@@ -47,15 +42,18 @@ final class AppraisalValuationMethodologyController
         if (!in_array($stage, ['plan', 'components', 'integration', 'decision', 'report', '1', '2', '3', '4', '5'], true)) $stage = 'plan';
         if (!empty($components[$componentKey]['container']) && in_array($stage, ['components','1','2','3','4','5'], true)) $stage = 'plan';
         if ($stage==='1' && ($_GET['consult_method'] ?? '')==='costo') $method='costo';
+        $deferIncome=$stage==='3' && $method==='renta' && ($_GET['renta_paso'] ?? '')!=='capture';
+        $allComparableRows=$deferIncome?[]:$this->comparables->forAppraisal($id,$this->user['id']);
+        $comparableRows=\App\Services\MethodologyComparableScope::rows($allComparableRows,$componentKey);
         $searchRecord = \App\Services\ComparableSearchContext::forMethod($record, $units, $componentKey, $method);
         $methodologyChapter = (new AppraisalMethodologyChapterReport())->build($record, $subject, $units);
-        $marketNeighborhoods = array_map(static function (array $row): array {
+        $marketNeighborhoods = $deferIncome?[]:array_map(static function (array $row): array {
             try { $url = \App\Services\FincaraizAreaSearch::url((string) $row['name']); }
             catch (\InvalidArgumentException) { $url = ''; }
             return $row + ['search_url' => $url];
         }, $this->geo->activeNeighborhoodsForCity((string) ($subject['city_id'] ?? '')));
         view('appraisals/valuation-methodology', ['title' => 'Metodología valuatoria',
-            'factorScales'=>$this->factorScales->all($this->user['id']),
+            'factorScales'=>$deferIncome?[]:$this->factorScales->all($this->user['id']),
             'record' => $record, 'subject' => $subject, 'units' => $units, 'phProfile' => $phProfile,
             'methodologyChapter' => $methodologyChapter, 'comparableRows' => $comparableRows,
             'marketNeighborhoods' => $marketNeighborhoods,

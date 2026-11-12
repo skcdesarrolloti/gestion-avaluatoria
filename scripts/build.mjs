@@ -6,6 +6,8 @@ import { createHash } from 'node:crypto';
 const revision = path => createHash('sha256').update(readFileSync(path)).digest('hex').slice(0, 20);
 
 mkdirSync('public/assets', { recursive: true });
+await build({ entryPoints: ['resources/js/income-inputs.js'], bundle: true, minify: true,
+    format: 'esm', target: ['es2020'], outfile: 'public/assets/income-inputs.js', legalComments: 'eof' });
 await build({ entryPoints: ['resources/js/analysis-filter-history.js'], bundle: true, minify: true,
     format: 'esm', target: ['es2020'], outfile: 'public/assets/analysis-filter-history.js', legalComments: 'eof' });
 await build({ entryPoints: ['resources/js/market-analysis-table.js'], bundle: true, minify: true,
@@ -19,7 +21,8 @@ await build({ entryPoints: ['resources/js/ph-pdf-reader.js'], bundle: true, mini
 await build({ entryPoints: ['resources/js/app.js'], bundle: true, minify: true,
     format: 'esm', target: ['es2020'], outfile: 'public/assets/app.js', legalComments: 'eof',
     define: { __PH_READER_REVISION__: JSON.stringify(revision('public/assets/ph-pdf-reader.js')),
-        __ANALYSIS_TABLE_REVISION__: JSON.stringify(revision('public/assets/market-analysis-table.js')) } });
+        __ANALYSIS_TABLE_REVISION__: JSON.stringify(revision('public/assets/market-analysis-table.js')),
+        __INCOME_INPUTS_REVISION__: JSON.stringify(revision('public/assets/income-inputs.js')) } });
 copyFileSync('node_modules/pdfjs-dist/build/pdf.worker.mjs', 'public/assets/pdf.worker.mjs');
 mkdirSync('public/assets/tesseract/core', { recursive: true });
 mkdirSync('public/assets/tesseract/lang', { recursive: true });

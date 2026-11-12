@@ -26,14 +26,14 @@ import { properatiPaste } from './properati-paste.js';
 import { mercadolibrePaste } from './mercadolibre-paste.js';
 
 import { sourceResultsPaste } from './source-results-paste.js';
-import { loadAnalysisTable } from './analysis-table-loader.js';
+import { loadPageComponents } from './page-components-loader.js';
 
 (async()=>{
 window.Alpine = Alpine;
-try {await loadAnalysisTable(document,Alpine);} catch {
-    const form=document.querySelector('[data-market-analysis]');
+try {await loadPageComponents(document,Alpine);} catch {
+    const form=document.querySelector('[data-market-analysis], [data-income-inputs]');
     if(form){const root=form.closest('[x-data]')??form;root.setAttribute('x-ignore','');root.querySelectorAll('button').forEach(b=>b.disabled=true);
-        const notice=document.createElement('p');notice.textContent='No se pudo cargar el an·lisis. Recarga la p·gina para reintentar.';notice.setAttribute('role','alert');form.prepend(notice);}
+        const notice=document.createElement('p');notice.textContent='No se pudo cargar esta secci√≥n. Recarga la p√°gina para reintentar.';notice.setAttribute('role','alert');form.prepend(notice);}
 }
 Alpine.data('sourceResultsPaste', sourceResultsPaste);
 Alpine.data('researchPlan', researchPlan);

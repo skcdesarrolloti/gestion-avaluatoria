@@ -28,5 +28,5 @@
     </div>
     <?php endforeach; ?>
     <p class="mt-4 text-sm leading-6">Al revisar avisos, distingue canon, periodicidad, administración, garaje y depósito incluidos. Conserva la fuente y deja por verificar lo que no se publique. Todavía no calculamos rentas ni tasas.</p>
-    <button type="button" class="btn-primary mt-4" @click="incomeTab='capture'; $dispatch('income-portal',incomePortal); $refs.incomeTabcapture.focus()">Continuar a 3. Recoger muestras</button>
+    <button type="button" class="btn-primary mt-4" @click="openTab('capture'); $refs.incomeTabcapture.focus()">Continuar a 3. Recoger muestras</button>
 </section>

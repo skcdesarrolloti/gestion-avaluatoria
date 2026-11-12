@@ -20,7 +20,7 @@ $formulaFamilies = [
 ];
 ?>
 <section class="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm sm:p-8" x-data="{ sourcePortal: '', intakeStep: 'review', supportTab: 'context', searchTab: 'captura' }"
-    <?php if (($method ?? '')==='renta'): ?>@income-portal.window="sourcePortal=$event.detail"<?php endif; ?>>
+    <?php if (($method ?? '')==='renta'): ?>@income-portal.window="sourcePortal=$event.detail" x-init="sourcePortal=incomePortal; $watch('sourcePortal',value => incomePortal=value)"<?php endif; ?>>
     <nav class="mb-3 flex flex-wrap gap-2 rounded-xl bg-slate-100 p-2" aria-label="Pasos de la investigación">
         <button type="button" class="btn-secondary" :aria-pressed="searchTab==='captura'" :class="(searchTab==='captura') ? 'ring-2 ring-teal-700 bg-teal-50' : ''" @click="searchTab='captura'">1. Recoger por portal</button>
         <button type="button" class="btn-secondary" :aria-pressed="searchTab==='matriz' && intakeStep==='consolidation'" @click="searchTab='matriz'; intakeStep='consolidation'; $dispatch('intake-navigate',{view:'consolidation'})">2. Consolidación de las muestras</button>
