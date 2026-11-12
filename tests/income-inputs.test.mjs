@@ -55,3 +55,54 @@ test('network failure, login redirect and obsolete HTML do not mark capture load
         globalThis.fetch=async()=>f.reply();await f.component.openTab('capture');assert.equal(f.mounts,1);
     } finally {f.restore();}
 });
+
+test('next portal keeps one mounted capture and its unsaved paste while changing source and view',async()=>{
+    const f=fixture();try {
+        Object.assign(f.component,{incomePortals:['FincaRaiz','Metrocuadrado','Ciencuadras'],incomeSources:['FincaRaiz','Metrocuadrado','Ciencuadras']});
+        const loading=f.component.openTab('capture');await f.finish();await loading;
+        const draft=f.root.querySelector('textarea');draft.value='Página pegada pendiente de subir';
+        assert.equal(await f.component.nextPortal(),true);
+        assert.equal(f.component.incomePortal,'Ciencuadras');assert.equal(f.calls,1);assert.equal(f.mounts,1);
+        assert.equal(f.root.querySelector('textarea'),draft);assert.equal(draft.value,'Página pegada pendiente de subir');
+        assert.equal(f.events.at(-2).type,'income-portal');assert.equal(f.events.at(-2).detail,'Ciencuadras');
+        assert.equal(f.events.at(-1).type,'income-source-view');assert.equal(f.events.at(-1).detail,'capture');
+        assert.equal(await f.component.choosePortal('FincaRaiz','review'),true);
+        assert.equal(f.events.at(-1).detail,'review');assert.equal(f.component.incomePortal,'FincaRaiz');
+        assert.equal(f.root.querySelector('textarea'),draft);
+    } finally {f.restore();}
+});
+
+test('pending server save blocks next portal; last portal does not wrap or submit samples',async()=>{
+    const f=fixture();try {
+        Object.assign(f.component,{incomePortals:['Metrocuadrado','Ciencuadras'],incomeSources:['Metrocuadrado','Ciencuadras']});
+        f.setFlushed(false);assert.equal(await f.component.nextPortal(),false);
+        assert.equal(f.component.incomePortal,'Metrocuadrado');assert.equal(f.calls,0);
+        assert.match(f.component.incomePortalError,/pendientes de guardar/);assert.equal(f.events.length,0);
+        f.component.incomePortal='Ciencuadras';assert.equal(await f.component.nextPortal(),false);
+        assert.equal(await f.component.choosePortal('portal-inventado'),false);assert.equal(f.calls,0);
+    } finally {f.restore();}
+});
+
+test('navigation remembers only tab and configured source in the current URL, preserving study context',async()=>{
+    const f=fixture();try {
+        let remembered;window.history={state:{route:'retained'},replaceState:(state,title,url)=>{remembered={state,url:new URL(url)};}};
+        globalThis.location=new URL('https://app.example/avaluos/test/metodo?method=renta&component=office');
+        f.component.incomeSources=['Metrocuadrado'];
+        assert.equal(await f.component.choosePortal('Metrocuadrado','search'),true);
+        assert.equal(remembered.url.searchParams.get('renta_portal'),'Metrocuadrado');
+        assert.equal(remembered.url.searchParams.get('renta_paso'),'search');
+        assert.equal(remembered.url.searchParams.get('component'),'office');
+        assert.equal(remembered.url.searchParams.get('method'),'renta');assert.deepEqual(remembered.state,{route:'retained'});
+        assert.equal(f.calls,0);
+    } finally {f.restore();}
+});
+
+test('saved source aliases keep the configured portal selected and its next-source navigation',async()=>{
+    const f=fixture();try {
+        Object.assign(f.component,{incomePortals:['FincaRaiz','Metrocuadrado','Mercado Libre Inmuebles'],incomeSources:['FincaRaiz','Metrocuadrado','Mercado Libre Inmuebles']});
+        f.component.incomePortal='FincaRaíz';assert.equal(f.component.incomeNextPortal,'Metrocuadrado');
+        assert.equal(await f.component.choosePortal('Mercado Libre','search'),true);
+        assert.equal(f.component.incomePortal,'Mercado Libre Inmuebles');assert.equal(f.component.incomeNextPortal,'');
+        assert.equal(f.calls,0);
+    } finally {f.restore();}
+});

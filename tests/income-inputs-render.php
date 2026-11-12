@@ -35,5 +35,16 @@ declare(strict_types=1);
         $_GET=['renta_paso'=>['capture']];
         ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-income-inputs.php';$invalid=ob_get_clean();
         expect(!str_contains($invalid,'id="tabla-madre-83"'),'parámetro de pestaña inválido conserva entrada ligera sin cargar muestras');
+        $_GET=['renta_paso'=>'search','renta_portal'=>'Ciencuadras'];
+        ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-income-inputs.php';$portalHtml=ob_get_clean();
+        preg_match('/data-income-state="([^"]+)"/',$portalHtml,$portalState);
+        $restoredPortal=json_decode(html_entity_decode($portalState[1],ENT_QUOTES,'UTF-8'),true);
+        expect($restoredPortal['incomePortal']==='Ciencuadras' && $restoredPortal['incomeTab']==='search',
+            'recargar el enlace restaura portal y paso sin atribuirse otro método o reconstruir la captura');
+        $_GET=['renta_portal'=>['Ciencuadras']];
+        ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-income-inputs.php';$invalidPortalHtml=ob_get_clean();
+        preg_match('/data-income-state="([^"]+)"/',$invalidPortalHtml,$invalidState);
+        $fallbackPortal=json_decode(html_entity_decode($invalidState[1],ENT_QUOTES,'UTF-8'),true);
+        expect($fallbackPortal['incomePortal']==='FincaRaiz','portal inválido usa una fuente configurada, sin aceptar parámetros arbitrarios');
     } finally { $_GET=$previousGet; }
 })();

@@ -1,3 +1,4 @@
+<?php if (($method ?? '')==='renta'): ?><details class="mt-3 rounded-lg border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Ver otros portales e inmobiliarias</summary><?php endif; ?>
 <div class="mt-4 space-y-3">
     <?php foreach (['Portales' => $portalLinks, 'Inmobiliarias' => $agencyLinks] as $sourceGroup => $links): ?>
     <?php if ($sourceGroup === 'Inmobiliarias'): ?><details :open="sourceTab >= <?= count($portalLinks) ?>"><summary class="min-h-11 cursor-pointer py-2 font-semibold">Inmobiliarias de la ciudad</summary><?php else: ?><div><?php endif; ?>
@@ -12,3 +13,4 @@
     <?php if ($sourceGroup === 'Inmobiliarias'): ?></details><?php else: ?></div><?php endif; ?>
     <?php endforeach; ?>
 </div>
+<?php if (($method ?? '')==='renta'): ?></details><?php endif; ?>

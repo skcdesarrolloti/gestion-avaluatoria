@@ -1,4 +1,8 @@
 <section x-show="searchTab==='matriz' && mode==='intake' && intakeView!=='consolidation'" x-cloak class="mt-4">
+    <?php if (($method ?? '')==='renta'): ?>
+    <?php require __DIR__.'/methodology-rental-review.php'; ?>
+    <details :open="intakeView!=='review'" class="mt-3 rounded-lg border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Ver tabla completa de datos recogidos</summary>
+    <?php endif; ?>
     <p class="mb-3 text-sm"><strong x-text="intakeTableData.rows.length"></strong> <span x-text="intakeView==='research' ? 'inmuebles consolidados' : 'muestras de '+intakePortal"></span>. Una fila por inmueble; solo datos recogidos. No publicado significa que no tenemos ese dato.</p>
     <div role="table" :aria-label="intakeView==='research' ? 'Inmuebles únicos y datos publicados' : 'Muestras y datos de '+intakePortal" tabindex="0" class="max-h-[65vh] max-w-full overflow-auto rounded-xl border">
         <div role="row" class="sticky top-0 z-10 flex w-max bg-slate-100 font-semibold">
@@ -18,4 +22,5 @@
         </template>
     </div>
     <p x-show="!intakeTableData.rows.length" class="p-3 text-sm">No hay muestras de este portal en esta vista.</p>
+    <?php if (($method ?? '')==='renta'): ?></details><?php endif; ?>
 </section>

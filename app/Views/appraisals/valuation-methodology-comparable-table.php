@@ -4,6 +4,7 @@
     action="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables')) ?>"
     x-data="comparableWorkbench" :data-comparable-mode="searchTab === 'mapa' ? 'cards' : mode" @input="refresh()" @change="refresh()"
     @intake-navigate.window="intakeNavigate($event.detail.view)" @comparable-imported="showImported($event.detail)"
+    <?php if (($method ?? '')==='renta'): ?>@income-source-view.window="if($event.detail==='review') intakeNavigate('review'); else searchTab='captura'"<?php endif; ?>
     data-module-autosave data-save-in-place data-comparable-json
     data-intake-sources="<?= e(json_encode(array_column(array_merge($portalSources ?? [],$agencySources ?? []),'label'),JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>"
     data-intake-evidence="<?= e(json_encode(['catalog'=>$researchCatalog,'subjects'=>$researchEvidence['subjects']],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>"
@@ -26,7 +27,7 @@
         <button type="button" class="btn-secondary min-h-11" @click="intakeNavigate(intakeStep)">Volver a las fichas (<span x-text="intakeCount"></span>)</button>
 
     </div>
-    <div id="capture-review" x-show="searchTab === 'matriz'" class="scroll-mt-6 flex flex-wrap items-start justify-between gap-4">
+    <div id="capture-review" x-show="searchTab === 'matriz'" class="scroll-mt-64 flex flex-wrap items-start justify-between gap-4">
         <div>
             <p class="eyebrow">Bandeja de captura · <?= e($methods[$method ?? 'mercado'] ?? 'Mercado') ?></p>
             <h3 class="mt-2 text-xl font-semibold" x-text="intakeView==='consolidation' ? 'Consolidación de las muestras' : intakeView==='research' ? 'Completar los inmuebles consolidados' : 'Muestras recogidas · '+intakePortal"></h3>

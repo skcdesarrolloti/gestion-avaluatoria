@@ -1,5 +1,19 @@
 # Entrega al responsable de la implementación
 
+12/11/2026 · Flujo Renta: barra fija con Portal actual, Siguiente portal,
+Buscar y pegar y Ver muestras, tanto en Preparación como en Captura/Revisión.
+Conserva un solo formulario montado y los pegados pendientes al cambiar de fuente;
+espera autoguardados y bloquea navegación ante error de guardado. No sube anuncios
+al pulsar Siguiente. Portal/paso se conservan en URL validada al recargar.
+Revisión sencilla por portal: una ficha por vez, anterior/siguiente, búsqueda,
+operación registrada, código, ubicación, importe/área publicados y enlace original.
+La tabla completa, conteos y controles previos siguen disponibles plegables.
+Enlaces explícitos oficina-en-venta muestran advertencia sin modificar registros.
+No corrige automáticamente las tres clasificaciones contradictorias de FincaRaíz.
+Sin DDL, cambios de persistencia ni cálculos nuevos. PHP1637/JS281/lint/build y
+79,9KB gzip. UI escritorio/móvil390, aviso de enlace de venta y conservación de
+una vista previa de tres anuncios al ir a otro portal y regresar verificados.
+
 12/11/2026 · Ciencuadras distingue pegado de otras ciudades de tarjetas no
 reconocidas. Mensaje identifica ciudades leídas/ciudad del expediente, explica
 por qué no hay avisos para subir y pide barrio + Enter antes de volver a copiar.

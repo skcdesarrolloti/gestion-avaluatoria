@@ -2,10 +2,12 @@
 $incomeTabs=['concept'=>'1. Comprender el inmueble','search'=>'2. Preparar la búsqueda','capture'=>'3. Recoger muestras'];
 $incomeInitial=is_string($_GET['renta_paso'] ?? null) && isset($incomeTabs[$_GET['renta_paso']])?$_GET['renta_paso']:'concept';
 $incomeSourceList=array_merge($guide['source_search']['portal_sources'] ?? [],$guide['source_search']['agency_sources'] ?? []);
+$incomeSourceLabels=array_column($incomeSourceList,'label');
+$incomeInitialPortal=is_string($_GET['renta_portal'] ?? null) && in_array($_GET['renta_portal'],$incomeSourceLabels,true)?$_GET['renta_portal']:($incomeSourceLabels[0] ?? '');
 ?>
 <section data-methodology-version-group data-income-inputs
     data-income-loaded="<?= $incomeInitial==='capture'?'1':'0' ?>" data-income-capture-url="<?= e($flowUrl('3').'&renta_paso=capture') ?>"
-    data-income-state="<?= e(json_encode(['incomeTab'=>$incomeInitial,'incomePortal'=>$incomeSourceList[0]['label'] ?? ''],JSON_UNESCAPED_UNICODE)) ?>"
+    data-income-state="<?= e(json_encode(['incomeTab'=>$incomeInitial,'incomePortal'=>$incomeInitialPortal,'incomeSources'=>$incomeSourceLabels,'incomePortals'=>array_column($guide['source_search']['portal_sources'] ?? [],'label')],JSON_UNESCAPED_UNICODE)) ?>"
     x-data="incomeInputs">
     <nav class="mb-5 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" role="tablist" aria-label="Preparación e investigación de Renta">
         <?php $incomeKeys=array_keys($incomeTabs); foreach ($incomeKeys as $incomeIndex=>$incomeKey):
@@ -22,6 +24,7 @@ $incomeSourceList=array_merge($guide['source_search']['portal_sources'] ?? [],$g
             @keydown.space.prevent="openTab('<?= e($incomeKey) ?>')"><?= e($incomeTabs[$incomeKey]) ?></a>
         <?php endforeach; ?>
     </nav>
+    <?php require __DIR__.'/methodology-income-portal-nav.php'; ?>
     <div id="renta-panel-concept" role="tabpanel" aria-labelledby="renta-tab-concept" x-show="incomeTab==='concept'">
         <?php require __DIR__.'/methodology-income-concept.php'; ?>
         <button type="button" class="btn-primary" @click="incomeTab='search'; $refs.incomeTabsearch.focus()">Continuar a 2. Preparar la búsqueda</button>

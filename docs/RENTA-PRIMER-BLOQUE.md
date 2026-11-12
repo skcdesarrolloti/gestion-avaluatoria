@@ -1,5 +1,32 @@
 # Renta: primer bloque conceptual
 
+12/11/2026 · Navegación simplificada por fuente. La barra superior permanece
+visible al desplazarse en Preparar búsqueda, Recoger y Revisar. Permite elegir
+portal, pasar al siguiente de los cinco portales configurados y abrir sus muestras
+sin buscar controles al final de la página. Las inmobiliarias siguen en el selector;
+no se consideran parte de la secuencia de cinco portales. No se salta por conteos
+ni se declara un portal terminado automáticamente; llegar al último no vuelve al primero.
+
+Siguiente abre la captura del portal indicado, con su enlace e instrucciones.
+No abre ventanas por su cuenta ni importa anuncios. El cambio espera los
+autoguardados; un fallo mantiene el portal anterior. Los pegados todavía sin subir
+se conservan en el mismo formulario al alternar portales, sin confirmar guardado.
+Las muestras incorporadas mantienen el guardado en BD y sus controles anteriores.
+El portal y el paso elegidos se conservan en el enlace al recargar, sin localStorage.
+
+Ver muestras abre una ficha por vez: fuente, operación registrada, código,
+ubicación, importe y área publicados; permite anterior/siguiente, buscar y consultar
+el anuncio original. La tabla completa y las acciones de revisión previas permanecen
+disponibles. Se advierten enlaces explícitos de venta; no se convierten ni borran
+datos históricos. Las tres contradicciones detectadas en FincaRaíz siguen pendientes
+de corrección de clasificación. No afirmar que las etiquetas bastan para validar renta.
+
+Pruebas: PHP1637/JS281, lint, build/check:size79,9KB. UI local de presentación:
+escritorio y móvil390, navegación y paginación, sin desbordamiento; copia pendiente
+de tres anuncios conservada después de cambiar de portal y volver. No se incorporan
+anuncios reales en esta prueba ni se revalida aquí la persistencia BD ya existente.
+Capturas renta-flujo-portal-revision-*.png en output/pdf. Publicar con commit/push.
+
 12/11/2026 · Continuación: los otros cuatro portales usan el recorrido existente
 abrir → copiar resultados → pegar → revisar → subir sin repetidos → confirmar.
 Se verificaron en navegador las búsquedas reales de oficinas en arriendo:

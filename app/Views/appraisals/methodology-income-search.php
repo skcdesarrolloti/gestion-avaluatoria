@@ -1,4 +1,4 @@
-<section id="renta-busqueda" class="rounded-2xl border bg-white p-5 sm:p-8">
+<section id="renta-busqueda" class="scroll-mt-64 rounded-2xl border bg-white p-5 sm:p-8">
     <p class="eyebrow">Renta · Preparar la investigación · <?= e($componentLabel) ?></p>
     <h2 class="mt-2 text-2xl font-semibold">2. Preparar la búsqueda de arriendos</h2>
     <p class="mt-3 leading-6">Revisa los datos del expediente y elige dónde buscar. Esta guía prepara el texto y los filtros que aplicarás dentro del portal; no cambia sus filtros automáticamente.</p>
@@ -16,12 +16,7 @@
         <?php endforeach; ?>
     </dl>
     <a class="mt-3 inline-flex min-h-11 items-center text-blue-800 underline" href="<?= e(url('avaluos/'.$record['id'].'/bien-sujeto?unit='.$sourceUnitKey)) ?>">Consultar o completar los datos de esta unidad · capítulo 3</a>
-    <label class="mt-5 block font-semibold" for="renta-search-source">Portal o inmobiliaria para preparar la búsqueda</label>
-    <select id="renta-search-source" class="input" x-model="incomePortal" aria-describedby="renta-search-source-hint">
-        <option value="">Selecciona una fuente</option>
-        <?php foreach ($incomeSourceList as $incomeSource): ?><option value="<?= e($incomeSource['label']) ?>"><?= e($incomeSource['label']) ?></option><?php endforeach; ?>
-    </select>
-    <p id="renta-search-source-hint" class="mt-2 text-sm text-slate-600">La selección organiza esta consulta; no se guarda como un dato del avalúo. Los criterios del portal pueden variar.</p>
+    <p class="mt-5 text-sm text-slate-600">Elige el portal en la barra superior. Puedes pasar al siguiente o consultar sus muestras desde esa misma barra.</p>
     <?php foreach ($incomeSourceList as $source): ?>
     <div class="mt-4" x-show="incomePortal===<?= e(json_encode($source['label'])) ?>">
         <?php require __DIR__.'/methodology-portal-search-prompt.php'; ?>
