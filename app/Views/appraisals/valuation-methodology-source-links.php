@@ -17,6 +17,7 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
         <section id="source-panel-<?= $sourceIndex ?>" aria-label="<?= e($source['label']) ?>"
             x-show="sourceTab === <?= $sourceIndex ?>" <?= $sourceIndex ? 'x-cloak' : '' ?> class="mt-4 rounded-xl bg-white p-4">
             <a class="btn-primary my-3 min-h-11" href="<?= e($sourceOpen) ?>" target="_blank" rel="noopener">Abrir búsqueda en <?= e($source['label']) ?></a>
+            <?php if (mb_strtolower($guide['business_label'] ?? '')==='arriendo') require __DIR__.'/methodology-rental-source-steps.php'; ?>
             <?php
             $batchPortal = ['Ciencuadras'=>'ciencuadras','Properati'=>'properati','Mercado Libre Inmuebles'=>'mercadolibre'][$source['label']] ?? '';
             if ($batchPortal && ($guide['type_label'] ?? '') === 'Oficina' && in_array(mb_strtolower($guide['business_label'] ?? ''),['venta','arriendo'],true)) {

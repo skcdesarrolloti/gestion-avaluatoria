@@ -1,5 +1,11 @@
 # Entrega al responsable de la implementación
 
+12/11/2026 · Ayuda de captura de Renta visible al elegir cada portal, directamente
+debajo de Abrir búsqueda: comprobar filtros, copiar resultados Ctrl+A/C, regresar
+al campo de pegado y revisar/subir hasta Guardado confirmado. Metrocuadrado explica
+área pendiente y distingue Pegar otra página de Empezar de cero. Solo presentación;
+se conservan lectores, separación de investigaciones y muestras.
+
 12/11/2026 · Renta en los otros cuatro portales: enlaces de oficinas en arriendo
 en Cartagena; Bocagrande directo en Metrocuadrado, Properati y Mercado Libre.
 Ciencuadras conserva operación/tipo y requiere escribir barrio + Enter, explicado
