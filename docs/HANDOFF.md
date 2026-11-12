@@ -1,5 +1,17 @@
 # Entrega al responsable de la implementación
 
+12/11/2026 · Acceso a muestras guardadas junto al contador de cada fuente:
+«Ver N muestras guardadas de…» abre y desplaza a la bandeja del portal actual.
+Aclara que el campo de pegado vacío no significa pérdida de anuncios. Conserva
+matriz única, filtros, capturas, lectores y persistencia existentes.
+Verificación autenticada del aplicativo publicado: recogida de arriendos de
+Metrocuadrado por copia/pegado de ambas páginas y carga al desplazarse; 53 enlaces
+distintos guardados con confirmación del servidor. Tras recarga: 20 FincaRaíz y
+53 Metrocuadrado, todos Arriendo; 74 registros ajenos conservados aparte.
+Esta recogida no confirma comparabilidad ni adopta áreas o valores. Sin cálculos.
+Cambio de acceso: PHP1635/JS276/lint/build/79,5KB; botón abre la tabla del portal,
+comprobado en escritorio y móvil390 sin desbordamiento.
+
 12/11/2026 · Ayuda de captura de Renta visible al elegir cada portal, directamente
 debajo de Abrir búsqueda: comprobar filtros, copiar resultados Ctrl+A/C, regresar
 al campo de pegado y revisar/subir hasta Guardado confirmado. Metrocuadrado explica

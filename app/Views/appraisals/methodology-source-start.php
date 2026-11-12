@@ -1,5 +1,9 @@
 <div class="my-2">
     <p class="text-sm"><strong x-text="sourceSavedCount"></strong> anuncios incorporados de <?= e($pasteLabel) ?> en esta unidad.</p>
+    <div x-show="sourceSavedCount > 0" x-cloak class="mt-2 rounded-lg border border-teal-200 bg-white p-3">
+        <button type="button" class="btn-primary min-h-11" @click="intakeNavigate('review'); $nextTick(() => document.getElementById('capture-review')?.scrollIntoView({ block: 'start', behavior: 'smooth' }))" x-text="'Ver ' + sourceSavedCount + ' muestras guardadas de ' + <?= e(json_encode($pasteLabel)) ?>">Ver muestras guardadas de <?= e($pasteLabel) ?></button>
+        <p class="mt-2 text-sm">Tus anuncios guardados se consultan aquí. El campo de pegado queda disponible para traer más páginas; no muestra de nuevo las páginas que copiaste antes.</p>
+    </div>
     <div class="mt-2 flex flex-wrap gap-2">
         <button type="button" class="min-h-11 text-sm text-teal-800 underline" :disabled="busy || removalBusy || researchBusy" @click="sourceRestartPending=true; requestSourceRemoval(<?= e(json_encode($pasteLabel)) ?>)">Empezar de cero en <?= e($pasteLabel) ?></button>
     </div>
