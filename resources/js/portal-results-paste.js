@@ -53,7 +53,8 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
             const omitted=studyOperation ? rows.filter(row=>normalize(row.operation)!==studyOperation).length : 0;
             if (studyOperation) rows=rows.filter(row=>normalize(row.operation)===studyOperation);
             if (!rows.length) {
-                this.message = omitted ? 'Los avisos recibidos no corresponden a esta investigación de '+studyOperation+'. No se incorporaron. Comprueba la operación en el portal.' : emptyMessage || `No se reconocieron tarjetas. Sí llegó contenido, pero no se pudieron leer sus avisos. Copia directamente la página de resultados de ${label} con Ctrl+A y Ctrl+C y pega con Ctrl+V (sin Mayús). No copies una ficha individual ni pases el texto por otra aplicación.`;
+                const emptyHint=typeof emptyMessage==='function' ? emptyMessage(html,panel.dataset.city,text,operation) : emptyMessage;
+                this.message = omitted ? 'Los avisos recibidos no corresponden a esta investigación de '+studyOperation+'. No se incorporaron. Comprueba la operación en el portal.' : emptyHint || `No se reconocieron tarjetas. Sí llegó contenido, pero no se pudieron leer sus avisos. Copia directamente la página de resultados de ${label} con Ctrl+A y Ctrl+C y pega con Ctrl+V (sin Mayús). No copies una ficha individual ni pases el texto por otra aplicación.`;
                 return;
             }
             this.collectPage(rows,text);

@@ -2,6 +2,24 @@ import test from 'node:test';
 import assert from 'node:assert/strict';
 import { parseCiencuadrasCards, ciencuadrasUrl, ciencuadrasPaste } from '../resources/js/ciencuadras-paste.js';
 import { fillRows } from '../resources/js/comparable-bulk-import.js';
+import { parseHTML } from 'linkedom';
+
+test('Ciencuadras explains a nationwide paste and only prepares the city requested by the study', async () => {
+    const previous=globalThis.document;
+    globalThis.document=parseHTML('<html><body><form id="tabla-madre-83"><input name="study_scope" value="renta:arriendo"></form></body></html>').document;
+    try {
+        const ui=ciencuadrasPaste(); ui.$el={dataset:{city:'Cartagena de Indias',operation:'arriendo'}}; ui.init();
+        const make=city=>`<a href="/inmueble/oficina-en-arriendo-123"><article><h3>Oficina en arriendo${city}, barrio</h3><p>Administración incluida: $3.000.000</p><p>37 m2</p></article></a>`;
+        const paste=html=>ui.paste({preventDefault(){},clipboardData:{getData:type=>type==='text/html'?html:''}});
+        await paste(make('Medellín'));
+        assert.equal(ui.results.length,0); assert.equal(ui.pages.length,0);
+        assert.match(ui.message,/otras ciudades \(Medellín\)/); assert.match(ui.message,/Cartagena de Indias/);
+        assert.match(ui.message,/pulsa Enter/); assert.match(ui.message,/No hay avisos preparados para subir/);
+        await paste(make('Cartagena'));
+        assert.equal(ui.results.length,1); assert.equal(ui.results[0].row.operation,'Arriendo');
+        assert.match(ui.message,/Pegar no guarda/); ui.destroy();
+    } finally {globalThis.document=previous;}
+});
 
 const card = { url: '/inmueble/oficina-en-arriendo-o-venta-en-boca-grande-cartagena-123',
     heading: 'Oficina en arriendo o ventacartagena, comuna 1, boca grande ',

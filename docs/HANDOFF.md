@@ -1,5 +1,15 @@
 # Entrega al responsable de la implementación
 
+12/11/2026 · Ciencuadras distingue pegado de otras ciudades de tarjetas no
+reconocidas. Mensaje identifica ciudades leídas/ciudad del expediente, explica
+por qué no hay avisos para subir y pide barrio + Enter antes de volver a copiar.
+Se comprobó en el portal real que ?v=Bocagrande puede mostrar resultados de toda
+Colombia hasta pulsar Enter. Se aplicó ese filtro, sin importar ni subir anuncios.
+Conserva selección por ciudad/operación y todas las muestras anteriores.
+Validación: PHP1635/JS277, build/check:size79,9KB. Prueba de pegado nacional:
+mensaje de otras ciudades sin preparar filas; al pegar Cartagena aparece Subir.
+UI escritorio/móvil390 sin desbordamiento. No se guardaron anuncios en esta revisión.
+
 12/11/2026 · Acceso a muestras guardadas junto al contador de cada fuente:
 «Ver N muestras guardadas de…» abre y desplaza a la bandeja del portal actual.
 Aclara que el campo de pegado vacío no significa pérdida de anuncios. Conserva
