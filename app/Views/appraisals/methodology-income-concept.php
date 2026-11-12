@@ -66,7 +66,7 @@ $incomeState=['occupancy'=>$incomeValues['occupancy'] ?? '', 'scope'=>$incomeVal
             <p class="mt-2 text-sm"><strong><?= e($question['label']) ?></strong>
                 <span x-text="<?= e(json_encode($question['values'],JSON_UNESCAPED_UNICODE)) ?>[<?= e($name) ?>] || 'Sin responder todavía'"><?= e($question['values'][$incomeValues[$name] ?? ''] ?? 'Sin responder todavía') ?></span></p>
             <?php endforeach; ?>
-            <p class="mt-3 text-sm">Es un borrador conceptual: las selecciones no verifican documentos ni confirman la viabilidad del método. Las muestras de arriendo existentes continúan debajo.</p>
+            <p class="mt-3 text-sm">Es un borrador conceptual: las selecciones no verifican documentos ni confirman la viabilidad del método. Las muestras de arriendo existentes están en la pestaña «3. Recoger muestras».</p>
         </div>
         <div class="flex flex-wrap items-center gap-3">
             <button type="submit" class="btn-primary">Guardar ahora / reintentar</button>

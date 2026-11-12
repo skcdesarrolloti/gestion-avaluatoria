@@ -45,10 +45,7 @@ $costAcademyTheoryOnly = $costAcademy && ($selected['method'] ?? '') !== 'costo'
 <?php elseif ($stage === '2'): ?>
     <?php require __DIR__ . '/methodology-selection.php'; ?>
 <?php elseif ($stage === '3' && $method === 'renta'): ?>
-    <div data-methodology-version-group>
-    <?php require __DIR__ . '/methodology-income-concept.php'; ?>
-    <?php require __DIR__ . '/methodology-unassigned.php'; require __DIR__ . '/valuation-methodology-search.php'; ?>
-    </div>
+    <?php require __DIR__.'/methodology-income-inputs.php'; ?>
 <?php elseif ($stage === '3' && in_array($method, ['costo', 'residual'], true)): ?>
     <?php require __DIR__ . '/methodology-other-inputs.php'; ?>
 <?php elseif ($method !== 'mercado'): ?>

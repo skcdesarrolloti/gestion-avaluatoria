@@ -1,5 +1,25 @@
 # Renta: primer bloque conceptual
 
+12/11/2026 · Insumos de Renta se organiza en tres pestañas horizontales:
+1. Comprender el inmueble; 2. Preparar la búsqueda; 3. Recoger muestras.
+Solo se muestra un panel con JavaScript; en móvil la barra se desplaza horizontalmente.
+Los paneles se mantienen montados: cambiar pestaña no reconstruye formularios,
+no borra borradores de pegado ni duplica la matriz. Teclado con flechas, Inicio y Fin;
+enlaces server-rendered `renta_paso` y contenido disponible como fallback sin JS.
+La preparación consulta los filtros existentes del expediente y permite elegir
+portal/inmobiliaria para reutilizar su texto e instrucciones de búsqueda. El botón
+Continuar lleva a la captura de esa fuente. La selección de fuente es de navegación,
+no un parámetro persistido del avalúo. Las correcciones del sujeto se hacen en su
+capítulo; no se agregan rangos, cálculos, campos de negocio ni migraciones.
+Ayuda plegable conecta con los soportes del tema 3 de Academia. La captura previa,
+conteos, lectores, consolidación, investigación, mapas y autoguardado se conservan.
+Validación: lint, PHP1598, JS268, build/check:size78,9KB; fixture PHP local con
+contexto Arriendo/Oficina/Cartagena/Chambacú, escritorio1440 y móvil390 sin
+desbordamiento, controles44px y sin errores JS. Se comprobó selección conservada,
+borrador de pegado intacto, una matriz/un formulario conceptual y fuente elegida
+al continuar. POST de la fixture simulado; no acredita persistencia nueva ni hosting.
+Capturas: output/pdf/renta-pestanas-escritorio.png y renta-pestanas-movil.png.
+
 Flujo enfocado (12/11/2026): al seleccionar Renta en Configuración se ocultan las
 entradas académicas de los otros métodos y la recomendación académica general.
 Botón directo «1. Abrir Academia de Renta y sus normas», seguido de Insumos.

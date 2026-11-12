@@ -1,5 +1,11 @@
 # Entrega al responsable de la implementación
 
+12/11/2026 · Renta con tres pestañas horizontales en Insumos: comprender, preparar
+búsqueda y recoger muestras. Preparación consulta criterios del expediente y guía
+por fuente; al continuar conserva el portal elegido en la captura existente.
+DOM único con x-show conserva formularios/borradores. Sin cálculos ni cambios de
+persistencia; ver RENTA-PRIMER-BLOQUE.md para alcance y revisión local realizada.
+
 12/11/2026 · Aclaración visible al inicio del bloque conceptual de Renta: prepara
 ocupación, cobertura y soportes para el informe; hoy se conserva como borrador,
 sin incorporación automática al informe ni modificación de filtros de portales.
