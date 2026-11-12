@@ -1,5 +1,9 @@
 # Gestión avaluatoria · SuCasa
 
+Renta: [primer bloque conceptual](docs/RENTA-PRIMER-BLOQUE.md) en Insumos, con
+listas, ayudas y soportes normativos. Academia incluye orientación y resumen PDF;
+respuestas como borrador por recorrido, sin cálculos ni nuevas migraciones.
+
 Capítulo 8: [Define el estudio y continúa con sus muestras o insumos](docs/PLAN-VALORACION-CAP8.md).
 
 Mercado: un solo recorrido durante captura y análisis. En 1. Preparar la muestra

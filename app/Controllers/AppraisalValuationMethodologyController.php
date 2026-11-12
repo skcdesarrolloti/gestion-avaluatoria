@@ -103,18 +103,17 @@ final class AppraisalValuationMethodologyController
             (isset($changes['plan_parts']) ? 'plan' : (isset($changes['research_plan'])?'3&research=1':'2')));
     }
 
+    public function saveIncomeConcept(string $id): never { \App\Services\IncomeConceptAction::save($this->appraisals,$this->workflow,$this->user['id'],$id); }
     public function saveFactorScale(string $id): never
     { \App\Services\ResearchFactorScaleAction::save($this->appraisals,$this->factorScales,$this->user['id'],$id); }
 
     public function savePhScope(string $id, string $unitId): never
     { \App\Services\MarketPhScopeAction::save($this->appraisals, $this->user['id'], $id, $unitId); }
-
     public function previewExcel(string $id): never
     { \App\Services\ComparableExcelAction::run($this->appraisals,$this->comparables,$this->user['id'],$id); }
 
     public function saveExcel(string $id): never
     { \App\Services\ComparableExcelAction::run($this->appraisals,$this->comparables,$this->user['id'],$id,true); }
-
     public function assignComparables(string $id): never
     {
         $record = $this->appraisals->find($id, $this->user['id']);

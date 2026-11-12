@@ -16,7 +16,7 @@
         <p>Registra la naturaleza jurídica, inclusión de parqueaderos y depósitos y base del área. La ubicación precisa y sus coordenadas se verifican manualmente en Análisis.</p>
     </div>
     <form x-data="researchPlan(<?= e(json_encode($researchConfig,JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>)" method="post"
-        action="<?= e(url($basePath.'/flujo')) ?>" data-module-autosave data-save-in-place data-autosave-endpoint="<?= e(url($basePath.'/flujo')) ?>" class="mt-5">
+        action="<?= e(url($basePath.'/flujo')) ?>" data-module-autosave data-save-in-place data-workflow-version data-autosave-endpoint="<?= e(url($basePath.'/flujo')) ?>" class="mt-5">
         <?= csrf_field() ?>
         <input type="hidden" name="component" value="<?= e($componentKey) ?>">
         <input type="hidden" name="version" value="<?= (int)($record['methodology_version'] ?? 0) ?>">

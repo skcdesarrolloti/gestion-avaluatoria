@@ -1,5 +1,10 @@
 # Crear y evolucionar la base sin SQL manual
 
+Renta conceptual (12/11/2026): `income_concept` dentro del JSON existente
+`methodology_workflow`, por componente/contraste y propietario; versión optimista
+de metodología compartida con su plan. Sin esquema ni migración nueva. Se conservan
+campos omitidos y respuestas al desactivar/reactivar. Ver RENTA-PRIMER-BLOQUE.md.
+
 Configuración de M4 (19/10/2026): `basis` (offer/adjusted) se valida y conserva en
 `analysis_factor_selection`, dentro de `capture_details` existente. `selected`
 habilita campos de verificación; `applied` conserva los factores preparados para

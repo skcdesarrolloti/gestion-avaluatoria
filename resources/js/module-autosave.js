@@ -43,8 +43,6 @@ function formBody(form, extras = {}) {
     if (form.hasAttribute?.('data-comparable-json')) packComparableRows(body);
     return body;
 }
-
-
 async function jsonResponse(response) {
     const type = response.headers?.get?.('content-type') ?? '';
     if (type.includes('application/json') || typeof response.text !== 'function') return response.json();
@@ -59,7 +57,7 @@ function updateVersion(form, result) {
     if (!Number.isInteger(result.version)) return;
     const field = form.querySelector('input[name="version"]');
     if (field) field.value = String(result.version);
-    form.closest?.('[data-methodology-version-group]')?.querySelectorAll('form').forEach(peer => { if (peer.getAttribute('action') === form.getAttribute('action')) peer.querySelector('input[name="version"]')?.setAttribute('value', String(result.version)); });
+    form.closest?.('[data-methodology-version-group]')?.querySelectorAll('form').forEach(peer => { if (peer.getAttribute('action') === form.getAttribute('action') || (form.hasAttribute('data-workflow-version') && peer.hasAttribute('data-workflow-version'))) peer.querySelector('input[name="version"]')?.setAttribute('value', String(result.version)); });
     form.closest?.('[data-ph-section]')?.querySelectorAll('input[name="version"]').forEach(node => {
         node.value = String(result.version);
     });
@@ -118,6 +116,7 @@ async function save(form) {
             return { response, result };
         }, state.controller);
         if (response.status === 409) state.conflict = true;
+        form.dispatchEvent?.(new CustomEvent('ga:validation', { detail: result.errors ?? {} }));
         if (!response.ok || result.ok !== true) throw new Error(result.message || 'No se pudo confirmar el guardado.');
         if (!Number.isInteger(result.version)) throw new Error('El servidor no confirmó la versión guardada. Conserva esta página y pulsa Guardar matriz para reintentar.');
         phase='confirmed';

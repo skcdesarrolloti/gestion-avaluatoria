@@ -16,6 +16,8 @@ final class MethodologyWorkflowRepository
         $row = $query->fetch();
         if (!$row) throw new HttpException(404, 'No se encontró el expediente.');
         $saved = MethodologyWorkflow::saved($row);
+        \App\Services\IncomeConcept::validate($changes,$saved[$key] ?? []);
+        if (isset($changes['income_concept'])) $changes['income_concept']=array_replace($saved[$key]['income_concept'] ?? [],$changes['income_concept']);
         \App\Services\CostMethodScope::validate($changes,$saved[$key] ?? []);
         if (isset($changes['cost_scope'])) $changes['cost_scope']=array_replace($saved[$key]['cost_scope'] ?? [],$changes['cost_scope']);
         $saved = \App\Services\MethodologyAlternativeMethods::save($saved,$key,$changes);

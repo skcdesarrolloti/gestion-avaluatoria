@@ -5,6 +5,10 @@
 $selectionHelp=\App\Services\MethodologySelectionHelp::methods($componentLabel);
 $selectionTreatments=\App\Services\MethodologySelectionHelp::treatments();
 $selectionRoutes=[];
+$selectionAcademyRoutes=[];
+foreach ($methods as $selectionMethod=>$selectionLabel) $selectionAcademyRoutes[$selectionMethod]=$flowUrl('1',$selectionMethod,$componentKey);
+$selectionAcademyBinding="academyRoutes.renta + '#renta-orientacion'";
+if (!empty($selectionInPlan)) $selectionAcademyBinding='!planNeedsRefresh ? ('.$selectionAcademyBinding.') : null';
 if (!empty($selectionInPlan)) foreach ($methods as $selectionMethod=>$selectionLabel) $selectionRoutes[$selectionMethod]=$flowUrl($selectionMethod==='mercado' && !empty($selectionHasSamples)?'4':'3',$selectionMethod,$componentKey);
 ?>
 <?php if (($record['regimen_ph'] ?? '') === 'si' && $method === 'mercado'): ?>
@@ -13,7 +17,7 @@ if (!empty($selectionInPlan)) foreach ($methods as $selectionMethod=>$selectionL
 </details>
 <?php endif; ?>
 <form x-data="<?= e(json_encode(['chosenMethod'=>$selected['method'] ?? '', 'chosenTreatment'=>$selected['treatment'] ?? '',
-    'methodHelp'=>$selectionHelp,'treatmentHelp'=>$selectionTreatments,'nextRoutes'=>$selectionRoutes,'reasonText'=>$selected['reason'] ?? '', 'coverageText'=>$selected['coverage'] ?? ''],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>" method="post" action="<?= e(url($basePath . '/flujo')) ?>" data-module-autosave data-save-in-place
+    'methodHelp'=>$selectionHelp,'treatmentHelp'=>$selectionTreatments,'nextRoutes'=>$selectionRoutes,'academyRoutes'=>$selectionAcademyRoutes,'reasonText'=>$selected['reason'] ?? '', 'coverageText'=>$selected['coverage'] ?? ''],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>" method="post" action="<?= e(url($basePath . '/flujo')) ?>" data-module-autosave data-save-in-place
     data-autosave-endpoint="<?= e(url($basePath . '/flujo')) ?>" class="<?= !empty($selectionInPlan)?'space-y-3':'rounded-2xl border bg-white p-5 sm:p-8' ?>">
     <?= csrf_field() ?>
     <input type="hidden" name="component" value="<?= e($componentKey) ?>">
@@ -21,7 +25,7 @@ if (!empty($selectionInPlan)) foreach ($methods as $selectionMethod=>$selectionL
     <h2 class="text-xl font-semibold">Método y alcance · <?= e($componentLabel) ?></h2>
     <div class="mt-5 grid gap-5 sm:grid-cols-2">
         <div><label for="method-choice-<?= e($componentKey) ?>" class="block font-semibold">Método del componente</label>
-            <select id="method-choice-<?= e($componentKey) ?>" name="method" aria-label="Método del componente" aria-describedby="method-help-<?= e($componentKey) ?>" class="input" x-model="chosenMethod" @change="$refs.methodAcademy.open=Boolean($event.target.value)"><option value="">Selecciona el método</option>
+            <select id="method-choice-<?= e($componentKey) ?>" name="method" aria-label="Método del componente" aria-describedby="method-help-<?= e($componentKey) ?>" class="input" x-model="chosenMethod" @change="$refs.methodAcademy.open=Boolean($event.target.value); $dispatch('method-selection-change',{method:$event.target.value})"><option value="">Selecciona el método</option>
             <?php foreach ($methods as $key => $label): if (isset($selectionComponent['alternate_method']) && $key!==$selectionComponent['alternate_method']) continue; ?><option value="<?= e($key) ?>" <?= ($selected['method'] ?? '') === $key ? 'selected' : '' ?>><?= e($label) ?></option><?php endforeach; ?>
             </select>
             <details x-ref="methodAcademy" class="mt-2"><summary class="min-h-11 cursor-pointer text-sm font-semibold">Qué significa el método elegido</summary>
@@ -72,6 +76,11 @@ if (!empty($selectionInPlan)) foreach ($methods as $selectionMethod=>$selectionL
     <?php require __DIR__.'/methodology-cost-scope.php'; ?>
     </details>
     <p class="mt-3 text-sm" data-autosave-status>Autoguardado activo · máximo 2000 caracteres por explicación.</p>
+    <div class="mt-4 rounded-xl border border-teal-200 bg-teal-50 p-4" x-show="chosenMethod === 'renta'" <?= ($selected['method'] ?? '')==='renta'?'':'x-cloak' ?>>
+        <p class="font-semibold">Tu recorrido es Renta</p>
+        <p class="mt-2 text-sm">Primero consulta Academia de Renta: allí están los cuatro temas conceptuales y sus soportes IGAC, IVS y NTS/GTS. Después pasa a sus Insumos.</p>
+        <a class="btn-primary mt-3" href="<?= e($selectionAcademyRoutes['renta'].'#renta-orientacion') ?>" :href="<?= e($selectionAcademyBinding) ?>" <?php if (!empty($selectionInPlan)): ?>:aria-disabled="planNeedsRefresh" @click="if(planNeedsRefresh)$event.preventDefault()"<?php endif; ?>>1. Abrir Academia de Renta y sus normas</a>
+    </div>
     <button type="submit" class="<?= !empty($selectionInPlan)?'btn-secondary':'btn-primary' ?> mt-4">Guardar ahora</button>
     <?php if (!empty($selectionInPlan)): ?>
     <a class="btn-primary mt-4" <?= isset($selectionRoutes[$selected['method'] ?? ''])?'href="'.e($selectionRoutes[$selected['method']]).'"':'aria-disabled="true"' ?> :href="!planNeedsRefresh?nextRoutes[chosenMethod] || null:null" :aria-disabled="!nextRoutes[chosenMethod]||planNeedsRefresh" :tabindex="nextRoutes[chosenMethod]&&!planNeedsRefresh?0:-1" @click="if(!nextRoutes[chosenMethod]||planNeedsRefresh)$event.preventDefault()" x-text="chosenMethod==='mercado'?'Continuar con las muestras':'Continuar con los insumos'">Continuar con las muestras o insumos</a>

@@ -3,6 +3,7 @@ declare(strict_types=1);
 require dirname(__DIR__) . '/bootstrap.php';
 require __DIR__ . '/support.php';
 require __DIR__ . '/methodology-workflow.php';
+require __DIR__ . '/income-concept.php';
 require __DIR__ . '/methodology-plan.php';
 require __DIR__ . '/cost-method.php';
 require __DIR__ . '/cost-academy-render.php';
@@ -1012,7 +1013,7 @@ try {
     $baseAppraiser = ['id' => '', 'identification_number' => '', 'email' => '', 'phone' => '', 'raa_number' => '',
         'raa_categories' => '["1"]', 'raa_contact_city' => '', 'raa_contact_department' => '',
         'raa_contact_address' => '', 'notes' => '', 'raa_issued_at' => '2026-09-01',
-        'raa_expires_at' => '2026-12-31', 'raa_pin' => '', 'raa_source_filename' => 'raa.pdf',
+        'raa_expires_at' => date('Y-m-d',strtotime('+30 days')), 'raa_pin' => '', 'raa_source_filename' => 'raa.pdf',
         'raa_storage_filename' => 'raa-test.pdf', 'raa_file_size_bytes' => 100];
     $activeAppraiserId = bin2hex(random_bytes(16));
     $inactiveAppraiserId = bin2hex(random_bytes(16));
@@ -1027,7 +1028,7 @@ try {
         'raa_number' => 'AVAL-73089485', 'raa_categories' => '["1","11"]',
         'raa_contact_city' => 'Cartagena', 'raa_contact_department' => 'Bolívar',
         'raa_contact_address' => 'Manga Calle 28 # 24-79 Oficina 303', 'raa_pin' => 'b40e0abe',
-        'raa_issued_at' => '2026-10-01', 'raa_expires_at' => '2026-10-31', 'active' => 'Si',
+        'raa_issued_at' => date('Y-m-d'), 'raa_expires_at' => date('Y-m-d',strtotime('+30 days')), 'active' => 'Si',
         'notes' => 'Actualizado', 'raa_source_filename' => 'raa-nuevo.pdf', 'raa_storage_filename' => 'raa-nuevo.pdf',
     ]));
     $updatedAppraiser = $appraisers->find($activeAppraiserId);

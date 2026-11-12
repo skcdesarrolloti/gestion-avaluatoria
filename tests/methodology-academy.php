@@ -42,6 +42,9 @@ declare(strict_types=1);
     expect(str_contains($html,'Leer artículo 22 completo') && str_contains($html,'Leer artículo 26 completo')
         && !str_contains($html,'Método de Mercado</h4>') && !str_contains($html,'Verificación de datos guardados'),
         'contraste abre su academia de Renta sin copiar teoría ni verificaciones de Mercado');
+    expect(!str_contains($html,'Mercado · 3 recorridos') && !str_contains($html,'General · todos los métodos')
+        && str_contains($html,'Fundamentos comunes · consulta opcional') && str_contains($html,'renta-tema-informacion'),
+        'Renta muestra su academia sin pestañas de otros métodos y mantiene fundamentos como consulta opcional');
     $_GET['academy']='general';
     ob_start();require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php';$html=ob_get_clean();
     unset($_GET['academy']);

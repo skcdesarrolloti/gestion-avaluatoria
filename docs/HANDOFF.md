@@ -1,5 +1,27 @@
 # Entrega al responsable de la implementación
 
+Flujo de Renta simplificado: Configuración oculta accesos de otras academias al
+seleccionarla y ofrece botón directo a Renta con normas. Academia Renta filtra
+pestañas ajenas; fundamentos comunes opcionales. Métodos y datos conservados.
+PHP1598/JS268/lint/build/78,9KB; UI escritorio/móvil. Falta desplegar al hosting.
+
+Academia Renta: cuatro temas didácticos con explicación, ejemplo, información por
+reunir y soportes IGAC/IVS/NTS-GTS por edición/apartado, síntesis y enlaces internos.
+Mantiene resumen PDF, artículos y captura previa; sin matemática ni datos nuevos.
+
+Identificación visual de Renta: distintivo de recorrido y sufijo «· Renta» en
+Academia/Insumos/Análisis/Entregable. Academia abre el método; consulta General
+identificada y con retorno. Vistas probadas escritorio/móvil; sin cambios de datos.
+
+12/11/2026 · Renta: primer bloque conceptual en Insumos, con tres desplegables,
+ayudas (?) y soporte IGAC/IVS/NTS por pregunta. Notas condicionales conservadas,
+autoguardado/versión/CSRF/propietario; JSON existente, sin migración ni números.
+Captura de muestras conservada. Academia Renta incorpora orientación y resumen PDF
+propio incluido en assets. PHP1594/JS268/BD236/HTTP específico13, lint/build y
+78,9KB gzip; revisión local escritorio/móvil. Suite HTTP general tiene una
+expectativa anterior fallida, documentada en RENTA-PRIMER-BLOQUE.md. Sin despliegue
+al hosting; publicar también assets/normativa/renta-orientacion-v1.pdf.
+
 Insumos: tercera pestaña de consulta «Configuración por portal y tipo de inmueble».
 Evidencia pública fechada 2026-10-04: 20 perfiles, especialmente FincaRaíz/Ciencuadras.
 Combos no documentados siguen pendientes; no declara formularios privados ni APIs.

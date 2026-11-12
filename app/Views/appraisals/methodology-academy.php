@@ -6,19 +6,27 @@ $academyCentralized=true;
 if (!$academyConsult && !isset($academyGroups[$method]) && $academyGroups!==[]) $method=(string)array_key_first($academyGroups);
 $prefix=\App\Services\MethodologyWorkflow::PREFIXES[$method];
 $academyUnits=$academyGroups[$method] ?? [];
+$academyIncome=$method==='renta' && !$academyConsult;
 $methodologyGuides=array_values(array_filter($methodologyChapter['method_guides'],static fn($g)=>$g['key']===$method));
 ?>
 <section class="rounded-2xl border bg-white p-5 sm:p-8">
     <p class="eyebrow">Academia del expediente</p>
-    <h2 class="mt-2 text-2xl font-semibold">Una academia por método</h2>
-    <p class="mt-3 text-sm leading-6">La teoría se consulta una sola vez para todas las unidades que usan el mismo método. Si un alcance tiene dos métodos, aparecen ambas academias; sus estimaciones se contrastan y no se suman automáticamente.</p>
+    <h2 class="mt-2 text-2xl font-semibold"><?= !$academyGeneral && $method==='renta'?'Academia · Modelo de Renta':'Una academia por método' ?></h2>
+    <?php if ($academyIncome && !$academyGeneral): ?>
+    <p class="mt-3 text-sm leading-6">Empieza por los cuatro temas de Renta que encontrarás debajo. Abre sus soportes cuando necesites ampliar una explicación y después continúa a Insumos de Renta.</p>
+    <?php else: ?><p class="mt-3 text-sm leading-6">La teoría se consulta una sola vez para todas las unidades que usan el mismo método. Si un alcance tiene dos métodos, aparecen ambas academias; sus estimaciones se contrastan y no se suman automáticamente.</p><?php endif; ?>
     <nav class="mt-4 flex flex-wrap gap-2" aria-label="Métodos de la academia">
+        <?php if (!$academyIncome || $academyGeneral): ?>
         <a class="btn-secondary <?= $academyGeneral?'bg-teal-50 text-teal-900':'' ?>" <?= $academyGeneral?'aria-current="page"':'' ?> href="<?= e($flowUrl('1',null,'').'&academy=general') ?>">General · todos los métodos</a>
-        <?php foreach ($academyGroups as $academyMethod=>$group): $academyKey=(string)array_key_first($group); ?>
+        <?php endif; ?>
+        <?php foreach ($academyGroups as $academyMethod=>$group): if ($academyIncome && $academyMethod!=='renta') continue; $academyKey=(string)array_key_first($group); ?>
         <a class="btn-secondary <?= !$academyGeneral && !$academyConsult && $method===$academyMethod?'bg-teal-50 text-teal-900':'' ?>" <?= !$academyGeneral && !$academyConsult && $method===$academyMethod?'aria-current="page"':'' ?> href="<?= e($flowUrl('1',$academyMethod,$academyKey)) ?>"><?= e($methods[$academyMethod]) ?> · <?= count($group) ?> recorrido<?= count($group)===1?'':'s' ?></a>
         <?php endforeach; ?>
     </nav>
     <?php if ($academyGeneral): ?><p class="mt-4 text-sm font-semibold">Consulta común para todo el expediente. Las reglas especiales se aplican según el encargo, el método y los derechos valorados.</p>
+        <?php if ($method==='renta' && $academyUnits!==[]): $incomeAcademyKey=(string)array_key_first($academyUnits); ?>
+        <a class="btn-primary mt-3" href="<?= e($flowUrl('1','renta',$incomeAcademyKey)) ?>">Volver a Academia de Renta</a>
+        <?php endif; ?>
     <?php elseif ($academyUnits!==[]): ?>
         <p class="mt-4 text-sm font-semibold">Aplicable a: <?= e(implode(' · ',array_column($academyUnits,'label'))) ?>.</p>
     <?php else: ?>
@@ -27,9 +35,12 @@ $methodologyGuides=array_values(array_filter($methodologyChapter['method_guides'
 </section>
 <?php if ($academyGeneral): require __DIR__.'/methodology-academy-general.php';
 else: ?>
+<?php if ($method==='renta'): require __DIR__.'/methodology-income-academy.php'; endif; ?>
 <?php if ($method==='costo'): require __DIR__.'/methodology-cost-academy-reading.php';
 else: require __DIR__.'/valuation-methodology-method-guides.php'; endif; ?>
+<?php if ($academyIncome): ?><details class="mt-4 rounded-xl border bg-white p-4"><summary class="min-h-11 cursor-pointer font-semibold">Fundamentos comunes · consulta opcional</summary><?php endif; ?>
 <a class="mt-4 inline-flex min-h-11 items-center font-semibold text-blue-800 underline" href="<?= e($flowUrl('1',null,'').'&academy=general') ?>">Consultar principios, parámetros, informe y reglas de PH en Academia General</a>
+<?php if ($academyIncome): ?></details><?php endif; ?>
 <?php if ($academyUnits!==[]): ?>
 <details class="mt-5 rounded-xl border bg-white p-4" <?= ($_GET['academy'] ?? '')==='unidad'?'open':'' ?>>
     <summary class="min-h-11 cursor-pointer font-semibold">Aplicación y verificación particular de cada unidad · <?= e($methods[$method]) ?></summary>

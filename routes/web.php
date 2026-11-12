@@ -12,6 +12,7 @@ return [
     ['GET', '#^/diagnostico/login$#', 'diagnostics', 'login', false],
     ['POST', '#^/logout$#', 'auth', 'logout', true],
     ['GET', '#^/valuaciones$#', 'valuations', 'index', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/renta/concepto$#', 'valuationMethodology', 'saveIncomeConcept', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/escalas$#', 'valuationMethodology', 'saveFactorScale', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/factores$#', 'userResearchFactors', 'save', true],
     ['GET', '#^/maestros$#', 'masters', 'index', true],

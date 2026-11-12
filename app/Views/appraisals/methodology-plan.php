@@ -7,7 +7,7 @@ $planExample=\App\Services\MethodologySelectionHelp::example($record,$planUnits[
 $planReferenceUnit=$planUnits[$planActive]['unit'] ?? [];
 $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)($planReferenceUnit['property_type'] ?? (($planReferenceUnit['unit_kind'] ?? '')==='property'?($record['tipo_inmueble'] ?? ''):'')));
 ?>
-<section class="rounded-2xl border bg-white p-5 sm:p-8" aria-labelledby="plan-valoracion-titulo" x-data="{configTab:<?= e(json_encode(($_GET['factor_catalog'] ?? '')==='1'?'factors':'methods')) ?>,planNeedsRefresh:false}" @plan-organization-change="planNeedsRefresh=$event.detail.changed">
+<section class="rounded-2xl border bg-white p-5 sm:p-8" aria-labelledby="plan-valoracion-titulo" x-data="{configTab:<?= e(json_encode(($_GET['factor_catalog'] ?? '')==='1'?'factors':'methods')) ?>,planNeedsRefresh:false,planMethod:<?= e(json_encode($flow[$planActive]['method'] ?? '')) ?>}" @plan-organization-change="planNeedsRefresh=$event.detail.changed" @method-selection-change="planMethod=$event.detail.method">
     <h2 id="plan-valoracion-titulo" class="text-2xl font-semibold" x-text="configTab==='factors'?'Catálogo de nombres y escalas':'Define el estudio'">Define el estudio</h2>
     <nav x-show="configTab==='factors'" x-cloak class="mt-4 flex flex-wrap gap-2" aria-label="Volver al estudio">
         <button type="button" class="btn-secondary" @click="configTab='methods'">Volver al estudio</button>
@@ -56,14 +56,14 @@ $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)(
             <?php if (!empty($planUnit['plan_blocked'])): ?><p role="alert" class="mt-3 rounded-lg border border-amber-200 bg-amber-50 p-3 text-sm">Revisa la organización: el régimen o el tipo de unidad cambió desde que separaste terreno y construcción. Los recorridos anteriores están conservados e inactivos. Confirma NPH en el expediente o guarda «Unidad con un alcance propio» para reorganizar esta valoración.</p><?php endif; ?>
             <div class="mt-4 space-y-3">
             <?php foreach ($planParts as $planPartKey): $planPart=$components[$planPartKey]; $planItem=$flow[$planPartKey] ?? []; $planMethod=$planItem['method'] ?? ''; ?>
-                <div class="space-y-3">
+                <div class="space-y-3" x-data="{activeStudyMethod:<?= e(json_encode($planMethod)) ?>}" @method-selection-change="activeStudyMethod=$event.detail.method">
                     <p class="text-xs"><?= in_array($planMethod,['mercado','renta'],true) ? count(\App\Services\MethodologyComparableScope::rows($allComparableRows,$planPartKey)).' muestras propias' : ($planMethod!==''?'Insumos propios del método':'Método pendiente de selección') ?></p>
                     <?php (static function() use ($record,$units,$components,$flow,$methods,$basePath,$flowUrl,$planPartKey,$planPart,$planItem,$planMethod,$allComparableRows): void {
                         $componentKey=$planPartKey; $componentLabel=$planPart['label']; $selected=$planItem; $method=$planMethod ?: 'mercado';
                         $selectionInPlan=true; $selectionHasSamples=\App\Services\MethodologyComparableScope::rows($allComparableRows,$planPartKey)!==[];
                         require __DIR__.'/methodology-selection.php';
                     })(); ?>
-                    <div class="mt-4 space-y-2">
+                    <div class="mt-4 space-y-2" x-show="activeStudyMethod !== 'renta'" <?= $planMethod==='renta'?'x-cloak':'' ?>>
                     <?php foreach ([$planPartKey,...array_keys(array_filter($components,static fn($c)=>($c['comparison_key'] ?? '')===$planPartKey))] as $studyKey):
                         $studyMethod=$flow[$studyKey]['method'] ?? ''; if ($studyMethod==='') continue; ?>
                         <?php if ($studyKey!==$planPartKey): ?>
@@ -82,7 +82,7 @@ $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)(
         </article>
     <?php endforeach; ?>
     </div>
-    <details class="mt-5 rounded-xl border p-3"><summary class="min-h-11 cursor-pointer font-semibold">Academia · recomendación y datos del expediente</summary>
+    <details class="mt-5 rounded-xl border p-3" x-show="planMethod !== 'renta'" <?= ($flow[$planActive]['method'] ?? '')==='renta'?'x-cloak':'' ?>><summary class="min-h-11 cursor-pointer font-semibold">Academia · recomendación y datos del expediente</summary>
         <details class="mt-3 rounded-xl border bg-teal-50 p-3"><summary class="min-h-11 cursor-pointer font-semibold"><?= e($planExample[0]) ?></summary><p class="mt-2 text-sm"><?= e($planExample[1]) ?></p></details>
         <div class="my-3 flex flex-wrap gap-2">
             <button type="button" class="btn-secondary" @click="configTab='factors'">Editar catálogo de factores</button>

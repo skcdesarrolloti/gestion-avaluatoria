@@ -57,6 +57,7 @@ final class MethodologyWorkflow
         if (isset($out['method']) && $out['method'] !== '' && !isset(self::METHODS[$out['method']])) throw new HttpException(422, 'Método inválido.');
         if (isset($out['treatment']) && !in_array($out['treatment'], ['', 'separado', 'integrado', 'descriptivo'], true)) throw new HttpException(422, 'Tratamiento inválido.');
         if (array_key_exists('cost_scope',$post)) $out['cost_scope']=CostMethodScope::input($post['cost_scope']);
+        if (array_key_exists('income_concept',$post)) $out['income_concept']=IncomeConcept::input($post['income_concept']);
         if (array_key_exists('research_plan',$post)) $out['research_plan']=ResearchPlanInput::input($post['research_plan']);
         if (isset($post['additional_methods_present'])) $out['additional_methods']=MethodologyAlternativeMethods::input($post['additional_methods'] ?? []);
         if (array_key_exists('plan_parts', $post)) {

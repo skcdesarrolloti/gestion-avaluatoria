@@ -3,6 +3,42 @@ import assert from 'node:assert/strict';
 import { flushModuleForm } from '../resources/js/module-autosave.js';
 import { HTMLFormElement, HTMLInputElement, HTMLSelectElement, CreateDossierButton, setup } from './module-autosave-support.mjs';
 
+test('concept and research share confirmed workflow version while comparable versions stay independent', async () => {
+    const { listeners, runTimer, cleanup } = setup();
+    try {
+        const form = new HTMLFormElement(), peers = [new HTMLFormElement(), new HTMLFormElement()];
+        form.attrs.add('data-workflow-version'); peers[0].attrs.add('data-workflow-version');
+        form.getAttribute = () => '/renta/concepto';
+        peers[0].getAttribute = () => '/flujo'; peers[1].getAttribute = () => '/comparables';
+        peers.forEach(peer => { peer.version.setAttribute = (_, value) => { peer.version.value = value; }; });
+        form.closest = () => ({ querySelectorAll: () => peers });
+        globalThis.fetch = async () => ({ ok: true, json: async () => ({ ok: true, version: 8 }) });
+        listeners.change({ target: new HTMLSelectElement(form) }); await runTimer();
+        assert.equal(form.version.value, '8'); assert.equal(peers[0].version.value, '8');
+        assert.equal(peers[1].version.value, '7');
+    } finally { cleanup(); }
+});
+
+test('field validation keeps draft/version and clears errors only after server confirmation', async () => {
+    const { listeners, runTimer, cleanup } = setup();
+    try {
+        const form = new HTMLFormElement(), events = [];
+        form.dispatchEvent = event => events.push(event);
+        globalThis.fetch = async () => ({ ok: false, status: 422, json: async () => ({ ok: false,
+            errors: { 'income_concept[scope]': 'Selecciona una opción.' }, message: 'Revisa los campos.' }) });
+        listeners.change({ target: new HTMLSelectElement(form) });
+        await runTimer();
+        assert.equal(form.version.value, '7');
+        assert.deepEqual(events[0].detail, { 'income_concept[scope]': 'Selecciona una opción.' });
+        assert.match(form.status.textContent, /Pendiente de guardar/);
+        globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => ({ ok: true, version: 8 }) });
+        await flushModuleForm(form);
+        assert.equal(form.version.value, '8');
+        assert.deepEqual(events.at(-1).detail, {});
+        assert.match(form.status.textContent, /confirmado/);
+    } finally { cleanup(); }
+});
+
 test('module autosave posts form data and updates optimistic version', async () => {
     const { listeners, runTimer, dispatched, cleanup } = setup();
     const form = new HTMLFormElement();
