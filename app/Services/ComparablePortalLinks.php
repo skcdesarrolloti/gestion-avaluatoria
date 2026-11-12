@@ -17,6 +17,11 @@ final class ComparablePortalLinks
         $sources[3]['network'] = 'Proppit';
         // Only enable combinations checked in the actual portal. Others retain an explicit fallback.
         $cartagena = in_array($this->slug($city), ['cartagena', 'cartagena-de-indias'], true);
+        if ($cartagena && $operation==='arriendo' && $type==='oficina' && strlen($this->slug($neighborhood))>=3) {
+            $sources[0]['url']=FincaraizAreaSearch::url($neighborhood,1,'arriendo');
+            $sources[0]['kind']='Filtros del portal';
+            $sources[0]['instruction']='Arriendo y oficina preparados para '.$neighborhood.', Cartagena. Comprueba los filtros antes de copiar la página de resultados.';
+        }
         if (!$cartagena || $operation !== 'venta') return $sources;
         $castillogrande = in_array($this->slug($neighborhood), ['castillogrande', 'castillo-grande'], true);
         if ($type === 'oficina' || ($type === 'casa' && $castillogrande)) {

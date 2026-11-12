@@ -27,6 +27,15 @@
         <?php require __DIR__.'/methodology-portal-search-prompt.php'; ?>
     </div>
     <?php endforeach; ?>
+    <div class="mt-4 rounded-xl bg-teal-50 p-4">
+        <h3 class="font-semibold">Qué hacer después de abrir el portal</h3>
+        <ol class="mt-2 list-decimal space-y-2 pl-5 text-sm leading-6">
+            <li>Comprueba <strong>Arriendo</strong>, el tipo de esta unidad y la ubicación en el portal. Si FincaRaíz abre su portada, selecciona esos filtros y elige la sugerencia de barrio correspondiente a tu ciudad antes de buscar.<?php if (($guide['type_label'] ?? '')==='Oficina'): ?> Deja únicamente <strong>Oficina</strong>; desmarca Casa y Apartamento si vienen seleccionadas.<?php endif; ?></li>
+            <li>En la <strong>página de resultados</strong>, pulsa <strong>Ctrl+A y después Ctrl+C</strong>. Copia los anuncios, no el texto de ayuda de este aplicativo.</li>
+            <li>Regresa aquí y abre <strong>3. Recoger muestras</strong>. En el portal elegido, haz clic en <strong>Pega la página de resultados</strong> y pulsa <strong>Ctrl+V</strong>.</li>
+            <li>Revisa los avisos preparados y los posibles repetidos. Pulsa <strong>Subir sin repetidos de este portal</strong> y espera <strong>Guardado confirmado</strong>. Repite para las demás páginas.</li>
+        </ol>
+    </div>
     <p class="mt-4 text-sm leading-6">Al revisar avisos, distingue canon, periodicidad, administración, garaje y depósito incluidos. Conserva la fuente y deja por verificar lo que no se publique. Todavía no calculamos rentas ni tasas.</p>
-    <button type="button" class="btn-primary mt-4" @click="openTab('capture'); $refs.incomeTabcapture.focus()">Continuar a 3. Recoger muestras</button>
+    <button type="button" class="btn-primary mt-4" @click="openTab('capture'); $refs.incomeTabcapture.focus()">Ir a 3. Recoger muestras para pegar los resultados</button>
 </section>

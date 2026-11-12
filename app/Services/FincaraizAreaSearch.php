@@ -4,20 +4,21 @@ namespace App\Services;
 
 final class FincaraizAreaSearch
 {
-    public function search(string $neighborhood, int $page): array
+    public function search(string $neighborhood, int $page, string $operation='venta'): array
     {
-        $url = self::url($neighborhood, $page);
+        $url = self::url($neighborhood, $page,$operation);
         return $this->parse((new FincaraizListingReader())->fetch($url), $url, $page);
     }
 
-    public static function url(string $neighborhood, int $page = 1): string
+    public static function url(string $neighborhood, int $page = 1, string $operation='venta'): string
     {
+        if (!in_array($operation,['venta','arriendo'],true)) throw new \InvalidArgumentException('Operación de búsqueda inválida.');
         if ($page < 1 || $page > 10 || mb_strlen($neighborhood) > 100) throw new \InvalidArgumentException('Barrio o página inválidos.');
         $slug = strtolower((string) iconv('UTF-8', 'ASCII//TRANSLIT//IGNORE', trim($neighborhood)));
         $slug = trim(preg_replace('/[^a-z0-9]+/', '-', $slug), '-');
         if (strlen($slug) < 3) throw new \InvalidArgumentException('Escribe el barrio que deseas consultar.');
         if ($slug === 'castillo-grande') $slug = 'castillogrande';
-        return 'https://www.fincaraiz.com.co/venta/oficinas/' . $slug . '/cartagena' . ($page > 1 ? '/pagina' . $page : '');
+        return 'https://www.fincaraiz.com.co/'.$operation.'/oficinas/' . $slug . '/cartagena' . ($page > 1 ? '/pagina' . $page : '');
     }
 
     public function parse(string $html, string $url, int $page): array
@@ -43,7 +44,9 @@ final class FincaraizAreaSearch
                     $encoded = json_encode($item, JSON_HEX_TAG | JSON_THROW_ON_ERROR);
                     $parsed = (new FincaraizListingParser())->parse('<script type="application/ld+json">' . $encoded . '</script>', $link);
                     $row = $parsed['row'];
-                    if (preg_match('/^Oficina en Venta en (.+), Cartagena$/ui', $parsed['title'], $match)) $row['neighborhood'] = $match[1];
+                    $expected=str_contains($url,'/arriendo/')?'arriendo':'venta';
+                    if (ComparableStudy::operation($row['operation'] ?? '')!==$expected) continue;
+                    if (preg_match('/^Oficina en (?:Venta|Arriendo) en (.+), Cartagena$/ui', $parsed['title'], $match)) $row['neighborhood'] = $match[1];
                     $row['comparability_notes'] = 'Capturado del resumen de resultados de FincaRaíz. Verificar ficha, ubicación, uso y clase de área; soporte pendiente.';
                     $rows[$link] = ['title' => $parsed['title'], 'row' => $row];
                 } catch (\InvalidArgumentException | \RuntimeException) { continue; }

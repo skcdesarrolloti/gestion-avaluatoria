@@ -11,6 +11,13 @@ declare(strict_types=1);
     $service=new \App\Services\FincaraizAreaSearch(); $result=$service->parse($html,$url,2);
     expect(count($result['results'])===1 && $result['has_next'],'listado deduplica enlaces y detecta pagina siguiente real');
     expect($result['results'][0]['row']['neighborhood']==='Bocagrande' && $result['results'][0]['row']['area_m2']==='46','captura resumen publicado sin imponer barrio del sujeto');
+    $rentalUrl=\App\Services\FincaraizAreaSearch::url('Bocagrande',2,'arriendo');
+    expect($rentalUrl==='https://www.fincaraiz.com.co/arriendo/oficinas/bocagrande/cartagena/pagina2','Renta reutiliza ruta y paginación de FincaRaíz con operación arriendo');
+    $rental=array_replace($listing,['url'=>'https://www.fincaraiz.com.co/oficina-en-arriendo-en-bocagrande-cartagena/456','name'=>'Oficina en Arriendo en Bocagrande, Cartagena','offers'=>['price'=>3000000,'priceCurrency'=>'COP']]);
+    $rentalHtml='<link rel="canonical" href="'.$rentalUrl.'"><script type="application/ld+json">'.json_encode(['@type'=>'CollectionPage','mainEntity'=>['itemListElement'=>[$rental,$listing,$rental]]]).'</script><a href="/arriendo/oficinas/bocagrande/cartagena/pagina3">3</a>';
+    $rentalResult=$service->parse($rentalHtml,$rentalUrl,2);
+    expect(count($rentalResult['results'])===1 && $rentalResult['has_next'] && $rentalResult['results'][0]['row']['operation']==='Arriendo'
+        && $rentalResult['results'][0]['row']['price_unit']==='canon_mensual','lector de Renta conserva canon mensual y duplicados sin incorporar anuncios de venta');
     try { $service->parse(str_replace($url,'https://www.fincaraiz.com.co/venta',$html),$url,2); $rejected=false; } catch(\RuntimeException) { $rejected=true; }
     expect($rejected,'rechaza listado cuyo canonico no confirma la zona');
 })();

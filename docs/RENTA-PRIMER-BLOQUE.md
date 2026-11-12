@@ -1,5 +1,24 @@
 # Renta: primer bloque conceptual
 
+12/11/2026 · FincaRaíz en Renta reutiliza el recorrido de ventas: enlace directo
+de oficinas por barrio en Cartagena, lector de resultados por pegado y búsqueda
+opcional por barrio. Se verificó en el portal real Arriendo/Oficina/Bocagrande:
+https://www.fincaraiz.com.co/arriendo/oficinas/bocagrande/cartagena
+y su paginación /pagina2. ComparablePortalLinks conserva las rutas de Venta y
+habilita esa combinación de Arriendo. Otras combinaciones mantienen su alternativa.
+La preparación muestra «Abrir búsqueda» y deja copiar barrio como consulta opcional:
+copiar no navega. Instrucciones visibles: abrir/comprobar filtros, Ctrl+A/C en la
+página de resultados, volver al paso3, Ctrl+V, revisar y Subir sin repetidos hasta
+confirmación de guardado. No se copia la ayuda del aplicativo como si fuera un aviso.
+FincaraizAreaSearch usa operación de servidor y filtra respuestas incompatibles;
+Metrocuadrado conserva la búsqueda automática por barrio solo para Venta.
+Pruebas PHP1629/JS273, lint/build/check:size79,1KB. Venta y su paginación conservadas;
+Arriendo mantiene canon mensual, deduplicación y exclusión de venta en el lector.
+Vista PHP local escritorio1440/móvil390, enlace del paso2 y de captura idénticos
+a la ruta verificada; transición al campo de pegado correcta, sin desbordamiento.
+No se importaron anuncios reales al expediente ni se verificó lectura automática
+del hosting. Capturas renta-fincaraiz-flujo-*.png y portal verificado en output/pdf.
+
 12/11/2026 · Corrección de carga al entrar a Insumos. Las pestañas conceptual y
 preparación ya no consultan ni renderizan las muestras, catálogo de factores o
 barrios para captura. La matriz completa se solicita por la misma ruta protegida

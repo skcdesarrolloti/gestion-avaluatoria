@@ -49,8 +49,9 @@ final class AppraisalValuationMethodologyController
         $comparableRows=\App\Services\MethodologyComparableScope::rows($allComparableRows,$componentKey,$record);
         $searchRecord = \App\Services\ComparableSearchContext::forMethod($record, $units, $componentKey, $method);
         $methodologyChapter = (new AppraisalMethodologyChapterReport())->build($record, $subject, $units);
-        $marketNeighborhoods = $deferIncome?[]:array_map(static function (array $row): array {
-            try { $url = \App\Services\FincaraizAreaSearch::url((string) $row['name']); }
+        $searchOperation=\App\Services\ComparableStudy::operation($searchRecord['tipo_negocio'] ?? '') ?: 'venta';
+        $marketNeighborhoods = $deferIncome?[]:array_map(static function (array $row) use ($searchOperation): array {
+            try { $url = \App\Services\FincaraizAreaSearch::url((string) $row['name'],1,$searchOperation); }
             catch (\InvalidArgumentException) { $url = ''; }
             return $row + ['search_url' => $url];
         }, $this->geo->activeNeighborhoodsForCity((string) ($subject['city_id'] ?? '')));
@@ -168,9 +169,9 @@ final class AppraisalValuationMethodologyController
         (new \App\Services\RateLimiter(BASE_PATH . '/storage/rate-limits'))->consume('comparable-search:' . $this->user['id'], 30, 900);
         try {
             $city = mb_strtolower(trim((string) ($subject['city_name'] ?? '')) ?: trim((string) ($record['municipio'] ?? '')));
-            if (($record['tipo_inmueble'] ?? '') !== 'oficina' || ($record['tipo_negocio'] ?? '') !== 'venta'
+            if (($record['tipo_inmueble'] ?? '') !== 'oficina' || !in_array($record['tipo_negocio'] ?? '',['venta','arriendo'],true)
                 || !in_array($city, ['cartagena', 'cartagena de indias'], true)) {
-                throw new \InvalidArgumentException('La búsqueda por barrio está disponible para oficinas en venta en Cartagena. Usa la lectura individual para otros casos.');
+                throw new \InvalidArgumentException('La búsqueda por barrio está disponible para oficinas en venta o arriendo en Cartagena. Usa la lectura individual para otros casos.');
             }
             $neighborhoodId = $_POST['neighborhood_id'] ?? '';
             $page = filter_var($_POST['page'] ?? 1, FILTER_VALIDATE_INT);
@@ -179,10 +180,11 @@ final class AppraisalValuationMethodologyController
             $portal = $_POST['portal'] ?? 'fincaraiz';
             if (!in_array($portal, ['fincaraiz', 'metrocuadrado'], true)) throw new \InvalidArgumentException('Portal no admitido.');
             if ($portal === 'metrocuadrado') {
+                if (($record['tipo_negocio'] ?? '')!=='venta') throw new \InvalidArgumentException('Metrocuadrado conserva la búsqueda por barrio para ventas. En arriendos usa el portal y pega los resultados.');
                 if ($page !== 1) throw new \InvalidArgumentException('Metrocuadrado admite la lectura inicial del barrio.');
                 Http::json(['ok' => true] + (new \App\Services\MetrocuadradoAreaSearch())->search($neighborhood));
             }
-            Http::json(['ok' => true] + (new \App\Services\FincaraizAreaSearch())->search($neighborhood, $page));
+            Http::json(['ok' => true] + (new \App\Services\FincaraizAreaSearch())->search($neighborhood, $page,$record['tipo_negocio']));
         } catch (\App\Core\HttpException $error) { Http::json(['ok' => false, 'message' => $error->getMessage()], $error->status); }
         catch (\InvalidArgumentException $error) { Http::json(['ok' => false, 'message' => $error->getMessage()], 422); }
         catch (\RuntimeException $error) { Http::json(['ok' => false, 'message' => $error->getMessage()], 502); }

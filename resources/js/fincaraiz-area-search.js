@@ -52,7 +52,7 @@ export function fincaraizAreaSearch() {
             if (this.busy) return;
             if (!this.neighborhoodId) { this.message = 'Selecciona un barrio de las sugerencias del catálogo.'; return; }
             this.busy = true; this.results = []; this.selected = []; this.hasNext = false; this.notice = '';
-            this.message = 'Buscando oficinas en el barrio…';
+            this.message = 'Buscando oficinas en '+(panel.dataset.operation==='arriendo'?'arriendo':'venta')+' en el barrio…';
             const abort = new AbortController();
             const timer = setTimeout(() => abort.abort(), 25000);
             try {

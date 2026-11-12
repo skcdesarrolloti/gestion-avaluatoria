@@ -40,7 +40,9 @@ final class ComparablePortalSearchPrompt
         } elseif (str_contains($typeLower,'depósito') || str_contains($typeLower,'deposito')) {
             foreach (['depósito','cuarto útil','bodega de almacenamiento'] as $term) $alternatives[]=trim($term.' '.$operation.' '.$zone.' '.$city);
         }
-        return ['query'=>$query, 'input'=>$input, 'location_only'=>$locationOnly,
+        $openUrl=($source['kind'] ?? '')==='Búsqueda en Google' && !empty($source['domain'])
+            ? 'https://www.'.$source['domain'].'/' : ($source['url'] ?? '');
+        return ['query'=>$query, 'input'=>$input, 'location_only'=>$locationOnly, 'open_url'=>$openUrl,
             'google'=>$domain!==''?'site:'.$domain.' '.$query:'', 'filters'=>$filters,
             'help'=>$help, 'alternatives'=>$alternatives, 'missing'=>$type==='' || $operation==='' || $city===''];
     }

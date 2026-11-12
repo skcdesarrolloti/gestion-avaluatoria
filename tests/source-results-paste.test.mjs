@@ -6,6 +6,16 @@ import { intakeTable } from '../resources/js/comparable-intake-table.js';
 import { intakeGroups } from '../resources/js/comparable-intake.js';
 import { previewFacts } from '../resources/js/comparable-preview-facts.js';
 
+test('FincaRaiz uses the same paste reader for rental listings and preserves monthly rent separately from sale offers',()=>{
+    const previous=globalThis.document;globalThis.document=parseHTML('<html/>').document;
+    try {
+        const html='<div class="listingCard"><a href="/oficina-en-arriendo-en-bocagrande-cartagena/123"><h2>Oficina en Arriendo en Bocagrande, Cartagena</h2></a><p>$ 3.000.000</p><div>1 Baño70 m²</div></div><div class="listingCard"><a href="/oficina-en-venta-en-bocagrande-cartagena/456"><h2>Oficina en Venta en Bocagrande, Cartagena</h2></a><p>$ 450.000.000</p><div>1 Baño70 m²</div></div>';
+        const rows=readSourceRows(html,'','https://www.fincaraiz.com.co/','FincaRaiz');
+        assert.equal(rows.length,2);assert.equal(rows[0].operation,'Arriendo');assert.equal(rows[0].price_unit,'canon_mensual');
+        assert.equal(rows[0].price_amount,'$ 3.000.000');assert.equal(rows[1].operation,'Venta');assert.equal(rows[1].price_amount,'$ 450.000.000');
+    } finally {globalThis.document=previous;}
+});
+
 test('agency reader separates cards, keeps source and unknown facts without executing HTML', () => {
     const previous=globalThis.document;
     globalThis.document=parseHTML('<html><body></body></html>').document;

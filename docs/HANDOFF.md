@@ -1,5 +1,13 @@
 # Entrega al responsable de la implementación
 
+12/11/2026 · Apertura de FincaRaíz en Renta como en Venta: oficinas por barrio en
+Cartagena con /arriendo/, botón «Abrir búsqueda» y copia de barrio solo opcional.
+Pasos visibles para copiar resultados Ctrl+A/C y pegarlos en paso3, revisar y subir
+sin repetidos. Mismo lector, carga diferida y separación de investigaciones.
+Búsqueda opcional FincaRaíz por barrio admite ambas operaciones desde contexto de
+servidor; Metrocuadrado automático sigue limitado a Venta. Portal real verificado,
+PHP1629/JS273/lint/build/79,1KB y UI local escritorio/móvil. Ver RENTA-PRIMER-BLOQUE.md.
+
 12/11/2026 · Investigación separada por unidad/recorrido, método y operación:
 Renta no carga ni sobrescribe ventas; guardado/Excel/reasignación validan el estudio
 en servidor. Históricos sin operación quedan conservados sin atribución automática.

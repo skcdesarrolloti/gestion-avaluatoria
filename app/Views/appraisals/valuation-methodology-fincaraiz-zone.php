@@ -10,12 +10,13 @@ if (!empty($isMetrocuadrado)) {
     unset($zoneItem);
 }
 $zoneCity = mb_strtolower(trim((string) ($sourceSearch['city'] ?? $guide['source_search']['city'] ?? $record['municipio'] ?? '')));
-$zoneSupported = ($guide['type_label'] ?? '') === 'Oficina' && ($guide['business_label'] ?? '') === 'Venta'
+$zoneSupported = ($guide['type_label'] ?? '') === 'Oficina' && (($guide['business_label'] ?? '') === 'Venta' || (empty($isMetrocuadrado) && ($guide['business_label'] ?? '')==='Arriendo'))
     && in_array($zoneCity, ['cartagena', 'cartagena de indias'], true);
 $zoneNeighborhood = (string) ($sourceSearch['neighborhood'] ?? $guide['source_search']['neighborhood'] ?? '');
 ?>
 <?php if ($zoneSupported): ?>
 <section x-show="sourceTask==='search'" data-component="<?= e($componentKey ?? '') ?>" x-data="fincaraizAreaSearch" data-portal="<?= e($zonePrefix) ?>" data-neighborhood-id="<?= e((string) ($subject['neighborhood_id'] ?? '')) ?>"
+    data-operation="<?= ($guide['business_label'] ?? '')==='Arriendo'?'arriendo':'venta' ?>"
     data-detail-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/leer-aviso')) ?>"
     data-neighborhoods="<?= e(json_encode($zoneCatalog, JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>"
     data-endpoint="<?= e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/buscar-zona')) ?>"
