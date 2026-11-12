@@ -7,6 +7,9 @@ Planes y memorias se conservan por método al cambiar y regresar. Aviso visible 
 colección actual y muestras conservadas fuera; conteos y continuación coherentes.
 Sin DDL ni cálculos nuevos. PHP1625/JS272/BD246 y11 específicos posteriores/HTTP14;
 UI PHP+BD reales local escritorio/móvil. Detalles en INVESTIGACIONES-VENTAS-ARRIENDOS.md.
+Publicación f8baa5a mediante commit/push. Tras esperar la actualización, se descargó
+el app.js versionado que referencia el login público y su SHA-256 coincidió con el
+bundle local. No se solicitó acceso al hosting ni se editaron datos de producción.
 
 12/11/2026 · Insumos de Renta ligero: entrada y preparación sin recuperar ni montar
 la matriz; captura por fetch al abrir paso3, con guardado previo, carga/error y
