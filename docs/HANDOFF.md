@@ -4,6 +4,11 @@
 ocupación, cobertura y soportes para el informe; hoy se conserva como borrador,
 sin incorporación automática al informe ni modificación de filtros de portales.
 Solo presentación; sin campos, cálculos, persistencia ni migraciones nuevas.
+Validación: lint de la vista, PHP1598 (avisos de sesión de fixtures existentes),
+JS268, build/check:size78,9KB. Vista PHP local escritorio1440/móvil390 legible y
+sin desbordamiento; capturas renta-aclaracion-informe-*.png en output/pdf.
+Commit/push e243c5e confirmado; verificación visual en producción pendiente porque
+Chrome no respondió a la recarga. No se solicitó acceso al hosting.
 
 12/11/2026 · Acuerdo permanente: publicar con commit y push a origin/main, sin
 solicitar acceso al hosting. Tras la entrega 52f07d5/56fd194 se verificó el resumen
