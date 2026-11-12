@@ -1,5 +1,12 @@
 # Entrega al responsable de la implementación
 
+12/11/2026 · Acuerdo permanente: publicar con commit y push a origin/main, sin
+solicitar acceso al hosting. Tras la entrega 52f07d5/56fd194 se verificó el resumen
+PDF público HTTP200 y SHA-256 idéntico al local; no confundir las notas históricas
+«falta desplegar» con este estado posterior. Revisar también la interfaz publicada.
+Siguiente etapa: revisar flujo conceptual de Renta y los cuatro temas de Academia,
+sus ayudas y referencias internas; matemática pendiente de indicación del usuario.
+
 Flujo de Renta simplificado: Configuración oculta accesos de otras academias al
 seleccionarla y ofrece botón directo a Renta con normas. Academia Renta filtra
 pestañas ajenas; fundamentos comunes opcionales. Métodos y datos conservados.

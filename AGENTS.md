@@ -92,6 +92,14 @@ de negocio ni trasladar el controlador monolítico. No modificar InversKC al tra
 
 ## Entrega y verificación
 
+- Publicación acordada con el usuario: **commit y push a `origin/main`**, sin pedir
+  acceso, credenciales ni inicio de sesión en el hosting. Después verificar los
+  recursos publicados y el flujo en el aplicativo; el despliegue puede tardar.
+  Si no aparece, informar el estado sin solicitar acceso al hosting ni afirmar éxito.
+- Continuidad de Renta: revisar primero el flujo conceptual y los cuatro temas de
+  Academia, con listas, ayudas y soportes normativos. No avanzar a números hasta
+  que el usuario lo solicite.
+
 - Leer `README.md`, `docs/DATABASE.md` y `docs/HANDOFF.md` antes de ampliar módulos.
 - Ejecutar lint PHP, `php tests/run.php`, `npm test`, `npm run build`, `npm run check:size`.
 - Para persistencia y migraciones ejecutar `php tests/database.php` únicamente contra

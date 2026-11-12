@@ -18,9 +18,11 @@ la versión nueva llegue a la carpeta que sirve el dominio. Conservar el `.env` 
 ## Flujo para consultar una actualización
 
 1. Validar los cambios y subir el commit a `origin/main`.
-2. Desplegar desde la integración Git existente de Hostinger o ejecutar el pull
-   anterior en la carpeta del proyecto. Conservar `.env` y `storage/`.
-3. Comprobar la versión publicada y el recorrido afectado dentro del aplicativo.
+2. Esperar la publicación mediante el mecanismo existente; no pedir acceso,
+   credenciales ni inicio de sesión en el hosting. El procedimiento acordado con
+   el usuario es **commit y push**; no configurar otro mecanismo de despliegue.
+3. Comprobar los recursos publicados y el recorrido dentro del aplicativo. Si aún
+   no aparecen, informar el estado pendiente y volver a verificar después.
 4. Avisar al usuario; entonces basta Ctrl + Shift + R para cargar la versión nueva.
 
 Ctrl + Shift + R recarga el navegador: no sube archivos ni ejecuta un despliegue.
@@ -30,6 +32,11 @@ No asociar una petición GET o una recarga a mutaciones del servidor.
 La entrega de Renta `52f07d5` incluye código, assets compilados y el resumen propio
 `public/assets/normativa/renta-orientacion-v1.pdf`; no requiere una migración nueva.
 Subirla a GitHub no confirma su despliegue: comprobar también el hosting.
+El 12/11/2026, después del push, el PDF público respondió HTTP 200 y su SHA-256
+coincidió con el archivo local. Esta evidencia confirma ese recurso, sin identificar
+la configuración interna del despliegue ni sustituir la revisión del flujo completo.
+Los pasos manuales de terminal/panel descritos arriba son referencia administrativa
+para el ingeniero; no son un requisito de acceso para el asistente.
 
 Algunos despliegues Git limpian la carpeta y eliminan archivos no versionados. Si eso
 borra `.env`, crea un archivo persistente llamado `.gestion-avaluatoria.env` en la
