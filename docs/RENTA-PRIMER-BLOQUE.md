@@ -1,5 +1,40 @@
 # Renta: primer bloque conceptual
 
+12/11/2026 · Continuación: los otros cuatro portales usan el recorrido existente
+abrir → copiar resultados → pegar → revisar → subir sin repetidos → confirmar.
+Se verificaron en navegador las búsquedas reales de oficinas en arriendo:
+
+- Metrocuadrado: /oficinas/arriendo/cartagena-de-indias/bocagrande/.
+- Properati: /s/bocagrande/oficina/arriendo; categoría Oficinas / Consultorios,
+  con uso de cada aviso por verificar.
+- Mercado Libre: /inmuebles/oficinas/arriendo/bolivar/cartagena-de-indias/bocagrande/.
+- Ciencuadras: /arriendo/oficina?v=Bocagrande; el texto de ubicación necesita
+  Enter dentro del portal. Se esperó la actualización de resultados antes de copiar.
+
+Los lectores especializados existentes conservan Venta como operación por defecto
+y admiten Arriendo explícito desde la vista. No se cambia un importe de compra por
+canon: Ciencuadras distingue las etiquetas; si incluye administración, conserva el
+importe publicado y señala que falta verificar el desglose. No se calcula canon neto.
+Properati omite proyectos, precios «desde» y tarjetas sin área inequívoca.
+Metrocuadrado puede omitir el área al copiar por usar componentes propios: se deja
+vacía con advertencia y se completa desde la ficha, sin usar el área del alt de foto.
+
+Prueba con Ctrl+A/C real en cada portal y Ctrl+V en la UI PHP local: 20 anuncios
+Ciencuadras, 27 Properati, 12 Mercado Libre y 3 Metrocuadrado (estos sin área).
+Son conteos de la página copiada, no totales de investigación ni garantía de todos
+los avisos del portal. Los listados pueden requerir más páginas o carga al desplazarse.
+No se subieron esas ofertas a expedientes reales ni se validó su comparabilidad.
+La prueba de presentación local usa transporte simulado y no acredita guardado BD.
+
+La vista previa descarta operaciones ajenas o desconocidas según study_scope;
+el servidor mantiene sus controles de investigación, propietario y versión. Las
+pruebas existentes verifican Mercado→Renta→Mercado y conservación de históricos;
+las nuevas cubren páginas mixtas, dos precios, área pendiente y filtro previo al
+guardado en ambas operaciones. Sin DDL ni cambios de persistencia.
+Validación: PHP1635, JS276, lint PHP, build y tamaño79,5KB gzip. Escritorio y móvil
+390 px sin desbordamiento; capturas renta-cuatro-portales-*.png en output/pdf.
+Publicación mediante commit/push; no solicitar acceso al hosting.
+
 12/11/2026 · FincaRaíz en Renta reutiliza el recorrido de ventas: enlace directo
 de oficinas por barrio en Cartagena, lector de resultados por pegado y búsqueda
 opcional por barrio. Se verificó en el portal real Arriendo/Oficina/Bocagrande:

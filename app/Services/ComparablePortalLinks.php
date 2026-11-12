@@ -22,6 +22,23 @@ final class ComparablePortalLinks
             $sources[0]['kind']='Filtros del portal';
             $sources[0]['instruction']='Arriendo y oficina preparados para '.$neighborhood.', Cartagena. Comprueba los filtros antes de copiar la página de resultados.';
         }
+        if ($cartagena && $operation==='arriendo' && $type==='oficina') {
+            $bocagrande=$this->slug($neighborhood)==='bocagrande';
+            $sources[1]['url']='https://www.metrocuadrado.com/oficinas/arriendo/cartagena-de-indias/'.($bocagrande?'bocagrande/':'');
+            $sources[2]['url']='https://www.ciencuadras.com/arriendo/oficina?v='.rawurlencode(trim($neighborhood) ?: $city);
+            $sources[3]['url']='https://www.properati.com.co/s/'.($bocagrande?'bocagrande':'cartagena-bolivar').'/oficina/arriendo';
+            foreach ([1,2,3] as $index) {
+                $sources[$index]['kind']='Filtros del portal';
+                $sources[$index]['instruction']='Oficinas en arriendo. Comprueba ciudad y barrio antes de copiar los resultados.';
+            }
+            $sources[2]['instruction']='Arriendo y oficina preparados. En «Ciudad, barrio, sector o sitio» escribe '.($neighborhood ?: $city).' y pulsa Enter. Espera los resultados y comprueba que los avisos sean de '.$city.'. La ubicación necesita esa confirmación dentro del portal.';
+            if ($bocagrande) {
+                foreach ([1,3] as $index) $sources[$index]['instruction']='Oficinas en arriendo en Bocagrande, Cartagena. Comprueba los filtros y copia la página de resultados.';
+                $sources[4]['url']='https://listado.mercadolibre.com.co/inmuebles/oficinas/arriendo/bolivar/cartagena-de-indias/bocagrande/';
+                $sources[4]['kind']='Filtros del portal';
+                $sources[4]['instruction']='Oficinas en arriendo en Bocagrande, Cartagena. Copia la página de resultados dentro de Mercado Libre.';
+            }
+        }
         if (!$cartagena || $operation !== 'venta') return $sources;
         $castillogrande = in_array($this->slug($neighborhood), ['castillogrande', 'castillo-grande'], true);
         if ($type === 'oficina' || ($type === 'casa' && $castillogrande)) {

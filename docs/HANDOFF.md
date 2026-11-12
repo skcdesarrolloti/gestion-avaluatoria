@@ -1,5 +1,16 @@
 # Entrega al responsable de la implementación
 
+12/11/2026 · Renta en los otros cuatro portales: enlaces de oficinas en arriendo
+en Cartagena; Bocagrande directo en Metrocuadrado, Properati y Mercado Libre.
+Ciencuadras conserva operación/tipo y requiere escribir barrio + Enter, explicado
+en pantalla. Se reutilizan lectores de Venta con operación explícita y selección
+del importe correspondiente; vista previa excluye operaciones ajenas/desconocidas.
+Metrocuadrado puede copiar sin área: se conserva pendiente, sin usar el alt de foto.
+Portales reales + copia Ctrl+A/C y pegado en UI local: Ciencuadras20, Properati27,
+Mercado Libre12 y Metrocuadrado3; no son muestras agregadas al expediente real.
+PHP1635/JS276, lint/build/tamaño79,5KB; UI escritorio/móvil390 sin desbordamiento.
+Sin DDL, cambios de persistencia ni cálculos. Ver RENTA-PRIMER-BLOQUE.md.
+
 12/11/2026 · Apertura de FincaRaíz en Renta como en Venta: oficinas por barrio en
 Cartagena con /arriendo/, botón «Abrir búsqueda» y copia de barrio solo opcional.
 Pasos visibles para copiar resultados Ctrl+A/C y pegarlos en paso3, revisar y subir

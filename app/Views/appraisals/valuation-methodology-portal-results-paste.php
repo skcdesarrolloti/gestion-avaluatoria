@@ -1,6 +1,6 @@
 <section class="mt-4 rounded-lg border border-teal-100 bg-teal-50 p-3" x-data="<?= e($pasteComponent) ?>"
     data-detail-endpoint="<?= !empty($record['id']) ? e(url('avaluos/' . $record['id'] . '/metodologia-valuatoria/comparables/leer-aviso')) : '' ?>"
-    data-city="<?= e($sourceSearch['city'] ?? $guide['source_search']['city'] ?? $record['municipio'] ?? '') ?>" data-query="<?= e($baseQuery) ?>" @input.stop @change.stop @comparable-matrix-changed.window="refresh()" @comparable-source-restarted.window="sourceRestarted($event)">
+    data-operation="<?= e(mb_strtolower($guide['business_label'] ?? 'Venta')) ?>" data-city="<?= e($sourceSearch['city'] ?? $guide['source_search']['city'] ?? $record['municipio'] ?? '') ?>" data-query="<?= e($baseQuery) ?>" @input.stop @change.stop @comparable-matrix-changed.window="refresh()" @comparable-source-restarted.window="sourceRestarted($event)">
     <h4 class="font-semibold">Copiar y pegar desde <?= e($pasteLabel) ?></h4>
     <?php require __DIR__ . '/methodology-source-start.php'; ?>
     <p class="mt-2 text-sm">En el portal: <strong>Ctrl+A → Ctrl+C</strong>. Pega aquí con <strong>Ctrl+V</strong>. Añade las demás páginas y después sube los no repetidos.</p>
@@ -9,7 +9,7 @@
     <textarea id="source-results-<?= (int) $sourceIndex ?>" x-ref="pasteInput" class="input mt-1 min-h-24 w-full bg-white" :value="pastedText"
         :disabled="busy" @paste="paste($event); $nextTick(() => $refs.pasteFeedback.scrollIntoView({ block: 'center', behavior: 'smooth' }))"
         placeholder="Haz clic aquí y pulsa Ctrl+V para preparar todos los avisos copiados." aria-describedby="source-help-<?= (int) $sourceIndex ?>"></textarea>
-    <p id="source-help-<?= (int) $sourceIndex ?>" class="mt-2 text-xs"><?= !empty($pasteGeneral) ? 'Si el listado no se reconoce, pega el enlace y texto de una ficha; separa las fichas con una línea vacía.' : 'Este lector reconoce oficinas en venta de la ciudad del expediente.' ?> Solo se conserva lo publicado. Los datos faltantes quedan pendientes.</p>
+    <p id="source-help-<?= (int) $sourceIndex ?>" class="mt-2 text-xs"><?= !empty($pasteGeneral) ? 'Si el listado no se reconoce, pega el enlace y texto de una ficha; separa las fichas con una línea vacía.' : 'Este lector reconoce oficinas en '.e(mb_strtolower($guide['business_label'] ?? 'Venta')).' de la ciudad del expediente.' ?> Solo se conserva lo publicado. Los datos faltantes quedan pendientes.</p>
     <p class="mt-2 text-sm">Las páginas pegadas se acumulan aquí. Las muestras quedan guardadas cuando pulsas «Subir sin repetidos» y aparece «Guardado confirmado». Conserva esta ventana hasta entonces.</p>
     <button type="button" class="btn-secondary mt-2 min-h-11" :disabled="busy" @click="nextPage()">Pegar otra página</button>
     <div x-show="results.length" x-cloak class="mt-3">

@@ -19,7 +19,7 @@ $sourceTabs = array_merge($portalLinks, $agencyLinks);
             <a class="btn-primary my-3 min-h-11" href="<?= e($sourceOpen) ?>" target="_blank" rel="noopener">Abrir búsqueda en <?= e($source['label']) ?></a>
             <?php
             $batchPortal = ['Ciencuadras'=>'ciencuadras','Properati'=>'properati','Mercado Libre Inmuebles'=>'mercadolibre'][$source['label']] ?? '';
-            if ($batchPortal && ($guide['type_label'] ?? '') === 'Oficina' && ($guide['business_label'] ?? '') === 'Venta') {
+            if ($batchPortal && ($guide['type_label'] ?? '') === 'Oficina' && in_array(mb_strtolower($guide['business_label'] ?? ''),['venta','arriendo'],true)) {
                 require __DIR__ . '/valuation-methodology-' . $batchPortal . '-paste.php';
             } else {
                 $pasteComponent = 'sourceResultsPaste(' . json_encode($sourceHome) . ',' . json_encode($source['label']) . ',' . ($isAgency ? 'true' : 'false') . ')';

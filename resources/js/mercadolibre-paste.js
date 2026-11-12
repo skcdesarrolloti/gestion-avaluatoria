@@ -11,7 +11,7 @@ export function mercadolibreUrl(value) {
     } catch { return ''; }
 }
 
-export function copiedMercadolibreRows(html, city) {
+export function copiedMercadolibreRows(html, city, operation = 'venta') {
     const template = document.createElement('template');
     template.innerHTML = html; // Detached and inert; never display external HTML.
     const expected = normalize(city).replace(' de indias', '');
@@ -26,16 +26,16 @@ export function copiedMercadolibreRows(html, city) {
         const amount = price.match(/^\$\s*([\d.]+(?:,\d{1,2})?)$/)?.[1];
         const areas = [...card.querySelectorAll('.poly-attributes_list__item')].map(el =>
             el.textContent.trim().match(/^(\d+(?:[.,]\d+)?)\s*m[2²]\s+(cubiertos|construidos|totales)$/i)).filter(Boolean);
-        if (!url || seen.has(id) || normalize(text('.poly-component__headline')) !== 'oficina en venta'
+        if (!url || seen.has(id) || normalize(text('.poly-component__headline')) !== (operation==='arriendo'?'oficina en arriendo':'oficina en venta')
             || !expected || cityIndex < 0 || !amount || areas.length !== 1) return [];
         seen.add(id);
         return [{ ...publishedDetails(card.textContent), listing_code:'MCO-' + id, source_type: 'portal', source_name: 'Mercado Libre Inmuebles', source_url: url,
-            operation: 'Venta', property_type: 'Oficina', price_amount: amount, price_unit: 'precio_total',
+            operation: operation==='arriendo'?'Arriendo':'Venta', property_type: 'Oficina', price_amount: amount, price_unit: operation==='arriendo'?'canon_mensual':'precio_total',
             area_m2: areas[0][1].replace('.', ','), neighborhood: cityIndex > 0 ? location[cityIndex - 1] : '',
             ph_regime: 'por_verificar', comparability_notes: `Mercado Libre, publicación MCO-${id}. Ubicación publicada: ${location.join(', ')}. Área publicada: ${areas[0][0]}; verificar clase de área y PH. Resumen copiado del portal.` }];
     });
 }
 
 export function mercadolibrePaste() {
-    return portalResultsPaste({ label: 'Mercado Libre', readRows: copiedMercadolibreRows, validUrl: mercadolibreUrl });
+    return portalResultsPaste({ label: 'Mercado Libre', readRows: (html,city,text,operation) => copiedMercadolibreRows(html,city,operation), validUrl: mercadolibreUrl });
 }

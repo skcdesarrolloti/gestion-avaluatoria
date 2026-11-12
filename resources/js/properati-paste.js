@@ -12,7 +12,7 @@ export function properatiUrl(value) {
     } catch { return ''; }
 }
 
-export function parseProperatiCards(cards, city) {
+export function parseProperatiCards(cards, city, operation = 'venta') {
     const expected = normalize(city).replace(' de indias', '');
     const seen = new Set();
     return cards.flatMap(card => {
@@ -21,18 +21,18 @@ export function parseProperatiCards(cards, city) {
         const cityIndex = places.findIndex(part => normalize(part).replace(' de indias', '') === expected);
         const price = String(card.price || '').trim().match(/^\$\s*([\d.]+(?:,\d{1,2})?)$/)?.[1];
         const area = String(card.area || '').trim().match(/^(\d+(?:[.,]\d+)?)\s*m[2²]$/)?.[1];
-        if (!url || seen.has(url) || !/^oficina en venta en\s/.test(normalize(card.heading))
+        if (!url || seen.has(url) || !(operation==='arriendo' ? /^oficina en arriendo en\s/ : /^oficina en venta en\s/).test(normalize(card.heading))
             || !expected || cityIndex < 0 || !price || !area) return [];
         seen.add(url);
         return [{ ...publishedDetails(card.text || card.heading), source_type: 'portal', source_name: 'Properati', source_url: url,
-            operation: 'Venta', property_type: 'Oficina', price_amount: price, price_unit: 'precio_total',
+            operation: operation==='arriendo'?'Arriendo':'Venta', property_type: 'Oficina', price_amount: price, price_unit: operation==='arriendo'?'canon_mensual':'precio_total',
             area_m2: area.replace('.', ','), neighborhood: cityIndex > 0 ? places[0] : '', ph_regime: 'por_verificar',
             contact_name: String(card.agency || '').trim(),
             comparability_notes: `Fuente: Properati · Red Proppit. Ubicación publicada: ${places.join(', ')}. Resumen copiado; área y PH por verificar. Puede estar publicado en otros portales de la red.` }];
     });
 }
 
-export function copiedProperatiRows(html, city) {
+export function copiedProperatiRows(html, city, operation = 'venta') {
     const template = document.createElement('template');
     template.innerHTML = html; // Detached, inert; external markup is never displayed or executed.
     const cards = [...template.content.querySelectorAll('article')].map(article => {
@@ -44,9 +44,9 @@ export function copiedProperatiRows(html, city) {
             location: text('snippet__location'), price: text('snippet__price'),
             area: text('area-value'), agency: text('agency-name'), text:article.textContent };
     });
-    return parseProperatiCards([...cards, ...properatiClipboardCards(template.content, properatiUrl)], city);
+    return parseProperatiCards([...cards, ...properatiClipboardCards(template.content, properatiUrl)], city, operation);
 }
 
 export function properatiPaste() {
-    return portalResultsPaste({ label: 'Properati', readRows: copiedProperatiRows, validUrl: properatiUrl });
+    return portalResultsPaste({ label: 'Properati', readRows: (html,city,text,operation) => copiedProperatiRows(html,city,operation), validUrl: properatiUrl });
 }

@@ -9,8 +9,9 @@ const listing = value => /(?:inmueble|propiedad|property|apartamento|oficina|cas
 
 export function readSourceRows(html, text, source, label, agency = false) {
     const found = new Map();
+    const incompleteMetro = row => label==='Metrocuadrado' && row.operation==='Arriendo' && /^oficina en arriendo[, ]/i.test(row.listing_title || '');
     const accept = (row, url) => {
-        if (!sameHost(url,source) || !row.price_amount || !row.area_m2) return;
+        if (!sameHost(url,source) || !row.price_amount || (!row.area_m2 && !incompleteMetro(row))) return;
         found.set(url,{...row, source_url:url, source_name:label, source_type:agency ? 'inmobiliaria' : 'portal'});
     };
     if (html) {
@@ -32,13 +33,15 @@ export function readSourceRows(html, text, source, label, agency = false) {
                 copy.querySelectorAll('p,div,li,br,h1,h2,h3,h4,dt,dd').forEach(el => { el.insertBefore(document.createTextNode('\n'),el.firstChild); el.appendChild(document.createTextNode('\n')); });
                 const content=copy.textContent.trim();
                 const row=parseComparableBlock(content);
-                if (row.price_amount && row.area_m2) {
-                    const heading=(node.querySelector('h2,h3')?.textContent || '').trim();
+                const heading=(node.querySelector('h2,h3')?.textContent || '').trim();
+                row.listing_title=heading.slice(0,180);
+                if (row.price_amount && (row.area_m2 || incompleteMetro(row))) {
                     row.listing_title=heading.slice(0,180);
                     const type=heading.match(/^(oficina|apartamento|casa|local|bodega|lote|consultorio)\b/i)?.[1];
                     if (type) row.property_type=type[0].toUpperCase()+type.slice(1).toLowerCase();
                     // A description about a building is not its name.
                     row.project_name=content.match(/(?:edificio|conjunto|proyecto|torre)\s*:\s*([^\n.;]{2,120})/i)?.[1]?.trim() || '';
+                    if (incompleteMetro(row) && !row.area_m2) row.comparability_notes+=' Área no recibida del portal; completar desde la ficha y verificar antes de usar la muestra.';
                     candidate=row;
                 }
                 if (candidate && (['ARTICLE','LI'].includes(node.tagName) || node.classList.contains('listingCard'))) break;

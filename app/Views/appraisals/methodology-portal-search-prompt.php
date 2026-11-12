@@ -6,8 +6,8 @@
     <?php if (($source['kind'] ?? '')==='Filtros del portal'): ?><p class="mt-2 text-sm"><?= e($source['instruction'] ?? '') ?></p><?php endif; ?>
     <?php endif; ?>
     <?php if ($portalSearch['missing']): ?><p class="mt-2 text-sm text-amber-900">Completa tipo, operación y ciudad de esta unidad para precisar la búsqueda.</p><?php endif; ?>
-    <?php $optionalLocation=$portalSearch['location_only'] && ($source['kind'] ?? '')==='Filtros del portal'; if ($optionalLocation): ?>
-    <details class="mt-3"><summary class="min-h-11 cursor-pointer text-sm font-semibold">Solo si necesitas cambiar la ubicación: copiar barrio</summary>
+    <?php $optionalLocation=str_starts_with($source['kind'] ?? '', 'Filtros del portal'); if ($optionalLocation): ?>
+    <details class="mt-3"><summary class="min-h-11 cursor-pointer text-sm font-semibold">Solo si necesitas ajustar la búsqueda: copiar texto</summary>
     <?php endif; ?>
     <label class="label mt-3"><?= $portalSearch['location_only'] ? 'Ubicación para pegar en el portal' : 'Texto breve para buscar en '.e($source['label']) ?>
         <textarea class="input mt-1" rows="2" readonly x-ref="portalSearchText" placeholder="Búsqueda según esta unidad y su ubicación."><?= e($portalSearch['input']) ?></textarea>

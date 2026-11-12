@@ -17,7 +17,7 @@ export function properatiClipboardCards(root, validUrl) {
             const locations = values.filter(value => /^[^,$\d]+,\s*[^,$\d]+(?:,\s*[^,$\d]+)?$/.test(value)
                 && !/publicado|foto|baños/i.test(value));
             const heading = [anchor.textContent, anchor.getAttribute('title'), ...values]
-                .find(value => /^oficina en venta en\s/i.test(String(value || '').trim()));
+                .find(value => /^oficina en (?:venta|arriendo) en\s/i.test(String(value || '').trim()));
             if (!heading || prices.length !== 1 || areas.length !== 1 || locations.length !== 1) continue;
             cards.push({ url, heading: heading.trim(), price: prices[0], area: areas[0], location: locations[0],
                 agency: box.querySelector('.agency__name')?.textContent || '', text:box.textContent });

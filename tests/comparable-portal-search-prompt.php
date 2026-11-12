@@ -22,6 +22,13 @@ declare(strict_types=1);
     $rentPrompt=\App\Services\ComparablePortalSearchPrompt::build($rentGuide,$rentSource);
     expect($rentPrompt['open_url']==='https://www.fincaraiz.com.co/arriendo/oficinas/bocagrande/cartagena'
         && $rentSource['kind']==='Filtros del portal' && $rentPrompt['input']==='Bocagrande','Renta abre resultados directos del barrio sin usar búsqueda de venta ni convertir la ubicación en una frase');
+    foreach ($rentGuide['source_search']['portal_sources'] as $rentaPortal) {
+        $rentaPrompt=\App\Services\ComparablePortalSearchPrompt::build($rentGuide,$rentaPortal);
+        expect($rentaPortal['kind']==='Filtros del portal' && str_contains($rentaPrompt['open_url'],'/arriendo')
+            && !str_contains($rentaPrompt['open_url'],'/venta/'),'cada portal abre su búsqueda de arriendos: '.$rentaPortal['label']);
+        if ($rentaPortal['label']==='Ciencuadras') expect(str_contains($rentaPortal['instruction'],'pulsa Enter')
+            && str_contains($rentaPortal['instruction'],'confirmación'),'Ciencuadras explica que el barrio debe aplicarse dentro del portal');
+    }
     $guideBefore=$guide;$sourceBefore=$source;$guide=$rentGuide;$source=$rentSource;
     ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-portal-search-prompt.php';$rentHtml=ob_get_clean();
     expect(str_contains($rentHtml,'Abrir búsqueda en FincaRaiz') && str_contains($rentHtml,'El botón de copiar no abre otra página')

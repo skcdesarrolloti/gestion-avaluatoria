@@ -45,16 +45,20 @@ export function portalResultsPaste({ label, readRows, validUrl, allowTsv = false
             this.pastedText = text.slice(0, 4000) + (text.length > 4000 ? '\n… Vista abreviada del texto recibido.' : '');
             if (!text && !html) { this.message = 'No llegó texto de la página. Si copiaste una foto o captura, vuelve al listado de inmuebles y copia la página con Ctrl+A y Ctrl+C.'; return; }
             if (html.length + text.length > 2000000) { this.message = 'Copia solo una página de resultados (máximo 2 MB).'; return; }
-            let rows = html || readText ? readRows(html, panel.dataset.city, text) : [];
+            const operation = panel.dataset.operation || 'venta';
+            let rows = html || readText ? readRows(html, panel.dataset.city, text, operation) : [];
             if (allowTsv && !rows.length && text.includes('\t')) rows = parseComparableText(text).filter(row =>
-                validUrl(row.source_url) && row.price_amount && row.area_m2 && normalize(row.operation) === 'venta');
+                validUrl(row.source_url) && row.price_amount && row.area_m2 && normalize(row.operation) === operation);
+            const studyOperation=form?.querySelector?.('[name=study_scope]')?.value?.split(':')[1];
+            const omitted=studyOperation ? rows.filter(row=>normalize(row.operation)!==studyOperation).length : 0;
+            if (studyOperation) rows=rows.filter(row=>normalize(row.operation)===studyOperation);
             if (!rows.length) {
-                this.message = emptyMessage || `No se reconocieron tarjetas. Sí llegó contenido, pero no se pudieron leer sus avisos. Copia directamente la página de resultados de ${label} con Ctrl+A y Ctrl+C y pega con Ctrl+V (sin Mayús). No copies una ficha individual ni pases el texto por otra aplicación.`;
+                this.message = omitted ? 'Los avisos recibidos no corresponden a esta investigación de '+studyOperation+'. No se incorporaron. Comprueba la operación en el portal.' : emptyMessage || `No se reconocieron tarjetas. Sí llegó contenido, pero no se pudieron leer sus avisos. Copia directamente la página de resultados de ${label} con Ctrl+A y Ctrl+C y pega con Ctrl+V (sin Mayús). No copies una ficha individual ni pases el texto por otra aplicación.`;
                 return;
             }
             this.collectPage(rows,text);
             this.selected = []; this.refresh();
-            this.message = `${this.pages.length} páginas recogidas: ${this.receivedCount} avisos recibidos, ${this.results.length} enlaces distintos. ${this.portalTotal > this.receivedCount ? 'El portal anuncia ' + this.portalTotal + '; faltan páginas por copiar. Pulsa «Pegar otra página».' : 'Revisa los colores y pulsa «Subir sin repetidos de este portal».'} Pegar no guarda las muestras.`;
+            this.message = `${this.pages.length} páginas recogidas: ${this.receivedCount} avisos recibidos, ${this.results.length} enlaces distintos. ${this.portalTotal > this.receivedCount ? 'El portal anuncia ' + this.portalTotal + '; faltan páginas por copiar. Pulsa «Pegar otra página».' : 'Revisa los colores y pulsa «Subir sin repetidos de este portal».'} Pegar no guarda las muestras.` + (omitted ? ` Se omitieron ${omitted} avisos de otra operación o sin operación identificada.` : '');
         },
         collectPage(rows,text='') {
             const total=String(text).match(/mostrando\s*[\d.,]+\s*[-–]\s*[\d.,]+\s*de\s*([\d.,]+)\s*resultados/i)?.[1];
