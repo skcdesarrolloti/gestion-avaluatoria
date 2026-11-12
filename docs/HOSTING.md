@@ -15,6 +15,22 @@ git pull --ff-only origin main
 Si el panel tiene despliegue Git, ejecutar su acción de actualizar/desplegar para que
 la versión nueva llegue a la carpeta que sirve el dominio. Conservar el `.env` local.
 
+## Flujo para consultar una actualización
+
+1. Validar los cambios y subir el commit a `origin/main`.
+2. Desplegar desde la integración Git existente de Hostinger o ejecutar el pull
+   anterior en la carpeta del proyecto. Conservar `.env` y `storage/`.
+3. Comprobar la versión publicada y el recorrido afectado dentro del aplicativo.
+4. Avisar al usuario; entonces basta Ctrl + Shift + R para cargar la versión nueva.
+
+Ctrl + Shift + R recarga el navegador: no sube archivos ni ejecuta un despliegue.
+La aplicación versiona sus assets y sirve las páginas con `Cache-Control: no-store`.
+No asociar una petición GET o una recarga a mutaciones del servidor.
+
+La entrega de Renta `52f07d5` incluye código, assets compilados y el resumen propio
+`public/assets/normativa/renta-orientacion-v1.pdf`; no requiere una migración nueva.
+Subirla a GitHub no confirma su despliegue: comprobar también el hosting.
+
 Algunos despliegues Git limpian la carpeta y eliminan archivos no versionados. Si eso
 borra `.env`, crea un archivo persistente llamado `.gestion-avaluatoria.env` en la
 carpeta padre del proyecto y coloca allí las mismas variables. El bootstrap lo lee
