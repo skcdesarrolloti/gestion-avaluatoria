@@ -7,6 +7,10 @@ bajo demanda, versión por hash. Comparación de HTML local77muestras:66KB/31
 controles al entrar frente a3,96MB/8.861controles de captura. Ver detalle y alcance
 en RENTA-PRIMER-BLOQUE.md; no cambia BD ni cálculos. Publicar con commit/push y
 comprobar recurso público income-inputs.js y después las pestañas en el aplicativo.
+Publicación538e20f: tras el push, income-inputs.js pasó de404 a200 y SHA-256
+idéntico al bundle local. En la verificación posterior, una pestaña nueva del
+aplicativo redirigió a login; no se acredita revisión visual autenticada del hosting.
+PHP1604/JS272/lint/build/check:size79,0KB; UI local escritorio/móvil comprobada.
 
 12/11/2026 · Renta con tres pestañas horizontales en Insumos: comprender, preparar
 búsqueda y recoger muestras. Preparación consulta criterios del expediente y guía
