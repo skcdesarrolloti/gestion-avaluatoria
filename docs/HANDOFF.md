@@ -10,6 +10,10 @@ y exportación autorizada. Detalles: RENTA-EXCLUSIONES.md.
 Validado: PHP1738, JS296, BD284, HTTP27; lint/build/check:size correctos.
 UI local verificó exclusión/reincorporación, actualización sin duplicar panel,
 borradores entre muestras y recarga; ancho móvil390 sin desbordamiento horizontal.
+Publicado22843f6: app.js/income-inputs.js/app.css HTTP200 y SHA-256 coincidente.
+Tras renovar sesión, expediente real muestra129 anuncios,73 calculables,
+CV41,69% y0 exclusiones. Formulario visible y consola sin errores; no se aplicó
+ninguna exclusión a los datos del usuario. Captura local en outputs/renta-exclusiones-20261113.
 
 13/11/2026 · Primera etapa de Renta: canon inicial, referencia al área del capítulo3,
 inicio/índice documentado e historial mensual por año. Arriendo recibido separado
