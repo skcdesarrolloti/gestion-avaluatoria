@@ -44,7 +44,7 @@ final class AppraisalValuationMethodologyController
         if ($stage==='1' && ($_GET['consult_method'] ?? '')==='costo') $method='costo';
         if (isset(\App\Services\MethodologyWorkflow::METHODS[$flow[$componentKey]['method'] ?? '']))
             $selected=\App\Services\MethodStudyState::visible($flow[$componentKey],\App\Services\ComparableStudy::context($record,$componentKey)['token']);
-        $deferIncome=$stage==='3' && $method==='renta' && ($_GET['renta_paso'] ?? '')!=='capture';
+        $deferIncome=in_array($stage,['3','4','5'],true) && $method==='renta' && ($_GET['renta_paso'] ?? '')!=='capture';
         $allComparableRows=$deferIncome?[]:$this->comparables->forAppraisal($id,$this->user['id']);
         $comparableRows=\App\Services\MethodologyComparableScope::rows($allComparableRows,$componentKey,$record);
         $searchRecord = \App\Services\ComparableSearchContext::forMethod($record, $units, $componentKey, $method);

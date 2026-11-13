@@ -44,7 +44,7 @@ $costAcademyTheoryOnly = $costAcademy && ($selected['method'] ?? '') !== 'costo'
     <?php require __DIR__ . '/valuation-methodology-deliverable-preview.php'; ?>
 <?php elseif ($stage === '2'): ?>
     <?php require __DIR__ . '/methodology-selection.php'; ?>
-<?php elseif ($stage === '3' && $method === 'renta'): ?>
+<?php elseif (in_array($stage,['3','4','5'],true) && $method === 'renta'): ?>
     <?php require __DIR__.'/methodology-income-inputs.php'; ?>
 <?php elseif ($stage === '3' && in_array($method, ['costo', 'residual'], true)): ?>
     <?php require __DIR__ . '/methodology-other-inputs.php'; ?>
@@ -60,4 +60,4 @@ $costAcademyTheoryOnly = $costAcademy && ($selected['method'] ?? '') !== 'costo'
 <?php endif; ?>
 </div>
 
-<?php if (!$costAcademyTheoryOnly && !in_array($stage,['plan','1'],true) && !($method==='mercado' && in_array($stage,['3','4'],true))): require __DIR__ . '/methodology-next.php'; endif; ?>
+<?php if (!$costAcademyTheoryOnly && !in_array($stage,['plan','1'],true) && !($method==='mercado' && in_array($stage,['3','4'],true)) && !($method==='renta' && in_array($stage,['3','4','5'],true))): require __DIR__ . '/methodology-next.php'; endif; ?>

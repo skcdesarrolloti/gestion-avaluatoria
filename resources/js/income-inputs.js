@@ -7,12 +7,17 @@ export function incomeInputs() {
         leaseForm,
         incomeTab:'concept', incomePortal:'', incomeLoaded:false, incomeLoading:false, incomeError:'',
         incomePortals:[], incomeSources:[], incomePortalBusy:false, incomePortalError:'',
+        incomeSteps:{concept:'1. Inmueble y arriendo',research:'2. Investigación de arriendos',evidence:'3. Ingresos y gastos',valuation:'4. Valoración por los dos métodos',review:'5. Revisión y sustentación'},
+        incomeResearchTab:'search',incomeNavigating:false,incomeNavigationError:'',
+        get incomeStage() { return ['search','capture'].includes(this.incomeTab)?'research':this.incomeTab; },
+        get incomeStepIndex() { return Object.keys(this.incomeSteps).indexOf(this.incomeStage); },
         get incomePortalIndex() { return this.incomePortals.indexOf(this.canonicalPortal(this.incomePortal)); },
         get incomeNextPortal() { return this.incomePortalIndex<0 ? '' : this.incomePortals[this.incomePortalIndex+1] || ''; },
         init() {
             root=this.$el;
             Object.assign(this,JSON.parse(root.dataset.incomeState));
             this.incomeLoaded=root.dataset.incomeLoaded==='1';
+            if(['search','capture'].includes(this.incomeTab)) this.incomeResearchTab=this.incomeTab;
             this.$watch?.('incomePortal',value=>{
                 const label=this.canonicalPortal(value);
                 if(label && label!==value) { this.incomePortal=label; return; }
@@ -29,6 +34,7 @@ export function incomeInputs() {
         rememberStep() {
             const url=new URL(location.href);
             url.searchParams.set('renta_paso',this.incomeTab);
+            url.searchParams.set('stage','3');url.hash='renta-estudio';
             if(this.incomePortal) url.searchParams.set('renta_portal',this.incomePortal);
             window.history?.replaceState(window.history.state,'',url.href);
         },
@@ -54,16 +60,38 @@ export function incomeInputs() {
         async nextPortal() {
             return this.incomeNextPortal ? this.choosePortal(this.incomeNextPortal) : false;
         },
-        async openTab(tab) {
-            if(!['concept','search','capture'].includes(tab)) return;
-            this.incomeTab=tab;
-            this.rememberStep();
-            if(tab!=='capture') return;
-            if(!this.incomeLoaded) {
-                if(!pending) pending=this.loadCapture().finally(()=>{pending=null;});
-                await pending;
+        async openStage(stage) {
+            if(!Object.hasOwn(this.incomeSteps,stage)) return false;
+            return this.openTab(stage==='research'?this.incomeResearchTab:stage);
+        },
+        async moveStep(offset) {
+            const stage=Object.keys(this.incomeSteps)[this.incomeStepIndex+offset];
+            if(await this.openStage(stage)) {
+                await this.$nextTick?.();root.querySelector('#renta-estudio')?.scrollIntoView?.({block:'start'});
             }
-            if(this.incomeLoaded) window.dispatchEvent(new CustomEvent('income-portal',{detail:this.incomePortal}));
+        },
+        async openTab(tab) {
+            if(!['concept','search','capture','evidence','valuation','review'].includes(tab) || this.incomeNavigating) return false;
+            this.incomeNavigating=true;this.incomeNavigationError='';
+            try {
+                if(window.gaFlushAutosaves && !await window.gaFlushAutosaves()) {
+                    this.incomeNavigationError='Confirma el guardado pendiente antes de cambiar de etapa. Tus cambios siguen aquí.';
+                    if(tab==='capture') this.incomeError=this.incomeNavigationError;
+                    return false;
+                }
+                this.incomeTab=tab;
+                if(['search','capture'].includes(tab)) this.incomeResearchTab=tab;
+                this.rememberStep();
+                if(tab==='capture') {
+                    if(!this.incomeLoaded) {
+                        if(!pending) pending=this.loadCapture().finally(()=>{pending=null;});
+                        await pending;
+                    }
+                    if(this.incomeLoaded) window.dispatchEvent(new CustomEvent('income-portal',{detail:this.incomePortal}));
+                    return this.incomeLoaded;
+                }
+                return true;
+            } finally {this.incomeNavigating=false;}
         },
         async loadCapture() {
             this.incomeLoading=true; this.incomeError='';

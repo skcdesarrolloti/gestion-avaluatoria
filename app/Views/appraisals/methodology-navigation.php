@@ -13,8 +13,9 @@ $navigationHasRoute=$navigationKey!=='' && isset($methods[$navigationMethod]);
 $navigationIncome=$navigationHasRoute && $navigationMethod==='renta';
 $navigationMarket = $method === 'mercado';
 $navigationWorkspace=$navigationMarket && $navigationWorking && ($selected['method'] ?? '')==='mercado' && in_array($stage,['3','4'],true) && ($stage==='3' || !empty($comparableRows));
+$navigationWorkspace=$navigationWorkspace || ($method==='renta' && in_array($stage,['3','4','5'],true));
 ?>
-<?php if (!$navigationWorkspace && !($navigationMarket && $stage==='plan')): ?>
+<?php if (!$navigationWorkspace && $stage!=='plan'): ?>
 <section class="mt-5 rounded-xl border bg-white p-4" aria-label="Camino del capítulo 8">
     <?php if ($navigationIncome): ?>
     <p class="mb-3 inline-flex rounded-lg bg-teal-800 px-4 py-2 font-semibold text-white">Recorrido activo: Renta</p>

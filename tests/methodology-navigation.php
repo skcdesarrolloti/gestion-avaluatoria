@@ -35,7 +35,7 @@ declare(strict_types=1);
             expect(strpos($html,'Método y alcance · Oficina')<strpos($html,'Academia · recomendación y datos del expediente')
                 && !str_contains($html,'Camino recomendado') && str_contains($html,'Datos utilizados · solo consulta'),
                 'decisión editable precede academia compacta sin repetir el recorrido ni la cabecera de recomendación');
-            expect(str_contains($html,'Continuar con las muestras o insumos') && !str_contains($html,'>Organizar unidades y métodos</a>') && str_contains($html,'Revisar qué partes se valoran'),
+            expect(str_contains($html,'Continuar con el estudio') && !str_contains($html,'>Organizar unidades y métodos</a>') && str_contains($html,'Revisar qué partes se valoran'),
                 'definición del estudio ofrece continuación y conserva organización sin enlace que regrese a la misma pantalla');
         }
         if ($stage === 'components') {
@@ -113,7 +113,7 @@ declare(strict_types=1);
     $record['methodology_workflow']=json_encode($flow);
     $allComparableRows[0]['operation']='Venta';
     $continueTarget=static function(string $html): array {
-        preg_match('/<a\b[^>]*?\shref="([^"]+)"[^>]*>Continuar con las muestras o insumos<\/a>/s',$html,$match);
+        preg_match('/<a\b[^>]*?\shref="([^"]+)"[^>]*>Continuar con el estudio<\/a>/s',$html,$match);
         parse_str((string)parse_url(html_entity_decode($match[1] ?? ''),PHP_URL_QUERY),$query);
         return $query;
     };
@@ -126,4 +126,17 @@ declare(strict_types=1);
     $target=$continueTarget($html);
     expect(($target['stage'] ?? '')==='3' && ($target['component'] ?? '')==='office',
         'muestras de otra unidad no desvían la continuación de una unidad sin capturas');
+    $method='renta';$selected=$flow['office']=['method'=>'renta'];$record['methodology_workflow']=json_encode($flow);
+    $comparableRows=$allComparableRows=[];
+    foreach (['3'=>'concept','4'=>'valuation','5'=>'review'] as $legacyStage=>$incomeStep) {
+        $stage=(string)$legacyStage;
+        ob_start();require BASE_PATH.'/app/Views/appraisals/valuation-methodology.php';$html=ob_get_clean();
+        preg_match('/data-income-state="([^"]+)"/',$html,$match);
+        $state=json_decode(html_entity_decode($match[1] ?? '',ENT_QUOTES,'UTF-8'),true);
+        expect(($state['incomeTab'] ?? '')===$incomeStep && substr_count($html,'aria-label="Etapas del estudio de Renta"')===1
+            && !str_contains($html,'aria-label="Organización del capítulo 8"') && !str_contains($html,'aria-label="Siguiente paso"'),
+            'ruta Renta '.$stage.' abre cinco etapas sin segunda barra ni continuación al recorrido anterior');
+        expect(!str_contains($html,'data-market-analysis') && str_contains($html,'Los cálculos de ambos métodos están pendientes'),
+            'navegar Renta '.$stage.' no activa cálculos de Mercado ni presenta resultados ficticios');
+    }
 })();

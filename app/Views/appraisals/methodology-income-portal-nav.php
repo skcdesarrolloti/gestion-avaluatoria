@@ -1,4 +1,4 @@
-<nav class="sticky top-0 z-30 mb-4 rounded-xl border border-teal-200 bg-white p-3 shadow-sm" x-show="incomeTab!=='concept'" aria-label="Continuar por portal de Renta">
+<nav class="sticky top-0 z-30 mb-4 rounded-xl border border-teal-200 bg-white p-3 shadow-sm" x-show="incomeStage==='research'" <?= in_array($incomeInitial,['search','capture'],true)?'':'x-cloak' ?> aria-label="Continuar por portal de Renta">
     <div class="flex flex-wrap items-end gap-3">
         <div class="min-w-0 w-full sm:flex-1">
             <label class="label" for="renta-portal-actual">Portal actual · Renta</label>

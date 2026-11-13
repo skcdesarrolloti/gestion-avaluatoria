@@ -8,7 +8,7 @@ $leaseLegacy=LeaseRegister::legacy($record,$leaseUnitId);
 ?>
 <section id="renta-concepto" class="mb-6 rounded-2xl border bg-white p-5 sm:p-8" data-income-preparation-version="3">
     <p class="eyebrow">Renta · <?= e($componentLabel) ?></p>
-    <h2 class="mt-2 text-2xl font-semibold">1. Ficha del arriendo</h2>
+    <h2 class="mt-2 text-2xl font-semibold">1. Inmueble y arriendo</h2>
     <p class="mt-3 rounded-lg bg-teal-50 p-3 font-semibold">Una ficha compartida por capitalización directa y flujo de caja descontado.</p>
     <p class="mt-3 text-sm">Registra lo que consta en contratos y soportes. Las fechas, importes e incrementos quedan como antecedentes; todavía no se calculan rentas, tasas ni valores.</p>
     <div class="mt-4 rounded-xl border bg-slate-50 p-4">

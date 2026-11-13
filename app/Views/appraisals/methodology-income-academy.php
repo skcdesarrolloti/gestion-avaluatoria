@@ -16,6 +16,6 @@
             <li><strong>Decisiones pendientes:</strong> mínimos particulares de NTS M01, compatibilidad de rentas y tasas, horizonte, contratos y ajustes. Se resolverán antes de programar cálculos; los ejemplos no son parámetros del expediente.</li>
         </ul>
     </details>
-    <p class="mt-4 text-sm">En Insumos encontrarás «1. Ficha del arriendo»: contrato y unidades, canon y pagos, vigencia e incrementos, condiciones y soportes. Consulta la descripción y ocupación del capítulo 3; la ficha sirve para capitalización directa y flujo de caja descontado. Los antecedentes y las muestras se conservan.</p>
-    <?php if (($selected['method'] ?? '')==='renta'): ?><a class="btn-primary mt-3" href="<?= e($flowUrl('3','renta')) ?>#renta-concepto">Ir al primer bloque conceptual</a><?php endif; ?>
+    <p class="mt-4 text-sm">El estudio de Renta tiene cinco etapas con estas ayudas disponibles en cada una. «1. Inmueble y arriendo» consulta el capítulo 3 y conserva la ficha del contrato para capitalización directa y flujo de caja descontado. La etapa 2 reúne búsqueda, captura y revisión de muestras.</p>
+    <?php if (($selected['method'] ?? '')==='renta'): ?><a class="btn-primary mt-3" href="<?= e($flowUrl('3','renta')) ?>#renta-estudio">Continuar con el estudio de Renta</a><?php endif; ?>
 </section>

@@ -8,13 +8,17 @@
         <p class="mt-2 text-sm leading-6">Se identifican las ediciones estudiadas en las bibliotecas del aplicativo. La traducción IVS 2025 debe contrastarse con el original oficial en inglés antes de declarar conformidad. Consultar estos temas no acredita cumplimiento ni verifica documentos.</p>
     </details>
     <?php foreach (\App\Services\IncomeAcademy::topics() as $topicIndex=>$incomeTopic): ?>
-    <details id="renta-tema-<?= e($incomeTopic['key']) ?>" class="mt-4 rounded-xl border p-4 sm:p-5">
+    <details id="renta-tema-<?= e($incomeTopic['key']) ?>" class="mt-4 rounded-xl border p-4 sm:p-5"
+        <?php if (!empty($incomeInlineAcademy)): $topicStages=\App\Services\IncomeStudyNavigation::academyStages($incomeTopic['key']); ?>
+        x-show="<?= e(json_encode($topicStages)) ?>.includes(incomeStage)"
+        <?= in_array(in_array($incomeInitial,['search','capture'],true)?'research':$incomeInitial,$topicStages,true)?'':'x-cloak' ?>
+        <?php endif; ?>>
         <summary class="min-h-11 cursor-pointer text-lg font-semibold text-teal-900"><?= $topicIndex+1 ?>. <?= e($incomeTopic['title']) ?></summary>
         <p class="mt-3 leading-6"><?= e($incomeTopic['explanation']) ?></p>
         <div class="mt-3 rounded-lg bg-teal-50 p-4 text-sm leading-6"><strong>Ejemplo para entenderlo:</strong> <?= e($incomeTopic['example']) ?></div>
         <h5 class="mt-4 font-semibold">Qué debes reunir o aclarar</h5>
         <ul class="mt-2 list-disc space-y-2 pl-5 text-sm leading-6"><?php foreach ($incomeTopic['collect'] as $item): ?><li><?= e($item) ?></li><?php endforeach; ?></ul>
-        <p class="mt-4 text-sm leading-6"><strong>Cómo se conecta con Insumos:</strong> <?= e($incomeTopic['connection']) ?></p>
+        <p class="mt-4 text-sm leading-6"><strong>Cómo se conecta con el estudio:</strong> <?= e($incomeTopic['connection']) ?></p>
         <details class="mt-4 rounded-lg border bg-slate-50 p-3 sm:p-4">
             <summary class="min-h-11 cursor-pointer font-semibold">Soportes de este tema · IGAC, IVS y NTS/GTS</summary>
             <p class="mt-2 text-sm text-slate-600">Síntesis del fragmento pertinente y su utilidad. Abre el documento existente para leer el apartado citado.</p>

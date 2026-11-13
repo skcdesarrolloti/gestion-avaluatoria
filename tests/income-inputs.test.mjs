@@ -106,3 +106,29 @@ test('saved source aliases keep the configured portal selected and its next-sour
         assert.equal(f.calls,0);
     } finally {f.restore();}
 });
+
+test('five-stage navigation retains capture, restores research and stops at either end',async()=>{
+    const f=fixture();try {
+        const loading=f.component.openTab('capture');await f.finish();await loading;
+        const draft=f.root.querySelector('textarea');draft.value='Pegado pendiente de incorporar';
+        for(const [step,index] of [['evidence',2],['valuation',3],['review',4]]) {
+            assert.equal(await f.component.openStage(step),true);assert.equal(f.component.incomeStepIndex,index);
+            assert.equal(f.calls,1);assert.equal(f.root.querySelector('textarea'),draft);
+        }
+        await f.component.moveStep(1);assert.equal(f.component.incomeStage,'review');
+        await f.component.openStage('research');assert.equal(f.component.incomeTab,'capture');
+        assert.equal(draft.value,'Pegado pendiente de incorporar');assert.equal(f.mounts,1);
+        await f.component.openStage('concept');await f.component.moveStep(-1);assert.equal(f.component.incomeStage,'concept');
+    } finally {f.restore();}
+});
+
+test('failed saving keeps the previous stage and URL until an explicit retry succeeds',async()=>{
+    const f=fixture();try {
+        let writes=0,last;window.history={state:{},replaceState:(_state,_title,url)=>{writes++;last=new URL(url);}};
+        f.setFlushed(false);assert.equal(await f.component.openStage('evidence'),false);
+        assert.equal(f.component.incomeTab,'concept');assert.equal(writes,0);assert.match(f.component.incomeNavigationError,/guardado pendiente/);
+        f.setFlushed(true);assert.equal(await f.component.openStage('evidence'),true);
+        assert.equal(last.searchParams.get('renta_paso'),'evidence');assert.equal(last.hash,'#renta-estudio');
+        assert.equal(f.component.incomeNavigationError,'');assert.equal(f.calls,0);
+    } finally {f.restore();}
+});

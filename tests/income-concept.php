@@ -35,7 +35,7 @@ declare(strict_types=1);
     expect(str_starts_with(file_get_contents(BASE_PATH.'/public/assets/normativa/renta-orientacion-v1.pdf'),'%PDF-'),'resumen completo empaquetado con el aplicativo');
     ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-income-academy.php';$academy=ob_get_clean();
     expect(substr_count($academy,'id="renta-tema-')===4 && str_contains($academy,'Qué debes reunir o aclarar')
-        && str_contains($academy,'Cómo se conecta con Insumos:'),'academia Renta incorpora cuatro temas didácticos conectados con la captura');
+        && str_contains($academy,'Cómo se conecta con el estudio:'),'academia Renta incorpora cuatro temas didácticos conectados con la captura');
     expect(str_contains($academy,'ivs-104-data-inputs/archivo') && str_contains($academy,'ivs-106-reporting/archivo')
         && str_contains($academy,'nts-m01-metodologias-valuacion') && str_contains($academy,'gts-e02-valuacion-arrendamiento')
         && str_contains($academy,'igac/documento/resolucion-igac-941-2026'),'temas de Renta enlazan soportes reales IGAC, IVS y sectoriales dentro del aplicativo');

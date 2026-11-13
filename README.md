@@ -1,5 +1,9 @@
 # Gestión avaluatoria · SuCasa
 
+Renta usa [cinco etapas con Academia contextual](docs/RENTA-CINCO-ETAPAS.md):
+inmueble y arriendo, investigación, ingresos/gastos, dos métodos y sustentación.
+Una sola navegación, con ficha y muestras conservadas; cálculos pendientes.
+
 Renta: [ficha compartida del arriendo](docs/RENTA-FICHA-ARRIENDO.md) para ambos
 métodos; contratos, canon, fechas e incrementos documentados. Tipologías y ocupación
 por unidad en el capítulo 3, con acceso al catálogo IGAC completo para todos los

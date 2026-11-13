@@ -1,8 +1,9 @@
 <?php
 declare(strict_types=1);
 require dirname(__DIR__).'/bootstrap.php';require __DIR__.'/support.php';
-if (getenv('GA_TEST_HTTP')!=='true' || getenv('GA_TEST_PORT')!=='3378') throw new RuntimeException('Requiere fixture HTTP local y BD desechable3378.');
-$db=\App\Core\Database::connect(['host'=>'127.0.0.1','port'=>'3378','database'=>'ga_test_app','username'=>'root','password'=>'']);
+$testPort=getenv('GA_TEST_PORT');
+if (getenv('GA_TEST_HTTP')!=='true' || !$testPort || !ctype_digit($testPort) || $testPort==='3306') throw new RuntimeException('Requiere fixture HTTP local y GA_TEST_PORT desechable.');
+$db=\App\Core\Database::connect(['host'=>'127.0.0.1','port'=>$testPort,'database'=>'ga_test_app','username'=>'root','password'=>'']);
 $ar=new \App\Models\AppraisalRepository($db);$samples=new \App\Models\AppraisalComparableRepository($db);
 $workflow=new \App\Models\MethodologyWorkflowRepository($db);
 $id=$ar->create(1);$ar->ensureUnits($id,1,1,0);$db->prepare('UPDATE appraisals SET igac_property_units_count=1 WHERE id=?')->execute([$id]);

@@ -14,7 +14,7 @@ $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)(
     </nav>
     <?php require __DIR__.'/methodology-factor-reference.php'; ?>
     <div x-show="configTab==='methods'" data-ph-section>
-    <p class="mt-3 leading-6">Elige la unidad → define su método → continúa con las muestras o insumos.</p>
+    <p class="mt-3 leading-6">Elige la unidad → define su método → continúa con el estudio.</p>
     <?php if ($components===[]): ?><p class="mt-4 rounded-xl border border-dashed p-4">Registra primero las unidades del predio en capítulos 1 y 3. La academia puede consultarse sin asignar un método.</p><?php endif; ?>
     <?php if ($planUnits!==[]): ?>
     <nav class="mt-5 flex gap-2 overflow-x-auto rounded-xl bg-slate-100 p-2" aria-label="Unidades en configuración">
@@ -63,8 +63,8 @@ $planReferenceType=\App\Services\ComparablePortalProfiles::defaultType((string)(
                         $selectionInPlan=true; $selectionSamples=$studyCounts; $selectionHasSamples=($studyCounts[$planMethod] ?? 0)>0;
                         require __DIR__.'/methodology-selection.php';
                     })(); ?>
-                    <div class="mt-4 space-y-2" x-show="activeStudyMethod !== 'renta'" <?= $planMethod==='renta'?'x-cloak':'' ?>>
-                    <?php foreach ([$planPartKey,...array_keys(array_filter($components,static fn($c)=>($c['comparison_key'] ?? '')===$planPartKey))] as $studyKey):
+                    <div class="mt-4 space-y-2">
+                    <?php foreach (array_keys(array_filter($components,static fn($c)=>($c['comparison_key'] ?? '')===$planPartKey)) as $studyKey):
                         $studyMethod=$flow[$studyKey]['method'] ?? ''; if ($studyMethod==='') continue; ?>
                         <?php if ($studyKey!==$planPartKey): ?>
                         <p class="font-semibold"><?= e($planMethods[$studyMethod]) ?> · contraste del mismo alcance</p>

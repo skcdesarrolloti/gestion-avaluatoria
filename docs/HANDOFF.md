@@ -1,5 +1,17 @@
 # Entrega al responsable de la implementación
 
+13/11/2026 · Renta adopta la navegación de trabajo de Mercado en cinco etapas:
+Inmueble y arriendo; Investigación de arriendos; Ingresos y gastos; Valoración
+por los dos métodos; Revisión y sustentación. Academia contextual conserva los
+cuatro temas y sus fuentes, sin duplicar la ficha ni remontar la captura.
+Entrada común «Continuar con el estudio» y enlace de Academia que sigue el
+método seleccionado. Rutas antiguas 4/5 abren las nuevas etapas correspondientes.
+Etapas 3–5 son preparación y ayudas; no se ejecutan cálculos ni adoptan tasas.
+PHP1700/JS293/HTTP18+14+14, lint/build/check:size81.920 bytes. Navegador local
+con PHP/BD desechables: guardado y recarga, desconexión/reintento, conservación
+del pegado, rutas anteriores, Academia al cambiar método y móvil390 sin errores.
+Sin DDL ni cambios de persistencia. Ver RENTA-CINCO-ETAPAS.md.
+
 13/11/2026 · Navegación bloqueada por guardado pendiente: ahora muestra al inicio
 el capítulo solicitado, la causa y el reintento; una sesión vencida permite abrir
 login en otra pestaña sin desmontar el borrador. Autoguardado renueva un CSRF

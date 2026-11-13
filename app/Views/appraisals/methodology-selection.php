@@ -7,7 +7,7 @@ $selectionTreatments=\App\Services\MethodologySelectionHelp::treatments();
 $selectionRoutes=[];
 $selectionAcademyRoutes=[];
 foreach ($methods as $selectionMethod=>$selectionLabel) $selectionAcademyRoutes[$selectionMethod]=$flowUrl('1',$selectionMethod,$componentKey);
-$selectionAcademyBinding="academyRoutes.renta + '#renta-orientacion'";
+$selectionAcademyBinding="academyRoutes[chosenMethod] || null";
 if (!empty($selectionInPlan)) $selectionAcademyBinding='!planNeedsRefresh ? ('.$selectionAcademyBinding.') : null';
 if (!empty($selectionInPlan)) foreach ($methods as $selectionMethod=>$selectionLabel) $selectionRoutes[$selectionMethod]=$flowUrl($selectionMethod==='mercado' && (($selectionSamples['mercado'] ?? null)!==null?$selectionSamples['mercado']>0:!empty($selectionHasSamples))?'4':'3',$selectionMethod,$componentKey);
 ?>
@@ -76,14 +76,14 @@ if (!empty($selectionInPlan)) foreach ($methods as $selectionMethod=>$selectionL
     <?php require __DIR__.'/methodology-cost-scope.php'; ?>
     </details>
     <p class="mt-3 text-sm" data-autosave-status>Autoguardado activo · máximo 2000 caracteres por explicación.</p>
-    <div class="mt-4 rounded-xl border border-teal-200 bg-teal-50 p-4" x-show="chosenMethod === 'renta'" <?= ($selected['method'] ?? '')==='renta'?'':'x-cloak' ?>>
-        <p class="font-semibold">Tu recorrido es Renta</p>
-        <p class="mt-2 text-sm">Primero consulta Academia de Renta: allí están los cuatro temas conceptuales y sus soportes IGAC, IVS y NTS/GTS. Después pasa a sus Insumos.</p>
-        <a class="btn-primary mt-3" href="<?= e($selectionAcademyRoutes['renta'].'#renta-orientacion') ?>" :href="<?= e($selectionAcademyBinding) ?>" <?php if (!empty($selectionInPlan)): ?>:aria-disabled="planNeedsRefresh" @click="if(planNeedsRefresh)$event.preventDefault()"<?php endif; ?>>1. Abrir Academia de Renta y sus normas</a>
-    </div>
+    <details class="mt-4" x-show="chosenMethod" <?= empty($selected['method'])?'x-cloak':'' ?>>
+        <summary class="min-h-11 cursor-pointer font-semibold">Academia del método elegido</summary>
+        <p class="mt-2 text-sm">Las ayudas están junto a las tareas del estudio. También puedes consultar aquí la Academia completa.</p>
+        <a class="btn-secondary mt-3" <?= isset($selectionAcademyRoutes[$selected['method'] ?? ''])?'href="'.e($selectionAcademyRoutes[$selected['method']]).'"':'' ?> :href="<?= e($selectionAcademyBinding) ?>" <?php if (!empty($selectionInPlan)): ?>:aria-disabled="planNeedsRefresh" @click="if(planNeedsRefresh)$event.preventDefault()"<?php endif; ?> x-text="'Consultar Academia · '+(<?= e(json_encode($methods,JSON_UNESCAPED_UNICODE)) ?>[chosenMethod] || '')">Consultar Academia · <?= e($methods[$selected['method'] ?? ''] ?? '') ?></a>
+    </details>
     <button type="submit" class="<?= !empty($selectionInPlan)?'btn-secondary':'btn-primary' ?> mt-4">Guardar ahora</button>
     <?php if (!empty($selectionInPlan)): ?>
-    <a class="btn-primary mt-4" <?= isset($selectionRoutes[$selected['method'] ?? ''])?'href="'.e($selectionRoutes[$selected['method']]).'"':'aria-disabled="true"' ?> :href="!planNeedsRefresh?nextRoutes[chosenMethod] || null:null" :aria-disabled="!nextRoutes[chosenMethod]||planNeedsRefresh" :tabindex="nextRoutes[chosenMethod]&&!planNeedsRefresh?0:-1" @click="if(!nextRoutes[chosenMethod]||planNeedsRefresh)$event.preventDefault()" x-text="chosenMethod==='mercado'?'Continuar con las muestras':'Continuar con los insumos'">Continuar con las muestras o insumos</a>
+    <a class="btn-primary mt-4" <?= isset($selectionRoutes[$selected['method'] ?? ''])?'href="'.e($selectionRoutes[$selected['method']]).'"':'aria-disabled="true"' ?> :href="!planNeedsRefresh?nextRoutes[chosenMethod] || null:null" :aria-disabled="!nextRoutes[chosenMethod]||planNeedsRefresh" :tabindex="nextRoutes[chosenMethod]&&!planNeedsRefresh?0:-1" @click="if(!nextRoutes[chosenMethod]||planNeedsRefresh)$event.preventDefault()">Continuar con el estudio</a>
     <p class="mt-2 text-sm" x-show="!chosenMethod">Selecciona el método para continuar.</p>
     <p class="mt-2 text-sm" x-show="planNeedsRefresh">Cambiaste las partes del estudio. Pulsa Actualizar plan antes de continuar.</p>
     <?php else: ?>

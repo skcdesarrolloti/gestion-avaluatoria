@@ -46,5 +46,17 @@ declare(strict_types=1);
         preg_match('/data-income-state="([^"]+)"/',$invalidPortalHtml,$invalidState);
         $fallbackPortal=json_decode(html_entity_decode($invalidState[1],ENT_QUOTES,'UTF-8'),true);
         expect($fallbackPortal['incomePortal']==='FincaRaiz','portal inválido usa una fuente configurada, sin aceptar parámetros arbitrarios');
+        foreach (['concept','search','capture','evidence','valuation','review'] as $testIncomeStep) {
+            $_GET=['renta_paso'=>$testIncomeStep];
+            ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-income-inputs.php';$page=ob_get_clean();
+            preg_match('/data-income-state="([^"]+)"/',$page,$stateMatch);
+            $state=json_decode(html_entity_decode($stateMatch[1],ENT_QUOTES,'UTF-8'),true);
+            expect($state['incomeTab']===$testIncomeStep && count($state['incomeSteps'])===5,'recarga restaura etapa de Renta sin crear otro recorrido: '.$testIncomeStep);
+            expect(substr_count($page,'id="lease-form"')===1 && substr_count($page,'id="renta-tema-')===4
+                && str_contains($page,'Ayuda / Academia de esta etapa'),'cinco etapas comparten ficha y cuatro temas únicos: '.$testIncomeStep);
+        }
+        expect(\App\Services\IncomeStudyNavigation::initial([],'4')==='valuation'
+            && \App\Services\IncomeStudyNavigation::initial([],'5')==='review','rutas anteriores de análisis y entregable abren sus etapas nuevas');
+        expect(\App\Services\IncomeStudyNavigation::initial(['renta_paso'=>['capture']],'3')==='concept','etapa inválida mantiene consulta ligera');
     } finally { $_GET=$previousGet; }
 })();
