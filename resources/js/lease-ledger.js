@@ -56,7 +56,8 @@ export function leaseSeries(lease,year,cutoff='') {
             totalReceived:rounded(sumKnown([received,ledgerNumber(row.admin_received),ledgerNumber(row.vat_paid)])),
             rentReceived:received,ownerCost:rounded(ownerCost),net:rounded(received!==null && ownerCost!==null?received-ownerCost:null),occupied,days,
             changes:adjustments.filter(a=>a.date?.startsWith(key)).map(a=>a.date+': '+(a.amount?ledgerMoney(ledgerNumber(a.amount))+' COP':a.rate+' %')).join('; '),
-            future:cut!==null && Date.UTC(year,m-1,1)>cut,review:row.review || '',occupancy:row.occupancy || 'unknown'});
+            future:cut!==null && Date.UTC(year,m-1,1)>cut,closed:cut===null || Date.UTC(year,m,0)<=cut,
+            review:row.review || '',occupancy:row.occupancy || 'unknown'});
     }
     return rows;
 }

@@ -11,9 +11,9 @@ export function leaseLedgerForm() {
         },
         get ledgerMax() { return Math.max(1,...this.ledgerRows.flatMap(r=>[r.contract || 0,r.rentReceived || 0])); },
         get ledgerSummary() {
-            const rows=this.ledgerRows.filter(r=>!r.future),known=rows.filter(r=>r.occupied!==null);
+            const rows=this.ledgerRows.filter(r=>r.closed),known=rows.filter(r=>r.occupied!==null);
             const days=known.reduce((s,r)=>s+r.days,0),vacant=known.reduce((s,r)=>s+r.days-r.occupied,0);
-            return `${known.length}/${rows.length} meses con ocupación documentada. ${days?((vacant/days)*100).toFixed(2)+' % de días vacantes sobre esos '+days+' días':'Vacancia pendiente por falta de evidencia'}.`;
+            return `${known.length}/${rows.length} meses cerrados al corte con ocupación documentada. ${days?((vacant/days)*100).toFixed(2)+' % de días vacantes sobre esos '+days+' días':'Vacancia pendiente por falta de evidencia'}.`;
         },
         addAdjustment() {
             if(Object.keys(this.values.rent_adjustments).length>=600) return;

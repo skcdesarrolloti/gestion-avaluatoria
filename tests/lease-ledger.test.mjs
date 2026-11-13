@@ -13,6 +13,8 @@ test('historia: cambio a mitad de mes, gracia expresa, bisiesto y corte del aval
     const s={...base(),history_rule:'schedule',start_date:'2024-02-15',rent_adjustments:{a:{date:'2024-02-20',amount:'0',source:'Gracia'}}};
     assert.equal(leaseSeries(s,2024,'2024-02-29')[1].contract,172.41);
     assert.equal(leaseSeries(s,2024,'2024-02-29')[2].contract,null);
+    assert.equal(leaseSeries(s,2024,'2024-02-20')[1].closed,false);
+    assert.equal(leaseSeries(s,2024,'2024-02-29')[1].closed,true);
     const a={...base(),first_adjustment_date:'2024-02-29',rent_adjustments:{a:{date:'2024-02-29',rate:'10',source:'Índice'},b:{date:'2025-02-28',rate:'10',source:'Índice'}}};
     assert.equal(leaseSeries(a,2025)[2].contract,1210);
 });

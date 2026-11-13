@@ -23,7 +23,7 @@ $historyFields=\App\Services\LeaseMonthlyHistory::fields();$historyUrl=$leaseUrl
             $month=sprintf('%04d-%02d',$leaseYear,$index+1);$monthlyValues=$leaseValues['monthly_history'][$month];$monthlyModel="values.monthly_history['".$month."']";
         ?>
         <tr @input="<?= e($monthlyModel) ?>.review='pending'">
-            <th scope="row" class="border p-3 text-left"><?= e($monthName) ?><span class="block text-xs text-amber-800" x-show="ledgerRows[<?= $index ?>].future">Posterior al corte</span></th>
+            <th scope="row" class="border p-3 text-left"><?= e($monthName) ?><span class="block text-xs text-amber-800" x-show="!ledgerRows[<?= $index ?>].closed" x-text="ledgerRows[<?= $index ?>].future?'Posterior al corte':'Mes del corte · parcial'"></span></th>
             <td class="border p-2" style="min-width:190px"><?php $monthlyField='occupancy';require __DIR__.'/lease-ledger-cell.php'; ?></td>
             <td class="border p-3" style="min-width:170px"><strong x-text="money(ledgerRows[<?= $index ?>].contract)">Pendiente</strong><span class="block text-xs" x-text="ledgerRows[<?= $index ?>].changes"></span></td>
             <?php foreach (['rent_billed','admin_billed','vat_billed'] as $monthlyField): ?><td class="border p-2" style="min-width:175px"><?php require __DIR__.'/lease-ledger-cell.php'; ?><?php if ($monthlyField==='vat_billed'): ?><span class="text-xs" x-show="ledgerRows[<?= $index ?>].vatEstimated">Estimado con tarifa documentada: <span x-text="money(ledgerRows[<?= $index ?>].vat)"></span></span><?php endif; ?></td><?php endforeach; ?>
