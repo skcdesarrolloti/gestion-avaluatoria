@@ -110,20 +110,21 @@ async function save(form) {
         if (response.status === 409) state.conflict = true;
         form.dispatchEvent?.(new CustomEvent('ga:validation', { detail: result.errors ?? {} }));
         if (!response.ok || result.ok !== true) throw new Error(result.message || 'No se pudo confirmar el guardado.');
-        if (!Number.isInteger(result.version)) throw new Error('El servidor no confirmó la versión. Conserva esta página y pulsa Guardar para reintentar.');
+        if (!Number.isInteger(result.version)) throw new Error('Versión sin confirmar. Conserva la página y reintenta Guardar.');
         phase='confirmed';
         updateVersion(form, result);
         acknowledgeCompositionMethods(form, result);
         if (typeof result.object_text === 'string') form.querySelectorAll('[data-object-preview]').forEach(node => { node.textContent = result.object_text; });
         updateDossierNumber(form, result);
         publishDerivedChange(form, result);
+        form.dispatchEvent?.(new CustomEvent('ga:saved', { detail: result }));
         state.lastSaveSucceeded = true;
         state.dirty = state.revision !== revision;
         const time = result.saved_at ? new Date(result.saved_at).toLocaleTimeString('es-CO') : new Date().toLocaleTimeString('es-CO');
         setStatus(form, state.dirty ? 'Cambios pendientes' : 'Autoguardado confirmado: ' + time, state.dirty ? 'pending' : 'saved');
     } catch (error) {
         if (error.name !== 'AbortError') setStatus(form, phase==='confirmed'
-            ? 'El servidor confirmó el guardado, pero falló la actualización de la pantalla. Conserva esta página mientras se revisa el aviso.'
+            ? 'El servidor confirmó el guardado; falló la actualización de pantalla.'
             : 'Pendiente de guardar: ' + (error instanceof TypeError ? phase==='network'
                 ? 'no se pudo conectar con el servidor. No cierres ni recargues; pulsa Guardar para reintentar.'
                 : 'no se pudo preparar o procesar el guardado. Los cambios siguen en esta página; pulsa Guardar para reintentar.' : error.message), 'error');

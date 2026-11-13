@@ -1,5 +1,18 @@
 # Entrega al responsable de la implementación
 
+13/11/2026 · Renta: etapa 3 divide Historial y contrato / Proyección futura /
+Costos con soporte. Serie mensual desde inicio con cambios documentados,
+ocupación y recaudo separados, PH/IVA/totales y gráfico anual. Costos en tabla,
+porcentajes históricos ponderados o referencias externas, adopción explícita.
+Ayudas emergentes por artículo 941; fecha, inmueble y ocupación editables en sus
+originales sin salir. Conserva ambos métodos, Academia, muestras y exclusiones.
+Sin DDL. PHP1765/JS306/BD322/HTTP39, lint/build/tamaño correctos. BD desechable
+3389 y servidor8093; UI escritorio/móvil CSS390, autoguardado/recarga, incrementos,
+origen, sugerencia, ayuda/Escape y recálculo de ambos métodos comprobados.
+Detalles y límites en RENTA-HISTORIAL-COSTOS-TABLAS.md. No presupone porcentajes
+universales ni IPC; datos ausentes siguen pendientes. No se editaron datos reales
+durante las pruebas. Publicación y verificación final se registran al completarse.
+
 13/11/2026 · Renta incorpora ingresos/costos y proyección mensual, alternativas de
 tasa (mercado, referencia+prima, CAPM del activo, ponderación antes de renta, manual
 y perpetuidad), selección sustentada y cálculo explícito de directa/FCD. Cinco etapas,

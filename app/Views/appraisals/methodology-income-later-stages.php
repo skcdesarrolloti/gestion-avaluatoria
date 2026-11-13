@@ -14,7 +14,7 @@ if (is_string($ivOld['old']['payload'] ?? null)) {
 }
 $ivEndpoint=url($basePath.'/renta/valoracion');$ivIssues=$ivOld['errors'] ?? [];
 ?>
-<div x-data="valuation" data-income-valuation data-valuation-state="<?= e(json_encode(['state'=>$ivState,'issues'=>(object)$ivIssues],JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE)) ?>">
+<div x-data="valuation" @ga:income-context.window="contextSaved($event.detail)" data-income-valuation data-valuation-state="<?= e(json_encode(['state'=>$ivState,'issues'=>(object)$ivIssues,'context'=>$ivContext,'costCatalog'=>\App\Services\IncomeCostCatalog::all()],JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE)) ?>">
 <form id="income-valuation" x-ref="valuationForm" method="post" action="<?= e($ivEndpoint) ?>" data-workflow-version
     data-module-autosave data-save-in-place data-autosave-endpoint="<?= e($ivEndpoint) ?>" @ga:validation="validation($event.detail)" @input="stale=true" @change="stale=true">
     <?= csrf_field() ?><input type="hidden" name="component" value="<?= e($componentKey) ?>"><input type="hidden" name="study_scope" value="renta:arriendo">
@@ -38,7 +38,7 @@ $ivEndpoint=url($basePath.'/renta/valoracion');$ivIssues=$ivOld['errors'] ?? [];
         <button class="btn-primary mt-4" type="button" @click="calculate()" :disabled="busy" x-text="busy?'Calculando y guardando…':'Comparar tasas y calcular los dos métodos'">Comparar tasas y calcular los dos métodos</button>
         <noscript><button class="btn-primary mt-4" type="submit" name="operation" value="calculate">Calcular y guardar</button></noscript>
     </section>
-    <div class="mt-4 flex flex-wrap items-center gap-3" x-show="incomeTab==='evidence' || incomeTab==='valuation'" <?= in_array($incomeInitial,['evidence','valuation'],true)?'':'x-cloak' ?>>
+    <div class="mt-4 flex flex-wrap items-center gap-3" x-show="(incomeTab==='evidence' && incomePane!=='history') || incomeTab==='valuation'" <?= $incomeInitial==='valuation'?'':'x-cloak' ?>>
         <button type="submit" class="btn-secondary">Guardar borrador ahora</button><p class="text-sm" role="status" data-autosave-status>Los cambios se guardan como borrador; calcular es una acción separada.</p>
     </div>
     </fieldset>

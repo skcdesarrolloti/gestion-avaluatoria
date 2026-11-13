@@ -18,8 +18,15 @@ final class LeaseAction
         $version=filter_var($_POST['version'] ?? null,FILTER_VALIDATE_INT);
         if ($version===false || $version===null || $version<0) throw new HttpException(422,'Versión inválida.');
         $redirect='avaluos/'.$id.'/metodologia-valuatoria?method=renta&stage=3&component='.rawurlencode($key)
-            .'&lease='.rawurlencode($leaseId).'&lease_year='.LeaseMonthlyHistory::year($_POST['lease_year'] ?? null,[]).'#renta-concepto';
+            .'&lease='.rawurlencode($leaseId).'&lease_year='.LeaseMonthlyHistory::year($_POST['lease_year'] ?? null,[])
+            .'&renta_paso='.(($_POST['return_step'] ?? '')==='evidence'?'evidence':'concept').'#historial-arriendo';
         try {
+            if (!$antecedent && isset($_POST['lease_payload'])) {
+                if (!is_string($_POST['lease_payload']) || strlen($_POST['lease_payload'])>1500000) throw new HttpException(422,'Ficha demasiado extensa.');
+                $payload=json_decode($_POST['lease_payload'],true);
+                if (!is_array($payload)) throw new HttpException(422,'No se pudo leer el borrador del arriendo.');
+                $_POST['lease']=$payload;
+            }
             if (!$antecedent) {
                 $linked=$_POST['lease_units'] ?? [];
                 if (!is_array($linked) || !in_array($components[$key]['unit']['id'],$linked,true))
@@ -40,12 +47,17 @@ final class LeaseAction
                         if (is_string($row[$field] ?? null)) $values['monthly_history'][$month][$field]=mb_substr($row[$field],0,1600);
                 }
             }
+            if (!$antecedent && is_array($posted['rent_adjustments'] ?? null)) $values['rent_adjustments']=$posted['rent_adjustments'];
             Session::flash('lease_'.$id,json_encode(['lease_id'=>$leaseId,'antecedent'=>$antecedent,'values'=>$values,
                 'units'=>is_array($_POST['lease_units'] ?? null)?array_filter($_POST['lease_units'],'is_string'):[],
                 'version'=>$version,'errors'=>$error->errors,'message'=>$error->getMessage()],JSON_THROW_ON_ERROR));
             Http::redirect($redirect);
         }
-        if (Http::wantsJson()) Http::json(['ok'=>true,'version'=>$next,'saved_at'=>gmdate('c')]);
+        if (Http::wantsJson()) {
+            $record=$repo->find($id,$owner);
+            Http::json(['ok'=>true,'version'=>$next,'saved_at'=>gmdate('c'),
+                'income_context'=>IncomeValuationContext::build($record,$components[$key])]);
+        }
         Http::redirect($redirect);
     }
 }

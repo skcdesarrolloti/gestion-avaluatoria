@@ -34,7 +34,8 @@ test('field validation keeps draft/version and clears errors only after server c
         globalThis.fetch = async () => ({ ok: true, status: 200, json: async () => ({ ok: true, version: 8 }) });
         await flushModuleForm(form);
         assert.equal(form.version.value, '8');
-        assert.deepEqual(events.at(-1).detail, {});
+        assert.deepEqual(events.filter(e=>e.type==='ga:validation').at(-1).detail, {});
+        assert.equal(events.filter(e=>e.type==='ga:saved').at(-1).detail.version,8);
         assert.match(form.status.textContent, /confirmado/);
     } finally { cleanup(); }
 });

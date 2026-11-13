@@ -3,8 +3,7 @@ declare(strict_types=1);
 
 // method, path expression, controller, action, requires authentication
 return [
-    ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/renta/valoracion$#', 'incomeValuation', 'save', true],
-    ['GET', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/renta/memoria$#', 'incomeValuation', 'export', true],
+    ...require __DIR__.'/income.php',
     ['POST', '#^/maestros/accesos$#', 'analystAccess', 'create', true],
     ['POST', '#^/maestros/accesos/([a-f0-9]{32})/desactivar$#', 'analystAccess', 'revoke', true],
     ['GET', '#^/acceso/clave$#', 'analystAccess', 'password', true],

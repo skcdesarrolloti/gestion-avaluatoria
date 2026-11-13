@@ -1,5 +1,9 @@
 # Renta: preparación del arriendo e historial de pagos
 
+Evolución posterior autorizada: [historial mensual y costos en tablas](RENTA-HISTORIAL-COSTOS-TABLAS.md)
+incorpora reconstrucción documentada, totales y gráficos separados de proyección.
+Lo siguiente describe la entrega inicial de captura, conservada como antecedente.
+
 13/11/2026. Autorización: completar la primera etapa y preparar un historial
 mensual de arriendo y administración. El usuario confirmó expresamente
 «Dejar primero la captura, sin cálculos». No se generan cánones por IPC, series

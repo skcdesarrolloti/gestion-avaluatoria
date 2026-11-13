@@ -13,6 +13,19 @@ export function incomeInputs() {
         incomePortals:[], incomeSources:[], incomePortalBusy:false, incomePortalError:'',
         incomeSteps:{concept:'1. Inmueble y arriendo',research:'2. Investigación de arriendos',evidence:'3. Ingresos y gastos',valuation:'4. Valoración por los dos métodos',review:'5. Revisión y sustentación'},
         incomeResearchTab:'search',incomeNavigating:false,incomeNavigationError:'',
+        incomePane:'history',
+        async editIncomeOrigin() {
+            if(window.gaFlushAutosaves && !await window.gaFlushAutosaves()) {this.incomeNavigationError='Confirma los cambios antes de editar el origen.';return;}
+            const panel=root.querySelector('#renta-origen');panel.open=true;panel.scrollIntoView({block:'start'});
+        },
+        originSaved(result,form) {
+            if(result.occupation_version!==undefined) form.querySelector('[name="occupation_version"]').value=String(result.occupation_version);
+            if(result.income_context) window.dispatchEvent(new CustomEvent('ga:income-context',{detail:result.income_context}));
+        },
+        async openIncomePane(pane) {
+            if(window.gaFlushAutosaves && !await window.gaFlushAutosaves()) {this.incomeNavigationError='Confirma los cambios antes de cambiar de tabla.';return;}
+            this.incomePane=pane;
+        },
         get incomeStage() { return ['search','capture','analysis'].includes(this.incomeTab)?'research':this.incomeTab; },
         get incomeStepIndex() { return Object.keys(this.incomeSteps).indexOf(this.incomeStage); },
         get incomePortalIndex() { return this.incomePortals.indexOf(this.canonicalPortal(this.incomePortal)); },

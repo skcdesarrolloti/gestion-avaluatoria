@@ -9,9 +9,9 @@ $antecedentLinked=array_filter($leaseRegister,static fn($item)=>($item['economic
     <p class="text-sm"><?= $antecedentLinked?'Relacionado con: '.e(\App\Services\LeaseRegister::title(reset($antecedentLinked))):'Aún no relacionado con un contrato. Verifica a qué unidades corresponde antes de utilizarlo.' ?></p>
     <p class="mt-2 text-sm">Este es el dato registrado anteriormente en el capítulo 1. Aquí se corrige el mismo registro. El capítulo 1 lo consulta; no se suma a los contratos.</p>
     <form class="mt-4 space-y-4" id="lease-antecedent" method="post" action="<?= e(url($basePath.'/renta/antecedente')) ?>"
-        data-module-autosave data-save-in-place data-autosave-endpoint="<?= e(url($basePath.'/renta/antecedente')) ?>"
+        data-module-autosave data-save-in-place data-income-origin-version data-autosave-endpoint="<?= e(url($basePath.'/renta/antecedente')) ?>"
         data-lease-form="<?= e(json_encode(['values'=>$leaseValues,'issues'=>(object)$leaseErrors],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>"
-        x-data="leaseForm()" @ga:validation="validation($event.detail)">
+        x-data="leaseForm()" @ga:validation="validation($event.detail)" @ga:saved="saved($event.detail)">
         <?= csrf_field() ?><input type="hidden" name="component" value="<?= e($componentKey) ?>"><input type="hidden" name="lease_id" value="<?= e($leaseId) ?>">
         <input type="hidden" name="version" value="<?= (int)($antecedentOld['version'] ?? $record['version']) ?>">
         <?php if ($antecedentOld): ?><p role="alert" class="rounded-lg bg-amber-50 p-3"><?= e($antecedentOld['message']) ?></p><?php endif; ?>

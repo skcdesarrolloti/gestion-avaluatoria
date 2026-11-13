@@ -18,6 +18,9 @@ final class LeasePreparationFields
                 ['same'=>'Sí, corresponde al espacio identificado','different'=>'Incluye otros espacios o solo una parte','pending'=>'Por verificar']),
             'analysis_area_notes'=>$f('Soporte del área y tratamiento de los espacios incluidos','textarea','Ej. El canon incluye garaje; falta documentar su tratamiento. Si el área es parcial, identificarla y respaldarla en el capítulo 3.'),
             'monthly_history'=>['type'=>'history'],
+            'rent_adjustments'=>['type'=>'adjustments'],
+            'history_rule'=>$f('Reconstrucción de incrementos','select','Selecciona solo lo documentado. Cada incremento aplicado necesita fecha, porcentaje o nuevo canon y fuente.',
+                ['annual'=>'Anual: verificar cada aniversario desde el primer incremento','schedule'=>'Según modificaciones documentadas, sin periodicidad fija','constant'=>'Canon constante, sin incrementos según soporte']),
         ];
     }
 }

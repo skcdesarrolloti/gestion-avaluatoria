@@ -22,6 +22,19 @@ $incomeInitialPortal=is_string($_GET['renta_portal'] ?? null) && in_array($_GET[
     <div id="renta-panel-search" x-show="incomeTab==='search'" <?= $incomeInitial==='search'?'':'x-cloak' ?>>
         <?php require __DIR__.'/methodology-income-search.php'; ?>
     </div>
+    <section class="mb-4 rounded-2xl border bg-white p-5" x-show="incomeTab==='evidence'" <?= $incomeInitial==='evidence'?'':'x-cloak' ?>>
+        <h2 class="text-2xl font-semibold">3. Ingresos y gastos</h2>
+        <p class="mt-2">Un historial documentado y supuestos compartidos por capitalización directa y FCD.</p>
+        <nav class="mt-4 flex flex-wrap gap-3" aria-label="Historial, proyección y costos">
+            <?php foreach (['history'=>'Historial y contrato','projection'=>'Proyección futura','costs'=>'Costos con soporte'] as $pane=>$label): ?>
+            <button type="button" class="btn-secondary" :aria-current="incomePane==='<?= $pane ?>'?'page':null" @click="openIncomePane('<?= $pane ?>')"><?= e($label) ?></button>
+            <?php endforeach; ?>
+        </nav>
+    </section>
+    <?php require __DIR__.'/income-origin-editor.php'; ?>
+    <section class="mb-5 min-w-0 rounded-2xl border bg-white p-5" x-show="incomeTab==='concept' || (incomeTab==='evidence' && incomePane==='history')" <?= in_array($incomeInitial,['concept','evidence'],true)?'':'x-cloak' ?>>
+        <?php require __DIR__.'/lease-form.php'; ?>
+    </section>
     <div id="renta-panel-capture" x-show="incomeTab==='capture'" <?= $incomeInitial==='capture'?'':'x-cloak' ?>>
         <div class="mb-4 rounded-xl border bg-white p-4" x-show="!incomeLoaded" :aria-busy="incomeLoading">
             <p role="status" aria-live="polite" x-text="incomeLoading?'Cargando las muestras de esta unidad…':'Las muestras se cargan al abrir esta pestaña.'">Las muestras se cargan al abrir esta pestaña.</p>

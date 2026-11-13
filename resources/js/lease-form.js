@@ -1,5 +1,6 @@
+import { leaseLedgerForm } from './lease-ledger-form.js';
 export function leaseForm() {
-    return {
+    return Object.defineProperties({
         values:{},issues:{},occupancy:'',areaAvailable:[],antecedentAvailable:false,
         get pendingItems() {
             const v=this.values,items=[];
@@ -11,7 +12,7 @@ export function leaseForm() {
                 if(v.economic_source==='assignment'?!this.antecedentAvailable:(!v.rent_amount || !v.rent_period)) items.push('Documentar el canon vigente y su periodicidad en su origen.');
                 if(!v.start_date || !v.end_date) items.push('Documentar inicio y terminación, o explicar su condición pendiente.');
                 if(!v.adjustment_rule) items.push('Documentar la regla de incremento o su no aplicación.');
-                if(!v.initial_rent_amount || !v.initial_rent_period) items.push('Para la futura serie: documentar canon inicial y periodicidad.');
+                if(!v.initial_rent_amount || !v.initial_rent_period) items.push('Para reconstruir la serie: documentar canon inicial y periodicidad.');
             }
             if(!v.support) items.push('Identificar los soportes revisados y su fecha.');
             if(Object.values(v.monthly_history || {}).some(row=>Object.values(row).some(value=>value!=='') && row.review!=='verified')) items.push('Hay meses registrados pendientes de validación manual.');
@@ -19,6 +20,7 @@ export function leaseForm() {
         },
         init() {
             Object.assign(this,JSON.parse(this.$el.dataset.leaseForm));
+            this.values.rent_adjustments={...(this.values.rent_adjustments || {})};
         },
         validation(errors) {
             this.issues=errors || {};
@@ -33,5 +35,5 @@ export function leaseForm() {
                     if(parent.tagName==='DETAILS') parent.open=true;
             });
         },
-    };
+    },Object.getOwnPropertyDescriptors(leaseLedgerForm()));
 }

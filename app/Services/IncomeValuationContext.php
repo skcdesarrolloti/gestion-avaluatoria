@@ -15,8 +15,9 @@ final class IncomeValuationContext
                 'start'=>$lease['start_date'] ?? '', 'end'=>$lease['end_date'] ?? '', 'status'=>$lease['status'] ?? '',
                 'scope'=>$lease['scope'] ?? '', 'support'=>$lease['support'] ?? '', 'increase'=>$lease['adjustment_rule'] ?? '', 'effective_date'=>$lease['effective_date'] ?? '',
                 'history'=>$lease['monthly_history'] ?? [],'unit_ids'=>$lease['unit_ids'] ?? []];
+            $out[$id]['ledger']=$lease;
         }
-        return ['unit'=>$unit['id'] ?? '', 'label'=>$component['label'] ?? '', 'leases'=>$out,'value_date'=>(string)($record['value_date'] ?? ''),
+        return ['record'=>$record['id'] ?? '', 'origin_version'=>(int)($record['version'] ?? 0), 'unit'=>$unit['id'] ?? '', 'type'=>$unit['property_type'] ?? '', 'label'=>$component['label'] ?? '', 'leases'=>$out,'value_date'=>(string)($record['value_date'] ?? ''),
             'hash'=>self::hash([$unit,$leases,(string)($record['value_date'] ?? ''),array_intersect_key($record,array_flip(LeaseFields::ECONOMIC))])];
     }
     public static function rent(array $p,array $context): array

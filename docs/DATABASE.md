@@ -1,5 +1,13 @@
 # Crear y evolucionar la base sin SQL manual
 
+13/11/2026 · Tablas de historial/costos de Renta: sin DDL. monthly_history agrega
+ocupación, facturado, IVA y costos; rent_adjustments registra cambios fechados.
+Combinación parcial preserva datos anteriores. Referencias porcentuales separadas
+del costo adoptado en income_valuation. IncomeOriginRepository edita originales
+de fecha/unidad/ocupación con transacción, propietario y doble CAS. Respuestas
+confirmadas sincronizan contexto; no modifican muestras ni exclusiones.
+Detalle y validación: RENTA-HISTORIAL-COSTOS-TABLAS.md.
+
 13/11/2026 · Flujos y tasas de Renta: sin DDL. `income_valuation` en
 `methodology_workflow`, por componente y estudio, con entradas y último snapshot.
 Transacción, propietario, CSRF, token Renta, CAS y huella del contrato/inmueble/fecha.

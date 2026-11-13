@@ -19,7 +19,7 @@ $leaseLegacy=LeaseRegister::legacy($record,$leaseUnitId);
         <p class="mt-1 text-sm">Antecedente general del capítulo 3: <?= e(\App\Support\AppraisalSubjectCatalog::selects()['current_occupation'][1][$subject['current_occupation']] ?? $subject['current_occupation']) ?>. Falta precisar a cuáles unidades corresponde.</p>
         <?php endif; ?>
         <?php if (!empty($leaseOccupation['source'])): ?><p class="mt-1 text-sm"><?= e($leaseOccupation['source']) ?> · <?= e($leaseOccupation['date'] ?? '') ?></p><?php endif; ?>
-        <a class="inline-flex min-h-11 items-center font-semibold text-blue-800 underline" href="<?= e(url($incomeSubject['source_url'].'&section=tipologias#ocupacion-'.$leaseUnitId)) ?>">Consultar o completar inmueble y ocupación en el capítulo 3</a>
+        <button class="btn-secondary mt-3" type="button" @click="editIncomeOrigin()">Corregir inmueble y ocupación aquí</button>
         <details><summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Consultar áreas, descripción y referencias del inmueble</summary>
             <?php $incomeOriginRows=$incomeSubject['rows']; require __DIR__.'/methodology-income-origin-rows.php'; ?>
             <p class="mt-2 text-sm">El piso de ubicación, la altura del edificio, los acabados y la PH se completan en el capítulo 3. Las áreas no se convierten automáticamente en área arrendable.</p>
@@ -33,7 +33,6 @@ $leaseLegacy=LeaseRegister::legacy($record,$leaseUnitId);
         </details>
     </div>
     <a class="mt-2 inline-flex min-h-11 items-center font-semibold text-blue-800 underline" href="<?= e($flowUrl('1')) ?>#renta-orientacion">Consultar ayudas y soportes en Academia de Renta</a>
-    <?php require __DIR__.'/lease-form.php'; ?>
     <?php require __DIR__.'/lease-legacy.php'; ?>
     <?php require __DIR__.'/lease-legacy-recovery.php'; ?>
 </section>

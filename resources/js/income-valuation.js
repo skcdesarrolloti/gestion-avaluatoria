@@ -1,7 +1,8 @@
 import { postAutosave } from './autosave-session.js';
+import { incomeCostTable } from './income-cost-table.js';
 
 export function incomeValuation() {
-    return {
+    return Object.defineProperties({
         state:{projection:{},costs:[],events:[],rates:[],adoption:{}},issues:{},busy:false,stale:false,message:'',
         init() { Object.assign(this,JSON.parse(this.$el.dataset.valuationState)); },
         validation(errors) {
@@ -55,5 +56,5 @@ export function incomeValuation() {
                 window.Alpine.mutateDom(()=>{window.Alpine.destroyTree(old);old.replaceWith(fresh);window.Alpine.initTree(fresh);});
             } finally {clearTimeout(timer);}
         },
-    };
+    },Object.getOwnPropertyDescriptors(incomeCostTable()));
 }

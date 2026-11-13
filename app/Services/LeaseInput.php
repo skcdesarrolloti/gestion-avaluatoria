@@ -15,6 +15,7 @@ final class LeaseInput
                 throw new HttpException(422,'La ficha contiene campos no admitidos.');
             $field=$definitions[$key]; $error='';
             if ($field['type']==='history') { $out[$key]=LeaseMonthlyHistory::input($value); continue; }
+            if ($field['type']==='adjustments') { $out[$key]=LeaseAdjustments::input($value); continue; }
             if (!is_string($value)) $error='Revisa el formato del dato.';
             else {
                 $value=trim($value);

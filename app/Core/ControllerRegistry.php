@@ -10,6 +10,7 @@ final class ControllerRegistry
     public static function make(string $controller,?\PDO $db,?array $user,AuthService $auth): object
     {
             return match ($controller) {
+                'incomeOrigin'=>new \App\Controllers\IncomeOriginController(new \App\Models\IncomeOriginRepository($db),$user),
                 'incomeValuation'=>new \App\Controllers\IncomeValuationController(new AppraisalRepository($db,$user),new \App\Models\IncomeValuationRepository($db),$user),
                 'incomeSelection'=>new \App\Controllers\IncomeSampleSelectionController(new AppraisalRepository($db,$user),new \App\Models\IncomeSampleSelectionRepository($db),$user),
                 'userResearchFactors'=>new \App\Controllers\UserResearchFactorController(new AppraisalRepository($db,$user),new \App\Models\UserResearchFactorRepository($db),$user),

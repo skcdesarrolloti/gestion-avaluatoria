@@ -17,7 +17,7 @@ $fieldError=$leaseErrors[$fieldName] ?? ''; $model=$monthlyModel.'.'.$monthlyFie
         aria-invalid="<?= $fieldError!==''?'true':'false' ?>" :aria-invalid="Boolean(issues['<?= e($fieldName) ?>'])"><?= e($fieldValue) ?></textarea>
     <?php else: ?>
     <input class="input" id="<?= e($fieldId) ?>" name="<?= e($fieldName) ?>" type="text" inputmode="decimal" maxlength="30"
-        value="<?= e($fieldValue) ?>" x-model="<?= e($model) ?>" placeholder="Importe documentado en COP; vacío si se desconoce"
+        value="<?= e($fieldValue) ?>" x-model="<?= e($model) ?>" placeholder="<?= e($definition['type']==='days'?'Días enteros; vacío si se desconoce':($definition['type']==='percent'?'Porcentaje documentado; 0 si no aplica':'Importe documentado en COP; vacío si se desconoce')) ?>"
         aria-describedby="<?= e($fieldId) ?>-help <?= e($fieldId) ?>-error" aria-invalid="<?= $fieldError!==''?'true':'false' ?>" :aria-invalid="Boolean(issues['<?= e($fieldName) ?>'])">
     <?php endif; ?>
     <p class="mt-1 text-xs text-slate-600" id="<?= e($fieldId) ?>-help"><?= e($definition['help']) ?></p>

@@ -12,8 +12,8 @@ final class IncomeValuationFields
             'projection'=>[
                 'date'=>$f('Fecha provisional del escenario','date','Solo si falta fecha de valoración en el encargo. Al completarla allí se consulta en origen. Primer mes prorrateado por días restantes.'),
                 'months'=>$f('Horizonte explícito (meses)','integer','Ej. 60. Justifica el plazo; máximo técnico 600 meses.'),
-                'income_source'=>$f('Renta de partida','select','Consulta el contrato o documenta una estimación de mercado.', ['lease'=>'Canon del contrato vinculado','market'=>'Canon de mercado sustentado']),
-                'lease_id'=>$f('Contrato de la etapa 1','lease','El canon se consulta en origen, sin copiarlo. Los anexos incluidos no se suman otra vez.'),
+                'income_source'=>$f('Canon que se usará en la valoración','select','Contrasta el contrato con el mercado y sustenta la elección. No cambia el historial.', ['lease'=>'Canon del contrato vinculado','market'=>'Canon de mercado sustentado']),
+                'lease_id'=>$f('Contrato documentado de esta unidad','lease','Selecciona por referencia y vigencia. Se consulta el mismo registro, sin duplicar anexos.'),
                 'market_rent'=>$f('Canon de mercado mensual (COP)','money','Ej. 3500000. Sin administración ni IVA; también se usa después del contrato si eliges recolocación.'),
                 'income_support'=>$f('Soporte del canon y alcance','textarea','Fuente, fecha, áreas y anexos incluidos; justifica el canon representativo.'),
                 'growth'=>$f('Incremento anual proyectado (%)','rate','Ej. 5,2. Escribe 0 para canon constante; no se descarga ni presume el IPC.'),
@@ -28,12 +28,16 @@ final class IncomeValuationFields
                 'cost_support'=>$f('Alcance de la revisión de costos','textarea','Explica costos no aplicables, cubiertos por PH o asumidos por el arrendatario; respalda también importes cero.'),
             ],
             'costs'=>[
+                'category'=>$f('Rubro de referencia · art. 26','select','Clasifica sin cambiar el concepto ni el importe guardado.',array_map(static fn($r)=>$r['label'],IncomeCostCatalog::all())),
                 'name'=>$f('Concepto','text','Ej. Predial, PH, seguros, mantenimiento o gestión inmobiliaria'),
                 'payer'=>$f('Responsable / aplicabilidad','select','Solo se deduce el costo a cargo del propietario.', ['owner'=>'Propietario','tenant'=>'Arrendatario','na'=>'No aplica']),
                 'amount'=>$f('Importe o porcentaje','money','Escribe 0 si el costo es cero y explica por qué.'),
                 'basis'=>$f('Base del importe','select','Selecciona la unidad del monto anterior.', ['monthly'=>'COP por mes','annual'=>'COP por año','potential'=>'% de renta potencial','effective'=>'% de ingreso efectivo']),
                 'growth'=>$f('Incremento anual del costo (%)','rate','0 para costo constante. No se iguala automáticamente al incremento del canon.'),
                 'source'=>$f('Soporte, fecha y alcance','textarea','Recibo, póliza, cotización o muestra local; indica si PH ya cubre este gasto.'),
+                'reference_percent'=>$f('Referencia porcentual documentada (%)','percent','Opcional: cotización o estudio del mismo tipo y ubicación. No es un porcentaje fijado por la 941.'),
+                'reference_basis'=>$f('Base de la referencia','select','Indispensable para interpretar el porcentaje.', ['potential'=>'% de renta potencial','effective'=>'% de ingreso efectivo']),
+                'reference_source'=>$f('Fuente de la referencia sugerida','textarea','Entidad, fecha, ciudad, tipo de inmueble, muestra o cotización y alcance. La referencia necesita aceptación expresa.'),
             ],
             'events'=>[
                 'month'=>$f('Mes del evento','month','Dentro del horizonte de proyección.'),

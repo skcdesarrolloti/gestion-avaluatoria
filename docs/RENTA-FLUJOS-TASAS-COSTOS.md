@@ -1,5 +1,9 @@
 # Renta: flujos, alternativas de tasa y costos sustentados
 
+Interfaz ampliada: [historial, costos y corrección del origen](RENTA-HISTORIAL-COSTOS-TABLAS.md).
+Ahora se puede editar contrato/inmueble/fecha desde Renta y sincronizar el contexto
+tras guardado confirmado. Las convenciones financieras siguientes se conservan.
+
 13/11/2026. Implementación solicitada por el responsable, sobre las cinco etapas
 existentes. Capitalización directa y flujo de caja descontado comparten insumos;
 no adoptan un valor de avalúo ni modifican investigaciones automáticamente.

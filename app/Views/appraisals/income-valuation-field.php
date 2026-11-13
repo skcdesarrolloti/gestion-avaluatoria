@@ -17,12 +17,14 @@ if ($ivType==='id'): ?>
 <?php else: ?>
 <div class="min-w-0" <?= $ivGroup==='rates' && $ivDynamic?'x-show="rateFieldVisible(\''.e($ivKey).'\',row.method)"':'' ?>>
     <label class="mb-2 block font-semibold" for="<?= e($ivId) ?>" :for="<?= e($ivIdExpr) ?>"><?= e($ivMeta['label']) ?></label>
+    <?php $normKey=\App\Services\IncomeNormHelp::field($ivGroup,$ivKey);if ($normKey && empty($ivCompact)) {$normDynamic=$ivDynamic;require __DIR__.'/income-norm-tip.php';} ?>
     <?php if (in_array($ivType,['select','lease','candidate'],true)): ?>
     <select class="input w-full" <?= $ivAttrs ?>><option value="">Selecciona una opción…</option>
         <?php if ($ivType==='candidate'): ?>
         <template x-for="candidate in state.rates.filter(r=>r.purpose==='<?= e(str_replace('_id','',$ivKey)) ?>')" :key="candidate.id"><option :value="candidate.id" x-text="candidate.name || 'Alternativa sin nombre'"></option></template>
         <?php endif; ?>
-        <?php foreach ($ivOptions as $val=>$label): ?><option <?= $ivType==='candidate'?'x-init="$el.remove()"':'' ?> value="<?= e($val) ?>" <?= (string)$ivValue===(string)$val?'selected':'' ?>><?= e($label) ?></option><?php endforeach; ?>
+        <?php if ($ivType==='lease'): ?><template x-for="(lease,id) in context.leases" :key="id"><option :value="id" x-text="lease.title+' · '+(lease.start || '?')+' a '+(lease.end || '?')"></option></template><?php endif; ?>
+        <?php foreach ($ivOptions as $val=>$label): ?><option <?= in_array($ivType,['candidate','lease'],true)?'x-init="$el.remove()"':'' ?> value="<?= e($val) ?>" <?= (string)$ivValue===(string)$val?'selected':'' ?>><?= e($label) ?></option><?php endforeach; ?>
     </select>
     <?php elseif ($ivType==='textarea'): ?>
     <textarea class="input w-full" rows="2" maxlength="2000" <?= $ivAttrs ?> placeholder="<?= e($ivMeta['help']) ?>"><?= e($ivValue) ?></textarea>
@@ -30,7 +32,7 @@ if ($ivType==='id'): ?>
     <input class="input w-full" type="<?= in_array($ivType,['date','month'],true)?$ivType:'text' ?>" <?= in_array($ivType,['money','rate','percent','number','integer'],true)?'inputmode="decimal"':'' ?>
         <?= $ivAttrs ?> value="<?= e($ivValue) ?>" <?= in_array($ivType,['date','month'],true)?'':'placeholder="'.e($ivMeta['help']).'"' ?>>
     <?php endif; ?>
-    <p class="mt-1 text-sm text-slate-600" id="<?= e($ivId) ?>-help" :id="<?= e($ivIdExpr) ?>+'-help'"><?= e($ivMeta['help']) ?></p>
+    <p class="<?= empty($ivCompact)?'mt-1 text-sm text-slate-600':'sr-only' ?>" id="<?= e($ivId) ?>-help" :id="<?= e($ivIdExpr) ?>+'-help'"><?= e($ivMeta['help']) ?></p>
     <p class="mt-1 text-sm text-red-800" role="alert" id="<?= e($ivId) ?>-error" :id="<?= e($ivIdExpr) ?>+'-error'" x-text="issues[<?= e($ivPath) ?>] || ''"><?= e($ivIssues[$ivName] ?? '') ?></p>
 </div>
 <?php endif; ?>

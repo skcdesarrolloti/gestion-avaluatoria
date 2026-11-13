@@ -1,5 +1,9 @@
 # Gestión avaluatoria · SuCasa
 
+Renta: [historial mensual y costos en tablas](docs/RENTA-HISTORIAL-COSTOS-TABLAS.md),
+separados de la proyección. Porcentajes con soporte y aceptación explícita,
+ayudas emergentes de la 941 y corrección del origen sin abandonar el recorrido.
+
 Renta: [flujos, tasas alternativas y costos con soporte](docs/RENTA-FLUJOS-TASAS-COSTOS.md)
 en etapas 3–5. Capitalización directa y FCD, cálculo explícito, resultados desplegables
 y memoria descargable. Conserva contratos, investigaciones y exclusiones existentes.

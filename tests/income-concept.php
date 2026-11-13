@@ -19,7 +19,8 @@ declare(strict_types=1);
     $record['methodology_workflow']=json_encode([$componentKey=>$selected]);
     $basePath='avaluos/'.$record['id'].'/metodologia-valuatoria';
     $flowUrl=static fn($stage)=>url($basePath.'?stage='.$stage.'&component='.$componentKey);
-    ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-income-concept.php';$html=ob_get_clean();
+    $incomeInitial='concept';
+    ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-income-concept.php';require BASE_PATH.'/app/Views/appraisals/lease-form.php';$html=ob_get_clean();
     expect(str_contains($html,'name="lease[start_date]"') && str_contains($html,'name="lease[adjustment_rule]"')
         && str_contains($html,'Consultar ayudas y soportes en Academia') && str_contains($html,'name="lease[expenses]"'),
         'ficha reúne vigencia, incrementos y condiciones con acceso a Academia');

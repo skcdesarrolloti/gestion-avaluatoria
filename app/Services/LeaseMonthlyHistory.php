@@ -3,13 +3,13 @@ declare(strict_types=1);
 namespace App\Services;
 use App\Core\HttpException;
 
-/** Pagos transcritos y revisión humana. No genera cánones, saldos, IPC ni totales. */
+/** Importes transcritos, ocupación y revisión humana; derivados no se persisten como pagos. */
 final class LeaseMonthlyHistory
 {
     public static function fields(): array
     {
         $f=static fn($label,$type,$help,$options=[])=>compact('label','type','help','options');
-        return [
+        return LeaseHistoryFields::all() + [
             'rent_paid'=>$f('Arriendo recibido imputado a este mes (COP)','money','Según recibo. Un pago que cubra varios meses necesita distribución documentada.'),
             'admin_billed'=>$f('Cuota ordinaria de administración de este mes (COP)','money','Según cuenta de cobro de PH. No equivale a lo pagado.'),
             'admin_paid'=>$f('Administración ordinaria pagada para este mes (COP)','money','Transcribe el pago soportado; no se presume a partir de la cuota.'),
@@ -42,6 +42,12 @@ final class LeaseMonthlyHistory
                 if ($value!=='' && $field['type']==='select' && !isset($field['options'][$value])) {
                     $errors[$name]='Selecciona una opción de la lista.'; continue;
                 }
+                if ($value!=='' && in_array($field['type'],['days','percent'],true)) {
+                    $value=str_replace(',','.',$value);$max=$field['type']==='days'?(int)date('t',strtotime($month.'-01')):100;
+                    if (!preg_match('/^\d+(\.\d{1,4})?$/D',$value) || (float)$value>$max || ($field['type']==='days' && (float)$value!==(float)(int)$value)) {
+                        $errors[$name]='Usa un valor de 0 a '.$max.($field['type']==='days'?' días enteros.':'.');continue;
+                    }
+                }
                 $out[$month][$key]=$value;
             }
         }
@@ -58,10 +64,11 @@ final class LeaseMonthlyHistory
             if (($previous[$month]['review'] ?? '')==='verified' && ($row['review'] ?? '')!=='verified'
                 && array_diff_assoc($merged,$previous[$month])) $merged['review']='pending';
             if (($merged['review'] ?? '')==='verified') {
-                $amounts=array_intersect_key($merged,array_flip(['rent_paid','admin_billed','admin_paid','admin_extra_paid']));
+                $amounts=array_intersect_key($merged,array_filter(self::fields(),static fn($f)=>in_array($f['type'],['money','days'],true)));
+                if (in_array($merged['occupancy'] ?? '',['occupied','vacant','partial','grace'],true)) $amounts['occupancy']=$merged['occupancy'];
                 if (trim($merged['support'] ?? '')==='' || !array_filter($amounts,static fn($value)=>$value!==''))
-                    throw new HttpException(422,'Para marcar un mes revisado, registra un importe y su soporte.',
-                        ['lease[monthly_history]['.$month.'][review]'=>'Falta un importe documentado o su soporte.']);
+                    throw new HttpException(422,'Para marcar un mes revisado, documenta importes u ocupación y su soporte.',
+                        ['lease[monthly_history]['.$month.'][review]'=>'Faltan importes u ocupación documentados, o su soporte.']);
             }
             $previous[$month]=$merged;
         }
