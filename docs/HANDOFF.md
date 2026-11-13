@@ -9,11 +9,17 @@ textos, IDs, fechas de creación, otras investigaciones o constancias de exclusi
 Propietario, CSRF, token de estudio y comparables_version se validan en servidor.
 Sin migración ni configuración nueva. PHP1738/JS297/BD301/HTTP27; lint/build/tamaño
 correctos. BD desechables ga_test_app/auth en3386. Interfaz local: guardado
-confirmado y recuperación tras recarga; comprobación móvil limitada por demora
-de captura del navegador (ancho del contenido no supera viewport).
+confirmado y recuperación tras recarga; diseño estrecho sin desbordamiento del
+contenido (override solicitado390, navegador informó585 por escala activa).
 Pruebas nuevas: tests/comparable-areas-persistence.php y comparable-areas-http.php
 (esta última exige GA_TEST_HTTP=true, servidor local8088 y GA_TEST_PORT definido).
-La verificación de las53 áreas y las3 exclusiones en hosting sigue pendiente.
+Publicado2b49f9a y verificado en hosting:53 áreas y sus notas coinciden con los
+anuncios tras recargar las seis páginas; tres ventas75/76/77 siguen excluidas
+con sus tres constancias originales. Los129 anuncios se conservan y126 permiten
+cociente exploratorio; CV43,40%. No se aplicaron nuevas exclusiones ni se adoptó
+canon. Evidencia local: tests/.runtime/renta-20261113/areas-persistidas-verificadas.json
+y resultado-areas-y-exclusiones.png. Algunas fuentes distinguen construida y
+privada o incluyen servicios; su comparabilidad queda pendiente de revisión.
 
 13/11/2026 · Carga de captura con colecciones grandes: el resumen de planificación
 se conserva entre lecturas y se actualiza al cambiar plan/evidencia. La matriz
