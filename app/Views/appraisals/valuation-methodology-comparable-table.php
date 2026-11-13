@@ -21,7 +21,7 @@
     <input type="hidden" name="version" value="<?= (int) ($record['comparables_version'] ?? 0) ?>">
     <?php require __DIR__ . '/methodology-capture-restart.php'; ?>
     <div x-show="searchTab === 'captura'"><?php require BASE_PATH . '/app/Views/appraisals/valuation-methodology-source-links.php'; ?></div>
-    <section x-show="['matriz', 'mapa'].includes(searchTab)" x-effect="if (['matriz', 'mapa'].includes(searchTab)) $nextTick(() => syncWidth())">
+    <section x-cloak x-show="['matriz', 'mapa'].includes(searchTab)" x-effect="if (['matriz', 'mapa'].includes(searchTab)) $nextTick(() => syncWidth())">
     <?php require __DIR__ . '/methodology-intake-portals.php'; ?>
     <div class="mb-4 flex flex-wrap items-center gap-2" aria-label="Vistas de las muestras" x-show="mode !== 'intake'">
         <button type="button" class="btn-secondary min-h-11" @click="intakeNavigate(intakeStep)">Volver a las fichas (<span x-text="intakeCount"></span>)</button>

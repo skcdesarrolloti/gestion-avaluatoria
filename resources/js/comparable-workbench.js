@@ -26,27 +26,27 @@ const groups = {
 };
 
 export function comparableWorkbench() {
-    let entries = [], resize, form, createRow, prepare, grow;
+    let entries = [], resize, form, createRow, prepare, grow, headers;
     return {
         ...comparablePhotos(), ...comparableMapNavigation(), ...comparableRemoval(), ...comparableExcel(), ...comparableIntake(() => entries, () => form), phFilter: 'all', mode: 'intake', group: 'capture', filter: 'all', search: '', page: 1, pages: 1, total: 0,
         pending: 0, duplicates: 0, shown: 0, usedIndexes: [], mapPoints: [], portalSummary: [], capturePendingCount: 0,
         get groupHelp() {
             return {
-                capture: 'Fuente, enlace, precio, área y contacto del aviso.',
-                composition: 'Áreas originales y sus soportes según PH/no PH. La desagregación de valores y los cálculos corresponden a 8.4.',
-                ph: 'PH: área privada, parqueaderos y depósitos, inclusión en el precio y naturaleza jurídica. Vacío significa por verificar; no equivale a No. Para condominio usa Áreas y componentes.',
-                location: 'Sector, dirección y coordenadas; indica si la ubicación es aproximada.',
-                attributes: 'Alcobas, baños, parqueaderos, edad, estado y dotaciones publicadas.',
-                review: 'Estado, variable de análisis y razones para incluir o descartar. No aplica factores de ajuste.',
-                all: 'Muestra todos los campos de la misma ficha. Cambiar de grupo conserva lo diligenciado.',
+                capture: 'Datos del aviso.',
+                composition: 'Áreas y soportes PH/no PH. Valores y cálculos en 8.4.',
+                ph: 'PH: áreas y anexos, precio y soporte jurídico. Vacío: por verificar. Condominio en Áreas y componentes.',
+                location: 'Ubicación y precisión documentadas.',
+                attributes: 'Características, estado y dotaciones publicadas.',
+                review: 'Estado y motivo de inclusión o descarte; sin ajustes.',
+                all: 'Todos los campos. Cambiar de grupo conserva los datos.',
             }[this.group];
         },
         init() {
             form = this.$el;
             if (form.dataset.phSubject === 'si') this.group = 'ph';
             this.initPhotos(form);
+            let labels = [...form.querySelectorAll('thead th')].map(th => th.childNodes[0].textContent.trim());
             prepare = (tr, index) => {
-                const headers = [...form.querySelectorAll('thead th')].map(th => th.childNodes[0].textContent.trim());
                 const controls = [...tr.querySelectorAll('[name]')];
                 for (const [column, cell] of [...tr.cells].entries()) {
                     const input = cell.querySelector('input:not([type=hidden]),select,textarea');
@@ -55,10 +55,10 @@ export function comparableWorkbench() {
                     const label = document.createElement('label');
                     label.htmlFor = input.id;
                     label.className = 'comparable-field-label';
-                    label.textContent = headers[column];
+                    label.textContent = labels[column];
                     cell.prepend(label);
                     if (input.tagName !== 'SELECT' && input.type !== 'date' && !input.placeholder) {
-                        input.placeholder = `Indica ${headers[column].toLowerCase()}`;
+                        input.placeholder = `Indica ${labels[column].toLowerCase()}`;
                     }
                 }
                 const summary = document.createElement('span');
@@ -66,8 +66,15 @@ export function comparableWorkbench() {
                 tr.cells[0].append(summary);
                 return { tr, controls, summary, index, opened: false, used: false, missing: [], data: {} };
             };
-            entries = [...form.querySelectorAll('tbody tr')].map(prepare);
-            arrangeSheet(entries, form, groups[this.group]);
+            // Alpine will walk the finished subtree once; do not observe thousands
+            // of label insertions and column moves as new component mounts.
+            window.Alpine.mutateDom(() => {
+                entries = [...form.querySelectorAll('tbody tr')].map(prepare);
+                arrangeSheet(entries, form, groups[this.group]);
+            });
+            headers = [...form.querySelectorAll('thead th')];
+            labels = headers.map(th => th.childNodes[0].textContent.trim());
+            entries.forEach(entry => { entry.cells = [...entry.tr.cells]; });
             createRow = rowFactory(form);
             grow = event => { for (let i = 0; i < event.detail; i++) this.appendRow(); };
             form.addEventListener('comparable-grow', grow);
@@ -84,6 +91,7 @@ export function comparableWorkbench() {
         appendRow() {
             const tr = createRow(entries.length);
             const entry = prepare(tr, entries.length);
+            entry.cells = [...tr.cells];
             entries.push(entry);
             form.querySelector('tbody').append(tr);
             return entry;
@@ -125,15 +133,21 @@ export function comparableWorkbench() {
             this.mapIndex = mapMode ? visible[0]?.index ?? null : null;
             if (mapMode && this.photoOpen && this.photoIndex !== this.mapIndex && !this.photoBusy) this.photoOpen = false;
             this.shown = eligible.length;
-            for (const entry of entries) entry.tr.hidden = !visible.includes(entry);
+            for (const entry of entries) {
+                const hidden = !visible.includes(entry);
+                if (entry.tr.hidden !== hidden) entry.tr.hidden = hidden;
+            }
             const fields = groups[mapMode ? 'location' : this.group];
             const first = entries[0];
             if (!first) return;
-            [...first.tr.cells].forEach((cell, index) => {
+            first.cells.forEach((cell, index) => {
                 const key = cell.querySelector('[name]')?.name.match(/\[([^\]]+)\]$/)?.[1];
                 const hidden = index > 0 && (mapMode ? !fields.includes(key) : mapFields.includes(key) || (this.group !== 'all' && !fields?.includes(key)));
-                form.querySelector(`thead th:nth-child(${index + 1})`).hidden = hidden;
-                for (const entry of entries) entry.tr.cells[index].hidden = hidden || (!mapMode && this.mode === 'cards' && !compositionVisible(key, entry.data));
+                if (headers[index].hidden !== hidden) headers[index].hidden = hidden;
+                for (const entry of entries) {
+                    const cellHidden = hidden || (!mapMode && this.mode === 'cards' && !compositionVisible(key, entry.data));
+                    if (entry.cells[index].hidden !== cellHidden) entry.cells[index].hidden = cellHidden;
+                }
             });
             this.$nextTick(() => this.syncWidth());
         },
@@ -154,7 +168,7 @@ export function comparableWorkbench() {
         syncWidth() { this.$refs.track.style.width = `${this.$refs.grid.scrollWidth}px`; },
         async exportExcel() {
             this.exportBusy=true;
-            try { if (!await flushModuleAutosaves()) throw new Error('Confirma el guardado antes de exportar.'); this.refresh(); exportCapture(entries, form); this.excelMessage='Excel exportado. Conserva ID y encabezados para importar actualizaciones.'; }
+            try { if (!await flushModuleAutosaves()) throw new Error('Confirma el guardado antes de exportar.'); this.refresh(); exportCapture(entries, form); this.excelMessage='Excel exportado. Conserva ID y encabezados.'; }
             catch(error) { this.excelMessage=error.message; }
             finally {this.exportBusy=false;}
         },

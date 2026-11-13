@@ -1,5 +1,16 @@
 # Entrega al responsable de la implementación
 
+13/11/2026 · Carga de captura con colecciones grandes: el resumen de planificación
+se conserva entre lecturas y se actualiza al cambiar plan/evidencia. La matriz
+prepara etiquetas una vez, reordena columnas sin remontajes de Alpine, conserva
+referencias de celdas y evita escrituras de visibilidad repetidas. Su sección
+oculta no se dibuja antes de inicializar. No cambia reglas, datos, endpoints ni
+exclusiones de Renta. PHP1738/JS297, lint/build/check:size correctos; advertencias
+de fixtures incompletos en PHP. Prueba local con129 filas: revisión por portal,
+tabla editable y respuesta de autoguardado confirmada. Sin cambios de esquema
+ni persistencia; no se repitió la suite de BD. Guardado de áreas reales y
+comprobación de las tres exclusiones se realizan después de publicar.
+
 13/11/2026 · Renta: etapa 2 incorpora Análisis y exclusiones, motivo/soporte,
 borrador autoguardado, reincorporación y constancia acumulativa antes/después.
 Estadísticos exploratorios de importe anunciado por m², señales RIC/Z/Chauvenet

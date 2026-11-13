@@ -37,10 +37,10 @@ export function arrangeSheet(entries, form, keys) {
         key: cell.querySelector('[name]')?.name.match(/\[([^\]]+)\]$/)?.[1]}));
     const score = column => column.index === 0 ? -1 : keys.includes(column.key) ? keys.indexOf(column.key) : keys.length + column.index;
     columns.sort((a,b) => score(a) - score(b));
-    for (const column of columns) form.querySelector('thead tr').append(column.header);
+    form.querySelector('thead tr').replaceChildren(...columns.map(column => column.header));
     for (const entry of entries) {
         const cells = [...entry.tr.cells];
-        for (const column of columns) entry.tr.append(cells[column.index]);
+        entry.tr.replaceChildren(...columns.map(column => cells[column.index]));
     }
 }
 export function exportCapture(entries, form) {

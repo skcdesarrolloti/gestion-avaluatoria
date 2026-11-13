@@ -110,6 +110,13 @@ export function researchPlan(config) {
     return {
         ...assessmentMethods,
         plan: config.plan, evidence: config.evidence, catalog: config.catalog,
+        summaryCache: null,
+        init() {
+            this.summaryCache = researchSummary(config.plan, config.evidence);
+            const refresh = () => { this.summaryCache = researchSummary(this.plan, this.evidence); };
+            this.$watch('plan', refresh);
+            this.$watch('evidence', refresh);
+        },
         scaleValid(key) { return validResearchScale(this.plan.factors[key],this.catalog[key]); },
         onlyCandidates: false,
         comparisonId: config.evidence.groups[0]?.id || '',
@@ -129,7 +136,7 @@ export function researchPlan(config) {
             return this.comparisonState(key) === 'equal' ? 'bg-emerald-50 text-emerald-900' : ['difference','review'].includes(this.comparisonState(key)) ? 'bg-amber-100 text-amber-900' : 'bg-slate-50 text-slate-700';
         },
         comparisonValue(key,ad) { return unknown(ad.values[key]) ? 'No publicado' : ad.values[key]; },
-        get summary() { return researchSummary(this.plan, this.evidence); },
+        get summary() { return this.summaryCache || researchSummary(this.plan, this.evidence); },
         get payload() { return JSON.stringify(this.plan); },
         get modelCount() { return Object.entries(this.plan.factors).filter(([key,f]) => researchFactor(key) && f.decision === 'model').length; },
         isFactor(key) { return researchFactor(key); },
