@@ -1,5 +1,10 @@
 # Crear y evolucionar la base sin SQL manual
 
+13/11/2026 · Exclusiones de Renta: sin esquema nuevo. `income_selection` dentro
+de `methodology_workflow` conserva borradores, IDs excluidos, datasets y eventos
+por componente/estudio. Bloqueo del expediente y CAS de `methodology_version`
+y `comparables_version`. No modifica captura. Ver RENTA-EXCLUSIONES.md.
+
 13/11/2026 · Historial mensual de arriendo y PH: campos opcionales y monthly_history
 por YYYY-MM dentro de lease_register. Sin esquema nuevo ni migración; combinación
 por mes/campo conserva años omitidos y clientes anteriores. CAS lease_version,

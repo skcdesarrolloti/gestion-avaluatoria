@@ -12,6 +12,8 @@ return [
     ['GET', '#^/diagnostico/login$#', 'diagnostics', 'login', false],
     ['POST', '#^/logout$#', 'auth', 'logout', true],
     ['GET', '#^/valuaciones$#', 'valuations', 'index', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/renta/seleccion$#', 'incomeSelection', 'save', true],
+    ['GET', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/renta/constancia$#', 'incomeSelection', 'export', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/renta/concepto$#', 'valuationMethodology', 'saveIncomeConcept', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/renta/arriendo$#', 'valuationMethodology', 'saveLease', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/renta/antecedente$#', 'valuationMethodology', 'saveLeaseAntecedent', true],

@@ -1,5 +1,16 @@
 # Entrega al responsable de la implementación
 
+13/11/2026 · Renta: etapa 2 incorpora Análisis y exclusiones, motivo/soporte,
+borrador autoguardado, reincorporación y constancia acumulativa antes/después.
+Estadísticos exploratorios de importe anunciado por m², señales RIC/Z/Chauvenet
+y CV frente a7,5%; sin exclusión automática ni adopción de valor. El usuario ya
+autorizó cálculos, sustituyendo la pausa conceptual anterior. Sin DDL ni cambios
+a captura: JSON por recorrido/método, autor/fecha/cifras en servidor, CAS doble
+y exportación autorizada. Detalles: RENTA-EXCLUSIONES.md.
+Validado: PHP1738, JS296, BD284, HTTP27; lint/build/check:size correctos.
+UI local verificó exclusión/reincorporación, actualización sin duplicar panel,
+borradores entre muestras y recarga; ancho móvil390 sin desbordamiento horizontal.
+
 13/11/2026 · Primera etapa de Renta: canon inicial, referencia al área del capítulo3,
 inicio/índice documentado e historial mensual por año. Arriendo recibido separado
 de cuota PH cobrada, pagos ordinarios y extraordinarios, con pagador y revisión

@@ -7,12 +7,12 @@ export async function loadPageComponents(root,alpine,importer=url=>import(url)) 
     if(!igacLoaded && root.querySelector('[x-data^="igacUnitSelector("]')) {
         const url=new URL('igac-unit-selector.js',import.meta.url);url.searchParams.set('v',igacRevision);
         const module=await importer(url.href);
-        if(typeof module.igacUnitSelector!=='function') throw new Error('Error al cargar IGAC.');
+        if(typeof module.igacUnitSelector!=='function') throw new Error('IGAC');
         alpine.data('igacUnitSelector',module.igacUnitSelector);igacLoaded=true;
     }
     if(incomeLoaded || !root.querySelector('[data-income-inputs]')) return;
     const url=new URL('income-inputs.js',import.meta.url); url.searchParams.set('v',revision);
     const module=await importer(url.href);
-    if(typeof module.incomeInputs!=='function') throw new Error('No se pudo cargar Renta.');
+    if(typeof module.incomeInputs!=='function') throw new Error('Renta');
     alpine.data('incomeInputs',module.incomeInputs); incomeLoaded=true;
 }

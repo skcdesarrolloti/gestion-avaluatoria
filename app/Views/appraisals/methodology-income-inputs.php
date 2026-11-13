@@ -10,9 +10,10 @@ $incomeInitialPortal=is_string($_GET['renta_portal'] ?? null) && in_array($_GET[
     data-income-state="<?= e(json_encode(['incomeSteps'=>$incomeSteps,'incomeTab'=>$incomeInitial,'incomePortal'=>$incomeInitialPortal,'incomeSources'=>$incomeSourceLabels,'incomePortals'=>array_column($guide['source_search']['portal_sources'] ?? [],'label')],JSON_UNESCAPED_UNICODE)) ?>"
     x-data="incomeInputs">
     <?php require __DIR__.'/methodology-income-navigation.php'; ?>
-    <nav class="mb-4 flex flex-wrap gap-2" x-show="incomeStage==='research'" <?= in_array($incomeInitial,['search','capture'],true)?'':'x-cloak' ?> aria-label="Tareas de investigación de arriendos">
+    <nav class="mb-4 flex flex-wrap gap-2" x-show="incomeStage==='research'" <?= in_array($incomeInitial,['search','capture','analysis'],true)?'':'x-cloak' ?> aria-label="Tareas de investigación de arriendos">
         <a class="btn-secondary" href="<?= e($flowUrl('3').'&renta_paso=search') ?>" @click.prevent="openTab('search')" :aria-current="incomeTab==='search'?'page':null">Preparar la búsqueda</a>
         <a class="btn-secondary" href="<?= e($flowUrl('3').'&renta_paso=capture') ?>" @click.prevent="openTab('capture')" :aria-current="incomeTab==='capture'?'page':null">Recoger y revisar muestras</a>
+        <a class="btn-secondary" href="<?= e($flowUrl('3').'&renta_paso=analysis') ?>#renta-analisis" :aria-current="incomeTab==='analysis'?'page':null">Análisis y exclusiones</a>
     </nav>
     <?php require __DIR__.'/methodology-income-portal-nav.php'; ?>
     <div id="renta-panel-concept" x-show="incomeTab==='concept'" <?= $incomeInitial==='concept'?'':'x-cloak' ?>>
@@ -31,6 +32,9 @@ $incomeInitialPortal=is_string($_GET['renta_portal'] ?? null) && in_array($_GET[
         <div x-ref="incomeCapture" data-income-capture-content>
             <?php if ($incomeInitial==='capture'): require __DIR__.'/methodology-unassigned.php'; require __DIR__.'/valuation-methodology-search.php'; endif; ?>
         </div>
+    </div>
+    <div x-show="incomeTab==='analysis'" <?= $incomeInitial==='analysis'?'':'x-cloak' ?>>
+        <?php if ($incomeInitial==='analysis') require __DIR__.'/income-selection.php'; ?>
     </div>
     <?php require __DIR__.'/methodology-income-later-stages.php'; ?>
     <nav class="mt-5 flex flex-wrap gap-3" aria-label="Continuar el estudio de Renta">

@@ -1,5 +1,5 @@
 <div id="renta-estudio" class="scroll-mt-6 mb-5 rounded-xl border border-teal-700 bg-white p-4">
-    <p class="font-semibold text-teal-900" role="status" aria-live="polite">Renta · <?= e($componentLabel) ?> → <span x-text="incomeSteps[incomeStage]"><?= e($incomeSteps[in_array($incomeInitial,['search','capture'],true)?'research':$incomeInitial]) ?></span></p>
+    <p class="font-semibold text-teal-900" role="status" aria-live="polite">Renta · <?= e($componentLabel) ?> → <span x-text="incomeSteps[incomeStage]"><?= e($incomeSteps[in_array($incomeInitial,['search','capture','analysis'],true)?'research':$incomeInitial]) ?></span></p>
     <nav class="mt-3 grid items-start gap-2 sm:grid-cols-2 lg:grid-cols-5" aria-label="Etapas del estudio de Renta">
         <?php foreach ($incomeSteps as $incomeKey=>$incomeLabel): $incomeTarget=$incomeKey==='research'?'search':$incomeKey; ?>
         <a class="btn-secondary text-left" href="<?= e($flowUrl('3').'&renta_paso='.$incomeTarget) ?>#renta-estudio"

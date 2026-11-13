@@ -4,7 +4,7 @@ namespace App\Services;
 
 final class MethodStudyState
 {
-    private const FIELDS=['research_plan','analysis','conclusion','evidence_hash','income_concept','cost_scope'];
+    private const FIELDS=['research_plan','analysis','conclusion','evidence_hash','income_concept','cost_scope','income_selection'];
     public static function change(array $item,array $changes): array
     {
         $old=$item['method'] ?? '';$next=$changes['method'] ?? $old;

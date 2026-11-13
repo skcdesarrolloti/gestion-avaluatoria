@@ -1,15 +1,17 @@
 import { incomePreparation } from './income-preparation.js';
 import { leaseForm } from './lease-form.js';
+import { incomeSelection } from './income-selection.js';
 export function incomeInputs() {
     let pending=null, controller, root;
     return {
         preparation:incomePreparation,
         leaseForm,
+        selection:incomeSelection,
         incomeTab:'concept', incomePortal:'', incomeLoaded:false, incomeLoading:false, incomeError:'',
         incomePortals:[], incomeSources:[], incomePortalBusy:false, incomePortalError:'',
         incomeSteps:{concept:'1. Inmueble y arriendo',research:'2. Investigación de arriendos',evidence:'3. Ingresos y gastos',valuation:'4. Valoración por los dos métodos',review:'5. Revisión y sustentación'},
         incomeResearchTab:'search',incomeNavigating:false,incomeNavigationError:'',
-        get incomeStage() { return ['search','capture'].includes(this.incomeTab)?'research':this.incomeTab; },
+        get incomeStage() { return ['search','capture','analysis'].includes(this.incomeTab)?'research':this.incomeTab; },
         get incomeStepIndex() { return Object.keys(this.incomeSteps).indexOf(this.incomeStage); },
         get incomePortalIndex() { return this.incomePortals.indexOf(this.canonicalPortal(this.incomePortal)); },
         get incomeNextPortal() { return this.incomePortalIndex<0 ? '' : this.incomePortals[this.incomePortalIndex+1] || ''; },

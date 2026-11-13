@@ -15,7 +15,7 @@ final class IncomeStudyNavigation
     public static function initial(array $query,string $stage): string
     {
         $tab=$query['renta_paso'] ?? '';
-        if (is_string($tab) && in_array($tab,['concept','search','capture','evidence','valuation','review'],true)) return $tab;
+        if (is_string($tab) && in_array($tab,['concept','search','capture','analysis','evidence','valuation','review'],true)) return $tab;
         return match ($stage) {'4'=>'valuation','5'=>'review',default=>'concept'};
     }
 

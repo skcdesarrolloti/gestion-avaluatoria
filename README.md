@@ -245,6 +245,9 @@ ode_modules/`, `tests/`,
 
 ## Para continuar
 
+[Renta: exclusiones con constancia](docs/RENTA-EXCLUSIONES.md): etapa 2,
+revisión de anuncios, CV antes/después y reincorporación sin borrar originales.
+
 Lee [AGENTS.md](AGENTS.md), [base de datos](docs/DATABASE.md) y
 [entrega al responsable](docs/HANDOFF.md). Las decisiones visuales usan tipografía
 del sistema, superficies claras, acento teal, labels visibles y formularios por secciones.
