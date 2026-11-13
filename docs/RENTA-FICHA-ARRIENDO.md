@@ -54,6 +54,9 @@ Validación de la corrección: PHP1680, JS285, HTTP18, lint/build/check:size
 Apartamento → Lote, conservación y borrado explícito de selección, recarga,
 tipo general, catálogo completo y móvil390; sin errores JS. No altera esquema
 ni guardado: se conservan las mismas columnas y validaciones de servidor.
+Publicada en 975adcb, con app.js público HTTP200 y SHA-256 idéntico al local.
+La apertura nueva del capítulo 3 pidió login; no se modificó el tipo ni la
+tipología del expediente real para hacer las pruebas.
 
 ## Persistencia y migraciones
 

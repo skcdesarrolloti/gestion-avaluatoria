@@ -9,6 +9,10 @@ texto no cambia el tipo. Tipo general y anexos usan su origen correspondiente.
 PHP1680/JS285/HTTP18, lint/build/check:size81.912 bytes (límite81.920).
 Navegador local: cambios de tipo, autoguardado, recarga y móvil390 sin errores.
 Sin DDL ni cambios de persistencia. Ver RENTA-FICHA-ARRIENDO.md.
+Publicado con commit/push 975adcb; app.js público HTTP200 y SHA-256 idéntico
+al local. Hubo un fallo DNS transitorio, resuelto al reintentar. La apertura
+nueva del capítulo 3 pidió login; revisión visual autenticada de esta versión
+no acreditada. El cambio de tipo se comprobó con fixtures locales, no con datos reales.
 
 13/11/2026 · Tipologías unificadas en capítulo 3 para todos los tipos, con búsqueda,
 familias relacionadas, catálogo completo y conservación de selección. Renta reúne
