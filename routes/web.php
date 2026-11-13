@@ -116,6 +116,8 @@ return [
     ['GET', '#^/avaluos/([a-f0-9]{32})/comparables/([a-f0-9]{32})/fotos/([a-f0-9]{32})$#', 'comparablePhotos', 'show', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/comparables$#', 'valuationMethodology', 'saveComparables', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/comparables/autoguardar$#', 'valuationMethodology', 'autosaveComparables', true],
+    ['GET', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/comparables/areas$#', 'valuationMethodology', 'showAreas', true],
+    ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/comparables/areas$#', 'valuationMethodology', 'saveAreas', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/comparables/excel/revisar$#', 'valuationMethodology', 'previewExcel', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/comparables/excel/guardar$#', 'valuationMethodology', 'saveExcel', true],
     ['POST', '#^/avaluos/([a-f0-9]{32})/metodologia-valuatoria/comparables/leer-aviso$#', 'valuationMethodology', 'readComparable', true],

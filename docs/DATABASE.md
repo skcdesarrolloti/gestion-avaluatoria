@@ -1,5 +1,11 @@
 # Crear y evolucionar la base sin SQL manual
 
+13/11/2026 · Completar áreas: sin DDL. ComparableAreaRepository actualiza solo
+area_m2, capture_details.area_basis/areas_source y updated_at en las filas
+existentes del estudio autorizado. Conserva el resto del JSON y las exclusiones.
+Transacción con bloqueo del expediente, comparables_version y token de estudio;
+rechaza muestras ajenas o de otra investigación. No elimina/reinserta la matriz.
+
 13/11/2026 · Exclusiones de Renta: sin esquema nuevo. `income_selection` dentro
 de `methodology_workflow` conserva borradores, IDs excluidos, datasets y eventos
 por componente/estudio. Bloqueo del expediente y CAS de `methodology_version`

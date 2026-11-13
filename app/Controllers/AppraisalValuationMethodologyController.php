@@ -121,6 +121,10 @@ final class AppraisalValuationMethodologyController
 
     public function saveExcel(string $id): never
     { \App\Services\ComparableExcelAction::run($this->appraisals,$this->comparables,$this->user['id'],$id,true); }
+    public function showAreas(string $id): void
+    { \App\Services\ComparableAreaAction::show($this->appraisals,$this->comparables,$this->user['id'],$id); }
+    public function saveAreas(string $id): never
+    { \App\Services\ComparableAreaAction::save($this->appraisals,$this->user['id'],$id); }
     public function assignComparables(string $id): never
     { \App\Services\ComparableStudyAction::assign($this->appraisals,$this->comparables,$this->user['id'],$id); }
 

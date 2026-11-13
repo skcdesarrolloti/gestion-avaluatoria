@@ -1,5 +1,20 @@
 # Entrega al responsable de la implementación
 
+13/11/2026 · Corrección adicional del guardado de áreas: la matriz completa de
+129 anuncios seguía agotando la espera de respuesta. Se incorpora «Completar
+áreas y fuentes» desde Investigación de Renta y la matriz. Página de diez anuncios
+con área, significado y soporte, autoguardado y errores por campo. Actualización
+parcial de las mismas filas, sin reemplazar toda la colección ni cambiar precios,
+textos, IDs, fechas de creación, otras investigaciones o constancias de exclusión.
+Propietario, CSRF, token de estudio y comparables_version se validan en servidor.
+Sin migración ni configuración nueva. PHP1738/JS297/BD301/HTTP27; lint/build/tamaño
+correctos. BD desechables ga_test_app/auth en3386. Interfaz local: guardado
+confirmado y recuperación tras recarga; comprobación móvil limitada por demora
+de captura del navegador (ancho del contenido no supera viewport).
+Pruebas nuevas: tests/comparable-areas-persistence.php y comparable-areas-http.php
+(esta última exige GA_TEST_HTTP=true, servidor local8088 y GA_TEST_PORT definido).
+La verificación de las53 áreas y las3 exclusiones en hosting sigue pendiente.
+
 13/11/2026 · Carga de captura con colecciones grandes: el resumen de planificación
 se conserva entre lecturas y se actualiza al cambiar plan/evidencia. La matriz
 prepara etiquetas una vez, reordena columnas sin remontajes de Alpine, conserva

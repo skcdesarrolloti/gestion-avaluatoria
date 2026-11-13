@@ -38,6 +38,7 @@
         <div class="flex flex-wrap items-center gap-3">
             <span class="text-sm font-semibold text-slate-500" data-autosave-status>Autoguardado activo</span>
             <button type="submit" class="btn-primary min-h-11">Guardar matriz</button>
+            <a class="btn-secondary" href="<?= e(url('avaluos/'.$record['id'].'/metodologia-valuatoria/comparables/areas?component='.rawurlencode($componentKey ?? ''))) ?>">Completar áreas y fuentes</a>
             <button type="button" @click="searchTab = 'captura'" class="btn-secondary min-h-11">Seguir capturando</button>
         </div>
     </div>

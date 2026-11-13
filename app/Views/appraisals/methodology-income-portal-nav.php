@@ -12,6 +12,7 @@
     <div class="mt-2 flex flex-wrap gap-2">
         <button type="button" class="btn-secondary min-h-11" :disabled="incomePortalBusy || !incomePortal" @click="choosePortal(incomePortal)">Buscar y pegar</button>
         <button type="button" class="btn-secondary min-h-11" :disabled="incomePortalBusy || !incomePortal" @click="choosePortal(incomePortal,'review')">Ver muestras</button>
+        <a class="btn-secondary min-h-11" href="<?= e(url('avaluos/'.$record['id'].'/metodologia-valuatoria/comparables/areas?component='.rawurlencode($componentKey))) ?>">Completar áreas y fuentes</a>
     </div>
     <p class="mt-2 text-sm" role="status" x-show="incomePortalBusy">Preparando el portal y comprobando el guardado…</p>
     <p class="mt-2 text-sm text-red-800" role="alert" x-show="incomePortalError" x-text="incomePortalError"></p>
