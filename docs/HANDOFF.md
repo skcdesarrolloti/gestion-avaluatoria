@@ -12,6 +12,10 @@ por pestañas simultáneas. Sin fórmulas ni tasas nuevas. Ver RENTA-FICHA-ARRIE
 Validación local: PHP1677/JS284/BD266/HTTP18+14, lint/build/check:size79,9KB.
 Navegador: escritorio/móvil390, alta y recarga, 409, desconexión/reintento,
 canon en su origen y referencias IGAC de categorías diferentes. Sin errores JS.
+Publicado con commit/push b7a7554. app.js, income-inputs.js y app.css públicos
+HTTP200 y SHA-256 idénticos al local. La recarga tras desplegar pidió login;
+UI nueva autenticada y migraciones del hosting no verificadas. Flujo y migraciones
+probados localmente; respuestas y muestras reales intactas.
 
 12/11/2026 · Primera etapa de Renta ampliada tras aprobación del borrador:
 cuatro temas en «1. Comprender el inmueble y su arriendo», con consulta viva del

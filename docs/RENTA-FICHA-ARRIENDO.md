@@ -78,3 +78,15 @@ ocupación por unidad y móvil 390 px sin desbordamiento ni errores JavaScript.
 Alta de otro contrato con enlace estable tras navegar/recargar; corrección del
 canon original desde Renta visible en capítulo 1, sin segundo campo editable.
 Fixtures/capturas quedan en tests/.runtime, fuera de Git.
+
+## Publicación
+
+Commit/push `b7a7554` a origin/main. Tras el despliegue, app.js,
+income-inputs.js y app.css públicos respondieron HTTP 200 con SHA-256 idéntico
+al local. La pestaña autenticada mostraba la versión anterior; al recargar
+después de actualizar, el aplicativo pidió iniciar sesión. Por ello no se
+acredita revisión visual autenticada de la versión nueva ni ejecución de sus
+migraciones en producción. El flujo completo y las migraciones se validaron
+en local; AUTO_MIGRATE las aplica en el siguiente acceso autenticado si está
+habilitado. No se modificaron respuestas ni muestras reales ni se pidió acceso
+al hosting. Los servicios locales desechables de esta prueba se detuvieron.
