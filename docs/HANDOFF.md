@@ -11,7 +11,9 @@ Sin DDL. PHP1765/JS306/BD322/HTTP39, lint/build/tamaño correctos. BD desechable
 origen, sugerencia, ayuda/Escape y recálculo de ambos métodos comprobados.
 Detalles y límites en RENTA-HISTORIAL-COSTOS-TABLAS.md. No presupone porcentajes
 universales ni IPC; datos ausentes siguen pendientes. No se editaron datos reales
-durante las pruebas. Publicación y verificación final se registran al completarse.
+durante las pruebas. Publicados48289d7/9bd0085; app.js, income-inputs.js y app.css
+HTTP200 con SHA-256 igual al build local. Carga inicial81913bytes gzip. El despliegue
+pidió renovar sesión; queda pendiente comprobar la nueva pantalla autenticada.
 
 13/11/2026 · Renta incorpora ingresos/costos y proyección mensual, alternativas de
 tasa (mercado, referencia+prima, CAPM del activo, ponderación antes de renta, manual

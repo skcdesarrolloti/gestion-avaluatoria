@@ -100,3 +100,8 @@ ediciones ajenas ni borra resultados. Sin localStorage ni credenciales nuevas.
 Los porcentajes no forman una biblioteca empírica por ciudad/tipo ni sustituyen
 presupuestos. No estima ocupación desconocida, valida documentos automáticamente,
 modifica muestras ni rellena contratos reales con datos de prueba.
+
+Publicación: commits48289d7/9bd0085 enviados a origin/main. Tres assets públicos
+HTTP200 y SHA-256 coincidente con build local; carga inicial81913bytes gzip.
+El corte parcial del mes se señala y no entra en el resumen de vacancia de meses
+cerrados. La sesión expiró después del despliegue; comprobación autenticada pendiente.
