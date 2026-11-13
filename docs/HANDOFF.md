@@ -1,5 +1,17 @@
 # Entrega al responsable de la implementación
 
+13/11/2026 · Primera etapa de Renta: canon inicial, referencia al área del capítulo3,
+inicio/índice documentado e historial mensual por año. Arriendo recibido separado
+de cuota PH cobrada, pagos ordinarios y extraordinarios, con pagador y revisión
+manual. Campos y años anteriores conservados; historial único por contrato/unidades.
+Resumen del sujeto ampliado y pendientes; condiciones especiales plegadas.
+El usuario confirmó captura sin cálculos: no generar aún serie por IPC ni estadísticas.
+Etapa2 documenta herramientas de Mercado y futura incorporación de Chauvenet;
+no afirma que éste exista ni que la validación predictiva pendiente esté terminada.
+PHP1718/JS293/BD272/HTTP26+14+14; lint/build/tamaño dentro de80KB. UI local:
+escritorio/móvil390, guardado, recarga, fetch por año, offline/reintento y409.
+Sin DDL ni alteración de muestras. Detalles: RENTA-HISTORIAL-MENSUAL.md.
+
 13/11/2026 · Renta adopta la navegación de trabajo de Mercado en cinco etapas:
 Inmueble y arriendo; Investigación de arriendos; Ingresos y gastos; Valoración
 por los dos métodos; Revisión y sustentación. Academia contextual conserva los

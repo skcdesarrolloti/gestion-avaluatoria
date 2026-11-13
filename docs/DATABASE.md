@@ -1,5 +1,10 @@
 # Crear y evolucionar la base sin SQL manual
 
+13/11/2026 · Historial mensual de arriendo y PH: campos opcionales y monthly_history
+por YYYY-MM dentro de lease_register. Sin esquema nuevo ni migración; combinación
+por mes/campo conserva años omitidos y clientes anteriores. CAS lease_version,
+propietario, CSRF y validación manual de soportes. Ver RENTA-HISTORIAL-MENSUAL.md.
+
 13/11/2026 · Ficha compartida de arriendo y ocupación por unidad:
 202611130001_shared_lease_register.php agrega appraisals.lease_register y
 lease_version; 202611130002_unit_occupation.php agrega occupation_details y

@@ -32,4 +32,16 @@ declare(strict_types=1);
     $repo->saveUnits($id,1,[$row],$v);
     expectStatus(409,fn()=>$repo->saveUnits($id,1,[$row],$v),'tipología rechaza actualización simultánea');
     expect(count(\App\Services\LeaseRegister::read($repo->find($id,1)))===1,'editar descripción conserva contrato');
+    $v=(int)$repo->find($id,1)['lease_version'];
+    $leases->save($id,1,$v++,$contract,[$office,$garage],['initial_rent_amount'=>'1000','initial_rent_period'=>'mensual',
+        'analysis_area_reference'=>$office.':area_private_m2','monthly_history'=>['2022-01'=>['rent_paid'=>'1000','admin_paid'=>'80','review'=>'verified','support'=>'Recibo enero']]]);
+    $leases->save($id,1,$v++,$contract,[$office,$garage],['monthly_history'=>['2023-01'=>['rent_paid'=>'1100','review'=>'pending']]]);
+    $leases->save($id,1,$v++,$contract,[$office,$garage],['notes'=>'Formulario anterior sin historial']);
+    $history=\App\Services\LeaseRegister::read($repo->find($id,1))[$contract];
+    expect(count($history['monthly_history'])===2 && $history['monthly_history']['2022-01']['review']==='verified','otro año y formulario anterior preservan historial y revisión');
+    expect($history['initial_rent_amount']==='1000' && $repo->find($id,1)['rent_amount']==='3600000.00','canon inicial independiente del antecedente vigente');
+    expectStatus(422,fn()=>$leases->save($id,1,$v,$contract,[$office],['analysis_area_reference'=>$garage.':area_private_m2']),'área debe corresponder a unidades relacionadas');
+    expectStatus(409,fn()=>$leases->save($id,1,$v-1,$contract,[$office,$garage],['monthly_history'=>['2022-01'=>['rent_paid'=>'1']]]),'historial rechaza guardado simultáneo');
+    expectStatus(404,fn()=>$leases->save($id,2,$v,$contract,[$office],['monthly_history'=>['2022-01'=>['rent_paid'=>'1']]]),'historial aislado por propietario');
+    expect(\App\Services\LeaseRegister::forUnit($repo->find($id,1),$garage)[$contract]['monthly_history']===$history['monthly_history'],'anexo consulta pagos compartidos sin duplicarlos');
 })();

@@ -54,6 +54,23 @@ expect(leaseRequest($route.'/renta/antecedente',$ante,true)['status']===200,'can
 expect($repo->find($id,1)['rent_amount']==='3600000.50','canon conserva su columna original');
 $foreign=$repo->create(2);
 expect(leaseRequest('/avaluos/'.$foreign.'/metodologia-valuatoria/renta/arriendo',$post,true)['status']===404,'contrato ajeno denegado');
+$v=(int)$repo->find($id,1)['lease_version'];
+$monthly=array_replace($post,['version'=>$v,'lease_year'=>'2022','lease'=>['initial_rent_amount'=>'1000','initial_rent_period'=>'mensual',
+    'monthly_history'=>['2022-01'=>['rent_paid'=>'1.000,00','admin_billed'=>'90','admin_paid'=>'80','review'=>'verified','support'=>'Recibo <enero>']]]]);
+expect(leaseRequest($route.'/renta/arriendo',$monthly,true)['status']===200,'historial mensual guarda importes documentados sin proyectar canon');
+expect(leaseRequest($route.'/renta/arriendo',$monthly,true)['status']===409,'historial conserva protección ante conflicto');
+$yearPage=$page.'&lease_year=2022';$html=leaseRequest($yearPage)['body'];
+expect(str_contains($html,'Recibo &lt;enero&gt;') && str_contains($html,'value="1000.00"'),'recarga del año recupera importes y soporte escapado');
+$badMonth=array_replace($monthly,['version'=>$v+1,'lease'=>['monthly_history'=>['2022-02'=>['admin_paid'=>'99','review'=>'verified','support'=>'']]]]);
+$response=leaseRequest($route.'/renta/arriendo',$badMonth,true);
+expect($response['status']===422 && isset(json_decode($response['body'],true)['errors']['lease[monthly_history][2022-02][review]']),'mes revisado exige soporte y señala campo');
+expect(leaseRequest($route.'/renta/arriendo',$badMonth)['status']===303,'fallback conserva error de revisión mensual');
+$html=leaseRequest($yearPage)['body'];
+expect(str_contains($html,'value="99"') && str_contains($html,'Falta un importe documentado o su soporte.'),'fallback mensual recupera borrador con error visible');
+$nextYear=array_replace($monthly,['version'=>$v+1,'lease_year'=>'2023','lease'=>['monthly_history'=>['2023-01'=>['rent_paid'=>'1100','review'=>'pending']]]]);
+expect(leaseRequest($route.'/renta/arriendo',$nextYear,true)['status']===200,'otro año guarda sin reemplazar el anterior');
+$hist=\App\Services\LeaseRegister::read($repo->find($id,1))[$contract];
+expect(count($hist['monthly_history'])===2 && $hist['monthly_history']['2022-01']['admin_paid']==='80','pagos y cuota cobrada conservados entre años');
 $auth=\App\Core\Database::connect(['host'=>'127.0.0.1','port'=>$port,'database'=>'ga_test_auth','username'=>'root','password'=>'']);
 $auth->exec("UPDATE wp_jet_cct_funcionarios SET activo='No' WHERE _ID=1");
 try { expect(leaseRequest($route.'/renta/arriendo',$post,true)['status']===401,'actividad revalidada al guardar contrato'); }

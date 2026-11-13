@@ -6,6 +6,7 @@ require __DIR__ . '/methodology-workflow.php';
 require __DIR__ . '/income-concept.php';
 require __DIR__ . '/income-preparation.php';
 require __DIR__ . '/lease-register.php';
+require __DIR__ . '/lease-monthly-history.php';
 require __DIR__ . '/methodology-plan.php';
 require __DIR__ . '/cost-method.php';
 require __DIR__ . '/cost-academy-render.php';

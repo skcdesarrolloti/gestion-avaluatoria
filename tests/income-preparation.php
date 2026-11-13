@@ -11,8 +11,9 @@ declare(strict_types=1);
     expect($context['occupancy']==='rented_unspecified','ocupación global inequívoca se consulta sin inferir que está totalmente arrendado');
     expect($build([$unit,['id'=>'b','unit_kind'=>'property']])['occupancy']==='','ocupación global no se atribuye a unidades múltiples');
     expect($build([$unit],['part'=>'construccion'])['occupancy']==='','ocupación de inmueble completo no se atribuye a una parte');
-    expect($context['rows'][3]['value']==='','uso observado no prueba ni rellena uso aprobado');
-    expect($context['rows'][5]['value']==='85' && $context['rows'][5]['support']==='Escritura p. 4','área privada conserva su magnitud y soporte sin convertirla en área arrendable');
+    $origin=array_column($context['rows'],null,'label');
+    expect($origin['Uso aprobado documentado']['value']==='','uso observado no prueba ni rellena uso aprobado');
+    expect($origin['Área privada (m²)']['value']==='85' && $origin['Área privada (m²)']['support']==='Escritura p. 4','área privada conserva su magnitud y soporte sin convertirla en área arrendable');
     $subject['current_occupation']='mixta';
     expect(\App\Services\IncomeSubjectContext::build($record,$subject,[$unit],$component,[])['occupancy']==='',
         'ocupación mixta no se convierte automáticamente en parcialmente arrendado');

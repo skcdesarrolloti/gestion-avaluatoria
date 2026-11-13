@@ -14,11 +14,14 @@ final class LeaseInput
             if (!isset($definitions[$key]) || ($only!==null && !in_array($key,$only,true)))
                 throw new HttpException(422,'La ficha contiene campos no admitidos.');
             $field=$definitions[$key]; $error='';
+            if ($field['type']==='history') { $out[$key]=LeaseMonthlyHistory::input($value); continue; }
             if (!is_string($value)) $error='Revisa el formato del dato.';
             else {
                 $value=trim($value);
                 if (mb_strlen($value)>1500) $error='Escribe como máximo 1500 caracteres.';
                 elseif ($value!=='' && $field['type']==='select' && !isset($field['options'][$value])) $error='Selecciona una opción de la lista.';
+                elseif ($value!=='' && $field['type']==='area_reference'
+                    && !preg_match('/^[a-f0-9]{32}:(area_private_m2|area_adopted_m2|built_area_adopted_m2)$/D',$value)) $error='Selecciona un área de las unidades del contrato.';
                 elseif ($value!=='' && $field['type']==='date') {
                     $date=\DateTimeImmutable::createFromFormat('!Y-m-d',$value);
                     if (!$date || $date->format('Y-m-d')!==$value) $error='Indica una fecha válida.';

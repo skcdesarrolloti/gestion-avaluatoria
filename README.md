@@ -1,5 +1,9 @@
 # Gestión avaluatoria · SuCasa
 
+Renta: [captura inicial e historial mensual de pagos](docs/RENTA-HISTORIAL-MENSUAL.md),
+con referencia viva del área, canon inicial y administración PH validada manualmente.
+Historial compartido por contrato; todavía sin proyección IPC ni cálculos de Renta.
+
 Renta usa [cinco etapas con Academia contextual](docs/RENTA-CINCO-ETAPAS.md):
 inmueble y arriendo, investigación, ingresos/gastos, dos métodos y sustentación.
 Una sola navegación, con ficha y muestras conservadas; cálculos pendientes.

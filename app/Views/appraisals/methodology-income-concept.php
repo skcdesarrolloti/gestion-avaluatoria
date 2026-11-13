@@ -24,6 +24,13 @@ $leaseLegacy=LeaseRegister::legacy($record,$leaseUnitId);
             <?php $incomeOriginRows=$incomeSubject['rows']; require __DIR__.'/methodology-income-origin-rows.php'; ?>
             <p class="mt-2 text-sm">El piso de ubicación, la altura del edificio, los acabados y la PH se completan en el capítulo 3. Las áreas no se convierten automáticamente en área arrendable.</p>
         </details>
+        <details><summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Ubicación, características y PH · consultar en origen</summary>
+            <?php $incomeOriginRows=array_values(array_filter($incomeSubject['context'],static fn($row)=>trim((string)$row['value'])!=='')); require __DIR__.'/methodology-income-origin-rows.php'; ?>
+            <?php $incomeOriginRows=$incomeSubject['physical']; require __DIR__.'/methodology-income-origin-rows.php'; ?>
+            <p class="mt-3 text-sm">Los datos generales del expediente y de la copropiedad requieren comprobar su alcance para esta unidad. No se atribuyen como gasto pagado.</p>
+            <?php $incomeOriginRows=array_values(array_filter($incomeSubject['economic'],static fn($row)=>str_starts_with($row['source'],'3.5') && trim((string)$row['value'])!=='')); require __DIR__.'/methodology-income-origin-rows.php'; ?>
+            <div class="mt-3 flex flex-wrap gap-3"><?php foreach ($incomeSubject['references'] as $reference): ?><a class="inline-flex min-h-11 items-center text-sm text-blue-800 underline" href="<?= e(url($reference['url'])) ?>"><?= e($reference['label']) ?></a><?php endforeach; ?></div>
+        </details>
     </div>
     <a class="mt-2 inline-flex min-h-11 items-center font-semibold text-blue-800 underline" href="<?= e($flowUrl('1')) ?>#renta-orientacion">Consultar ayudas y soportes en Academia de Renta</a>
     <?php require __DIR__.'/lease-form.php'; ?>

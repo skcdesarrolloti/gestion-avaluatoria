@@ -2,7 +2,7 @@
 declare(strict_types=1);
 namespace App\Models;
 use App\Core\HttpException;
-use App\Services\{LeaseFields,LeaseInput,LeaseRegister};
+use App\Services\{LeaseFields,LeaseInput,LeaseRegister,LeaseMonthlyHistory};
 use PDO;
 
 final class LeaseRepository
@@ -18,7 +18,12 @@ final class LeaseRepository
         $allowed=array_unique([...$active,...($previous['unit_ids'] ?? [])]);
         if (!is_array($unitIds) || !$unitIds || array_filter($unitIds,static fn($u)=>!is_string($u) || !in_array($u,$allowed,true)))
             throw new HttpException(422,'Relaciona las unidades del contrato.',['lease_units'=>'Selecciona unidades de este expediente.']);
-        $data=array_replace($previous,LeaseInput::fields($posted),['unit_ids'=>array_values(array_unique($unitIds))]);
+        $changes=LeaseInput::fields($posted);
+        if (isset($changes['monthly_history'])) $changes['monthly_history']=LeaseMonthlyHistory::merge($previous['monthly_history'] ?? [],$changes['monthly_history']);
+        $data=array_replace($previous,$changes,['unit_ids'=>array_values(array_unique($unitIds))]);
+        if (!empty($data['analysis_area_reference']) && !in_array(explode(':',$data['analysis_area_reference'])[0],$data['unit_ids'],true))
+            throw new HttpException(422,'El área debe pertenecer a una unidad relacionada.',
+                ['lease[analysis_area_reference]'=>'Revisa las unidades incluidas en el contrato.']);
         LeaseInput::validate($data);
         if (($data['economic_source'] ?? '')==='assignment') foreach ($all as $key=>$lease)
             if ($key!==$leaseId && ($lease['economic_source'] ?? '')==='assignment')

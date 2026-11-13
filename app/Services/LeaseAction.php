@@ -18,7 +18,7 @@ final class LeaseAction
         $version=filter_var($_POST['version'] ?? null,FILTER_VALIDATE_INT);
         if ($version===false || $version===null || $version<0) throw new HttpException(422,'Versión inválida.');
         $redirect='avaluos/'.$id.'/metodologia-valuatoria?method=renta&stage=3&component='.rawurlencode($key)
-            .'&lease='.rawurlencode($leaseId).'#renta-concepto';
+            .'&lease='.rawurlencode($leaseId).'&lease_year='.LeaseMonthlyHistory::year($_POST['lease_year'] ?? null,[]).'#renta-concepto';
         try {
             if (!$antecedent) {
                 $linked=$_POST['lease_units'] ?? [];
@@ -33,6 +33,13 @@ final class LeaseAction
             $posted=$_POST[$antecedent?'antecedent':'lease'] ?? [];
             foreach (is_array($posted)?$posted:[] as $field=>$value)
                 if (is_string($value)) $values[$field]=mb_substr($value,0,1600);
+            if (!$antecedent && is_array($posted['monthly_history'] ?? null)) {
+                foreach (array_slice($posted['monthly_history'],0,12,true) as $month=>$row) {
+                    if (!is_string($month) || !preg_match('/^(19|20|21)\d{2}-(0[1-9]|1[0-2])$/D',$month) || !is_array($row)) continue;
+                    foreach (LeaseMonthlyHistory::fields() as $field=>$definition)
+                        if (is_string($row[$field] ?? null)) $values['monthly_history'][$month][$field]=mb_substr($row[$field],0,1600);
+                }
+            }
             Session::flash('lease_'.$id,json_encode(['lease_id'=>$leaseId,'antecedent'=>$antecedent,'values'=>$values,
                 'units'=>is_array($_POST['lease_units'] ?? null)?array_filter($_POST['lease_units'],'is_string'):[],
                 'version'=>$version,'errors'=>$error->errors,'message'=>$error->getMessage()],JSON_THROW_ON_ERROR));

@@ -8,10 +8,10 @@ final class LeaseFields
     public static function all(): array
     {
         $f=static fn($label,$type,$help,$options=[])=>compact('label','type','help','options');
-        return [
+        return LeasePreparationFields::all() + [
             'reference'=>$f('Identificación del contrato','text','Ej. Contrato oficina y garaje · firmado en 2025'),
             'status'=>$f('Situación documentada del contrato','select','Selecciona según los documentos; las fechas no cambian este estado automáticamente.',
-                ['draft'=>'Por verificar','current'=>'Vigente según soporte','past'=>'Anterior / terminado']),
+                ['draft'=>'Por verificar','current'=>'Vigente según soporte','past'=>'Anterior / terminado','none'=>'Sin contrato vigente · antecedentes y gastos']),
             'scope'=>$f('Espacios o partes comprendidos','textarea','Ej. Oficina completa y garaje 12; el depósito tiene otro contrato.'),
             'economic_source'=>$f('Procedencia del canon','select','Usa el antecedente del encargo solo si corresponde a este contrato. Se consulta sin copiarlo.',
                 ['own'=>'Canon propio de este contrato','assignment'=>'Canon ya registrado en el encargo']),

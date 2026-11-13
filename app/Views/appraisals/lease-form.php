@@ -12,9 +12,19 @@ $leaseErrors=$leaseOwnOld['errors'] ?? []; $leasePrefix='lease';
 $leaseLinked=$leaseOwnOld['units'] ?? $leaseSaved['unit_ids'] ?? [$leaseUnitId];
 $leaseActive=array_column(array_filter($units,static fn($u)=>$u['unit_kind']!=='common'),null,'id');
 $leaseUrl=$flowUrl('3').'&lease=';
+$leaseAreaAvailable=[];
+foreach ($units as $areaSourceUnit) foreach (['area_private_m2','area_adopted_m2','built_area_adopted_m2'] as $areaSourceKey)
+    if (is_numeric($areaSourceUnit[$areaSourceKey] ?? '') && (float)$areaSourceUnit[$areaSourceKey]>0) $leaseAreaAvailable[]=$areaSourceUnit['id'].':'.$areaSourceKey;
+$leaseAntecedentAvailable=($record['rent_amount'] ?? '')!=='' && ($record['rent_amount'] ?? null)!==null && !empty($record['rent_period']);
+$leaseYear=\App\Services\LeaseMonthlyHistory::year($_GET['lease_year'] ?? null,$leaseValues);
+$leaseValues['monthly_history']=is_array($leaseValues['monthly_history'])?$leaseValues['monthly_history']:[];
+for ($month=1;$month<=12;$month++) {
+    $key=sprintf('%04d-%02d',$leaseYear,$month);
+    $leaseValues['monthly_history'][$key]=array_replace(array_fill_keys(array_keys(\App\Services\LeaseMonthlyHistory::fields()),''),$leaseValues['monthly_history'][$key] ?? []);
+}
 ?>
 <div class="mt-5 space-y-3">
-    <h3 class="text-xl font-semibold">Contratos y unidades relacionadas</h3>
+    <h3 class="text-xl font-semibold">Ficha del arriendo · contratos y unidades relacionadas</h3>
     <p class="text-sm">Un contrato puede comprender varias unidades. Abre la ficha existente para relacionarlas; el canon se registra una sola vez.</p>
     <div class="flex flex-wrap gap-2" aria-label="Fichas de arriendo">
         <?php foreach ($leaseRegister as $key=>$entry): ?>
@@ -23,9 +33,12 @@ $leaseUrl=$flowUrl('3').'&lease=';
         <a class="btn-secondary" href="<?= e($leaseUrl.bin2hex(random_bytes(16))) ?>#renta-concepto">Agregar otro contrato</a>
     </div>
 </div>
+<details class="mt-4" <?= !in_array($leaseOccupation['occupancy'] ?? '',['vacant','owner','works'],true) || $leaseSaved || $leaseOwnOld?'open':'' ?>>
+<summary class="min-h-11 cursor-pointer font-semibold">Consultar o completar contrato, antecedentes y pagos</summary>
+<p class="mt-2 text-sm">Si no hay arriendo vigente, conserva aquí los contratos anteriores y los pagos documentados de PH. No necesitas inventar un canon ni llenar fechas de un contrato inexistente.</p>
 <form id="lease-form" class="mt-5 space-y-5" method="post" action="<?= e(url($basePath.'/renta/arriendo')) ?>"
     data-module-autosave data-save-in-place data-autosave-endpoint="<?= e(url($basePath.'/renta/arriendo')) ?>"
-    data-lease-form="<?= e(json_encode(['values'=>$leaseValues,'issues'=>(object)$leaseErrors,'id'=>$leaseId],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>"
+    data-lease-form="<?= e(json_encode(['values'=>$leaseValues,'issues'=>(object)$leaseErrors,'id'=>$leaseId,'occupancy'=>$leaseOccupation['occupancy'] ?? '', 'areaAvailable'=>$leaseAreaAvailable,'antecedentAvailable'=>$leaseAntecedentAvailable],JSON_UNESCAPED_UNICODE|JSON_THROW_ON_ERROR)) ?>"
     x-data="leaseForm()" @ga:validation="validation($event.detail)">
     <?= csrf_field() ?><input type="hidden" name="component" value="<?= e($componentKey) ?>"><input type="hidden" name="lease_id" value="<?= e($leaseId) ?>">
     <input type="hidden" name="version" value="<?= (int)($leaseOwnOld['version'] ?? $record['lease_version'] ?? 0) ?>">
@@ -44,6 +57,7 @@ $leaseUrl=$flowUrl('3').'&lease=';
         </div>
         <p id="lease-units-error" class="text-sm text-red-700" role="alert" x-text="issues.lease_units || ''"><?= e($leaseErrors['lease_units'] ?? '') ?></p>
         <?php $leaseField='scope'; require __DIR__.'/lease-field.php'; ?>
+        <?php require __DIR__.'/lease-area.php'; ?>
     </fieldset>
     <fieldset class="rounded-xl border p-4"><legend class="px-2 font-semibold">2. Canon y pagos documentados</legend>
         <?php $leaseField='economic_source'; require __DIR__.'/lease-field.php'; ?>
@@ -56,13 +70,22 @@ $leaseUrl=$flowUrl('3').'&lease=';
             <?php foreach (['received_amount','received_period'] as $leaseField) require __DIR__.'/lease-field.php'; ?>
         </div>
     </fieldset>
-    <fieldset class="rounded-xl border p-4"><legend class="px-2 font-semibold">3. Vigencia e incrementos pactados</legend>
+    <details class="rounded-xl border p-4"><summary class="min-h-11 cursor-pointer font-semibold">3. Inicio, vigencia e incrementos pactados</summary>
+        <p class="my-3 text-sm">El canon inicial corresponde a la fecha de inicio registrada abajo. Conserva la regla y el período de IPC del contrato; después se construirá la serie mensual. No se presumen incrementos en enero ni se calculan valores anteriores.</p>
+        <div class="mb-4 grid gap-4 md:grid-cols-2"><?php foreach (['initial_rent_amount','initial_rent_period','first_adjustment_date','adjustment_index_reference'] as $leaseField) require __DIR__.'/lease-field.php'; ?></div>
         <div class="grid gap-4 md:grid-cols-2"><?php foreach (['start_date','end_date','term','renewals','adjustment_rule','adjustment_frequency','adjustment_next_date'] as $leaseField) require __DIR__.'/lease-field.php'; ?></div>
-    </fieldset>
-    <fieldset class="rounded-xl border p-4"><legend class="px-2 font-semibold">4. Condiciones y soportes</legend>
-        <div class="grid gap-4 md:grid-cols-2"><?php foreach (['inclusions','grace','expenses','support','notes'] as $leaseField) require __DIR__.'/lease-field.php'; ?></div>
+    </details>
+    <details class="rounded-xl border p-4"><summary class="min-h-11 cursor-pointer font-semibold">4. Condiciones especiales y responsables de gastos</summary>
+        <div class="grid gap-4 md:grid-cols-2"><?php foreach (['inclusions','grace','expenses'] as $leaseField) require __DIR__.'/lease-field.php'; ?></div>
+    </details>
+    <?php require __DIR__.'/lease-history.php'; ?>
+    <fieldset class="rounded-xl border p-4"><legend class="px-2 font-semibold">Soportes y pendientes</legend>
+        <p class="text-sm">Esta lista señala datos faltantes en la ficha; no acredita cumplimiento ni sustituye la revisión de documentos.</p>
+        <ul class="my-3 list-disc pl-5"><template x-for="item in pendingItems" :key="item"><li x-text="item"></li></template></ul>
+        <div class="grid gap-4 md:grid-cols-2"><?php foreach (['support','notes'] as $leaseField) require __DIR__.'/lease-field.php'; ?></div>
     </fieldset>
     <div class="flex flex-wrap items-center gap-3"><button type="submit" class="btn-primary">Guardar ficha / reintentar</button><p data-autosave-status role="status" class="text-sm">Sin cambios pendientes. Autoguardado como borrador.</p></div>
     <p class="text-xs text-slate-600">El guardado se confirma al responder el servidor. Sin conexión, conserva la página abierta hasta confirmar el guardado.</p>
 </form>
+</details>
 <?php require __DIR__.'/lease-antecedent.php'; ?>

@@ -23,6 +23,7 @@ final class IncomeSubjectContext
             $rows[]=compact('label','value','source','support')+['url'=>$subjectUrl.'&section='.$section.'#'.$hash];
         };
         $add('Unidad y tipología',$component['label'] ?? $unit['label'] ?? '', '3.1 · Unidad del recorrido','tipologias');
+        $add('Referencia IGAC registrada',$unit['igac_typology_hint'] ?? '', '3.1 · Referencia por revisar con la evidencia','tipologias');
         $add('Matrícula de la unidad',$evidence['registry'] ?? ($same?($subject['property_registry'] ?? ''):''),
             '3.1 · Identificación','tipologias',$evidence['legal_source'] ?? '');
         $observed=$evidence['observed_use'] ?? '';

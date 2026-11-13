@@ -4,7 +4,7 @@
     <ul class="mt-4 list-disc space-y-3 pl-5">
         <li><strong>Ingresos:</strong> distinguir canon pactado, cobros documentados y evidencia de arriendos comparables.</li>
         <li><strong>Vacancia y falta de pago:</strong> reunir antecedentes de ocupación y cobros con sus períodos y fuentes.</li>
-        <li><strong>Gastos:</strong> identificar qué asume el propietario, qué corresponde al arrendatario y qué pagos se recuperan.</li>
+        <li><strong>Gastos:</strong> consultar el historial mensual de la etapa 1: cuota de administración cobrada, pago ordinario, expensas extraordinarias, pagador y validación manual. Identificar qué asume el propietario, qué corresponde al arrendatario y qué pagos se recuperan.</li>
         <li><strong>Soportes:</strong> relacionar contratos, liquidaciones, facturas y condiciones particulares del tipo de inmueble.</li>
     </ul>
     <p class="mt-4 rounded-lg bg-amber-50 p-3 text-sm">Preparación pendiente de desarrollar: aquí todavía no se calculan ingresos netos ni se adoptan porcentajes de vacancia o gastos.</p>

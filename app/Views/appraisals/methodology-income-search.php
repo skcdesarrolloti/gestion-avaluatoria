@@ -1,6 +1,7 @@
 <section id="renta-busqueda" class="scroll-mt-64 rounded-2xl border bg-white p-5 sm:p-8">
     <p class="eyebrow">Renta · Preparar la investigación · <?= e($componentLabel) ?></p>
     <h2 class="mt-2 text-2xl font-semibold">2. Preparar la búsqueda de arriendos</h2>
+    <?php require __DIR__.'/methodology-income-statistical-scope.php'; ?>
     <p class="mt-3 leading-6">Revisa los datos del expediente y elige dónde buscar. Esta guía prepara el texto y los filtros que aplicarás dentro del portal; no cambia sus filtros automáticamente.</p>
     <details class="mt-3 rounded-lg bg-teal-50 p-4">
         <summary class="min-h-11 cursor-pointer font-semibold">(?) ¿Por qué revisar estos criterios?</summary>
