@@ -1,4 +1,7 @@
 import { loadPageComponents } from './page-components-loader.js';
+import { showSaveBlocked } from './save-navigation-notice.js';
+import { refreshCsrf, isLoginRedirect } from './session-refresh.js';
+export { isLoginRedirect };
 const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 const flushAutosaves = () => typeof window.gaFlushAutosaves === 'function' ? window.gaFlushAutosaves() : Promise.resolve(true);
 let busyTimer = null;
@@ -65,17 +68,6 @@ async function renderFetchedPage(response, fallbackUrl, focusMain) {
     return true;
 }
 
-async function refreshCsrf() {
-    const response = await fetch(window.location.href, {
-        headers: { Accept: 'text/html', 'X-Requested-With': 'fetch' },
-        credentials: 'same-origin',
-    });
-    const html = await response.text();
-    const nextDocument = new DOMParser().parseFromString(html, 'text/html');
-    updateHeadFrom(nextDocument);
-    return csrfToken() !== '';
-}
-
 export function redirectedUrl(responseUrl, fallbackUrl, body = null, currentHref = window.location.href) {
     const url = new URL(responseUrl || fallbackUrl, currentHref);
     if (!(body instanceof FormData)) {
@@ -100,16 +92,6 @@ export function redirectedUrl(responseUrl, fallbackUrl, body = null, currentHref
         url.hash = target.hash;
     }
     return url.toString();
-}
-
-export function isLoginRedirect(responseUrl, currentHref = window.location.href) {
-    try {
-        const url = new URL(responseUrl, currentHref);
-        const current = new URL(currentHref);
-        return url.origin === current.origin && /\/login\/?$/i.test(url.pathname);
-    } catch {
-        return false;
-    }
 }
 
 function showSessionExpiredNotice() {
@@ -186,7 +168,8 @@ export function installFetchNavigation() {
         const link = event.target.closest?.('a[href]');
         if (!link || !shouldHandleLink(link, event)) return;
         event.preventDefault();
-        if (!await flushAutosaves()) return;
+        setBusy(true,'Guardando cambios...');
+        if (!await flushAutosaves()) {setBusy(false);showSaveBlocked(link);return;}
         visit(link.href, { text: 'Cargando página...' });
     });
 

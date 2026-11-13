@@ -1,6 +1,5 @@
 import Alpine from 'alpinejs';
 import { researchPlan } from './research-plan.js';
-import { igacUnitSelector } from './igac-unit-selector.js';
 import { appraisalForm } from './appraisal-form.js';
 import { installFetchNavigation } from './fetch-navigation.js';
 import { installModuleAutosave } from './module-autosave.js';
@@ -31,13 +30,12 @@ import { loadPageComponents } from './page-components-loader.js';
 (async()=>{
 window.Alpine = Alpine;
 try {await loadPageComponents(document,Alpine);} catch {
-    const form=document.querySelector('[data-market-analysis], [data-income-inputs]');
+    const form=document.querySelector('[data-market-analysis], [data-income-inputs], [x-data^="igacUnitSelector("]');
     if(form){const root=form.closest('[x-data]')??form;root.setAttribute('x-ignore','');root.querySelectorAll('button').forEach(b=>b.disabled=true);
         const notice=document.createElement('p');notice.textContent='No se pudo cargar esta sección. Recarga la página para reintentar.';notice.setAttribute('role','alert');form.prepend(notice);}
 }
 Alpine.data('sourceResultsPaste', sourceResultsPaste);
 Alpine.data('researchPlan', researchPlan);
-Alpine.data('igacUnitSelector', igacUnitSelector);
 Alpine.data('ciencuadrasPaste', ciencuadrasPaste);
 Alpine.data('properatiPaste', properatiPaste);
 Alpine.data('mercadolibrePaste', mercadolibrePaste);

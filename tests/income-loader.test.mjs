@@ -16,3 +16,12 @@ test('Renta code loads only on its page, retries a failed import, and registers 
     assert.equal(imports,1);assert.equal(registered[0][0],'incomeInputs');
     await loadPageComponents(income,alpine,async()=>{imports++;});assert.equal(imports,1);
 });
+
+test('IGAC loads on its form, retries a missing bundle and is ready before mounting chapter 3',async()=>{
+    const page={querySelector:selector=>selector==='[x-data^="igacUnitSelector("]'?{}:null};
+    const registered=[],alpine={data:(...args)=>registered.push(args)};let imports=0;
+    await assert.rejects(loadPageComponents(page,alpine,async()=>({})),/IGAC/);
+    await loadPageComponents(page,alpine,async url=>{imports++;assert.match(url,/igac-unit-selector.js\?v=/);return {igacUnitSelector:()=>({})};});
+    assert.equal(registered[0][0],'igacUnitSelector');
+    await loadPageComponents(page,alpine,async()=>{imports++;});assert.equal(imports,1);
+});

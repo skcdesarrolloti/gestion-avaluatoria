@@ -1,5 +1,17 @@
 # Entrega al responsable de la implementación
 
+13/11/2026 · Navegación bloqueada por guardado pendiente: ahora muestra al inicio
+el capítulo solicitado, la causa y el reintento; una sesión vencida permite abrir
+login en otra pestaña sin desmontar el borrador. Autoguardado renueva un CSRF
+desactualizado y reintenta una sola vez, conservando versión y protección 409.
+IGAC se carga por página para respetar el presupuesto inicial: 81.913/81.920 bytes.
+PHP1680/JS291/HTTP18; navegador local valida renovación, sesión vencida, borrador,
+login separado, guardado y entrada al capítulo 8; escritorio/móvil390 sin errores.
+En producción se observó el error de sesión en capítulo 3; tras el login del
+usuario se abrió capítulo 8. No se editaron sus respuestas ni se confirmó el
+guardado de su borrador anterior. Sin DDL ni cálculos nuevos.
+Detalle y comandos: NAVEGACION-GUARDADO-SESION.md.
+
 13/11/2026 · Corregido filtro IGAC al cambiar tipo en 3.1: la categoría anterior
 ya no se añade completa a las opciones. Apartamento consulta sus familias;
 Lote muestra cero propuestas constructivas y ayuda sobre suelo/mejoras.

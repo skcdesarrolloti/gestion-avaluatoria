@@ -2,8 +2,8 @@ import { packComparableRows } from './comparable-transport.js';
 import { publishDerivedChange } from './derived-refresh.js';
 import { acknowledgeCompositionMethods } from './composition-method-save.js';
 import { requestDeadline } from './request-deadline.js';
+import { postAutosave } from './autosave-session.js';
 
-const csrfToken = () => document.querySelector('meta[name="csrf-token"]')?.content ?? '';
 const states = new WeakMap();
 const activeStates = new Set();
 
@@ -47,9 +47,7 @@ async function jsonResponse(response) {
     const type = response.headers?.get?.('content-type') ?? '';
     if (type.includes('application/json') || typeof response.text !== 'function') return response.json();
     const text = (await response.text()).replace(/<[^>]+>/g, ' ').replace(/\s+/g, ' ').trim();
-    const message = response.status === 401 || response.status === 419
-        ? 'Tu sesión venció. Recarga e inicia sesión antes de guardar.'
-        : (text ? text.slice(0, 220) : 'El servidor no devolvió una confirmación válida de guardado.');
+    const message = text ? text.slice(0, 220) : 'El servidor no devolvió una confirmación válida de guardado.';
     return { ok: false, message };
 }
 
@@ -104,13 +102,7 @@ async function save(form) {
         const body=formBody(form, extras);
         phase='network';
         const { response, result } = await requestDeadline(async () => {
-            const response = await fetch(form.dataset.autosaveEndpoint, {
-                method: 'POST',
-                body,
-                headers: { Accept: 'application/json', 'X-CSRF-Token': csrfToken() },
-                credentials: 'same-origin',
-                signal: state.controller.signal,
-            });
+            const response = await postAutosave(form,body,state.controller.signal);
             phase='response';
             const result = await jsonResponse(response);
             return { response, result };
