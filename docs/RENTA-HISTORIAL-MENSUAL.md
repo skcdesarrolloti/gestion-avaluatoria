@@ -77,4 +77,9 @@ insumo común de capitalización directa y flujo de caja descontado.
   muestras); los1718 checks pasan. La navegación HTTP/UI probada no emitió esos
   avisos ni errores de JavaScript. No se afirma cumplimiento normativo automático.
 
-Publicar mediante commit/push origin/main y verificar assets y flujo del hosting.
+Publicado con commit/push575d9b1 a origin/main. Después de esperar el despliegue,
+app.js, income-inputs.js y app.css públicos respondieron200 y sus SHA-256
+coincidieron con los locales. La apertura autenticada del expediente confirmó
+que Oficina Principal sigue en Mercado; no se cambió su método ni sus datos
+para verificar. La ficha nueva completa se verificó con PHP/BD locales; su
+verificación visual en un recorrido Renta activo del hosting queda pendiente.

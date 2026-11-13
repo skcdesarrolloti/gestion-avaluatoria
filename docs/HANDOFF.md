@@ -11,6 +11,9 @@ no afirma que éste exista ni que la validación predictiva pendiente esté term
 PHP1718/JS293/BD272/HTTP26+14+14; lint/build/tamaño dentro de80KB. UI local:
 escritorio/móvil390, guardado, recarga, fetch por año, offline/reintento y409.
 Sin DDL ni alteración de muestras. Detalles: RENTA-HISTORIAL-MENSUAL.md.
+Publicado575d9b1; los tres assets públicos200 con SHA-256 idénticos. El expediente
+autenticado continúa en Mercado; no se cambió su selección para la comprobación.
+Ficha nueva verificada localmente; revisión visual de Renta activa en hosting pendiente.
 
 13/11/2026 · Renta adopta la navegación de trabajo de Mercado en cinco etapas:
 Inmueble y arriendo; Investigación de arriendos; Ingresos y gastos; Valoración
