@@ -4,11 +4,11 @@ namespace App\Services;
 
 final class MethodStudyState
 {
-    private const FIELDS=['research_plan','analysis','conclusion','evidence_hash','income_concept','cost_scope','income_selection'];
+    private const FIELDS=['research_plan','analysis','conclusion','evidence_hash','income_concept','cost_scope','income_selection','income_valuation'];
     public static function change(array $item,array $changes): array
     {
         $old=$item['method'] ?? '';$next=$changes['method'] ?? $old;
-        if ($old!=='' && $old!==$next && array_intersect(array_keys($changes),['research_plan','analysis','conclusion','income_concept','evidence_hash']))
+        if ($old!=='' && $old!==$next && array_intersect(array_keys($changes),['research_plan','analysis','conclusion','income_concept','evidence_hash','income_valuation']))
             throw new \App\Core\HttpException(422,'Guarda el cambio de método separado de los datos de la investigación.');
         if ($old!==$next) {
             $snapshot=array_intersect_key($item,array_flip(self::FIELDS));

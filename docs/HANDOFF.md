@@ -1,5 +1,17 @@
 # Entrega al responsable de la implementación
 
+13/11/2026 · Renta incorpora ingresos/costos y proyección mensual, alternativas de
+tasa (mercado, referencia+prima, CAPM del activo, ponderación antes de renta, manual
+y perpetuidad), selección sustentada y cálculo explícito de directa/FCD. Cinco etapas,
+Academia contextual, detalle plegable, gráfico anual, mensual completo y memoria JSON.
+Canon/contrato y fecha del encargo consultados en origen. Sin porcentajes predeterminados,
+sin alterar captura, muestras ni exclusiones. Persistencia sin DDL con CAS/contexto y
+snapshot marcado anterior cuando cambian sus entradas. PHP1759/JS300/BD312/HTTP24;
+lint/build/tamaño correctos. BD desechables ga_test_app/auth3388; HTTP local8090 con
+DB3387. Advertencias preexistentes de fixtures PHP incompletos se mantienen.
+UI local: autoguardado, recarga, cálculo y alternativas comprobados. Ver convenciones,
+supuestos, límites y comandos en RENTA-FLUJOS-TASAS-COSTOS.md.
+
 13/11/2026 · Corrección adicional del guardado de áreas: la matriz completa de
 129 anuncios seguía agotando la espera de respuesta. Se incorpora «Completar
 áreas y fuentes» desde Investigación de Renta y la matriz. Página de diez anuncios

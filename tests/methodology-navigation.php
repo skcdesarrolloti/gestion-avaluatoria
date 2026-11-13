@@ -136,7 +136,7 @@ declare(strict_types=1);
         expect(($state['incomeTab'] ?? '')===$incomeStep && substr_count($html,'aria-label="Etapas del estudio de Renta"')===1
             && !str_contains($html,'aria-label="Organización del capítulo 8"') && !str_contains($html,'aria-label="Siguiente paso"'),
             'ruta Renta '.$stage.' abre cinco etapas sin segunda barra ni continuación al recorrido anterior');
-        expect(!str_contains($html,'data-market-analysis') && str_contains($html,'Los cálculos de ambos métodos están pendientes'),
+        expect(!str_contains($html,'data-market-analysis') && str_contains($html,'Aún no hay cálculo.') && str_contains($html,'data-income-valuation'),
             'navegar Renta '.$stage.' no activa cálculos de Mercado ni presenta resultados ficticios');
     }
 })();

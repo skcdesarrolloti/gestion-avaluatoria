@@ -1,0 +1,45 @@
+<?php
+declare(strict_types=1);
+require_once __DIR__.'/income-valuation-fixture.php';
+(static function(): void {
+    $s=incomeValuationFixture();$context=['leases'=>[],'hash'=>'fixture'];
+    $calc=\App\Services\IncomeValuationCalculator::calculate($s,$context);
+    expect(abs($calc['direct']['value']-120000)<0.00001,'directa capitaliza NOI anual con tasa neta emparejada');
+    $pv=0;$origin=new DateTimeImmutable('2026-12-31');
+    for ($m=1;$m<=12;$m++) { $end=(new DateTimeImmutable(sprintf('2027-%02d-01',$m)))->modify('last day of this month');$pv+=800/pow(1.1,$origin->diff($end)->days/365); }
+    expect(abs($calc['dcf']['value']-($pv+120000/1.1))<0.00001,'FCD coincide con suma independiente de flujos al cierre y salida descontada');
+    expect(count($calc['dcf']['months'])===12 && abs($calc['dcf']['months'][0]['cash']-800)<1e-8,'doce cierres mensuales separan costos del canon');
+    $dateSource=\App\Services\IncomeValuationCalculator::calculate($s,array_replace($context,['value_date'=>'2027-01-31']));
+    expect($dateSource['dcf']['months'][0]['month']==='2027-02','fecha de encargo prima sobre fecha provisional sin duplicación');
+    $s['events']=\App\Services\IncomeValuationInput::section('events',[['month'=>'2027-03','rent'=>'0','source'=>'Gracia de marzo'],['month'=>'2027-06','capex'=>'300','extra'=>'100','source'=>'Presupuesto']]);
+    $changed=\App\Services\IncomeValuationCalculator::calculate($s,$context);
+    expect($changed['dcf']['months'][2]['cash']===-200.0 && abs($changed['dcf']['months'][5]['cash']-400)<1e-8,'gracia conserva gastos y CAPEX se descuenta después del NOI');
+    expect($changed['direct']['value']===$calc['direct']['value'],'directa usa año representativo sin eventos extraordinarios del FCD');
+    $s=incomeValuationFixture();$s['projection']['date']='2026-01-15';$s['projection']['months']='1';$s['projection']['market_rent']='3100';
+    $partial=\App\Services\IncomeValuationCalculator::calculate($s,$context)['dcf']['months'][0];
+    expect(abs($partial['potential']-1600)<1e-8 && abs($partial['costs']-200*16/31)<1e-8,'primer mes prorratea canon y gasto desde el día siguiente');
+    $p=['growth'=>'10','next_increase'=>'2024-02-29'];$source=['rent'=>1000,'lease'=>null];
+    expect(abs(\App\Services\IncomeCashFlow::rentAt(new DateTimeImmutable('2025-02-28'),$p,$source)-1210)<1e-8,'aniversario de febrero bisiesto se ajusta al último día válido');
+    $p+=['after_contract'=>'market','relet_date'=>'2025-03-01','market_rent'=>'2000'];
+    $source['lease']=['start'=>'2023-01-01','end'=>'2025-01-31'];
+    expect(\App\Services\IncomeCashFlow::rentAt(new DateTimeImmutable('2025-02-15'),$p,$source)===0.0,'intervalo entre vencimiento y recolocación queda sin renta');
+    expect(abs(\App\Services\IncomeCashFlow::rentAt(new DateTimeImmutable('2025-03-01'),$p,$source)-2420)<1e-8,'recolocación usa renta de mercado con incremento documentado');
+    $s=incomeValuationFixture();$s['rates'][2]['method']='gordon';$s['rates'][2]['basis']='cash';$s['adoption']['terminal_growth']='2';$s['adoption']['terminal_capex']='600';
+    $g=\App\Services\IncomeValuationCalculator::calculate($s,$context)['dcf'];
+    expect(abs($g['terminal_value']-((9600-600)*1.02/.08))<1e-7,'perpetuidad usa flujo del año siguiente tras reposición y k menos g');
+    $s['adoption']['terminal_growth']='10';expect(\App\Services\IncomeValuationCalculator::calculate($s,$context)['dcf']['value']===null,'k igual a g bloquea perpetuidad');
+    $s=incomeValuationFixture();$s['projection']['vacancy']='';expect(\App\Services\IncomeValuationCalculator::calculate($s,$context)['direct']['value']===null,'vacío no se convierte en vacancia cero');
+    $s['rates'][0]['basis']='gross';$gross=\App\Services\IncomeValuationCalculator::calculate($s,$context);
+    expect(abs($gross['direct']['value']-150000)<1e-7 && $gross['dcf']['value']===null,'renta bruta usa tasa bruta sin inventar gastos faltantes para FCD');
+    $s=incomeValuationFixture();$s['costs'][]=array_replace($s['costs'][0],['payer'=>'tenant','amount'=>'900']);
+    expect(abs(\App\Services\IncomeValuationCalculator::calculate($s,$context)['direct']['value']-120000)<1e-8,'gasto del arrendatario no se resta al propietario');
+    $rate=$s['rates'][1];$rate['method']='capm';$rate['beta']='0.5';
+    expect(abs(\App\Services\IncomeRateCalculator::one($rate)['value']-.08)<1e-9,'CAPM usa beta multiplicando prima y no R cuadrado');
+    $rate=array_replace($rate,['method'=>'wacc','equity'=>'12','debt'=>'8','debt_weight'=>'25']);
+    expect(abs(\App\Services\IncomeRateCalculator::one($rate)['value']-.11)<1e-9,'ponderación antes de impuesto no introduce escudo fiscal');
+    $rate['purpose']='direct';expect(\App\Services\IncomeRateCalculator::one($rate)['value']===null,'WACC no se usa como capitalización directa');
+    expectStatus(422,fn()=>\App\Services\IncomeValuationInput::section('projection',['vacancy'=>'1.000,5']),'rechaza miles ambiguos');
+    expectStatus(422,fn()=>\App\Services\IncomeValuationInput::section('events',[['month'=>'2027-13']]),'rechaza mes inválido');
+    $s=incomeValuationFixture();$s['events']=[['month'=>'2028-01','rent'=>'0','extra'=>'','capex'=>'','source'=>'fuera']];
+    expect(\App\Services\IncomeValuationCalculator::calculate($s,$context)['dcf']['value']===null,'eventos fuera del horizonte no se omiten silenciosamente');
+})();

@@ -13,7 +13,7 @@
             <li><strong>Solo lo atribuible al inmueble:</strong> separar rentas inmobiliarias de los ingresos de un negocio, marcas u otros intangibles.</li>
             <li><strong>Datos con soporte:</strong> reconocer la fuente, fecha, verificación y decisión del analista. Un documento disponible todavía requiere revisión.</li>
             <li><strong>Normas con su alcance:</strong> IGAC 22–26; IVS 101–106 y 400; NTS M01, GTS E01 y E02 e informes sectoriales. Las referencias internacionales se mantienen separadas del marco colombiano.</li>
-            <li><strong>Decisiones pendientes:</strong> mínimos particulares de NTS M01, compatibilidad de rentas y tasas, horizonte, contratos y ajustes. Se resolverán antes de programar cálculos; los ejemplos no son parámetros del expediente.</li>
+            <li><strong>Decisiones del analista:</strong> comprobar requisitos aplicables al encargo, compatibilidad de rentas y tasas, horizonte, contratos y ajustes antes de utilizar resultados; los ejemplos no son parámetros del expediente.</li>
         </ul>
     </details>
     <p class="mt-4 text-sm">El estudio de Renta tiene cinco etapas con estas ayudas disponibles en cada una. «1. Inmueble y arriendo» consulta el capítulo 3 y conserva la ficha del contrato para capitalización directa y flujo de caja descontado. La etapa 2 reúne búsqueda, captura y revisión de muestras.</p>

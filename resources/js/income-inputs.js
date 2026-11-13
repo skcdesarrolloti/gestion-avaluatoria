@@ -1,12 +1,14 @@
 import { incomePreparation } from './income-preparation.js';
 import { leaseForm } from './lease-form.js';
 import { incomeSelection } from './income-selection.js';
+import { incomeValuation } from './income-valuation.js';
 export function incomeInputs() {
     let pending=null, controller, root;
     return {
         preparation:incomePreparation,
         leaseForm,
         selection:incomeSelection,
+        valuation:incomeValuation,
         incomeTab:'concept', incomePortal:'', incomeLoaded:false, incomeLoading:false, incomeError:'',
         incomePortals:[], incomeSources:[], incomePortalBusy:false, incomePortalError:'',
         incomeSteps:{concept:'1. Inmueble y arriendo',research:'2. Investigación de arriendos',evidence:'3. Ingresos y gastos',valuation:'4. Valoración por los dos métodos',review:'5. Revisión y sustentación'},

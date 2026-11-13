@@ -1,37 +1,54 @@
-<section class="rounded-2xl border bg-white p-5 sm:p-8" x-show="incomeTab==='evidence'" <?= $incomeInitial==='evidence'?'':'x-cloak' ?>>
-    <h2 class="text-2xl font-semibold">3. Ingresos y gastos</h2>
-    <p class="mt-3">Organiza los soportes antes de estimar una renta. El contrato, los pagos y las responsabilidades se registran en la ficha del arriendo de la etapa 1.</p>
-    <ul class="mt-4 list-disc space-y-3 pl-5">
-        <li><strong>Ingresos:</strong> distinguir canon pactado, cobros documentados y evidencia de arriendos comparables.</li>
-        <li><strong>Vacancia y falta de pago:</strong> reunir antecedentes de ocupación y cobros con sus períodos y fuentes.</li>
-        <li><strong>Gastos:</strong> consultar el historial mensual de la etapa 1: cuota de administración cobrada, pago ordinario, expensas extraordinarias, pagador y validación manual. Identificar qué asume el propietario, qué corresponde al arrendatario y qué pagos se recuperan.</li>
-        <li><strong>Soportes:</strong> relacionar contratos, liquidaciones, facturas y condiciones particulares del tipo de inmueble.</li>
-    </ul>
-    <p class="mt-4 rounded-lg bg-amber-50 p-3 text-sm">Preparación pendiente de desarrollar: aquí todavía no se calculan ingresos netos ni se adoptan porcentajes de vacancia o gastos.</p>
-    <button type="button" class="btn-secondary mt-4" @click="openStage('concept')">Consultar o completar la ficha del arriendo</button>
-    <button type="button" class="btn-secondary mt-4" @click="openStage('research')">Consultar la investigación de arriendos</button>
-</section>
-<section class="rounded-2xl border bg-white p-5 sm:p-8" x-show="incomeTab==='valuation'" <?= $incomeInitial==='valuation'?'':'x-cloak' ?>>
-    <h2 class="text-2xl font-semibold">4. Valoración por los dos métodos</h2>
-    <p class="mt-3">Ambos consultarán el mismo inmueble, contratos, muestras y soportes. Cada método tendrá sus parámetros y su resultado identificado.</p>
-    <div class="mt-5 grid gap-4 sm:grid-cols-2">
-        <div class="rounded-xl border p-4"><h3 class="text-xl font-semibold">Capitalización directa</h3>
-            <p class="mt-3">Preparar la investigación de una renta representativa, sus gastos y una tasa de capitalización consistente con la renta utilizada.</p></div>
-        <div class="rounded-xl border p-4"><h3 class="text-xl font-semibold">Flujo de caja descontado</h3>
-            <p class="mt-3">Preparar la secuencia de contratos, ocupación, ingresos, gastos y cambios por período; sustentar horizonte, tasa de descuento y valor terminal.</p></div>
+<?php
+use App\Services\{IncomeValuationContext,IncomeValuationFields};
+$ivContext=IncomeValuationContext::build($record,$components[$componentKey] ?? []);
+$ivSaved=$selected['income_valuation'] ?? [];
+$ivOld=json_decode(\App\Core\Session::pullFlash('income_valuation_'.$record['id'].'_'.$componentKey) ?: '{}',true) ?: [];
+$ivState=[];
+foreach (['projection','costs','events','rates','adoption'] as $group) {
+    $defaults=in_array($group,['projection','adoption'],true)?array_fill_keys(array_keys(IncomeValuationFields::group($group)),''):[];
+    $ivState[$group]=array_replace($defaults,$ivSaved[$group] ?? []);
+}
+if (isset($ivOld['old']['data']) && is_array($ivOld['old']['data'])) $ivState=array_replace($ivState,$ivOld['old']['data']);
+if (is_string($ivOld['old']['payload'] ?? null)) {
+    $prior=json_decode($ivOld['old']['payload'],true);if (is_array($prior)) $ivState=array_replace($ivState,$prior);
+}
+$ivEndpoint=url($basePath.'/renta/valoracion');$ivIssues=$ivOld['errors'] ?? [];
+?>
+<div x-data="valuation" data-income-valuation data-valuation-state="<?= e(json_encode(['state'=>$ivState,'issues'=>(object)$ivIssues],JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE)) ?>">
+<form id="income-valuation" x-ref="valuationForm" method="post" action="<?= e($ivEndpoint) ?>" data-workflow-version
+    data-module-autosave data-save-in-place data-autosave-endpoint="<?= e($ivEndpoint) ?>" @ga:validation="validation($event.detail)" @input="stale=true" @change="stale=true">
+    <?= csrf_field() ?><input type="hidden" name="component" value="<?= e($componentKey) ?>"><input type="hidden" name="study_scope" value="renta:arriendo">
+    <input type="hidden" name="version" value="<?= (int)($ivOld['old']['version'] ?? $record['methodology_version'] ?? 0) ?>">
+    <input type="hidden" name="context_hash" value="<?= e($ivOld['old']['context_hash'] ?? $ivContext['hash']) ?>">
+    <input type="hidden" name="payload" value="" :value="JSON.stringify(state)">
+    <input type="hidden" name="return_step" value="<?= e(in_array($incomeInitial,['evidence','valuation','review'],true)?$incomeInitial:'valuation') ?>" :value="incomeTab">
+    <fieldset :disabled="busy" class="min-w-0">
+    <?php require __DIR__.'/income-valuation-inputs.php'; ?>
+    <section class="rounded-2xl border bg-white p-5 sm:p-8" x-show="incomeTab==='valuation'" <?= $incomeInitial==='valuation'?'':'x-cloak' ?>>
+        <h2 class="text-2xl font-semibold">4. Tasas y valoración</h2>
+        <p class="mt-3">Agrega alternativas sustentadas, compáralas y escoge una para cada función. Los cálculos no adoptan un valor de avalúo automáticamente.</p>
+        <?php $ivAcademy='rates';require __DIR__.'/income-valuation-academy.php';$ivGroup='rates';require __DIR__.'/income-valuation-rows.php'; ?>
+        <details class="mt-5 rounded-xl border p-4" open><summary class="min-h-11 cursor-pointer font-semibold">Elegir las tasas y justificar su uso</summary>
+            <div class="grid gap-4 md:grid-cols-2"><?php $ivGroup='adoption';$ivDynamic=false;foreach (['direct_id','direct_reason','discount_id','discount_reason'] as $ivKey) require __DIR__.'/income-valuation-field.php'; ?></div>
+        </details>
+        <details class="mt-5 rounded-xl border p-4"><summary class="min-h-11 cursor-pointer font-semibold">Salida del flujo y conclusión</summary>
+            <div class="grid gap-4 md:grid-cols-2"><?php foreach (['terminal_mode','exit_id','exit_reason','terminal_growth','terminal_capex','selling_cost','conclusion'] as $ivKey) require __DIR__.'/income-valuation-field.php'; ?></div>
+        </details>
+        <p class="mt-4 text-sm">Si solo hay soporte para un método, se mostrará su resultado y los pendientes del otro. Para FCD revisa calendario, costos y salida.</p>
+        <button class="btn-primary mt-4" type="button" @click="calculate()" :disabled="busy" x-text="busy?'Calculando y guardando…':'Comparar tasas y calcular los dos métodos'">Comparar tasas y calcular los dos métodos</button>
+        <noscript><button class="btn-primary mt-4" type="submit" name="operation" value="calculate">Calcular y guardar</button></noscript>
+    </section>
+    <div class="mt-4 flex flex-wrap items-center gap-3" x-show="incomeTab==='evidence' || incomeTab==='valuation'" <?= in_array($incomeInitial,['evidence','valuation'],true)?'':'x-cloak' ?>>
+        <button type="submit" class="btn-secondary">Guardar borrador ahora</button><p class="text-sm" role="status" data-autosave-status>Los cambios se guardan como borrador; calcular es una acción separada.</p>
     </div>
-    <p class="mt-4 rounded-lg bg-amber-50 p-3 text-sm">Los cálculos de ambos métodos están pendientes. No hay tasas predeterminadas, proyecciones ni valores adoptados en esta etapa.</p>
-    <p class="mt-3 text-sm">La vacancia, la tasa de capitalización y la tasa de descuento requieren sustentaciones propias. El criterio CV ≤ 7,5 % se conserva para el análisis de la muestra.</p>
-</section>
-<section class="rounded-2xl border bg-white p-5 sm:p-8" x-show="incomeTab==='review'" <?= $incomeInitial==='review'?'':'x-cloak' ?>>
-    <h2 class="text-2xl font-semibold">5. Revisión y sustentación</h2>
-    <p class="mt-3">Prepara qué deberá explicar la memoria cuando se desarrollen y revisen los cálculos.</p>
-    <ul class="mt-4 list-disc space-y-3 pl-5">
-        <li>Inmueble, derecho y unidades comprendidas, según el encargo y el capítulo 3.</li>
-        <li>Contratos, muestras y soportes examinados; información comprobada y pendiente.</li>
-        <li>Supuestos y fuentes utilizados en cada método, con sus limitaciones.</li>
-        <li>Resultados de capitalización directa y flujo descontado, sus diferencias y justificación.</li>
-    </ul>
-    <p class="mt-4 rounded-lg bg-amber-50 p-3 text-sm">La revisión de resultados y la memoria final de Renta están pendientes. Recorrer estas etapas no confirma información ni adopta un valor.</p>
-    <button type="button" class="btn-secondary mt-4" @click="openStage('concept')">Volver a contratos y antecedentes conservados</button>
-</section>
+    </fieldset>
+    <input type="hidden" name="form_complete" value="1">
+    <?php if (!empty($ivOld['message'])): ?><p role="alert" class="mt-3 text-red-800"><?= e($ivOld['message']) ?></p><?php endif; ?>
+    <p class="mt-3 text-red-800" role="alert" x-text="issues.data || ''"></p>
+</form>
+<p class="mt-3" role="status" aria-live="polite" x-text="message"></p>
+<p class="mt-3 rounded-lg bg-amber-50 p-3" x-show="stale && ['valuation','review'].includes(incomeTab)" x-cloak>Hay cambios desde el resultado mostrado. Guarda y vuelve a calcular para actualizarlo.</p>
+<div x-ref="valuationResults" data-income-valuation-results x-show="incomeTab==='valuation' || incomeTab==='review'" <?= in_array($incomeInitial,['valuation','review'],true)?'':'x-cloak' ?>>
+    <?php require __DIR__.'/income-valuation-results.php'; ?>
+</div>
+</div>

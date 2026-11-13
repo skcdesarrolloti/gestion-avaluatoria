@@ -2,6 +2,7 @@
 declare(strict_types=1);
 require dirname(__DIR__) . '/bootstrap.php';
 require __DIR__ . '/support.php';
+require __DIR__ . '/income-valuation.php';
 require __DIR__ . '/methodology-workflow.php';
 require __DIR__ . '/income-concept.php';
 require __DIR__ . '/income-preparation.php';

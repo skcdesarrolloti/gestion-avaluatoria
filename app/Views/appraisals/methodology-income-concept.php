@@ -10,7 +10,7 @@ $leaseLegacy=LeaseRegister::legacy($record,$leaseUnitId);
     <p class="eyebrow">Renta · <?= e($componentLabel) ?></p>
     <h2 class="mt-2 text-2xl font-semibold">1. Inmueble y arriendo</h2>
     <p class="mt-3 rounded-lg bg-teal-50 p-3 font-semibold">Una ficha compartida por capitalización directa y flujo de caja descontado.</p>
-    <p class="mt-3 text-sm">Registra lo que consta en contratos y soportes. Las fechas, importes e incrementos quedan como antecedentes; todavía no se calculan rentas, tasas ni valores.</p>
+    <p class="mt-3 text-sm">Registra lo que consta en contratos y soportes. Ingresos y gastos consulta estos antecedentes; la proyección y los dos métodos se calculan expresamente en la etapa 4.</p>
     <div class="mt-4 rounded-xl border bg-slate-50 p-4">
         <h3 class="font-semibold">Inmueble consultado del capítulo 3</h3>
         <p class="mt-2"><?= e($leaseUnit['label']) ?> · <?= e($leaseUnit['property_type'] ?: ($record['tipo_inmueble'] ?? '')) ?></p>

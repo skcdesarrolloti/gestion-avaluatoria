@@ -1,12 +1,16 @@
 # Gestión avaluatoria · SuCasa
 
+Renta: [flujos, tasas alternativas y costos con soporte](docs/RENTA-FLUJOS-TASAS-COSTOS.md)
+en etapas 3–5. Capitalización directa y FCD, cálculo explícito, resultados desplegables
+y memoria descargable. Conserva contratos, investigaciones y exclusiones existentes.
+
 Renta: [captura inicial e historial mensual de pagos](docs/RENTA-HISTORIAL-MENSUAL.md),
 con referencia viva del área, canon inicial y administración PH validada manualmente.
-Historial compartido por contrato; todavía sin proyección IPC ni cálculos de Renta.
+Historial compartido por contrato; proyección separada y sustentada en etapas 3–4.
 
 Renta usa [cinco etapas con Academia contextual](docs/RENTA-CINCO-ETAPAS.md):
 inmueble y arriendo, investigación, ingresos/gastos, dos métodos y sustentación.
-Una sola navegación, con ficha y muestras conservadas; cálculos pendientes.
+Una sola navegación, con ficha y muestras conservadas; cálculo por solicitud del analista.
 
 Renta: [ficha compartida del arriendo](docs/RENTA-FICHA-ARRIENDO.md) para ambos
 métodos; contratos, canon, fechas e incrementos documentados. Tipologías y ocupación

@@ -1,5 +1,11 @@
 # Crear y evolucionar la base sin SQL manual
 
+13/11/2026 · Flujos y tasas de Renta: sin DDL. `income_valuation` en
+`methodology_workflow`, por componente y estudio, con entradas y último snapshot.
+Transacción, propietario, CSRF, token Renta, CAS y huella del contrato/inmueble/fecha.
+Conservación al cambiar de método y ante formularios anteriores. Comparables,
+contratos y constancias no se modifican. Ver RENTA-FLUJOS-TASAS-COSTOS.md.
+
 13/11/2026 · Completar áreas: sin DDL. ComparableAreaRepository actualiza solo
 area_m2, capture_details.area_basis/areas_source y updated_at en las filas
 existentes del estudio autorizado. Conserva el resto del JSON y las exclusiones.
