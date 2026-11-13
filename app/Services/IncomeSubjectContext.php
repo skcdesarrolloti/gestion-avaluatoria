@@ -48,6 +48,7 @@ final class IncomeSubjectContext
             $context[]=['label'=>$label,'value'=>self::subjectLabel($key,$subject[$key] ?? ''),'source'=>'3.1 · Contexto del expediente',
                 'support'=>'','url'=>$subjectUrl];
         $occupancy=$same?(['propio_uso'=>'owner','arrendado'=>'rented_unspecified','desocupado'=>'vacant','adecuacion'=>'works'][$subject['current_occupation'] ?? ''] ?? ''):'';
+        $occupancy=UnitOccupation::read($unit)['occupancy'] ?? $occupancy;
         return ['rows'=>$rows,'context'=>$context,'occupancy'=>$occupancy,'same_scope'=>$same,'source_url'=>$subjectUrl,
             'physical'=>IncomeSubjectDetails::physical($unit,$record), 'economic'=>IncomeSubjectDetails::economic($record,$ph,$subject,$base),
             'references'=>[

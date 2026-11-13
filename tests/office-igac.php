@@ -18,8 +18,8 @@ $commercialHint = $officeCatalog['COMERCIALES'][0]['value'];
 $officeUnit['igac_typology_hint'] = $commercialHint;
 expect(\App\Support\AppraisalConstructionTypeCatalog::categoryForUnit($officeUnit) === 'COMERCIALES',
     'oficina conserva referencia comercial existente');
-expect(\App\Support\AppraisalConstructionTypeCatalog::optionsForUnit([
-    'unit_kind' => 'annex', 'construction_type' => 'piscina'], $officeCatalog) === $officeCatalog['ANEXOS'],
+expect(array_column(\App\Support\AppraisalConstructionTypeCatalog::optionsForUnit([
+    'unit_kind' => 'annex', 'construction_type' => 'piscina'], $officeCatalog),'value') === array_column($officeCatalog['ANEXOS'],'value'),
     'búsqueda de piscina conserva su catálogo');
 
 $garageUnit = ['unit_kind' => 'annex', 'construction_type' => 'parqueo'];

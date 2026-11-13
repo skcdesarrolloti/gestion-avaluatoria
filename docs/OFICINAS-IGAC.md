@@ -1,5 +1,11 @@
 # Numeral 1: referencias IGAC para Oficina
 
+Actualización 13/11/2026: el selector común se amplía a capítulo 3 y todos los
+tipos, con familias de consulta, búsqueda y acceso al catálogo completo.
+Oficina conserva Comerciales + Edificios; la selección previa nunca se borra
+por cambiar de filtro. Ver [Ficha y tipologías](RENTA-FICHA-ARRIENDO.md).
+Lo que sigue documenta la primera implementación, limitada al numeral 1.
+
 Al seleccionar Tipo de construcción = Oficina, Tipología IGAC de apoyo reúne
 Comerciales y Edificios, incluidos ED.Servicios_Tipo_1, Tipo_2 y Tipo_3.
 Se conservan las denominaciones originales; cada opción muestra su categoría.

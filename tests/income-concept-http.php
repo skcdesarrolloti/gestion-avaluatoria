@@ -39,8 +39,8 @@ expect(request($incomePath,http_build_query($incomePost),$jsonHeaders)['status']
 expect(request($incomePath,http_build_query($incomePost),$jsonHeaders)['status']===409,'HTTP renta rechaza versión antigua');
 $incomePage=$flowPath.'?stage=3&component='.$incomeKey;
 $incomeHtml=request($incomePage)['body'];
-expect(str_contains($incomeHtml,'Zona &lt;reservada&gt;') && str_contains($incomeHtml,'value="partial" selected'),'HTTP recarga conserva respuestas y escapa notas');
-expect(str_contains($incomeHtml,'Vigencia según cláusula &lt;privada&gt;') && str_contains($incomeHtml,'value="tenant" selected'),
+expect(str_contains($incomeHtml,'Zona &lt;reservada&gt;') && str_contains($incomeHtml,'Parcialmente arrendado'),'HTTP recarga conserva respuestas y escapa notas');
+expect(str_contains($incomeHtml,'Vigencia según cláusula &lt;privada&gt;') && str_contains($incomeHtml,'Arrendatario'),
     'HTTP recarga contrato y responsabilidades nuevas junto a respuestas históricas');
 $invalidIncome=array_replace($incomePost,['version'=>2,'income_concept'=>['occupancy'=>'invalid','scope_detail'=>'Borrador pendiente']]);
 $incomeResponse=request($incomePath,http_build_query($invalidIncome),$jsonHeaders);

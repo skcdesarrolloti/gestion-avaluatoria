@@ -1,5 +1,13 @@
 # Crear y evolucionar la base sin SQL manual
 
+13/11/2026 · Ficha compartida de arriendo y ocupación por unidad:
+202611130001_shared_lease_register.php agrega appraisals.lease_register y
+lease_version; 202611130002_unit_occupation.php agrega occupation_details y
+occupation_version a appraisal_units. Migraciones aditivas/reintentables,
+sin borrar ni copiar datos anteriores. Contratos por ID y varias unidades;
+canon original del encargo referenciado, sin duplicarlo. CAS independiente por
+registro; descripción/tipología usa appraisals.version. Ver RENTA-FICHA-ARRIENDO.md.
+
 12/11/2026 · Comprender el inmueble en Renta: ampliación aditiva del objeto
 income_concept en methodology_workflow por recorrido. Sin esquema nuevo ni DDL.
 Listas de alcance, disponibilidad, responsables e historial; notas hasta 1000

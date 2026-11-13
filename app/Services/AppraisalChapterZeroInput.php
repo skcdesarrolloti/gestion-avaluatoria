@@ -52,6 +52,7 @@ final class AppraisalChapterZeroInput
             $category = trim((string) ($unit['igac_category'] ?? ''));
             self::assertIgacCategory($category, $igacCodes, 'Selecciona categorías IGAC válidas por unidad.');
             $hint = mb_substr(trim((string) ($unit['igac_typology_hint'] ?? '')), 0, 190);
+            $category=\App\Support\IgacTypologySelection::category($hint,$typologiesByCategory) ?? $category;
             self::assertIgacTypology($category, $hint, $typologiesByCategory);
             $label = mb_substr(trim((string) ($unit['label'] ?? '')), 0, 120);
             $defaultLabel = trim((string) ($unit['default_label'] ?? ''));

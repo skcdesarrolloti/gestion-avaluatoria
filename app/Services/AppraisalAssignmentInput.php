@@ -30,6 +30,8 @@ final class AppraisalAssignmentInput
         $selected = is_array($posted) ? array_intersect(array_map('strval', $posted), $allowed) : [];
         $data['source_documents_json'] = json_encode(array_values(array_unique($selected)), JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR);
         if (array_key_exists('source_document_details', $_POST)) $data['source_document_details'] = AppraisalDocumentTable::input($_POST['source_document_details']);
+        foreach (['income_producing',...LeaseFields::ECONOMIC] as $key)
+            if (!array_key_exists($key,$_POST)) unset($data[$key]);
         return $data;
     }
 

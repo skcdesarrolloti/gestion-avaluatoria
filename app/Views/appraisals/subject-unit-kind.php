@@ -14,7 +14,7 @@
 </div>
 <?php else: ?>
 <label class="label">Tipo de inmueble de esta unidad
-    <select class="input" name="units[<?= e($unit['id']) ?>][property_type]">
+    <select class="input" name="units[<?= e($unit['id']) ?>][property_type]" x-model="constructionType" @change="syncIgacFromConstruction()">
         <option value="">Usar tipo general del avalúo</option>
         <?php foreach (($catalog['selects']['tipo_inmueble'][4] ?? []) as $value => $text): ?>
         <option value="<?= e($value) ?>" <?= (string) ($unit['property_type'] ?? '') === (string) $value ? 'selected' : '' ?>><?= e($text) ?></option>

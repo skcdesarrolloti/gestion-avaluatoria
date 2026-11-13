@@ -3,7 +3,7 @@ declare(strict_types=1);
 (static function(): void {
     $previousGet=$_GET;
     try {
-        $record=['id'=>str_repeat('c',32),'tipo_inmueble'=>'oficina','regimen_ph'=>'si','municipio'=>'Cartagena'];
+        $record=['id'=>str_repeat('c',32),'tipo_inmueble'=>'oficina','regimen_ph'=>'si','municipio'=>'Cartagena','version'=>1];
         $units=[['id'=>'office','label'=>'Oficina Principal','unit_kind'=>'property','property_type'=>'oficina']];
         $components=\App\Services\MethodologyWorkflow::components($record,$units);
         $componentKey=$sourceUnitKey='office';$componentLabel='Oficina Principal';$method='renta';
@@ -27,8 +27,8 @@ declare(strict_types=1);
             'preparación ligera conserva criterios de arriendo y ruta autenticada de carga');
         $_GET=['renta_paso'=>'capture'];
         ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-income-inputs.php';$complete=ob_get_clean();
-        expect(substr_count($complete,'id="tabla-madre-83"')===1 && substr_count($complete,'id="income-concept-form"')===1,
-            'captura bajo demanda contiene una sola matriz y un solo formulario conceptual');
+        expect(substr_count($complete,'id="tabla-madre-83"')===1 && substr_count($complete,'id="lease-form"')===1,
+            'captura bajo demanda contiene una sola matriz y una sola ficha de contrato');
         expect(substr_count($complete,'[comparability_notes]"')===77 && str_contains($complete,'Conservar soporte &lt;original&gt;'),
             'carga completa conserva las 77 muestras y sus notas escapadas');
         expect(strlen($light)<strlen($complete)/2,'entrada conceptual reduce a menos de la mitad el HTML con 77 muestras');

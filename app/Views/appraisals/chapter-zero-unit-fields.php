@@ -58,7 +58,7 @@
                             <span class="mt-1 text-xs font-normal text-slate-600">Busca en denominación, descripción y especificaciones; reconoce términos equivalentes.</span>
                         </label>
                         <label class="flex min-h-11 items-center gap-2 text-sm">
-                            <input type="checkbox" x-model="igacShowAll" @change.stop> Ver toda la categoría, sin filtro por tipo de construcción
+                            <input type="checkbox" x-model="igacShowAll" @change.stop> Consultar todo el catálogo IGAC, sin filtro por tipo
                         </label>
                         <p class="text-sm text-amber-900 md:col-span-2" x-show="constructionType === 'parqueo'" x-cloak>
                             Garaje, parqueadero y celda de parqueo comparten búsqueda. El catálogo cargado ofrece referencias relacionadas,
@@ -67,8 +67,8 @@
                         <label class="label">Tipología IGAC de apoyo
                             <select class="input" name="config_units[<?= e($key) ?>][igac_typology_hint]" x-model="igacHint"
                                 @change="selectIgacCategory()"
-                                :disabled="!igacCategory" x-init="$el.querySelectorAll('[data-fallback-option]').forEach(option => option.remove())">
-                                <option value="" x-text="igacCategory ? '<?= e($igacSearchPlaceholder($unit)) ?>' : 'Selecciona primero categoría IGAC'"></option>
+                                :disabled="!igacOptions.length" x-init="$el.querySelectorAll('[data-fallback-option]').forEach(option => option.remove())">
+                                <option value="">Selecciona una referencia para contrastar</option>
                                 <?php foreach (\App\Support\AppraisalConstructionTypeCatalog::optionsForUnit($unit, $igacTypologiesByCategory) as $option): ?>
                                     <option data-fallback-option value="<?= e((string) $option['value']) ?>" <?= (string) ($unit['igac_typology_hint'] ?? '') === (string) $option['value'] ? 'selected' : '' ?>>
                                         <?= e((string) $option['label']) ?>

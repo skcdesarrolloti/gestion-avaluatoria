@@ -35,3 +35,22 @@ test('search never erases saved selection or substitutes a typology on empty res
     selector.syncIgacFromConstruction();
     assert.equal(selector.igacHint, selected);
 });
+
+test('every property type can consult the complete catalog and retain a cross-category choice', () => {
+    const definitions = JSON.parse(execFileSync(php, ['-r',
+        "require 'bootstrap.php'; echo json_encode([App\\Support\\IgacTypologySelection::families(), (new App\\Models\\IgacTypologyRepository())->optionsByCategory()]);"], { encoding: 'utf8' }));
+    const [igacFamilies, typologies] = definitions;
+    const total = Object.values(typologies).reduce((count, options) => count + options.length, 0);
+    for (const constructionType of [...Object.keys(igacFamilies), 'lote', 'parqueo', 'deposito', 'otro']) {
+        const selector = Object.assign(igacUnitSelector({constructionType, igacCategory:'COMERCIALES',
+            igacHint:'9026547_ED.Servicios_Tipo_1'}), {typologies, igacFamilies, igacFilterRules:rules});
+        selector.igacShowAll = true;
+        assert.equal(selector.igacOptions.length, total, constructionType);
+        selector.igacShowAll = false;
+        selector.igacQuery = 'sin coincidencia';
+        assert.deepEqual(selector.igacOptions.map(option => option.value), ['9026547_ED.Servicios_Tipo_1']);
+        selector.selectIgacCategory();
+        assert.equal(selector.igacCategory, 'EDIFICIOS');
+        assert.equal(selector.igacHint, '9026547_ED.Servicios_Tipo_1');
+    }
+});

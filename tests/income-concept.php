@@ -12,17 +12,19 @@ declare(strict_types=1);
     }
     expectStatus(422,fn()=>\App\Services\IncomeConcept::input(['rate'=>'6']),'renta no admite variables numéricas o campos nuevos por petición');
     expectStatus(422,fn()=>\App\Services\IncomeConcept::validate(['income_concept'=>$concept],['method'=>'mercado']),'renta impide guardar conceptos en Mercado');
-    $record=['id'=>str_repeat('a',32),'methodology_version'=>8];
-    $componentKey='office:metodo:renta';$componentLabel='Oficina <principal>';
+    $record=['id'=>str_repeat('a',32),'methodology_version'=>8,'lease_version'=>8,'version'=>2];
+    $unitId=str_repeat('b',32);$units=[['id'=>$unitId,'label'=>'Oficina <principal>','unit_kind'=>'property','property_type'=>'oficina']];
+    $componentKey=$unitId.':metodo:renta';$components=[$componentKey=>['unit'=>$units[0],'label'=>'Oficina <principal>']];$componentLabel='Oficina <principal>';
     $selected=['method'=>'renta','income_concept'=>$concept];
+    $record['methodology_workflow']=json_encode([$componentKey=>$selected]);
     $basePath='avaluos/'.$record['id'].'/metodologia-valuatoria';
     $flowUrl=static fn($stage)=>url($basePath.'?stage='.$stage.'&component='.$componentKey);
     ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-income-concept.php';$html=ob_get_clean();
-    expect(str_contains($html,'name="income_concept[lease_term]"') && str_contains($html,'IGAC 941 de 2026, art. 24.a–c')
-        && str_contains($html,'NTS M01 (2016)') && str_contains($html,'(?)') && str_contains($html,'name="income_concept[cost_ph]"'),
-        'renta amplía contratos y gastos conservando preguntas previas, ayudas y soporte sectorial e IGAC');
+    expect(str_contains($html,'name="lease[start_date]"') && str_contains($html,'name="lease[adjustment_rule]"')
+        && str_contains($html,'Consultar ayudas y soportes en Academia') && str_contains($html,'name="lease[expenses]"'),
+        'ficha reúne vigencia, incrementos y condiciones con acceso a Academia');
     expect(str_contains($html,'Zona &lt;privada&gt;') && !str_contains($html,'Zona <privada>') && str_contains($html,'Oficina &lt;principal&gt;'),'renta escapa textos y unidad');
-    expect(str_contains($html,'value="partial" selected') && str_contains($html,'value="8"') && str_contains($html,'data-module-autosave'),'renta restaura selección y versión para autoguardado');
+    expect(str_contains($html,'Parcialmente arrendado') && !str_contains($html,'name="income_concept[occupancy]"') && str_contains($html,'value="8"') && str_contains($html,'data-module-autosave'),'renta restaura selección y versión para autoguardado');
     expect(!str_contains($html,'type="number"') && !str_contains($html,'name="rate"'),'bloque conceptual no captura cálculos');
     $errorKey=\App\Services\IncomeConceptAction::flashKey($record['id'],$componentKey);
     \App\Core\Session::flash($errorKey,json_encode(['values'=>['scope'=>'no_valida','scope_detail'=>'Nota pendiente'],

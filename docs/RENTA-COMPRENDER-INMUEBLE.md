@@ -1,5 +1,11 @@
 # Renta · Comprender el inmueble y su arriendo
 
+**Historia de la versión del 12/11/2026.** Desde el 13/11, la pantalla vigente es
+[Ficha del arriendo](RENTA-FICHA-ARRIENDO.md): descripción/tipologías y ocupación
+por unidad en capítulo 3, contratos compartidos en Renta. Esta versión conceptual
+y sus respuestas se conservan como antecedentes; el flujo siguiente documenta
+la implementación anterior, no la pantalla actual.
+
 Primera etapa aprobada por el usuario tras revisar una propuesta de pantalla.
 Solo preparación conceptual para inmuebles urbanos, común a capitalización directa
 y flujo de caja descontado. No añade cálculos, tasas o porcentajes de deducción.

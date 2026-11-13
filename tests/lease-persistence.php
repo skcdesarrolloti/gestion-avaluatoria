@@ -1,0 +1,35 @@
+<?php
+declare(strict_types=1);
+(static function() use ($app): void {
+    $repo=new \App\Models\AppraisalRepository($app);$leases=new \App\Models\LeaseRepository($app);
+    $id=$repo->create(1);$repo->ensureUnits($id,1,1,1);
+    $app->prepare('UPDATE appraisals SET igac_property_units_count=1,igac_annex_units_count=1,rent_amount=3500000,income_notes=? WHERE id=?')->execute(['Canon original',$id]);
+    $units=$repo->units($id,1);$office=$units[0]['id'];$garage=$units[1]['id'];$contract=str_repeat('c',32);
+    $leases->save($id,1,0,$contract,[$office,$garage],['reference'=>'Contrato compartido','economic_source'=>'assignment','start_date'=>'2026-01-01','end_date'=>'2027-01-01']);
+    $r=$repo->find($id,1);$saved=\App\Services\LeaseRegister::read($r);
+    expect(count($saved)===1 && $saved[$contract]['unit_ids']===[$office,$garage],'un contrato enlaza oficina y garaje sin duplicarlo');
+    expect($r['rent_amount']==='3500000.00' && !isset($saved[$contract]['rent_amount']),'canon original conservado y referenciado');
+    $leases->save($id,1,1,$contract,[$office,$garage],['adjustment_rule'=>'IPC según contrato']);
+    expect(\App\Services\LeaseRegister::read($repo->find($id,1))[$contract]['start_date']==='2026-01-01','guardado parcial conserva fechas');
+    expectStatus(409,fn()=>$leases->save($id,1,1,$contract,[$office],['reference'=>'obsoleto']),'conflicto conserva contrato y vínculos');
+    expectStatus(404,fn()=>$leases->save($id,2,2,$contract,[$office],['reference'=>'ajeno']),'contrato rechaza otro propietario');
+    expectStatus(422,fn()=>$leases->save($id,1,2,str_repeat('d',32),[str_repeat('e',32)],['reference'=>'ajeno']),'contrato rechaza unidades externas');
+    expectStatus(422,fn()=>$leases->save($id,1,2,str_repeat('d',32),[$garage],['economic_source'=>'assignment']),'canon del encargo no se vincula a dos contratos');
+    expectStatus(422,fn()=>$leases->save($id,1,2,$contract,[$office],['end_date'=>'2025-12-31']),'fecha final se valida con inicio ya guardado');
+    $wf=new \App\Models\MethodologyWorkflowRepository($app);$wf->save($id,1,0,$office,['method'=>'renta']);
+    $wf->save($id,1,1,$office,['income_concept'=>['lease_term'=>'Texto histórico','occupancy'=>'partial']]);
+    $wf->save($id,1,2,$office,['method'=>'mercado']);$wf->save($id,1,3,$office,['method'=>'renta']);
+    expect(count(\App\Services\LeaseRegister::read($repo->find($id,1)))===1,'cambio de método conserva la ficha común');
+    expect(\App\Services\LeaseRegister::legacy($repo->find($id,1),$office)[$office]['lease_term']==='Texto histórico','antecedentes conceptuales preservados');
+    $version=$repo->find($id,1)['version'];$leases->saveAntecedent($id,1,$version,['rent_amount'=>'3600000']);
+    expect($repo->find($id,1)['income_notes']==='Canon original','corregir canon en origen conserva notas');
+    expectStatus(409,fn()=>$leases->saveAntecedent($id,1,$version,['rent_amount'=>'1']),'antecedente rechaza versión obsoleta');
+    $repo->saveUnitOccupation($id,1,$office,0,['occupancy'=>'rented','source'=>'Visita']);
+    $read=array_column($repo->units($id,1),null,'id');
+    expect(\App\Services\UnitOccupation::read($read[$office])['occupancy']==='rented' && !\App\Services\UnitOccupation::read($read[$garage]),'ocupación de oficina no se atribuye al garaje');
+    expectStatus(409,fn()=>$repo->saveUnitOccupation($id,1,$office,0,['occupancy'=>'vacant']),'ocupación usa versión optimista');
+    $v=$repo->find($id,1)['version'];$row=['id'=>$office,'label'=>'Oficina','property_type'=>'oficina','igac_category'=>'EDIFICIOS','igac_typology_hint'=>'9026547_ED.Servicios_Tipo_1','notes'=>'Texto propio'];
+    $repo->saveUnits($id,1,[$row],$v);
+    expectStatus(409,fn()=>$repo->saveUnits($id,1,[$row],$v),'tipología rechaza actualización simultánea');
+    expect(count(\App\Services\LeaseRegister::read($repo->find($id,1)))===1,'editar descripción conserva contrato');
+})();

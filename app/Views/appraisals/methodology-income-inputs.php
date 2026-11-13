@@ -1,5 +1,5 @@
 <?php
-$incomeTabs=['concept'=>'1. Comprender el inmueble','search'=>'2. Preparar la búsqueda','capture'=>'3. Recoger muestras'];
+$incomeTabs=['concept'=>'1. Ficha del arriendo','search'=>'2. Preparar la búsqueda','capture'=>'3. Recoger muestras'];
 $incomeInitial=is_string($_GET['renta_paso'] ?? null) && isset($incomeTabs[$_GET['renta_paso']])?$_GET['renta_paso']:'concept';
 $incomeSourceList=array_merge($guide['source_search']['portal_sources'] ?? [],$guide['source_search']['agency_sources'] ?? []);
 $incomeSourceLabels=array_column($incomeSourceList,'label');

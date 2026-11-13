@@ -23,15 +23,15 @@ declare(strict_types=1);
     expectStatus(422,fn()=>\App\Services\IncomeConcept::input(['cost_ph'=>'5%']),'gastos rechazan porcentajes donde se pide responsable');
     expectStatus(422,fn()=>\App\Services\IncomeConcept::input(['history_payment'=>['yes']]),'historial rechaza estructuras no admitidas');
     expectStatus(422,fn()=>\App\Services\IncomeConcept::input(['lease_term'=>str_repeat('a',1001)]),'notas nuevas conservan límite de longitud');
-    $subject['current_occupation']='propio_uso';$units=[$unit];$components=['a'=>$component];
+    $subject['current_occupation']='propio_uso';$unit['occupation_details']=json_encode(['occupancy'=>'owner']);$units=[$unit];$component['unit']=$unit;$components=['a'=>$component];$record['version']=1;
     $componentKey='a';$componentLabel=$component['label'];$selected=['method'=>'renta'];$phProfile=[];
     $basePath='avaluos/'.$record['id'].'/metodologia-valuatoria';$flowUrl=static fn($s)=>url($basePath.'?stage='.$s.'&component=a');
     ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-income-concept.php';$html=ob_get_clean();
-    expect(str_contains($html,'data-income-occupancy-source') && !str_contains($html,'name="income_concept[occupancy]"'),
+    expect(str_contains($html,'Ocupado por el propietario') && !str_contains($html,'name="income_concept[occupancy]"'),
         'ocupación del origen se muestra sin pedir ni enviar una segunda copia');
     expect(str_contains($html,'Oficina &lt;A&gt;') && str_contains($html,'Escritura p. 4'),'contexto vivo escapa identidad y muestra evidencia original');
-    $selected['income_concept']=['occupancy'=>'vacant'];
+    $selected['income_concept']=['occupancy'=>'vacant'];$record['methodology_workflow']=json_encode(['a'=>$selected]);
     ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-income-concept.php';$html=ob_get_clean();
-    expect(str_contains($html,'value="vacant" selected') && str_contains($html,'Ocupado por el propietario'),
+    expect(str_contains($html,'Desocupado') && str_contains($html,'Ocupado por el propietario'),
         'respuesta contradictoria de Renta y referencia del sujeto se conservan visibles, sin sobrescritura');
 })();

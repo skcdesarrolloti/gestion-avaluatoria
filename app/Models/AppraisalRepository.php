@@ -66,7 +66,7 @@ final class AppraisalRepository
     public function saveChapterZero(string $id, int $owner, int $version, array $data): array
     {
         $previous = $this->find($id, $owner);
-        foreach (['requester_email', 'requester_phone', 'requester_municipality', 'value_date_notes', 'source_document_details'] as $field) {
+        foreach (['requester_email', 'requester_phone', 'requester_municipality', 'value_date_notes', 'source_document_details', 'income_producing', 'rent_amount', 'rent_period', 'ph_admin_fee_amount', 'rent_charges_vat', 'income_notes'] as $field) {
             if (!array_key_exists($field, $data)) $data[$field] = $previous[$field];
         }
         $now = gmdate('Y-m-d H:i:s');
@@ -110,16 +110,15 @@ final class AppraisalRepository
     public function saveMarketEvidence(string $id, int $owner, string $unitId, int $version, array $data): int
     { return (new MarketSubjectEvidenceRepository($this->db))->save($id, $owner, $unitId, $version, $data); }
 
-    public function saveUnits(string $id, int $owner, array $units): void
-    {
-        $now = gmdate('Y-m-d H:i:s');
-        $query = $this->db->prepare('UPDATE appraisal_units SET label = ?, property_type = ?, igac_category = ?,
-            igac_typology_hint = ?, notes = ?, updated_at = ? WHERE id = ? AND appraisal_id = ? AND owner_id = ?');
-        foreach ($units as $unit) {
-            $query->execute([$unit['label'], $unit['property_type'], $unit['igac_category'], $unit['igac_typology_hint'],
-                $unit['notes'], $now, $unit['id'], $id, $owner]);
-        }
-    }
+    public function saveLease(string $id,int $owner,int $version,string $lease,mixed $units,mixed $data): int
+    { return (new LeaseRepository($this->db))->save($id,$owner,$version,$lease,$units,$data); }
+    public function saveLeaseAntecedent(string $id,int $owner,int $version,mixed $data): int
+    { return (new LeaseRepository($this->db))->saveAntecedent($id,$owner,$version,$data); }
+    public function saveUnitOccupation(string $id,int $owner,string $unit,int $version,array $data): int
+    { return (new UnitOccupationRepository($this->db))->save($id,$owner,$unit,$version,$data); }
+
+    public function saveUnits(string $id, int $owner, array $units, ?int $version=null): int
+    { return (new SubjectUnitsRepository($this->db))->save($id,$owner,$units,$version); }
 
     public function saveUnitDefinitionsByKey(string $id, int $owner, array $units): void
     { AppraisalUnitDefinitions::save($this->db, $id, $owner, $units); }

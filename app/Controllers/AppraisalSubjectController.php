@@ -78,15 +78,12 @@ final class AppraisalSubjectController
     { $this->appraisals->find($id, $this->user['id']); $this->subjects->save($id, $this->user['id'], $_POST); $this->savedJson(); }
     public function saveMarketEvidence(string $id, string $unitId): never
     { \App\Services\MarketSubjectEvidenceAction::save($this->appraisals, $this->user['id'], $id, $unitId); }
+    public function saveOccupation(string $id,string $unitId): never
+    { \App\Services\UnitOccupation::save($this->appraisals,$this->user['id'],$id,$unitId); }
     public function saveUnits(string $id): never
-    { $this->saveUnitsAndRedirect($id, 'avaluos/' . $id . '/bien-sujeto'); }
+    { \App\Services\SubjectUnitsAction::save($this->appraisals,$this->user['id'],$id); }
     public function autosaveUnits(string $id): never
-    {
-        $this->appraisals->find($id, $this->user['id']);
-        $this->appraisals->saveUnits($id, $this->user['id'],
-            AppraisalChapterZeroInput::unitData($this->igacCodes(), $this->typologies->optionsByCategory()));
-        $this->savedJson();
-    }
+    { \App\Services\SubjectUnitsAction::save($this->appraisals,$this->user['id'],$id); }
 
     public function saveSurfaces(string $id): never
     { $this->saveSubjectData($id, fn () => $this->appraisals->saveUnitSurfaces($id, $this->user['id'], AppraisalChapterZeroInput::unitSurfaceData()), 'Datos de superficie guardados correctamente.', '#superficies'); }

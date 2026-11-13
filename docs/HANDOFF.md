@@ -1,5 +1,18 @@
 # Entrega al responsable de la implementación
 
+13/11/2026 · Tipologías unificadas en capítulo 3 para todos los tipos, con búsqueda,
+familias relacionadas, catálogo completo y conservación de selección. Renta reúne
+la ficha de arriendo compartida por directa y flujo descontado: unidades cubiertas,
+canon, cobros, fechas, plazo, incrementos y soportes. La ocupación por unidad se
+registra en capítulo 3; Renta la consulta. Capítulo 1 consulta cánones de Renta;
+el canon anterior conserva sus columnas y solo se referencia desde un contrato.
+Respuestas conceptuales anteriores visibles como antecedentes, sin convertir
+texto libre ni tocar muestras. Dos migraciones aditivas y CAS para evitar pérdida
+por pestañas simultáneas. Sin fórmulas ni tasas nuevas. Ver RENTA-FICHA-ARRIENDO.md.
+Validación local: PHP1677/JS284/BD266/HTTP18+14, lint/build/check:size79,9KB.
+Navegador: escritorio/móvil390, alta y recarga, 409, desconexión/reintento,
+canon en su origen y referencias IGAC de categorías diferentes. Sin errores JS.
+
 12/11/2026 · Primera etapa de Renta ampliada tras aprobación del borrador:
 cuatro temas en «1. Comprender el inmueble y su arriendo», con consulta viva del
 capítulo 3, faltantes y ayudas de Academia, común a directa y flujo descontado.

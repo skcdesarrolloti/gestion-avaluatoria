@@ -1,9 +1,10 @@
 # Gestión avaluatoria · SuCasa
 
-Renta: [comprender el inmueble y su arriendo](docs/RENTA-COMPRENDER-INMUEBLE.md)
-consulta el capítulo 3 y reúne faltantes de alcance, contratos, gastos y antecedentes
-en cuatro temas, con ayudas de Academia para ambos métodos. Borrador por recorrido,
-sin cálculos ni nuevas migraciones. [Historia del primer bloque](docs/RENTA-PRIMER-BLOQUE.md).
+Renta: [ficha compartida del arriendo](docs/RENTA-FICHA-ARRIENDO.md) para ambos
+métodos; contratos, canon, fechas e incrementos documentados. Tipologías y ocupación
+por unidad en el capítulo 3, con acceso al catálogo IGAC completo para todos los
+tipos. Conserva canon original, respuestas anteriores y ayudas de Academia.
+Dos migraciones aditivas; sin cálculos. [Etapa conceptual anterior](docs/RENTA-COMPRENDER-INMUEBLE.md).
 Investigaciones de [ventas y arriendos independientes](docs/INVESTIGACIONES-VENTAS-ARRIENDOS.md):
 colecciones, guardado y Excel separados por unidad, método y operación; muestras
 históricas conservadas al cambiar de método.

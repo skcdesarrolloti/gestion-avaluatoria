@@ -1,55 +1,25 @@
 <?php
-$incomeOptions = ['' => 'Selecciona una opción', 'si' => 'Sí', 'no' => 'No', 'pendiente' => 'Pendiente por verificar'];
-$periodOptions = ['' => 'Selecciona periodicidad', 'mensual' => 'Mensual', 'trimestral' => 'Trimestral', 'anual' => 'Anual', 'otro' => 'Otro'];
-$vatOptions = ['' => 'Selecciona una opción', 'si' => 'Sí', 'no' => 'No', 'no_aplica' => 'No aplica', 'pendiente' => 'Pendiente por verificar'];
-$moneyValue = static function (string $name) use ($field): string {
-    if ($field($name) === '') return '';
-    $value = (float) $field($name);
-    return '$ ' . number_format($value, fmod($value, 1.0) !== 0.0 ? 2 : 0, ',', '.');
-};
+$leaseSummary=\App\Services\LeaseRegister::read($record);
+$leaseRoutes=\App\Services\MethodologyWorkflow::components($record,$units ?? []);
+$leaseWorkflow=\App\Services\MethodologyWorkflow::saved($record);
+$leaseKey='';foreach ($leaseRoutes as $key=>$item) if (($leaseWorkflow[$key]['method'] ?? '')==='renta') {$leaseKey=$key;break;}
+$leaseSummaryUrl='avaluos/'.$record['id'].'/metodologia-valuatoria'.($leaseKey!==''?'?method=renta&stage=3&component='.rawurlencode($leaseKey):'?method=renta&stage=plan');
 ?>
-<div class="md:col-span-2 rounded-2xl border border-emerald-100 bg-emerald-50 p-4">
-    <h3 class="text-sm font-bold text-emerald-950">Contexto de renta del inmueble o activo</h3>
-    <p class="mt-1 text-xs leading-5 text-emerald-900">
-        Estos datos no cambian por sí solos el método. Sirven para saber si la renta documentada debe considerarse
-        como antecedente económico, soporte de consistencia o insumo principal cuando el encargo sea de renta.
-    </p>
-    <div class="mt-4 grid gap-4 md:grid-cols-2">
-        <label class="label">¿El inmueble o activo produce renta actualmente?
-            <select class="input" name="income_producing">
-                <?php foreach ($incomeOptions as $value => $label): ?>
-                    <option value="<?= e($value) ?>" <?= $selected('income_producing', $value) ?>><?= e($label) ?></option>
-                <?php endforeach; ?>
-            </select>
-        </label>
-        <label class="label">Canon o ingreso periódico informado
-            <input class="input" name="rent_amount" inputmode="decimal" maxlength="20" data-money-input
-                value="<?= e($moneyValue('rent_amount')) ?>" placeholder="Ej. 3.500.000">
-        </label>
-        <label class="label">Periodicidad del canon
-            <select class="input" name="rent_period">
-                <?php foreach ($periodOptions as $value => $label): ?>
-                    <option value="<?= e($value) ?>" <?= $selected('rent_period', $value) ?>><?= e($label) ?></option>
-                <?php endforeach; ?>
-            </select>
-        </label>
-        <label class="label">Administración periódica si aplica PH
-            <input class="input" name="ph_admin_fee_amount" inputmode="decimal" maxlength="20" data-money-input
-                value="<?= e($moneyValue('ph_admin_fee_amount')) ?>" placeholder="Ej. 850.000">
-        </label>
-        <label class="label">¿El canon causa o cobra IVA?
-            <select class="input" name="rent_charges_vat">
-                <?php foreach ($vatOptions as $value => $label): ?>
-                    <option value="<?= e($value) ?>" <?= $selected('rent_charges_vat', $value) ?>><?= e($label) ?></option>
-                <?php endforeach; ?>
-            </select>
-            <span class="mt-1 block text-xs leading-5 text-slate-500">
-                Útil en inmuebles comerciales, oficinas, locales, bodegas o activos con explotación económica.
-            </span>
-        </label>
-        <label class="label">Observaciones sobre renta, administración o IVA
-            <textarea class="input" name="income_notes" rows="3" maxlength="1500"
-                placeholder="Ej. canon informado por el propietario; administración incluida o no incluida; IVA pendiente de confirmar."><?= e($field('income_notes')) ?></textarea>
-        </label>
+<div class="md:col-span-2 rounded-2xl border bg-emerald-50 p-4">
+    <h3 class="font-semibold">Arriendos del inmueble · consulta</h3>
+    <p class="mt-2 text-sm">La descripción se completa en el capítulo 3. Los contratos y sus cánones se registran una sola vez en Renta y sirven para ambos métodos.</p>
+    <?php foreach ($leaseSummary as $entry): $economic=\App\Services\LeaseRegister::economic($entry,$record); ?>
+    <div class="mt-3 rounded-lg border bg-white p-3">
+        <p class="font-semibold"><?= e(\App\Services\LeaseRegister::title($entry)) ?></p>
+        <p class="text-sm">Canon informado (COP): <?= e((string)($economic['rent_amount'] ?? '')) ?: 'Por completar' ?> · <?= e((string)($economic['rent_period'] ?? '')) ?></p>
+        <p class="text-xs">Las unidades relacionadas comparten este registro; no se suma un ingreso por cada anexo.</p>
     </div>
+    <?php endforeach; ?>
+    <details class="mt-3"><summary class="min-h-11 cursor-pointer py-3 font-semibold">Antecedente conservado del encargo</summary>
+        <p class="text-sm">Producción de renta informada: <?= e(['si'=>'Sí','no'=>'No','pendiente'=>'Por verificar'][$field('income_producing')] ?? 'Sin dato') ?>.</p>
+        <p class="text-sm">Canon (COP): <?= e($field('rent_amount')) ?: 'Sin dato' ?> · <?= e($field('rent_period')) ?></p>
+        <p class="text-sm">Administración (COP): <?= e($field('ph_admin_fee_amount')) ?: 'Sin dato' ?>. IVA: <?= e($field('rent_charges_vat')) ?: 'Por verificar' ?>.</p>
+        <p class="whitespace-pre-line text-sm"><?= e($field('income_notes')) ?></p>
+    </details>
+    <a class="btn-secondary mt-3" href="<?= e(url($leaseSummaryUrl)) ?>#renta-concepto"><?= $leaseKey!==''?'Consultar o completar ficha de arriendo':'Configurar recorrido de Renta' ?></a>
 </div>

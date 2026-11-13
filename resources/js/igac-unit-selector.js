@@ -24,10 +24,12 @@ export function igacUnitSelector(initial) {
     return {
         ...initial, igacQuery: '', igacShowAll: false,
         get allIgacOptions() {
-            const categories = this.constructionType === 'oficina'
-                ? [...new Set(['COMERCIALES', 'EDIFICIOS', this.igacCategory])] : [this.igacCategory];
+            const families=this.igacFamilies || {oficina:['COMERCIALES','EDIFICIOS']};
+            const selected=Object.keys(this.typologies).find(code=>this.typologies[code].some(item=>item.value===this.igacHint));
+            const categories = [...new Set([...(this.igacShowAll?Object.keys(this.typologies):
+                families[this.constructionType] || (this.igacCategory?[this.igacCategory]:Object.keys(this.typologies))),this.igacCategory,selected])];
             return categories.flatMap(category => (this.typologies[category] || []).map(item => ({ ...item, category,
-                label: item.label + (this.constructionType === 'oficina' ? ' · ' + category : '') })));
+                label: item.label + ' · ' + category })));
         },
         get igacOptions() {
             return filterIgacOptions(this.allIgacOptions, { type: this.constructionType, query: this.igacQuery,
@@ -40,7 +42,7 @@ export function igacUnitSelector(initial) {
         syncIgacFromConstruction() {
             this.igacQuery = '';
             this.igacShowAll = false;
-            if (this.constructionType === 'oficina' && this.igacHint) { this.selectIgacCategory(); return; }
+            if (this.igacHint) { this.selectIgacCategory(); return; }
             const next = this.constructionIgacCategories[this.constructionType] || (this.unitKind === 'annex' ? 'ANEXOS' : '');
             if (next && next !== this.igacCategory) this.igacCategory = next;
             if (!this.allIgacOptions.some(item => item.value === this.igacHint)) this.igacHint = '';

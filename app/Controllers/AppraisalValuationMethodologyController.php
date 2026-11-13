@@ -109,6 +109,8 @@ final class AppraisalValuationMethodologyController
     }
 
     public function saveIncomeConcept(string $id): never { \App\Services\IncomeConceptAction::save($this->appraisals,$this->workflow,$this->user['id'],$id); }
+    public function saveLease(string $id): never { \App\Services\LeaseAction::save($this->appraisals,$this->user['id'],$id); }
+    public function saveLeaseAntecedent(string $id): never { \App\Services\LeaseAction::save($this->appraisals,$this->user['id'],$id,true); }
     public function saveFactorScale(string $id): never
     { \App\Services\ResearchFactorScaleAction::save($this->appraisals,$this->factorScales,$this->user['id'],$id); }
 
