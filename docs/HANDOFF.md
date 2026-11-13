@@ -1,5 +1,15 @@
 # Entrega al responsable de la implementación
 
+13/11/2026 · Corregido filtro IGAC al cambiar tipo en 3.1: la categoría anterior
+ya no se añade completa a las opciones. Apartamento consulta sus familias;
+Lote muestra cero propuestas constructivas y ayuda sobre suelo/mejoras.
+Referencia anterior conservada y rotulada para revisar, fuera del conteo de
+coincidencias. Cambio de tipo limpia buscador y consulta completa; búsqueda de
+texto no cambia el tipo. Tipo general y anexos usan su origen correspondiente.
+PHP1680/JS285/HTTP18, lint/build/check:size81.912 bytes (límite81.920).
+Navegador local: cambios de tipo, autoguardado, recarga y móvil390 sin errores.
+Sin DDL ni cambios de persistencia. Ver RENTA-FICHA-ARRIENDO.md.
+
 13/11/2026 · Tipologías unificadas en capítulo 3 para todos los tipos, con búsqueda,
 familias relacionadas, catálogo completo y conservación de selección. Renta reúne
 la ficha de arriendo compartida por directa y flujo descontado: unidades cubiertas,

@@ -69,7 +69,8 @@ foreach ($visibleUnits as $unit) $labelMap[$unit['id']] = $labelInput($unit);
         <?php foreach ($visibleUnits as $unit): ?>
             <div class="mt-5 rounded-xl border border-slate-200 p-5" x-show="active === '<?= e($unit['id']) ?>'"
                 x-data="igacUnitSelector({
-                    constructionType: <?= e(json_encode((string)(($unit['property_type'] ?? '') ?: ($unit['construction_type'] ?? '') ?: ($record['tipo_inmueble'] ?? '')), JSON_THROW_ON_ERROR)) ?>,
+                    constructionType: <?= e(json_encode((string)($unit['unit_kind']==='annex'?($unit['construction_type'] ?? ''):($unit['property_type'] ?? '')), JSON_THROW_ON_ERROR)) ?>,
+                    defaultConstructionType: <?= e(json_encode($unit['unit_kind']==='annex'?'':(string)($record['tipo_inmueble'] ?? ''), JSON_THROW_ON_ERROR)) ?>,
                     unitKind: <?= e(json_encode($unit['unit_kind'], JSON_THROW_ON_ERROR)) ?>,
                     igacCategory: <?= e(json_encode((string) $unit['igac_category'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,
                     igacHint: <?= e(json_encode((string) $unit['igac_typology_hint'], JSON_UNESCAPED_UNICODE | JSON_THROW_ON_ERROR)) ?>,

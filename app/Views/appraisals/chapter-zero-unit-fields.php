@@ -67,8 +67,8 @@
                         <label class="label">Tipología IGAC de apoyo
                             <select class="input" name="config_units[<?= e($key) ?>][igac_typology_hint]" x-model="igacHint"
                                 @change="selectIgacCategory()"
-                                :disabled="!igacOptions.length" x-init="$el.querySelectorAll('[data-fallback-option]').forEach(option => option.remove())">
-                                <option value="">Selecciona una referencia para contrastar</option>
+                                x-init="$el.querySelectorAll('[data-fallback-option]').forEach(option => option.remove())">
+                                <option value="">Sin referencia · por definir o no aplica</option>
                                 <?php foreach (\App\Support\AppraisalConstructionTypeCatalog::optionsForUnit($unit, $igacTypologiesByCategory) as $option): ?>
                                     <option data-fallback-option value="<?= e((string) $option['value']) ?>" <?= (string) ($unit['igac_typology_hint'] ?? '') === (string) $option['value'] ? 'selected' : '' ?>>
                                         <?= e((string) $option['label']) ?>
@@ -82,13 +82,14 @@
                                 Oficinas: referencias de Comerciales y Edificios. Consulta sus especificaciones antes de elegir.
                             </span>
                             <span class="mt-1 block text-xs leading-5 text-slate-500" x-show="igacCategory">
-                                <span x-text="igacOptions.length"></span>
-                                referencia(s) mostradas. La selección guardada se conserva aunque no coincida con el filtro.
+                                <span x-text="igacMatches.length"></span>
+                                coincidencias del filtro. La selección anterior, si no coincide, aparece señalada aparte.
                             </span>
-                            <span role="status" class="mt-2 block text-sm text-amber-900" x-show="igacCategory && !igacOptions.length" x-cloak>
+                            <span role="status" class="mt-2 block text-sm text-amber-900" x-show="!igacMatches.length && igacType!=='lote'" x-cloak>
                                 No hay coincidencias. Prueba otro término o amplía la categoría; no se asignará una referencia automáticamente.
                             </span>
                         </label>
+                        <?php require __DIR__.'/igac-filter-notice.php'; ?>
                         <?php require BASE_PATH . '/app/Views/appraisals/chapter-zero-igac-preview.php'; ?>
                         <?php require __DIR__ . '/chapter-zero-unit-method.php'; ?>
                         <label class="label">Tratamiento en el avalúo

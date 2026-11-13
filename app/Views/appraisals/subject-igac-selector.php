@@ -8,15 +8,16 @@
     <label class="label">Tipología preliminar de esta unidad
         <select class="input" name="units[<?= e($unit['id']) ?>][igac_typology_hint]" x-model="igacHint" @change="selectIgacCategory()"
             x-init="$el.querySelectorAll('[data-fallback-option]').forEach(option=>option.remove())">
-            <option value="">Selecciona una referencia para contrastar</option>
+            <option value="">Sin referencia · por definir o no aplica</option>
             <?php foreach (\App\Support\IgacTypologySelection::options('', '', (string)$unit['igac_typology_hint'], $typologyOptions, true) as $option): ?>
             <option data-fallback-option value="<?= e($option['value']) ?>" <?= $unit['igac_typology_hint']===$option['value']?'selected':'' ?>><?= e($option['label']) ?></option>
             <?php endforeach; ?>
             <template x-for="item in igacOptions" :key="item.value"><option :value="item.value" x-text="item.label"></option></template>
         </select>
-        <span class="text-xs font-normal"><span x-text="igacOptions.length"></span> referencias. La selección guardada se conserva aunque no coincida con la búsqueda.</span>
+        <span class="text-xs font-normal"><span x-text="igacMatches.length"></span> coincidencias del filtro actual. La selección anterior, si no coincide, aparece señalada aparte.</span>
     </label>
-    <p class="text-sm text-amber-900" x-show="!igacOptions.length" role="status">Sin coincidencias. Amplía al catálogo completo o cambia el término de búsqueda.</p>
+    <?php require __DIR__.'/igac-filter-notice.php'; ?>
+    <p class="text-sm text-amber-900" x-show="!igacMatches.length && igacType!=='lote'" role="status">Sin coincidencias. Amplía al catálogo completo o cambia el término de búsqueda.</p>
     <article class="grid gap-4 rounded-xl border bg-slate-50 p-4 sm:grid-cols-[9rem_1fr]" x-show="selectedItem(igacCategory, igacHint)">
         <a class="block" :href="imageUrl(selectedItem(igacCategory, igacHint))" target="_blank" rel="noopener" data-no-fetch>
             <img class="w-full object-contain" :src="imageUrl(selectedItem(igacCategory, igacHint))" alt="Referencia IGAC seleccionada" loading="lazy">

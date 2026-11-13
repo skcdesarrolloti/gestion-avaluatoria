@@ -6,7 +6,7 @@ export function normalizeIgac(text) {
 export function filterIgacOptions(options, { type = '', query = '', selected = '', showAll = false, rules = {} } = {}) {
     const search = normalizeIgac(query);
     const family = Object.values(rules).find(rule => rule.aliases.some(alias => normalizeIgac(alias) === search));
-    const typeRule = showAll ? null : rules[type];
+    const typeRule = showAll ? null : rules[type === 'parqueadero' ? 'parqueo' : type];
     const matchesRule = (item, rule) => {
         const text = normalizeIgac(rule.fields.map(field => item[field] || '').join(' '));
         return rule.terms.some(term => text.includes(normalizeIgac(term)));
@@ -23,29 +23,33 @@ export function filterIgacOptions(options, { type = '', query = '', selected = '
 export function igacUnitSelector(initial) {
     return {
         ...initial, igacQuery: '', igacShowAll: false,
+        get igacType() { return this.constructionType || this.defaultConstructionType || ''; },
+        get igacCatalog() {
+            return Object.entries(this.typologies).flatMap(([category,options])=>options.map(item=>({...item,category,label:item.label+' · '+category})));
+        },
         get allIgacOptions() {
-            const families=this.igacFamilies || {oficina:['COMERCIALES','EDIFICIOS']};
-            const selected=Object.keys(this.typologies).find(code=>this.typologies[code].some(item=>item.value===this.igacHint));
-            const categories = [...new Set([...(this.igacShowAll?Object.keys(this.typologies):
-                families[this.constructionType] || (this.igacCategory?[this.igacCategory]:Object.keys(this.typologies))),this.igacCategory,selected])];
-            return categories.flatMap(category => (this.typologies[category] || []).map(item => ({ ...item, category,
-                label: item.label + ' · ' + category })));
+            const categories=this.igacFamilies?.[this.igacType] ??
+                (!this.igacType && this.igacCategory?[this.igacCategory]:Object.keys(this.typologies));
+            return filterIgacOptions(this.igacCatalog.filter(item=>categories.includes(item.category)),{type:this.igacType,rules:this.igacFilterRules});
+        },
+        get igacOutsideType() { return Boolean(this.igacHint) && !this.allIgacOptions.some(item=>item.value===this.igacHint); },
+        get igacMatches() {
+            return filterIgacOptions(this.igacShowAll?this.igacCatalog:this.allIgacOptions,{query:this.igacQuery,rules:this.igacFilterRules});
         },
         get igacOptions() {
-            return filterIgacOptions(this.allIgacOptions, { type: this.constructionType, query: this.igacQuery,
-                selected: this.igacHint, showAll: this.igacShowAll, rules: this.igacFilterRules });
+            const options=this.igacMatches, previous=this.igacCatalog.find(item=>item.value===this.igacHint);
+            return previous && !options.some(item=>item.value===this.igacHint)?[...options,{...previous,
+                label:(this.igacOutsideType?'Anterior · revisar tipo: ':'Selección fuera de búsqueda: ')+previous.label}]:options;
         },
         selectIgacCategory() {
-            const selected = this.allIgacOptions.find(item => item.value === this.igacHint);
+            const selected = this.igacCatalog.find(item => item.value === this.igacHint);
             if (selected) this.igacCategory = selected.category;
         },
         syncIgacFromConstruction() {
             this.igacQuery = '';
             this.igacShowAll = false;
             if (this.igacHint) { this.selectIgacCategory(); return; }
-            const next = this.constructionIgacCategories[this.constructionType] || (this.unitKind === 'annex' ? 'ANEXOS' : '');
-            if (next && next !== this.igacCategory) this.igacCategory = next;
-            if (!this.allIgacOptions.some(item => item.value === this.igacHint)) this.igacHint = '';
+            this.igacCategory = this.constructionIgacCategories?.[this.igacType] || '';
         },
     };
 }

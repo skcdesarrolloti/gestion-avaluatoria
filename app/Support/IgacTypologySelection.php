@@ -8,11 +8,13 @@ final class IgacTypologySelection
     public static function families(): array
     {
         return [
+            ...array_map(static fn($category)=>[$category],AppraisalConstructionTypeCatalog::igacCategories()),
             'oficina'=>['COMERCIALES','EDIFICIOS'], 'consultorio'=>['COMERCIALES','EDIFICIOS','INSTITUCIONALES'],
             'apartamento'=>['RESIDENCIALES','EDIFICIOS'], 'casa'=>['RESIDENCIALES','EDIFICIOS'],
             'local'=>['COMERCIALES','EDIFICIOS'], 'bodega'=>['INDUSTRIALES','COMERCIALES'],
             'galpon'=>['INDUSTRIALES'], 'edificio'=>['EDIFICIOS','COMERCIALES','INSTITUCIONALES'],
             'hotel'=>['EDIFICIOS','COMERCIALES','INSTITUCIONALES'],
+            'lote'=>[], 'parqueadero'=>['ANEXOS'],
         ];
     }
 
@@ -25,11 +27,16 @@ final class IgacTypologySelection
 
     public static function options(string $type, string $category, string $selected, array $catalog, bool $all=false): array
     {
-        $categories=$all?array_keys($catalog):(self::families()[$type] ?? ($category!==''?[$category]:array_keys($catalog)));
-        $categories=array_unique([...$categories,$category,self::category($selected,$catalog) ?? '']);
+        $categories=$all?array_keys($catalog):(self::families()[$type] ?? ($type==='' && $category!==''?[$category]:array_keys($catalog)));
         $out=[];
         foreach ($categories as $code) foreach ($catalog[$code] ?? [] as $item)
             $out[]=array_replace($item,['category'=>$code,'label'=>$item['label'].' · '.$code]);
-        return $all?$out:IgacTypologyFilter::options($out,$type,$selected);
+        if ($all) return $out;
+        $out=IgacTypologyFilter::options($out,$type);
+        if ($selected!=='' && !in_array($selected,array_column($out,'value'),true))
+            foreach ($catalog[self::category($selected,$catalog) ?? ''] ?? [] as $item)
+                if ($item['value']===$selected) $out[]=array_replace($item,['category'=>self::category($selected,$catalog),
+                    'label'=>'Anterior · revisar tipo: '.$item['label'],'retained'=>true]);
+        return $out;
     }
 }

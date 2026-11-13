@@ -44,3 +44,12 @@ expect(!in_array('Anexos.Estacion_Sistema_Transporte_Sencilla_Tipo_20', array_co
     'garaje no propone estaciones que expresamente excluyen estacionamiento');
 expect(count($depositOptions) === 1 && $depositOptions[0]['value'] === 'Anexos.Depósitos_1',
     'cuarto útil no se confunde con depósito de líquidos ni silo');
+
+$apartmentOptions=\App\Support\IgacTypologySelection::options('apartamento','COMERCIALES',$commercialHint,$officeCatalog);
+$retained=array_values(array_filter($apartmentOptions,static fn($row)=>($row['category'] ?? '')==='COMERCIALES'));
+expect(count($retained)===1 && $retained[0]['value']===$commercialHint && $retained[0]['retained'],
+    'apartamento conserva solo la referencia comercial previa marcada para revisión');
+expect(\App\Support\IgacTypologySelection::options('lote','COMERCIALES','',$officeCatalog)===[],
+    'lote no hereda tipologías constructivas de la categoría anterior');
+$lotOptions=\App\Support\IgacTypologySelection::options('lote','COMERCIALES',$commercialHint,$officeCatalog);
+expect(count($lotOptions)===1 && $lotOptions[0]['retained'],'lote conserva antecedente sin convertirlo en sugerencia');

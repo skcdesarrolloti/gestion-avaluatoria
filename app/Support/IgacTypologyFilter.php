@@ -23,7 +23,7 @@ final class IgacTypologyFilter
 
     public static function options(array $options, string $type, string $selected = ''): array
     {
-        $rule = self::rules()[$type] ?? [];
+        $rule = self::rules()[$type==='parqueadero'?'parqueo':$type] ?? [];
         $terms = $rule['terms'] ?? [];
         if ($terms === []) return $options;
         return array_values(array_filter($options, static function (array $item) use ($rule, $terms, $selected): bool {

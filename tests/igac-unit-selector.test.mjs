@@ -54,3 +54,31 @@ test('every property type can consult the complete catalog and retain a cross-ca
         assert.equal(selector.igacHint, '9026547_ED.Servicios_Tipo_1');
     }
 });
+
+test('changing office to apartment or lot does not carry the previous commercial category into suggestions', () => {
+    const [igacFamilies,typologies] = JSON.parse(execFileSync(php, ['-r',
+        "require 'bootstrap.php'; echo json_encode([App\\Support\\IgacTypologySelection::families(), (new App\\Models\\IgacTypologyRepository())->optionsByCategory()]);"], {encoding:'utf8'}));
+    const previous='2026532_Comercial.Intermedio_3';
+    const selector=Object.assign(igacUnitSelector({constructionType:'oficina',igacCategory:'COMERCIALES',igacHint:previous}),
+        {igacFamilies,typologies,igacFilterRules:rules,constructionIgacCategories:{apartamento:'RESIDENCIALES'}});
+    assert.ok(selector.igacMatches.some(item=>item.category==='COMERCIALES'));
+    selector.constructionType='apartamento'; selector.igacQuery='lote'; selector.igacShowAll=true;
+    selector.syncIgacFromConstruction();
+    assert.equal(selector.igacQuery,''); assert.equal(selector.igacShowAll,false);
+    assert.ok(selector.igacMatches.some(item=>item.category==='RESIDENCIALES'));
+    assert.ok(selector.igacMatches.every(item=>['RESIDENCIALES','EDIFICIOS'].includes(item.category)));
+    assert.deepEqual(selector.igacOptions.filter(item=>item.category==='COMERCIALES').map(item=>item.value),[previous]);
+    assert.equal(selector.igacOutsideType,true);
+    assert.match(selector.igacOptions.find(item=>item.value===previous).label,/Anterior/);
+    selector.constructionType='lote'; selector.syncIgacFromConstruction();
+    assert.equal(selector.igacMatches.length,0);
+    assert.equal(selector.igacOptions.length,1); assert.equal(selector.igacHint,previous);
+    selector.igacHint=''; selector.syncIgacFromConstruction();
+    assert.deepEqual(selector.igacOptions,[]);
+    selector.igacShowAll=true; assert.ok(selector.igacMatches.length>0);
+    selector.constructionType='parqueadero'; selector.syncIgacFromConstruction();
+    assert.ok(selector.igacMatches.length>0);
+    assert.ok(selector.igacMatches.every(item=>item.category==='ANEXOS' && !item.value.includes('Depósitos')));
+    selector.constructionType=''; selector.defaultConstructionType='apartamento'; selector.syncIgacFromConstruction();
+    assert.ok(selector.igacMatches.some(item=>item.category==='RESIDENCIALES'));
+});

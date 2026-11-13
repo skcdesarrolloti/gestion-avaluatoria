@@ -39,6 +39,22 @@ No se inventan tipologías ni se modifican descripciones oficiales del catálogo
 La imagen y especificación orientan la revisión; la referencia no se adopta sola.
 Capítulo 1 consulta el mismo catálogo y conserva las mismas unidades.
 
+Corrección del filtro (13/11): cambiar el tipo ya no agrega toda la categoría
+de la referencia anterior. Apartamento consulta Residenciales + Edificios;
+Lote no propone tipologías del suelo desde este catálogo constructivo.
+La selección previa fuera del filtro queda como única excepción rotulada
+«Anterior · revisar tipo», con aviso; no se borra ni se sustituye automáticamente.
+El conteo muestra coincidencias reales, excluyendo la excepción conservada.
+Cambiar el tipo limpia la búsqueda y desactiva la consulta del catálogo completo.
+«Usar tipo general» consulta el tipo del expediente sin copiarlo a la unidad.
+Parqueadero usa el mismo filtro de garaje/parqueo. Buscar texto no cambia el tipo.
+
+Validación de la corrección: PHP1680, JS285, HTTP18, lint/build/check:size
+81.912 bytes gzip (límite 81.920). Navegador con PHP/BD locales: Oficina →
+Apartamento → Lote, conservación y borrado explícito de selección, recarga,
+tipo general, catálogo completo y móvil390; sin errores JS. No altera esquema
+ni guardado: se conservan las mismas columnas y validaciones de servidor.
+
 ## Persistencia y migraciones
 
 - `202611130001_shared_lease_register.php`: `appraisals.lease_register` JSON
