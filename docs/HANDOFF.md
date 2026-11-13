@@ -9,7 +9,11 @@ sin alterar captura, muestras ni exclusiones. Persistencia sin DDL con CAS/conte
 snapshot marcado anterior cuando cambian sus entradas. PHP1759/JS300/BD312/HTTP24;
 lint/build/tamaño correctos. BD desechables ga_test_app/auth3388; HTTP local8090 con
 DB3387. Advertencias preexistentes de fixtures PHP incompletos se mantienen.
-UI local: autoguardado, recarga, cálculo y alternativas comprobados. Ver convenciones,
+UI local: autoguardado, recarga, cálculo y alternativas comprobados; móvil390px sin
+desbordamiento. Carga inicial81918bytes gzip. Publicado24ec1ca y comprobados hashes
+de assets en SuCasa. Comprobación autenticada pendiente de sesión del usuario.
+El aviso genérico de versión sin confirmar ahora indica Guardar, también fuera
+de matrices; se repitieron300 pruebas JS, build y control de tamaño. Ver convenciones,
 supuestos, límites y comandos en RENTA-FLUJOS-TASAS-COSTOS.md.
 
 13/11/2026 · Corrección adicional del guardado de áreas: la matriz completa de

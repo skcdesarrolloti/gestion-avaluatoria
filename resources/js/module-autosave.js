@@ -110,7 +110,7 @@ async function save(form) {
         if (response.status === 409) state.conflict = true;
         form.dispatchEvent?.(new CustomEvent('ga:validation', { detail: result.errors ?? {} }));
         if (!response.ok || result.ok !== true) throw new Error(result.message || 'No se pudo confirmar el guardado.');
-        if (!Number.isInteger(result.version)) throw new Error('El servidor no confirmó la versión guardada. Conserva esta página y pulsa Guardar matriz para reintentar.');
+        if (!Number.isInteger(result.version)) throw new Error('El servidor no confirmó la versión. Conserva esta página y pulsa Guardar para reintentar.');
         phase='confirmed';
         updateVersion(form, result);
         acknowledgeCompositionMethods(form, result);
