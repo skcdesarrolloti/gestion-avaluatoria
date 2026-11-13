@@ -1,8 +1,9 @@
 # Gestión avaluatoria · SuCasa
 
-Renta: [primer bloque conceptual](docs/RENTA-PRIMER-BLOQUE.md) en Insumos, con
-listas, ayudas y soportes normativos. Academia incluye orientación y resumen PDF;
-respuestas como borrador por recorrido, sin cálculos ni nuevas migraciones.
+Renta: [comprender el inmueble y su arriendo](docs/RENTA-COMPRENDER-INMUEBLE.md)
+consulta el capítulo 3 y reúne faltantes de alcance, contratos, gastos y antecedentes
+en cuatro temas, con ayudas de Academia para ambos métodos. Borrador por recorrido,
+sin cálculos ni nuevas migraciones. [Historia del primer bloque](docs/RENTA-PRIMER-BLOQUE.md).
 Investigaciones de [ventas y arriendos independientes](docs/INVESTIGACIONES-VENTAS-ARRIENDOS.md):
 colecciones, guardado y Excel separados por unidad, método y operación; muestras
 históricas conservadas al cambiar de método.

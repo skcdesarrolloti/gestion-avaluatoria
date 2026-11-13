@@ -1,5 +1,12 @@
 # Crear y evolucionar la base sin SQL manual
 
+12/11/2026 · Comprender el inmueble en Renta: ampliación aditiva del objeto
+income_concept en methodology_workflow por recorrido. Sin esquema nuevo ni DDL.
+Listas de alcance, disponibilidad, responsables e historial; notas hasta 1000
+caracteres. Ocupación works/rented_unspecified conserva códigos anteriores.
+Lectura viva del capítulo 3 sin copiarlo; persistencia parcial con CAS existente,
+propietario y CSRF. Ver RENTA-COMPRENDER-INMUEBLE.md y pruebas de conservación.
+
 12/11/2026 · Separación de investigaciones sin DDL: research_method y
 research_operation en capture_details; planes/memorias por método en
 methodology_workflow.method_studies. No borra ni migra automáticamente muestras.

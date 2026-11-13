@@ -1,6 +1,8 @@
+import { incomePreparation } from './income-preparation.js';
 export function incomeInputs() {
     let pending=null, controller, root;
     return {
+        preparation:incomePreparation,
         incomeTab:'concept', incomePortal:'', incomeLoaded:false, incomeLoading:false, incomeError:'',
         incomePortals:[], incomeSources:[], incomePortalBusy:false, incomePortalError:'',
         get incomePortalIndex() { return this.incomePortals.indexOf(this.canonicalPortal(this.incomePortal)); },

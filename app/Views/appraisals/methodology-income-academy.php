@@ -16,6 +16,6 @@
             <li><strong>Decisiones pendientes:</strong> mínimos particulares de NTS M01, compatibilidad de rentas y tasas, horizonte, contratos y ajustes. Se resolverán antes de programar cálculos; los ejemplos no son parámetros del expediente.</li>
         </ul>
     </details>
-    <p class="mt-4 text-sm">En Insumos encontrarás «1. Comprender el inmueble y su arriendo», con desplegables, ayudas (?) y soportes por pregunta. La captura de muestras existente se conserva.</p>
+    <p class="mt-4 text-sm">En Insumos encontrarás «1. Comprender el inmueble y su arriendo»: A. Inmueble y alcance, B. Ocupación y contrato, C. Gastos y antecedentes y D. Preparación reunida. Consulta el capítulo 3 y completa faltantes con ayudas (?), para capitalización directa y flujo de caja descontado. La captura de muestras existente se conserva.</p>
     <?php if (($selected['method'] ?? '')==='renta'): ?><a class="btn-primary mt-3" href="<?= e($flowUrl('3','renta')) ?>#renta-concepto">Ir al primer bloque conceptual</a><?php endif; ?>
 </section>

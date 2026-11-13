@@ -19,6 +19,8 @@ final class IncomeConceptAction
         MethodologyValuationPlan::validateWorkKey($key,$components);
         if ($key==='' || (MethodologyWorkflow::saved($record)[$key]['method'] ?? '')!=='renta')
             throw new HttpException(422,'Selecciona un recorrido activo de Renta.');
+        $section=is_string($_POST['income_section'] ?? null) && in_array($_POST['income_section'],['subject','lease','evidence','summary'],true)?$_POST['income_section']:'subject';
+        $redirect='avaluos/'.$id.'/metodologia-valuatoria?method=renta&stage=3&component='.rawurlencode($key).'&renta_tema='.$section.'#renta-concepto';
         $version=filter_var($_POST['version'] ?? null,FILTER_VALIDATE_INT);
         if ($version===false || $version===null || $version<0) throw new HttpException(422,'Versión inválida.');
         try {
@@ -33,10 +35,10 @@ final class IncomeConceptAction
             }
             Session::flash(self::flashKey($id,$key),json_encode(['values'=>$old,'errors'=>$error->errors,
                 'message'=>$error->getMessage(),'version'=>$version],JSON_THROW_ON_ERROR));
-            Http::redirect('avaluos/'.$id.'/metodologia-valuatoria?method=renta&stage=3&component='.rawurlencode($key).'#renta-concepto');
+            Http::redirect($redirect);
         }
         if (Http::wantsJson()) Http::json(['ok'=>true,'version'=>$next,'saved_at'=>gmdate('c')]);
         Session::flash('methodology_message','Borrador conceptual de Renta guardado.');
-        Http::redirect('avaluos/'.$id.'/metodologia-valuatoria?method=renta&stage=3&component='.rawurlencode($key).'#renta-concepto');
+        Http::redirect($redirect);
     }
 }

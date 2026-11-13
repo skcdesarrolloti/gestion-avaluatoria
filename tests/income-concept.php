@@ -18,8 +18,9 @@ declare(strict_types=1);
     $basePath='avaluos/'.$record['id'].'/metodologia-valuatoria';
     $flowUrl=static fn($stage)=>url($basePath.'?stage='.$stage.'&component='.$componentKey);
     ob_start();require BASE_PATH.'/app/Views/appraisals/methodology-income-concept.php';$html=ob_get_clean();
-    expect(substr_count($html,'<select ')===3 && str_contains($html,'IGAC 941 de 2026, art. 24.a–c')
-        && str_contains($html,'NTS M01 (2016)') && str_contains($html,'(?)'),'renta ofrece tres preguntas con ayudas y soporte sectorial e IGAC');
+    expect(str_contains($html,'name="income_concept[lease_term]"') && str_contains($html,'IGAC 941 de 2026, art. 24.a–c')
+        && str_contains($html,'NTS M01 (2016)') && str_contains($html,'(?)') && str_contains($html,'name="income_concept[cost_ph]"'),
+        'renta amplía contratos y gastos conservando preguntas previas, ayudas y soporte sectorial e IGAC');
     expect(str_contains($html,'Zona &lt;privada&gt;') && !str_contains($html,'Zona <privada>') && str_contains($html,'Oficina &lt;principal&gt;'),'renta escapa textos y unidad');
     expect(str_contains($html,'value="partial" selected') && str_contains($html,'value="8"') && str_contains($html,'data-module-autosave'),'renta restaura selección y versión para autoguardado');
     expect(!str_contains($html,'type="number"') && !str_contains($html,'name="rate"'),'bloque conceptual no captura cálculos');

@@ -20,4 +20,11 @@ declare(strict_types=1);
     $read=\App\Services\MethodologyWorkflow::saved($ar->find($id,1));
     expect($read[$key]['income_concept']===['occupancy'=>'partial','scope'=>'part','scope_detail'=>'Zona privada','support'=>'verbal','support_detail'=>'Manifestación pendiente'],
         'formulario anterior y desactivar/reactivar conservan las respuestas de Renta');
+    $repo->save($id,1,6,$key,['income_concept'=>['lease_term'=>'Contrato conservado','cost_ph'=>'tenant','history_occupancy'=>'none']]);
+    $repo->save($id,1,7,$key,['income_concept'=>['support'=>'contract']]);
+    $read=\App\Services\MethodologyWorkflow::saved($ar->find($id,1));
+    expect($read[$key]['income_concept']['lease_term']==='Contrato conservado' && $read[$key]['income_concept']['cost_ph']==='tenant'
+        && $read[$key]['income_concept']['scope_detail']==='Zona privada','campos nuevos persisten junto a antecedentes y formularios anteriores sin borrado');
+    expect($read[$key]['income_concept']['history_occupancy']==='none','historial no disponible persiste sin convertirse en cero');
+    expectStatus(409,fn()=>$repo->save($id,1,7,$key,['income_concept'=>['cost_ph'=>'owner']]),'edición obsoleta no sustituye nuevas responsabilidades');
 })();

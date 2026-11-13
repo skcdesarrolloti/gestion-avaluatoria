@@ -31,7 +31,8 @@ expect(request('/login',http_build_query(['_token'=>$token,'username'=>'ga_test'
 $home=request('/');preg_match('/name="csrf-token" content="([a-f0-9]+)"/',$home['body'],$matches);$token=$matches[1];
 $incomePath=$flowPath.'/renta/concepto';
 $incomePost=['_token'=>$token,'version'=>1,'component'=>$incomeKey,
-    'income_concept'=>['occupancy'=>'partial','scope'=>'part','support'=>'verbal','scope_detail'=>'Zona <reservada>']];
+    'income_concept'=>['occupancy'=>'partial','scope'=>'part','support'=>'verbal','scope_detail'=>'Zona <reservada>',
+        'rental_scope'=>'different','lease_term'=>'Vigencia según cláusula <privada>','cost_ph'=>'tenant','history_occupancy'=>'none']];
 expect(request($incomePath,http_build_query(array_replace($incomePost,['_token'=>'invalid'])),$jsonHeaders)['status']===419,'HTTP renta requiere CSRF');
 expect(request($incomePath,http_build_query(array_replace($incomePost,['component'=>$unitId])),$jsonHeaders)['status']===422,'HTTP renta rechaza recorrido Mercado');
 expect(request($incomePath,http_build_query($incomePost),$jsonHeaders)['status']===200,'HTTP renta guarda borrador');
@@ -39,6 +40,8 @@ expect(request($incomePath,http_build_query($incomePost),$jsonHeaders)['status']
 $incomePage=$flowPath.'?stage=3&component='.$incomeKey;
 $incomeHtml=request($incomePage)['body'];
 expect(str_contains($incomeHtml,'Zona &lt;reservada&gt;') && str_contains($incomeHtml,'value="partial" selected'),'HTTP recarga conserva respuestas y escapa notas');
+expect(str_contains($incomeHtml,'Vigencia según cláusula &lt;privada&gt;') && str_contains($incomeHtml,'value="tenant" selected'),
+    'HTTP recarga contrato y responsabilidades nuevas junto a respuestas históricas');
 $invalidIncome=array_replace($incomePost,['version'=>2,'income_concept'=>['occupancy'=>'invalid','scope_detail'=>'Borrador pendiente']]);
 $incomeResponse=request($incomePath,http_build_query($invalidIncome),$jsonHeaders);
 expect($incomeResponse['status']===422 && isset(json_decode($incomeResponse['body'],true)['errors']['income_concept[occupancy]']),'HTTP validación devuelve errores por campo');

@@ -1,5 +1,9 @@
 # Renta: primer bloque conceptual
 
+Actualización: el primer bloque ahora se organiza en cuatro temas y consulta el
+capítulo 3 antes de pedir faltantes. Ver [Comprender el inmueble y su arriendo](RENTA-COMPRENDER-INMUEBLE.md).
+Las entradas siguientes conservan la historia de entregas anteriores.
+
 12/11/2026 · Navegación simplificada por fuente. La barra superior permanece
 visible al desplazarse en Preparar búsqueda, Recoger y Revisar. Permite elegir
 portal, pasar al siguiente de los cinco portales configurados y abrir sus muestras

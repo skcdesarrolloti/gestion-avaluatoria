@@ -11,8 +11,8 @@ final class IncomeConcept
     {
         return [
             'occupancy' => ['label'=>'¿Cómo se ocupa actualmente el inmueble?', 'values'=>[
-                'rented'=>'Totalmente arrendado', 'partial'=>'Parcialmente arrendado',
-                'vacant'=>'Desocupado', 'owner'=>'Ocupado por el propietario',
+                'rented'=>'Totalmente arrendado', 'partial'=>'Parcialmente arrendado', 'rented_unspecified'=>'Arrendado · alcance por precisar',
+                'vacant'=>'Desocupado', 'owner'=>'Ocupado por el propietario', 'works'=>'En adecuación',
                 'other'=>'Otra situación', 'pending'=>'Pendiente de verificar'],
                 'meaning'=>'Selecciona la situación observada a la fecha del avalúo.',
                 'why'=>'Distingue la ocupación actual del potencial de arriendo. Estar desocupado no significa que el inmueble carezca de capacidad para generar renta.',
@@ -33,7 +33,7 @@ final class IncomeConcept
                 'why'=>'Identificar un documento no confirma su contenido. Se necesita comprobar la procedencia de la información y las condiciones del arriendo.',
                 'example'=>'Si el propietario lo explicó por teléfono y aún no entregó documentos, selecciona «Información verbal».',
                 'references'=>['IGAC 941 de 2026, art. 24.a–c', 'GTS E02 (2009), apartados 4.9 y 7.11', 'NTS M01 (2016), apartado 7.4.2']],
-        ];
+        ] + IncomePreparationQuestions::all();
     }
 
     public static function texts(): array
@@ -42,7 +42,7 @@ final class IncomeConcept
             'occupancy_detail'=>['Describe la otra situación de ocupación', 'Ej. Uso compartido entre el propietario y un tercero; falta verificar el acuerdo.', "occupancy === 'other'"],
             'scope_detail'=>['Identifica las partes que se estudiarán', 'Ej. Zona del primer piso destinada a oficinas; contrastar con el alcance configurado.', "['part','several'].includes(scope) || occupancy === 'partial'"],
             'support_detail'=>['Identifica el soporte o la procedencia de la información', 'Ej. Contrato archivado en el expediente; o información del propietario pendiente de corroborar.', "['contract_changes','contract','other','verbal'].includes(support)"],
-        ];
+        ] + IncomePreparationNotes::all();
     }
 
     public static function input(mixed $post): array

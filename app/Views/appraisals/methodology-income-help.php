@@ -2,6 +2,7 @@
     <summary class="flex min-h-11 cursor-pointer items-center gap-2 font-semibold text-teal-900"><span aria-hidden="true">(?)</span> Ayuda sobre esta pregunta</summary>
     <p class="mt-2 text-sm leading-6"><strong>Por qué se pregunta:</strong> <?= e($question['why']) ?></p>
     <p class="mt-2 text-sm leading-6"><strong>Ejemplo:</strong> <?= e($question['example']) ?></p>
+    <?php if (!empty($question['support'])): ?><p class="mt-2 text-sm leading-6"><strong>Qué soporte revisar:</strong> <?= e($question['support']) ?></p><?php endif; ?>
     <details class="my-3 rounded-lg bg-white px-3">
         <summary class="min-h-11 cursor-pointer py-3 text-sm font-semibold">Ver soporte normativo</summary>
         <ul class="list-disc space-y-2 pl-5 text-sm"><?php foreach ($question['references'] as $reference): ?><li><?= e($reference) ?></li><?php endforeach; ?></ul>

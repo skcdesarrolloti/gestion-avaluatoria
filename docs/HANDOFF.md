@@ -1,5 +1,16 @@
 # Entrega al responsable de la implementación
 
+12/11/2026 · Primera etapa de Renta ampliada tras aprobación del borrador:
+cuatro temas en «1. Comprender el inmueble y su arriendo», con consulta viva del
+capítulo 3, faltantes y ayudas de Academia, común a directa y flujo descontado.
+Preserva respuestas anteriores, notas condicionales y muestras. No copia ocupación
+global a unidades múltiples/partes ni transforma «arrendado» en ocupación total.
+Advierte diferencias, consulta antecedentes económicos y conserva pendientes.
+Sin DDL ni cálculos; autoguardado y versión existentes. PHP1650/JS283/BD250/HTTP14,
+lint/build/check:size79,9KB. Navegador real local: guardado, recarga, 409, desconexión
+y reintento, escritorio/móvil390. Ver RENTA-COMPRENDER-INMUEBLE.md.
+Publicar por commit/push a origin/main y verificar recurso y pantalla publicados.
+
 12/11/2026 · Flujo Renta: barra fija con Portal actual, Siguiente portal,
 Buscar y pegar y Ver muestras, tanto en Preparación como en Captura/Revisión.
 Conserva un solo formulario montado y los pegados pendientes al cambiar de fuente;
