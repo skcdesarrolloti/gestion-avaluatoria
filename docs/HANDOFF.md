@@ -9,7 +9,10 @@ Advierte diferencias, consulta antecedentes económicos y conserva pendientes.
 Sin DDL ni cálculos; autoguardado y versión existentes. PHP1650/JS283/BD250/HTTP14,
 lint/build/check:size79,9KB. Navegador real local: guardado, recarga, 409, desconexión
 y reintento, escritorio/móvil390. Ver RENTA-COMPRENDER-INMUEBLE.md.
-Publicar por commit/push a origin/main y verificar recurso y pantalla publicados.
+Publicado con commit/push 50eaf67 a origin/main. Recursos públicos app.js e
+income-inputs.js HTTP200 y SHA-256 idéntico al local tras la actualización.
+La nueva apertura del expediente redirigió a login; revisión visual autenticada
+del hosting pendiente. No se editaron respuestas ni muestras de producción.
 
 12/11/2026 · Flujo Renta: barra fija con Portal actual, Siguiente portal,
 Buscar y pegar y Ver muestras, tanto en Preparación como en Captura/Revisión.

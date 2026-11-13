@@ -77,5 +77,8 @@ Comandos: `php tests/run.php`, `npm test`, `npm run build`, `npm run check:size`
 local de prueba. Fixtures y capturas de navegador en tests/.runtime, fuera de Git.
 Los avisos previos de fixtures sobre sesión/sample_index no proceden de esta ampliación.
 
-Publicar mediante commit y push a origin/main; verificar assets versionados y
-pantalla autenticada. No requiere acceso al hosting ni cambios en InversKC.
+Publicación: commit/push 50eaf67 a origin/main. Tras la actualización, app.js e
+income-inputs.js públicos respondieron HTTP200 con SHA-256 idéntico al local.
+La apertura nueva del expediente redirigió a login, por lo que no se acredita
+revisión visual autenticada del hosting. Se conservaron respuestas y muestras
+reales; no se solicitó acceso al hosting ni se modificó InversKC.
