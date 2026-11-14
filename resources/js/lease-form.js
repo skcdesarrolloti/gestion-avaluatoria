@@ -20,7 +20,7 @@ export function leaseForm() {
         },
         init() {
             Object.assign(this,JSON.parse(this.$el.dataset.leaseForm));
-            this.values.rent_adjustments={...(this.values.rent_adjustments || {})};
+            for(const key of ['rent_adjustments','admin_adjustments','vacancy_periods']) this.values[key]={...(this.values[key] || {})};
         },
         validation(errors) {
             this.issues=errors || {};

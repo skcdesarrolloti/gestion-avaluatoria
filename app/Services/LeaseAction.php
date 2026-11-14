@@ -47,7 +47,8 @@ final class LeaseAction
                         if (is_string($row[$field] ?? null)) $values['monthly_history'][$month][$field]=mb_substr($row[$field],0,1600);
                 }
             }
-            if (!$antecedent && is_array($posted['rent_adjustments'] ?? null)) $values['rent_adjustments']=$posted['rent_adjustments'];
+            foreach (['rent_adjustments','admin_adjustments','vacancy_periods'] as $group)
+                if (!$antecedent && is_array($posted[$group] ?? null)) $values[$group]=$posted[$group];
             Session::flash('lease_'.$id,json_encode(['lease_id'=>$leaseId,'antecedent'=>$antecedent,'values'=>$values,
                 'units'=>is_array($_POST['lease_units'] ?? null)?array_filter($_POST['lease_units'],'is_string'):[],
                 'version'=>$version,'errors'=>$error->errors,'message'=>$error->getMessage()],JSON_THROW_ON_ERROR));

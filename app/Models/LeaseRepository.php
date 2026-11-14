@@ -20,7 +20,9 @@ final class LeaseRepository
             throw new HttpException(422,'Relaciona las unidades del contrato.',['lease_units'=>'Selecciona unidades de este expediente.']);
         $changes=LeaseInput::fields($posted);
         if (isset($changes['monthly_history'])) $changes['monthly_history']=LeaseMonthlyHistory::merge($previous['monthly_history'] ?? [],$changes['monthly_history']);
-        if (isset($changes['rent_adjustments'])) $changes['rent_adjustments']=\App\Services\LeaseAdjustments::merge($previous['rent_adjustments'] ?? [],$changes['rent_adjustments']);
+        foreach (['rent_adjustments','admin_adjustments'] as $group)
+            if (isset($changes[$group])) $changes[$group]=\App\Services\LeaseAdjustments::merge($previous[$group] ?? [],$changes[$group]);
+        if (isset($changes['vacancy_periods'])) $changes['vacancy_periods']=\App\Services\LeaseVacancies::merge($previous['vacancy_periods'] ?? [],$changes['vacancy_periods']);
         $data=array_replace($previous,$changes,['unit_ids'=>array_values(array_unique($unitIds))]);
         if (!empty($data['analysis_area_reference']) && !in_array(explode(':',$data['analysis_area_reference'])[0],$data['unit_ids'],true))
             throw new HttpException(422,'El área debe pertenecer a una unidad relacionada.',

@@ -5,7 +5,7 @@ use App\Core\HttpException;
 
 final class LeaseAdjustments
 {
-    public static function input(mixed $rows): array
+    public static function input(mixed $rows,string $group='rent_adjustments'): array
     {
         if (!is_array($rows) || count($rows)>600) throw new HttpException(422,'Revisa las modificaciones del canon.');
         $out=[];$errors=[];
@@ -14,7 +14,7 @@ final class LeaseAdjustments
                 || array_diff(array_keys($row),['date','rate','amount','source'])) throw new HttpException(422,'Modificación del canon no admitida.');
             foreach (['date','rate','amount','source'] as $key) {
                 if (!array_key_exists($key,$row)) continue;
-                $v=$row[$key] ?? '';$name='lease[rent_adjustments]['.$id.']['.$key.']';
+                $v=$row[$key] ?? '';$name='lease['.$group.']['.$id.']['.$key.']';
                 if (!is_string($v) || mb_strlen($v)>1500) {$errors[$name]='Usa texto de hasta 1500 caracteres.';continue;}
                 $v=trim($v);
                 if ($v!=='' && $key==='date' && !IncomeValuationInput::date($v)) $errors[$name]='Fecha inválida.';

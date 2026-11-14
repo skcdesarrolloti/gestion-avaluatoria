@@ -1,5 +1,14 @@
 # Entrega al responsable de la implementación
 
+13/11/2026 · Historial de Renta ahora automático: inicio, canon inicial, IPC+puntos,
+enero predeterminado editable; PH inicial con IPC y excepciones, IVA separado y
+vacancias por intervalos. Tabla de todos los meses y gráfico; registros manuales
+previos plegados y conservados. No adopta la referencia como flujo/costo/pago real.
+Sin DDL ni cambios en muestras, exclusiones o motores directa/FCD. DANE anual de
+diciembre2016–2025 con fuente; índice faltante queda pendiente. PHP1770/JS312,
+BD324/HTTP39, lint931, build/tamaño correctos; UI escritorio/móvil390 y guardado/
+recarga verificados con datos ficticios. Detalles: RENTA-HISTORIAL-AUTOMATICO.md.
+
 13/11/2026 · Renta: etapa 3 divide Historial y contrato / Proyección futura /
 Costos con soporte. Serie mensual desde inicio con cambios documentados,
 ocupación y recaudo separados, PH/IVA/totales y gráfico anual. Costos en tabla,

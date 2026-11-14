@@ -9,7 +9,7 @@ const stamp=s=>{const n=Date.parse(s+'T00:00:00Z');return /^\d{4}-\d{2}-\d{2}$/.
 const sumKnown=values=>values.every(v=>v!==null)?values.reduce((a,b)=>a+b,0):null;
 const rounded=n=>n===null?null:Math.round((n+Number.EPSILON)*100)/100;
 export const ledgerMoney=n=>n===null || n===undefined?'Pendiente':new Intl.NumberFormat('es-CO',{maximumFractionDigits:2}).format(n);
-export function leaseSeries(lease,year,cutoff='') {
+export function leaseSeries(lease,year,cutoff='',vacancies=[]) {
     const start=stamp(lease.start_date),end=stamp(lease.end_date),cut=stamp(cutoff);
     const factor={mensual:1,trimestral:3,anual:12}[lease.initial_rent_period];
     const initial=ledgerNumber(lease.initial_rent_amount),rule=lease.history_rule;
@@ -36,12 +36,18 @@ export function leaseSeries(lease,year,cutoff='') {
         if(change && !invalid && !duplicate && rule!=='constant' && start!==null && t>=start) {
             const fixed=ledgerNumber(change.amount),rate=ledgerNumber(change.rate);
             current=fixed!==null?fixed:current===null?null:current*(1+rate/100);
+            if(lease.reference_round) current=rounded(current);
         }
         if(d.getUTCFullYear()!==year) continue;
-        const bucket=monthly[month] ??= {total:0,known:true,days:0};
+        const bucket=monthly[month] ??= {total:0,reference:0,known:true,days:0,vacant:0};
         if(start===null || t<start || (end!==null && t>end) || (cut!==null && t>cut)) continue;
-        bucket.days++;if(current===null || !Number.isFinite(current)) bucket.known=false;
-        else bucket.total+=current/new Date(Date.UTC(year,d.getUTCMonth()+1,0)).getUTCDate();
+        const vacant=vacancies.some(v=>date>=v.start && date<=v.end) || lease.monthly_history?.[month]?.occupancy==='vacant';
+        bucket.days++;if(vacant) bucket.vacant++;
+        if(current===null || !Number.isFinite(current)) bucket.known=false;
+        else {
+            const daily=current/new Date(Date.UTC(year,d.getUTCMonth()+1,0)).getUTCDate();
+            bucket.total+=daily;if(!vacant) bucket.reference+=daily;
+        }
     }
     for(let m=1;m<=12;m++) {
         const key=year+'-'+String(m).padStart(2,'0'),row=lease.monthly_history?.[key] || {},b=monthly[key];
@@ -51,6 +57,7 @@ export function leaseSeries(lease,year,cutoff='') {
         const ownerCost=sumKnown(costs),days=new Date(Date.UTC(year,m,0)).getUTCDate();
         const occupied=['occupied','grace'].includes(row.occupancy)?days:row.occupancy==='vacant'?0:row.occupancy==='partial'?ledgerNumber(row.occupied_days):null;
         rows.push({month:key,contract:rounded(b?.days && b.known?b.total:null),contractDays:b?.days || 0,
+            reference:rounded(b?.days && b.known?b.reference:null),vacantDays:b?.vacant || 0,
             billed:rent,vat:vatBill,vatEstimated:vat===null && vatBill!==null,
             totalBilled:rounded(sumKnown([rent,ledgerNumber(row.admin_billed),vatBill])),
             totalReceived:rounded(sumKnown([received,ledgerNumber(row.admin_received),ledgerNumber(row.vat_paid)])),

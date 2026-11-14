@@ -1,5 +1,9 @@
 # Renta: historial mensual, costos y edición del origen
 
+Actualización posterior del 13/11/2026: el historial principal ahora se reconstruye
+automáticamente por IPC+puntos; la captura manual descrita abajo se conserva como
+consulta opcional. Ver RENTA-HISTORIAL-AUTOMATICO.md para reglas, fuentes y pruebas.
+
 13/11/2026. Ampliación autorizada por el responsable. Conserva cinco etapas,
 Academia, contratos compartidos, muestras/exclusiones y ambos métodos.
 

@@ -29,4 +29,11 @@ declare(strict_types=1);
     expect($repo->find($id,1)['version']===$result['version'],'conflicto no incrementa versión ni altera fecha');
     $post['occupation_version']=1;$post['origin']['area_private_m2']='-5';
     expectStatus(422,fn()=>$origin->save($id,1,$key,$post),'áreas inválidas rechazadas en servidor');
+    $repo->saveLease($id,1,3,$lease,[$key,$annex],['history_rule'=>'ipc','history_calendar'=>'january','history_ipc_points'=>'2',
+        'admin_adjustments'=>[$adj=>['date'=>'2025-01-01','amount'=>'300000','source'=>'Acta']],
+        'vacancy_periods'=>[$adj=>['start'=>'2024-01-01','end'=>'2024-02-29','source'=>'Entregas']]]);
+    $repo->saveLease($id,1,4,$lease,[$key,$annex],['admin_adjustments'=>[$adj=>['amount'=>'320000']],'vacancy_periods'=>[$adj=>['source'=>'Actas verificadas']]]);
+    $read=\App\Services\LeaseRegister::read($repo->find($id,1))[$lease];
+    expect($read['admin_adjustments'][$adj]['source']==='Acta' && $read['vacancy_periods'][$adj]['end']==='2024-02-29','excepciones y vacancias preservan campos omitidos al guardar');
+    expect(count($read['monthly_history'])===2 && $read['rent_adjustments'][$adj]['rate']==='10' && $read['unit_ids']===[$key,$annex],'referencia automática conserva pagos, cambios y unidades compartidas');
 })();
