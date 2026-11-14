@@ -70,6 +70,7 @@ require __DIR__ . '/methodology-persistence.php';
 require __DIR__ . '/income-concept-persistence.php';
 require __DIR__ . '/income-selection-persistence.php';
 require __DIR__ . '/income-valuation-persistence.php';
+require __DIR__ . '/income-preview-persistence.php';
 require __DIR__ . '/lease-persistence.php';
 require __DIR__ . '/comparable-study-persistence.php';
 require __DIR__ . '/research-plan-persistence.php';

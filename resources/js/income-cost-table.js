@@ -4,7 +4,7 @@ export function incomeCostTable() {
         context:{leases:{}},costCatalog:{},historyLease:'',money:ledgerMoney,
         contextSaved(context) {
             if(context.record!==this.context.record || context.unit!==this.context.unit) return;
-            this.context=context;this.stale=true;
+            this.context=context;this.stale=true;this.previewStale=true;
             this.$refs.valuationForm.querySelector('[name="context_hash"]').value=context.hash;
             this.$el.closest('[data-income-inputs]')?.querySelectorAll('[data-income-origin-version] [name="version"]').forEach(i=>{i.value=String(context.origin_version);});
         },

@@ -12,7 +12,8 @@ final class IncomeValuationFields
             'projection'=>[
                 'date'=>$f('Fecha provisional del escenario','date','Solo si falta fecha de valoración en el encargo. Al completarla allí se consulta en origen. Primer mes prorrateado por días restantes.'),
                 'months'=>$f('Horizonte explícito (meses)','integer','Ej. 60. Justifica el plazo; máximo técnico 600 meses.'),
-                'income_source'=>$f('Canon que se usará en la valoración','select','Contrasta el contrato con el mercado y sustenta la elección. No cambia el historial.', ['lease'=>'Canon del contrato vinculado','market'=>'Canon de mercado sustentado']),
+                'income_source'=>$f('Canon que se usará en la valoración','select','Contrasta el contrato con el mercado y sustenta la elección. No cambia el historial.', ['lease'=>'Canon del contrato vinculado','market'=>'Canon de mercado sustentado','scenario'=>'Canon de un escenario de prueba']),
+                'scenario_rent'=>$f('Canon mensual del escenario de prueba (COP)','money','Canon a la fecha del avalúo, sin PH ni IVA. Identifica su origen y supuestos; no se presenta como renta de mercado verificada.'),
                 'lease_id'=>$f('Contrato documentado de esta unidad','lease','Selecciona por referencia y vigencia. Se consulta el mismo registro, sin duplicar anexos.'),
                 'market_rent'=>$f('Canon de mercado mensual (COP)','money','Ej. 3500000. Sin administración ni IVA; también se usa después del contrato si eliges recolocación.'),
                 'income_support'=>$f('Soporte del canon y alcance','textarea','Fuente, fecha, áreas y anexos incluidos; justifica el canon representativo.'),

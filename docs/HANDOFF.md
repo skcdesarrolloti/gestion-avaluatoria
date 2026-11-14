@@ -1,5 +1,16 @@
 # Entrega al responsable de la implementación
 
+13/11/2026 · Proyección preliminar de Renta: tabla mensual disponible en etapa 3,
+Proyección futura, aun con costos y tasas pendientes. Opción explícita de escenario
+de prueba, distinta del canon de contrato o mercado; conserva contexto y resultado
+final anterior. Calendario compartido con FCD, sin convertir PH desconocida en cero.
+Resumen anual de directa y suma bruta del horizonte separados. Ejemplo autorizado:
+60 meses desde 30/09/2026, canon 2.941.590,06, crecimiento hipotético 7,10 % cada enero.
+PHP1791/JS314/BD330/HTTP46, lint939, build/tamaño correctos. Prueba local de actualización
+SPA, guardado y recarga; tabla60filas y diseño móvil CSS390 sin desbordar página.
+Sin migraciones ni configuración nueva. Ver RENTA-PROYECCION-PRELIMINAR.md para
+convenciones, comandos, límites y pendientes de la verificación publicada.
+
 13/11/2026 · Historial de Renta ahora automático: inicio, canon inicial, IPC+puntos,
 enero predeterminado editable; PH inicial con IPC y excepciones, IVA separado y
 vacancias por intervalos. Tabla de todos los meses y gráfico; registros manuales

@@ -29,7 +29,7 @@ final class IncomeValuationRepository
         }
         if ($issues) throw new HttpException(422,'Revisa los campos señalados.',$issues);
         $operation=$post['operation'] ?? 'save';
-        if (!in_array($operation,['save','calculate','add_costs','add_events','add_rates'],true)) throw new HttpException(422,'Acción inválida.');
+        if (!in_array($operation,['save','calculate','preview','add_costs','add_events','add_rates'],true)) throw new HttpException(422,'Acción inválida.');
         if (str_starts_with($operation,'add_')) {
             $group=substr($operation,4);$fields=$group==='rates'?\App\Services\IncomeValuationFields::rates():\App\Services\IncomeValuationFields::group($group);
             $row=array_fill_keys(array_keys($fields),'');if ($group==='rates') $row['id']=bin2hex(random_bytes(8));
@@ -49,6 +49,9 @@ final class IncomeValuationRepository
             if (!is_string($post['context_hash'] ?? null) || !hash_equals($context['hash'],$post['context_hash'])) throw new HttpException(409,'Cambió el inmueble o el contrato de origen. Guarda allí y vuelve a abrir Ingresos y gastos para revisar el nuevo contexto.');
             $old=MethodologyWorkflow::saved($record)[$key]['income_valuation'] ?? [];
             $state=array_replace($old,$clean);
+            if ($operation==='preview') $state['flow_preview']=['fingerprint'=>IncomeValuationContext::fingerprint($clean,$context),
+                'at'=>gmdate('c'),'actor'=>$owner,'inputs'=>$clean,'context'=>$context,
+                'result'=>\App\Services\IncomeFlowPreview::calculate($clean,$context)];
             if ($operation==='calculate') {
                 $state['calculation']=['fingerprint'=>IncomeValuationContext::fingerprint($clean,$context),'at'=>gmdate('c'),'actor'=>$owner,'engine'=>'renta-1',
                     'inputs'=>$clean,'context'=>$context,'result'=>IncomeValuationCalculator::calculate($clean,$context)];

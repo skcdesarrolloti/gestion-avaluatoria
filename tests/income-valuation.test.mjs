@@ -21,3 +21,25 @@ test('network failure retains the rental scenario for retry rather than claiming
     try {await s.calculate();assert.equal(sent,1);assert.equal(s.busy,false);assert.match(s.message,/Network failed/);assert.equal(s.state.adoption.direct_reason,'Soporte');}
     finally {globalThis.FormData=original;globalThis.fetch=oldFetch;}
 });
+test('preliminary flow confirms the shared version without marking final valuation current',async()=>{
+    globalThis.window={gaFlushAutosaves:async()=>true};globalThis.document={querySelector:()=>({content:'fixture'})};
+    const s=incomeValuation(),version={value:'4'};s.stale=true;s.previewStale=true;
+    s.$refs={valuationForm:{dataset:{autosaveEndpoint:'/test'},closest:()=>({querySelectorAll:()=>[version]})}};
+    const original=globalThis.FormData,oldFetch=globalThis.fetch;let operation,refreshed=false;
+    globalThis.FormData=class {set(k,v){if(k==='operation') operation=v;}};
+    globalThis.fetch=async()=>({ok:true,status:200,json:async()=>({ok:true,version:5})});
+    s.refreshResults=async()=>{refreshed=true;};
+    try {
+        await s.calculate('preview');assert.equal(operation,'preview');assert.equal(version.value,'5');assert.ok(refreshed);
+        assert.equal(s.previewStale,false);assert.equal(s.stale,true);assert.equal(s.busy,false);assert.match(s.message,/preliminar guardado/);
+    } finally {globalThis.FormData=original;globalThis.fetch=oldFetch;}
+});
+test('conflicting preliminary flow keeps the previous table stale and inputs available',async()=>{
+    globalThis.window={gaFlushAutosaves:async()=>true};globalThis.document={querySelector:()=>({content:'fixture'})};
+    const s=incomeValuation();s.previewStale=true;s.state.projection.scenario_rent='2941590.06';
+    s.$refs={valuationForm:{dataset:{autosaveEndpoint:'/test'}}};
+    const original=globalThis.FormData,oldFetch=globalThis.fetch;globalThis.FormData=class {set(){}};
+    globalThis.fetch=async()=>({ok:false,status:409,json:async()=>({message:'La valoración cambió en otra pestaña.'})});
+    try {await s.calculate('preview');assert.ok(s.previewStale);assert.equal(s.busy,false);assert.match(s.message,/otra pestaña/);assert.equal(s.state.projection.scenario_rent,'2941590.06');}
+    finally {globalThis.FormData=original;globalThis.fetch=oldFetch;}
+});

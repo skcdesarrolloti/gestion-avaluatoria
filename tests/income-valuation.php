@@ -1,6 +1,7 @@
 <?php
 declare(strict_types=1);
 require_once __DIR__.'/income-valuation-fixture.php';
+require __DIR__.'/income-preview.php';
 (static function(): void {
     $s=incomeValuationFixture();$context=['leases'=>[],'hash'=>'fixture'];
     $calc=\App\Services\IncomeValuationCalculator::calculate($s,$context);

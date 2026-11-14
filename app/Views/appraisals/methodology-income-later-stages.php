@@ -16,7 +16,7 @@ $ivEndpoint=url($basePath.'/renta/valoracion');$ivIssues=$ivOld['errors'] ?? [];
 ?>
 <div x-data="valuation" @ga:income-context.window="contextSaved($event.detail)" data-income-valuation data-valuation-state="<?= e(json_encode(['state'=>$ivState,'issues'=>(object)$ivIssues,'context'=>$ivContext,'costCatalog'=>\App\Services\IncomeCostCatalog::all()],JSON_THROW_ON_ERROR|JSON_UNESCAPED_UNICODE)) ?>">
 <form id="income-valuation" x-ref="valuationForm" method="post" action="<?= e($ivEndpoint) ?>" data-workflow-version
-    data-module-autosave data-save-in-place data-autosave-endpoint="<?= e($ivEndpoint) ?>" @ga:validation="validation($event.detail)" @input="stale=true" @change="stale=true">
+    data-module-autosave data-save-in-place data-autosave-endpoint="<?= e($ivEndpoint) ?>" @ga:validation="validation($event.detail)" @input="stale=true;previewStale=true" @change="stale=true;previewStale=true">
     <?= csrf_field() ?><input type="hidden" name="component" value="<?= e($componentKey) ?>"><input type="hidden" name="study_scope" value="renta:arriendo">
     <input type="hidden" name="version" value="<?= (int)($ivOld['old']['version'] ?? $record['methodology_version'] ?? 0) ?>">
     <input type="hidden" name="context_hash" value="<?= e($ivOld['old']['context_hash'] ?? $ivContext['hash']) ?>">
@@ -47,6 +47,7 @@ $ivEndpoint=url($basePath.'/renta/valoracion');$ivIssues=$ivOld['errors'] ?? [];
     <p class="mt-3 text-red-800" role="alert" x-text="issues.data || ''"></p>
 </form>
 <p class="mt-3" role="status" aria-live="polite" x-text="message"></p>
+<?php require __DIR__.'/income-flow-preview.php'; ?>
 <p class="mt-3 rounded-lg bg-amber-50 p-3" x-show="stale && ['valuation','review'].includes(incomeTab)" x-cloak>Hay cambios desde el resultado mostrado. Guarda y vuelve a calcular para actualizarlo.</p>
 <div x-ref="valuationResults" data-income-valuation-results x-show="incomeTab==='valuation' || incomeTab==='review'" <?= in_array($incomeInitial,['valuation','review'],true)?'':'x-cloak' ?>>
     <?php require __DIR__.'/income-valuation-results.php'; ?>

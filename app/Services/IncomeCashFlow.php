@@ -7,6 +7,20 @@ final class IncomeCashFlow
 {
     public static function forecast(array $s,array $source,float $discount): array
     {
+        $p=$s['projection'];$rows=[];
+        foreach (self::calendar($s,$source) as $entry) {
+            $r=IncomeOperatingCosts::month($entry['potential'],$p,$s['costs'] ?? [],$entry['fraction'],$entry['year']);
+            $r=array_merge($r,$entry);$r['noi']-=$r['extra'];$r['cash']=$r['noi']-$r['capex'];
+            $r['pv']=$r['cash']/pow(1+$discount,$r['time']);$rows[]=$r;
+        }
+        $last=end($rows);$lastDate=new Date($last['date']);
+        // Terminal stabilization excludes extraordinary events; it is explicitly reviewed in adoption.
+        $stabilized=IncomeOperatingCosts::month(self::rentAt($lastDate,$p,$source),$p,$s['costs'] ?? [],1,intdiv(count($rows)-1,12));
+        return ['months'=>$rows,'pv_flows'=>array_sum(array_column($rows,'pv')),'terminal_noi'=>$stabilized['noi']*12,'terminal_time'=>$last['time']];
+    }
+    /** Shared calendar for preliminary and final flows; callers validate inputs first. */
+    public static function calendar(array $s,array $source): array
+    {
         $p=$s['projection'];$origin=new Date($p['date']);$cursor=$origin->modify('+1 day');$rows=[];
         $events=[];foreach ($s['events'] ?? [] as $e) $events[$e['month']]=$e;
         for ($i=0;$i<(int)$p['months'];$i++) {
@@ -16,18 +30,13 @@ final class IncomeCashFlow
             for ($d=$cursor;$d<=$end;$d=$d->modify('+1 day')) $potential+=self::rentAt($d,$p,$source)/$days;
             $event=$events[$end->format('Y-m')] ?? [];
             if (($event['rent'] ?? '')!=='') $potential=(float)$event['rent']*$fraction;
-            $year=intdiv($i,12);$r=IncomeOperatingCosts::month($potential,$p,$s['costs'] ?? [],$fraction,$year);
-            $r['extra']=(float)($event['extra'] ?? 0);$r['capex']=(float)($event['capex'] ?? 0);
-            $r['noi']-=$r['extra'];$r['cash']=$r['noi']-$r['capex'];
+            $r=['potential'=>$potential,'year'=>intdiv($i,12),'extra'=>(float)($event['extra'] ?? 0),'capex'=>(float)($event['capex'] ?? 0)];
             $r['date']=$end->format('Y-m-d');$r['month']=$end->format('Y-m');$r['fraction']=$fraction;
             $r['time']=(int)$origin->diff($end)->format('%a')/365;
-            $r['pv']=$r['cash']/pow(1+$discount,$r['time']);$r['event']=$event['source'] ?? '';
+            $r['event']=$event['source'] ?? '';
             $rows[]=$r;$cursor=$end->modify('+1 day');
         }
-        $last=end($rows);$lastDate=new Date($last['date']);
-        // Terminal stabilization excludes extraordinary events; it is explicitly reviewed in adoption.
-        $stabilized=IncomeOperatingCosts::month(self::rentAt($lastDate,$p,$source),$p,$s['costs'] ?? [],1,intdiv(count($rows)-1,12));
-        return ['months'=>$rows,'pv_flows'=>array_sum(array_column($rows,'pv')),'terminal_noi'=>$stabilized['noi']*12,'terminal_time'=>$last['time']];
+        return $rows;
     }
     public static function rentAt(Date $day,array $p,array $source): float
     {

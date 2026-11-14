@@ -44,6 +44,7 @@ final class IncomeValuationCalculator
             }
         }
         $warnings=[];
+        if (($p['income_source'] ?? '')==='scenario') $warnings[]='Escenario de prueba: el canon y sus supuestos no constituyen evidencia de un contrato ni de renta de mercado verificados.';
         foreach ($s['rates'] ?? [] as $r) if (($p['date'] ?? '')!=='' && ($r['date'] ?? '')>$p['date']) $warnings[]=$r['name'].': evidencia posterior a la fecha del avalúo; revisa su procedencia y pertinencia para esa fecha.';
         if ($source['lease'] && ($source['lease']['effective_date'] ?? '')==='') $warnings[]='El contrato no indica fecha de referencia del canon vigente; comprueba que corresponda al origen de la proyección.';
         if ($f['value']!==null && $f['value']<=0) $warnings[]='El escenario produce valor presente no positivo. Revisa viabilidad y alcance antes de interpretarlo como valor del inmueble.';

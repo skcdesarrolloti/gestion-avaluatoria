@@ -25,6 +25,8 @@ final class IncomeValuationContext
         $errors=[];$rent=null;$lease=null;
         if (($p['income_source'] ?? '')==='market') {
             if (($p['market_rent'] ?? '')!=='') $rent=(float)$p['market_rent'];
+        } elseif (($p['income_source'] ?? '')==='scenario') {
+            if (($p['scenario_rent'] ?? '')!=='') $rent=(float)$p['scenario_rent'];
         } elseif (($p['income_source'] ?? '')==='lease') {
             $lease=$context['leases'][$p['lease_id'] ?? ''] ?? null;
             $rent=$lease['rent'] ?? null;
@@ -36,7 +38,7 @@ final class IncomeValuationContext
         return compact('rent','lease','errors');
     }
     public static function fingerprint(array $state,array $context): string
-    { unset($state['calculation'],$state['history']);return self::hash([$state,$context['hash']]); }
+    { unset($state['calculation'],$state['flow_preview'],$state['history']);return self::hash([$state,$context['hash']]); }
     private static function hash(array $data): string
     {
         $sort=static function(array $a) use (&$sort): array {
