@@ -5,7 +5,6 @@ import { installFetchNavigation } from './fetch-navigation.js';
 import { installModuleAutosave } from './module-autosave.js';
 import { photoUpload } from './photo-upload.js';
 import { sectorPhotoUpload } from './sector-photo-upload.js';
-import { locationPhotos } from './location-photos.js';
 import { sectorBankTabs } from './sector-bank-tabs.js';
 import { subjectAttributes } from './subject-attributes.js';
 import { installPhPdfUpload } from './ph-pdf-upload.js';
@@ -30,7 +29,7 @@ import { loadPageComponents } from './page-components-loader.js';
 (async()=>{
 window.Alpine = Alpine;
 try {await loadPageComponents(document,Alpine);} catch {
-    const form=document.querySelector('[data-market-analysis], [data-income-inputs], [x-data^="igacUnitSelector("]');
+    const form=document.querySelector('[data-market-analysis], [data-income-inputs], [data-upload-url], [x-data^="igacUnitSelector("]');
     if(form){const root=form.closest('[x-data]')??form;root.setAttribute('x-ignore','');root.querySelectorAll('button').forEach(b=>b.disabled=true);
         const notice=document.createElement('p');notice.textContent='No se pudo cargar esta sección. Recarga la página para reintentar.';notice.setAttribute('role','alert');form.prepend(notice);}
 }
@@ -44,7 +43,6 @@ Alpine.data('comparableWorkbench', comparableWorkbench);
 Alpine.data('appraisalForm', appraisalForm);
 Alpine.data('photoUpload', photoUpload);
 Alpine.data('sectorPhotoUpload', sectorPhotoUpload);
-Alpine.data('locationPhotos', locationPhotos);
 Alpine.data('sectorBankTabs', sectorBankTabs);
 Alpine.data('subjectAttributes', subjectAttributes);
 Alpine.data('phCommonLive', phCommonLive);

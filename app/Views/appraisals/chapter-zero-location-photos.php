@@ -3,9 +3,9 @@
     data-upload-url="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto/fotos')) ?>">
     <h4 class="font-semibold">Fotos y mapas de localización · 1.4</h4>
     <noscript><a class="btn-secondary" href="<?= e(url('avaluos/' . $record['id'] . '/bien-sujeto#fotos')) ?>">Abrir carga de fotos del expediente</a></noscript>
-    <p class="my-2 text-sm">Elige una imagen o pega una captura y pulsa «Guardar foto». Se conserva en este expediente para el analista y el titular.</p>
+    <p class="my-2 text-sm">Elige una imagen o pega una captura y pulsa «Guardar foto». Espera la confirmación y su aparición en «Imágenes guardadas» antes de salir.</p>
     <label class="label">Nombre de la imagen
-        <input class="input" x-model="name" maxlength="190" placeholder="Ej. Mapa de localización o fachada principal">
+        <input class="input" x-model="name" :disabled="busy" maxlength="190" placeholder="Ej. Mapa de localización o fachada principal">
     </label>
     <label class="label mt-3">Archivo de imagen
         <input class="input" type="file" accept="image/jpeg,image/png,image/webp" x-ref="photos" :disabled="busy" @change="update($event.target)">
@@ -15,7 +15,10 @@
     <p class="text-sm" x-text="fileNames"></p>
     <div class="flex flex-wrap gap-2"><template x-for="preview in previews" :key="preview.url"><img class="size-24 object-contain" :src="preview.url" :alt="preview.name"></template></div>
     <button type="button" class="btn-primary my-3" :disabled="busy || !hasFiles" @click="save()" x-text="busy ? 'Guardando foto...' : 'Guardar foto'">Guardar foto</button>
+    <button type="button" class="btn-secondary my-3" x-show="hasFiles" :disabled="busy" @click="clearSelection()">Quitar selección pendiente</button>
     <p role="status" aria-live="polite" class="text-sm font-semibold" x-text="status"></p>
+    <h5 class="mt-3 font-semibold">Imágenes guardadas <span x-text="'(' + saved.length + ')'"></span></h5>
+    <p class="text-sm" x-show="!saved.length">Aún no hay imágenes guardadas en este apartado.</p>
     <div class="mt-3 grid gap-3 sm:grid-cols-2">
         <template x-for="photo in saved" :key="photo.id">
             <a class="rounded-lg border bg-white p-3" :href="photo.url" target="_blank" rel="noopener">

@@ -55,6 +55,7 @@ try {
     expect(request($path . '/borrador', json_encode($data), $headers)['status'] === 409, 'conflicto HTTP');
     $page = request($path);
     expect($page['status'] === 200 && !str_contains($page['body'], '<script>alert(1)</script>'), 'XSS escapado al recuperar');
+    require __DIR__ . '/location-photos-http.php';
     require __DIR__ . '/ph-http.php';
     require __DIR__ . '/methodology-http.php';
     expect(request('/logout')['status'] === 405, 'logout GET rechazado');

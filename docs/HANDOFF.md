@@ -1,5 +1,17 @@
 # Entrega al responsable de la implementación
 
+23/11/2026 · Fotos de localización 1.4: corregido destino de carga. En Alpine,
+`$el` durante el clic era el botón y no contenía `data-upload-url`; se reproducía
+«Página no encontrada». El destino se captura desde `$root` al inicializar.
+Renovación CSRF, conservación de selección ante error, confirmación con galería,
+aviso al navegar con foto pendiente y contador de imágenes guardadas. Componente
+con carga diferida para mantener CSS+JS inicial en 79,8 KB gzip. Sin DDL ni cambios
+en imágenes anteriores. Pruebas: PHP1791, JS319, BD330, HTTP focalizado19; lint,
+build y tamaño correctos. Carga pegada, recarga y retorno SPA probados localmente.
+La suite HTTP general tiene una aserción previa fallida sobre unidades vacías
+en tests/methodology-http.php:6; no se modificó ese recorrido. Advertencias PHP
+de fixtures incompletos preexistentes. Detalles: FOTOS-LOCALIZACION-GUARDADO.md.
+
 13/11/2026 · Proyección preliminar de Renta: tabla mensual disponible en etapa 3,
 Proyección futura, aun con costos y tasas pendientes. Opción explícita de escenario
 de prueba, distinta del canon de contrato o mercado; conserva contexto y resultado
